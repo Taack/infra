@@ -1,0 +1,193 @@
+if (rootProject.name == 'infra') {
+    version "0.1"
+    group "org.taack"
+
+    apply plugin: "idea"
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: "org.grails.grails-plugin"
+    apply plugin: "asset-pipeline"
+    apply plugin: "org.grails.grails-gsp"
+
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+
+    configurations {
+        developmentOnly
+        runtimeClasspath {
+            extendsFrom developmentOnly
+        }
+    }
+
+    dependencies {
+        developmentOnly("org.springframework.boot:spring-boot-devtools")
+        compileOnly "io.micronaut:micronaut-inject-groovy"
+//        console "org.grails:grails-console"
+        implementation "org.springframework.boot:spring-boot-starter-logging"
+        implementation "org.springframework.boot:spring-boot-starter-validation"
+        implementation "org.springframework.boot:spring-boot-autoconfigure"
+        implementation "org.grails:grails-core"
+        implementation "org.springframework.boot:spring-boot-starter-actuator"
+        implementation "org.springframework.boot:spring-boot-starter-tomcat"
+        implementation "org.grails:grails-web-boot"
+        implementation "org.grails:grails-logging"
+//        implementation "org.grails:grails-plugin-rest"
+        implementation "org.grails:grails-plugin-databinding"
+        implementation "org.grails:grails-plugin-i18n"
+        implementation "org.grails:grails-plugin-services"
+//        implementation "org.grails:grails-plugin-url-mappings"
+//        implementation "org.grails:grails-plugin-interceptors"
+//        implementation "org.grails.plugins:cache"
+//        implementation "org.grails.plugins:async"
+//        implementation "org.grails.plugins:scaffolding"
+        implementation "org.grails.plugins:gsp"
+        profile "org.grails.profiles:web-plugin"
+        runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
+    }
+
+    bootRun {
+        ignoreExitValue true
+        jvmArgs(
+                '-Dspring.output.ansi.enabled=always',
+                '-noverify',
+                '-XX:TieredStopAtLevel=1',
+                '-Xmx1024m')
+        sourceResources sourceSets.main
+        String springProfilesActive = 'spring.profiles.active'
+        systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+    }
+
+    tasks.withType(GroovyCompile) {
+        configure(groovyOptions) {
+            forkOptions.jvmArgs = ['-Xmx1024m']
+        }
+    }
+
+    tasks.withType(Test) {
+        useJUnitPlatform()
+    }
+    bootJar.enabled = false
+
+    assets {
+        packagePlugin = true
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+                from components.java
+                pom {
+                    name = 'Taack Framework'
+                    description = 'Framework'
+                    url = 'http://taack.org'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'johnd'
+                            name = 'John Doe'
+                            email = 'john.doe@example.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://example.com/my-library.git'
+                        developerConnection = 'scm:git:ssh://example.com/my-library.git'
+                        url = 'http://example.com/my-library/'
+                    }
+                }
+
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
+            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+
+//    signing {
+//        sign publishing.publications.mavenJava
+//    }
+
+
+    javadoc {
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation "com.openhtmltopdf:openhtmltopdf-core:${openhtmlVersion}"
+    implementation "com.openhtmltopdf:openhtmltopdf-pdfbox:${openhtmlVersion}"
+    implementation "com.openhtmltopdf:openhtmltopdf-svg-support:${openhtmlVersion}"
+
+    implementation "org.grails.plugins:hibernate5"
+    implementation "org.hibernate:hibernate-core:${hibernateCore}"
+    implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
+
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
+
+    api "org.apache.solr:solr-solrj:${solrj}"
+    api 'org.apache.tika:tika-core:2.6.0'
+    api 'org.apache.tika:tika-parsers-standard-package:2.6.0'
+
+    implementation 'net.i2p.crypto:eddsa:0.3.0'
+    implementation "org.apache.sshd:sshd:${minaSshd}"
+    implementation "org.apache.sshd:sshd-core:${minaSshd}"
+    implementation "org.apache.sshd:sshd-common:${minaSshd}"
+    implementation "org.apache.sshd:sshd-sftp:${minaSshd}"
+    implementation "org.apache.sshd:sshd-git:${minaSshd}"
+    implementation "org.apache.sshd:sshd-cli:${minaSshd}"
+    implementation 'org.codehaus.groovy:groovy-dateutil'
+
+    if (rootProject.name != 'infra') {
+        implementation project(':infra:taack-jdbc-common')
+    } else {
+        implementation project(':taack-jdbc-common')
+    }
+}
+
+if (rootProject.name != 'infra') {
+    grails {
+        // should use gradle -Dgrails.run.active=true bootRun
+        exploded = true
+        plugins {
+        }
+    }
+} else {
+    assets {
+        minifyJs = true
+        minifyCss = true
+        configOptions = [commonJs: false] //useful for custom config on extension libraries
+
+        excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
+
+        //for plugin packaging
+        packagePlugin = true //set to true if this is a library
+
+        //developmentRuntime can be turned off
+        developmentRuntime = false
+
+        //if you want to customize the jar task this task runs on you can specify a jarTaskName
+        jarTaskName = null
+    }
+}

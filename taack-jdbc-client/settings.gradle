@@ -1,0 +1,4 @@
+rootProject.name = 'taack-jdbc-client'
+
+include ':taack-jdbc-common'
+project(":taack-jdbc-common").projectDir = file("../taack-jdbc-common")

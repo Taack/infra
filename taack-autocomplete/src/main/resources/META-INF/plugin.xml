@@ -1,0 +1,23 @@
+<idea-plugin>
+    <id>org.taack.taack-autocomplete</id>
+    <name>TaackUiASTAutocomplete</name>
+    <vendor>Taack</vendor>
+
+    <description><![CDATA[
+    Allows to <em>autocomplete</em> and use <em>@CompileStatic</em> on Taack DSL.<br>
+    ]]></description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+<!--    <depends>com.intellij.psi</depends>-->
+    <depends>org.intellij.groovy</depends>
+
+    <extensions defaultExtensionNs="org.intellij.groovy">
+        <astTransformationSupport implementation="org.taack.plugins.groovy.transformations.impl.TaackFieldEnumASTTransformationSupport"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>

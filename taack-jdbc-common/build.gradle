@@ -1,0 +1,79 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.18'
+    }
+}
+
+plugins {
+    id 'com.google.protobuf' version '0.8.18'
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'antlr'
+}
+
+group 'org.taack'
+version '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'com.google.protobuf:protobuf-java:3.21.9'
+    antlr 'org.antlr:antlr4:4.11.1'
+    implementation 'org.antlr:antlr4-runtime:4.11.1'
+}
+
+protobuf {
+    generatedFilesBaseDir = "$projectDir/src/"
+
+    if (new File("/usr/local/bin/protoc").exists()) {
+        protoc {
+            path = '/usr/local/bin/protoc'
+        }
+    } else if (new File("/opt/homebrew/bin/protoc").exists()) {
+        protoc {
+            path = '/opt/homebrew/bin/protoc'
+        }
+    } else {
+        protoc {
+            artifact = 'com.google.protobuf:protoc:3.21.9'
+        }
+    }
+//    generateProtoTasks {
+//        ofSourceSet('main').each { task ->
+//            task.builtins {
+//                java {}
+//            }
+//        }
+////        ofSourceSet('mainJs').each { task ->
+////            task.builtins {
+////                java {}
+////                js {
+////                    option "library=taack_proto_libs"
+////                    option "binary"
+////                }
+////            }
+////        }
+//    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            from components.java
+        }
+    }
+}

@@ -1,0 +1,230 @@
+/* PureCss fancy tabs */
+.pc-tab > input,
+.pc-tab section > div {
+    display: none;
+}
+
+.inputTab1:checked ~ section .tab1,
+.inputTab2:checked ~ section .tab2,
+.inputTab3:checked ~ section .tab3,
+.inputTab4:checked ~ section .tab4,
+.inputTab5:checked ~ section .tab5,
+.inputTab6:checked ~ section .tab6,
+.inputTab7:checked ~ section .tab7,
+.inputTab8:checked ~ section .tab8,
+.inputTab9:checked ~ section .tab9,
+.inputTab10:checked ~ section .tab10,
+.inputTab11:checked ~ section .tab11,
+.inputTab12:checked ~ section .tab12 {
+    display: block;
+}
+
+.inputTab1Inner:checked ~ section .tab1Inner,
+.inputTab2Inner:checked ~ section .tab2Inner,
+.inputTab3Inner:checked ~ section .tab3Inner,
+.inputTab4Inner:checked ~ section .tab4Inner,
+.inputTab5Inner:checked ~ section .tab5Inner,
+.inputTab6Inner:checked ~ section .tab6Inner,
+.inputTab7Inner:checked ~ section .tab7Inner,
+.inputTab8Inner:checked ~ section .tab8Inner,
+.inputTab9Inner:checked ~ section .tab9Inner,
+.inputTab10Inner:checked ~ section .tab10Inner,
+.inputTab11Inner:checked ~ section .tab11Inner,
+.inputTab12Inner:checked ~ section .tab12Inner {
+    display: block;
+}
+
+*, *:after, *:before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.pc-tab>nav>ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pc-tab ul li label {
+    float: left;
+    padding: 10px 25px;
+    border: 1px solid #ddd;
+    border-bottom: 0;
+}
+
+.pc-tab ul li label:hover {
+    background: #dddddd;
+}
+
+.pc-tab ul li label:active {
+    background: #ffffff;
+}
+
+.pc-tab ul li:not(:last-child) label {
+    border-right-width: 0;
+}
+
+.pc-tab section {
+    clear: both;
+    border: 1px solid #ddd;
+}
+
+.pc-tab section div h2 {
+    margin: 0;
+    letter-spacing: 1px;
+    color: #34495e;
+}
+
+.inputTab1:checked ~ nav .tab1 label,
+.inputTab2:checked ~ nav .tab2 label,
+.inputTab3:checked ~ nav .tab3 label,
+.inputTab4:checked ~ nav .tab4 label,
+.inputTab5:checked ~ nav .tab5 label,
+.inputTab6:checked ~ nav .tab6 label,
+.inputTab7:checked ~ nav .tab7 label,
+.inputTab8:checked ~ nav .tab8 label,
+.inputTab9:checked ~ nav .tab9 label,
+.inputTab10:checked ~ nav .tab10 label,
+.inputTab11:checked ~ nav .tab11 label,
+.inputTab12:checked ~ nav .tab12 label,
+.inputTab1Inner:checked ~ nav .tab1 label,
+.inputTab2Inner:checked ~ nav .tab2 label,
+.inputTab3Inner:checked ~ nav .tab3 label,
+.inputTab4Inner:checked ~ nav .tab4 label,
+.inputTab5Inner:checked ~ nav .tab5 label,
+.inputTab6Inner:checked ~ nav .tab6 label,
+.inputTab7Inner:checked ~ nav .tab7 label,
+.inputTab8Inner:checked ~ nav .tab8 label,
+.inputTab9Inner:checked ~ nav .tab9 label,
+.inputTab10Inner:checked ~ nav .tab10 label,
+.inputTab11Inner:checked ~ nav .tab11 label,
+.inputTab12Inner:checked ~ nav .tab12 label{
+    position: relative;
+}
+
+.inputTab1:checked ~ nav .tab1 label:after,
+.inputTab2:checked ~ nav .tab2 label:after,
+.inputTab3:checked ~ nav .tab3 label:after,
+.inputTab4:checked ~ nav .tab4 label:after,
+.inputTab5:checked ~ nav .tab5 label:after,
+.inputTab6:checked ~ nav .tab6 label:after,
+.inputTab7:checked ~ nav .tab7 label:after,
+.inputTab8:checked ~ nav .tab8 label:after,
+.inputTab9:checked ~ nav .tab9 label:after,
+.inputTab10:checked ~ nav .tab10 label:after,
+.inputTab11:checked ~ nav .tab11 label:after,
+.inputTab12:checked ~ nav .tab12 label:after,
+.inputTab1Inner:checked ~ nav .tab1 label:after,
+.inputTab2Inner:checked ~ nav .tab2 label:after,
+.inputTab3Inner:checked ~ nav .tab3 label:after,
+.inputTab4Inner:checked ~ nav .tab4 label:after,
+.inputTab5Inner:checked ~ nav .tab5 label:after,
+.inputTab6Inner:checked ~ nav .tab6 label:after,
+.inputTab7Inner:checked ~ nav .tab7 label:after,
+.inputTab8Inner:checked ~ nav .tab8 label:after,
+.inputTab9Inner:checked ~ nav .tab9 label:after,
+.inputTab10Inner:checked ~ nav .tab10 label:after,
+.inputTab11Inner:checked ~ nav .tab11 label:after,
+.inputTab12Inner:checked ~ nav .tab12 label:after {
+    content: '';
+    display: block;
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: #ffffff;
+    left: 0;
+    bottom: -1px;
+}
+
+.taackColorRed {
+    color: #990000;
+}
+
+/*.taackColorBlue {*/
+/*    color: #000099;*/
+/*}*/
+
+.taackColorGreen {
+    color: #009900;
+}
+
+.taackColorOrange {
+    color: #ba731b;
+}
+
+.taackColorYellow {
+    color: #baaf1b;
+}
+
+.taackFontBold {
+    font-weight: bold;
+}
+
+.taackFontEmphasis {
+    font-weight: bolder;
+    font-size: larger;
+}
+
+.taackFontItalic {
+    font-style: italic;
+}
+
+.taackFontSmaller {
+    font-size: small;
+}
+
+.taackContainer {
+    overflow: hidden;
+    padding: 5px 5px 10px 5px;
+    zoom: 0.9;
+}
+
+.taackAjaxBlock {
+    /*zoom: 0.9;*/
+}
+.taackChartContainer {
+    zoom: 1.1111111;
+}
+
+.taackContainer .taackContainer {
+    outline: none;
+}
+
+.taackCssDisabled {
+    color: gray;
+}
+
+.taackBreakAfter:after {
+    content: "\a";
+    white-space: pre;
+}
+
+.citelTag {
+    background-color: #50768d !important;
+}
+
+.obstaTag {
+    background-color: #1789b8 !important;
+}
+
+span.taackDefaultDesc:not(.desc):not(.asc) a, span.desc a {
+    background-image: url(../images/taack/icons/modifiers/sorted_desc_tr.webp);
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-position-y: center;
+}
+
+span.taackDefaultAsc:not(.desc):not(.asc) a, span.asc a {
+    background-image: url(../images/taack/icons/modifiers/sorted_asc_tr.webp);
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-position-y: center;
+}
+
+.deleteIconM2M {
+    position: absolute;
+    margin-top: 3px;
+
+}
+/*# sourceMappingURL=taack.css.map */

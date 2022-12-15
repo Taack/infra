@@ -1,0 +1,12 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+    plugins {
+        id "java"
+        id "org.jetbrains.intellij" version "1.5.3"
+    }
+}
+
+rootProject.name = 'taack-autocomplete'
+

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package taack.jdbc.common;
+
+message Column {
+  string name = 1;
+  int32 colNumber = 2;
+  enum JavaType {
+    DATE = 0;
+    LONG = 1;
+    BIG_DECIMAL = 2;
+    STRING = 3;
+    BOOL = 4;
+    BYTE = 5;
+    SHORT = 6;
+    INT = 7;
+    BYTES = 8;
+  }
+  JavaType javaType = 3;
+  bool isNullable = 4;
+  int32 displaySize = 5;
+  int32 precision = 6;
+  int32 scale = 7;
+  string tableName = 8;
+  int32 sqlType = 9;
+  string sqlTypeName = 10;
+  string javaTypeName = 11;
+}
+
+message Cell {
+  oneof Content {
+    string stringValue = 1;
+    int64 longValue = 2;
+    int64 dateValue = 3;
+    string bigDecimal = 4;
+    bool boolValue = 5;
+    int32 byteValue = 6;
+    int32 shortValue = 7;
+    int32 intValue = 8;
+    bytes bytesValue = 9;
+  }
+}
+
+message ProcessingError {
+  string processingStep = 1;
+  string errorMessage = 2;
+}
+
+message TaackResultSet {
+  repeated Column columns = 1;
+  repeated Cell cells = 2;
+  int64 offset = 3;
+  int64 max = 4;
+  int64 counter = 5;
+  ProcessingError processingError = 6;
+}
+
+

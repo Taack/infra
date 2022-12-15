@@ -1,0 +1,20 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+group 'org.taack'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+//    implementation 'ch.qos.logback:logback-core:1.2.11'
+//    implementation 'ch.qos.logback:logback-classic:1.2.11'
+//    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation project(':taack-jdbc-common')
+    implementation 'com.google.guava:guava:31.1-jre'
+}
