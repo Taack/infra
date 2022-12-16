@@ -16,3 +16,136 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipeline}"
     }
 }
+
+version "0.1"
+group "org.taack"
+
+ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
+ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
+ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
+def isReleaseVersion = !project.version.endsWith("-SNAPSHOT")
+
+if (isReleaseVersion) {
+    apply plugin: 'io.github.gradle-nexus.publish-plugin'
+
+    nexusPublishing {
+        repositories {
+            sonatype {
+                def ossUser = System.getenv("SONATYPE_USERNAME") ?: project.hasProperty("sonatypeOssUsername") ? project.sonatypeOssUsername : ''
+                def ossPass = System.getenv("SONATYPE_PASSWORD") ?: project.hasProperty("sonatypeOssPassword") ? project.sonatypeOssPassword : ''
+                def ossStagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID") ?: project.hasProperty("sonatypeOssStagingProfileId") ? project.sonatypeOssStagingProfileId : ''
+                nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
+                snapshotRepositoryUrl = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
+                username = ossUser
+                password = ossPass
+                stagingProfileId = ossStagingProfileId
+            }
+        }
+
+        transitionCheckOptions {
+            maxRetries.set(40)
+            delayBetween.set(java.time.Duration.ofMillis(2000))
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                if (project.name == 'taack-jdbc-common') {
+                    versionMapping {
+                        usage('java-api') {
+                            fromResolutionOf('runtimeClasspath')
+                        }
+                        usage('java-runtime') {
+                            fromResolutionResult()
+                        }
+                    }
+                    pom {
+                        name = 'Taack JDBC Common'
+                        description = 'Taack JDBC Common'
+                        url = 'http://taack.org'
+                        licenses {
+                            license {
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+                        scm {
+                            url = 'scm:git@github.com:Taack/infra.git'
+                            connection = 'scm:git@github.com:Taack/infra.git'
+                            developerConnection = 'scm:git@github.com:Taack/infra.git'
+                        }
+                        developers {
+                            developer {
+                                id = 'Taack'
+                                name = 'Adrien Guichard'
+                                email = 'adrien.guichard@taack.org'
+                            }
+                        }
+                    }
+                } else {
+                    afterEvaluate {
+                        artifact source: sourcesJar, classifier: "sources"
+                        artifact source: javadocJar, classifier: "javadoc"
+                    }
+                    pom {
+                        name = 'Taack UI Framework'
+                        description = 'Taack UI Framework'
+                        url = 'http://taack.org'
+                        licenses {
+                            license {
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+                        scm {
+                            url = 'scm:git@github.com:Taack/infra.git'
+                            connection = 'scm:git@github.com:Taack/infra.git'
+                            developerConnection = 'scm:git@github.com:Taack/infra.git'
+                        }
+                        developers {
+                            developer {
+                                id = 'Taack'
+                                name = 'Adrien Guichard'
+                                email = 'adrien.guichard@taack.org'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    afterEvaluate {
+        if (project.name != 'taack-jdbc-common')
+            artifacts {
+                archives javadocJar, sourcesJar
+            }
+
+        signing {
+            required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+            sign publishing.publications.maven
+        }
+    }
+
+    tasks.withType(Sign) {
+        onlyIf { isReleaseVersion }
+    }
+
+    //do not generate extra load on Nexus with new staging repository if signing fails
+    tasks.withType(io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository).configureEach {
+        shouldRunAfter(tasks.withType(Sign))
+    }
+}
+

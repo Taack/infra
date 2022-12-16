@@ -1,24 +1,8 @@
 if (rootProject.name == 'infra') {
-    version "0.1"
-    group "org.taack"
-
-    ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
-    ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
-    ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
-
-
     apply plugin: "idea"
-    apply plugin: 'java-library'
-    apply plugin: 'maven-publish'
-    apply plugin: 'signing'
     apply plugin: "org.grails.grails-plugin"
     apply plugin: "asset-pipeline"
     apply plugin: "org.grails.grails-gsp"
-
-    repositories {
-        mavenCentral()
-        maven { url "https://repo.grails.org/grails/core" }
-    }
 
     configurations {
         developmentOnly
@@ -78,54 +62,6 @@ if (rootProject.name == 'infra') {
 
     assets {
         packagePlugin = true
-    }
-
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from components.java
-
-                afterEvaluate {
-                    artifact source: sourcesJar, classifier: "sources"
-                    artifact source: javadocJar, classifier: "javadoc"
-                }
-
-                pom {
-                    name = 'Taack UI Framework'
-                    description = 'Taack UI Framework'
-                    url = 'http://taack.org'
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    scm {
-                        url = 'scm:git@github.com:Taack/infra.git'
-                        connection = 'scm:git@github.com:Taack/infra.git'
-                        developerConnection = 'scm:git@github.com:Taack/infra.git'
-                    }
-                    developers {
-                        developer {
-                            id = 'Taack'
-                            name = 'Adrien Guichard'
-                            email = 'adrien.guichard@taack.org'
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    afterEvaluate {
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        signing {
-            required { gradle.taskGraph.hasTask("publish") }
-            sign publishing.publications.maven
-        }
     }
 }
 
