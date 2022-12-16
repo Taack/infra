@@ -10,6 +10,9 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import java.util.List;
 
+/**
+ * Translate Markdown to HTML using flexmark
+ */
 public class Markdown {
     private static final MutableDataHolder OPTIONS = new MutableDataSet()
             .set(Parser.REFERENCES_KEEP, KeepType.LAST)
@@ -27,6 +30,11 @@ public class Markdown {
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
 
+    /**
+     * Translate Markdown content to HTML
+     * @param content The Markdown Text
+     * @return The HTML results
+     */
     public static String getContentHtml(String content) {
         if (content != null) {
             Node document = PARSER.parse(content);
