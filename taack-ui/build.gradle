@@ -2,9 +2,15 @@ if (rootProject.name == 'infra') {
     version "0.1"
     group "org.taack"
 
+    ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
+    ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
+    ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
+
+
     apply plugin: "idea"
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
     apply plugin: "org.grails.grails-plugin"
     apply plugin: "asset-pipeline"
     apply plugin: "org.grails.grails-gsp"
@@ -77,18 +83,16 @@ if (rootProject.name == 'infra') {
     publishing {
         publications {
             maven(MavenPublication) {
-                versionMapping {
-                    usage('java-api') {
-                        fromResolutionOf('runtimeClasspath')
-                    }
-                    usage('java-runtime') {
-                        fromResolutionResult()
-                    }
-                }
                 from components.java
+
+                afterEvaluate {
+                    artifact source: sourcesJar, classifier: "sources"
+                    artifact source: javadocJar, classifier: "javadoc"
+                }
+
                 pom {
-                    name = 'Taack Framework'
-                    description = 'Framework'
+                    name = 'Taack UI Framework'
+                    description = 'Taack UI Framework'
                     url = 'http://taack.org'
                     licenses {
                         license {
@@ -96,40 +100,31 @@ if (rootProject.name == 'infra') {
                             url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
+                    scm {
+                        url = 'scm:git@github.com:Taack/infra.git'
+                        connection = 'scm:git@github.com:Taack/infra.git'
+                        developerConnection = 'scm:git@github.com:Taack/infra.git'
+                    }
                     developers {
                         developer {
-                            id = 'johnd'
-                            name = 'John Doe'
-                            email = 'john.doe@example.com'
+                            id = 'Taack'
+                            name = 'Adrien Guichard'
+                            email = 'adrien.guichard@taack.org'
                         }
                     }
-                    scm {
-                        connection = 'scm:git:git://example.com/my-library.git'
-                        developerConnection = 'scm:git:ssh://example.com/my-library.git'
-                        url = 'http://example.com/my-library/'
-                    }
                 }
-
             }
         }
     }
-    repositories {
-        maven {
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
-            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+    afterEvaluate {
+        artifacts {
+            archives javadocJar, sourcesJar
         }
-    }
 
-//    signing {
-//        sign publishing.publications.mavenJava
-//    }
-
-
-    javadoc {
-        if(JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+        signing {
+            required { gradle.taskGraph.hasTask("publish") }
+            sign publishing.publications.maven
         }
     }
 }
