@@ -23,7 +23,7 @@ group "org.taack"
 ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
 ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
 ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
-def isReleaseVersion = !project.version.endsWith("-SNAPSHOT")
+def isReleaseVersion = true
 
 if (isReleaseVersion) {
     apply plugin: 'io.github.gradle-nexus.publish-plugin'
@@ -50,6 +50,9 @@ if (isReleaseVersion) {
 }
 
 subprojects {
+    version "0.1"
+    group "org.taack"
+
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
     apply plugin: 'java'
@@ -63,7 +66,13 @@ subprojects {
     publishing {
         publications {
             maven(MavenPublication) {
+                from components.java
                 if (project.name == 'taack-jdbc-common') {
+                    afterEvaluate {
+                        artifact source: sourcesJar, classifier: "sources"
+                        artifact source: javadocJar, classifier: "javadoc"
+                    }
+
                     versionMapping {
                         usage('java-api') {
                             fromResolutionOf('runtimeClasspath')
@@ -127,11 +136,22 @@ subprojects {
             }
         }
     }
+
+    if (project.name == 'taack-jdbc-common') {
+        task javadocJar(type: Jar) {
+            classifier = 'javadoc'
+            from javadoc
+        }
+
+        task sourcesJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
+    }
     afterEvaluate {
-        if (project.name != 'taack-jdbc-common')
-            artifacts {
-                archives javadocJar, sourcesJar
-            }
+        artifacts {
+            archives javadocJar, sourcesJar
+        }
 
         signing {
             required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
