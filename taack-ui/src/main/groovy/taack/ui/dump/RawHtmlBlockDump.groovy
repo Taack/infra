@@ -57,7 +57,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
                 <div class='title'>${i18n}</div>
             """
         } else {
-            if (!parameter.isAjaxRendering || isModal) out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock taackAjaxBlock" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
+            if (!parameter.isAjaxRendering || isModal) out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
             if (hasPureG == 0)
                 out << "<div class='pure-g'>"
         }
