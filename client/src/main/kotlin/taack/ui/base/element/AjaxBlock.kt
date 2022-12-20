@@ -2,12 +2,13 @@ package taack.ui.base.element
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import org.w3c.dom.*
 import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
-import taack.ui.base.leaf.AjaxBlockInputTab
 import taack.ui.base.leaf.AjaxLink
 import taack.ui.base.record.RecordState
 import kotlin.js.Promise
@@ -52,16 +53,19 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
 //                val code: Any = s.innerHTML
 //                js("const dataUri = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code);const module = await import(dataUri);console.log(module);const myHello = module.default;myHello();")
             } else {
-                if (s.hasAttribute("src")) {
-                    console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
-                    val script = document.createElement("script") as HTMLScriptElement
-                    script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
-                    document.head?.appendChild(script)
+                console.log("Do we have to Eval Scripts ? ${Helper.hasExecutedAjax}")
+                if (Helper.hasExecutedAjax) { // TODO avoid executing the same script 2 times
+                    if (s.hasAttribute("src")) {
+                        console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
+                        val script = document.createElement("script") as HTMLScriptElement
+                        script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
+                        document.head?.appendChild(script)
 
-                } else {
-                    console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
-                    eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
+                    } else {
+                        console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
+                        eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
 //                    document.body?.appendChild(innerScripts.get(i)!!)
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@ typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> U
 class Helper {
     companion object {
         var level = 0
+        var hasExecutedAjax = false
         fun trace(level: Int, message: String) {
             var s = ""
             for (i in 0..level) {
@@ -52,10 +53,12 @@ class Helper {
         }
 
         fun mapAjaxText(text: String): Map<String, String> {
+            console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
             val abs = "__ajaxBlockStart__"
             val abe = "__ajaxBlockEnd__"
             if (text.startsWith(abs)) {
+                hasExecutedAjax = true
                 var pos1 = abs.length
                 var pos2 = text.indexOf(':')
                 do {
@@ -146,6 +149,7 @@ class Helper {
                 }
                 else -> {
                     trace("Helper::opening Modal")
+                    hasExecutedAjax = true
                     if (process != null) {
                         processingStack.add(process)
                     }
