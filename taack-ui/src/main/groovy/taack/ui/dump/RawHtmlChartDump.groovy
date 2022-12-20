@@ -80,6 +80,7 @@ class RawHtmlChartDump implements IUiChartVisitor {
     @Override
     void visitChartEnd() {
         out << """
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             (function () {
                 const ctx = document.querySelector("canvas#chart_${chartId}").getContext('2d');

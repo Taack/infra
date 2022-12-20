@@ -177,14 +177,14 @@
 .taackContainer {
     overflow: hidden;
     padding: 5px 5px 10px 5px;
-    zoom: 0.9;
+    /*zoom: 0.9;*/
 }
 
 .taackAjaxBlock {
     /*zoom: 0.9;*/
 }
 .taackChartContainer {
-    zoom: 1.1111111;
+    /*zoom: 1.1111111;*/
 }
 
 .taackContainer .taackContainer {
