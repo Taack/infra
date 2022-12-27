@@ -15,6 +15,8 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     final private String modalId
     final Parameter parameter
 
+    private int menuLevel = 0
+
     RawHtmlMenuDump(final ByteArrayOutputStream out, final String modalId, final Parameter parameter) {
         this.out = out
         this.modalId = modalId
@@ -68,7 +70,13 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitSection(String i18n, MenuSpec.MenuPosition position) {
-
+        out << """
+            <li class="nav-item dropdown">
+                <span class="navbar-text">
+                  <b>${i18n}</b>
+                </span>
+            </li>
+        """
     }
 
     @Override
