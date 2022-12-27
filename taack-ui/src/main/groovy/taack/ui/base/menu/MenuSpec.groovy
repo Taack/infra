@@ -65,7 +65,7 @@ final class MenuSpec {
     }
 
     void section(final String i18n, final MenuPosition position = MenuPosition.TOP_LEFT,
-                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure) {
+                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SubMenuSpec) final Closure closure) {
         menuVisitor.visitSection(i18n, position)
         closure.delegate = subMenuSpec
         closure.call()
