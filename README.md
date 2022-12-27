@@ -1,7 +1,8 @@
-# infra
-Taack Infrastructure
+# DSL User Interface for Grails
 
-Go to:
+This project enable DSL User Interface for common graphical components.
+
+See:
 https://taack.org
 
 For accessing the documentation.
