@@ -53,19 +53,18 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
 //                val code: Any = s.innerHTML
 //                js("const dataUri = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code);const module = await import(dataUri);console.log(module);const myHello = module.default;myHello();")
             } else {
-                console.log("Do we have to Eval Scripts ? ${Helper.hasExecutedAjax}")
-                if (Helper.hasExecutedAjax) { // TODO avoid executing the same script 2 times
-                    if (s.hasAttribute("src")) {
-                        console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
-                        val script = document.createElement("script") as HTMLScriptElement
-                        script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
-                        document.head?.appendChild(script)
+                if (!s.hasAttribute("postExecute")) continue
 
-                    } else {
-                        console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
-                        eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
+                if (s.hasAttribute("src")) {
+                    console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
+                    val script = document.createElement("script") as HTMLScriptElement
+                    script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
+                    document.head?.appendChild(script)
+
+                } else {
+                    console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
+                    eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
 //                    document.body?.appendChild(innerScripts.get(i)!!)
-                    }
                 }
             }
         }
