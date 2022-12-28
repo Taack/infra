@@ -5331,3 +5331,7 @@ form .bootstrap legend {
 	border: solid #e0e0e0 1px;
 	text-shadow: none;
 }
+
+.navbar-brand img {
+	opacity: .7;
+}

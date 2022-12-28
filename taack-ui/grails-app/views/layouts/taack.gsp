@@ -47,7 +47,7 @@
      style="background-color: ${conf.bgColor}; color: ${conf.fgColor}; font-size: small;">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><asset:image src='${conf.logoFileName}' width='${conf.logoWidth}'
-                                                      height='${conf.logoHeight}' style="opacity: .7"/>
+                                                      height='${conf.logoHeight}'/>
         </a>
         <button id="dLabel" class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent"
