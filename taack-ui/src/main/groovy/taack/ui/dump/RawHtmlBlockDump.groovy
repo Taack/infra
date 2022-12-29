@@ -125,7 +125,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitHtmlBlock(String html, Style style) {
         out << """
-            <div class="${style?.cssClassesString}">${html}</div>
+            <div class="${style?.cssClassesString ?: ''}">${html}</div>
         """
     }
 
@@ -270,7 +270,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitInnerBlockEnd() {
         hasPureG--
-        out << "</div></div>"
+        if (hasPureG == 0) out << "</div>"
+        out << "</div>"
     }
 
     @Override
