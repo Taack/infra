@@ -37,14 +37,14 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlock() {
-        if (!parameter.isAjaxRendering || isModal) out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.map['controller']}-${parameter.map['action']}''>"
+        if (!parameter.isAjaxRendering || isModal)
+            out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.map['controller']}-${parameter.map['action']}'>"
     }
 
     @Override
     void visitBlockEnd() {
-        if (!parameter.isAjaxRendering || isModal) {
+        if (!parameter.isAjaxRendering || isModal)
             out << "</div>"
-        }
     }
 
     @Override
@@ -65,6 +65,13 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
                 out << "<div>"
         }
         hasPureG++
+    }
+
+    @Override
+    void visitInnerBlockEnd() {
+        hasPureG--
+        out << "</div>"
+        out << "</div>"
     }
 
     @Override
@@ -267,13 +274,6 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void anonymousBlockEnd() {
-        out << "</div>"
-    }
-
-    @Override
-    void visitInnerBlockEnd() {
-        hasPureG--
-        out << "</div>"
         out << "</div>"
     }
 
