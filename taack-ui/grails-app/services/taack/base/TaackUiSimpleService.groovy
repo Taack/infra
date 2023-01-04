@@ -1,6 +1,5 @@
 package taack.base
 
-import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.web.api.WebAttributes
@@ -10,7 +9,7 @@ import groovy.json.JsonSlurper
 import org.grails.core.io.ResourceLocator
 import org.grails.datastore.gorm.GormEntity
 
-//import grails.artefact.controller.support.ResponseRenderer
+import grails.artefact.controller.support.ResponseRenderer
 
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils

@@ -71,6 +71,8 @@ dependencies {
     implementation "com.openhtmltopdf:openhtmltopdf-pdfbox:${openhtmlVersion}"
     implementation "com.openhtmltopdf:openhtmltopdf-svg-support:${openhtmlVersion}"
 
+    implementation "org.grails:grails-plugin-controllers"
+
     implementation "org.grails.plugins:hibernate5"
     implementation "org.hibernate:hibernate-core:${hibernateCore}"
     implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
