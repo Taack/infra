@@ -41,7 +41,13 @@ class SectionSpec {
         filterVisitor.visitFilterField(null, fields as FieldInfo[], enumOptions)
     }
 
-    void filterField(final String i18n = null, final FieldInfo... fields) {
+    void filterField(final FieldInfo... fields) {
+        if (fields == null || fields.size() == 0) return
+        filterVisitor.visitFilterField(null, fields, null)
+    }
+
+    void filterField(String i18n, final FieldInfo... fields) {
+        if (fields == null || fields.size() == 0) return
         filterVisitor.visitFilterField(i18n, fields, null)
     }
 

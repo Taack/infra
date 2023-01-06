@@ -130,7 +130,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             out << htmlTheme.radioFooter()
         } else {
             out << """
-                <input class="${htmlTheme.getFilterInputCssTheme()}" id="${qualifiedId}" name="${qualifiedName}" type="text" value="${value ?: fieldInfo?.value ?: ''}" autocomplete="off" autofocus placeholder="${i18n.replace('"', '\\u0027')}">
+                <input class="${htmlTheme.getFilterInputCssTheme()}" id="${qualifiedId}" name="${qualifiedName}" type="text" value="${value ?: fieldInfo?.value ?: ''}" autocomplete="off" autofocus placeholder="${i18n?.replace('"', '\\u0027')}">
                 """
         }
         out << htmlTheme.filterFieldFooter(i18n, qualifiedId, (!enumOptions && !isEnum && !isBoolean))
