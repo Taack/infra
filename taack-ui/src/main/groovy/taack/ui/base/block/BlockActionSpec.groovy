@@ -14,7 +14,7 @@ import taack.ui.base.helper.Utils
 final class BlockActionSpec {
     final IUiBlockVisitor blockVisitor
 
-    final static private TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
 
     BlockActionSpec(final IUiBlockVisitor blockVisitor) {
         this.blockVisitor = blockVisitor

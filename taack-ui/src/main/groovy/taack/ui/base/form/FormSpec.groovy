@@ -19,7 +19,7 @@ import taack.ui.base.helper.Utils
  */
 @CompileStatic
 final class FormSpec extends FormSectionSpec {
-    private static final TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
 
     /**
      * Form sections relative Width
