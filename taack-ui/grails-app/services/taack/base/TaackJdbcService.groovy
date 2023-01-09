@@ -345,8 +345,8 @@ final class TaackJdbcService {
     private final Pair<List<Object[]>, Long> listFromTranslator(TQLTranslator translator, Integer max, int offset) {
         def simpleName = translator.tables.first()
         Class<? extends GormEntity> aClass = gormClassesMap[simpleName]
-        def res = taackSimpleFilterService.executeQuery(hqlFromTranslator(translator), max, offset)
-        def num = taackSimpleFilterService.executeQueryUniqueResult(Long, hqlFromTranslator(translator, true)) as Long
+        def res = taackSimpleFilterService.executeQuery(hqlFromTranslator(translator), [:], max, offset)
+        def num = taackSimpleFilterService.executeQueryUniqueResult(Long, [:], hqlFromTranslator(translator, true)) as Long
         log.info "AUO num: ${num}, #ofRes: ${res.size()}"
         return new Pair<List<Object[]>, Long>(res, num)
     }
@@ -647,7 +647,7 @@ final class TaackJdbcService {
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(0))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("id"))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        def count = taackSimpleFilterService.executeQueryUniqueResult(Long, "select count(id) from ${table}") as Long
+        def count = taackSimpleFilterService.executeQueryUniqueResult(Long, [:], "select count(id) from ${table}") as Long
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setLongValue(count)) // number of rows in the table
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setLongValue(10)) // number of pages in the table
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())

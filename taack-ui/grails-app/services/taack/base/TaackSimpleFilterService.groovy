@@ -23,7 +23,7 @@ import java.lang.reflect.ParameterizedType
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
  *
- * <p>The main methods are named {@link TaackSimpleFilterService#list(Class<T>)}. The uniq mandatory
+ * <p>The main methods are named {@link TaackSimpleFilterService#list(Class < T >)}. The uniq mandatory
  * parameter is the Class we want the list for. Optional params includes allowed ids or passing a filter directly
  * allow to restrict the list of objects returned.
  */
@@ -132,8 +132,9 @@ class TaackSimpleFilterService implements WebAttributes {
      * @param offset
      * @return the list of objects
      */
-    final List<Object[]> executeQuery(final String query, final Integer max = null, final Integer offset = null) {
+    final List<Object[]> executeQuery(final String query, final Map<String, Object> namedParams, final Integer max = null, final Integer offset = null) {
         Query q = sessionFactory.currentSession.createQuery(query, Object[])
+        namedParams.each { q.setParameter(it.key, it.value) }
         if (max != null) q.maxResults = max
         if (offset) q.firstResult = offset
         q.resultList
@@ -147,8 +148,9 @@ class TaackSimpleFilterService implements WebAttributes {
      * @param offset
      * @return
      */
-    final <T> T executeQueryUniqueResult(final Class<T> aClass, final String query, final Integer max = null, final Integer offset = null) {
+    final <T> T executeQueryUniqueResult(final Class<T> aClass, Map<String, Object> namedParams, final String query, final Integer max = null, final Integer offset = null) {
         Query<T> q = sessionFactory.currentSession.createQuery(query, aClass)
+        namedParams.each { q.setParameter(it.key, it.value) }
         if (max) q.maxResults = max
         if (offset) q.firstResult = offset
         q.uniqueResult()
@@ -186,7 +188,7 @@ class TaackSimpleFilterService implements WebAttributes {
         list(aClass, max, null, null, sortableDirection, idsInList)
     }
 
-    private static final int visitFilterFieldExpressionBool(FilterExpression filterExpression, int occ, List<String> where) {
+    private static final int visitFilterFieldExpressionBool(FilterExpression filterExpression, int occ, List<String> where, Map namedParams) {
         if (!filterExpression.isCollection) {
             switch (filterExpression.operator) {
                 case Operator.IN:
@@ -204,14 +206,16 @@ class TaackSimpleFilterService implements WebAttributes {
                             occ++
                         }
                     } else if (filterExpression.value instanceof Collection) {
-                        where << ("sc.${filterExpression.fieldName} in ('${(filterExpression.value as Collection)?.join("','")}')" as String)
+                        where << ("sc.${filterExpression.fieldName} in :${'npfe' + occ}" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
                     break
                 case Operator.NI:
                     if (filterExpression.value instanceof Collection) {
                         if (!GormEntity.isAssignableFrom((filterExpression.value as Collection).first()?.class)) {
-                            where << ("sc.${filterExpression.fieldName} not in ('${(filterExpression.value as Collection)?.join("','")}')" as String)
+                            where << ("sc.${filterExpression.fieldName} not in :${'npfe' + occ}" as String)
+                            namedParams.put('npfe' + occ, filterExpression.value)
                             occ++
                         } else {
                             List<Long> listOfLongs = (filterExpression.value as List<? extends GormEntity>)*.ident() as List<Long>
@@ -246,7 +250,8 @@ class TaackSimpleFilterService implements WebAttributes {
                             where << ("sc.${filterExpression.fieldName} = ${filterExpression.value}" as String)
                             occ++
                         } else if (filterExpression.value) {
-                            where << ("sc.${filterExpression.fieldName} = '${filterExpression.value.toString()}'" as String)
+                            where << ("sc.${filterExpression.fieldName} = :${'npfe' + occ}" as String)
+                            namedParams.put('npfe' + occ, filterExpression.value)
                             occ++
                         }
                     }
@@ -355,6 +360,7 @@ class TaackSimpleFilterService implements WebAttributes {
         StringBuffer join = new StringBuffer()
         int occ = 0
 
+        Map<String, Object> namedParams = [:]
         filter?.each { Map.Entry<String, Object> entry ->
             if (entry.value && !filterMeta.contains(entry.key)) {
                 final String entryKey = entry.key as String
@@ -386,7 +392,8 @@ class TaackSimpleFilterService implements WebAttributes {
                             } else {
                                 String entryValue = escapeHqlParameter(entry.value as String)
                                 join.append(" inner join ${aliasKey} j${occ}")
-                                where << ("j${occ} IN ('$entryValue')" as String)
+                                where << ("j${occ} IN (:np$occ)" as String)
+                                namedParams.put('np' + occ, entry.value)
                             }
                         } else {
                             if ((entry.value as List<String>).every { it.isNumber() }) {
@@ -394,7 +401,8 @@ class TaackSimpleFilterService implements WebAttributes {
                                 where << ("j${occ} IN (${(entry.value as List<Long>).join(',')})" as String)
                             } else {
                                 join.append(" inner join ${aliasKey} j${occ}")
-                                where << ("j${occ} IN ('${(entry.value as List<String>).collect { escapeHqlParameter(it) }.join("','")}')" as String)
+                                where << ("j${occ} IN (:np$occ)" as String)
+                                namedParams.put('np' + occ, entry.value)
                             }
                         }
                     } else if (entry.value instanceof Long || (f && f.type == Integer)) {
@@ -403,13 +411,20 @@ class TaackSimpleFilterService implements WebAttributes {
                     } else if (entry.value instanceof String) {
                         String entryValue = entry.value as String
                         if (entryKey.contains('active')) {
-                            where << ("$aliasKey = '${escapeHqlParameter(entry.value as String)}'" as String)
+                            where << ("$aliasKey = :np$occ" as String)
+                            namedParams.put('np'+occ, entry.value)
                         } else if (entryKey.contains('area')) {
                         } else if (entryValue == 'null') {
                             //Useful if the null select option is picked to filter object without object (ex: businessTodo without parent)
                             where << ("${aliasKey} is null" as String)
-                        } else if (!entryValue.contains(',')) where << (" upper($aliasKey) like '${escapeHqlParameter((entry.value as String).toUpperCase())}' " as String)
-                        else {
+                        } else if (!entryValue.contains(',')) {
+                            if (f.type.isEnum()) {
+                                where << (" $aliasKey = '$entryValue' " as String)
+                            } else {
+                                where << (" upper($aliasKey) like :np$occ " as String)
+                                namedParams.put('np'+occ, entry.value.toString().toUpperCase())
+                            }
+                        } else {
                             StringBuffer tmp = new StringBuffer()
                             tmp.append(' (')
                             Integer index = 0
@@ -417,14 +432,16 @@ class TaackSimpleFilterService implements WebAttributes {
                                 String v = it.trim()
                                 if (v) {
                                     if (index++ > 0) tmp.append(' or ')
-                                    tmp.append(" upper($aliasKey) like '${v.toUpperCase()}' ")
+                                    tmp.append(" upper($aliasKey) like :np$index ")
+                                    namedParams.put('np' + index, v.toUpperCase())
                                 }
                             }
                             tmp.append(') ')
                             where << tmp.toString()
                         }
                     } else {
-                        where << ("$aliasKey = '${entry.value}'" as String)
+                        where << ("$aliasKey = :${'np' + occ}" as String)
+                        namedParams.put('np' + occ, entry.value)
                     }
                 }
             }
@@ -439,7 +456,7 @@ class TaackSimpleFilterService implements WebAttributes {
                     if (!applyFilter) return
 
                     filterExpressions.each {
-                        occ = visitFilterFieldExpressionBool(it, occ, where)
+                        occ = visitFilterFieldExpressionBool(it, occ, where, namedParams)
                     }
                 }
 
@@ -447,7 +464,7 @@ class TaackSimpleFilterService implements WebAttributes {
                 void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
                     boolean applyFilter = (theParams[filterExpression.qualifiedName] || theParams[filterExpression.qualifiedName + "Default"]) ? (theParams[filterExpression.qualifiedName] == "1" || (defaultValue && !theParams[filterExpression.qualifiedName + "Default"])) : defaultValue
                     if (!applyFilter) return
-                    occ = visitFilterFieldExpressionBool(filterExpression, occ, where)
+                    occ = visitFilterFieldExpressionBool(filterExpression, occ, where, namedParams)
                 }
             })
 
@@ -463,14 +480,14 @@ class TaackSimpleFilterService implements WebAttributes {
         List<T> res
         try {
             if (simpleSort && simpleOrder) {
-                res = (executeQuery(query, (max == -1) ? null : max, theParams["offset"] as Integer) as List<List>)*.first() as List<T>
+                res = (executeQuery(query, namedParams, (max == -1) ? null : max, theParams["offset"] as Integer) as List<List>)*.first() as List<T>
             } else {
-                res = executeQuery(query, (max == -1) ? null : max, theParams["offset"] as Integer) as List<T>
+                res = executeQuery(query, namedParams, (max == -1) ? null : max, theParams["offset"] as Integer) as List<T>
             }
         } catch (e) {
             println "ERROR: $e Filter KO: $query"
         }
-        return new Pair<List<T>, Long>(res, executeQueryUniqueResult(Long, count) as Long)
+        return new Pair<List<T>, Long>(res, executeQueryUniqueResult(Long, namedParams, count) as Long)
     }
 
     /**
@@ -495,7 +512,7 @@ class TaackSimpleFilterService implements WebAttributes {
                 order by sc.${columnsName}
             """
 
-            return executeQuery(query)
+            return executeQuery(query, [:])
         } else return null
     }
 
