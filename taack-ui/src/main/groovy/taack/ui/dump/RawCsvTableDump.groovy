@@ -20,7 +20,7 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
 
     @Override
     void visitSortableFieldHeader(String i18n, String controller, String action, Map<String, ?> params, Map<String, ?> additionalParams) {
-        out << "\"${i18n.replace(sep, (char)':')}\"${sep}"
+        out << "\"${i18n?.replace(sep, (char)':')}\"${sep}"
     }
 
     @Override
@@ -35,11 +35,13 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
 
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo fieldInfo, ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+        i18n ?= fieldInfo.fieldName
         out << "\"${i18n.replace(sep, (char)':')}\"${sep}"
     }
 
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields, ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+        i18n ?= fields*.fieldName.join('>')
         out << "\"${i18n.replace(sep, (char)':')}\"${sep}"
     }
 
