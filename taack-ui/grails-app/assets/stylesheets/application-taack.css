@@ -17,7 +17,7 @@
 *= require main
 *= require my
 *= require taack
-*= require slideshow.css
+*= require slideshow
 *= require font-awesome-4.7.0/css/font-awesome.css
 *= require alert
 *= require custom.css
