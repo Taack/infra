@@ -262,7 +262,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
         printableSpecifier.visitPrintableBlock(htmlPdf)
         final StringBuffer css = new StringBuffer()
         final listCss = [
-                'pure-nr.css',
+                'pure-min.css',
                 'my.css',
                 'main-pdf.css',
                 'taack.css'
