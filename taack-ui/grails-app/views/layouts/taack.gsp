@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="${language}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width">
     <meta name="color-scheme" content="dark light">
     %{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-unlit.min.css" rel="stylesheet">--}%
 
@@ -47,7 +47,7 @@
      style="background-color: ${conf.bgColor}; color: ${conf.fgColor}; font-size: small;">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><asset:image src='${conf.logoFileName}' width='${conf.logoWidth}'
-                                                      height='${conf.logoHeight}'/>
+                                                      height='${conf.logoHeight}' alt="Logo"/>
         </a>
         <button id="dLabel" class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent"
