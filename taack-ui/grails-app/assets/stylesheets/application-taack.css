@@ -14,8 +14,8 @@
 *= require pure-min
 *= require github-markdown
 *= require grids-responsive-min
-*= require main
-*= require my
+** require main
+** require my
 *= require taack
 *= require slideshow
 *= require font-awesome-4.7.0/css/font-awesome.css

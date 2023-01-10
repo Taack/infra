@@ -44,7 +44,7 @@
 <body class="day">
 
 <nav class="navbar navbar-expand-md"
-     style="background-color: ${conf.bgColor}; color: ${conf.fgColor}; font-size: small;">
+     style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><asset:image src='${conf.logoFileName}' width='${conf.logoWidth}'
                                                       height='${conf.logoHeight}' alt="Logo"/>
