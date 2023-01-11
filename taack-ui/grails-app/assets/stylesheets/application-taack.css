@@ -7,15 +7,15 @@
 * You're free to add application-wide styles to this file and they'll appear at the top of the
 * compiled file, but it's generally better to create a new file per style scope.
 *
-*= require reveal.js/dist/reset.css
+** require reveal.js/dist/reset.css
 *= require reveal.js/dist/reveal.css
 *= require reveal.js/dist/theme/black.css
 *= require reveal.js/plugin/highlight/monokai.css
 *= require pure-min
 *= require github-markdown
 *= require grids-responsive-min
-*= require main
-*= require my
+** require main
+** require my
 *= require taack
 *= require slideshow
 *= require font-awesome-4.7.0/css/font-awesome.css
