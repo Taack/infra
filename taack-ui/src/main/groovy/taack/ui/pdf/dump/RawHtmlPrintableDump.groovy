@@ -55,6 +55,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitPrintableHeaderLeft(String height) {
+        this.headerHeight = height
         out << """<div id="header-left">"""
     }
 

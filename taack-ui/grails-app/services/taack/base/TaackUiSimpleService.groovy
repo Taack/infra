@@ -263,15 +263,17 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
         final StringBuffer css = new StringBuffer()
         final listCss = [
                 'pure-min.css',
-                'my.css',
-                'main-pdf.css',
-                'taack.css'
+                'taack.css',
+                'taack-pdf.css',
+                'custom-pdf.css'
         ]
         listCss.each {
             Resource r = assetResourceLocator.findResourceForURI(it)
             if (r?.exists()) {
+                css.append('\n/*! ' + it.toString() + '++++ */\n')
                 css.append(r.inputStream.text)
                 css.append('\n')
+                css.append('\n/*! ' + it.toString() + '---- */\n')
             }
         }
 

@@ -140,14 +140,6 @@
         display: table-footer-group;
     }
 
-    .fieldcontain .property-value {
-        /*padding-left: 1mm;*/
-    }
-
-    .fieldcontain label, .fieldcontain .property-label {
-        /*padding-right: 1mm;*/
-    }
-
     li {
         list-style-type: none;
     }

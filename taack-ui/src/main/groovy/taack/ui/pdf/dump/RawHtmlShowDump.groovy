@@ -55,10 +55,12 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (field.value) {
             boolean isDiv = style?.isDiv
             final String htmlElement = "${isDiv?"div":"span"}"
+            String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n}</span>""" : ""
+            String value = !field.value.toString().trim().empty ? """<${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${field.value.toString()}</${htmlElement}>""" : ""
             out << """
                 <li class="fieldcontain">
-                    <span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n ?: ''}</span>
-                    <${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${field.value.toString()}</${htmlElement}>
+                    $label
+                    $value
                 </li>
             """
         }
@@ -69,9 +71,10 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (field) {
             boolean isDiv = style?.isDiv
             final String htmlElement = "${isDiv?"div":"span"}"
+            String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n}</span>""" : ""
             out << """
                 <li class="fieldcontain">
-                    <span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n ?: ''}</span>
+                    $label
                     <${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${field}</${htmlElement}>
                 </li>
             """
@@ -98,7 +101,9 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowInlineHtml(String html, String additionalCSSClass) {
-
+        out << """<div class="$additionalCSSClass">"""
+        out << html
+        out << "</div>"
     }
 }
 
