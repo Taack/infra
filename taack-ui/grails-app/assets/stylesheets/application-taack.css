@@ -14,12 +14,13 @@
 *= require pure-min
 *= require github-markdown
 *= require grids-responsive-min
-** require main
+*= require main
 ** require my
 *= require taack
 *= require slideshow
 *= require font-awesome-4.7.0/css/font-awesome.css
 *= require alert
+*= require mobile
 *= require custom.css
 *= require_self
 */
