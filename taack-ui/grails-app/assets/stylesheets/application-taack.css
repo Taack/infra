@@ -15,6 +15,7 @@
 *= require github-markdown
 *= require grids-responsive-min
 *= require main
+*= require wysiwyg
 ** require my
 *= require taack
 *= require slideshow
