@@ -330,11 +330,40 @@ input, select, textarea {
     display: block;
 }
 
-fieldset, .property-list {
+fieldset,
+.property-list {
+    /*margin: 0.6em 1.25em 0 1.25em;
+    padding: 0.3em 1.8em 1.25em;*/
     position: relative;
     zoom: 1;
     border: none;
     font-size: small;
+}
+
+.property-list .fieldcontain {
+    list-style: none;
+    overflow: hidden;
+    zoom: 1;
+}
+
+.fieldcontain {
+    margin-top: 0.6em;
+}
+
+.fieldcontain label,
+.fieldcontain .property-label {
+    color: #666666;
+    text-align: right;
+    width: 20%;
+}
+
+.fieldcontain .property-label {
+    /*float: left;*/
+}
+
+.fieldcontain .property-value {
+    display: block;
+    margin-left: 23%;
 }
 
 ul.errorKey {

@@ -14,7 +14,7 @@
 *= require pure-min
 *= require github-markdown
 *= require grids-responsive-min
-*= require main
+** require main
 *= require wysiwyg
 ** require my
 *= require taack
