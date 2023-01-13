@@ -50,13 +50,13 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     @Override
     void visitPrintableHeader(final String height) {
         this.headerHeight = height
-        out << """<div id="header">"""
+        out << """<div id="header" class="pure-g">"""
     }
 
     @Override
     void visitPrintableHeaderLeft(String height) {
         this.headerHeight = height
-        out << """<div id="header-left">"""
+        out << """<div id="header-left" class="pure-g">"""
     }
 
     @Override
@@ -66,7 +66,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitPrintableHeaderRight(String right) {
-        out << """<div id="header-right">"""
+        out << """<div id="header-right" class="pure-g">"""
     }
 
     @Override
@@ -122,7 +122,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitPrintableBody() {
-        out << "<div id=\"body\">"
+        out << "<div id=\"body\" class=\"pure-g\">"
     }
 
     @Override
