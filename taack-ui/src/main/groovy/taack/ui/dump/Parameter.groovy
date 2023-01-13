@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
 import taack.ast.type.FieldInfo
+import taack.ast.type.GetMethodReturn
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -110,27 +111,44 @@ final class Parameter implements WebAttributes {
         null
     }
 
+    String trField(final GetMethodReturn methodReturn) {
+        if (!testI18n) {
+            String rv = tr(methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label')
+            if (rv) return rv
+            rv = tr 'default' + '.' + methodReturn.method.name + '.label'
+            if (rv) return rv
+        } else {
+            "${methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label'}, ${'default' + '.' + methodReturn.method.name + '.label'}"
+        }
+    }
+
     String trField(final FieldInfo... fieldInfo) {
         def fieldNames = fieldInfo*.fieldName
         def fieldTypes = fieldInfo*.fieldConstraint.field*.type
-        String cn = aClassSimpleName.uncapitalize()
+        String cn = aClassSimpleName?.uncapitalize() ?: fieldInfo[0].fieldConstraint.field.declaringClass.simpleName.uncapitalize()
         final int s = fieldNames.size() - 1
         if (!testI18n) {
             for (int i = 0; i <= s; i++) {
-                String rv = tr cn + '.' + fieldNames[i..s].join('.') + '.label'
+                String rv = tr(cn + '.' + fieldNames[i..s].join('.') + '.label')
                 if (rv) return rv
                 rv = tr 'default' + '.' + fieldNames[i..s].join('.') + '.label'
                 if (rv) return rv
                 cn = classNameUncap fieldTypes[i]
             }
         } else {
-            String rv = "{${cn + '.' + fieldNames.join('.') + '.label'}}"
+            StringBuffer rvl = new StringBuffer()
             for (int i = 0; i <= s; i++) {
-                rv += '{' + cn + '.' + fieldNames[i..s].join('.') + '.label' + '}'
-                rv += '{' + 'default' + '.' + fieldNames[i..s].join('.') + '.label' + '}'
+                String rv = cn + '.' + fieldNames[i..s].join('.') + '.label'
+                def found = tr(rv) == null
+                rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
+                rvl << ', '
+                rv = 'default' + '.' + fieldNames[i..s].join('.') + '.label'
+                found = tr(rv) == null
+                rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
+                rvl << ', '
                 cn = classNameUncap fieldTypes[i]
             }
-            return rv
+            return rvl.toString()
         }
         return null
     }

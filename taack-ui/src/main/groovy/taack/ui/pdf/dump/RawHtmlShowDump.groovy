@@ -2,6 +2,7 @@ package taack.ui.pdf.dump
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
+import taack.ast.type.GetMethodReturn
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.show.IUiShowVisitor
@@ -48,6 +49,16 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowFieldLabeled(Style style, FieldInfo... fields) {
         visitShowField(parameter.trField(fields), fields.last().value?.toString(), style)
+    }
+
+    @Override
+    void visitShowFieldUnLabeled(Style style, GetMethodReturn methodReturn) {
+        visitShowField(null, methodReturn.value?.toString(), style)
+    }
+
+    @Override
+    void visitShowFieldLabeled(Style style, GetMethodReturn methodReturn) {
+        visitShowField(parameter.trField(methodReturn), methodReturn.value?.toString(), style)
     }
 
     @Override

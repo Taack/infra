@@ -2,6 +2,7 @@ package taack.ui.base.show
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
+import taack.ast.type.GetMethodReturn
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 
@@ -19,6 +20,10 @@ interface IUiShowVisitor {
     void visitShowFieldUnLabeled(final Style style, final FieldInfo... fields)
 
     void visitShowFieldLabeled(final Style style, final FieldInfo... fields)
+
+    void visitShowFieldUnLabeled(final Style style, final GetMethodReturn methodReturn)
+
+    void visitShowFieldLabeled(final Style style, final GetMethodReturn methodReturn)
 
     void visitShowField(final String i18n, final FieldInfo field, final Style style)
 

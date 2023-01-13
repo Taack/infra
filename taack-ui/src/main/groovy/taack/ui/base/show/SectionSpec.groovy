@@ -4,6 +4,7 @@ import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
+import taack.ast.type.GetMethodReturn
 import taack.base.TaackUiEnablerService
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
@@ -65,6 +66,16 @@ class SectionSpec {
     }
 
     /**
+     * Add a field in the show graphical element, label is automatically deduced.
+     *
+     * @param style Portable and static element style
+     * @param methodReturn target a getter field
+     */
+    void fieldLabeled(final Style style = null, GetMethodReturn methodReturn) {
+        showVisitor.visitShowFieldLabeled(style, methodReturn)
+    }
+
+    /**
      * field content without labeling
      *
      * @param style
@@ -72,6 +83,16 @@ class SectionSpec {
      */
     void fieldUnlabeled(final Style style = null, FieldInfo... fieldInfos) {
         showVisitor.visitShowFieldUnLabeled(style, fieldInfos)
+    }
+
+    /**
+     * field content without labeling
+     *
+     * @param style
+     * @param fieldInfos
+     */
+    void fieldUnlabeled(final Style style = null, GetMethodReturn methodReturn) {
+        showVisitor.visitShowFieldUnLabeled(style, methodReturn)
     }
 
     /**
