@@ -59,9 +59,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitColumn(Integer colSpan, Integer rowSpan) {
         colCount++
         if (colSpan) {
-            out << """<th style="font-size: 12px !important;" colspan="${colSpan}" ${rowSpan ?"rowSpan='${rowSpan}'":""}>"""
+            out << """<th colspan="${colSpan}" ${rowSpan ?"rowSpan='${rowSpan}'":""}>"""
         } else {
-            out << """<th style="font-size: 12px !important">"""
+            out << """<th >"""
         }
     }
 
