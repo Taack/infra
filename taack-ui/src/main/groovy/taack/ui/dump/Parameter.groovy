@@ -129,7 +129,7 @@ final class Parameter implements WebAttributes {
         final int s = fieldNames.size() - 1
         if (!testI18n) {
             for (int i = 0; i <= s; i++) {
-                String rv = tr(cn + '.' + fieldNames[i..s].join('.') + '.label')
+                String rv = tr cn + '.' + fieldNames[i..s].join('.') + '.label'
                 if (rv) return rv
                 rv = tr 'default' + '.' + fieldNames[i..s].join('.') + '.label'
                 if (rv) return rv
@@ -149,34 +149,6 @@ final class Parameter implements WebAttributes {
                 cn = classNameUncap fieldTypes[i]
             }
             return rvl.toString()
-        }
-        return null
-    }
-
-    String trFieldHeader(final FieldInfo... fieldInfo) {
-        def fieldNames = fieldInfo*.fieldName
-        def fieldTypes = fieldInfo*.fieldConstraint.field*.type
-        String cn = aClassSimpleName.uncapitalize()
-        final int s = fieldNames.size() - 1
-        if (!testI18n) {
-            for (int i = 0; i <= s; i++) {
-                String rv = tr cn + '.' + fieldNames[i..s].join('.') + '.label'
-                if (rv) return rv
-                rv = tr 'default' + '.' + fieldNames[i..s].join('.') + '.label'
-                if (rv) return rv
-                rv = tr 'default' + '.' + fieldNames[i] + '.label'
-                if (rv) return rv
-                cn = classNameUncap fieldTypes[i]
-            }
-        } else {
-            String rv = "{${cn + '.' + fieldNames.join('.') + '.label'}}"
-            for (int i = 0; i <= s; i++) {
-                rv += '{' + cn + '.' + fieldNames[i..s].join('.') + '.label' + '}'
-                rv += '{' + 'default' + '.' + fieldNames[i..s].join('.') + '.label' + '}'
-                rv += '{' + 'default' + '.' + fieldNames[i] + '.label' + '}'
-                cn = classNameUncap fieldTypes[i]
-            }
-            return rv
         }
         return null
     }

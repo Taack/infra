@@ -157,7 +157,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitSortableFieldHeader(String i18n, final FieldInfo fieldInfo, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
-        i18n ?= parameter.trFieldHeader(fieldInfo)
+        i18n ?= parameter.trField(fieldInfo)
         fieldHeader()
         out << """
             <span class="sortable sortColumn taackSortableColumn ${defaultDirection ? defaultDirection.className : ''}" property="${fieldInfo.fieldName}" formid="${fieldInfo.fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
@@ -167,7 +167,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
-        i18n ?= parameter.trFieldHeader(fields)
+        i18n ?= parameter.trField(fields)
         fieldHeader()
         out << """
             <span class="sortable sortColumn taackSortableColumn ${defaultDirection ? defaultDirection.className : ''}" property="${RawHtmlFilterDump.getQualifiedName(fields)}" formid="${aClass.simpleName}_Filter"><a>${i18n}</a></span>

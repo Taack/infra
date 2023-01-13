@@ -10,6 +10,7 @@ import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
 import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.base.table.IUiTableVisitor
+import taack.ui.dump.Parameter
 import taack.ui.style.EnumStyle
 
 import java.text.DecimalFormat
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat
 @CompileStatic
 final class RawHtmlTableDump implements IUiTableVisitor {
     final private ByteArrayOutputStream out
+    final private Parameter parameter
 
     private boolean hasRowAction = false
     private List<String> fieldNames = []
@@ -33,8 +35,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private Style rowStyle = null
 
 
-    RawHtmlTableDump(final String id, final ByteArrayOutputStream out) {
+    RawHtmlTableDump(final String id, final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
+        this.parameter = parameter
         currentFormId++
     }
 
@@ -114,12 +117,14 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitSortableFieldHeader(final String i18n, final FieldInfo fieldInfo, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+    void visitSortableFieldHeader(String i18n, final FieldInfo fieldInfo, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+        i18n ?= parameter.trField(fieldInfo)
         visitFieldHeader(i18n)
     }
 
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+        i18n ?= parameter.trField(fields)
         visitFieldHeader(i18n)
     }
 
