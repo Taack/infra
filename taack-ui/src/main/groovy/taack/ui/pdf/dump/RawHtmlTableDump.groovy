@@ -130,7 +130,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitFieldHeader(final String i18n) {
-        out << " ${i18n} "
+        out << " ${i18n} <br>"
     }
 
     @Override
