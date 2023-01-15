@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="${language}">
+<html lang="${(language as String)?.toLowerCase()}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
