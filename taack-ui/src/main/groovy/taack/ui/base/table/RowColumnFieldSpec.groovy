@@ -92,10 +92,10 @@ class RowColumnFieldSpec {
     }
 
     void rowLink(final String i18n, final ActionIcon icon, final MethodClosure action, final Map<String, ?> params, final Boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(action)) tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, params, isAjax)
+        if (taackUiEnablerService.hasAccess(action, params)) tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, params, isAjax)
     }
 
     void footerButton(String i18n, MethodClosure action, Long id = null, Map<String, ?> additionalParams = null) {
-        if (taackUiEnablerService.hasAccess(action)) tableVisitor.visitFooterButton(i18n, Utils.getControllerName(action), action.method, id, additionalParams)
+        if (taackUiEnablerService.hasAccess(action, id, additionalParams)) tableVisitor.visitFooterButton(i18n, Utils.getControllerName(action), action.method, id, additionalParams)
     }
 }

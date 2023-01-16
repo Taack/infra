@@ -76,6 +76,7 @@ dependencies {
     implementation "org.grails.plugins:hibernate5"
     implementation "org.hibernate:hibernate-core:${hibernateCore}"
     implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
+    implementation "org.grails:grails-plugin-interceptors"
 
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
 
