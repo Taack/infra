@@ -377,7 +377,40 @@ class TaackSimpleFilterService implements WebAttributes {
 
                     Field f = getTheField(aClass, entryKey)
                     if (f && f.type == Date) {
-                        where << ("$aliasKey > '${entry.value}'" as String)
+                        def v = (entry.value as String).replaceAll(' ', '')
+                        def p = v.indexOf('-')
+                        def v1 = p > 1 ? v.substring(0, p) : p == 0 ? null : v
+                        if (v1)
+                            if (v1 ==~ /([0-9]{2})/) {
+                                where << ("$aliasKey > '${Calendar.instance.get(Calendar.YEAR)}-${v1.toInteger()}-01'" as String)
+                            } else if (v1 ==~ /([0-9]{4})/) {
+                                where << ("$aliasKey > '${v1.substring(0, 4).toInteger()}-01-01'" as String)
+                            } else if (v1 ==~ /([0-9]{6})/) {
+                                where << ("$aliasKey > '${v1.substring(0, 4).toInteger()}-${v1.substring(4, 6).toInteger()}-01'" as String)
+                            } else {
+                                try {
+                                    Date d = Date.parse('yyyyMMdd', v1)
+                                    where << ("$aliasKey >= '${d.format('yyyy-MM-dd')}'" as String)
+                                } catch (e) {
+                                    log.error "Parse Date Error: ${e.message}"
+                                }
+                            }
+                        def v2 = p >= 0 ? v.substring(p + 1) : null
+                        if (v2)
+                            if (v2 ==~ /([0-9]{2})/) {
+                                where << ("$aliasKey < '${Calendar.instance.get(Calendar.YEAR)}-${v2.toInteger()}-01'" as String)
+                            } else if (v2 ==~ /([0-9]{4})/) {
+                                where << ("$aliasKey < '${v2.substring(0, 4).toInteger()}-01-01'" as String)
+                            } else if (v2 ==~ /([0-9]{6})/) {
+                                where << ("$aliasKey < '${v2.substring(0, 4).toInteger()}-${v2.substring(4, 6).toInteger()}-01'" as String)
+                            } else {
+                                try {
+                                    Date d = Date.parse('yyyyMMdd', v2)
+                                    where << ("$aliasKey < '${d.format('yyyy-MM-dd')}'" as String)
+                                } catch (e) {
+                                    log.error "Parse Date Error: ${e.message}"
+                                }
+                            }
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
                         boolean entryValue = entry.value instanceof String ? entry.value == "1" : entry.value as Boolean
                         where << ("$aliasKey = $entryValue" as String)
@@ -414,7 +447,7 @@ class TaackSimpleFilterService implements WebAttributes {
                         String entryValue = entry.value as String
                         if (entryKey.contains('active')) {
                             where << ("$aliasKey = :np$occ" as String)
-                            namedParams.put('np'+occ, entry.value)
+                            namedParams.put('np' + occ, entry.value)
                         } else if (entryKey.contains('area')) {
                         } else if (entryValue == 'null') {
                             //Useful if the null select option is picked to filter object without object (ex: businessTodo without parent)
@@ -424,7 +457,7 @@ class TaackSimpleFilterService implements WebAttributes {
                                 where << (" $aliasKey = '$entryValue' " as String)
                             } else {
                                 where << (" upper($aliasKey) like :np$occ " as String)
-                                namedParams.put('np'+occ, entry.value.toString().toUpperCase())
+                                namedParams.put('np' + occ, entry.value.toString().toUpperCase())
                             }
                         } else {
                             StringBuffer tmp = new StringBuffer()
