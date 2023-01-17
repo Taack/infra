@@ -1,6 +1,5 @@
 package taack.base
 
-
 import grails.util.Pair
 import grails.web.api.WebAttributes
 import groovy.transform.CompileStatic
@@ -18,7 +17,6 @@ import taack.ui.dump.RawHtmlFilterDump
 
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
-
 /**
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
@@ -385,15 +383,19 @@ class TaackSimpleFilterService implements WebAttributes {
                         where << ("$aliasKey = $entryValue" as String)
                     } else if (f && f.type == Set) {
                         if (entry.value instanceof String) {
+                            join.append(" inner join ${aliasKey} j${occ}")
+                            // TODO: review this part of the code ...
                             if ((entry.value as String).isNumber()) {
                                 Long entryValue = entry.value as Long
-                                join.append(" inner join ${aliasKey} j${occ}")
                                 where << ("j${occ} IN ($entryValue)" as String)
                             } else {
-                                String entryValue = escapeHqlParameter(entry.value as String)
-                                join.append(" inner join ${aliasKey} j${occ}")
-                                where << ("j${occ} IN (:np$occ)" as String)
-                                namedParams.put('np' + occ, entry.value)
+                                if (Class.forName((f.genericType as ParameterizedType).actualTypeArguments.first().typeName).isEnum()) {
+                                    String entryValue = escapeHqlParameter(entry.value as String)
+                                    where << ("j${occ} IN ('$entryValue')" as String)
+                                } else {
+                                    where << ("j${occ} IN (:np$occ)" as String)
+                                    namedParams.put('np' + occ, entry.value)
+                                }
                             }
                         } else {
                             if ((entry.value as List<String>).every { it.isNumber() }) {
