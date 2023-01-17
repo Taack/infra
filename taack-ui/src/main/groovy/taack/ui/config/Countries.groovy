@@ -523,7 +523,7 @@ enum Country {
     UA(Continent.AF, "Ukraine", "UA", "UKR", 804, 49f),
     AE(Continent.AF, "United Arab Emirates", "AE", "ARE", 784, 24f),
     GB(Continent.AF, "United Kingdom", "GB", "GBR", 826, 54f),
-    US(Continent.AF, "United States", "US", "USA", 840, 38f),
+    US(Continent.AF, "United States of America", "US", "USA", 840, 38f),
     UM(Continent.AF, "United States Minor Outlying Islands", "UM", "UMI", 581, 19.2833f),
     UY(Continent.AF, "Uruguay", "UY", "URY", 858, -33f),
     UZ(Continent.AF, "Uzbekistan", "UZ", "UZB", 860, 41f),
