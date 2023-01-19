@@ -37,7 +37,7 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
         String content = """\
         package $appName
          
-        import grails.artefact.Controller
+        import grails.web.api.WebAttributes
         import grails.compiler.GrailsCompileStatic
         import grails.plugin.springsecurity.annotation.Secured
         import taack.base.TaackUiSimpleService
@@ -45,11 +45,11 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
          
         @GrailsCompileStatic
         @Secured(['ROLE_ADMIN'])
-        class ${appName.capitalize()}Controller implements Controller {
-          TaackUiSimpleService taackUiSimpleService
-          ${appName.capitalize()}UiService ${appName}UiService
-         
-          def index() {
+        class ${appName.capitalize()}Controller implements WebAttributes {
+            TaackUiSimpleService taackUiSimpleService
+            ${appName.capitalize()}UiService ${appName}UiService
+            
+            def index() {
               UiBlockSpecifier b = new UiBlockSpecifier()
               b.ui {
                   ajaxBlock "helloWorld", {
@@ -57,7 +57,7 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
                   }
               }
               taackUiSimpleService.show(b, ${appName}UiService.buildMenu())
-          }
+            }
         }
          
         """.stripIndent()
@@ -88,9 +88,9 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
          
         @GrailsCompileStatic
         class ${appName.capitalize()}UiService implements WebAttributes {
-          MessageSource messageSource
-         
-          protected String tr(final String code, final Locale locale = null, final Object[] args = null) {
+            MessageSource messageSource
+            
+            protected String tr(final String code, final Locale locale = null, final Object[] args = null) {
               if (LocaleContextHolder.locale.language == "test") return code
               try {
                   messageSource.getMessage(code, args, locale ?: LocaleContextHolder.locale)
@@ -101,15 +101,15 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
                       code
                   }
               }
-          }
-         
-          UiMenuSpecifier buildMenu() {
+            }
+            
+            UiMenuSpecifier buildMenu() {
               UiMenuSpecifier m = new UiMenuSpecifier()
               m.ui {
                   menu tr("default.home.label"), ${appName.capitalize()}Controller.&index as MethodClosure
               }
               m
-          }
+            }
         }
          
         """.stripIndent()
@@ -139,54 +139,54 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
         */
         @GrailsCompileStatic
         class ${appName.capitalize()}GrailsPlugin extends Plugin implements TaackPlugin {
-           // the version or versions of Grails the plugin is designed for
-           def grailsVersion = "4.0.3 > *"
-           // resources that are excluded from plugin packaging
-           def pluginExcludes = [
+            // the version or versions of Grails the plugin is designed for
+            def grailsVersion = "4.0.3 > *"
+            // resources that are excluded from plugin packaging
+            def pluginExcludes = [
                    "grails-app/views/error.gsp"
-           ]
-         
-           // TODO Fill in these fields
-           def title = "${appName.capitalize()}" // Headline display name of the plugin
-         
-           def profiles = ['web']
-         
-           Closure doWithSpring() {
+            ]
+            
+            // TODO Fill in these fields
+            def title = "${appName.capitalize()}" // Headline display name of the plugin
+            
+            def profiles = ['web']
+            
+            Closure doWithSpring() {
                { ->
                    // TODO Implement runtime spring config (optional)
                }
-           }
-         
-           void doWithDynamicMethods() {
+            }
+            
+            void doWithDynamicMethods() {
                // TODO Implement registering dynamic methods to classes (optional)
-           }
-         
-           void doWithApplicationContext() {
+            }
+            
+            void doWithApplicationContext() {
                // TODO Implement post initialization spring config (optional)
-           }
-         
-           void onChange(Map<String, Object> event) {
+            }
+            
+            void onChange(Map<String, Object> event) {
                // TODO Implement code that is executed when any artefact that this plugin is
                // watching is modified and reloaded. The event contains: event.source,
                // event.application, event.manager, event.ctx, and event.plugin.
-           }
-         
-           void onConfigChange(Map<String, Object> event) {
+            }
+            
+            void onConfigChange(Map<String, Object> event) {
                // TODO Implement code that is executed when the project configuration changes.
                // The event is the same as for 'onChange'.
-           }
-         
-           void onShutdown(Map<String, Object> event) {
+            }
+            
+            void onShutdown(Map<String, Object> event) {
                // TODO Implement code that is executed when the application shuts down (optional)
-           }
-         
-           static final List<TaackPluginConfiguration.PluginRole> pluginRoles = [
+            }
+            
+            static final List<TaackPluginConfiguration.PluginRole> pluginRoles = [
                    new TaackPluginConfiguration.PluginRole("ROLE_${appName.toUpperCase()}_DIRECTOR", TaackPluginConfiguration.PluginRole.RoleRanking.DIRECTOR),
                    new TaackPluginConfiguration.PluginRole("ROLE_${appName.toUpperCase()}_MANAGER", TaackPluginConfiguration.PluginRole.RoleRanking.MANAGER),
                    new TaackPluginConfiguration.PluginRole("ROLE_${appName.toUpperCase()}_USER", TaackPluginConfiguration.PluginRole.RoleRanking.USER),
-           ]
-         
-           static final TaackPluginConfiguration pluginConfiguration = new TaackPluginConfiguration("${appName.capitalize()}",
+            ]
+            
+            static final TaackPluginConfiguration pluginConfiguration = new TaackPluginConfiguration("${appName.capitalize()}",
                    "/$appName/${appName}.svg", "$appName", Language.values() as List,
                    new TaackPluginConfiguration.IPluginRole() {
                        @Override
@@ -194,11 +194,11 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
                            pluginRoles
                        }
                    })
-         
-           @Override
-           List<TaackPluginConfiguration> getTaackPluginControllerConfigurations() {
+            
+            @Override
+            List<TaackPluginConfiguration> getTaackPluginControllerConfigurations() {
                [pluginConfiguration]
-           }
+            }
         }
          
         """.stripIndent()
@@ -288,11 +288,11 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
         File file = new File("$appPath/build.gradle")
         String content = '''\
         grails {
-          // should use gradle -Dgrails.run.active=true bootRun
-          exploded = true
-          plugins {
-              implementation project(':app:crew')
-          }
+            // should use gradle -Dgrails.run.active=true bootRun
+            exploded = true
+            plugins {
+                implementation project(':app:crew')
+            }
         }
          
         '''.stripIndent()
