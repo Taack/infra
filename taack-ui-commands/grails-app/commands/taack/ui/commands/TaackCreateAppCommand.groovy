@@ -23,7 +23,7 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
             println """\
                 Usage:
                 
-                ./gradlew server:taackCreateApp -name=nameOfTheAppModule -Pargs='-name=testAuo'
+                ./gradlew server:taackCreateApp -Pargs='-name=nameOfTheAppModule'
             """.stripIndent()
         }
 
