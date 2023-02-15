@@ -129,15 +129,16 @@ final class BlockSpec {
      * Mandatory invisible block that enable ajax.
      *
      * @param id uniq id in the page.
+     * @param visitAjax set to false to process block like non ajax block
      * @param closure description of the user interface
      */
-    void ajaxBlock(final String id, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+    void ajaxBlock(final String id, Boolean visitAjax = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         this.id = id
         if (displayElement(id)) {
-            blockVisitor.visitAjaxBlock(id)
+            if (visitAjax) blockVisitor.visitAjaxBlock(id)
             closure.delegate = this
             closure.call()
-            blockVisitor.visitAjaxBlockEnd()
+            if (visitAjax) blockVisitor.visitAjaxBlockEnd()
         }
         displayElement("_-DoNotDisplayAnything-_")
     }
