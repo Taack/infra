@@ -1,8 +1,6 @@
 package taackUi
 
 import grails.compiler.GrailsCompileStatic
-import grails.gsp.PageRenderer
-import org.springframework.beans.factory.annotation.Autowired
 import taack.ui.TaackPluginConfiguration
 import taack.ui.TaackPluginService
 
@@ -13,9 +11,6 @@ class TaackMenuTagLib {
 
     TaackPluginService taackPluginService
 
-    @Autowired
-    PageRenderer g
-
     /**
      * @attr language REQUIRED
      */
@@ -24,12 +19,12 @@ class TaackMenuTagLib {
 
         if (pluginConfiguration) {
             if (pluginConfiguration.supportedLanguage.size() > 1) {
-                out << g.render(template: "/taackUi/taackMenu", model: [pluginConfiguration: pluginConfiguration,
-                                                                        language           : attribs['language'],
-                                                                        id                 : attribs['id'],
-                                                                        params             : params,
-                                                                        controllerName     : controllerName,
-                                                                        actionName         : actionName
+                out << render(template: "/taackUi/taackMenu", model: [pluginConfiguration: pluginConfiguration,
+                                                                      language           : attribs['language'],
+                                                                      id                 : attribs['id'],
+                                                                      params             : params,
+                                                                      controllerName     : controllerName,
+                                                                      actionName         : actionName
                 ])
             }
         }
