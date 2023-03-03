@@ -1,10 +1,11 @@
 package taackUi
 
-import grails.compiler.GrailsCompileStatic
+
 import taack.ui.TaackPluginConfiguration
 import taack.ui.TaackPluginService
 
-@GrailsCompileStatic
+// TODO: Restaure this annotation, cyclic dependency if injecting PageRenderer...
+//@GrailsCompileStatic (
 class TaackMenuTagLib {
 
     static namespace = "taack"
