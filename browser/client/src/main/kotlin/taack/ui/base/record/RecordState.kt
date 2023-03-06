@@ -8,7 +8,8 @@ import kotlinx.serialization.json.Json
 import org.w3c.xhr.FormData
 import taack.ui.base.Helper.Companion.trace
 
-//external fun decodeURIComponent(encodedURI: String): String
+external fun decodeURIComponent(encodedURI: String): String
+external  fun encodeURIComponent(encodedURI: String): String
 
 class RecordState() {
     companion object {
@@ -28,7 +29,7 @@ class RecordState() {
             if (recordStateString.isNotEmpty()) {
                 serverState.clear()
                 try {
-                    val recordData: String? = try { window.atob(recordStateString) } catch (e: Throwable) { null }
+                    val recordData: String? = try { decodeURIComponent(window.atob(recordStateString)) } catch (e: Throwable) { null }
                     if (!recordData.isNullOrEmpty()) serverState.putAll(Json.decodeFromString(recordData))
                 } catch (e: Exception) {
                     trace("RecordState ERROR => atob failed for $recordStateString")
@@ -41,7 +42,7 @@ class RecordState() {
             trace("RecordState::dumpServerState ${document.cookie} => $clientJson")
             document.cookie = "clientState=${clientJson}; path=/; max-age=400"
             val toSend = Json.encodeToString(serverState)
-            return window.btoa(toSend)
+            return window.btoa(encodeURIComponent(toSend))
         }
 
         fun clearServerState() {

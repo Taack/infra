@@ -127,7 +127,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
     }
 
     private final static Object decodeCookie(String encoded) {
-        if (encoded) new JsonSlurper().parseText(new String(Base64.getDecoder().decode(encoded)))
+        if (encoded) new JsonSlurper().parseText(URLDecoder.decode(new String(Base64.getDecoder().decode(encoded)), "UTF-8"))
         else null
     }
 
