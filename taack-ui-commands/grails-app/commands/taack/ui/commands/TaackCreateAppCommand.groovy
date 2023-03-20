@@ -287,11 +287,15 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
     static void createBuildGradleFile(String appName, String appPath) {
         File file = new File("$appPath/build.gradle")
         String content = '''\
+        plugins {
+            id 'taack-grails-plugin.java-conventions\'
+        }
+
         grails {
             // should use gradle -Dgrails.run.active=true bootRun
             exploded = true
             plugins {
-                implementation project(':app:crew')
+                implementation project(':crew')
             }
         }
          
