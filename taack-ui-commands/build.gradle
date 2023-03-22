@@ -8,13 +8,13 @@ buildscript {
     }
 }
 
-version "0.5-SNAPSHOT"
+version "0.5"
 group "org.taack"
 
 ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
 ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
 ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
-def isReleaseVersion = false
+def isReleaseVersion = true
 
 apply plugin: "idea"
 apply plugin: "org.grails.grails-core"
