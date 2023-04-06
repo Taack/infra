@@ -238,7 +238,7 @@ final class TaackSearchService implements WebAttributes {
     private final void indexAllClass(Class<? extends GormEntity> aClass, IIndexService toIndex, SolrSpecifier solrSpecifier) {
         log.info "indexAll ${aClass}"
         toIndex.indexThose(aClass).each {
-            SolrInputDocument d = new SolrInputDocument()
+            SolrInputDocument d = new SolrInputDocument([:])
             solrSpecifier.visitSolr(new SolrIndexerVisitor(d, it), it)
             solrClient.add d
         }
