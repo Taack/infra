@@ -3,7 +3,6 @@ package taack.ui.diagram.render
 import taack.ui.base.common.Style
 
 interface IDiagramRender {
-    void rotate(BigDecimal degrees)
 
     void translateTo(BigDecimal Double, BigDecimal y)
 
@@ -12,10 +11,6 @@ interface IDiagramRender {
     void strokeStyle(Style style)
 
     void lineWidth(BigDecimal width)
-
-    void swapOrientation()
-
-    void changeZoom()
 
     enum LineStyle {
         DASHED,
@@ -34,14 +29,9 @@ interface IDiagramRender {
 
     void renderLine(BigDecimal toX, BigDecimal toY, LineStyle style)
 
-    enum StripStyle {
-        LIGHT_GREY,
-        DARK_GREY
-    }
+    void renderHorizontalStrip(BigDecimal height, RectStyle style)
 
-    void renderHorizontalStrip(BigDecimal height, StripStyle style)
-
-    void renderVerticalStrip(BigDecimal width, StripStyle style)
+    void renderVerticalStrip(BigDecimal width, RectStyle style)
 
     enum LabelStyle {
         BLUE("#71cbff"),
@@ -60,51 +50,27 @@ interface IDiagramRender {
 
     void renderLabel(String label, LabelStyle style)
 
-    void renderSmallLabel(String label)
+    enum TextJustify {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
 
-enum TextJustify {
-LEFT,
-CENTER,
-RIGHT
-}
+    enum RectStyle {
+        DARK_BLUE,
+        DARK_RED,
+    }
 
-void renderLabelMonospaced (String label, BigDecimal height, BigDecimal boxWith, BigDecimal boxHeight, TextJustify justify)
+    void renderRect(String label, BigDecimal width, BigDecimal height, RectStyle style)
 
-enum RectStyle {
-DARK_BLUE,
-DARK_RED,
-}
+    void renderRect(BigDecimal width, BigDecimal height, RectStyle style)
 
-void renderRect(String label, BigDecimal width, BigDecimal height, RectStyle style)
+    void renderPoly(RectStyle style, BigDecimal... coords)
 
-void renderRect (BigDecimal width, BigDecimal height, RectStyle style)
+    void renderArrow(LineStyle style, BigDecimal... coords)
 
-void renderPoly (RectStyle style, BigDecimal... coords)
+    BigDecimal pxInPxTransformed(BigDecimal pxY)
 
-void renderArrow (LineStyle style, BigDecimal... coords)
-
-BigDecimal pxInPxTransformed (BigDecimal pxY)
-
-void renderTriangle (BigDecimal length, boolean isDown)
-
-//fun getVerticalScrollBarPercentage ( ): Double
-//
-//fun renderVerticalScrollBar ( isClicked : Boolean )
-//
-//fun getCanvasWidth ( ): Int
-//
-//fun getCanvasHeight ( ): Int
-//
-//fun clearRect ( width: Double, height: Double, isWidthZoom : Boolean = false, isHeightZoom: Boolean = false )
-//
-//fun clearAll ( )
-//
-//fun measureText ( label: String ): Double
-//
-//fun isClicked ( ): Boolean
-//
-//fun isMoving ( ): Boolean
-//
-//fun getDisplayedDateNumbers ( widthPerDay: Double ): Pair < Int, Int >
+    void renderTriangle(BigDecimal length, boolean isDown)
 
 }
