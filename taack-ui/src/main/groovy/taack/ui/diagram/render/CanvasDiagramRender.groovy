@@ -17,17 +17,19 @@ class CanvasDiagramRender implements IDiagramRender {
     private final BigDecimal boundY
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
-    private Style fillStyle
-    private Style strokeStyle
-    private BigDecimal pxPerMmX
-    private BigDecimal pxPerMmY
-    private BigDecimal scaleX
-    private BigDecimal scaleY
+    private Style fillStyle = Style.BOLD
+    private Style strokeStyle = Style.BOLD
+    private BigDecimal pxPerMmX = 72 / 25.4
+    private BigDecimal pxPerMmY = 72 / 25.4
+    private BigDecimal scaleX = 1.0
+    private BigDecimal scaleY = 1.0
     private BigDecimal fontHeightPx = 10.0
     Font currentFont = new Font("SansSerif", Font.BOLD, 20)
     BasicStroke stroke = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.1F)
 
     CanvasDiagramRender(int width, int height) {
+        boundX = width
+        boundY = height
         bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(Color.black)

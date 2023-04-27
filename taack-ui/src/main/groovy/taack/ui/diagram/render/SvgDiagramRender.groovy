@@ -11,12 +11,12 @@ class SvgDiagramRender implements IDiagramRender {
     private final BigDecimal boundY
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
-    private Style fillStyle
-    private Style strokeStyle
-    private BigDecimal pxPerMmX
-    private BigDecimal pxPerMmY
-    private BigDecimal scaleX
-    private BigDecimal scaleY
+    private Style fillStyle = Style.BOLD
+    private Style strokeStyle = Style.BOLD
+    private BigDecimal pxPerMmX = 72 / 25.4
+    private BigDecimal pxPerMmY = 72 / 25.4
+    private BigDecimal scaleX = 1.0
+    private BigDecimal scaleY = 1.0
     private BigDecimal fontHeightPx = 10.0
 
 
@@ -60,7 +60,7 @@ class SvgDiagramRender implements IDiagramRender {
     void renderLine(BigDecimal toX, BigDecimal toY, LineStyle style) {
         outStr.append(
                 """
-            <line x1="${trX * pxPerMmX * scaleX}" y1="${trY * pxPerMmY * scaleY}" x2="${toX * pxPerMmX * scaleX + trX * pxPerMmX * scaleX}" y2="${toY * pxPerMmY * scaleY + trY * pxPerMmY * scaleY}" style="stroke:$fillStyle;stroke-width:1.3" />
+            <line x1="${trX * pxPerMmX * scaleX}" y1="${trY * pxPerMmY * scaleY}" x2="${toX * pxPerMmX * scaleX + trX * pxPerMmX * scaleX}" y2="${toY * pxPerMmY * scaleY + trY * pxPerMmY * scaleY}" style="stroke:black;stroke-width:1.3" />
         """.stripIndent())
     }
 
@@ -99,12 +99,12 @@ class SvgDiagramRender implements IDiagramRender {
     void renderRect(BigDecimal width, BigDecimal height, RectStyle style) {
         if (style == null) {
             outStr.append("""
-                    <rect x="${trX * pxPerMmX * scaleX}" y="${trY * pxPerMmY * scaleY}" width="${width * pxPerMmX * scaleX}" height="${height * pxPerMmY * scaleY}" style="fill:$fillStyle;" />
+                    <rect x="${trX * pxPerMmX * scaleX}" y="${trY * pxPerMmY * scaleY}" width="${width * pxPerMmX * scaleX}" height="${height * pxPerMmY * scaleY}" style="fill:black;" />
               """.stripIndent()
             )
         } else {
             outStr.append("""
-                    <rect x="${trX * pxPerMmX * scaleX}" y="${trY * pxPerMmY * scaleY}" width="${width * pxPerMmX * scaleX}" height="${height * pxPerMmY * scaleY}" style="stroke:$fillStyle;" fill-opacity="0" />
+                    <rect x="${trX * pxPerMmX * scaleX}" y="${trY * pxPerMmY * scaleY}" width="${width * pxPerMmX * scaleX}" height="${height * pxPerMmY * scaleY}" style="stroke:black;" fill-opacity="0" />
               """.stripIndent()
             )
 
