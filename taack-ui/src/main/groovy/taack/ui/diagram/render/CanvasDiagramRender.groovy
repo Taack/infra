@@ -13,26 +13,19 @@ import java.awt.image.BufferedImage
 class CanvasDiagramRender implements IDiagramRender {
     final BufferedImage bi
     final Graphics2D ig2
-    private final BigDecimal boundX
-    private final BigDecimal boundY
+    private final BigDecimal canvasWidth
+    private final BigDecimal canvasHeight
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
-    private Style fillStyle = Style.BOLD
-    private Style strokeStyle = Style.BOLD
-    private BigDecimal pxPerMmX = 72 / 25.4
-    private BigDecimal pxPerMmY = 72 / 25.4
-    private BigDecimal scaleX = 1.0
-    private BigDecimal scaleY = 1.0
-    private BigDecimal fontHeightPx = 10.0
-    Font currentFont = new Font("SansSerif", Font.BOLD, 20)
-    BasicStroke stroke = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0.1F)
+    private Color fillStyle = Color.BLACK
+    Font currentFont = new Font("SansSerif", Font.PLAIN, 13)
 
-    CanvasDiagramRender(int width, int height) {
-        boundX = width
-        boundY = height
-        bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+    CanvasDiagramRender(BigDecimal width, BigDecimal height) {
+        canvasWidth = width
+        canvasHeight = height
+        bi = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
-        ig2.setPaint(Color.black)
+        ig2.setPaint(fillStyle)
         ig2.setFont(currentFont)
     }
 
@@ -45,13 +38,13 @@ class CanvasDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void fillStyle(Style style) {
-
+    void fillStyle(Color color) {
+        fillStyle = color
     }
 
     @Override
     void strokeStyle(Style style) {
-        ig2.setPaint(Color.black)
+
     }
 
     @Override
@@ -60,117 +53,112 @@ class CanvasDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderVerticalLine(LineStyle style) {
-        renderLine(0.0, boundY, style)
+    void renderVerticalLine() {
+        renderLine(0.0, canvasHeight - trY)
     }
 
     @Override
-    void renderHorizontalLine(LineStyle style) {
-        renderLine(boundX, 0.0, style)
+    void renderHorizontalLine() {
+        renderLine(canvasWidth - trX, 0.0)
     }
 
     @Override
-    void renderLine(BigDecimal toX, BigDecimal toY, LineStyle style) {
-        ig2.draw(stroke.createStrokedShape(new Line2D.Double((trX * pxPerMmX * scaleX).toDouble(), (trY * pxPerMmY * scaleY).toDouble(), toX.toDouble(), toY.toDouble())))
+    void renderLine(BigDecimal toX, BigDecimal toY) {
+        ig2.setPaint(fillStyle)
+        ig2.draw(new Line2D.Double(trX.toDouble(), trY.toDouble(), (toX + trX).toDouble(), (toY + trY).toDouble()))
     }
 
     @Override
-    void renderHorizontalStrip(BigDecimal height, RectStyle style) {
-        renderRect(boundX, height, style)
+    void renderHorizontalStrip(BigDecimal height) {
+        renderRect(canvasWidth - trX, height)
     }
 
     @Override
-    void renderVerticalStrip(BigDecimal width, RectStyle style) {
-        renderRect(width, boundY, style)
+    void renderVerticalStrip(BigDecimal width) {
+        renderRect(width, canvasHeight - trY)
     }
 
     @Override
-    void renderLabel(String label, LabelStyle style = null) {
-        var tTrY = trY
-
-        if (trY <= fontHeightPx / pxPerMmY) {
-            tTrY = fontHeightPx / pxPerMmY
-        }
-
-        ig2.drawString(label, (trX * pxPerMmX * scaleX).toInteger(), (tTrY * pxPerMmY * scaleY).toInteger())
+    void renderLabel(String label) {
+        ig2.setPaint(Color.BLACK)
+        ig2.drawString(label, trX.toInteger(), (trY + 13.0 - 2.0).toInteger())
+        ig2.setPaint(fillStyle)
     }
 
     @Override
-    void renderRect(String label, BigDecimal width, BigDecimal height, RectStyle style) {
-        renderLabel(label)
-        renderRect(width, height, style)
+    void renderSmallLabel(String label) {
+        ig2.setPaint(Color.BLACK)
+        ig2.setFont(new Font("SansSerif", Font.PLAIN, 10))
+        ig2.drawString(label, trX.toInteger(), (trY + 13.0 - 2.0).toInteger())
+        ig2.setFont(new Font("SansSerif", Font.PLAIN, 13))
+        ig2.setPaint(fillStyle)
     }
 
     @Override
-    void renderRect(BigDecimal width, BigDecimal height, RectStyle style) {
-        if (style == null) {
-            ig2.draw(stroke.createStrokedShape(new Rectangle2D.Double((trX * pxPerMmX * scaleX).toDouble(), (trY * pxPerMmY * scaleY).toDouble(), (width * pxPerMmX * scaleX).toDouble(), (height * pxPerMmY * scaleY).toDouble())))
-        } else {
-            ig2.setPaint(style == RectStyle.DARK_BLUE ? Color.blue : Color.red)
-            ig2.draw(stroke.createStrokedShape(new Rectangle2D.Double((trX * pxPerMmX * scaleX).toDouble(), (trY * pxPerMmY * scaleY).toDouble(), (width * pxPerMmX * scaleX).toDouble(), (height * pxPerMmY * scaleY).toDouble())))
-            ig2.setPaint(Color.black)
-        }
+    void renderRect(BigDecimal width, BigDecimal height) {
+        ig2.setPaint(fillStyle)
+        ig2.fill(new Rectangle2D.Double(trX.toDouble(), trY.toDouble(), width.toDouble(), height.toDouble()))
     }
 
     @Override
-    void renderPoly(RectStyle style, BigDecimal... coords) {
+    void renderPoly(BigDecimal... coords) {
         def p = new Polygon()
         def it = coords.iterator()
+        ig2.setPaint(fillStyle)
         while (it.hasNext()) {
-            p.addPoint(((it.next() + trX) * pxPerMmX * scaleX).toInteger(), ((it.next() + trY) * pxPerMmY * scaleY).toInteger())
+            p.addPoint((it.next() + trX).toInteger(), (it.next() + trY).toInteger())
         }
-        ig2.draw(stroke.createStrokedShape(p))
+        ig2.fill(p)
     }
 
     @Override
-    void renderArrow(LineStyle style, BigDecimal... coords) {
-        int headLen = 1
-        def p = new Polygon()
+    void renderArrow(BigDecimal... coords) { // ARROW_LENGTH = 8.0
         def it = coords.iterator()
-        var dx = 0.0
-        var dy = 0.0
-        var tdx = 0.0
-        var tdy = 0.0
-        var tmpTdx = 0.0
-        var tmpTdy = 0.0
-        p.addPoint((trX * pxPerMmX).toInteger(), (trY * pxPerMmY).toInteger())
-        while (it.hasNext()) {
-            tdx = it.next()
-            tdy = it.next()
-            p.addPoint((tdx * pxPerMmX * scaleX).toInteger(), (tdy * pxPerMmY * scaleY).toInteger())
-            dx = tdx - tmpTdx
-            dy = tdy - tmpTdy
-            tmpTdx = tdx
-            tmpTdy = tdy
-        }
-        def angle = Math.atan2(dy.toDouble(), dx.toDouble())
-        p.addPoint(((tdx - headLen * Math.cos(angle - Math.PI / 6)) * pxPerMmX).toInteger(), ((tdy - headLen * Math.sin(angle - Math.PI / 6)) * pxPerMmY).toInteger())
-        p.addPoint((tdx * pxPerMmX * scaleX).toInteger(), (tdy * pxPerMmY * scaleY).toInteger())
-        p.addPoint(((tdx - headLen * Math.cos(angle + Math.PI / 6)) * pxPerMmX).toInteger(), ((tdy - headLen * Math.sin(angle + Math.PI / 6)) * pxPerMmY).toInteger())
-        ig2.draw(stroke.createStrokedShape(p))
-    }
+        ig2.setPaint(Color.BLACK)
+        ArrayList<Integer> xPoints = new ArrayList(trX.toInteger())
+        ArrayList<Integer> yPoints = new ArrayList(trY.toInteger())
+        BigDecimal x1 = 0.0
+        BigDecimal y1 = 0.0
+        BigDecimal x2 = 0.0
+        BigDecimal y2 = 0.0
 
-    @Override
-    BigDecimal pxInPxTransformed(BigDecimal pxY) {
-        return pxY.toDouble() * 297 / 1160
+        while (it.hasNext()) {
+            x1 = x2
+            y1 = y2
+            x2 = it.next()
+            y2 = it.next()
+            xPoints.add((trX + x2).toInteger())
+            yPoints.add((trY + y2).toInteger())
+        }
+        Double angle = Math.atan2((y2 - y1).toDouble(), (x2 - x1).toDouble())
+        xPoints.add((trX + x2 - 8.0 * Math.cos(angle - Math.PI / 6)).toInteger())
+        yPoints.add((trY + (y2 - 8.0 * Math.sin(angle - Math.PI / 6))).toInteger())
+        xPoints.add((trX + x2).toInteger())
+        yPoints.add((trY + y2).toInteger())
+        xPoints.add((trX + x2 - 8.0 * Math.cos(angle + Math.PI / 6)).toInteger())
+        yPoints.add((trY + (y2 - 8.0 * Math.sin(angle + Math.PI / 6))).toInteger())
+        ig2.drawPolyline(xPoints as int[], yPoints as int[], xPoints.size())
     }
 
     @Override
     void renderTriangle(BigDecimal length, boolean isDown) {
+        def tmp = fillStyle
+        fillStyle = Color.BLACK
         if (isDown) {
             renderPoly(
-                    null, 0.0,
+                    0.0, 0.0,
                     length, 0.0,
-                    length / 2.0, length * Math.sin(Math.PI / 3.0d) as BigDecimal
+                    length / 2.0, length
             )
         }
         else {
             renderPoly(
-                    null, 0.0,
-                    0.0, length,
-                    length * Math.sin(Math.PI / 3.0d) as BigDecimal, length / 2.0
+                    0.0, 0.0,
+                    length, length / 2.0,
+                    0.0, length
             )
         }
+        fillStyle = tmp
     }
 
     void writeImage(OutputStream os) {

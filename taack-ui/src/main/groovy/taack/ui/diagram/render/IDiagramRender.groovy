@@ -2,11 +2,13 @@ package taack.ui.diagram.render
 
 import taack.ui.base.common.Style
 
+import java.awt.Color
+
 interface IDiagramRender {
 
     void translateTo(BigDecimal Double, BigDecimal y)
 
-    void fillStyle(Style style)
+    void fillStyle(Color color)
 
     void strokeStyle(Style style)
 
@@ -23,15 +25,15 @@ interface IDiagramRender {
         PLAIN_EM_BOLD
     }
 
-    void renderVerticalLine(LineStyle style)
+    void renderVerticalLine()
 
-    void renderHorizontalLine(LineStyle style)
+    void renderHorizontalLine()
 
-    void renderLine(BigDecimal toX, BigDecimal toY, LineStyle style)
+    void renderLine(BigDecimal toX, BigDecimal toY)
 
-    void renderHorizontalStrip(BigDecimal height, RectStyle style)
+    void renderHorizontalStrip(BigDecimal height)
 
-    void renderVerticalStrip(BigDecimal width, RectStyle style)
+    void renderVerticalStrip(BigDecimal width)
 
     enum LabelStyle {
         BLUE("#71cbff"),
@@ -48,7 +50,9 @@ interface IDiagramRender {
 
     }
 
-    void renderLabel(String label, LabelStyle style)
+    void renderLabel(String label)
+
+    void renderSmallLabel(String label)
 
     enum TextJustify {
         LEFT,
@@ -61,15 +65,11 @@ interface IDiagramRender {
         DARK_RED,
     }
 
-    void renderRect(String label, BigDecimal width, BigDecimal height, RectStyle style)
+    void renderRect(BigDecimal width, BigDecimal height)
 
-    void renderRect(BigDecimal width, BigDecimal height, RectStyle style)
+    void renderPoly(BigDecimal... coords)
 
-    void renderPoly(RectStyle style, BigDecimal... coords)
-
-    void renderArrow(LineStyle style, BigDecimal... coords)
-
-    BigDecimal pxInPxTransformed(BigDecimal pxY)
+    void renderArrow(BigDecimal... coords)
 
     void renderTriangle(BigDecimal length, boolean isDown)
 

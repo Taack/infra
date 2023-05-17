@@ -1,29 +1,24 @@
 package taack.ui.diagram.render
 
-
 import groovy.transform.CompileStatic
 import taack.ui.base.common.Style
 
+import java.awt.Color
 
 @CompileStatic
 class SvgDiagramRender implements IDiagramRender {
     private StringBuilder outStr = new StringBuilder()
-    private final BigDecimal boundX
-    private final BigDecimal boundY
+    private final BigDecimal svgWidth
+    private final BigDecimal svgHeight
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
-    private Style fillStyle = Style.BOLD
+    private String fillStyle = "black"
     private Style strokeStyle = Style.BOLD
-    private BigDecimal pxPerMmX = 72 / 25.4
-    private BigDecimal pxPerMmY = 72 / 25.4
-    private BigDecimal scaleX = 1.0
-    private BigDecimal scaleY = 1.0
-    private BigDecimal fontHeightPx = 10.0
 
 
     SvgDiagramRender(BigDecimal boundX, BigDecimal boundY) {
-        this.boundX = boundX
-        this.boundY = boundY
+        this.svgWidth = boundX
+        this.svgHeight = boundY
     }
 
     @Override
@@ -33,13 +28,13 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void fillStyle(Style style) {
-        fillStyle = style
+    void fillStyle(Color color) {
+        fillStyle = "rgba(${color.red}, ${color.green}, ${color.blue}, ${color.alpha / 255})"
     }
 
     @Override
     void strokeStyle(Style style) {
-        strokeStyle = style
+
     }
 
     @Override
@@ -48,110 +43,94 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderVerticalLine(LineStyle style) {
-        renderLine(0.0, boundY, style)
+    void renderVerticalLine() {
+        renderLine(0.0, svgHeight - trY)
     }
 
     @Override
-    void renderHorizontalLine(LineStyle style) {
-        renderLine(boundX, 0.0, style)
+    void renderHorizontalLine() {
+        renderLine(svgWidth - trX, 0.0)
     }
 
     @Override
-    void renderLine(BigDecimal toX, BigDecimal toY, LineStyle style) {
+    void renderLine(BigDecimal toX, BigDecimal toY) {
         outStr.append(
                 """
-            <line x1="${trX * pxPerMmX * scaleX}" y1="${trY * pxPerMmY * scaleY}" x2="${toX * pxPerMmX * scaleX + trX * pxPerMmX * scaleX}" y2="${toY * pxPerMmY * scaleY + trY * pxPerMmY * scaleY}" style="stroke:black;stroke-width:1.3" />
+            <line x1="${trX}" y1="${trY}" x2="${toX + trX}" y2="${toY + trY}" style="stroke:${fillStyle};stroke-width:1.3" />
         """.stripIndent())
     }
 
     @Override
-    void renderHorizontalStrip(BigDecimal height, RectStyle style) {
-        renderRect(boundX, height, style)
+    void renderHorizontalStrip(BigDecimal height) {
+        renderRect(svgWidth - trX, height)
     }
 
     @Override
-    void renderVerticalStrip(BigDecimal width, RectStyle style) {
-        renderRect(width, boundY, style)
+    void renderVerticalStrip(BigDecimal width) {
+        renderRect(width, svgHeight - trY)
     }
 
     @Override
-    void renderLabel(String label, LabelStyle style = null) {
-        var tTrY = trY
+    void renderLabel(String label) { // FONT_SIZE = 13.0
+        outStr.append("""
+              <text x="${trX}" y="${trY + 13.0 - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${13.0}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+        """.stripIndent()
+        )
+    }
 
-        if (trY <= fontHeightPx / pxPerMmY) {
-            tTrY = fontHeightPx / pxPerMmY
+    @Override
+    void renderSmallLabel(String label) {
+        outStr.append("""
+              <text x="$trX" y="${trY + 13.0 - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${13.0 * 0.8}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+        """.stripIndent()
+        )
+    }
+
+    @Override
+    void renderRect(BigDecimal width, BigDecimal height) {
+        outStr.append("""
+                <rect x="${trX}" y="${trY}" width="${width}" height="${height}" style="fill:${fillStyle};" />
+          """.stripIndent()
+        )
+    }
+
+    @Override
+    void renderPoly(BigDecimal... coords) {
+        def it = coords.iterator()
+        def sb = new StringBuilder()
+        sb.append(" ${trX},${trY}")
+        while (it.hasNext()) {
+            sb.append(" ${it.next() + trX},${it.next() + trY}")
         }
 
         outStr.append("""
-              <text x="${trX * pxPerMmX * scaleX}" y="${tTrY * pxPerMmY * scaleY}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${fontHeightPx}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+                <polygon points="$sb" style="fill:${fillStyle}" />
         """.stripIndent()
         )
 
     }
 
     @Override
-    void renderRect(String label, BigDecimal width, BigDecimal height, RectStyle style) {
-        renderLabel(label)
-        renderRect(width, height, style)
-    }
-
-    @Override
-    void renderRect(BigDecimal width, BigDecimal height, RectStyle style) {
-        if (style == null) {
-            outStr.append("""
-                    <rect x="${trX * pxPerMmX * scaleX}" y="${trY * pxPerMmY * scaleY}" width="${width * pxPerMmX * scaleX}" height="${height * pxPerMmY * scaleY}" style="fill:black;" />
-              """.stripIndent()
-            )
-        } else {
-            outStr.append("""
-                    <rect x="${trX * pxPerMmX * scaleX}" y="${trY * pxPerMmY * scaleY}" width="${width * pxPerMmX * scaleX}" height="${height * pxPerMmY * scaleY}" style="stroke:black;" fill-opacity="0" />
-              """.stripIndent()
-            )
-
-        }
-    }
-
-    @Override
-    void renderPoly(RectStyle style, BigDecimal... coords) {
+    void renderArrow(BigDecimal... coords) { // ARROW_LENGTH = 8.0
         def it = coords.iterator()
         def sb = new StringBuilder()
+        sb.append(" ${trX},${trY}")
+        BigDecimal x1 = 0.0
+        BigDecimal y1 = 0.0
+        BigDecimal x2 = 0.0
+        BigDecimal y2 = 0.0
+
         while (it.hasNext()) {
-            sb.append(" ${(it.next() + trX) * pxPerMmX * scaleX},${(it.next() + trY) * pxPerMmY * scaleY}")
+            x1 = x2
+            y1 = y2
+            x2 = it.next()
+            y2 = it.next()
+            sb.append(" ${trX + x2},${trY + y2}")
         }
-
-        outStr.append("""
-                <polygon points="$sb" style="fill:$fillStyle" />
-        """.stripIndent()
-        )
-
-    }
-
-    @Override
-    void renderArrow(LineStyle style, BigDecimal... coords) {
-        int headLen = 1
-        def it = coords.iterator()
-        def sb = new StringBuilder()
-        var dx = 0.0
-        var dy = 0.0
-        var tdx = 0.0
-        var tdy = 0.0
-        var tmpTdx = 0.0
-        var tmpTdy = 0.0
-        sb.append(" ${trX * pxPerMmX},${trY * pxPerMmY}")
-        while (it.hasNext()) {
-            tdx = it.next()
-            tdy = it.next()
-            sb.append(" ${tdx * pxPerMmX * scaleX},${tdy * pxPerMmY * scaleY}")
-            dx = tdx - tmpTdx
-            dy = tdy - tmpTdy
-            tmpTdx = tdx
-            tmpTdy = tdy
-        }
-        def angle = Math.atan2(dy.toDouble(), dx.toDouble())
-        sb.append(" ${(tdx - headLen * Math.cos(angle - Math.PI / 6)) * pxPerMmX},${(tdy - headLen * Math.sin(angle - Math.PI / 6)) * pxPerMmY}")
-        sb.append(" ${tdx * pxPerMmX * scaleX},${tdy * pxPerMmY * scaleY}")
-        sb.append(" ${(tdx - headLen * Math.cos(angle + Math.PI / 6)) * pxPerMmX},${(tdy - headLen * Math.sin(angle + Math.PI / 6)) * pxPerMmY}")
+        Double angle = Math.atan2((y2 - y1) as Double, (x2 - x1) as Double)
+        sb.append(" ${trX + x2 - 8.0 * Math.cos(angle - Math.PI / 6)},${trY + (y2 - 8.0 * Math.sin(angle - Math.PI / 6))}")
+        sb.append(" ${trX + x2},${trY + y2}")
+        sb.append(" ${trX + x2 - 8.0 * Math.cos(angle + Math.PI / 6)},${trY + (y2 - 8.0 * Math.sin(angle + Math.PI / 6))}")
         outStr.append("""
                 <polyline points="$sb" stroke="black" fill="none" />
         """.stripIndent()
@@ -159,32 +138,26 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    BigDecimal pxInPxTransformed(BigDecimal pxY) {
-        return pxY.toDouble() * 297 / 1160
-    }
-
-    @Override
     void renderTriangle(BigDecimal length, boolean isDown) {
         def tmp = fillStyle
-        fillStyle = new Style("", "black")
         if (isDown) {
             renderPoly(
-                    null, 0.0,
+                    0.0, 0.0,
                     length, 0.0,
-                    length / 2.0, length * Math.sin(Math.PI / 3.0d) as BigDecimal
+                    length / 2.0, length
             )
         }
         else {
             renderPoly(
-                    null, 0.0,
-                    0.0, length,
-                    length * Math.sin(Math.PI / 3.0d) as BigDecimal, length / 2.0
+                    0.0, 0.0,
+                    length, length / 2.0,
+                    0.0, length
             )
         }
         fillStyle = tmp
     }
 
-    String getRendered(int svgWidth, int svgHeight) {
+    String getRendered() {
         return """<?xml version="1.0" encoding="utf-8"?>
             <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${svgWidth}px" height="${svgHeight}px" viewBox="0 0 $svgWidth $svgHeight">
