@@ -16,9 +16,9 @@ class SvgDiagramRender implements IDiagramRender {
     private Style strokeStyle = Style.BOLD
 
 
-    SvgDiagramRender(BigDecimal boundX, BigDecimal boundY) {
-        this.svgWidth = boundX
-        this.svgHeight = boundY
+    SvgDiagramRender(BigDecimal width, BigDecimal height) {
+        this.svgWidth = width
+        this.svgHeight = height
     }
 
     @Override
@@ -140,6 +140,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderTriangle(BigDecimal length, boolean isDown) {
         def tmp = fillStyle
+        fillStyle = "black"
         if (isDown) {
             renderPoly(
                     0.0, 0.0,
