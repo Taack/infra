@@ -288,6 +288,21 @@ final class BlockSpec {
         }
     }
 
+    void diagram(final String i18n, final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
+        if (displayElement()) {
+            blockVisitor.visitDiagram(i18n, width)
+            blockVisitor.visitDiagramEnd(diagramSpecifier)
+        }
+    }
+
+    void diagramFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier,
+                       final String i18nDiagram, final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
+        if (displayElement()) {
+            blockVisitor.visitDiagramFilter(i18nFilter, filterSpecifier, i18nDiagram, width)
+            blockVisitor.visitDiagramEnd(diagramSpecifier)
+        }
+    }
+
     /**
      * Add custom HTML code in a block
      *

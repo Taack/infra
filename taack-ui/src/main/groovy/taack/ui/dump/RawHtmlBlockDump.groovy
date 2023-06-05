@@ -3,6 +3,7 @@ package taack.ui.dump
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.base.UiChartSpecifier
+import taack.ui.base.UiDiagramSpecifier
 import taack.ui.base.UiFilterSpecifier
 import taack.ui.base.UiFormSpecifier
 import taack.ui.base.UiShowSpecifier
@@ -192,6 +193,30 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitChartEnd(final UiChartSpecifier chartSpecifier) {
         visitCloseTitle()
         chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
+        visitInnerBlockEnd()
+        visitInnerBlockEnd()
+    }
+
+    @Override
+    void visitDiagram(final String i18n, final BlockSpec.Width width) {
+        visitInnerBlock(null, width)
+        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    }
+
+    @Override
+    void visitDiagramFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier, final String i18n, final BlockSpec.Width width) {
+        visitInnerBlock(null, width)
+        visitInnerBlock(i18nFilter, BlockSpec.Width.QUARTER)
+        visitCloseTitle()
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
+        visitInnerBlockEnd()
+        visitInnerBlock(i18n, BlockSpec.Width.THREE_QUARTER)
+    }
+
+    @Override
+    void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier) {
+        visitCloseTitle()
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId))
         visitInnerBlockEnd()
         visitInnerBlockEnd()
     }

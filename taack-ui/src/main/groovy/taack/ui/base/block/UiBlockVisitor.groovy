@@ -119,6 +119,21 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitDiagram(String i18n, BlockSpec.Width width) {
+
+    }
+
+    @Override
+    void visitDiagramFilter(String i18nFilter, UiFilterSpecifier filterSpecifier, String i18n, BlockSpec.Width width) {
+
+    }
+
+    @Override
+    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier = null) {
+
+    }
+
+    @Override
     void visitCloseModal(String id, String value, FieldInfo[] fields = null) {
 
     }
