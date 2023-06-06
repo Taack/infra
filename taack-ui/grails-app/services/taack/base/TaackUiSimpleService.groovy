@@ -302,7 +302,6 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType("application/pdf")
         webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=\"${fileName}${isHtml ? ".html" : ""}\"")
-        println(streamPdf(printableSpecifier))
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
         try {
