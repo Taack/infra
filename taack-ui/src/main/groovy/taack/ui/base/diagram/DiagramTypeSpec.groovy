@@ -12,24 +12,24 @@ final class DiagramTypeSpec {
         this.diagramDatasetSpec = new DiagramDatasetSpec(diagramVisitor)
     }
 
-    void bar(List<String> xLabels, String title = "", String xTitle = "", String yTitle = "", boolean isStacked = true,
+    void bar(List<String> xLabels, String xTitle = "", String yTitle = "", boolean isStacked = true,
              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitBarDiagram(xLabels, title)
+        diagramVisitor.visitBarDiagram(xLabels)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitBarDiagramEnd(xTitle, yTitle, isStacked)
     }
 
-    void line(List<String> xLabels, String title = "", String xTitle = "", String yTitle = "",
+    void line(List<String> xLabels, String xTitle = "", String yTitle = "",
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitLineDiagram(xLabels, title)
+        diagramVisitor.visitLineDiagram(xLabels)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitLineDiagramEnd(xTitle, yTitle)
     }
 
-    void pie(String title = "", @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitPieDiagram(title)
+    void pie(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure) {
+        diagramVisitor.visitPieDiagram()
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitPieDiagramEnd()

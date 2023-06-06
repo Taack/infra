@@ -25,6 +25,7 @@ import taack.ui.config.Language
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawCsvTableDump
 import taack.ui.dump.RawHtmlBlockDump
+import taack.ui.dump.RawHtmlDiagramDump
 import taack.ui.dump.RawHtmlMenuDump
 import taack.ui.mail.dump.RawHtmlMailDump
 import taack.ui.pdf.dump.RawHtmlPrintableDump
@@ -301,8 +302,33 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType("application/pdf")
         webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=\"${fileName}${isHtml ? ".html" : ""}\"")
+        println(streamPdf(printableSpecifier))
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
+        try {
+            webUtils.currentResponse.outputStream.flush()
+            webUtils.currentResponse.outputStream.close()
+        } catch (e) {
+            log.error "${e.message}"
+        }
+    }
+
+    /**
+     * Allow to upload the diagram to the client browser
+     *
+     * @param diagramSpecifier diagram descriptor
+     * @param fileName
+     * @param isSvg
+     * @return
+     */
+    final def downloadDiagram(final UiDiagramSpecifier diagramSpecifier, final String fileName, final Boolean isSvg) {
+        GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
+        ByteArrayOutputStream stream = new ByteArrayOutputStream()
+        RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream, "0")
+        diagramSpecifier.visitDiagram(diagramDump)
+        webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")
+        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}.${isSvg ? "svg" : "png"}")
+        stream.writeTo(webUtils.currentResponse.outputStream)
         try {
             webUtils.currentResponse.outputStream.flush()
             webUtils.currentResponse.outputStream.close()

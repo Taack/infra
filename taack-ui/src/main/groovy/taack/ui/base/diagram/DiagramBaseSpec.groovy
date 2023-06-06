@@ -30,11 +30,10 @@ final class DiagramBaseSpec {
         diagramVisitor.visitSvgDiagram(radio)
         closure.delegate = diagramTypeSpec
         closure.call()
-        diagramVisitor.visitSvgDiagramEnd()
     }
 
-    void png(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramTypeSpec) Closure closure) {
-        diagramVisitor.visitPngDiagram()
+    void png(HeightWidthRadio radio, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramTypeSpec) Closure closure) {
+        diagramVisitor.visitPngDiagram(radio)
         closure.delegate = diagramTypeSpec
         closure.call()
     }

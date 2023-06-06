@@ -20,17 +20,12 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitSvgDiagramEnd() {
+    void visitPngDiagram(DiagramBaseSpec.HeightWidthRadio radio) {
 
     }
 
     @Override
-    void visitPngDiagram() {
-
-    }
-
-    @Override
-    void visitBarDiagram(List<String> xLabels, String title) {
+    void visitBarDiagram(List<String> xLabels) {
 
     }
 
@@ -40,7 +35,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitLineDiagram(List<String> xLabels, String title) {
+    void visitLineDiagram(List<String> xLabels) {
 
     }
 
@@ -50,7 +45,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitPieDiagram(String title) {
+    void visitPieDiagram() {
 
     }
 

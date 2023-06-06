@@ -19,6 +19,8 @@ import org.jfree.chart.util.SortOrder
 import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.data.general.DefaultPieDataset
 import org.jfree.svg.SVGGraphics2D
+import org.jfree.chart.ChartUtils
+import org.jfree.svg.ViewBox
 import taack.ui.base.diagram.DiagramBaseSpec
 import taack.ui.base.diagram.IUiDiagramVisitor
 
@@ -44,7 +46,6 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private BigDecimal diagramWidth
     private BigDecimal diagramHeight
     private List<String> xLabels
-    private String diagramTitle
     private Map<String, List<BigDecimal>> yDataPerKey
     private JFreeChart chart
 
@@ -55,7 +56,13 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitDiagramEnd() {
-
+        if (diagramBase == DiagramBase.SVG) {
+            SVGGraphics2D graphics2D = new SVGGraphics2D(diagramWidth.toDouble(), diagramHeight.toDouble())
+            chart.draw(graphics2D, new Rectangle2D.Double(0, 0, diagramWidth.toDouble(), diagramHeight.toDouble()), null)
+            out << graphics2D.getSVGElement(null, false, new ViewBox(0, 0, diagramWidth.toDouble(), diagramHeight.toDouble()), null, null)
+        } else if (diagramBase == DiagramBase.PNG) {
+            ChartUtils.writeChartAsPNG(out, chart, diagramWidth.toInteger(), diagramHeight.toInteger())
+        }
     }
 
     @Override
@@ -66,27 +73,15 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitSvgDiagramEnd() {
-        if (diagramBase == DiagramBase.SVG) {
-            out << "<svg viewBox='0 0 ${diagramWidth} ${diagramHeight}'>"
-
-            SVGGraphics2D graphics2D = new SVGGraphics2D(diagramWidth.toDouble(), diagramHeight.toDouble())
-            chart.draw(graphics2D, new Rectangle2D.Double(0, 0, diagramWidth.toDouble(), diagramHeight.toDouble()), null)
-            out << graphics2D.SVGDocument
-
-            out << "</svg>"
-        }
-    }
-
-    @Override
-    void visitPngDiagram() {
+    void visitPngDiagram(DiagramBaseSpec.HeightWidthRadio radio) {
         this.diagramBase = DiagramBase.PNG
+        this.diagramWidth = 480.0 / radio.radio
+        this.diagramHeight = 480.0
     }
 
     @Override
-    void visitBarDiagram(List<String> xLabels, String title) {
+    void visitBarDiagram(List<String> xLabels) {
         this.xLabels = xLabels
-        this.diagramTitle = title
         this.yDataPerKey = [:]
     }
 
@@ -100,7 +95,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             }
         }
         chart = ChartFactory.createBarChart(
-                diagramTitle,
+                "",
                 xTitle,
                 yTitle,
                 dataset,
@@ -122,9 +117,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitLineDiagram(List<String> xLabels, String title) {
+    void visitLineDiagram(List<String> xLabels) {
         this.xLabels = xLabels
-        this.diagramTitle = title
         this.yDataPerKey = [:]
     }
 
@@ -138,7 +132,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             }
         }
         chart = ChartFactory.createLineChart(
-                diagramTitle,
+                "",
                 xTitle,
                 yTitle,
                 dataset,
@@ -158,9 +152,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitPieDiagram(String title) {
+    void visitPieDiagram() {
         this.xLabels = []
-        this.diagramTitle = title
         this.yDataPerKey = [:]
     }
 
@@ -174,7 +167,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         }
         dataset.sortByValues(SortOrder.DESCENDING)
         chart = ChartFactory.createPieChart(
-                diagramTitle,
+                "",
                 dataset,
                 true,
                 true,
