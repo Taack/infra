@@ -320,11 +320,12 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
      * @param isSvg
      * @return
      */
-    final def downloadDiagram(final UiDiagramSpecifier diagramSpecifier, final String fileName, final Boolean isSvg) {
+    final def downloadDiagram(final UiDiagramSpecifier diagramSpecifier, final String fileName) {
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         ByteArrayOutputStream stream = new ByteArrayOutputStream()
         RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream, "0")
         diagramSpecifier.visitDiagram(diagramDump)
+        Boolean isSvg = diagramDump.diagramBase == RawHtmlDiagramDump.DiagramBase.SVG
         webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")
         webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}.${isSvg ? "svg" : "png"}")
         stream.writeTo(webUtils.currentResponse.outputStream)
