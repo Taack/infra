@@ -8,19 +8,15 @@ interface IUiDiagramVisitor {
 
     void visitDiagramEnd()
 
-    void visitSvgDiagram(DiagramBaseSpec.HeightWidthRadio radio)
-
-    void visitPngDiagram(DiagramBaseSpec.HeightWidthRadio radio)
-
-    void visitBarDiagram(List<String> xLabels)
+    void visitBarDiagram(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio)
 
     void visitBarDiagramEnd(String xTitle, String yTitle, boolean isStacked)
 
-    void visitLineDiagram(List<String> xLabels)
+    void visitLineDiagram(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio)
 
     void visitLineDiagramEnd(String xTitle, String yTitle)
 
-    void visitPieDiagram()
+    void visitPieDiagram(DiagramTypeSpec.HeightWidthRadio radio)
 
     void visitPieDiagramEnd()
 
