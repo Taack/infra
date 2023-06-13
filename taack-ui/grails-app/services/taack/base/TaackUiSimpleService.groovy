@@ -1,5 +1,7 @@
 package taack.base
 
+
+import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.web.api.WebAttributes
@@ -8,9 +10,6 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
 import org.grails.core.io.ResourceLocator
 import org.grails.datastore.gorm.GormEntity
-
-import grails.artefact.controller.support.ResponseRenderer
-
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,11 +21,7 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec
 import taack.ui.config.Language
-import taack.ui.dump.Parameter
-import taack.ui.dump.RawCsvTableDump
-import taack.ui.dump.RawHtmlBlockDump
-import taack.ui.dump.RawHtmlDiagramDump
-import taack.ui.dump.RawHtmlMenuDump
+import taack.ui.dump.*
 import taack.ui.mail.dump.RawHtmlMailDump
 import taack.ui.pdf.dump.RawHtmlPrintableDump
 /**
@@ -241,7 +236,24 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
      * @param text label of the object
      * @return
      */
-    final def closeModal(Long id, String text) {
+    final def closeModal(Long id = null, String text = null) {
+        UiBlockSpecifier block = new UiBlockSpecifier()
+        block.ui {
+            closeModal id, text
+        }
+        show(block)
+    }
+
+    /**
+     * Shortcut method that call the {@link #show(UiBlockSpecifier)} underneath.
+     * <p>Allow to return the selection to the parent form from a table in a many to many relationship..
+     * <p>Calling this method close the current modal, that contains usually a table.
+     *
+     * @param id id of the object selected
+     * @param text label of the object
+     * @return
+     */
+    final def closeModal(String id, String text) {
         UiBlockSpecifier block = new UiBlockSpecifier()
         block.ui {
             closeModal id, text
@@ -469,7 +481,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
                 }
             })
         else {
-            closeModal(null, null)
+            closeModal()
         }
         return confirm
     }
