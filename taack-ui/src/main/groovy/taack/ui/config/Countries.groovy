@@ -597,7 +597,7 @@ enum Country {
     }
 
     String getId() {
-        this.alphaIso2
+        this.name()
     }
 }
 
