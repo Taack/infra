@@ -578,17 +578,22 @@ enum Country {
     }
 
     String nameForLanguage(String lang = "en") {
-        def locale = new Locale("", this.toString())
-        return locale.getDisplayCountry(new Locale(lang, this.toString()))
+        def locale = new Locale("", this.alphaIso2)
+        return locale.getDisplayCountry(new Locale(lang, this.alphaIso2))
     }
 
     static EnumOption[] getEnumOptions() {
         EnumOption[] res = new EnumOption[values().size()]
         int i = 0
         for (def option in values()) {
-            res[i++] = new EnumOption(option.toString(), option.name)
+            res[i++] = new EnumOption(option.alphaIso2, option.name)
         }
         return res
+    }
+
+    @Override
+    String toString() {
+        name
     }
 
     String getId() {
