@@ -35,8 +35,6 @@ if (rootProject.name == 'infra') {
         implementation "org.grails.plugins:gsp"
         profile "org.grails.profiles:web-plugin"
         runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
-        implementation group: 'org.jfree', name: 'jfreechart', version: '1.5.4'
-        implementation group: 'org.jfree', name: 'org.jfree.svg', version: '5.0.5'
     }
 
     bootRun {

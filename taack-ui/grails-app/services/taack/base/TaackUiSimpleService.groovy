@@ -324,30 +324,30 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
         }
     }
 
-    /**
-     * Allow to upload the diagram to the client browser
-     *
-     * @param diagramSpecifier diagram descriptor
-     * @param fileName
-     * @param isSvg
-     * @return
-     */
-    final def downloadDiagram(final UiDiagramSpecifier diagramSpecifier, final String fileName) {
-        GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
-        ByteArrayOutputStream stream = new ByteArrayOutputStream()
-        RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream, "0")
-        diagramSpecifier.visitDiagram(diagramDump)
-        Boolean isSvg = diagramDump.diagramBase == RawHtmlDiagramDump.DiagramBase.SVG
-        webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")
-        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}.${isSvg ? "svg" : "png"}")
-        stream.writeTo(webUtils.currentResponse.outputStream)
-        try {
-            webUtils.currentResponse.outputStream.flush()
-            webUtils.currentResponse.outputStream.close()
-        } catch (e) {
-            log.error "${e.message}"
-        }
-    }
+//    /**
+//     * Allow to upload the diagram to the client browser
+//     *
+//     * @param diagramSpecifier diagram descriptor
+//     * @param fileName
+//     * @param isSvg
+//     * @return
+//     */
+//    final def downloadDiagram(final UiDiagramSpecifier diagramSpecifier, final String fileName) {
+//        GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream()
+//        RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream, "0")
+//        diagramSpecifier.visitDiagram(diagramDump)
+//        Boolean isSvg = diagramDump.diagramBase == RawHtmlDiagramDump.DiagramBase.SVG
+//        webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")
+//        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}.${isSvg ? "svg" : "png"}")
+//        stream.writeTo(webUtils.currentResponse.outputStream)
+//        try {
+//            webUtils.currentResponse.outputStream.flush()
+//            webUtils.currentResponse.outputStream.close()
+//        } catch (e) {
+//            log.error "${e.message}"
+//        }
+//    }
 
     /**
      * Allow to upload a CSV version of a table to the client browser
