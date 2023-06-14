@@ -27,39 +27,39 @@ class RowColumnFieldSpec {
     }
 
     void rowField(final FieldInfo field, final String format = null, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(field, format, style, Utils.getControllerName(action), action.method, id)
+        tableVisitor.visitRowField(field, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final GetMethodReturn field, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(field, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(field, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final String value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final Long value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final BigDecimal value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, null as NumberFormat, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, null as NumberFormat, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final BigDecimal value, final NumberFormat format, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, format, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final Map value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id)  ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final EnumStyle value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id)  ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowField(final Date value, final String format = null, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, format, style, action ? Utils.getControllerName(action) : null, action?.method, id)
+        tableVisitor.visitRowField(value, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
     void rowLink(final String i18n, final ActionIcon icon, final String controller, final String action, final Long id = null, final Boolean isAjax = true) {
