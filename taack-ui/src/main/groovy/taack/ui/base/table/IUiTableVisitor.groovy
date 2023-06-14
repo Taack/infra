@@ -40,17 +40,17 @@ interface IUiTableVisitor {
 
     void visitRowColumn(Integer colSpan, Integer rowSpan)
 
-    void visitRowField(FieldInfo fieldInfo, String format, final Style style)
+    void visitRowField(FieldInfo fieldInfo, String format, final Style style, final String controller, final String action, final Long id)
 
-    void visitRowField(GetMethodReturn fieldInfo, final Style style)
+    void visitRowField(GetMethodReturn fieldInfo, final Style style, final String controller, final String action, final Long id)
 
-    void visitRowField(String value, final Style style)
+    void visitRowField(String value, final Style style, final String controller, final String action, final Long id)
 
-    void visitRowField(Long value, final Style style)
+    void visitRowField(Long value, final Style style, final String controller, final String action, final Long id)
 
-    void visitRowField(BigDecimal value, String format, final Style style)
+    void visitRowField(BigDecimal value, String format, final Style style, final String controller, final String action, final Long id)
 
-    void visitRowField(Date value, String format, final Style style)
+    void visitRowField(Date value, String format, final Style style, final String controller, final String action, final Long id)
 
     void visitRowLink(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax)
 
@@ -68,11 +68,11 @@ interface IUiTableVisitor {
 
     void visitRowGroupFooter(String content)
 
-    void visitRowField(Map value, Style style)
+    void visitRowField(Map value, Style style, String controller, String action, Long id)
 
-    void visitRowField(EnumStyle value, Style style)
+    void visitRowField(EnumStyle value, Style style, String controller, String action, Long id)
 
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style)
+    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller, String action, Long id)
 
     void visitColumn(Integer colSpan, Integer rowSpan)
 
