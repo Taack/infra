@@ -30,4 +30,6 @@ interface IUiFilterVisitor {
     void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue)
 
     void visitFilterAction(String i18n, MethodClosure action)
+
+    void visitFilterExtension(String i18n, FieldInfo... field)
 }

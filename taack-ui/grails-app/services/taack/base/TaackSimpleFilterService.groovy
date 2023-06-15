@@ -9,6 +9,7 @@ import org.hibernate.query.Query
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.UiFilterSpecifier
+import taack.ui.base.filter.ITaackFilterExtension
 import taack.ui.base.filter.UiFilterVisitorImpl
 import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.filter.expression.Operator
@@ -17,6 +18,7 @@ import taack.ui.dump.RawHtmlFilterDump
 
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
+
 /**
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
@@ -28,6 +30,27 @@ import java.lang.reflect.ParameterizedType
 @CompileStatic
 class TaackSimpleFilterService implements WebAttributes {
     SessionFactory sessionFactory
+
+    final static Map<Class, ITaackFilterExtension> filterExtensionMap = [:]
+
+    /**
+     * Allow to register a GormEntity class as base class for TQL queries.
+     *
+     * <pre>{@code
+     *  @PostConstruct
+     *  private static void init() {
+     *      def u = new User()
+     *      Jdbc.registerClass( User,
+     *                          u.username_, u.mail_, u.mainSubsidiary_, u.firstName_,
+     *                          u.lastName_, u.businessUnit_, u.enabled_)
+     *   }
+     * }</pre>
+     */
+    final static class TaackSimpleFilterExtension {
+        static final void registerStringExt(Class<? extends GormEntity> aClass, ITaackFilterExtension filterExtension) {
+            filterExtensionMap[aClass] = filterExtension
+        }
+    }
 
     private Map<String, JoinEntity> joinEntityMap = [:]
     private int joinEntityOrder = 0
@@ -337,7 +360,9 @@ class TaackSimpleFilterService implements WebAttributes {
             fieldNames.addAll superClass.declaredFields*.name.findAll { it != "id" }
         }
         Map<String, Object> filter = theParams.findAll {
-            (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) || (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains("Default"))
+            (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) ||
+                    (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains("Default")) ||
+                    (it.key.startsWith('_reverse') || it.key.startsWith('_extension_'))
         }
         if (tInstance) {
             tInstance.class.getDeclaredFields().eachWithIndex { Field entry, int i ->
@@ -363,12 +388,19 @@ class TaackSimpleFilterService implements WebAttributes {
             if (entry.value && !filterMeta.contains(entry.key)) {
                 final String entryKey = entry.key as String
                 occ++
+                /**
+                 * We process special filter behaviors that are induced by their key names.
+                 */
                 if (entryKey.startsWith('_reverse')) {
                     String[] t = entryKey.split('_')
                     final String reverseClassName = t[2].substring(t[2].lastIndexOf(".") + 1)
                     final String reverseFieldName = t[3]
                     final String targetField = t[4]
                     where << ("sc.id IN (select auo.${reverseFieldName}.id from ${reverseClassName} auo where auo.${targetField} like '${escapeHqlParameter(entry.value as String)}')" as String)
+                } else if (entryKey.startsWith('_extension_')) {
+                    def targetField = entryKey - '_extension_'
+                    Field f = getTheField(aClass, targetField)
+                    where << filterExtensionMap[f.type]?.queryToWherePart(f.type, targetField, entry.value?.toString())
                 } else {
                     addJoinEntity(entryKey)
                     JoinEntity joinEntity = getJoinEntity(entryKey)
@@ -377,6 +409,15 @@ class TaackSimpleFilterService implements WebAttributes {
 
                     Field f = getTheField(aClass, entryKey)
                     if (f && f.type == Date) {
+                        /**
+                         *  For dates we have a simple DSL:
+                         *      2022        everything after 2022 included
+                         *      10          since october this year
+                         *      202210      since october 2022
+                         *
+                         *  End date is build the same way, so we can create interval:
+                         *      2022-2023   every after 2022 but before 2023 excluded
+                         */
                         def v = (entry.value as String).replaceAll(' ', '')
                         def p = v.indexOf('-')
                         def v1 = p > 1 ? v.substring(0, p) : p == 0 ? null : v
