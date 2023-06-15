@@ -4,21 +4,27 @@ import groovy.transform.CompileStatic
 import taack.ui.base.common.Style
 
 import java.awt.Color
+import java.awt.Font
+import java.awt.FontMetrics
+import java.awt.image.BufferedImage
 
 @CompileStatic
 class SvgDiagramRender implements IDiagramRender {
     private StringBuilder outStr = new StringBuilder()
     private final BigDecimal svgWidth
     private final BigDecimal svgHeight
+    private final isViewBox
+    private final FontMetrics fm
+
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private String fillStyle = "black"
-    private Style strokeStyle = Style.BOLD
 
-
-    SvgDiagramRender(BigDecimal width, BigDecimal height) {
+    SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false) {
         this.svgWidth = width
         this.svgHeight = height
+        this.isViewBox = isViewBox
+        this.fm = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font("SansSerif", Font.PLAIN, 13))
     }
 
     @Override
@@ -87,11 +93,26 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderRect(BigDecimal width, BigDecimal height) {
+    void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + 13.0 - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${13.0}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+        """.stripIndent()
+        )
+    }
+
+    @Override
+    void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle = RectStyle.fill) {
+        if (rectStyle == RectStyle.fill) {
+            outStr.append("""
                 <rect x="${trX}" y="${trY}" width="${width}" height="${height}" style="fill:${fillStyle};" />
           """.stripIndent()
-        )
+            )
+        } else {
+            outStr.append("""
+                <rect x="${trX}" y="${trY}" width="${width}" height="${height}" style="stroke:${fillStyle};" fill-opacity="0" />
+          """.stripIndent()
+            )
+        }
     }
 
     @Override
@@ -158,10 +179,25 @@ class SvgDiagramRender implements IDiagramRender {
         fillStyle = tmp
     }
 
+    @Override
+    BigDecimal getDiagramWidth() {
+        return svgWidth
+    }
+
+    @Override
+    BigDecimal getDiagramHeight() {
+        return svgHeight
+    }
+
+    @Override
+    BigDecimal measureText(String text) {
+        return fm.stringWidth(text)
+    }
+
     String getRendered() {
         return """<?xml version="1.0" encoding="utf-8"?>
             <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${svgWidth}px" height="${svgHeight}px" viewBox="0 0 $svgWidth $svgHeight">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
             """.stripIndent() + outStr.toString() + "</svg>"
     }
 }

@@ -6,24 +6,13 @@ import java.awt.Color
 
 interface IDiagramRender {
 
-    void translateTo(BigDecimal Double, BigDecimal y)
+    void translateTo(BigDecimal x, BigDecimal y)
 
     void fillStyle(Color color)
 
     void strokeStyle(Style style)
 
     void lineWidth(BigDecimal width)
-
-    enum LineStyle {
-        DASHED,
-        DASHED_EM,
-        DASHED_BOLD,
-        DASHED_EM_BOLD,
-        PLAIN,
-        PLAIN_BOLD,
-        PLAIN_EM,
-        PLAIN_EM_BOLD
-    }
 
     void renderVerticalLine()
 
@@ -35,37 +24,17 @@ interface IDiagramRender {
 
     void renderVerticalStrip(BigDecimal width)
 
-    enum LabelStyle {
-        BLUE("#71cbff"),
-        RED("#c01a11"),
-        YELLOW("#c0c00f"),
-        ORANGE("#c0740b"),
-        PINK("lightsalmon")
-
-
-        LabelStyle(String color) {
-            this.color = color
-        }
-        String color
-
-    }
-
     void renderLabel(String label)
 
     void renderSmallLabel(String label)
 
-    enum TextJustify {
-        LEFT,
-        CENTER,
-        RIGHT
-    }
+    void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY)
 
     enum RectStyle {
-        DARK_BLUE,
-        DARK_RED,
+        fill,
+        stroke,
     }
-
-    void renderRect(BigDecimal width, BigDecimal height)
+    void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle)
 
     void renderPoly(BigDecimal... coords)
 
@@ -73,4 +42,9 @@ interface IDiagramRender {
 
     void renderTriangle(BigDecimal length, boolean isDown)
 
+    BigDecimal getDiagramWidth()
+
+    BigDecimal getDiagramHeight()
+
+    BigDecimal measureText(String text)
 }

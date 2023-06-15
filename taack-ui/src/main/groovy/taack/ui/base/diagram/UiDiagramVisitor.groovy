@@ -1,11 +1,12 @@
 package taack.ui.base.diagram
 
 import groovy.transform.CompileStatic
+import taack.ui.base.UiDiagramSpecifier
 
 @CompileStatic
 class UiDiagramVisitor implements IUiDiagramVisitor {
     @Override
-    void visitDiagram() {
+    void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
 
     }
 
@@ -15,32 +16,22 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitBarDiagram(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio) {
+    void visitDiagramPreparation(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio) {
 
     }
 
     @Override
-    void visitBarDiagramEnd(String xTitle, String yTitle, boolean isStacked) {
+    void visitBarDiagram(boolean isStacked) {
 
     }
 
     @Override
-    void visitLineDiagram(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio) {
+    void visitLineDiagram() {
 
     }
 
     @Override
-    void visitLineDiagramEnd(String xTitle, String yTitle) {
-
-    }
-
-    @Override
-    void visitPieDiagram(DiagramTypeSpec.HeightWidthRadio radio) {
-
-    }
-
-    @Override
-    void visitPieDiagramEnd() {
+    void visitPieDiagram() {
 
     }
 

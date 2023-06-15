@@ -26,26 +26,25 @@ final class DiagramTypeSpec {
         final BigDecimal radio
     }
 
-    void bar(List<String> xLabels, String xTitle = "", String yTitle = "", boolean isStacked = true,
+    void bar(List<String> xLabels, boolean isStacked = true,
              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
-        diagramVisitor.visitBarDiagram(xLabels, radio)
+        diagramVisitor.visitDiagramPreparation(xLabels, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
-        diagramVisitor.visitBarDiagramEnd(xTitle, yTitle, isStacked)
+        diagramVisitor.visitBarDiagram(isStacked)
     }
 
-    void line(List<String> xLabels, String xTitle = "", String yTitle = "",
-              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
-        diagramVisitor.visitLineDiagram(xLabels, radio)
+    void line(List<String> xLabels, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation(xLabels, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
-        diagramVisitor.visitLineDiagramEnd(xTitle, yTitle)
+        diagramVisitor.visitLineDiagram()
     }
 
     void pie(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
-        diagramVisitor.visitPieDiagram(radio)
+        diagramVisitor.visitDiagramPreparation([], radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
-        diagramVisitor.visitPieDiagramEnd()
+        diagramVisitor.visitPieDiagram()
     }
 }

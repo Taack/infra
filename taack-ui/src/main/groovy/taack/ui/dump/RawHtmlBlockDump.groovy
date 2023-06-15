@@ -216,7 +216,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier) {
         visitCloseTitle()
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId))
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId), UiDiagramSpecifier.DiagramBase.SVG)
         visitInnerBlockEnd()
         visitInnerBlockEnd()
     }

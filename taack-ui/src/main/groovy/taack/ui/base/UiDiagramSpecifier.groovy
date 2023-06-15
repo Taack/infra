@@ -13,9 +13,13 @@ final class UiDiagramSpecifier {
         this
     }
 
-    void visitDiagram(final IUiDiagramVisitor diagramVisitor) {
+    enum DiagramBase {
+        SVG,
+        PNG
+    }
+    void visitDiagram(final IUiDiagramVisitor diagramVisitor, final DiagramBase diagramBase) {
         if (diagramVisitor && closure) {
-            diagramVisitor.visitDiagram()
+            diagramVisitor.visitDiagram(diagramBase)
             closure.delegate = new DiagramTypeSpec(diagramVisitor)
             closure.call()
             diagramVisitor.visitDiagramEnd()

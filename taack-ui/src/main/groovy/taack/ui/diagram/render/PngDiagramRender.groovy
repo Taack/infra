@@ -10,23 +10,26 @@ import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 
 @CompileStatic
-class CanvasDiagramRender implements IDiagramRender {
+class PngDiagramRender implements IDiagramRender {
     final BufferedImage bi
     final Graphics2D ig2
-    private final BigDecimal canvasWidth
-    private final BigDecimal canvasHeight
+    private final BigDecimal pngWidth
+    private final BigDecimal pngHeight
+    Font currentFont = new Font("SansSerif", Font.PLAIN, 13)
+    private final FontMetrics fm
+
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private Color fillStyle = Color.BLACK
-    Font currentFont = new Font("SansSerif", Font.PLAIN, 13)
 
-    CanvasDiagramRender(BigDecimal width, BigDecimal height) {
-        canvasWidth = width
-        canvasHeight = height
+    PngDiagramRender(BigDecimal width, BigDecimal height) {
+        pngWidth = width
+        pngHeight = height
         bi = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(fillStyle)
         ig2.setFont(currentFont)
+        fm = ig2.getFontMetrics(currentFont)
     }
 
     @Override
@@ -54,12 +57,12 @@ class CanvasDiagramRender implements IDiagramRender {
 
     @Override
     void renderVerticalLine() {
-        renderLine(0.0, canvasHeight - trY)
+        renderLine(0.0, pngHeight - trY)
     }
 
     @Override
     void renderHorizontalLine() {
-        renderLine(canvasWidth - trX, 0.0)
+        renderLine(pngWidth - trX, 0.0)
     }
 
     @Override
@@ -70,12 +73,12 @@ class CanvasDiagramRender implements IDiagramRender {
 
     @Override
     void renderHorizontalStrip(BigDecimal height) {
-        renderRect(canvasWidth - trX, height)
+        renderRect(pngWidth - trX, height)
     }
 
     @Override
     void renderVerticalStrip(BigDecimal width) {
-        renderRect(width, canvasHeight - trY)
+        renderRect(width, pngHeight - trY)
     }
 
     @Override
@@ -95,8 +98,13 @@ class CanvasDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderRect(BigDecimal width, BigDecimal height) {
-        ig2.setPaint(fillStyle)
+    void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
+        // todo
+    }
+
+    @Override
+    void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle = RectStyle.fill) {
+        ig2.setPaint(fillStyle) // todo: stroke
         ig2.fill(new Rectangle2D.Double(trX.toDouble(), trY.toDouble(), width.toDouble(), height.toDouble()))
     }
 
@@ -159,6 +167,21 @@ class CanvasDiagramRender implements IDiagramRender {
             )
         }
         fillStyle = tmp
+    }
+
+    @Override
+    BigDecimal getDiagramWidth() {
+        return pngWidth
+    }
+
+    @Override
+    BigDecimal getDiagramHeight() {
+        return pngHeight
+    }
+
+    @Override
+    BigDecimal measureText(String text) {
+        return fm.stringWidth(text)
     }
 
     void writeImage(OutputStream os) {
