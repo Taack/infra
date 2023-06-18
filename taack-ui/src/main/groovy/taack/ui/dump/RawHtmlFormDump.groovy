@@ -120,11 +120,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 ${field.fieldConstraint.nullable ? '<option value=""></option>' : ""}
                 """
 
+            def valId = isEnum ? (field.value as Enum)?.name() : field.value?.toString()
+
             enumConstraints.each {
                 if (isListOrSet) {
                     result.append """<option value="${it.key}" ${(field.value as Collection)*.toString().contains(it.key) ? 'selected' : ''}>${it.value}</option>"""
                 } else {
-                    result.append """<option value="${it.key}" ${(field.value as Enum)?.name() == it.key ? 'selected' : ''}>${it.value}</option>"""
+                    result.append """<option value="${it.key}" ${valId == it.key ? 'selected' : ''}>${it.value}</option>"""
                 }
             }
             result.append ST_CL_SELECT + ST_CL_DIV
