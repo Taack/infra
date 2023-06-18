@@ -7,7 +7,6 @@ import taack.ast.type.WidgetKind
 import taack.ui.EnumOption
 import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
-import taack.ui.base.helper.Utils
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -125,7 +124,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 if (isListOrSet) {
                     result.append """<option value="${it.key}" ${(field.value as Collection)*.toString().contains(it.key) ? 'selected' : ''}>${it.value}</option>"""
                 } else {
-                    result.append """<option value="${it.key}" ${field.value.toString() == it.key ? 'selected' : ''}>${it.value}</option>"""
+                    result.append """<option value="${it.key}" ${(field.value as Enum)?.name() == it.key ? 'selected' : ''}>${it.value}</option>"""
                 }
             }
             result.append ST_CL_SELECT + ST_CL_DIV
