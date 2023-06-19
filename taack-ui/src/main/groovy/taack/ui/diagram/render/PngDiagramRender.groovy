@@ -15,7 +15,7 @@ class PngDiagramRender implements IDiagramRender {
     final Graphics2D ig2
     private final BigDecimal pngWidth
     private final BigDecimal pngHeight
-    Font currentFont = new Font("SansSerif", Font.PLAIN, 13)
+    Font currentFont = new Font(Font.SANS_SERIF, Font.PLAIN, 13)
     private final FontMetrics fm
 
     private BigDecimal trX = 0.0
@@ -91,9 +91,9 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         ig2.setPaint(Color.BLACK)
-        ig2.setFont(new Font("SansSerif", Font.PLAIN, 10))
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10))
         ig2.drawString(label, trX.toInteger(), (trY + 13.0 - 2.0).toInteger())
-        ig2.setFont(new Font("SansSerif", Font.PLAIN, 13))
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 13))
         ig2.setPaint(fillStyle)
     }
 

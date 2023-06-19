@@ -24,7 +24,7 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
-        this.fm = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font("SansSerif", Font.PLAIN, 13))
+        this.fm = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, 13))
     }
 
     @Override
