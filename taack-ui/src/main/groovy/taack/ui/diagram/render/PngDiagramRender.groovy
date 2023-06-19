@@ -109,6 +109,11 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderCircle(BigDecimal radius, CircleStyle circleStyle = CircleStyle.fill) {
+        // todo
+    }
+
+    @Override
     void renderPoly(BigDecimal... coords) {
         def p = new Polygon()
         def it = coords.iterator()

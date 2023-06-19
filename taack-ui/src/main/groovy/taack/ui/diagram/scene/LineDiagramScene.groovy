@@ -3,43 +3,28 @@ package taack.ui.diagram.scene
 import groovy.transform.CompileStatic
 import taack.ui.diagram.render.IDiagramRender
 
-import java.awt.Color
+import java.awt.*
+import java.util.List
 
 @CompileStatic
-class BarDiagramScene extends DiagramScene {
+class LineDiagramScene extends DiagramScene {
     final private List<String> xLabels
-    final private boolean isStacked
 
     private BigDecimal startLabelY
     private BigDecimal gapY
     private BigDecimal gapHeight
-    final private BigDecimal MAX_BAR_WIDTH = 200.0
+    final private BigDecimal CIRCLE_RADIUS = 2.5
 
-    BarDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey, boolean isStacked) {
+    LineDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey) {
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
         this.yDataPerKey = yDataPerKey
         this.xLabels = xLabels
-        this.isStacked = isStacked
     }
 
     void drawHorizontalBackground() {
-        Set<String> keys = yDataPerKey.keySet()
-        Set<BigDecimal> values
-        if (isStacked) {
-            values = []
-            for (int i = 0; i < xLabels.size(); i++) {
-                BigDecimal value = 0.0
-                for (int j = 0; j < keys.size(); j++) {
-                    value += yDataPerKey[keys[j]][i]
-                }
-                values.add(value)
-            }
-            values = values.sort() as Set<BigDecimal>
-        } else {
-            values = yDataPerKey.values().flatten().sort() as Set<BigDecimal>
-        }
+        Set<BigDecimal> values = yDataPerKey.values().flatten().sort() as Set<BigDecimal>
         startLabelY = values.first() >= 0 ? 0.0 : Math.floor(values.first().toDouble()).toBigDecimal()
         BigDecimal totalGapY = values.last() - startLabelY
         int gapNumberY
@@ -72,12 +57,11 @@ class BarDiagramScene extends DiagramScene {
         }
     }
 
-    void drawVerticalBackgroundAndDataBar() {
-        Set<String> keys = yDataPerKey.keySet()
-        int gapNumberX = xLabels.size()
+    void drawVerticalBackground() {
+        int gapNumberX = xLabels.size() - 1
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / gapNumberX
         int showLabelEveryX = (render.measureText(xLabels.join("")) / (gapWidth * gapNumberX * 0.8)).toInteger()
-        for (int i = 0; i < gapNumberX; i++) {
+        for (int i = 0; i < gapNumberX + 1; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
             // background vertical line
@@ -89,47 +73,45 @@ class BarDiagramScene extends DiagramScene {
             String xLabel = xLabels[i]
             if (showLabelEveryX >= 1) {
                 if (i % showLabelEveryX == 0) {
-                    render.translateTo(startX + gapWidth * 0.5 - render.measureText(xLabel), height - DIAGRAM_MARGIN_BOTTOM + 10.0)
-                    render.renderRotatedLabel(xLabel, -20.0, startX + gapWidth * 0.5, height - DIAGRAM_MARGIN_BOTTOM + 10.0)
+                    render.translateTo(startX - render.measureText(xLabel), height - DIAGRAM_MARGIN_BOTTOM + 10.0)
+                    render.renderRotatedLabel(xLabel, -20.0, startX, height - DIAGRAM_MARGIN_BOTTOM + 10.0)
                 }
             } else {
-                render.translateTo(startX + (gapWidth - render.measureText(xLabel)) / 2, height - DIAGRAM_MARGIN_BOTTOM + 10.0)
+                render.translateTo(startX - render.measureText(xLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM + 10.0)
                 render.renderLabel(xLabel)
             }
+        }
+    }
 
-            // data bar
-            int barNumber = isStacked ? 1 : keys.size()
-            BigDecimal horizontalPadding = gapWidth * 0.2
-            BigDecimal barWidth = barNumber > 1 ? (gapWidth - horizontalPadding) * 0.8 / barNumber : (gapWidth - horizontalPadding)
-            BigDecimal barMargin = barNumber > 1 ? (gapWidth - horizontalPadding) * 0.2 / (barNumber - 1) : 0.0
-            if (barWidth > MAX_BAR_WIDTH) {
-                barWidth = MAX_BAR_WIDTH
-                horizontalPadding = gapWidth - barWidth * barNumber - barMargin * (barNumber - 1)
-            }
-            BigDecimal barX = startX + horizontalPadding / 2
-            BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
+    void drawDataLine() {
+        Set<String> keys = yDataPerKey.keySet()
+        int gapNumberX = xLabels.size() - 1
+        BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / gapNumberX
+        for (int i = 0; i < gapNumberX + 1; i++) {
+            BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
             for (int j = 0; j < keys.size(); j++) {
                 BigDecimal yData = yDataPerKey[keys[j]][i]
-                BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
-                if (yData > startLabelY) {
-                    // bar rect
-                    render.translateTo(barX, barY - barHeight)
-                    Color rectColor = LegendColor.colorFrom(j)
-                    render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
-                    render.renderRect(barWidth, barHeight, IDiagramRender.RectStyle.fill)
-                    render.fillStyle(rectColor)
-                    render.renderRect(barWidth, barHeight, IDiagramRender.RectStyle.stroke)
+                BigDecimal lineHeight = (yData - startLabelY) / gapY * gapHeight
 
-                    // data label
-                    String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
-                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - 6.5 : barY - barHeight - 15.0)
-                    render.renderLabel(yDataLabel)
+                // circle
+                render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
+                Color circleColor = LegendColor.colorFrom(j)
+                render.fillStyle(circleColor)
+                render.renderCircle(CIRCLE_RADIUS, IDiagramRender.CircleStyle.stroke)
+
+                // line to next circle
+                if (i < gapNumberX) { // not the last point
+                    BigDecimal lineHeight2 = (yDataPerKey[keys[j]][i + 1] - startLabelY) / gapY * gapHeight
+                    BigDecimal startX2 = DIAGRAM_MARGIN_LEFT + gapWidth * (i + 1)
+                    render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 192))
+                    render.renderLine(startX2 - startX, lineHeight - lineHeight2)
                 }
 
-                if (isStacked) {
-                    barY -= barHeight
-                } else {
-                    barX += barWidth + barMargin
+                // data label
+                if (yData > startLabelY) {
+                    String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
+                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - CIRCLE_RADIUS - 15.0)
+                    render.renderLabel(yDataLabel)
                 }
             }
         }
@@ -141,6 +123,7 @@ class BarDiagramScene extends DiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
-        drawVerticalBackgroundAndDataBar()
+        drawVerticalBackground()
+        drawDataLine()
     }
 }

@@ -116,6 +116,21 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderCircle(BigDecimal radius, CircleStyle circleStyle = CircleStyle.fill) {
+        if (circleStyle == CircleStyle.fill) {
+            outStr.append("""
+                <circle cx="${trX}" cy="${trY}" r="${radius}" fill="${fillStyle}" />
+          """.stripIndent()
+            )
+        } else {
+            outStr.append("""
+                <circle cx="${trX}" cy="${trY}" r="${radius}" stroke="${fillStyle}" stroke-width="1.3" fill="none" />
+          """.stripIndent()
+            )
+        }
+    }
+
+    @Override
     void renderPoly(BigDecimal... coords) {
         def it = coords.iterator()
         def sb = new StringBuilder()

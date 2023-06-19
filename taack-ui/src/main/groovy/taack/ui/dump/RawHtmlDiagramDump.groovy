@@ -8,6 +8,7 @@ import taack.ui.diagram.render.IDiagramRender
 import taack.ui.diagram.render.PngDiagramRender
 import taack.ui.diagram.render.SvgDiagramRender
 import taack.ui.diagram.scene.BarDiagramScene
+import taack.ui.diagram.scene.LineDiagramScene
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
@@ -57,13 +58,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitLineDiagram() {
-//        yDataPerKey.each { Map.Entry<String, List<BigDecimal>> entry ->
-//            List<BigDecimal> yDataList = entry.value
-//            xLabels.eachWithIndex { String xLabel, int i ->
-////                i < yDataList.size() ? yDataList[i] : 0, entry.key, xLabel
-//            }
-//        }
-
+        LineDiagramScene scene = new LineDiagramScene(render, xLabels, yDataPerKey)
+        scene.draw()
     }
 
     @Override

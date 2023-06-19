@@ -36,6 +36,12 @@ interface IDiagramRender {
     }
     void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle)
 
+    enum CircleStyle {
+        fill,
+        stroke,
+    }
+    void renderCircle(BigDecimal radius, CircleStyle circleStyle)
+
     void renderPoly(BigDecimal... coords)
 
     void renderArrow(BigDecimal... coords)
