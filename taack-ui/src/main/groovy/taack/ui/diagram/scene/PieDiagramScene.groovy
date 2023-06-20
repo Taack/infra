@@ -42,7 +42,7 @@ class PieDiagramScene extends DiagramScene {
             Double labelAngle = (((angle1 + angle2) / 2 - 90.0) * Math.PI / 180.0) as Double
             BigDecimal labelX = centerX + radius * Math.cos(labelAngle) * 3 / 4
             BigDecimal labelY = centerY + radius * Math.sin(labelAngle) * 3 / 4
-            String valueLabel = "${it.key}: ${value}"
+            String valueLabel = "${it.key}: ${value.toDouble() % 1 == 0 ? "${value.toInteger()}" : "$value"}"
             render.translateTo(labelX - render.measureText(valueLabel) / 2, labelY - FONT_SIZE)
             render.renderLabel(valueLabel)
             String percentLabel = "(${(percent * 100).round(2)}%)"
