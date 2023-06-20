@@ -103,13 +103,13 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle = RectStyle.fill) {
+    void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle = DiagramStyle.fill) {
         ig2.setPaint(fillStyle) // todo: stroke
         ig2.fill(new Rectangle2D.Double(trX.toDouble(), trY.toDouble(), width.toDouble(), height.toDouble()))
     }
 
     @Override
-    void renderCircle(BigDecimal radius, CircleStyle circleStyle = CircleStyle.fill) {
+    void renderCircle(BigDecimal radius, DiagramStyle diagramStyle = DiagramStyle.fill) {
         // todo
     }
 
@@ -172,6 +172,11 @@ class PngDiagramRender implements IDiagramRender {
             )
         }
         fillStyle = tmp
+    }
+
+    @Override
+    void renderSector(BigDecimal r, BigDecimal Angle1, BigDecimal Angle2, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        // todo
     }
 
     @Override

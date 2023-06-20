@@ -8,18 +8,22 @@ import java.util.List
 
 @CompileStatic
 abstract class DiagramScene {
+    final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
+    final protected BigDecimal LEGEND_RECT_HEIGHT = 13.0 // should be same as font size
+    final protected BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
+    final protected BigDecimal LEGEND_MARGIN = 10.0
+    final protected BigDecimal DIAGRAM_MARGIN_LEFT = 60.0
+    final protected BigDecimal DIAGRAM_MARGIN_RIGHT = 20.0
+    final protected BigDecimal DIAGRAM_MARGIN_TOP = 20.0
+    final protected BigDecimal DIAGRAM_MARGIN_BOTTOM = 60.0
+    final protected BigDecimal FONT_SIZE = 13.0 // should be same as the value of fontSize from render
+
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
     protected Map<String, List<BigDecimal>> yDataPerKey
-
-    final protected BigDecimal LEGEND_MARGIN = 10.0
-    final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
-    final protected BigDecimal LEGEND_RECT_HEIGHT = 13.0 // same as font size
-    final protected BigDecimal DIAGRAM_MARGIN_LEFT = 60.0
-    final protected BigDecimal DIAGRAM_MARGIN_RIGHT = 20.0
-    final protected BigDecimal DIAGRAM_MARGIN_TOP = 10.0
-    final protected BigDecimal DIAGRAM_MARGIN_BOTTOM = 60.0
+    protected BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP
+    protected boolean legendFullColor = false
 
     enum LegendColor {
         RED(new Color(255, 99, 132)),
@@ -42,22 +46,54 @@ abstract class DiagramScene {
     }
 
     void drawLegend() {
-        Set<String> keys = yDataPerKey.keySet()
-        BigDecimal legendX = (width - keys.size() * (LEGEND_RECT_WIDTH + 5.0 + LEGEND_MARGIN) + LEGEND_MARGIN - render.measureText(keys.join(""))) / 2
-        keys.eachWithIndex { String key, int index ->
-            // rect
-            render.translateTo(legendX, LEGEND_MARGIN)
-            Color rectColor = LegendColor.colorFrom(index)
-            render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
-            render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.RectStyle.fill)
-            render.fillStyle(rectColor)
-            render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.RectStyle.stroke)
+        Integer line = 1
+        BigDecimal totalLength = 0.0
+        Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
+        yDataPerKey.keySet().each { String key ->
+            BigDecimal length = LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
+            if (totalLength + length > width) {
+                line++
+                totalLength = 0.0
+            }
+            if (keyMapPerLine.keySet().contains(line)) {
+                keyMapPerLine[line].put(key, length)
+            } else {
+                Map<String, BigDecimal> m = [:]
+                m.put(key, length)
+                keyMapPerLine.put(line, m)
+            }
+            totalLength += length + LEGEND_MARGIN
+        }
 
-            // text
-            render.translateTo(legendX + LEGEND_RECT_WIDTH + 5.0, LEGEND_MARGIN)
-            render.renderLabel(key)
+        diagramMarginTop += (LEGEND_MARGIN + LEGEND_RECT_HEIGHT) * line
 
-            legendX += LEGEND_RECT_WIDTH + 5.0 + render.measureText(key) + LEGEND_MARGIN
+        BigDecimal startY = LEGEND_MARGIN
+        Integer legendIndex = 0
+        keyMapPerLine.each {
+            Map<String, BigDecimal> keyMap = it.value
+            BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
+            keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
+                // rect
+                render.translateTo(startX, startY)
+                Color rectColor = LegendColor.colorFrom(legendIndex)
+                if (legendFullColor) {
+                    render.fillStyle(rectColor)
+                    render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.DiagramStyle.fill)
+                } else {
+                    render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
+                    render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.DiagramStyle.fill)
+                    render.fillStyle(rectColor)
+                    render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.DiagramStyle.stroke)
+                }
+
+                // text
+                render.translateTo(startX + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
+                render.renderLabel(keyEntry.key)
+
+                startX += keyEntry.value + LEGEND_MARGIN
+                legendIndex++
+            }
+            startY += LEGEND_RECT_HEIGHT + LEGEND_MARGIN
         }
     }
 }

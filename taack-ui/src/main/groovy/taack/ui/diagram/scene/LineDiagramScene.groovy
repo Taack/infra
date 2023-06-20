@@ -14,6 +14,9 @@ class LineDiagramScene extends DiagramScene {
     private BigDecimal gapY
     private BigDecimal gapHeight
     final private BigDecimal CIRCLE_RADIUS = 2.5
+    final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
+    final private BigDecimal AXIS_LABEL_MARGIN = 10.0
+    final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
 
     LineDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey) {
         this.width = render.getDiagramWidth()
@@ -42,17 +45,16 @@ class LineDiagramScene extends DiagramScene {
             gapNumberY = 10
         }
         BigDecimal endLabelY = startLabelY + gapY * gapNumberY
-        BigDecimal diagramTopMargin = LEGEND_MARGIN * 2 + LEGEND_RECT_HEIGHT + DIAGRAM_MARGIN_TOP
-        gapHeight = (height - diagramTopMargin - DIAGRAM_MARGIN_BOTTOM) / gapNumberY
+        gapHeight = (height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / gapNumberY
         render.fillStyle(new Color(231, 231, 231))
         for (int i = 0; i <= gapNumberY; i++) {
             // background horizontal line
-            render.translateTo(DIAGRAM_MARGIN_LEFT - 5.0, diagramTopMargin + gapHeight * i)
-            render.renderLine(width - (DIAGRAM_MARGIN_LEFT - 5.0) - DIAGRAM_MARGIN_RIGHT, 0.0)
+            render.translateTo(DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM, diagramMarginTop + gapHeight * i)
+            render.renderLine(width - (DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM) - DIAGRAM_MARGIN_RIGHT, 0.0)
 
             // y axis label
             String yLabel = "${gapY < 1 ? (endLabelY - gapY * i).round(1) : (endLabelY - gapY * i).toInteger()}"
-            render.translateTo(DIAGRAM_MARGIN_LEFT - 10.0 - render.measureText(yLabel), diagramTopMargin + gapHeight * i - 6.5)
+            render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - FONT_SIZE / 2)
             render.renderLabel(yLabel)
         }
     }
@@ -65,19 +67,19 @@ class LineDiagramScene extends DiagramScene {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
             // background vertical line
-            render.translateTo(startX, LEGEND_MARGIN * 2 + LEGEND_RECT_HEIGHT + DIAGRAM_MARGIN_TOP)
+            render.translateTo(startX, diagramMarginTop)
             render.fillStyle(new Color(231, 231, 231))
-            render.renderLine(0.0, height - (LEGEND_MARGIN * 2 + LEGEND_RECT_HEIGHT + DIAGRAM_MARGIN_TOP) - (DIAGRAM_MARGIN_BOTTOM - 5.0))
+            render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
 
             // x axis label
             String xLabel = xLabels[i]
             if (showLabelEveryX >= 1) {
                 if (i % showLabelEveryX == 0) {
-                    render.translateTo(startX - render.measureText(xLabel), height - DIAGRAM_MARGIN_BOTTOM + 10.0)
-                    render.renderRotatedLabel(xLabel, -20.0, startX, height - DIAGRAM_MARGIN_BOTTOM + 10.0)
+                    render.translateTo(startX - render.measureText(xLabel), height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 }
             } else {
-                render.translateTo(startX - render.measureText(xLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM + 10.0)
+                render.translateTo(startX - render.measureText(xLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 render.renderLabel(xLabel)
             }
         }
@@ -97,7 +99,7 @@ class LineDiagramScene extends DiagramScene {
                 render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
                 Color circleColor = LegendColor.colorFrom(j)
                 render.fillStyle(circleColor)
-                render.renderCircle(CIRCLE_RADIUS, IDiagramRender.CircleStyle.stroke)
+                render.renderCircle(CIRCLE_RADIUS, IDiagramRender.DiagramStyle.stroke)
 
                 // line to next circle
                 if (i < gapNumberX) { // not the last point
@@ -110,7 +112,7 @@ class LineDiagramScene extends DiagramScene {
                 // data label
                 if (yData > startLabelY) {
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
-                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - CIRCLE_RADIUS - 15.0)
+                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - CIRCLE_RADIUS - FONT_SIZE - 2.0)
                     render.renderLabel(yDataLabel)
                 }
             }

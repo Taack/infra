@@ -55,9 +55,9 @@ interface IUiBlockVisitor {
 
     void visitDiagram(String i18n, BlockSpec.Width width)
 
-    void visitDiagramFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier, final String i18n, final BlockSpec.Width width)
+    void visitDiagramFilter(String i18nFilter, UiFilterSpecifier filterSpecifier, String i18n, BlockSpec.Width width)
 
-    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier)
+    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier, BlockSpec.Width width)
 
     void visitCloseModal(String id, String value, FieldInfo[] fields)
 

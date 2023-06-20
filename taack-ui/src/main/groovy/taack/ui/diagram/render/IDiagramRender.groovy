@@ -5,6 +5,10 @@ import taack.ui.base.common.Style
 import java.awt.Color
 
 interface IDiagramRender {
+    enum DiagramStyle {
+        fill,
+        stroke,
+    }
 
     void translateTo(BigDecimal x, BigDecimal y)
 
@@ -30,23 +34,17 @@ interface IDiagramRender {
 
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY)
 
-    enum RectStyle {
-        fill,
-        stroke,
-    }
-    void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle)
+    void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle)
 
-    enum CircleStyle {
-        fill,
-        stroke,
-    }
-    void renderCircle(BigDecimal radius, CircleStyle circleStyle)
+    void renderCircle(BigDecimal radius, DiagramStyle diagramStyle)
 
     void renderPoly(BigDecimal... coords)
 
     void renderArrow(BigDecimal... coords)
 
     void renderTriangle(BigDecimal length, boolean isDown)
+
+    void renderSector(BigDecimal r, BigDecimal Angle1, BigDecimal Angle2, DiagramStyle diagramStyle)
 
     BigDecimal getDiagramWidth()
 

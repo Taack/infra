@@ -2,6 +2,7 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import taack.ui.base.UiDiagramSpecifier
+import taack.ui.base.block.BlockSpec
 import taack.ui.base.diagram.DiagramTypeSpec
 import taack.ui.base.diagram.IUiDiagramVisitor
 import taack.ui.diagram.render.IDiagramRender
@@ -9,15 +10,18 @@ import taack.ui.diagram.render.PngDiagramRender
 import taack.ui.diagram.render.SvgDiagramRender
 import taack.ui.diagram.scene.BarDiagramScene
 import taack.ui.diagram.scene.LineDiagramScene
+import taack.ui.diagram.scene.PieDiagramScene
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
     final private ByteArrayOutputStream out
     final private String diagramId
+    final private BlockSpec.Width blockSpecWidth
 
-    RawHtmlDiagramDump(final ByteArrayOutputStream out, final String diagramId) {
+    RawHtmlDiagramDump(final ByteArrayOutputStream out, final String diagramId, final BlockSpec.Width blockSpecWidth) {
         this.out = out
         this.diagramId = diagramId
+        this.blockSpecWidth = blockSpecWidth
     }
 
     UiDiagramSpecifier.DiagramBase diagramBase
@@ -43,10 +47,19 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitDiagramPreparation(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio) {
         this.yDataPerKey = [:]
         this.xLabels = xLabels
+        BigDecimal width
+        switch (blockSpecWidth) {
+            case BlockSpec.Width.THREE_QUARTER: width = 1800.0 * 3 / 4; break
+            case BlockSpec.Width.TWO_THIRD: width = 1800.0 * 2 / 3; break
+            case BlockSpec.Width.HALF: width = 1800.0 / 2; break
+            case BlockSpec.Width.THIRD: width = 1800.0 / 3; break
+            case BlockSpec.Width.QUARTER: width = 1800.0 / 4; break
+            default: width = 1800.0; break
+        }
         if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
-            this.render = new SvgDiagramRender(1800.0, 1800.0 * radio.radio, true)
+            this.render = new SvgDiagramRender(width, width * radio.radio, true)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            this.render = new PngDiagramRender(1800.0, 1800.0 * radio.radio) // todo: adjust size for Pie (radio == 1)
+            this.render = new PngDiagramRender(width, width * radio.radio)
         }
     }
 
@@ -64,12 +77,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitPieDiagram() {
-//        BigDecimal total = yDataPerKey.values().collect { it.size() ? it.first() : 0 }.sum() as BigDecimal
-//        yDataPerKey.each {
-//            BigDecimal value = it.value.size() ? it.value.first() : 0
-////            "${it.key}: ${value} (${(value / total * 100).round(2)}%)", value
-//        }
-
+        PieDiagramScene scene = new PieDiagramScene(render, yDataPerKey)
+        scene.draw()
     }
 
     @Override
