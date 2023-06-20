@@ -101,8 +101,8 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderRect(BigDecimal width, BigDecimal height, RectStyle rectStyle = RectStyle.fill) {
-        if (rectStyle == RectStyle.fill) {
+    void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        if (diagramStyle == DiagramStyle.fill) {
             outStr.append("""
                 <rect x="${trX}" y="${trY}" width="${width}" height="${height}" style="fill:${fillStyle};" />
           """.stripIndent()
@@ -116,8 +116,8 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderCircle(BigDecimal radius, CircleStyle circleStyle = CircleStyle.fill) {
-        if (circleStyle == CircleStyle.fill) {
+    void renderCircle(BigDecimal radius, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        if (diagramStyle == DiagramStyle.fill) {
             outStr.append("""
                 <circle cx="${trX}" cy="${trY}" r="${radius}" fill="${fillStyle}" />
           """.stripIndent()
@@ -192,6 +192,32 @@ class SvgDiagramRender implements IDiagramRender {
             )
         }
         fillStyle = tmp
+    }
+
+    @Override
+    void renderSector(BigDecimal r, BigDecimal Angle1, BigDecimal Angle2, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        Double radius = r as Double
+        Double centerX = trX as Double
+        Double centerY = trY as Double
+        Double startAngle = ((Angle1 - 90.0) * Math.PI / 180.0) as Double
+        Double endAngle = ((Angle2 - 90.0) * Math.PI / 180.0) as Double
+
+        Double startX = centerX + radius * Math.cos(startAngle)
+        Double startY = centerY + radius * Math.sin(startAngle)
+        Double endX = centerX + radius * Math.cos(endAngle)
+        Double endY = centerY + radius * Math.sin(endAngle)
+        int largeArcFlag = Angle2 - Angle1 <= 180.0 ? 0 : 1
+        if (diagramStyle == DiagramStyle.fill) {
+            outStr.append("""
+                <path d="M ${trX} ${trY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z" fill="${fillStyle}" />
+          """.stripIndent()
+            )
+        } else {
+            outStr.append("""
+                <path d="M ${trX} ${trY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z" fill="transparent" stroke="${fillStyle}" stroke-width="1.3" />
+          """.stripIndent()
+            )
+        }
     }
 
     @Override

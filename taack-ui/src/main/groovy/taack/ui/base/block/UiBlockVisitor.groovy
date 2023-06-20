@@ -129,7 +129,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier = null) {
+    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier, BlockSpec.Width width) {
 
     }
 
