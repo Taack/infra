@@ -44,7 +44,7 @@ interface IDiagramRender {
 
     void renderTriangle(BigDecimal length, boolean isDown)
 
-    void renderSector(BigDecimal r, BigDecimal Angle1, BigDecimal Angle2, DiagramStyle diagramStyle)
+    void renderSector(BigDecimal r, BigDecimal angle1, BigDecimal angle2, DiagramStyle diagramStyle)
 
     BigDecimal getDiagramWidth()
 

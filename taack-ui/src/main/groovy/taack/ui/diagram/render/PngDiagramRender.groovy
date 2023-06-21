@@ -5,6 +5,8 @@ import taack.ui.base.common.Style
 
 import javax.imageio.ImageIO
 import java.awt.*
+import java.awt.geom.Arc2D
+import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
@@ -99,18 +101,32 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
-        // todo
+        double radians = Math.toRadians(rotateAngle.toDouble())
+        ig2.rotate(radians, rotatePointX.toDouble(), rotatePointY.toDouble())
+        renderLabel(label)
+        ig2.rotate(-radians, rotatePointX.toDouble(), rotatePointY.toDouble())
     }
 
     @Override
     void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle = DiagramStyle.fill) {
-        ig2.setPaint(fillStyle) // todo: stroke
-        ig2.fill(new Rectangle2D.Double(trX.toDouble(), trY.toDouble(), width.toDouble(), height.toDouble()))
+        ig2.setPaint(fillStyle)
+        Rectangle2D.Double rect = new Rectangle2D.Double(trX.toDouble(), trY.toDouble(), width.toDouble(), height.toDouble())
+        if (diagramStyle == DiagramStyle.fill) {
+            ig2.fill(rect)
+        } else {
+            ig2.draw(rect)
+        }
     }
 
     @Override
     void renderCircle(BigDecimal radius, DiagramStyle diagramStyle = DiagramStyle.fill) {
-        // todo
+        ig2.setPaint(fillStyle)
+        Ellipse2D.Double circle = new Ellipse2D.Double((trX - radius).toDouble(), (trY - radius).toDouble(), radius.toDouble() * 2, radius.toDouble() * 2)
+        if (diagramStyle == DiagramStyle.fill) {
+            ig2.fill(circle)
+        } else {
+            ig2.draw(circle)
+        }
     }
 
     @Override
@@ -175,8 +191,14 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderSector(BigDecimal r, BigDecimal Angle1, BigDecimal Angle2, DiagramStyle diagramStyle = DiagramStyle.fill) {
-        // todo
+    void renderSector(BigDecimal r, BigDecimal angle1, BigDecimal angle2, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        ig2.setPaint(fillStyle)
+        Arc2D.Double sector = new Arc2D.Double((trX - r).toDouble(), (trY - r).toDouble(), 2 * r.toDouble(), 2 * r.toDouble(), (90 - angle1).toDouble(), ( - angle2 + angle1).toDouble(), Arc2D.PIE)
+        if (diagramStyle == DiagramStyle.fill) {
+            ig2.fill(sector)
+        } else {
+            ig2.draw(sector)
+        }
     }
 
     @Override
