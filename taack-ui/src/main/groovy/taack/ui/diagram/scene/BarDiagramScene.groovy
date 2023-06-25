@@ -13,6 +13,7 @@ class BarDiagramScene extends DiagramScene {
     private BigDecimal startLabelY
     private BigDecimal gapY
     private BigDecimal gapHeight
+    final private BigDecimal MIN_BAR_WIDTH = 2.0
     final private BigDecimal MAX_BAR_WIDTH = 200.0
     final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
     final private BigDecimal AXIS_LABEL_MARGIN = 10.0
@@ -77,9 +78,30 @@ class BarDiagramScene extends DiagramScene {
     void drawVerticalBackgroundAndDataBar() {
         Set<String> keys = yDataPerKey.keySet()
         int gapNumberX = xLabels.size()
-        BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / gapNumberX
-        int showLabelEveryX = (render.measureText(xLabels.join("")) / (gapWidth * gapNumberX * 0.8)).toInteger()
-        for (int i = 0; i < gapNumberX; i++) {
+        BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
+        BigDecimal gapWidth = diagramWidth / gapNumberX
+        int barNumber = isStacked ? 1 : keys.size()
+        int showGapEveryX = 1
+
+        // bar width should be bigger than a min value (In the case of "smaller", we will combine several gaps to get enough space and only draw bars of the first gap. It means "showGapEveryX".)
+        BigDecimal singleBarWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
+        if (singleBarWidth < MIN_BAR_WIDTH) {
+            BigDecimal minGapWidth = barNumber > 1 ? MIN_BAR_WIDTH * barNumber / 0.8 / 0.8 : MIN_BAR_WIDTH / 0.8
+            showGapEveryX = Math.ceil((minGapWidth / gapWidth).toDouble()).toInteger()
+            gapWidth = gapWidth * showGapEveryX
+        }
+
+        // calculate true value of bar width
+        BigDecimal gapHorizontalPadding = gapWidth * 0.2 / 2
+        BigDecimal barWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
+        BigDecimal barMargin = barNumber > 1 ? (gapWidth * 0.8) * 0.2 / (barNumber - 1) : 0.0
+        if (barWidth > MAX_BAR_WIDTH) {
+            barWidth = MAX_BAR_WIDTH
+            gapHorizontalPadding = (gapWidth - barWidth * barNumber - barMargin * (barNumber - 1)) / 2
+        }
+
+        int showLabelEveryX = (render.measureText(xLabels.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
+        for (int i = 0; i < gapNumberX / showGapEveryX; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
             // background vertical line
@@ -88,7 +110,7 @@ class BarDiagramScene extends DiagramScene {
             render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
 
             // x axis label
-            String xLabel = xLabels[i]
+            String xLabel = xLabels[i * showGapEveryX]
             if (showLabelEveryX >= 1) {
                 if (i % showLabelEveryX == 0) {
                     render.translateTo(startX + gapWidth * 0.5 - render.measureText(xLabel), height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
@@ -99,30 +121,38 @@ class BarDiagramScene extends DiagramScene {
                 render.renderLabel(xLabel)
             }
 
-            // data bar
-            int barNumber = isStacked ? 1 : keys.size()
-            BigDecimal horizontalPadding = gapWidth * 0.2
-            BigDecimal barWidth = barNumber > 1 ? (gapWidth - horizontalPadding) * 0.8 / barNumber : (gapWidth - horizontalPadding)
-            BigDecimal barMargin = barNumber > 1 ? (gapWidth - horizontalPadding) * 0.2 / (barNumber - 1) : 0.0
-            if (barWidth > MAX_BAR_WIDTH) {
-                barWidth = MAX_BAR_WIDTH
-                horizontalPadding = gapWidth - barWidth * barNumber - barMargin * (barNumber - 1)
-            }
-            BigDecimal barX = startX + horizontalPadding / 2
+            // data bar rect
+            BigDecimal barX = startX + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
-                BigDecimal yData = yDataPerKey[keys[j]][i]
+                BigDecimal yData = yDataPerKey[keys[j]][i * showGapEveryX]
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 if (yData > startLabelY) {
-                    // bar rect
                     render.translateTo(barX, barY - barHeight)
                     Color rectColor = LegendColor.colorFrom(j)
                     render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
                     render.fillStyle(rectColor)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.stroke)
+                }
 
-                    // data label
+                if (isStacked) {
+                    barY -= barHeight
+                } else {
+                    barX += barWidth + barMargin
+                }
+            }
+        }
+
+        // data bar label
+        for (int i = 0; i < gapNumberX / showGapEveryX; i++) {
+            BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
+            BigDecimal barX = startX + gapHorizontalPadding
+            BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
+            for (int j = 0; j < keys.size(); j++) {
+                BigDecimal yData = yDataPerKey[keys[j]][i * showGapEveryX]
+                BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
+                if (yData > startLabelY) {
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
                     render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - FONT_SIZE / 2 : barY - barHeight - FONT_SIZE - 2.0)
                     render.renderLabel(yDataLabel)
