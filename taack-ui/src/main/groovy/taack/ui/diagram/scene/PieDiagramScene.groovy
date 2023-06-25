@@ -16,7 +16,7 @@ class PieDiagramScene extends DiagramScene {
 
     void drawDataPie() {
         BigDecimal total = yDataPerKey.values().collect { it.size() ? it.first() : 0 }.sum() as BigDecimal
-        BigDecimal radius = (Math.min((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT).toDouble(), (height - diagramMarginTop).toDouble()) / 2).toBigDecimal()
+        BigDecimal radius = (Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2).toDouble(), (height - diagramMarginTop).toDouble()) / 2).toBigDecimal()
         BigDecimal centerX = width / 2
         BigDecimal centerY = diagramMarginTop + radius
 

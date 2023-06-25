@@ -13,7 +13,7 @@ class BarDiagramScene extends DiagramScene {
     private BigDecimal startLabelY
     private BigDecimal gapY
     private BigDecimal gapHeight
-    final private BigDecimal MIN_BAR_WIDTH = 2.0
+    final private BigDecimal MIN_BAR_WIDTH = 5.0
     final private BigDecimal MAX_BAR_WIDTH = 200.0
     final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
     final private BigDecimal AXIS_LABEL_MARGIN = 10.0

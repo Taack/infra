@@ -299,7 +299,7 @@ final class BlockSpec {
                        final String i18nDiagram, final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
         if (displayElement()) {
             blockVisitor.visitDiagramFilter(i18nFilter, filterSpecifier, i18nDiagram, width)
-            blockVisitor.visitDiagramEnd(diagramSpecifier, width)
+            blockVisitor.visitDiagramEnd(diagramSpecifier, width) // todo: width ?
         }
     }
 
