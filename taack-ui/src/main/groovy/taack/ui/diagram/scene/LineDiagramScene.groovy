@@ -17,6 +17,7 @@ class LineDiagramScene extends DiagramScene {
     final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
     final private BigDecimal AXIS_LABEL_MARGIN = 10.0
     final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
+    final private BigDecimal MIN_GAP_WIDTH = 5.0 // hide dataLabel/dataCircle/backgroundVerticalLine when gap too narrow (it means huge number of labels)
 
     LineDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey) {
         this.width = render.getDiagramWidth()
@@ -67,9 +68,11 @@ class LineDiagramScene extends DiagramScene {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
             // background vertical line
-            render.translateTo(startX, diagramMarginTop)
-            render.fillStyle(new Color(231, 231, 231))
-            render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
+            if (gapWidth >= MIN_GAP_WIDTH || i % showLabelEveryX == 0) {
+                render.translateTo(startX, diagramMarginTop)
+                render.fillStyle(new Color(231, 231, 231))
+                render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
+            }
 
             // x axis label
             String xLabel = xLabels[i]
@@ -89,28 +92,32 @@ class LineDiagramScene extends DiagramScene {
         Set<String> keys = yDataPerKey.keySet()
         int gapNumberX = xLabels.size() - 1
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / gapNumberX
+        boolean hideInfo = gapWidth < MIN_GAP_WIDTH
         for (int i = 0; i < gapNumberX + 1; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
             for (int j = 0; j < keys.size(); j++) {
                 BigDecimal yData = yDataPerKey[keys[j]][i]
                 BigDecimal lineHeight = (yData - startLabelY) / gapY * gapHeight
+                Color circleColor = LegendColor.colorFrom(j)
 
                 // circle
-                render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
-                Color circleColor = LegendColor.colorFrom(j)
-                render.fillStyle(circleColor)
-                render.renderCircle(CIRCLE_RADIUS, IDiagramRender.DiagramStyle.stroke)
+                if (!hideInfo || i == 0) {
+                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
+                    render.fillStyle(circleColor)
+                    render.renderCircle(CIRCLE_RADIUS, IDiagramRender.DiagramStyle.stroke)
+                }
 
                 // line to next circle
                 if (i < gapNumberX) { // not the last point
                     BigDecimal lineHeight2 = (yDataPerKey[keys[j]][i + 1] - startLabelY) / gapY * gapHeight
                     BigDecimal startX2 = DIAGRAM_MARGIN_LEFT + gapWidth * (i + 1)
+                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
                     render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 192))
                     render.renderLine(startX2 - startX, lineHeight - lineHeight2)
                 }
 
                 // data label
-                if (yData > startLabelY) {
+                if (yData > startLabelY && !hideInfo) {
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
                     render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - CIRCLE_RADIUS - FONT_SIZE - 2.0)
                     render.renderLabel(yDataLabel)
