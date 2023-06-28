@@ -392,7 +392,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry) {
-        final String trI18n = i18n ?: parameter.trField(field)
+        final String trI18n = i18n ?: parameter.trField(field) ?: mapEntry
         final String qualifiedName = field.fieldName + '.' + mapEntry
         final String value = (field.value as Map<String, String>)?.get(mapEntry)
         out << """
