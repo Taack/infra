@@ -199,13 +199,13 @@ class SvgDiagramRender implements IDiagramRender {
         Double radius = r as Double
         Double centerX = trX as Double
         Double centerY = trY as Double
-        Double startAngle = ((angle1 - 90.0) * Math.PI / 180.0) as Double
-        Double endAngle = ((angle2 - 90.0) * Math.PI / 180.0) as Double
+        Double startAngle = Math.toRadians(angle1.toDouble())
+        Double endAngle = Math.toRadians(angle2.toDouble())
 
-        Double startX = centerX + radius * Math.cos(startAngle)
-        Double startY = centerY + radius * Math.sin(startAngle)
-        Double endX = centerX + radius * Math.cos(endAngle)
-        Double endY = centerY + radius * Math.sin(endAngle)
+        Double startX = centerX + radius * Math.cos(startAngle - Math.PI / 2)
+        Double startY = centerY + radius * Math.sin(startAngle - Math.PI / 2)
+        Double endX = centerX + radius * Math.cos(endAngle - Math.PI / 2)
+        Double endY = centerY + radius * Math.sin(endAngle - Math.PI / 2)
         int largeArcFlag = angle2 - angle1 <= 180.0 ? 0 : 1
         if (diagramStyle == DiagramStyle.fill) {
             outStr.append("""
