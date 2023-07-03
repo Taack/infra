@@ -192,6 +192,11 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderSector(BigDecimal r, BigDecimal angle1, BigDecimal angle2, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        if (angle1 == 0.0 && angle2 == 360.0) {
+            renderCircle(r, diagramStyle)
+            return
+        }
+
         ig2.setPaint(fillStyle)
         Arc2D.Double sector = new Arc2D.Double((trX - r).toDouble(), (trY - r).toDouble(), 2 * r.toDouble(), 2 * r.toDouble(), (90 - angle1).toDouble(), ( - angle2 + angle1).toDouble(), Arc2D.PIE)
         if (diagramStyle == DiagramStyle.fill) {

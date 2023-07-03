@@ -196,6 +196,11 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void renderSector(BigDecimal r, BigDecimal angle1, BigDecimal angle2, DiagramStyle diagramStyle = DiagramStyle.fill) {
+        if (angle1 == 0.0 && angle2 == 360.0) {
+            renderCircle(r, diagramStyle)
+            return
+        }
+
         Double radius = r as Double
         Double centerX = trX as Double
         Double centerY = trY as Double
