@@ -44,8 +44,26 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
 //        val controller = i.attributes.getNamedItem("taackAjaxFormM2MController")!!.value
         val action = i.attributes.getNamedItem("taackAjaxFormM2MAction")!!.value
         val id = i.attributes.getNamedItem("taackAjaxFormM2MId")?.value
+
+        val additionalParams = mutableMapOf<String, String>()
+        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
+            val v = parent.f[it]
+            println("AUO3 onClick, v: $v, it: $it")
+            if (v is HTMLSelectElement) {
+                if (v.value.isNotBlank())
+                    additionalParams["ajaxParams.$it"] = v.value
+//                    ajaxParams.append("ajaxParams.$it=${v.value}&")
+            }
+            if (v is HTMLInputElement) {
+                println("AUO31 v.value = ${v.value}")
+                if (v.value.isNotBlank())
+                    additionalParams["ajaxParams.$it"] = v.value
+//                    ajaxParams.append("ajaxParams.$it=${v.value}&")
+            }
+        }
+
 //        val params = i.attributes.getNamedItem("taackAjaxFormM2MParams")?.value
-        val url = AjaxLink.createUrl(action)
+        val url = AjaxLink.createUrl(action, additionalParams)
 
         window.fetch(url.toString(), RequestInit(method = "GET")).then {
             if (it.ok) {
