@@ -162,7 +162,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
      * @param menu
      * @return
      */
-    final def show(UiFormSpecifier formSpecifier, String i18n, UiMenuSpecifier menu = null) {
+    final def show(UiFormSpecifier formSpecifier, String i18n = null, UiMenuSpecifier menu = null) {
         show(new UiBlockSpecifier().ui {
             ajaxBlock actionName, {
                 form(i18n, formSpecifier)
@@ -177,7 +177,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
      * @param i18n title of the form
      * @return
      */
-    final def showModal(UiFormSpecifier formSpecifier, String i18n) {
+    final def showModal(UiFormSpecifier formSpecifier, String i18n = null) {
         show(new UiBlockSpecifier().ui {
             modal {
                 ajaxBlock actionName, {
@@ -216,7 +216,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
      * @param i18nTableFilter
      * @return
      */
-    final def showModal(UiTableSpecifier tableSpecifier, String i18nTable, UiFilterSpecifier filterSpecifier = null, String i18nTableFilter = null) {
+    final def showModal(UiTableSpecifier tableSpecifier, String i18nTable = null, UiFilterSpecifier filterSpecifier = null, String i18nTableFilter = null) {
         show(new UiBlockSpecifier().ui {
             modal {
                 ajaxBlock actionName, {
