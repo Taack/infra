@@ -97,7 +97,7 @@ final class TaackJdbcService {
      */
     final static class Jdbc {
         static final void registerClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
-            TaackJdbcService.registerJdbcClass(aClass, fieldInfos)
+            registerJdbcClass(aClass, fieldInfos)
         }
     }
 
@@ -108,7 +108,7 @@ final class TaackJdbcService {
         gormClassesMap.put(aClass.simpleName, aClass)
     }
 
-    private final String hqlFromTranslator(TQLTranslator translator, boolean count = false) {
+    private static final String hqlFromTranslator(TQLTranslator translator, boolean count = false) {
         StringBuffer out = new StringBuffer(512)
         if (!count) {
             if (!translator.columns?.isEmpty()) {
@@ -671,5 +671,9 @@ final class TaackJdbcService {
         cId.setPrecision(0)
         b.addColumns(cId)
         b.build().toByteArray()
+    }
+
+    final static Map<Class<? extends GormEntity>, FieldInfo[]> getFieldInfoMapDesc() {
+        fieldInfoMap
     }
 }
