@@ -81,6 +81,7 @@ final class TaackJdbcService {
     }
     private final static Map<Class<? extends GormEntity>, FieldInfo[]> fieldInfoMap = [:]
     private final static Map<String, Class<? extends GormEntity>> gormClassesMap = [:]
+    private final static Map<String, Class<? extends GormEntity>> gormRealClassesMap = [:]
 
     /**
      * Allow to register a GormEntity class as base class for TQL queries.
@@ -106,6 +107,7 @@ final class TaackJdbcService {
         fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), aClass.getDeclaredField('id'), null), 'id', (Long) 0)
         fieldInfoMap.put(aClass, fieldInfoWithId as FieldInfo[])
         gormClassesMap.put(aClass.simpleName, aClass)
+        gormRealClassesMap.put(aClass.name, aClass)
     }
 
     private static final String hqlFromTranslator(TQLTranslator translator, boolean count = false) {
@@ -675,5 +677,9 @@ final class TaackJdbcService {
 
     final static Map<Class<? extends GormEntity>, FieldInfo[]> getFieldInfoMapDesc() {
         fieldInfoMap
+    }
+
+    final static FieldInfo[] gormFields(String className) {
+        fieldInfoMap[gormRealClassesMap[className]]
     }
 }
