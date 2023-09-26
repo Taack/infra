@@ -70,7 +70,7 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowColumn(Integer colSpan, Integer rowSpan) {
+    void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
 
     }
 

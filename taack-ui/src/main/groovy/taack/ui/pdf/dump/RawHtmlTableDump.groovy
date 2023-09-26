@@ -139,11 +139,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowColumn(Integer colSpan, Integer rowSpan) {
+    void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
         if (colSpan) {
-            out << """<td colspan="${colSpan}" ${rowSpan ?"rowSpan='${rowSpan}'":""} ${rowStyle ?"style='${rowStyle.cssStyleString}' ":""}>"""
+            out << """<td colspan="${colSpan}" ${rowSpan ?"rowSpan='${rowSpan}'":""} ${style ? "style='${style.cssStyleString}'" : (rowStyle ? "style='${rowStyle.cssStyleString}'" : "")}>"""
         } else {
-            out << """<td ${rowStyle ?"style='${rowStyle.cssStyleString}' ":""}>"""
+            out << """<td ${style ? "style='${style.cssStyleString}'" : (rowStyle ? "style='${rowStyle.cssStyleString}'" : "")}>"""
         }
     }
 

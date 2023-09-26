@@ -67,6 +67,7 @@ class Style {
     final static Style ALIGN_CENTER = new Style(null, "text-align: center;", true)
     final static Style NOWRAP = new Style(null, "white-space: nowrap;")
 
+    final static Style LABEL_WIDTH_AUTO_MIN = new Style(null, "width: 1%; white-space: nowrap;")
     final static Style LABEL_WIDTH90PX = new Style(null, "width: 90px; display: inline-block;", false, true)
     final static Style LABEL_WIDTH120PX = new Style(null, "width: 120px; display: inline-block;", false, true)
     final static Style LABEL_WIDTH150PX = new Style(null, "width: 150px; display: inline-block;", false, true)

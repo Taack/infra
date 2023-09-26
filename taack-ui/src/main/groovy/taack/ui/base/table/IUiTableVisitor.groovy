@@ -38,7 +38,7 @@ interface IUiTableVisitor {
 
     void visitRowColumnEnd()
 
-    void visitRowColumn(Integer colSpan, Integer rowSpan)
+    void visitRowColumn(Integer colSpan, Integer rowSpan, Style style)
 
     void visitRowField(FieldInfo fieldInfo, String format, final Style style)
 
