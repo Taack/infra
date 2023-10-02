@@ -15,10 +15,10 @@ import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.filter.expression.Operator
 import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.dump.RawHtmlFilterDump
+import taack.ui.dump.RawMapFilterDump
 
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
-
 /**
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
@@ -615,5 +615,11 @@ class TaackSimpleFilterService implements WebAttributes {
                 return list(aClass, 20, f, t)
             }
         } else return null
+    }
+
+    final Map<String, String> mapFilterDump(UiFilterSpecifier filter) {
+        def v = new RawMapFilterDump(params)
+        filter.visitFilter(v)
+        v.theResults
     }
 }
