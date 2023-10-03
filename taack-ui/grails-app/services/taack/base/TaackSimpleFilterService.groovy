@@ -617,7 +617,7 @@ class TaackSimpleFilterService implements WebAttributes {
         } else return null
     }
 
-    final Map<String, String> mapFilterDump(UiFilterSpecifier filter) {
+    final Map mapFilterDump(UiFilterSpecifier filter) {
         def v = new RawMapFilterDump(params)
         filter.visitFilter(v)
         v.theResults

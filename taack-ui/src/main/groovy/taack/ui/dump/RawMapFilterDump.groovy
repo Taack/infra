@@ -9,7 +9,7 @@ import taack.ui.base.filter.UiFilterVisitorImpl
 @CompileStatic
 final class RawMapFilterDump extends UiFilterVisitorImpl {
 
-    final Map<String, String> theResults = [:]
+    final Map theResults = [:]
     final Map parameter
 
     RawMapFilterDump(final Map parameter) {
@@ -35,7 +35,7 @@ final class RawMapFilterDump extends UiFilterVisitorImpl {
         } else if (isBoolean) {
             Boolean isChecked = parameter[qualifiedName + 'Default'] ?
                     ((parameter[qualifiedName] && parameter[qualifiedName] == '1') ? true : (parameter[qualifiedName] && parameter[qualifiedName] == '0') ? false : null) : fieldInfo.value
-            if (isChecked) theResults.put(qualifiedName, isChecked.toString())
+            if (isChecked) theResults.put(qualifiedName, isChecked ? '1' : '0')
         } else {
             theResults.put(qualifiedName, fieldInfo?.value?.toString())
         }
