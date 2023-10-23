@@ -268,6 +268,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 """
             }
             out << ST_CL_DIV
+        } else if (String.isAssignableFrom(field.fieldConstraint.field.type)) {
+            out << """
+                ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">"""}
+                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2O"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}" taackAjaxFormM2OInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" taackAjaxFormM2OAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
+                <input value="${field.value ? field.value : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>
+            """
+            out << ST_CL_DIV
         } else {
             out << """
                 ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">"""}

@@ -8,12 +8,12 @@ import org.grails.plugins.AbstractGrailsPluginManager
 import javax.annotation.PostConstruct
 
 @CompileStatic
-class TaackPluginService {
+final class TaackPluginService {
     GrailsApplication grailsApplication
 
     List<TaackPlugin> taackPlugins = []
 
-//    static lazyInit = false
+    static EnumOption[] enumOptions
 
     @PostConstruct
     void init() {
@@ -28,6 +28,7 @@ class TaackPluginService {
             }
         }
         taackPlugins = tp.sort { it.taackPluginControllerConfigurations.name }
+        enumOptions = buildEnumOptions()
     }
 
     TaackPluginConfiguration getTaackPluginConfigurationFromControllerName(final String controllerName) {
@@ -43,7 +44,7 @@ class TaackPluginService {
         taackPlugins.find { it.getTaackPluginControllerConfigurations().name.contains(name) }
     }
 
-    EnumOption[] getEnumOptions() {
+    private EnumOption[] buildEnumOptions() {
         def controllers = taackPlugins.taackPluginControllerConfigurations.flatten() as List<TaackPluginConfiguration>
         def shownControllers = controllers.findAll { it.hideIcon == false }
         EnumOption[] ret = new EnumOption[shownControllers.size()]
