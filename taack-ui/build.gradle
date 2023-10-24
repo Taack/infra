@@ -58,11 +58,7 @@ if (rootProject.name == 'infra') {
     tasks.withType(Test) {
         useJUnitPlatform()
     }
-    bootJar.enabled = false
-
-    assets {
-        packagePlugin = true
-    }
+//    bootJar.enabled = false
 }
 
 dependencies {
@@ -112,7 +108,14 @@ if (rootProject.name != 'infra') {
     assets {
         minifyJs = true
         minifyCss = true
-        configOptions = [commonJs: false] //useful for custom config on extension libraries
+
+        configOptions = [
+                commonJs: false,
+                babel: [
+                        enabled: false,
+                        processJsFiles: false
+                ]
+        ] //useful for custom config on extension libraries
 
         excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
 
