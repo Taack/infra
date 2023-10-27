@@ -24,7 +24,7 @@ import taack.ui.base.UiBlockSpecifier
  *      }
  *      taackUiProgressBarService.progressEnded(pId)
  *  }
- * }</pre>
+ *}</pre>
  */
 @GrailsCompileStatic
 @Secured("isAuthenticated()")
@@ -52,5 +52,15 @@ class ProgressController {
         } else {
             return true
         }
+    }
+
+    def echoSelect(Long id, String label) {
+        if (id && label)
+            taackUiSimpleService.show(
+                    new UiBlockSpecifier().ui {
+                        closeModal id, label
+                    }
+            )
+        else return true
     }
 }

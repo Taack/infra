@@ -25,6 +25,8 @@ interface IUiFilterVisitor {
 
     void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields)
 
+    void visitFilterFieldExpressionBool(FilterExpression filterExpression)
+
     void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue)
 
     void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue)

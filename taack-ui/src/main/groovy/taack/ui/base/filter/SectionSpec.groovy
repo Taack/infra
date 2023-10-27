@@ -21,6 +21,10 @@ class SectionSpec {
         filterVisitor.visitFilterField(i18n, field, enumOptions)
     }
 
+    void filterFieldExpressionBool(final FilterExpression filterExpression) {
+        filterVisitor.visitFilterFieldExpressionBool(filterExpression)
+    }
+
     void filterFieldExpressionBool(final String i18n, final FilterExpression filterExpression, final Boolean defaultValue = false) {
         filterVisitor.visitFilterFieldExpressionBool(i18n, filterExpression, defaultValue)
     }

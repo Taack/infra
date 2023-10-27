@@ -21,6 +21,13 @@ final class FilterExpression {
     final Object value
     final boolean isCollection
 
+    FilterExpression(Long... ids) {
+        this.fieldName = 'id'
+        this.isCollection = ids.size() > 1
+        this.operator = isCollection ? Operator.IN : Operator.EQ
+        this.value = ids
+    }
+
     FilterExpression(final FieldInfo operand, final Operator operator, final Object value = null) {
         this.fieldName = operand.fieldName
         this.isCollection = operand.fieldConstraint.field?.type ? Collection.isAssignableFrom(operand.fieldConstraint.field?.type) : false

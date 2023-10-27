@@ -2,6 +2,7 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.UiTableSpecifier.SelectMode
@@ -304,6 +305,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         fieldHeader()
         if (value) out << surroundCell(numberFormat.format(value), style ?: new Style(null, "text-align: right;"))
         fieldFooter()
+    }
+
+    @Override
+    void visitRowLink(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+        visitRowLink(i18n, actionIcon, 'progress', 'echoSelect', id, [label: label], isAjax)
     }
 
     @Override

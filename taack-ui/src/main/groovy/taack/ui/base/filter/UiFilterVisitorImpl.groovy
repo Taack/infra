@@ -19,6 +19,11 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
+    void visitFilterFieldExpressionBool(FilterExpression filterExpression) {
+
+    }
+
+    @Override
     void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
 
     }

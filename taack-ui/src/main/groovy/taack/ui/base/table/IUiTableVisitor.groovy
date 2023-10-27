@@ -2,6 +2,7 @@ package taack.ui.base.table
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.UiTableSpecifier.SelectMode
@@ -51,6 +52,8 @@ interface IUiTableVisitor {
     void visitRowField(BigDecimal value, String format, final Style style)
 
     void visitRowField(Date value, String format, final Style style)
+
+    void visitRowLink(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax)
 
     void visitRowLink(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax)
 

@@ -3,6 +3,7 @@ package taack.ui.base.table
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.base.TaackUiEnablerService
@@ -60,6 +61,10 @@ class RowColumnFieldSpec {
 
     void rowField(final Date value, final String format = null, final Style style = null) {
         tableVisitor.visitRowField(value, format, style)
+    }
+
+    void rowLink(final String i18n, final ActionIcon icon, final Long id, String label, final Boolean isAjax = true) {
+        tableVisitor.visitRowLink(i18n, icon, id, label, null, isAjax)
     }
 
     void rowLink(final String i18n, final ActionIcon icon, final String controller, final String action, final Long id = null, final Boolean isAjax = true) {

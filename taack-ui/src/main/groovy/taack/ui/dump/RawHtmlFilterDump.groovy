@@ -156,6 +156,11 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
+    void visitFilterFieldExpressionBool(FilterExpression filterExpression) {
+        visitFilterFieldExpressionBool(null, filterExpression, true)
+    }
+
+    @Override
     void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
         final String qualifiedId = filterExpression.qualifiedName + '-' + parameter.modalId
         out << htmlTheme.expressionBoolLabel(filterExpression.qualifiedName, i18n)

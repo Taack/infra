@@ -105,6 +105,11 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
+    void visitRowLink(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+
+    }
+
+    @Override
     void visitSortableFieldHeader(String i18n, String controller, String action, Map<String, ?> params, Map<String, ?> additionalParams) {
 
     }

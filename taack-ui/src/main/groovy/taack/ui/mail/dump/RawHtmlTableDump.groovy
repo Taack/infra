@@ -300,4 +300,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowLink(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
 
     }
+
+    @Override
+    void visitRowLink(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+
+    }
 }
