@@ -79,6 +79,8 @@ dependencies {
     api "org.apache.solr:solr-solrj:${solrj}"
     api "org.apache.tika:tika-core:${tika}"
     api "org.apache.tika:tika-parsers-standard:${tika}"
+    api "org.apache.tika:tika-parser-ocr-module:${tika}"
+
 
 
     implementation 'net.i2p.crypto:eddsa:0.3.0'
