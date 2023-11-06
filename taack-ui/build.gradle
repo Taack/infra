@@ -77,9 +77,9 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
 
     api "org.apache.solr:solr-solrj:${solrj}"
-//    api "org.apache.solr:solr-core:${solrj}"
-    api 'org.apache.tika:tika-core:2.6.0'
-    api 'org.apache.tika:tika-parsers-standard-package:2.6.0'
+    api "org.apache.tika:tika-core:${tika}"
+    api "org.apache.tika:tika-parsers-standard:${tika}"
+
 
     implementation 'net.i2p.crypto:eddsa:0.3.0'
     implementation "org.apache.sshd:sshd:${minaSshd}"
