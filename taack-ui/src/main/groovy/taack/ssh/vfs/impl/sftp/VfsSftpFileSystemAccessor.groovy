@@ -219,8 +219,8 @@ class VfsSftpFileSystemAccessor implements SftpFileSystemAccessor {
     }
 
     @Override
-    DirectoryStream<Path> openDirectory(SftpSubsystemProxy subsystem, DirectoryHandle dirHandle, Path dir, String handle) throws IOException {
-        log.info("openDirectory $subsystem $dirHandle $dir $handle")
+    DirectoryStream<Path> openDirectory(SftpSubsystemProxy subsystem, DirectoryHandle dirHandle, Path dir, String handle, LinkOption... linkOptions) throws IOException {
+        log.info("openDirectory $subsystem $dirHandle $dir $handle $linkOptions")
         if (dir instanceof VfsPath) {
             log.info "new VfsProvider $dir"
             return (new VfsProvider(subsystem.serverSession)).newDirectoryStream(dir, null)
@@ -228,5 +228,6 @@ class VfsSftpFileSystemAccessor implements SftpFileSystemAccessor {
             log.info "newDirectoryStream $dir"
             return Files.newDirectoryStream(dir)
         }
+
     }
 }
