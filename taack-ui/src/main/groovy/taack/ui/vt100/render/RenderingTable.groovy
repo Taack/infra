@@ -88,22 +88,22 @@ final class RenderingTable extends UiTableVisitorImpl {
     }
 
     @Override
-    void visitRowField(String value, Style style) {
+    void visitRowField(String value, Style style, String controller, String action, Long id) {
         drawCell(value.toString())
     }
 
     @Override
-    void visitRowField(Long value, Style style) {
+    void visitRowField(Long value, Style style, String controller, String action, Long id) {
         drawCell(value.toString(), false)
     }
 
     @Override
-    void visitRowField(BigDecimal value, String format, Style style) {
+    void visitRowField(BigDecimal value, String format, Style style, String controller, String action, Long id) {
         drawCell(value.toString(), false)
     }
 
     @Override
-    void visitRowField(Date value, String format, Style style) {
+    void visitRowField(Date value, String format, Style style, String controller, String action, Long id) {
         drawCell(value.toString())
     }
 
@@ -123,7 +123,7 @@ final class RenderingTable extends UiTableVisitorImpl {
     }
 
     @Override
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style) {
+    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller, String action, Long id) {
         drawCell(value.toString(), false)
     }
 }

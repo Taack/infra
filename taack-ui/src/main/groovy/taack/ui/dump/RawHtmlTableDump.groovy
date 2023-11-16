@@ -200,110 +200,112 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style) {
+    void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
         switch (fieldInfo.fieldConstraint.field.type) {
             case Long:
             case Integer:
-                visitRowField((Long) fieldInfo.value, style)
+                visitRowField((Long) fieldInfo.value, style, controller, action, id)
                 break
             case Double:
             case Float:
             case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, style)
+                visitRowField((BigDecimal) fieldInfo.value, format, style, controller, action, id)
                 break
             case Date:
-                visitRowField((Date) fieldInfo.value, style)
+                visitRowField((Date) fieldInfo.value, format, style, controller, action, id)
                 break
             default:
-                visitRowField((String) fieldInfo.value, style)
+                visitRowField((String) fieldInfo.value, style, controller, action, id)
         }
     }
 
     @Override
-    void visitRowField(final GetMethodReturn fieldInfo, final Style style) {
+    void visitRowField(final GetMethodReturn fieldInfo, final Style style, final String controller = null, final String action = null, final Long id = null) {
         switch (fieldInfo.getMethod().returnType) {
             case Long:
             case Integer:
-                visitRowField((Long) fieldInfo.value, style)
+                visitRowField((Long) fieldInfo.value, style, controller, action, id)
                 break
             case Double:
             case Float:
             case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, style)
+                visitRowField((BigDecimal) fieldInfo.value, (String) null, style, controller, action, id)
                 break
             case Date:
-                visitRowField((Date) fieldInfo.value, style)
+                visitRowField((Date) fieldInfo.value, null, style, controller, action, id)
                 break
             default:
-                visitRowField((String) fieldInfo.value, style)
+                visitRowField((String) fieldInfo.value, style, controller, action, id)
         }
     }
 
-    private static String surroundCell(final String cell, final Style style = null) {
+    private static String surroundCell(final String cell, final Style style = null, final String url = null) {
         if (style) {
             if (!cell || cell.empty) return ""
             return """
-                <div class="${style.cssClassesString ?: ''}" style="${style.cssStyleString ?: ''}">${cell ?: ''}</div>
+                <div class="${style.cssClassesString ?: ''}" style="${style.cssStyleString ?: ''}">
+                    ${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell ?: ''}"}
+                </div>
             """
-        } else return "${cell && !cell.empty ? cell + "<br>" : ''}"
+        } else return "${cell && !cell.empty ? "${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell}"} <br>" : ''}"
     }
 
     @Override
-    void visitRowField(final String value, final Style style) {
+    void visitRowField(final String value, final Style style, final String controller = null, final String action = null, final Long id = null) {
         fieldHeader()
-        out << surroundCell(value, style)
+        out << surroundCell(value, style, controller ? parameter.urlMapped(controller, action, id) : null)
         fieldFooter()
     }
 
     @Override
-    void visitRowField(final Long value, final Style style) {
+    void visitRowField(final Long value, final Style style, final String controller = null, final String action = null, final Long id = null) {
         fieldHeader()
         out << surroundCell(value?.toString(), style)
         fieldFooter()
     }
 
     @Override
-    void visitRowField(final BigDecimal value, final String format = null, final Style style) {
+    void visitRowField(final BigDecimal value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
         DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
         fieldHeader()
-        if (value) out << surroundCell(df.format(value), style ?: new Style(null, "text-align: right;"))
+        if (value) out << surroundCell(df.format(value), style ?: new Style(null, "text-align: right;"), controller ? parameter.urlMapped(controller, action, id) : null)
         fieldFooter()
     }
 
     @Override
-    void visitRowField(final Date value, final String format = null, final Style style) {
+    void visitRowField(final Date value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
         SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
         fieldHeader()
-        out << surroundCell(value ? sdf.format(value) : "", style)
+        out << surroundCell(value ? sdf.format(value) : "", style, controller ? parameter.urlMapped(controller, action, id) : null)
         fieldFooter()
     }
 
     @Override
-    void visitRowField(Map value, Style style) {
+    void visitRowField(Map value, Style style, String controller = null, String action = null, Long id = null) {
         String display = value?.entrySet()?.findAll {
             it.value != null
         }?.collect { "${it.key}: ${it.value}" }?.join(', ')
         fieldHeader()
-        out << surroundCell(display ?: "")
+        out << surroundCell(display ?: "", null, controller ? parameter.urlMapped(controller, action, id) : null)
         fieldFooter()
     }
 
     @Override
-    void visitRowField(EnumStyle value, Style style) {
+    void visitRowField(EnumStyle value, Style style, String controller = null, String action = null, Long id = null) {
         if (value?.getStyle()) {
             if (style) style = value.getStyle() + style
             else style = value.getStyle()
         }
         fieldHeader()
-        out << surroundCell(value?.getName(), style)
+        out << surroundCell(value?.getName(), style, controller ? parameter.urlMapped(controller, action, id) : null)
         fieldFooter()
     }
 
     @Override
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style) {
+    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller = null, String action = null, Long id = null) {
         if (!numberFormat) numberFormat = parameter.nf
         fieldHeader()
-        if (value) out << surroundCell(numberFormat.format(value), style ?: new Style(null, "text-align: right;"))
+        if (value) out << surroundCell(numberFormat.format(value), style ?: new Style(null, "text-align: right;"), controller ? parameter.urlMapped(controller, action, id) : null)
         fieldFooter()
     }
 
