@@ -119,12 +119,12 @@ class RawHtmlChartDump implements IUiChartVisitor {
         if (isStacked)
             out << """
                             scales: {
-                                xAxes: [{
+                                x: {
                                     stacked: ${this.chartType.stacked},
-                                }],
-                                yAxes: [{
+                                },
+                                y: {
                                     stacked: ${this.chartType.stacked}
-                                }]
+                                }
                             }
                         }
                     });
