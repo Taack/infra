@@ -56,6 +56,8 @@ class ActionIcon {
     final static ActionIcon TIMING = new ActionIcon("/assets/taack/icons/actions/timing.svg")
     final static ActionIcon START = new ActionIcon("/assets/taack/icons/actions/start.svg")
     final static ActionIcon STOP = new ActionIcon("/assets/taack/icons/actions/stop.svg")
+    final static ActionIcon FOLLOW = new ActionIcon("/assets/taack/icons/actions/follow.svg")
+    final static ActionIcon UNFOLLOW = new ActionIcon("/assets/taack/icons/actions/unfollow.svg")
 
     ActionIcon(final String src, final ActionIconStyleModifier style = null) {
         this.src = src

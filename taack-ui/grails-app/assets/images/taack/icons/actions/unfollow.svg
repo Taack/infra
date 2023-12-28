@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32.004002"
+   height="31.995001"
+   viewBox="0 0 32.004002 31.995001"
+   version="1.1"
+   id="svg194"
+   sodipodi:docname="filled-star.svg"
+   inkscape:version="0.92.1 r15371">
+  <metadata
+     id="metadata200">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs198" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="982"
+     id="namedview196"
+     showgrid="false"
+     inkscape:zoom="7.2407734"
+     inkscape:cx="55.332364"
+     inkscape:cy="11.222359"
+     inkscape:window-x="0"
+     inkscape:window-y="37"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg194" />
+  <desc
+     id="desc184">Made with illustrio</desc>
+  <g
+     class="base"
+     id="g190"
+     transform="translate(-18.004,-19.001)">
+    <g
+       class="main-fill"
+       id="g188"
+       style="fill:#3499ff;fill-rule:evenodd;stroke:none">
+      <polygon
+         points="9.983,19.886 5.998,31.996 16.013,24.528 25.997,31.996 22.028,19.78 32.008,12 20.021,12 15.998,0.001 11.99,12 0.004,12 "
+         transform="translate(18,19)"
+         class="main-fill"
+         id="polygon186"
+         style="fill:#3499ff;stroke:none" />
+    </g>
+  </g>
+  <style
+     id="style192">
+          .main-fill {fill: #3499ff;}
+          .main-stroke {stroke: #3499ff;}
+          .secondary-fill {fill: #f7f9ff;}
+          .secondary-stroke {stroke: #f7f9ff;}
+
+          .main-fill--darken {fill: #0073e6;}
+          .main-stroke--darken {stroke: #0073e6;}
+          .secondary-fill--darken {fill: #aac0ff;}
+          .secondary-stroke--darken {stroke: #aac0ff;}
+
+          .main-fill--darkener {fill: #0059b3;}
+          .main-stroke--darkener {stroke: #0059b3;}
+          .secondary-fill--darkener {fill: #7799ff;}
+          .secondary-stroke--darkener {stroke: #7799ff;}
+        </style>
+</svg>
