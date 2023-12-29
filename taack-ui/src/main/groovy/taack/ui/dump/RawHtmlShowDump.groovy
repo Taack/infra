@@ -260,7 +260,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (isAjax) {
             out << """
                      <div class='icon'>
-                        <a class='ajaxLink taackAjaxRowLink' ajaxAction='${parameter.urlMapped(controller, action, id, additionalParams)}'>
+                        <a class='ajaxLink taackShowAction' taackShowActionLink='${parameter.urlMapped(controller, action, id, additionalParams)}'>
                             ${actionIcon.getHtml(i18n)}
                         </a>
                      </div>
