@@ -157,7 +157,7 @@ enum IndianStates implements StateBase {
 }
 
 @CompileStatic
-enum CanadaStates implements StateBase {
+enum CanadianStates implements StateBase {
     ALBERTA("AB", "Alberta"),
     BRITISH_COLUMBIA("BC", "British Columbia"),
     MANITOBA("MB", "Manitoba"),
@@ -172,7 +172,7 @@ enum CanadaStates implements StateBase {
     SASKATCHEWAN("SK", "Saskatchewan"),
     YUKON("YT", "Yukon")
 
-    CanadaStates(String name, String abbrev) {
+    CanadianStates(String name, String abbrev) {
         this.name = name
         this.abbrev = abbrev
     }
@@ -186,7 +186,7 @@ enum CanadaStates implements StateBase {
 }
 
 @CompileStatic
-enum ChinaStates implements StateBase {
+enum ChineseStates implements StateBase {
     ANHUI("AH", "Anhui"),
     BEIJING("BJ", "Beijing"),
     CHONGQING("CQ", "Chongqing"),
@@ -219,7 +219,7 @@ enum ChinaStates implements StateBase {
     YUNNAN("YN", "Yunnan"),
     ZHEJIANG("ZJ", "Zhejiang")
 
-    ChinaStates(String name, String abbrev) {
+    ChineseStates(String name, String abbrev) {
         this.name = name
         this.abbrev = abbrev
     }
@@ -233,7 +233,7 @@ enum ChinaStates implements StateBase {
 }
 
 @CompileStatic
-enum MexicoStates implements StateBase {
+enum MexicanStates implements StateBase {
     AGUASCALIENTES("AGU", "Aguascalientes"),
     BAJA_CALIFORNIA("BCN", "Baja California"),
     BAJA_CALIFORNIA_SUR("BCS", "Baja California Sur"),
@@ -266,7 +266,7 @@ enum MexicoStates implements StateBase {
     YUCATAN("YUC", "Yucatán"),
     ZACATECAS("ZAC", "Zacatecas")
 
-    MexicoStates(String name, String abbrev) {
+    MexicanStates(String name, String abbrev) {
         this.name = name
         this.abbrev = abbrev
     }
@@ -287,11 +287,11 @@ final class ManagedStates {
             case Country.US:
                 return UsaStates.values()
             case Country.CA:
-                return CanadaStates.values()
+                return CanadianStates.values()
             case Country.CN:
-                return ChinaStates.values()
+                return ChineseStates.values()
             case Country.ME:
-                return MexicoStates.values()
+                return MexicanStates.values()
         }
         return null
     }
