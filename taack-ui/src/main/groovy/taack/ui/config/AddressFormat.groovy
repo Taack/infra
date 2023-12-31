@@ -44,6 +44,7 @@ interface StateBase {
 
 /*
     credit to Google Bard and ChatGPT for next lines
+    From Here
 */
 
 @CompileStatic
@@ -141,7 +142,15 @@ enum IndianStates implements StateBase {
     TR("Tripura", "TR"),
     UP("Uttar Pradesh", "UP"),
     UK("Uttarakhand", "UK"),
-    WB("West Bengal", "WB")
+    WB("West Bengal", "WB"),
+    AN("Andaman and Nicobar Islands", "AN"),
+    CH("Chandigarh", "CH"),
+    DD("Dadra and Nagar Haveli and Daman and Diu", "DD"),
+    DL("Delhi", "DL"),
+    JK("Jammu and Kashmir", "JK"),
+    LA("Ladakh", "LA"),
+    LD("Lakshadweep", "LD"),
+    PY("Puducherry", "PY")
 
     IndianStates(String name, String abbrev) {
         this.name = name
@@ -279,6 +288,10 @@ enum MexicanStates implements StateBase {
     final String name
 }
 
+/*
+    to there
+*/
+
 @CompileStatic
 final class ManagedStates {
 
@@ -303,3 +316,17 @@ final class ManagedStates {
     }
 
 }
+
+/*
+
+AN("Andaman and Nicobar Islands", "AN"),
+CH("Chandigarh", "CH"),
+DD("Dadra and Nagar Haveli and Daman and Diu", "DD"),
+DL("Delhi", "DL"),
+JK("Jammu and Kashmir", "JK"),
+LA("Ladakh", "LA"),
+LD("Lakshadweep", "LD"),
+PY("Puducherry", "PY"),
+ 
+
+*/
