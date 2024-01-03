@@ -400,7 +400,7 @@ class TaackSimpleFilterService implements WebAttributes {
                 } else if (entryKey.startsWith('_extension_')) {
                     def targetField = entryKey - '_extension_'
                     Field f = getTheField(aClass, targetField)
-                    where << filterExtensionMap[f.type]?.queryToWherePart(f.type, targetField, entry.value?.toString())
+                    where << filterExtensionMap[f.type]?.queryToWherePart(f.type, "sc." + targetField, entry.value?.toString())
                 } else {
                     addJoinEntity(entryKey)
                     JoinEntity joinEntity = getJoinEntity(entryKey)
