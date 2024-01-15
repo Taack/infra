@@ -1,6 +1,7 @@
 package taack.ui.base.filter.expression
 
 import groovy.transform.CompileStatic
+import org.apache.http.annotation.Obsolete
 import taack.ast.type.FieldInfo
 
 enum Operator {
@@ -16,27 +17,29 @@ enum Operator {
 @CompileStatic
 final class FilterExpression {
 
-    final String fieldName
+    final FieldInfo[] operand
     final Operator operator
     final Object value
     final boolean isCollection
 
     FilterExpression(Long... ids) {
-        this.fieldName = 'id'
+        this.operand = null
         this.isCollection = ids.size() > 1
         this.operator = isCollection ? Operator.IN : Operator.EQ
         this.value = ids
     }
 
+    @Deprecated
     FilterExpression(final FieldInfo operand, final Operator operator, final Object value = null) {
-        this.fieldName = operand.fieldName
+        this.operand = [operand]
         this.isCollection = operand.fieldConstraint.field?.type ? Collection.isAssignableFrom(operand.fieldConstraint.field?.type) : false
         this.operator = operator
         this.value = value
     }
 
+    @Deprecated
     FilterExpression(final FieldInfo[] operand, final Operator operator, final Object value = null) {
-        this.fieldName = operand*.fieldName.join(".")
+        this.operand = operand
         boolean t = false
         for (def o in operand) {
             if (o.fieldConstraint.field?.type && Collection.isAssignableFrom(o.fieldConstraint.field?.type)) t = true
@@ -44,6 +47,24 @@ final class FilterExpression {
         this.isCollection = t
         this.operator = operator
         this.value = value
+    }
+
+    FilterExpression(final Object value = null, final Operator operator, final FieldInfo... operand) {
+        this.operand = operand
+        boolean t = false
+        for (def o in operand) {
+            if (o.fieldConstraint.field?.type && Collection.isAssignableFrom(o.fieldConstraint.field?.type)) t = true
+        }
+        this.isCollection = t
+        this.operator = operator
+        this.value = value
+    }
+
+    String getFieldName() {
+        if (!operand) return 'id'
+        else {
+            operand*.fieldName.join(".")
+        }
     }
 
     String getQualifiedName() {
