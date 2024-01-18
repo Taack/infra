@@ -50,8 +50,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         this.aClass = aClass
         this.selectMode = selectMode
         out << """
-                <div class='${aClass.simpleName}-table-div' style='overflow: auto;'><table class='pure-table ${aClass.simpleName}-table taackTable' taackTableId='${blockId}'>
-                <form>
+                <div class='${aClass.simpleName}-table-div' style='overflow: auto;'><form><table class='pure-table ${aClass.simpleName}-table taackTable' taackTableId='${blockId}'>
                """
     }
 
