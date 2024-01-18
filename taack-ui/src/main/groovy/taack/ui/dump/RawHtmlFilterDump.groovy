@@ -163,7 +163,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
         final String qualifiedId = filterExpression.qualifiedName + '-' + parameter.modalId
-        out << htmlTheme.expressionBoolLabel(filterExpression.qualifiedName, i18n)
+        out << htmlTheme.expressionBoolLabel(filterExpression.qualifiedName, i18n?:parameter.trField(filterExpression.operand))
         boolean isChecked = parameter.map[filterExpression.qualifiedName + 'Default'] ? parameter.map[filterExpression.qualifiedName] == '1' : defaultValue
         out << """
                 ${htmlTheme.expressionBoolHeader()}
