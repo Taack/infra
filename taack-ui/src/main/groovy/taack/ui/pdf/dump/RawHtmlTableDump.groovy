@@ -148,42 +148,42 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style) {
+    void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
         switch (fieldInfo.fieldConstraint.field.type) {
             case Long:
             case Integer:
-                visitRowField((Long) fieldInfo.value, style)
+                visitRowField((Long) fieldInfo.value, style, controller, action, id)
                 break
             case Double:
             case Float:
             case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, style)
+                visitRowField((BigDecimal) fieldInfo.value, format, style, controller, action, id)
                 break
             case Date:
-                visitRowField((Date) fieldInfo.value, style)
+                visitRowField((Date) fieldInfo.value, format, style, controller, action, id)
                 break
             default:
-                visitRowField((String) fieldInfo.value, style)
+                visitRowField((String) fieldInfo.value, style, controller, action, id)
         }
     }
 
     @Override
-    void visitRowField(final GetMethodReturn fieldInfo, final Style style) {
+    void visitRowField(final GetMethodReturn fieldInfo, final Style style, final String controller = null, final String action = null, final Long id = null) {
         switch (fieldInfo.getMethod().returnType) {
             case Long:
             case Integer:
-                visitRowField((Long) fieldInfo.value, style)
+                visitRowField((Long) fieldInfo.value, style, controller, action, id)
                 break
             case Double:
             case Float:
             case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, style)
+                visitRowField((BigDecimal) fieldInfo.value, (String) null, style, controller, action, id)
                 break
             case Date:
-                visitRowField((Date) fieldInfo.value, style)
+                visitRowField((Date) fieldInfo.value, null, style, controller, action, id)
                 break
             default:
-                visitRowField((String) fieldInfo.value, style)
+                visitRowField((String) fieldInfo.value, style, controller, action, id)
         }
     }
 
@@ -197,29 +197,29 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(final String value, final Style style) {
+    void visitRowField(final String value, final Style style, final String controller = null, final String action = null, final Long id = null) {
         out << surroundCell(value, style)
     }
 
     @Override
-    void visitRowField(final Long value, final Style style) {
+    void visitRowField(final Long value, final Style style, final String controller = null, final String action = null, final Long id = null) {
         out << surroundCell(value?.toString(), style)
     }
 
     @Override
-    void visitRowField(final BigDecimal value, final String format = null, final Style style) {
+    void visitRowField(final BigDecimal value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
         DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
         if (value) out << surroundCell(df.format(value), style ?: new Style(null, "text-align: right;"))
     }
 
     @Override
-    void visitRowField(final Date value, final String format = null, final Style style) {
+    void visitRowField(final Date value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
         SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
         out << surroundCell(value ? sdf.format(value) : "", style)
     }
 
     @Override
-    void visitRowField(Map value, Style style) {
+    void visitRowField(Map value, Style style, String controller = null, String action = null, Long id = null) {
         String display = value.entrySet().findAll {
             it.value != null
         }.collect { "${it.key}: ${it.value}" }.join(', ')
@@ -227,7 +227,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(EnumStyle value, Style style) {
+    void visitRowField(EnumStyle value, Style style, String controller = null, String action = null, Long id = null) {
         if (value?.getStyle()) {
             if (style) style = value.getStyle() + style
             else style = value.getStyle()
@@ -236,7 +236,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style) {
+    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller = null, String action = null, Long id = null) {
         if (value) out << surroundCell(numberFormat.format(value), style ?: new Style(null, "text-align: right;"))
     }
 
