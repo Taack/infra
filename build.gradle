@@ -17,7 +17,7 @@ buildscript {
     }
 }
 
-version "0.3.8-SNAPSHOT"
+version "0.3.9-SNAPSHOT"
 group "org.taack"
 
 ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
@@ -50,7 +50,7 @@ if (isReleaseVersion) {
 }
 
 subprojects {
-    version "0.3.8-SNAPSHOT"
+    version "0.3.9-SNAPSHOT"
     group "org.taack"
 
     apply plugin: 'maven-publish'

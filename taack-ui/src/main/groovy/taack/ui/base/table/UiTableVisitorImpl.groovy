@@ -75,32 +75,32 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(FieldInfo fieldInfo, String format, Style style) {
+    void visitRowField(FieldInfo fieldInfo, String format, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(GetMethodReturn fieldInfo, Style style) {
+    void visitRowField(GetMethodReturn fieldInfo, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(String value, Style style) {
+    void visitRowField(String value, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(Long value, Style style) {
+    void visitRowField(Long value, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(BigDecimal value, String format, Style style) {
+    void visitRowField(BigDecimal value, String format, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(Date value, String format, Style style) {
+    void visitRowField(Date value, String format, Style style, String controller, String action, Long id) {
 
     }
 
@@ -145,17 +145,17 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(Map value, Style style) {
+    void visitRowField(Map value, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(EnumStyle value, Style style) {
+    void visitRowField(EnumStyle value, Style style, String controller, String action, Long id) {
 
     }
 
     @Override
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style) {
+    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller, String action, Long id) {
 
     }
 

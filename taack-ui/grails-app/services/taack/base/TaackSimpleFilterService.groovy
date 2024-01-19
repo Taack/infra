@@ -386,7 +386,7 @@ class TaackSimpleFilterService implements WebAttributes {
 
         Map<String, Object> namedParams = [:]
         filter?.each { Map.Entry<String, Object> entry ->
-            if (entry.value && !filterMeta.contains(entry.key)) {
+            if (entry.value && !filterMeta.contains(entry.key) && !entry.key.contains("filterExpression")) {
                 final String entryKey = entry.key as String
                 occ++
                 /**
@@ -495,9 +495,9 @@ class TaackSimpleFilterService implements WebAttributes {
                             //Useful if the null select option is picked to filter object without object (ex: businessTodo without parent)
                             where << ("${aliasKey} is null" as String)
                         } else if (!entryValue.contains(',')) {
-                            if (f.type.isEnum()) {
+                            if (f && f.type.isEnum()) {
                                 where << (" $aliasKey = '$entryValue' " as String)
-                            } else {
+                            } else if (f) {
                                 where << (" upper($aliasKey) like :np$occ " as String)
                                 namedParams.put('np' + occ, entry.value.toString().toUpperCase())
                             }
@@ -521,11 +521,22 @@ class TaackSimpleFilterService implements WebAttributes {
                         namedParams.put('np' + occ, entry.value)
                     }
                 }
+            } else if (entry.key.contains("filterExpression")) {
+
             }
         }
 
-        if (filterSpecifier)
+        if (filterSpecifier) {
             filterSpecifier.visitFilter(new UiFilterVisitorImpl() {
+                @Override
+                void visitFilterFieldExpressionBool(FilterExpression filterExpression) {
+                    String qualifiedName = filterExpression.qualifiedName
+                    boolean applyFilter = (theParams[qualifiedName] || theParams[qualifiedName + 'Default']) ? (theParams[qualifiedName] == '1') : true
+                    if (!applyFilter) return
+
+                    occ = visitFilterFieldExpressionBool(filterExpression, occ, where, namedParams)
+                }
+
                 @Override
                 void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue) {
                     String qualifiedName = filterExpressions*.qualifiedName.join('_')
@@ -540,10 +551,12 @@ class TaackSimpleFilterService implements WebAttributes {
                 @Override
                 void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
                     boolean applyFilter = (theParams[filterExpression.qualifiedName] || theParams[filterExpression.qualifiedName + "Default"]) ? (theParams[filterExpression.qualifiedName] == "1" || (defaultValue && !theParams[filterExpression.qualifiedName + "Default"])) : defaultValue
+
                     if (!applyFilter) return
                     occ = visitFilterFieldExpressionBool(filterExpression, occ, where, namedParams)
                 }
             })
+        }
 
         join = buildJoinClause() ? buildJoinClause().append(join) : join
         String simpleOrder = filter['order'] ?: sortableDirection?.defaultSortingDirection?.toString()
