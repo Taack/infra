@@ -9,6 +9,7 @@ import org.hibernate.query.Query
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.UiFilterSpecifier
+import taack.ui.base.UiTableSpecifier
 import taack.ui.base.filter.ITaackFilterExtension
 import taack.ui.base.filter.UiFilterVisitorImpl
 import taack.ui.base.filter.expression.FilterExpression
@@ -621,5 +622,9 @@ class TaackSimpleFilterService implements WebAttributes {
         def v = new RawMapFilterDump(params)
         filter.visitFilter(v)
         v.theResults
+    }
+
+    final <T extends GormEntity> Pair<List<T>, Long> list(UiTableSpecifier table) {
+        list(table.aClass, table.max, table.filterSpecifier, table.tInstance as T, table.sortableDirection, table.idsFilter)
     }
 }

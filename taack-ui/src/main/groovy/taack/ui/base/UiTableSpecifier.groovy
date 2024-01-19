@@ -1,6 +1,10 @@
 package taack.ui.base
 
+
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
+import taack.ast.type.FieldInfo
+import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.base.table.IUiTableVisitor
 import taack.ui.base.table.TableSpec
 /**
@@ -13,9 +17,10 @@ import taack.ui.base.table.TableSpec
  * {@link taack.ui.base.block.BlockSpec#tableFilter(java.lang.String, taack.ui.base.UiFilterSpecifier, java.lang.String, taack.ui.base.UiTableSpecifier)}
  */
 @CompileStatic
-final class UiTableSpecifier {
+final class UiTableSpecifier<T extends GormEntity> {
+
     Closure closure
-    Class aClass
+    Class<T> aClass
     SelectMode selectMode
 
     enum SelectMode {
@@ -23,6 +28,12 @@ final class UiTableSpecifier {
         SINGLE,
         MULTIPLE
     }
+
+    ColumnHeaderFieldSpec.SortableDirection sortableDirection
+    Integer max
+    UiFilterSpecifier filterSpecifier
+    T tInstance
+    Collection<Long> idsFilter
 
     /**
      * Describe the table to display with an added column with select input per line.
@@ -56,10 +67,40 @@ final class UiTableSpecifier {
      * @param closure The table specification
      * @return Itself
      */
-    UiTableSpecifier ui(final Class aClass, SelectMode selectMode = SelectMode.NONE, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure closure) {
+    UiTableSpecifier ui(final Class<T> aClass, SelectMode selectMode = SelectMode.NONE, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure closure) {
         this.closure = closure
         this.aClass = aClass
         this.selectMode = selectMode
+        this
+    }
+
+    UiTableSpecifier sortColumnAsc(FieldInfo fieldInfo) {
+        sortableDirection = new ColumnHeaderFieldSpec.SortableDirection(fieldInfo, ColumnHeaderFieldSpec.DefaultSortingDirection.ASC)
+        this
+    }
+
+    UiTableSpecifier sortColumnDesc(FieldInfo fieldInfo) {
+        sortableDirection = new ColumnHeaderFieldSpec.SortableDirection(fieldInfo, ColumnHeaderFieldSpec.DefaultSortingDirection.DESC)
+        this
+    }
+
+    UiTableSpecifier filter(UiFilterSpecifier filterSpecifier) {
+        this.filterSpecifier = filterSpecifier
+        this
+    }
+
+    UiTableSpecifier max(Integer max) {
+        this.max = max
+        this
+    }
+
+    UiTableSpecifier instanceFilter(T instance) {
+        this.tInstance = instance
+        this
+    }
+
+    UiTableSpecifier idsFilter(Collection<Long> ids) {
+        this.idsFilter = ids
         this
     }
 
@@ -85,4 +126,5 @@ final class UiTableSpecifier {
             tableVisitor.visitTableEnd()
         }
     }
+
 }
