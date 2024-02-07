@@ -8,7 +8,6 @@ import org.apache.sshd.server.ServerBuilder
 import org.apache.sshd.server.SshServer
 import org.apache.sshd.server.auth.AsyncAuthException
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
-import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator
 import org.apache.sshd.server.channel.ChannelSession
 import org.apache.sshd.server.command.CommandFactory
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
