@@ -100,6 +100,10 @@ final class TaackJdbcService {
         static final void registerClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
             registerJdbcClass(aClass, fieldInfos)
         }
+
+        static final Map<Class<? extends GormEntity>, FieldInfo[]> getFieldInfoMap() {
+            fieldInfoMap
+        }
     }
 
     final static void registerJdbcClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
