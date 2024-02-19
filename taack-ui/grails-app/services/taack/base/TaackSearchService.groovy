@@ -255,6 +255,14 @@ final class TaackSearchService implements WebAttributes {
         }
     }
 
+    final void indexAllOnly(String name) {
+        solrClient.deleteByQuery("*:*")
+        createSolrSchemas()
+        mapSolrSpecifier.each {
+            if (it.key.simpleName == name) indexAllClass(it.key, it.value.aValue, it.value.bValue)
+        }
+    }
+
     private void createSolrSchemas() {
         try {
             def deleteDynamicFieldQuery = new SchemaRequest.DeleteDynamicField("*_noAccent")
