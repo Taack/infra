@@ -11,5 +11,4 @@ rootProject.name = 'infra'
 
 include 'taack-jdbc-common'
 include 'taack-ui'
-include 'taack-ui-commands'
 
