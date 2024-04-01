@@ -112,6 +112,10 @@
     display: block;
 }
 
+.wysiwyg-content-source-code {
+    display: inline-block !important;
+}
+
 .wysiwyg-content.wysiwyg-file-dragging {
     background-color: #ECECEC;
     background-image: url(/assets/taack/icons/actions/import.svg);

@@ -8,7 +8,8 @@ enum WidgetKind {
     TEXTAREA("textarea"),
     PASSWD("passwd"),
     AJAX("ajax"),
-    MARKDOWN("markdown")
+    MARKDOWN("markdown"),
+    ASCIIDOC("asciidoc")
 
     WidgetKind(final String name) {
         this.name = name

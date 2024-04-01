@@ -3,4 +3,5 @@
 //= require reveal.js/plugin/zoom/zoom.js
 //= require client
 //= require wysiwyg-markdown
+//= require wysiwyg-asciidoc
 //= require_self

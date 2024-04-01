@@ -184,6 +184,11 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     <input value="" type="hidden" id="${qualifiedName}-attachment-link"/>
                 </div>
                 """
+            } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
+                result.append """<div id="${qualifiedName}-editor">
+                    <div id="${qualifiedName}" contenteditable="true" class="wysiwyg-content asciidoctor" style="width: 90%" ${isDisabled(field) ? "disabled" : ""}>${field.value ?: ''}</div>
+                </div>
+                """
             } else {
 
                 String valueString = inputEscape(field.value?.toString())
