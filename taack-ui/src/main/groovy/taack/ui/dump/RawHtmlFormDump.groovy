@@ -178,10 +178,10 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${field.value ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>"""
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """<div id="${qualifiedName}-editor">
-                    <div><textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="wysiwyg-content many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ''}</textarea>
+                    <textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ''}</textarea>
                     <div id="${qualifiedName}-markdown-preview" class="pure-u-10-24 markdown-body wysiwyg-markdown-preview"></div>
                     <input value="" readonly="on" class="many-to-one taackAjaxFormM2O" autocomplete="off" id="${qualifiedName}-attachment-select" taackAjaxFormM2OInputId="${qualifiedName}-attachment-link" taackAjaxFormM2OAction="${parameter.urlMapped('markdown', 'selectAttachment')}"/>
-                    <input value="" type="hidden" id="${qualifiedName}-attachment-link"/></div>
+                    <input value="" type="hidden" id="${qualifiedName}-attachment-link"/>
                 </div>
                 """
             } else {
