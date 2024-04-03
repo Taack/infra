@@ -14,7 +14,7 @@
 }
 
 .wysiwyg-content.asciidoctor {
-    height: 800px;
+    height: 500px;
 }
 
 .wysiwyg-content-paragraph {
@@ -32,13 +32,31 @@
     display: block;
 }
 
-.wysiwyg-action-menu-left {
+.wysiwyg-action-menu {
+    width: 90%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px
+}
+
+.wysiwyg-action-menu .main-group {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: end;
+}
+
+.wysiwyg-action-menu .main-group .sub-group {
     display: inline-block;
-    box-shadow: 2px 2px 15px 0 #e5e5e5;
     border: 1px solid #cccccc;
     border-radius: 4px;
     padding: 3px;
     user-select: none;
+}
+
+.wysiwyg-action-menu .main-group .sub-group .button-list {
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .wysiwyg-action-button {
@@ -89,6 +107,12 @@
     margin: 0 4px;
 }
 
+.wysiwyg-content-source-code {
+    height: 500px;
+    vertical-align: top !important;
+    margin: 0 !important;
+}
+
 .wysiwyg-table-unit {
     display: inline-block;
     height: 15px;
@@ -110,10 +134,6 @@
 .wysiwyg-content-cell {
     min-height: 1.5em;
     display: block;
-}
-
-.wysiwyg-content-source-code {
-    display: inline-block !important;
 }
 
 .wysiwyg-content.wysiwyg-file-dragging {
