@@ -113,7 +113,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         out << "\n<tr>"
         if (selectMode == SelectMode.MULTIPLE) {
             out << """<th>
-                <input type="checkbox" id="selectAll" name="selectAll" class="taackTableSelectAll" checked>
+                <input type="checkbox" id="selectAll" name="selectAll" class="taackTableSelectAll">
                 <label for="selectAll">All</label>
             </th>"""
         } else if (selectMode == SelectMode.SINGLE) {
