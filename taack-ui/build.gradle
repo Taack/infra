@@ -55,7 +55,7 @@ if (rootProject.name == 'infra') {
 }
 
 dependencies {
-    implementation 'org.jsoup:jsoup:1.17.2'
+    implementation 'org.jsoup:jsoup:1.15.3'
     implementation "com.openhtmltopdf:openhtmltopdf-core:${openhtmlVersion}"
     implementation "com.openhtmltopdf:openhtmltopdf-pdfbox:${openhtmlVersion}"
     implementation "com.openhtmltopdf:openhtmltopdf-svg-support:${openhtmlVersion}"
