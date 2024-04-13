@@ -82,7 +82,6 @@ dependencies {
     implementation "org.apache.sshd:sshd-sftp:${minaSshd}"
     implementation "org.apache.sshd:sshd-git:${minaSshd}"
     implementation "org.apache.sshd:sshd-cli:${minaSshd}"
-    implementation 'org.codehaus.groovy:groovy-dateutil'
 
     if (rootProject.name != 'infra') {
         implementation project(':infra:taack-jdbc-common')

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import taack.domain.graph.gantt.GanttEntry
 import taack.domain.graph.timing.TimingEntry
 import taack.ui.TaackUiConfiguration
+import taack.utils.DateFormat
 
 /**
  * Service allowing to draw read-only Gantt and Timing diagram using PlantUML
@@ -52,15 +53,15 @@ final class TaackUMLService {
                 } else if (previous && ge.temporality == GanttEntry.Temporality.HAPPEN) graph.append("\n")
                 else if ((!previous && ge.start)) {
                     //if (!previous) graph.append("Language ${LocaleContextHolder.locale.language}\n")
-                    if (ge.start) graph.append("Project starts on ${ge.start.format("yyyy-MM-dd")}\n")
+                    if (ge.start) graph.append("Project starts on ${DateFormat.format(ge.start, 'yyyy-MM-dd')}\n")
                 }
                 if (ge.temporality == GanttEntry.Temporality.SEPARATOR) {
                     graph.append("-- ${ge.name} --\n")
                     wasSeparator = true
                 } else if (ge.temporality == GanttEntry.Temporality.LASTS_DAYS) {
-                    graph.append("[${ge.name}]${ge.start ? " starts ${ge.start.format("yyyy-MM-dd")} and " : " "} lasts ${ge.lastsDays} days\n")
+                    graph.append("[${ge.name}]${ge.start ? " starts ${DateFormat.format(ge.start,'yyyy-MM-dd')} and " : " "} lasts ${ge.lastsDays} days\n")
                 } else if (previous && ge.temporality == GanttEntry.Temporality.HAPPEN) {
-                    graph.append("[${ge.name}]${ge.start ? " starts ${ge.start.format("yyyy-MM-dd")} and " : " "} happens after [${previous.name}]'s end\n")
+                    graph.append("[${ge.name}]${ge.start ? " starts ${DateFormat.format(ge.start,'yyyy-MM-dd')} and " : " "} happens after [${previous.name}]'s end\n")
                 }
                 previous = ge
             }
@@ -88,7 +89,7 @@ final class TaackUMLService {
             for (def te in timingEntries) {
                 graph.append("@${te.alias}\n")
                 for (def s in te.seriesEntries) {
-                    graph.append("${s.date.format("yyyy/MM/dd")} is ${s.status}\n")
+                    graph.append("${DateFormat.format(s.date, 'yyyy/MM/dd')} is ${s.status}\n")
                 }
             }
         }
@@ -114,7 +115,7 @@ final class TaackUMLService {
             graph.append("@${timingEntry.alias}\n")
 
             for (def s in timingEntry.seriesEntries) {
-                graph.append("${s.date.format("yyyy/MM/dd")} is ${s.status}\n")
+                graph.append("${DateFormat.format(s.date, 'yyyy/MM/dd')} is ${s.status}\n")
             }
         }
         graph.append("@enduml")

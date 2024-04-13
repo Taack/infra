@@ -17,6 +17,7 @@ import taack.ui.base.filter.expression.Operator
 import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.dump.RawHtmlFilterDump
 import taack.ui.dump.RawMapFilterDump
+import taack.utils.DateFormat
 
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
@@ -431,8 +432,8 @@ class TaackSimpleFilterService implements WebAttributes {
                                 where << ("$aliasKey > '${v1.substring(0, 4).toInteger()}-${v1.substring(4, 6).toInteger()}-01'" as String)
                             } else {
                                 try {
-                                    Date d = Date.parse('yyyyMMdd', v1)
-                                    where << ("$aliasKey >= '${d.format('yyyy-MM-dd')}'" as String)
+                                    Date d = DateFormat.parse('yyyyMMdd', v1)
+                                    where << ("$aliasKey >= '${DateFormat.format(d, 'yyyy-MM-dd')}'" as String)
                                 } catch (e) {
                                     log.error "Parse Date Error: ${e.message}"
                                 }
@@ -447,8 +448,8 @@ class TaackSimpleFilterService implements WebAttributes {
                                 where << ("$aliasKey < '${v2.substring(0, 4).toInteger()}-${v2.substring(4, 6).toInteger()}-01'" as String)
                             } else {
                                 try {
-                                    Date d = Date.parse('yyyyMMdd', v2)
-                                    where << ("$aliasKey < '${d.format('yyyy-MM-dd')}'" as String)
+                                    Date d = DateFormat.parse('yyyyMMdd', v2)
+                                    where << ("$aliasKey < '${DateFormat.format(d, 'yyyy-MM-dd')}'" as String)
                                 } catch (e) {
                                     log.error "Parse Date Error: ${e.message}"
                                 }
