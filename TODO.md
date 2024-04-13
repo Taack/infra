@@ -7,8 +7,13 @@
 
 - AsciidoctorJ
   - remove external kotlin code transpiled
-  - offline plugins
-  - code completion 
+  - support offline plugins
+  - allow code on TQL like language
+
+# 3.11
+
+- Secured Solr Search
+- More Secured TQL
 
 # 4.0
 
