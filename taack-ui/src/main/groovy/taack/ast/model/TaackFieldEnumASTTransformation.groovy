@@ -5,6 +5,7 @@ import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.*
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
+import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.ast.tools.GenericsUtils
 import org.codehaus.groovy.control.CompilePhase
@@ -22,6 +23,20 @@ import taack.ast.type.GetMethodReturn
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 final class TaackFieldEnumASTTransformation implements ASTTransformation {
+
+    @CompileStatic
+    enum DebugEnum {
+        NORMAL, ONLY_FIELD, ONLY_METHOD
+    }
+
+    static DebugEnum debugEnum = DebugEnum.NORMAL
+    static boolean trace = true
+
+    static printOut(String outputString) {
+        if (trace)
+            println(outputString)
+    }
+
     static boolean checkNodes(final ASTNode[] astNodes) {
         astNodes &&
                 astNodes[0] &&
@@ -39,8 +54,10 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
         methods.each {
             if (it.name.startsWith("get") && !it.name.contains('_') && !it.name.contains('Solr') && !it.name.contains('Iterator') &&
                     it.parameters.size() == 0 && (it.modifiers & MethodNode.ACC_PRIVATE) == 0) {
-                MethodNode methodNode = addGetMethodMethodNode(classNode, it)
-                classNode.addMethod(methodNode)
+                if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_METHOD) {
+                    MethodNode methodNode = addGetMethodMethodNode(classNode, it)
+                    classNode.addMethod(methodNode)
+                }
             } else {
             }
         }
@@ -63,17 +80,19 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                                     valueClassExpression.type,
                                     classNode,
                                     null)
-                            MethodNode methodNode = addFieldMethodNode(classNode,
-                                    //classNode.addField(fieldName, 2, valueClassExpression.type, null),
-                                    fieldNode,
-                                    null,
-                                    constraints)
-                            println valueClassExpression
-                            println "Add method for ${it.name} variable ${fieldName}: ${valueClassExpression.type}"
-                            classNode.addMethod(methodNode)
-                            avoidDuplicate.add(fieldName)
+                            if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_FIELD) {
+                                MethodNode methodNode = addFieldMethodNode(classNode,
+                                        //classNode.addField(fieldName, 2, valueClassExpression.type, null),
+                                        fieldNode,
+                                        null,
+                                        constraints)
+                                printOut valueClassExpression.toString()
+                                printOut "Add method for ${it.name} variable ${fieldName}: ${valueClassExpression.type}"
+                                classNode.addMethod(methodNode)
+                                avoidDuplicate.add(fieldName)
+                            }
                         } else {
-                            println "Avoid duplicates for ${keyExpression.value}"
+                            printOut "Avoid duplicates for ${keyExpression.value}"
                         }
                     }
                 } else if (it.initialExpression instanceof ListExpression) {
@@ -97,16 +116,19 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                 }
 
                 if (!avoidDuplicate.contains(it.name)) {
-                    MethodNode methodNode = addFieldMethodNode(classNode, it, constraintName, constraints)
-                    classNode.addMethod(methodNode)
-                    avoidDuplicate.add(it.name)
+                    if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_FIELD) {
+                        MethodNode methodNode = addFieldMethodNode(classNode, it, constraintName, constraints)
+                        classNode.addMethod(methodNode)
+                        avoidDuplicate.add(it.name)
+                    }
                 } else {
                 }
 
             } else {
             }
         }
-        classNode.addMethod addSelfObjectMethod(classNode)
+        if (debugEnum == DebugEnum.NORMAL)
+            classNode.addMethod addSelfObjectMethod(classNode)
     }
 
     private static MethodNode addSelfObjectMethod(final ClassNode classNode) {
@@ -130,14 +152,17 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                 )
         ))
 
-        final ExpressionStatement fieldMethodReturnExpression = new ExpressionStatement(
-                new ConstructorCallExpression(
+        final ReturnStatement fieldMethodReturnExpression = new ReturnStatement(
+                new CastExpression(
                         GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
-                        new ArgumentListExpression([
-                                fieldConstraintsVariable,
-                                new ConstantExpression("selfObject"),
-                                new VariableExpression("this", classNode)
-                        ] as List<Expression>)
+                        new ConstructorCallExpression(
+                                GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
+                                new ArgumentListExpression([
+                                        fieldConstraintsVariable,
+                                        new ConstantExpression("selfObject"),
+                                        new VariableExpression("this", classNode)
+                                ] as List<Expression>)
+                        )
                 )
         )
         List<Statement> statements = []
@@ -236,6 +261,12 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
     private static MethodNode addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode, final String constraintName = null, final FieldConstraint.Constraints constraints = null) {
         final VariableExpression constraintsVariable = constraints ? new VariableExpression("constraints", ClassHelper.make(FieldConstraint.Constraints)) : null
+        printOut "addFieldMethodNode: ${classNode.name}::${fieldNode.name}"
+
+        if (debugEnum == DebugEnum.ONLY_METHOD) {
+            printOut "return $debugEnum"
+        }
+
         final ExpressionStatement constraintsDeclarationExpression = constraints ? new ExpressionStatement(new DeclarationExpression(
                 constraintsVariable,
                 Token.newSymbol(Types.ASSIGN, -1, -1),
@@ -270,15 +301,19 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                 )
         ))
 
-        final ExpressionStatement fieldMethodReturnExpression = new ExpressionStatement(
-                new ConstructorCallExpression(
+        final ReturnStatement fieldMethodReturnExpression = new ReturnStatement(
+                new CastExpression(
                         GenericsUtils.makeClassSafeWithGenerics(FieldInfo, castTypeToClass(fieldNode.type)),
-                        new ArgumentListExpression([
-                                fieldConstraintsVariable,
-                                new ConstantExpression(fieldNode.name),
-                                new VariableExpression(fieldNode.name, fieldNode.type)
-                        ] as List<Expression>)
+                        new ConstructorCallExpression(
+                                GenericsUtils.makeClassSafeWithGenerics(FieldInfo, castTypeToClass(fieldNode.type)),
+                                new ArgumentListExpression([
+                                        fieldConstraintsVariable,
+                                        new ConstantExpression(fieldNode.name),
+                                        new VariableExpression(fieldNode.name, fieldNode.type)
+                                ] as List<Expression>)
+                        )
                 )
+
         )
         List<Statement> statements = []
         if (constraintsDeclarationExpression) statements.add(constraintsDeclarationExpression)
@@ -309,26 +344,35 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
     private static MethodNode addGetMethodMethodNode(final ClassNode classNode, final MethodNode methodNode) {
         String methodName = methodNode.name + '_'
+        printOut "addGetMethodMethodNode: ${classNode.name}::$methodName"
+
+        if (debugEnum == DebugEnum.ONLY_FIELD) {
+            printOut "return $debugEnum"
+        }
 
         BlockStatement code = new BlockStatement([
-                new ExpressionStatement(
-                        new ConstructorCallExpression(
+                new ReturnStatement(
+                        new CastExpression(
                                 GenericsUtils.makeClassSafeWithGenerics(GetMethodReturn, transformNativeTypeIntoClass(methodNode.returnType)),
-                                new ArgumentListExpression([
-                                        new StaticMethodCallExpression(
-                                                classNode,
-                                                "getMethod",
-                                                new ArgumentListExpression(
-                                                        [new ConstantExpression(methodNode.name)] as List<Expression>
-                                                )),
-                                        new MethodCallExpression(
-                                                new VariableExpression('this'),
-                                                methodNode.name,
-                                                [] as ArgumentListExpression),
-                                ] as List<Expression>)
+                                new ConstructorCallExpression(
+                                        GenericsUtils.makeClassSafeWithGenerics(GetMethodReturn, transformNativeTypeIntoClass(methodNode.returnType)),
+                                        new ArgumentListExpression([
+                                                new StaticMethodCallExpression(
+                                                        classNode,
+                                                        "getMethod",
+                                                        new ArgumentListExpression(
+                                                                [new ConstantExpression(methodNode.name)] as List<Expression>
+                                                        )),
+                                                new MethodCallExpression(
+                                                        new VariableExpression('this'),
+                                                        methodNode.name,
+                                                        [] as ArgumentListExpression),
+                                        ] as List<Expression>)
+                                )
                         )
-                )] as List<Statement>, new VariableScope())
-
+                )
+        ] as List<Statement>, new VariableScope())
+// cast something
         new MethodNode(
                 methodName,
                 MethodNode.ACC_PUBLIC,

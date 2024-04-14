@@ -288,7 +288,7 @@ class TaackCreateAppCommand implements GrailsApplicationCommand {
         File file = new File("$appPath/build.gradle")
         String content = '''\
         plugins {
-            id 'taack-grails-plugin.java-conventions\'
+            id 'taack-grails-plugin\'
         }
 
         grails {

@@ -60,12 +60,9 @@ class SectionSpec {
         filterVisitor.visitFilterField(i18n, fields as FieldInfo[], null)
     }
 
-    final <T, U, V> void filterFieldInverse(final String i18n, final Class<T> reverseClass, final FieldInfo<U> field, final FieldInfo<V>... fields) {
+    final <T> void filterFieldInverse(final String i18n, final Class<T> reverseClass, final FieldInfo field, final FieldInfo... fields) {
+        if (fields == null || fields.size() == 0) return
         filterVisitor.visitFilterFieldReverse(i18n, reverseClass, field, fields)
-    }
-
-    final <T, U, V> void filterFieldInverse(final String i18n, final Class<T> reverseClass, final FieldInfo<U> field, final FieldInfo<V> reverseField) {
-        filterVisitor.visitFilterFieldReverse(i18n, reverseClass, field, reverseField)
     }
 
     final <U> void filterExtension(final String i18n, final FieldInfo... field) {
