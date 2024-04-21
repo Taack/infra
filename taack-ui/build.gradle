@@ -66,7 +66,7 @@ dependencies {
     implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
     implementation "org.grails:grails-plugin-interceptors"
 
-    implementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
 
     api "org.apache.solr:solr-solrj:${solrj}"
     api "org.apache.tika:tika-core:${tika}"
