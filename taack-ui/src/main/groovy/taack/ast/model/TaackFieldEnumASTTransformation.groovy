@@ -29,22 +29,25 @@ import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
-    private static final ClassNode GRM_TYPE = make(GetMethodReturn.class, false)
-
     @CompileStatic
     enum DebugEnum {
         NORMAL, ONLY_FIELD, ONLY_METHOD
     }
 
-    static DebugEnum debugEnum = DebugEnum.NORMAL
-    static boolean trace = true
+    private static final DebugEnum debugEnum = DebugEnum.NORMAL
+    private static final boolean trace = true
 
-    static printOut(String outputString) {
+    private static final ClassNode GRM_TYPE = make(GetMethodReturn.class, false)
+    private static final ClassNode FC_TYPE = make(FieldConstraint)
+    private static final String[] DOMAIN_RESERVED =
+            ['serialVersionUID', 'self', 'mapping', 'constraints', 'ui', 'uiMap', 'metaClass', 'transients', 'mappedBy']
+
+    private static final printOut(String outputString) {
         if (trace)
             println(outputString)
     }
 
-    static boolean checkNodes(final ASTNode[] astNodes) {
+    private static final boolean checkNodes(final ASTNode[] astNodes) {
         astNodes &&
                 astNodes[0] &&
                 astNodes[1] &&
@@ -53,23 +56,27 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
     @Override
     void visit(ASTNode[] nodes, SourceUnit source) {
-        Set<String> avoidDuplicate = []
+        final Set<String> avoidDuplicate = []
         if (!checkNodes(nodes)) return
-        ClassNode classNode = (ClassNode) nodes[1]
+        final ClassNode classNode = (ClassNode) nodes[1]
         final Map<String, FieldConstraint.Constraints> constraintsMap = dumpConstraints(classNode)
-        List<MethodNode> methods = new ArrayList<>(classNode.methods)
+        final List<MethodNode> methods = new ArrayList<>(classNode.methods)
         methods.each {
-            if (it.name.startsWith("get") && !it.name.contains('_') && !it.name.contains('Solr') && !it.name.contains('Iterator') &&
-                    it.parameters.size() == 0 && (it.modifiers & MethodNode.ACC_PRIVATE) == 0) {
+
+            // Filter pure Getters
+            if (it.name.startsWith("get") && !it.name.contains('_') && !it.name.contains('Solr') &&
+                    !it.name.contains('Iterator') && it.parameters.size() == 0 &&
+                    (it.modifiers & MethodNode.ACC_PRIVATE) == 0) {
+
                 if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_METHOD) {
                     MethodNode methodNode = addGetMethodMethodNode(classNode, it)
                     classNode.addMethod(methodNode)
                 }
-            } else {
             }
         }
 
         classNode.fields.each {
+
             // hasMany fields are added after semantic analysis
             if (it.name == 'belongsTo' /*|| it.name == "hasMany"*/) {
                 if (it.initialExpression instanceof MapExpression) {
@@ -81,7 +88,6 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                         FieldConstraint.Constraints constraints = constraintsMap.get(keyExpression.value)
                         final String fieldName = keyExpression.value as String
                         if (!avoidDuplicate.contains(fieldName)) {
-//                            FieldNode fieldNode = classNode.getField(fieldName)
                             FieldNode fieldNode = new FieldNode(fieldName,
                                     2,
                                     valueClassExpression.type,
@@ -94,7 +100,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                                         null,
                                         constraints)
                                 printOut valueClassExpression.toString()
-                                printOut "Add method for ${it.name} variable ${fieldName}: ${valueClassExpression.type}"
+                                printOut "Method ${it.name} added ${fieldName}: ${valueClassExpression.type}"
                                 classNode.addMethod(methodNode)
                                 avoidDuplicate.add(fieldName)
                             }
@@ -107,12 +113,14 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                     ListExpression le = it.initialExpression as ListExpression
                     le.expressions.each {
                         ClassExpression valueClassExpression = it as ClassExpression
+                        // TODO
+                        printOut "valueClassExpression: ${valueClassExpression} NOT DONE !"
                     }
                 }
             } else if (!(it.name.contains('_') || it.name.contains('$') || it.name.contains('hasMany') ||
-                    ['serialVersionUID', 'self', 'mapping', 'constraints', 'ui', 'uiMap', 'metaClass', 'transients', 'mappedBy'].contains(it.name) ||
-                    it.type.name.contains('DetachedCriteria') && (it.modifiers & MethodNode.ACC_PRIVATE) != 0
-            )) {
+                    DOMAIN_RESERVED.contains(it.name) ||
+                    it.type.name.contains('DetachedCriteria') && (it.modifiers & MethodNode.ACC_PRIVATE) != 0)) {
+
                 List<AnnotationNode> annotationNodes = it.getAnnotations(new ClassNode(TaackEnumName))
                 String constraintName = null
                 FieldConstraint.Constraints constraints = constraintsMap.get(it.name)
@@ -128,23 +136,20 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                         classNode.addMethod(methodNode)
                         avoidDuplicate.add(it.name)
                     }
-                } else {
                 }
-
-            } else {
             }
         }
         if (debugEnum == DebugEnum.NORMAL)
             classNode.addMethod addSelfObjectMethod(classNode)
     }
 
-    private static MethodNode addSelfObjectMethod(final ClassNode classNode) {
-        final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", make(FieldConstraint))
+    private static final MethodNode addSelfObjectMethod(final ClassNode classNode) {
+        final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", FC_TYPE)
         final Statement fieldConstraintDeclarationStatement = stmt(new DeclarationExpression(
                 fieldConstraintsVariable,
                 Token.newSymbol(Types.ASSIGN, -1, -1),
                 ctorX(
-                        make(FieldConstraint),
+                        FC_TYPE,
                         args(
                                 nullX(),
                                 nullX(),
@@ -153,11 +158,13 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                 )
         ))
 
+        final ClassNode fiNode = GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode)
+
         final Statement fieldMethodReturnExpression = returnS(
                 castX(
-                        GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
+                        fiNode,
                         ctorX(
-                                GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
+                                fiNode,
                                 args(
                                         fieldConstraintsVariable,
                                         varX("this", classNode)
@@ -166,7 +173,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                 )
         )
 
-        BlockStatement code = block(
+        final BlockStatement code = block(
                 fieldConstraintDeclarationStatement,
                 fieldMethodReturnExpression
         )
@@ -174,21 +181,22 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
         new MethodNode(
                 "getSelfObject_",
                 MethodNode.ACC_PUBLIC,
-                GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
+                fiNode,
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,
                 code
         )
-
     }
 
     static Map<String, FieldConstraint.Constraints> dumpConstraints(final ClassNode classNode) {
         final FieldNode fn = classNode.getDeclaredField("constraints")
+
         if (fn == null) return [:]
+
         final ClosureExpression ce = fn.initialValueExpression as ClosureExpression
         final BlockStatement bs = ce.code as BlockStatement
+        final Map<String, FieldConstraint.Constraints> ret = [:]
 
-        Map<String, FieldConstraint.Constraints> ret = [:]
         bs.statements.each { Statement s ->
             if (s instanceof ExpressionStatement) {
                 Expression e = s.expression
@@ -252,37 +260,43 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
         }
     }
 
-    private static String transformNameIntoMethodName(final String fieldNodeName) {
+    private static final String transformNameIntoMethodName(final String fieldNodeName) {
         'get' + fieldNodeName.capitalize() + '_'
     }
 
-    private static String transformNameIntoMethodName(FieldNode fieldNode) {
-//        'get' + (fieldNode.name != "name" ? fieldNode.name : "${fieldNode.type.nameWithoutPackage}Name").capitalize() + '_'
+    private static final String transformNameIntoMethodName(final MethodNode methodNode) {
+        methodNode.name + '_'
+    }
+
+    private static final String transformNameIntoMethodName(final FieldNode fieldNode) {
         transformNameIntoMethodName fieldNode.name
     }
 
-    private static MethodNode addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode, final String constraintName = null, final FieldConstraint.Constraints constraints = null) {
-        final VariableExpression constraintsVariable = constraints ? new VariableExpression("constraints", make(FieldConstraint.Constraints)) : null
+    private static MethodNode addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode,
+                                                 final String constraintName = null,
+                                                 final FieldConstraint.Constraints constraints = null) {
+        final VariableExpression constrVar = constraints ? varX("constraints", make(FieldConstraint.Constraints)) : null
         printOut "addFieldMethodNode: ${classNode.name}::${fieldNode.name}"
 
         if (debugEnum == DebugEnum.ONLY_METHOD) {
             printOut "return $debugEnum"
         }
 
-        final Statement constraintsDeclarationExpression = constraints ? stmt(new DeclarationExpression(
-                constraintsVariable,
-                Token.newSymbol(Types.ASSIGN, -1, -1),
-                ctorX(
-                        make(FieldConstraint.Constraints),
-                        args(
-                                constX(constraints.widget),
-                                constX(constraints.nullable),
-                                constX(constraints.email),
-                                constX(constraints.min),
-                                constX(constraints.max),
+        final Statement constraintsDeclarationExpression = constraints ? stmt(
+                new DeclarationExpression(
+                        constrVar,
+                        Token.newSymbol(Types.ASSIGN, -1, -1),
+                        ctorX(
+                                make(FieldConstraint.Constraints),
+                                args(
+                                        constX(constraints.widget),
+                                        constX(constraints.nullable),
+                                        constX(constraints.email),
+                                        constX(constraints.min),
+                                        constX(constraints.max),
+                                )
                         )
-                )
-        )) : new EmptyStatement()
+                )) : new EmptyStatement()
 
         final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", make(FieldConstraint))
 
@@ -295,7 +309,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
         final ConstructorCallExpression cceFieldConstraint = ctorX(
                 make(FieldConstraint),
                 args(
-                        constraintsVariable ?: constX(null),
+                        constrVar ?: constX(null),
                         sceGetDeclaredField,
                         new ConstantExpression(constraintName),
                 )
@@ -352,8 +366,8 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
     }
 
     private static MethodNode addGetMethodMethodNode(final ClassNode classNode, final MethodNode methodNode) {
-        String generatedMethodName = methodNode.name + '_'
-        printOut "addGetMethodMethodNode: ${classNode.name}::$generatedMethodName"
+        String genMethodName = transformNameIntoMethodName methodNode
+        printOut "addGetMethodMethodNode: ${classNode.name}::$genMethodName"
 
         if (debugEnum == DebugEnum.ONLY_FIELD) {
             printOut "return $debugEnum"
@@ -393,7 +407,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
         )
 
         new MethodNode(
-                generatedMethodName,
+                genMethodName,
                 MethodNode.ACC_PUBLIC,
                 GRM_TYPE,
                 Parameter.EMPTY_ARRAY,
