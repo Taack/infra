@@ -3,12 +3,12 @@ package taack.ui.base.common
 import groovy.transform.CompileStatic
 
 @CompileStatic
-enum ActionIconStyleModifier {
+enum IconStyle {
     SCALE_DOWN("object-fit: scale-down;vertical-align: middle;float:right;max-height: 22px;max-width: 22px;"),
     RIGHT("vertical-align: middle;float: right;max-height: 22px;"),
     LEFT("vertical-align: middle;float: left;max-height: 22px;")
 
-    ActionIconStyleModifier(final String inlineStyle) {
+    IconStyle(final String inlineStyle) {
         this.inlineStyle = inlineStyle
     }
 
@@ -59,13 +59,13 @@ class ActionIcon {
     final static ActionIcon FOLLOW = new ActionIcon("/assets/taack/icons/actions/follow.svg")
     final static ActionIcon UNFOLLOW = new ActionIcon("/assets/taack/icons/actions/unfollow.svg")
 
-    ActionIcon(final String src, final ActionIconStyleModifier style = null) {
+    ActionIcon(final String src, final IconStyle style = null) {
         this.src = src
         this.style = style
     }
 
     final String src
-    final ActionIconStyleModifier style
+    final IconStyle style
 
     ActionIcon plus(ActionIcon other) {
         return new ActionIcon(this.src + "+" + other.src)
@@ -75,7 +75,7 @@ class ActionIcon {
         return new ActionIcon(this.src + "*" + other.src)
     }
 
-    ActionIcon multiply(ActionIconStyleModifier other) {
+    ActionIcon multiply(IconStyle other) {
         return new ActionIcon(this.src, other)
     }
 

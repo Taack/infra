@@ -24,6 +24,9 @@ import taack.ui.config.Language
 import taack.ui.dump.*
 import taack.ui.mail.dump.RawHtmlMailDump
 import taack.ui.pdf.dump.RawHtmlPrintableDump
+
+import javax.annotation.PostConstruct
+
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -50,6 +53,8 @@ import taack.ui.pdf.dump.RawHtmlPrintableDump
 @GrailsCompileStatic
 final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, DataBinder {
 
+    static lazyInit = false
+
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
 
     @Autowired
@@ -64,13 +69,20 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
     @Autowired
     MessageSource messageSource
 
-    String tr(final String code, final Locale locale = null, final Object[] args = null) {
+    private static MessageSource staticMs
+
+    @PostConstruct
+    void init() {
+        staticMs = messageSource
+    }
+
+    static final String tr(final String code, final Locale locale = null, final String... args) {
         if (LocaleContextHolder.locale.language == "test") return code
         try {
-            messageSource.getMessage(code, args, locale ?: LocaleContextHolder.locale)
+            staticMs.getMessage(code, args, locale ?: LocaleContextHolder.locale)
         } catch (e1) {
             try {
-                messageSource.getMessage(code, args, new Locale("en"))
+                staticMs.getMessage(code, args, new Locale("en"))
             } catch (e2) {
                 code
             }

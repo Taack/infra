@@ -26,7 +26,7 @@ import taack.ui.base.UiBlockSpecifier
 import taack.ui.base.UiTableSpecifier
 import taack.ui.base.block.BlockSpec
 import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.ActionIconStyleModifier
+import taack.ui.base.common.IconStyle
 
 import javax.annotation.PostConstruct
 
@@ -177,8 +177,8 @@ final class TaackSearchService implements WebAttributes {
                                     String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
                                     row {
                                         rowField c.value + "(${c.count})"
-                                        if (rangesClicked.contains(currentRange)) rowLink "Remove Filter", ActionIcon.DELETE * ActionIconStyleModifier.SCALE_DOWN, search, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q], false
-                                        else rowLink "Filter", ActionIcon.FILTER * ActionIconStyleModifier.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q], false
+                                        if (rangesClicked.contains(currentRange)) rowLink "Remove Filter", ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q], false
+                                        else rowLink "Filter", ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q], false
                                     }
                                 }
                             }
@@ -197,8 +197,8 @@ final class TaackSearchService implements WebAttributes {
                                 String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                 row {
                                     rowField v.name + "(${v.count})"
-                                    if (facetsClicked.contains(currentFacet)) rowLink "Remove Filter", ActionIcon.DELETE * ActionIconStyleModifier.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q], false
-                                    else rowLink "Filter", ActionIcon.FILTER * ActionIconStyleModifier.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q], false
+                                    if (facetsClicked.contains(currentFacet)) rowLink "Remove Filter", ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q], false
+                                    else rowLink "Filter", ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q], false
                                 }
                             }
                         }
