@@ -265,8 +265,8 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                         }
                         FieldConstraint.Constraints constraints = new FieldConstraint.Constraints(
                                 c['widget'] as String,
-                                (c['nullable'] ?: false) as boolean,
-                                (c['email'] ?: false) as boolean,
+                                (c['nullable'] ?: false) as Boolean,
+                                (c['email'] ?: false) as Boolean,
                                 c['min'] as Integer,
                                 c['max'] as Integer
                         )
@@ -390,12 +390,16 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
     private static ClassNode castTypeToClass(final ClassNode classNode) {
         if (!classNode.isPrimaryClassNode()) {
+            println "COUCOU11"
             if (boolean.isAssignableFrom(classNode.typeClass)) {
+                println "COUCOU12"
                 return make(Boolean)
             } else if (int.isAssignableFrom(classNode.typeClass)) {
+                println "COUCOU13"
                 return make(Integer)
             }
         }
+        println "COUCOU14"
         return classNode
     }
 
@@ -420,17 +424,13 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                 "getMethod",
                 args(methodNode.name)
         )
-        println "AUO1"
-        callGetMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, true)
-        callGetMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, true)
-        println "AUO2"
+        callGetMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, methodNode)
+        callGetMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, methodNode.returnType)
 
         MethodCallExpression callMethod = callThisX(methodNode.name)
 
-        println "AUO3"
-        callMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, true)
-        callMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, true)
-        println "AUO4"
+        callMethod.putNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, methodNode)
+        callMethod.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, classNode)
 
         ConstructorCallExpression ctorGetMethodReturn = ctorX(
                 GRM_TYPE,
@@ -439,11 +439,9 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                         callMethod
                 )
         )
-        println "AUO5"
 
-        ctorGetMethodReturn.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, true)
-        ctorGetMethodReturn.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, true)
-        println "AUO6"
+        ctorGetMethodReturn.putNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, GRM_TYPE.getDeclaredConstructors().first())
+        ctorGetMethodReturn.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, GRM_TYPE)
 
         body.addStatement(
                 returnS(
@@ -451,7 +449,6 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                 )
         )
 
-        println "AUO7"
         addGeneratedMethod(
                 classNode,
                 genMethodName,
@@ -461,7 +458,6 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                 ClassNode.EMPTY_ARRAY,
                 body
         )
-        println "AUO8"
 
     }
 }
