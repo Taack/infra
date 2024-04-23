@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.*
 import org.codehaus.groovy.ast.stmt.BlockStatement
+import org.codehaus.groovy.ast.stmt.EmptyStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
@@ -14,15 +15,21 @@ import org.codehaus.groovy.syntax.Token
 import org.codehaus.groovy.syntax.Types
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
+import org.codehaus.groovy.transform.stc.StaticTypesMarker
 import taack.ast.annotation.TaackEnumName
 import taack.ast.type.FieldConstraint
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 
+import static org.codehaus.groovy.ast.ClassHelper.make
+import static org.codehaus.groovy.ast.tools.GeneralUtils.*
+
 // see http://docs.groovy-lang.org/latest/html/documentation/index.html#developing-ast-xforms
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 final class TaackFieldEnumASTTransformation implements ASTTransformation {
+
+    private static final ClassNode GRM_TYPE = make(GetMethodReturn.class, false)
 
     @CompileStatic
     enum DebugEnum {
@@ -132,49 +139,44 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
     }
 
     private static MethodNode addSelfObjectMethod(final ClassNode classNode) {
-        final VariableExpression fieldConstraintsVariable = new VariableExpression("fieldConstraints", ClassHelper.make(FieldConstraint))
-        final ExpressionStatement fieldConstraintDeclarationStatement = new ExpressionStatement(new DeclarationExpression(
+        final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", make(FieldConstraint))
+        final Statement fieldConstraintDeclarationStatement = stmt(new DeclarationExpression(
                 fieldConstraintsVariable,
                 Token.newSymbol(Types.ASSIGN, -1, -1),
-                new ConstructorCallExpression(
-                        ClassHelper.make(FieldConstraint),
-                        new ArgumentListExpression([
-                                new ConstantExpression(null),
-//                                new StaticMethodCallExpression(
-//                                        classNode,
-//                                        "getDeclaredField",
-//                                        new ArgumentListExpression([new ConstantExpression("this")] as List<Expression>)
-//                                ),
-                                new ConstantExpression(null),
-                                new ConstantExpression(null),
-
-                        ] as List<Expression>)
+                ctorX(
+                        make(FieldConstraint),
+                        args(
+                                nullX(),
+                                nullX(),
+                                nullX(),
+                        )
                 )
         ))
 
-        final ReturnStatement fieldMethodReturnExpression = new ReturnStatement(
-                new CastExpression(
+        final Statement fieldMethodReturnExpression = returnS(
+                castX(
                         GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
-                        new ConstructorCallExpression(
+                        ctorX(
                                 GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
-                                new ArgumentListExpression([
+                                args(
                                         fieldConstraintsVariable,
-                                        new ConstantExpression("selfObject"),
-                                        new VariableExpression("this", classNode)
-                                ] as List<Expression>)
+                                        varX("this", classNode)
+                                )
                         )
                 )
         )
-        List<Statement> statements = []
-        statements.addAll([fieldConstraintDeclarationStatement, fieldMethodReturnExpression])
-        BlockStatement code = new BlockStatement(statements, new VariableScope())
+
+        BlockStatement code = block(
+                fieldConstraintDeclarationStatement,
+                fieldMethodReturnExpression
+        )
 
         new MethodNode(
                 "getSelfObject_",
                 MethodNode.ACC_PUBLIC,
                 GenericsUtils.makeClassSafeWithGenerics(FieldInfo, classNode),
-                [] as Parameter[],
-                [] as ClassNode[],
+                Parameter.EMPTY_ARRAY,
+                ClassNode.EMPTY_ARRAY,
                 code
         )
 
@@ -234,17 +236,17 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
     private static ClassNode transformNativeTypeIntoClass(ClassNode nativeType) {
         switch (nativeType.toString()) {
             case 'boolean':
-                return ClassHelper.make(Boolean)
+                return make(Boolean)
             case 'int':
-                return ClassHelper.make(Integer)
+                return make(Integer)
             case 'float':
-                return ClassHelper.make(Float)
+                return make(Float)
             case 'double':
-                return ClassHelper.make(Double)
+                return make(Double)
             case 'char':
-                return ClassHelper.make(Character)
+                return make(Character)
             case 'short':
-                return ClassHelper.make(Short)
+                return make(Short)
             default:
                 return nativeType
         }
@@ -260,48 +262,54 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
     }
 
     private static MethodNode addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode, final String constraintName = null, final FieldConstraint.Constraints constraints = null) {
-        final VariableExpression constraintsVariable = constraints ? new VariableExpression("constraints", ClassHelper.make(FieldConstraint.Constraints)) : null
+        final VariableExpression constraintsVariable = constraints ? new VariableExpression("constraints", make(FieldConstraint.Constraints)) : null
         printOut "addFieldMethodNode: ${classNode.name}::${fieldNode.name}"
 
         if (debugEnum == DebugEnum.ONLY_METHOD) {
             printOut "return $debugEnum"
         }
 
-        final ExpressionStatement constraintsDeclarationExpression = constraints ? new ExpressionStatement(new DeclarationExpression(
+        final Statement constraintsDeclarationExpression = constraints ? stmt(new DeclarationExpression(
                 constraintsVariable,
                 Token.newSymbol(Types.ASSIGN, -1, -1),
-                new ConstructorCallExpression(
-                        ClassHelper.make(FieldConstraint.Constraints),
-                        new ArgumentListExpression([
-                                new ConstantExpression(constraints.widget),
-                                new ConstantExpression(constraints.nullable),
-                                new ConstantExpression(constraints.email),
-                                new ConstantExpression(constraints.min),
-                                new ConstantExpression(constraints.max),
-                        ] as List<Expression>)
+                ctorX(
+                        make(FieldConstraint.Constraints),
+                        args(
+                                constX(constraints.widget),
+                                constX(constraints.nullable),
+                                constX(constraints.email),
+                                constX(constraints.min),
+                                constX(constraints.max),
+                        )
                 )
-        )) : null
+        )) : new EmptyStatement()
 
-        final VariableExpression fieldConstraintsVariable = new VariableExpression("fieldConstraints", ClassHelper.make(FieldConstraint))
-        final ExpressionStatement fieldConstraintDeclarationStatement = new ExpressionStatement(new DeclarationExpression(
-                fieldConstraintsVariable,
-                Token.newSymbol(Types.ASSIGN, -1, -1),
-                new ConstructorCallExpression(
-                        ClassHelper.make(FieldConstraint),
-                        new ArgumentListExpression([
-                                constraintsVariable ?: new ConstantExpression(null),
-                                new StaticMethodCallExpression(
-                                        classNode,
-                                        "getDeclaredField",
-                                        new ArgumentListExpression([new ConstantExpression(fieldNode.name)] as List<Expression>)
-                                ),
-                                new ConstantExpression(constraintName),
+        final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", make(FieldConstraint))
 
-                        ] as List<Expression>)
+        final StaticMethodCallExpression sceGetDeclaredField = callX(
+                classNode,
+                "getDeclaredField",
+                args(constX(fieldNode.name))
+        )
+
+        final ConstructorCallExpression cceFieldConstraint = ctorX(
+                make(FieldConstraint),
+                args(
+                        constraintsVariable ?: constX(null),
+                        sceGetDeclaredField,
+                        new ConstantExpression(constraintName),
                 )
-        ))
+        )
 
-        final ReturnStatement fieldMethodReturnExpression = new ReturnStatement(
+
+        final Statement fieldConstraintDeclarationStatement = stmt(
+                new DeclarationExpression(
+                        fieldConstraintsVariable,
+                        Token.newSymbol(Types.ASSIGN, -1, -1),
+                        cceFieldConstraint
+                ))
+
+        final Statement fieldMethodReturnExpression = returnS(
                 new CastExpression(
                         GenericsUtils.makeClassSafeWithGenerics(FieldInfo, castTypeToClass(fieldNode.type)),
                         new ConstructorCallExpression(
@@ -313,20 +321,21 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
                                 ] as List<Expression>)
                         )
                 )
-
         )
-        List<Statement> statements = []
-        if (constraintsDeclarationExpression) statements.add(constraintsDeclarationExpression)
-        statements.addAll([fieldConstraintDeclarationStatement, fieldMethodReturnExpression])
-        BlockStatement code = new BlockStatement(statements, new VariableScope())
+
+        BlockStatement code = block(
+                constraintsDeclarationExpression,
+                fieldConstraintDeclarationStatement,
+                fieldMethodReturnExpression
+        )
 
 
         new MethodNode(
                 transformNameIntoMethodName(fieldNode),
                 MethodNode.ACC_PUBLIC,
                 GenericsUtils.makeClassSafeWithGenerics(FieldInfo, castTypeToClass(fieldNode.type)),
-                [] as Parameter[],
-                [] as ClassNode[],
+                Parameter.EMPTY_ARRAY,
+                ClassNode.EMPTY_ARRAY,
                 code
         )
     }
@@ -334,52 +343,63 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
     private static ClassNode castTypeToClass(final ClassNode classNode) {
         if (!classNode.isPrimaryClassNode()) {
             if (boolean.isAssignableFrom(classNode.typeClass)) {
-                return new ClassNode(Boolean)
+                return make(Boolean)
             } else if (int.isAssignableFrom(classNode.typeClass)) {
-                return new ClassNode(Integer)
+                return make(Integer)
             }
         }
         return classNode
     }
 
     private static MethodNode addGetMethodMethodNode(final ClassNode classNode, final MethodNode methodNode) {
-        String methodName = methodNode.name + '_'
-        printOut "addGetMethodMethodNode: ${classNode.name}::$methodName"
+        String generatedMethodName = methodNode.name + '_'
+        printOut "addGetMethodMethodNode: ${classNode.name}::$generatedMethodName"
 
         if (debugEnum == DebugEnum.ONLY_FIELD) {
             printOut "return $debugEnum"
         }
 
-        BlockStatement code = new BlockStatement([
-                new ReturnStatement(
-                        new CastExpression(
-                                GenericsUtils.makeClassSafeWithGenerics(GetMethodReturn, transformNativeTypeIntoClass(methodNode.returnType)),
-                                new ConstructorCallExpression(
-                                        GenericsUtils.makeClassSafeWithGenerics(GetMethodReturn, transformNativeTypeIntoClass(methodNode.returnType)),
-                                        new ArgumentListExpression([
-                                                new StaticMethodCallExpression(
-                                                        classNode,
-                                                        "getMethod",
-                                                        new ArgumentListExpression(
-                                                                [new ConstantExpression(methodNode.name)] as List<Expression>
-                                                        )),
-                                                new MethodCallExpression(
-                                                        new VariableExpression('this'),
-                                                        methodNode.name,
-                                                        [] as ArgumentListExpression),
-                                        ] as List<Expression>)
-                                )
-                        )
-                )
-        ] as List<Statement>, new VariableScope())
-// cast something
-        new MethodNode(
-                methodName,
-                MethodNode.ACC_PUBLIC,
-                GenericsUtils.makeClassSafeWithGenerics(GetMethodReturn, transformNativeTypeIntoClass(methodNode.returnType)),
-                [] as Parameter[],
-                [] as ClassNode[],
-                code
+        final BlockStatement body = new BlockStatement()
+
+        StaticMethodCallExpression callGetMethod = callX(
+                methodNode.returnType,
+                "getMethod",
+                args(methodNode.name)
         )
+
+        callGetMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, true)
+        callGetMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, true)
+
+        MethodCallExpression callMethod = callThisX(methodNode.name)
+
+        callMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, true)
+        callMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, true)
+
+        ConstructorCallExpression ctorGetMethodReturn = ctorX(
+                GRM_TYPE,
+                args(
+                        callGetMethod,
+                        callMethod
+                )
+        )
+
+        ctorGetMethodReturn.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, true)
+        ctorGetMethodReturn.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, true)
+
+        body.addStatement(
+                returnS(
+                        ctorGetMethodReturn
+                )
+        )
+
+        new MethodNode(
+                generatedMethodName,
+                MethodNode.ACC_PUBLIC,
+                GRM_TYPE,
+                Parameter.EMPTY_ARRAY,
+                ClassNode.EMPTY_ARRAY,
+                body
+        )
+
     }
 }
