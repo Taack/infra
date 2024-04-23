@@ -212,6 +212,8 @@ class TaackSimpleFilterService implements WebAttributes {
     }
 
     private static final int visitFilterFieldExpressionBool(FilterExpression filterExpression, int occ, List<String> where, Map namedParams) {
+        final String fieldName = filterExpression.fieldName.replace("selfObject", "id")
+
         if (!filterExpression.isCollection) {
             switch (filterExpression.operator) {
                 case Operator.IN:
@@ -219,7 +221,7 @@ class TaackSimpleFilterService implements WebAttributes {
                         GetMethodReturn methodReturn = filterExpression.value as GetMethodReturn
                         List<Long> listOfLongs = (methodReturn.value as List<? extends GormEntity>)*.ident() as List<Long>
                         if (filterExpression.fieldName.endsWith("selfObject") && !listOfLongs.isEmpty()) {
-                            where << ("sc.${filterExpression.fieldName.replace("selfObject", "id")} in (${listOfLongs.join(',')})" as String)
+                            where << ("sc.${fieldName} in (${listOfLongs.join(',')})" as String)
                             occ++
                         }
                     } else if (filterExpression.value instanceof FieldInfo) {
@@ -229,7 +231,7 @@ class TaackSimpleFilterService implements WebAttributes {
                             occ++
                         }
                     } else if (filterExpression.value instanceof Collection) {
-                        where << ("sc.${filterExpression.fieldName} in :${'npfe' + occ}" as String)
+                        where << ("sc.${fieldName} in :${'npfe' + occ}" as String)
                         namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }

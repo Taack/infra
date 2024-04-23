@@ -99,7 +99,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
             methods.each {
                 if (!DOMAIN_RESERVED.contains(it.name)) {
                     // Filter pure Getters
-                    if (it.name.startsWith("get") && !it.name.contains('_') && !it.name.contains('Solr') &&
+                    if (it.name.startsWith('get') && !it.name.contains('_') && !it.name.contains('Solr') &&
                             !it.name.contains('Iterator') && it.parameters.size() == 0 &&
                             (it.modifiers & ACC_PRIVATE) == 0) {
 
@@ -184,7 +184,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
     private static final MethodNode addSelfObjectMethod(final ClassNode classNode) {
         printOut "addSelfObjectMethod: ${classNode.name}"
 
-        final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", FC_TYPE)
+        final VariableExpression fieldConstraintsVariable = varX('fieldConstraints', FC_TYPE)
 
         final ConstructorCallExpression ctorFC = ctorX(
                 FC_TYPE,
@@ -210,8 +210,8 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                 fiNode,
                 args(
                         fieldConstraintsVariable,
-                        nullX(),
-                        varX("this", classNode)
+                        constX('selfObject'),
+                        varX('this', classNode)
                 )
         )
 
@@ -232,7 +232,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
         addGeneratedMethod(
                 classNode,
-                "getSelfObject_",
+                'getSelfObject_',
                 ACC_PUBLIC,
                 fiNode,
                 Parameter.EMPTY_ARRAY,
@@ -242,7 +242,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
     }
 
     static Map<String, FieldConstraint.Constraints> dumpConstraints(final ClassNode classNode) {
-        final FieldNode fn = classNode.getDeclaredField("constraints")
+        final FieldNode fn = classNode.getDeclaredField('constraints')
 
         if (fn == null) return [:]
 
@@ -263,19 +263,19 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                         if (mee.valueExpression instanceof ConstantExpression) {
                             Object value = ((ConstantExpression) mee.valueExpression).value
                             switch (key) {
-                                case "nullable":
+                                case 'nullable':
                                     c.nullable = value
                                     break
-                                case "min":
+                                case 'min':
                                     c.min = (int) value
                                     break
-                                case "max":
+                                case 'max':
                                     c.max = (int) value
                                     break
-                                case "widget":
+                                case 'widget':
                                     c.widget = value
                                     break
-                                case "email":
+                                case 'email':
                                     c.email = value
                             }
                         }
@@ -305,9 +305,9 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
     private static final void addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode,
                                                  final String constraintName = null,
                                                  final FieldConstraint.Constraints constraints = null) {
-        printOut "addFieldMethodNode: ${classNode.name}::${fieldNode.name}"
+        printOut 'addFieldMethodNode: ${classNode.name}::${fieldNode.name}'
 
-        final VariableExpression constrVar = constraints ? varX("constraints", make(FieldConstraint.Constraints)) : null
+        final VariableExpression constrVar = constraints ? varX('constraints', make(FieldConstraint.Constraints)) : null
 
         if (debugEnum == DebugEnum.ONLY_METHOD) {
             printOut "return $debugEnum"
@@ -315,7 +315,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
         ClassNode fieldConstraintsCN = make(FieldConstraint.Constraints)
 
-        ConstructorCallExpression ctorFieldConstraints = ctorX(
+        ConstructorCallExpression ctorFieldConstraints = constraints ? ctorX(
                 fieldConstraintsCN,
                 args(
                         constX(constraints.widget),
@@ -324,37 +324,39 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                         constX(constraints.min),
                         constX(constraints.max),
                 )
-        )
+        ) : null
 
-        ctorFieldConstraints.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, fieldConstraintsCN.getDeclaredConstructors().first())
-        ctorFieldConstraints.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, fieldConstraintsCN)
+        if (ctorFieldConstraints) {
+            ctorFieldConstraints.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, fieldConstraintsCN.getDeclaredConstructors().first())
+            ctorFieldConstraints.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, fieldConstraintsCN)
+        }
 
         final Statement constraintsDeclarationExpression = constraints ? stmt(
                 new DeclarationExpression(
                         constrVar,
                         Token.newSymbol(Types.ASSIGN, -1, -1),
-                        ctorFieldConstraints
+                        ctorFieldConstraints ?: new EmptyExpression()
                 )) : new EmptyStatement()
 
         final ClassNode fieldConstraintCN = make(FieldConstraint)
         final ClassNode fieldCN = make(Field)
 
 
-        final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", fieldConstraintCN)
+        final VariableExpression fieldConstraintsVariable = varX('fieldConstraints', fieldConstraintCN)
 
         final StaticMethodCallExpression sceGetDeclaredField = callX(
                 classNode,
-                "getDeclaredField",
+                'getDeclaredField',
                 args(constX(fieldNode.name))
         )
 
-        sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, "getDeclaredField")
+        sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, 'getDeclaredField')
         sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, fieldCN)
 
         final ConstructorCallExpression cceFieldConstraint = ctorX(
                 fieldConstraintCN,
                 args(
-                        constrVar ?: constX(null),
+                        constrVar ?: nullX(),
                         sceGetDeclaredField,
                         new ConstantExpression(constraintName),
                 )
@@ -427,7 +429,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
      */
     private static final void addGetMethodMethodNode(final ClassNode classNode, final MethodNode methodNode) {
         String genMethodName = transformNameIntoMethodName methodNode
-        printOut "addGetMethodMethodNode: ${classNode.name}::$genMethodName ${methodNode.returnType}"
+        printOut 'addGetMethodMethodNode: ${classNode.name}::$genMethodName ${methodNode.returnType}'
 
         if (debugEnum == DebugEnum.ONLY_FIELD) {
             printOut "return $debugEnum"
@@ -437,7 +439,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
         StaticMethodCallExpression callGetMethod = callX(
                 methodNode.returnType,
-                "getMethod",
+                'getMethod',
                 args(methodNode.name)
         )
         callGetMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, methodNode)
