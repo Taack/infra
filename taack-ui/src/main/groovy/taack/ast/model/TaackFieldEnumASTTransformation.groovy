@@ -12,10 +12,11 @@ import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.syntax.Token
 import org.codehaus.groovy.syntax.Types
-import org.codehaus.groovy.transform.ASTTransformation
+import org.codehaus.groovy.transform.AbstractASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.codehaus.groovy.transform.stc.StaticTypesMarker
 import taack.ast.annotation.TaackEnumName
+import taack.ast.annotation.TaackFieldEnum
 import taack.ast.type.FieldConstraint
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
@@ -23,10 +24,13 @@ import taack.ast.type.GetMethodReturn
 import static org.codehaus.groovy.ast.ClassHelper.make
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 
+/**
+ * Handles generation of code for the @TaackFieldEnum annotation.
+ */
 // see http://docs.groovy-lang.org/latest/html/documentation/index.html#developing-ast-xforms
 @CompileStatic
-@GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
-final class TaackFieldEnumASTTransformation implements ASTTransformation {
+@GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
+final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
     @CompileStatic
     enum DebugEnum {
@@ -38,108 +42,125 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
     private static final ClassNode GRM_TYPE = make(GetMethodReturn.class, false)
     private static final ClassNode FC_TYPE = make(FieldConstraint)
+    private static final ClassNode TFE_TYPE = make(TaackFieldEnum)
+    private static final String TFE_TYPE_NAME = '@' + TFE_TYPE.nameWithoutPackage
     private static final String[] DOMAIN_RESERVED =
-            ['serialVersionUID', 'self', 'mapping', 'constraints', 'ui', 'uiMap', 'metaClass', 'transients', 'mappedBy']
+            [
+                    'serialVersionUID', 'self', 'mapping', 'constraints', 'ui',
+                    'uiMap', 'metaClass', 'transients', 'mappedBy',
+                    'log', 'instanceControllersDomainBindingApi',           // >6.2.0
+                    'instanceConvertersApi', 'getConstrainedProperties',    // >6.2.0
+                    'getProperties', 'getDirtyPropertyNames',               // >6.2.0
+                    'getGormPersistentEntity', 'getGormDynamicFinders',     // >6.2.0
+                    'getCount', 'getAll', 'getErrors'                       // >6.2.0
+            ]
 
     private static final printOut(String outputString) {
         if (trace)
             println(outputString)
     }
 
-    private static final boolean checkNodes(final ASTNode[] astNodes) {
-        astNodes &&
-                astNodes[0] &&
-                astNodes[1] &&
-                astNodes[0] instanceof AnnotationNode
-    }
-
     @Override
     void visit(ASTNode[] nodes, SourceUnit source) {
-        final Set<String> avoidDuplicate = []
-        if (!checkNodes(nodes)) return
-        final ClassNode classNode = (ClassNode) nodes[1]
-        final Map<String, FieldConstraint.Constraints> constraintsMap = dumpConstraints(classNode)
-        final List<MethodNode> methods = new ArrayList<>(classNode.methods)
-        methods.each {
 
-            // Filter pure Getters
-            if (it.name.startsWith("get") && !it.name.contains('_') && !it.name.contains('Solr') &&
-                    !it.name.contains('Iterator') && it.parameters.size() == 0 &&
-                    (it.modifiers & MethodNode.ACC_PRIVATE) == 0) {
+        printOut "source ${source.name}"
+        init(nodes, source)
 
-                if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_METHOD) {
-                    MethodNode methodNode = addGetMethodMethodNode(classNode, it)
-                    classNode.addMethod(methodNode)
-                }
-            }
-        }
+        AnnotationNode node = (AnnotationNode) nodes[0]
+        AnnotatedNode parent = (AnnotatedNode) nodes[1]
+        if (!TFE_TYPE.equals(node.getClassNode()))
+            return
 
-        classNode.fields.each {
+        if (parent instanceof ClassNode) {
+            ClassNode cNode = (ClassNode) parent
+            if (!checkNotInterface(cNode, TFE_TYPE_NAME)) return
 
-            // hasMany fields are added after semantic analysis
-            if (it.name == 'belongsTo' /*|| it.name == "hasMany"*/) {
-                if (it.initialExpression instanceof MapExpression) {
+            final Set<String> avoidDuplicate = []
+            final ClassNode classNode = (ClassNode) nodes[1]
+            final Map<String, FieldConstraint.Constraints> constraintsMap = dumpConstraints(classNode)
+            final List<MethodNode> methods = new ArrayList<>(classNode.methods)
+            methods.each {
+                if (!DOMAIN_RESERVED.contains(it.name)) {
+                    // Filter pure Getters
+                    if (it.name.startsWith("get") && !it.name.contains('_') && !it.name.contains('Solr') &&
+                            !it.name.contains('Iterator') && it.parameters.size() == 0 &&
+                            (it.modifiers & ACC_PRIVATE) == 0) {
 
-                    MapExpression me = it.initialExpression as MapExpression
-                    me.mapEntryExpressions.each { mee ->
-                        ConstantExpression keyExpression = mee.keyExpression as ConstantExpression
-                        ClassExpression valueClassExpression = mee.valueExpression as ClassExpression
-                        FieldConstraint.Constraints constraints = constraintsMap.get(keyExpression.value)
-                        final String fieldName = keyExpression.value as String
-                        if (!avoidDuplicate.contains(fieldName)) {
-                            FieldNode fieldNode = new FieldNode(fieldName,
-                                    2,
-                                    valueClassExpression.type,
-                                    classNode,
-                                    null)
-                            if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_FIELD) {
-                                MethodNode methodNode = addFieldMethodNode(classNode,
-                                        //classNode.addField(fieldName, 2, valueClassExpression.type, null),
-                                        fieldNode,
-                                        null,
-                                        constraints)
-                                printOut valueClassExpression.toString()
-                                printOut "Method ${it.name} added ${fieldName}: ${valueClassExpression.type}"
-                                classNode.addMethod(methodNode)
-                                avoidDuplicate.add(fieldName)
-                            }
-                        } else {
-                            printOut "Avoid duplicates for ${keyExpression.value}"
+                        if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_METHOD) {
+                            MethodNode methodNode = addGetMethodMethodNode(classNode, it)
+                            classNode.addMethod(methodNode)
                         }
                     }
-                } else if (it.initialExpression instanceof ListExpression) {
+                }
+            }
 
-                    ListExpression le = it.initialExpression as ListExpression
-                    le.expressions.each {
-                        ClassExpression valueClassExpression = it as ClassExpression
-                        // TODO
-                        printOut "valueClassExpression: ${valueClassExpression} NOT DONE !"
+            classNode.fields.each {
+
+                // hasMany fields are added after semantic analysis
+                if (it.name == 'belongsTo' /*|| it.name == "hasMany"*/) {
+                    if (it.initialExpression instanceof MapExpression) {
+
+                        MapExpression me = it.initialExpression as MapExpression
+                        me.mapEntryExpressions.each { mee ->
+                            ConstantExpression keyExpression = mee.keyExpression as ConstantExpression
+                            ClassExpression valueClassExpression = mee.valueExpression as ClassExpression
+                            FieldConstraint.Constraints constraints = constraintsMap.get(keyExpression.value)
+                            final String fieldName = keyExpression.value as String
+                            if (!avoidDuplicate.contains(fieldName)) {
+                                FieldNode fieldNode = new FieldNode(fieldName,
+                                        2,
+                                        valueClassExpression.type,
+                                        classNode,
+                                        null)
+                                if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_FIELD) {
+                                    MethodNode methodNode = addFieldMethodNode(classNode,
+                                            //classNode.addField(fieldName, 2, valueClassExpression.type, null),
+                                            fieldNode,
+                                            null,
+                                            constraints)
+                                    printOut valueClassExpression.toString()
+                                    printOut "Method ${it.name} added ${fieldName}: ${valueClassExpression.type}"
+                                    classNode.addMethod(methodNode)
+                                    avoidDuplicate.add(fieldName)
+                                }
+                            } else {
+                                printOut "Avoid duplicates for ${keyExpression.value}"
+                            }
+                        }
+                    } else if (it.initialExpression instanceof ListExpression) {
+
+                        ListExpression le = it.initialExpression as ListExpression
+                        le.expressions.each {
+                            ClassExpression valueClassExpression = it as ClassExpression
+                            // TODO
+                            printOut "valueClassExpression: ${valueClassExpression} NOT DONE !"
+                        }
                     }
-                }
-            } else if (!(it.name.contains('_') || it.name.contains('$') || it.name.contains('hasMany') ||
-                    DOMAIN_RESERVED.contains(it.name) ||
-                    it.type.name.contains('DetachedCriteria') && (it.modifiers & MethodNode.ACC_PRIVATE) != 0)) {
+                } else if (!(it.name.contains('_') || it.name.contains('$') || it.name.contains('hasMany') ||
+                        DOMAIN_RESERVED.contains(it.name) ||
+                        it.type.name.contains('DetachedCriteria') && (it.modifiers & ACC_PRIVATE) != 0)) {
 
-                List<AnnotationNode> annotationNodes = it.getAnnotations(new ClassNode(TaackEnumName))
-                String constraintName = null
-                FieldConstraint.Constraints constraints = constraintsMap.get(it.name)
-                if (!annotationNodes.empty) {
-                    AnnotationNode enumName = annotationNodes.first()
-                    ConstantExpression constantExpression = (ConstantExpression) enumName.getMember("name")
-                    constraintName = constantExpression.value
-                }
+                    List<AnnotationNode> annotationNodes = it.getAnnotations(TFE_TYPE)
+                    String constraintName = null
+                    FieldConstraint.Constraints constraints = constraintsMap.get(it.name)
+                    if (!annotationNodes.empty) {
+                        AnnotationNode enumName = annotationNodes.first()
+                        ConstantExpression constantExpression = (ConstantExpression) enumName.getMember("name")
+                        constraintName = constantExpression.value
+                    }
 
-                if (!avoidDuplicate.contains(it.name)) {
-                    if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_FIELD) {
-                        MethodNode methodNode = addFieldMethodNode(classNode, it, constraintName, constraints)
-                        classNode.addMethod(methodNode)
-                        avoidDuplicate.add(it.name)
+                    if (!avoidDuplicate.contains(it.name)) {
+                        if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_FIELD) {
+                            MethodNode methodNode = addFieldMethodNode(classNode, it, constraintName, constraints)
+                            classNode.addMethod(methodNode)
+                            avoidDuplicate.add(it.name)
+                        }
                     }
                 }
             }
+            if (debugEnum == DebugEnum.NORMAL)
+                classNode.addMethod addSelfObjectMethod(classNode)
         }
-        if (debugEnum == DebugEnum.NORMAL)
-            classNode.addMethod addSelfObjectMethod(classNode)
     }
 
     private static final MethodNode addSelfObjectMethod(final ClassNode classNode) {
@@ -179,7 +200,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
         new MethodNode(
                 "getSelfObject_",
-                MethodNode.ACC_PUBLIC,
+                ACC_PUBLIC,
                 fiNode,
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,
@@ -345,7 +366,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
         new MethodNode(
                 transformNameIntoMethodName(fieldNode),
-                MethodNode.ACC_PUBLIC,
+                ACC_PUBLIC,
                 GenericsUtils.makeClassSafeWithGenerics(FieldInfo, castTypeToClass(fieldNode.type)),
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,
@@ -407,7 +428,7 @@ final class TaackFieldEnumASTTransformation implements ASTTransformation {
 
         new MethodNode(
                 genMethodName,
-                MethodNode.ACC_PUBLIC,
+                ACC_PUBLIC,
                 GRM_TYPE,
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,
