@@ -305,7 +305,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
     private static final void addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode,
                                                  final String constraintName = null,
                                                  final FieldConstraint.Constraints constraints = null) {
-        printOut 'addFieldMethodNode: ${classNode.name}::${fieldNode.name}'
+        printOut "addFieldMethodNode: ${classNode.name}::${fieldNode.name}"
 
         final VariableExpression constrVar = constraints ? varX('constraints', make(FieldConstraint.Constraints)) : null
 
@@ -429,7 +429,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
      */
     private static final void addGetMethodMethodNode(final ClassNode classNode, final MethodNode methodNode) {
         String genMethodName = transformNameIntoMethodName methodNode
-        printOut 'addGetMethodMethodNode: ${classNode.name}::$genMethodName ${methodNode.returnType}'
+        printOut "addGetMethodMethodNode: ${classNode.name}::$genMethodName ${methodNode.returnType}"
 
         if (debugEnum == DebugEnum.ONLY_FIELD) {
             printOut "return $debugEnum"
