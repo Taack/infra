@@ -19,17 +19,13 @@ interface IUiFilterVisitor {
 
     void visitSectionEnd()
 
-    void visitFilterField(final String i18n, final FieldInfo field, EnumOption[] enumOptions)
-
-    void visitFilterField(final String i18n, final FieldInfo[] fields, EnumOption[] enumOptions)
+    void visitFilterField(final String i18n, EnumOption[] enumOptions, final FieldInfo... fields)
 
     void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields)
 
-    void visitFilterFieldExpressionBool(FilterExpression filterExpression)
+    void visitFilterFieldExpressionBool(FilterExpression... filterExpression)
 
-    void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue)
-
-    void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue)
+    void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression... filterExpressions)
 
     void visitFilterAction(String i18n, MethodClosure action)
 
