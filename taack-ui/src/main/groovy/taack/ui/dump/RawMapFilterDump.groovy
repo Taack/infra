@@ -42,13 +42,7 @@ final class RawMapFilterDump extends UiFilterVisitorImpl {
     }
 
     @Override
-    void visitFilterField(final String i18n, final FieldInfo field, EnumOption[] enumOptions) {
-        final String qualifiedName = getQualifiedName(field)
-        filterField(qualifiedName, field, enumOptions)
-    }
-
-    @Override
-    void visitFilterField(String i18n, FieldInfo[] fields, EnumOption[] enumOptions) {
+    void visitFilterField(String i18n, EnumOption[] enumOptions, FieldInfo[] fields) {
         final String qualifiedName = getQualifiedName(fields)
         filterField(qualifiedName, fields?.last(), enumOptions)
     }

@@ -1,4 +1,4 @@
-package taack.base
+package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
@@ -15,10 +15,8 @@ import taack.jdbc.common.TaackResultSetOuterClass
 import taack.jdbc.common.TaackResultSetOuterClass.TaackResultSet
 import taack.jdbc.common.tql.gen.TQLLexer
 import taack.jdbc.common.tql.gen.TQLParser
-import taack.jdbc.common.tql.listener.TQLDump
 import taack.jdbc.common.tql.listener.TQLTranslator
 
-import java.nio.charset.StandardCharsets
 import java.sql.DatabaseMetaData
 
 /**
@@ -36,7 +34,7 @@ import java.sql.DatabaseMetaData
  */
 @GrailsCompileStatic
 final class TaackJdbcService {
-    TaackSimpleFilterService taackSimpleFilterService
+    TaackFilterService taackFilterService
 
     private class ColumnDesc {
         FieldInfo fieldInfo
@@ -351,8 +349,9 @@ final class TaackJdbcService {
     private final Pair<List<Object[]>, Long> listFromTranslator(TQLTranslator translator, Integer max, int offset) {
         def simpleName = translator.tables.first()
         Class<? extends GormEntity> aClass = gormClassesMap[simpleName]
-        def res = taackSimpleFilterService.executeQuery(hqlFromTranslator(translator), [:], max, offset)
-        def num = taackSimpleFilterService.executeQueryUniqueResult(Long, [:], hqlFromTranslator(translator, true)) as Long
+        TaackFilter tf = taackFilterService.getBuilder(aClass).build()
+        def res = tf.executeQuery(hqlFromTranslator(translator), [:], max, offset)
+        def num = tf.executeQueryUniqueResult(Long, [:], hqlFromTranslator(translator, true)) as Long
         log.info "AUO num: ${num}, #ofRes: ${res.size()}"
         return new Pair<List<Object[]>, Long>(res, num)
     }
@@ -653,7 +652,9 @@ final class TaackJdbcService {
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(0))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("id"))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        def count = taackSimpleFilterService.executeQueryUniqueResult(Long, [:], "select count(id) from ${table}") as Long
+
+        TaackFilter tf = taackFilterService.getBuilder(GormEntity).build()
+        def count = tf.executeQueryUniqueResult(Long, [:], "select count(id) from ${table}") as Long
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setLongValue(count)) // number of rows in the table
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setLongValue(10)) // number of pages in the table
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())

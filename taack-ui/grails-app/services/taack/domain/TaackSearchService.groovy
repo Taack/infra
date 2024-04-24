@@ -1,4 +1,4 @@
-package taack.base
+package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
@@ -80,7 +80,7 @@ final class TaackSearchService implements WebAttributes {
     /**
      * Service interface allowing an application module to index its domain.
      *
-     * Returned entities will be indexed as specified via {@link #registerSolrSpecifier(taack.base.TaackSearchService.IIndexService, taack.solr.SolrSpecifier)}
+     * Returned entities will be indexed as specified via {@link #registerSolrSpecifier(taack.domain.TaackSearchService.IIndexService, taack.solr.SolrSpecifier)}
      */
     interface IIndexService {
         List<? extends GormEntity> indexThose(Class<? extends GormEntity> toIndex)
@@ -165,7 +165,7 @@ final class TaackSearchService implements WebAttributes {
         new UiBlockSpecifier().ui {
             anonymousBlock BlockSpec.Width.THIRD, {
                 ajaxBlock "range", {
-                    table "Ranges", new UiTableSpecifier().ui(QueryResponse, {
+                    table "Ranges", new UiTableSpecifier().ui {
                         header {
                             fieldHeader "Value"
                             fieldHeader "Action"
@@ -183,10 +183,10 @@ final class TaackSearchService implements WebAttributes {
                                 }
                             }
                         }
-                    })
+                    }
                 }
                 ajaxBlock "faceting", {
-                    table "Facets", new UiTableSpecifier().ui(QueryResponse, {
+                    table "Facets", new UiTableSpecifier().ui {
                         header {
                             fieldHeader "Value"
                             fieldHeader "Action"
@@ -202,12 +202,12 @@ final class TaackSearchService implements WebAttributes {
                                 }
                             }
                         }
-                    })
+                    }
                 }
             }
             anonymousBlock BlockSpec.Width.TWO_THIRD, {
                 ajaxBlock "results", {
-                    table "Highlighting", new UiTableSpecifier().ui(QueryResponse, {
+                    table "Highlighting", new UiTableSpecifier().ui {
                         header {
                             fieldHeader "Field"
                             fieldHeader "Value"
@@ -229,7 +229,7 @@ final class TaackSearchService implements WebAttributes {
                                 }
                             }
                         }
-                    })
+                    }
                 }
             }
         }

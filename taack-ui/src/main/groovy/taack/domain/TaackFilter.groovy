@@ -1,20 +1,17 @@
-package taack.base
+package taack.domain
 
 import grails.util.Pair
-import grails.web.api.WebAttributes
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.SessionFactory
 import org.hibernate.query.Query
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.UiFilterSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.filter.ITaackFilterExtension
 import taack.ui.base.filter.UiFilterVisitorImpl
 import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.filter.expression.Operator
-import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.dump.RawHtmlFilterDump
 import taack.ui.dump.RawMapFilterDump
 import taack.utils.DateFormat
@@ -25,37 +22,38 @@ import java.lang.reflect.ParameterizedType
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
  *
- * <p>The main methods are named {@link TaackSimpleFilterService#list(Class < T >)}. The uniq mandatory
+ * <p>The main methods are named {@link TaackFilter#list(Class < T >)}. The uniq mandatory
  * parameter is the Class we want the list for. Optional params includes allowed ids or passing a filter directly
  * allow to restrict the list of objects returned.
  */
 @CompileStatic
-class TaackSimpleFilterService implements WebAttributes {
-    SessionFactory sessionFactory
+final class TaackFilter<T extends GormEntity> {
 
-    final static Map<Class, ITaackFilterExtension> filterExtensionMap = [:]
+    private final SessionFactory sessionFactory
+    private final Map<String, ? extends Object> theParams
 
-    /**
-     * Allow to register a GormEntity class as base class for TQL queries.
-     *
-     * <pre>{@code
-     *  @PostConstruct
-     *  private static void init() {
-     *      def u = new User()
-     *      Jdbc.registerClass( User,
-     *                          u.username_, u.mail_, u.mainSubsidiary_, u.firstName_,
-     *                          u.lastName_, u.businessUnit_, u.enabled_)
-     *   }
-     * }</pre>
-     */
-    final static class TaackSimpleFilterExtension {
-        static final void registerStringExt(Class<? extends GormEntity> aClass, ITaackFilterExtension filterExtension) {
-            filterExtensionMap[aClass] = filterExtension
-        }
-    }
-
-    private Map<String, JoinEntity> joinEntityMap = [:]
+    private final Map<String, JoinEntity> joinEntityMap = [:]
     private int joinEntityOrder = 0
+
+    private final Class<T> cClass
+    private final T oObject
+    private Integer maxNumberOfLine = 20
+    private List<UiFilterSpecifier> additionalFilters = []
+    private List<Long> restrictedIds = []
+    private FieldInfo[] sortFields
+    private Order order
+
+    TaackFilter(FilterBuilder filterBuilder, SessionFactory sessionFactory, Map<String, ? extends Object> theParams) {
+        this.theParams = theParams
+        this.sessionFactory = sessionFactory
+        this.cClass = filterBuilder.cClass
+        this.oObject = filterBuilder.oObject
+        this.maxNumberOfLine = filterBuilder.maxNumberOfLine
+        this.additionalFilters = filterBuilder.additionalFilters
+        this.restrictedIds = filterBuilder.restrictedIds
+        this.sortFields = filterBuilder.sortFields
+        this.order = filterBuilder.order
+    }
 
     private final class JoinEntity {
         final String joinName
@@ -123,7 +121,7 @@ class TaackSimpleFilterService implements WebAttributes {
         joins.each {
             String path = it.order == 0 ? it.joinName : it.joinName.substring(it.joinName.lastIndexOf('.') + 1)
             join.append(" join sc${joinEntity ? joinEntity.order : ''}.${path} sc${it.order} ")
-            buildJoinClause(join, it)
+            buildJoinClause(join, it as JoinEntity)
         }
         join
     }
@@ -147,6 +145,7 @@ class TaackSimpleFilterService implements WebAttributes {
         }
         f
     }
+
 
     /**
      * Helper method allowing to execute a query
@@ -183,32 +182,6 @@ class TaackSimpleFilterService implements WebAttributes {
 
     private static String escapeHqlParameter(final String hqlParam) {
         hqlParam?.replace("'", "''")
-    }
-
-    /**
-     * list entities and number of results
-     *
-     * @param aClass type we want to list
-     * @param max (optional) max number of results
-     * @param sortableDirection (optional) sort parameter
-     * @param tInstance object of the same class as aClass, allowing to add filter criteria
-     * @return pair that contains the max results and the total number of objects reached by the filter
-     */
-    final <T extends GormEntity> Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final ColumnHeaderFieldSpec.SortableDirection sortableDirection, final T tInstance = null) {
-        list(aClass, max, null, tInstance, sortableDirection, null)
-    }
-
-    /**
-     * list entities and number of results
-     *
-     * @param aClass type we want to list
-     * @param max (optional) max number of results
-     * @param sortableDirection (optional) sort parameter
-     * @param idsInList restrict the results to those ids
-     * @return pair that contains the max results and the total number of objects reached by the filter
-     */
-    final <T extends GormEntity> Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final ColumnHeaderFieldSpec.SortableDirection sortableDirection = null, final Collection<Long> idsInList) {
-        list(aClass, max, null, null, sortableDirection, idsInList)
     }
 
     private static final int visitFilterFieldExpressionBool(FilterExpression filterExpression, int occ, List<String> where, Map namedParams) {
@@ -354,10 +327,8 @@ class TaackSimpleFilterService implements WebAttributes {
      * @param idsInList (optional) restrict the results to those ids
      * @return pair that contains the max results and the total number of objects reached by the filter
      */
-    final <T extends GormEntity> Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final UiFilterSpecifier filterSpecifier = null, final T tInstance = null, final ColumnHeaderFieldSpec.SortableDirection sortableDirection = null, final Collection<Long> idsInList = null) {
+    final <T extends GormEntity> Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final UiFilterSpecifier filterSpecifier = null, final T tInstance = null, final FieldInfo[] fields = null, final Order order = null, final Collection<Long> idsInList = null) {
         if (idsInList != null && idsInList.empty) return new Pair<>([], 0)
-        joinEntityMap = [:]
-        final Map<String, ? extends Object> theParams = params as Map<String, ? extends Object>
         def fieldNames = aClass.declaredFields*.name.findAll { it != "id" }
         def superClass = aClass.superclass
         if (superClass) {
@@ -401,10 +372,6 @@ class TaackSimpleFilterService implements WebAttributes {
                     final String reverseFieldName = t[3]
                     final String targetField = t[4]
                     where << ("sc.id IN (select auo.${reverseFieldName}.id from ${reverseClassName} auo where auo.${targetField} like '${escapeHqlParameter(entry.value as String)}')" as String)
-                } else if (entryKey.startsWith('_extension_')) {
-                    def targetField = entryKey - '_extension_'
-                    Field f = getTheField(aClass, targetField)
-                    where << filterExtensionMap[f.type]?.queryToWherePart(f.type, "sc." + targetField, entry.value?.toString())
                 } else {
                     addJoinEntity(entryKey)
                     JoinEntity joinEntity = getJoinEntity(entryKey)
@@ -437,7 +404,7 @@ class TaackSimpleFilterService implements WebAttributes {
                                     Date d = DateFormat.parse('yyyyMMdd', v1)
                                     where << ("$aliasKey >= '${DateFormat.format(d, 'yyyy-MM-dd')}'" as String)
                                 } catch (e) {
-                                    log.error "Parse Date Error: ${e.message}"
+                                    println "Parse Date Error: ${e.message}"
                                 }
                             }
                         def v2 = p >= 0 ? v.substring(p + 1) : null
@@ -453,7 +420,7 @@ class TaackSimpleFilterService implements WebAttributes {
                                     Date d = DateFormat.parse('yyyyMMdd', v2)
                                     where << ("$aliasKey < '${DateFormat.format(d, 'yyyy-MM-dd')}'" as String)
                                 } catch (e) {
-                                    log.error "Parse Date Error: ${e.message}"
+                                    println "Parse Date Error: ${e.message}"
                                 }
                             }
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
@@ -493,7 +460,6 @@ class TaackSimpleFilterService implements WebAttributes {
                         if (entryKey.contains('active')) {
                             where << ("$aliasKey = :np$occ" as String)
                             namedParams.put('np' + occ, entry.value)
-                        } else if (entryKey.contains('area')) {
                         } else if (entryValue == 'null') {
                             //Useful if the null select option is picked to filter object without object (ex: businessTodo without parent)
                             where << ("${aliasKey} is null" as String)
@@ -524,24 +490,13 @@ class TaackSimpleFilterService implements WebAttributes {
                         namedParams.put('np' + occ, entry.value)
                     }
                 }
-            } else if (entry.key.contains("filterExpression")) {
-
             }
         }
 
         if (filterSpecifier) {
             filterSpecifier.visitFilter(new UiFilterVisitorImpl() {
                 @Override
-                void visitFilterFieldExpressionBool(FilterExpression filterExpression) {
-                    String qualifiedName = filterExpression.qualifiedName
-                    boolean applyFilter = (theParams[qualifiedName] || theParams[qualifiedName + 'Default']) ? (theParams[qualifiedName] == '1') : true
-                    if (!applyFilter) return
-
-                    occ = visitFilterFieldExpressionBool(filterExpression, occ, where, namedParams)
-                }
-
-                @Override
-                void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue) {
+                void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
                     String qualifiedName = filterExpressions*.qualifiedName.join('_')
                     boolean applyFilter = (theParams[qualifiedName] || theParams[qualifiedName + 'Default']) ? (theParams[qualifiedName] == '1' || (defaultValue && !theParams[qualifiedName + 'Default'])) : defaultValue
                     if (!applyFilter) return
@@ -550,20 +505,12 @@ class TaackSimpleFilterService implements WebAttributes {
                         occ = visitFilterFieldExpressionBool(it, occ, where, namedParams)
                     }
                 }
-
-                @Override
-                void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
-                    boolean applyFilter = (theParams[filterExpression.qualifiedName] || theParams[filterExpression.qualifiedName + "Default"]) ? (theParams[filterExpression.qualifiedName] == "1" || (defaultValue && !theParams[filterExpression.qualifiedName + "Default"])) : defaultValue
-
-                    if (!applyFilter) return
-                    occ = visitFilterFieldExpressionBool(filterExpression, occ, where, namedParams)
-                }
             })
         }
 
         join = buildJoinClause() ? buildJoinClause().append(join) : join
-        String simpleOrder = filter['order'] ?: sortableDirection?.defaultSortingDirection?.toString()
-        String simpleSort = filter['sort'] ?: sortableDirection?.field?.fieldName ?: sortableDirection ? RawHtmlFilterDump.getQualifiedName(sortableDirection?.fields) : null
+        String simpleOrder = filter['order'] ?: order?.toString()
+        String simpleSort = filter['sort'] ?: RawHtmlFilterDump.getQualifiedName(fields)
         String sortOrder = simpleSort && simpleOrder ? " order by sc.$simpleSort $simpleOrder" : ""
         String selectOrder = simpleSort && simpleOrder ? " ,sc.$simpleSort " : ""
 
@@ -591,7 +538,6 @@ class TaackSimpleFilterService implements WebAttributes {
      * @return list of distinct value
      */
     List listGroup(final Class aClass) {
-        final Map<String, ? extends Object> theParams = params as Map<String, ? extends Object>
         if (theParams['grouping']) {
             final String simpleClassName = aClass.name.substring(aClass.name.lastIndexOf('.') + 1)
 
@@ -619,7 +565,6 @@ class TaackSimpleFilterService implements WebAttributes {
      * @return pair that contains list of objects and the number of objects reached by the query
      */
     final <T extends GormEntity> Pair<List<T>, Long> listInGroup(def group, Class<T> aClass, final UiFilterSpecifier f = null, final T t = null) {
-        final Map<String, ? extends Object> theParams = params as Map<String, ? extends Object>
         if (theParams['grouping']) {
             if (group.class.isArray()) {
                 final def groupList = (theParams['grouping'] as String).tokenize(' ')
@@ -635,12 +580,78 @@ class TaackSimpleFilterService implements WebAttributes {
     }
 
     final Map mapFilterDump(UiFilterSpecifier filter) {
-        def v = new RawMapFilterDump(params)
+        def v = new RawMapFilterDump(theParams)
         filter.visitFilter(v)
         v.theResults
     }
 
-    final <T extends GormEntity> Pair<List<T>, Long> list(UiTableSpecifier table) {
-        list(table.aClass, table.max, table.filterSpecifier, table.tInstance as T, table.sortableDirection, table.idsFilter)
+    static enum Order {
+        ASC, DESC, NONE
+    }
+
+
+    final void iterate(Closure c) {
+        final Pair<List<T>, Long> res = list(
+                cClass as Class<T>,
+                maxNumberOfLine,
+                additionalFilters?.first() as UiFilterSpecifier,
+                oObject as T,
+                sortFields,
+                order,
+                restrictedIds
+        )
+        for (T item : res.aValue) {
+            c.call(item, res.bValue)
+        }
+    }
+
+    static final class FilterBuilder<T extends GormEntity> {
+        private final Class<T> cClass
+        private final T oObject
+        private final SessionFactory sessionFactory
+        private final Map<String, ? extends Object> theParams
+        private Integer maxNumberOfLine = 20
+        private List<UiFilterSpecifier> additionalFilters = []
+        private List<Long> restrictedIds = []
+        private FieldInfo[] sortFields
+        private Order order
+
+        FilterBuilder(Class<T> cClass, SessionFactory sessionFactory, Map<String, ? extends Object> theParams) {
+            this.cClass = cClass
+            this.oObject = null
+            this.sessionFactory = sessionFactory
+            this.theParams = theParams
+        }
+
+        FilterBuilder(T oObject, SessionFactory sessionFactory) {
+            this.oObject = oObject
+            this.cClass = (oObject.class) as Class<T>
+            this.sessionFactory = sessionFactory
+        }
+
+        FilterBuilder setMaxNumberOfLine(Integer maxNumberOfLine) {
+            this.maxNumberOfLine = maxNumberOfLine
+            this
+        }
+
+        FilterBuilder setSortOrder(Order order, FieldInfo... sortFields) {
+            this.sortFields = sortFields
+            this.order = order
+            this
+        }
+
+        FilterBuilder addFilter(UiFilterSpecifier securityClosure) {
+            this.additionalFilters.add securityClosure
+            this
+        }
+
+        FilterBuilder addRestrictedIds(Long... ids) {
+            this.restrictedIds.addAll ids
+            this
+        }
+
+        TaackFilter build() {
+            new TaackFilter(this, sessionFactory, theParams)
+        }
     }
 }

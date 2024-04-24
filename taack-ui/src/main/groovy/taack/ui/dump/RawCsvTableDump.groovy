@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.common.Style
-import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.base.table.UiTableVisitorImpl
 import taack.ui.style.EnumStyle
 
@@ -20,29 +19,23 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
 
     @Override
     void visitSortableFieldHeader(String i18n, String controller, String action, Map<String, ?> params, Map<String, ?> additionalParams) {
-        out << "\"${i18n?.replace(sep, (char)':')}\"${sep}"
+        out << "\"${i18n?.replace(sep, (char) ':')}\"${sep}"
     }
 
     @Override
     void visitRowField(EnumStyle value, Style style, String controller = null, String action = null, Long id = null) {
-        out << (value?.name?:"") + sep
+        out << (value?.name ?: "") + sep
     }
 
     @Override
     void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller = null, String action = null, Long id = null) {
-        out << (value?.toString()?:"") + sep
+        out << (value?.toString() ?: "") + sep
     }
 
     @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo fieldInfo, ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
-        i18n ?= fieldInfo.fieldName
-        out << "\"${i18n.replace(sep, (char)':')}\"${sep}"
-    }
-
-    @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo[] fields, ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+    void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= fields*.fieldName.join('>')
-        out << "\"${i18n.replace(sep, (char)':')}\"${sep}"
+        out << "\"${i18n.replace(sep, (char) ':')}\"${sep}"
     }
 
     RawCsvTableDump(final ByteArrayOutputStream out) {
@@ -61,51 +54,41 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
 
     @Override
     void visitFieldHeader(final String i18n) {
-        out << "\"${i18n.replace(sep, (char)':')}\"${sep}"
+        out << "\"${i18n.replace(sep, (char) ':')}\"${sep}"
+    }
+
+    private visitRowFieldCommon(final Class type, final Object value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
+        switch (type) {
+            case Long:
+            case Integer:
+                visitRowField((Long) value, style, controller, action, id)
+                break
+            case Double:
+            case Float:
+            case BigDecimal:
+                visitRowField((BigDecimal) value, format, style, controller, action, id)
+                break
+            case Date:
+                visitRowField((Date) value, format, style, controller, action, id)
+                break
+            default:
+                visitRowField((String) value, style, controller, action, id)
+
+        }
     }
 
     @Override
     void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
-        switch (fieldInfo.fieldConstraint.field.type) {
-            case Long:
-            case Integer:
-                visitRowField((Long) fieldInfo.value, style, controller, action, id)
-                break
-            case Double:
-            case Float:
-            case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, format, style, controller, action, id)
-                break
-            case Date:
-                visitRowField((Date) fieldInfo.value, format, style, controller, action, id)
-                break
-            default:
-                visitRowField((String) fieldInfo.value, style, controller, action, id)
-        }
+        visitRowFieldCommon(fieldInfo.fieldConstraint.field.type, fieldInfo.value, format, style, controller, action, id)
     }
 
     @Override
     void visitRowField(final GetMethodReturn fieldInfo, final Style style, final String controller = null, final String action = null, final Long id = null) {
-        switch (fieldInfo.getMethod().returnType) {
-            case Long:
-            case Integer:
-                visitRowField((Long) fieldInfo.value, style, controller, action, id)
-                break
-            case Double:
-            case Float:
-            case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, (String) null, style, controller, action, id)
-                break
-            case Date:
-                visitRowField((Date) fieldInfo.value, null, style, controller, action, id)
-                break
-            default:
-                visitRowField((String) fieldInfo.value, style, controller, action, id)
-        }
+        visitRowFieldCommon(fieldInfo.getMethod().returnType, fieldInfo.value, null, style, controller, action, id)
     }
 
     private static String surroundCell(final String cell) {
-        "\"${cell?cell.replace(sep, (char)':').replace('"', '_'):''}\"${sep}"
+        "\"${cell ? cell.replace(sep, (char) ':').replace('"', '_') : ''}\"${sep}"
     }
 
     @Override

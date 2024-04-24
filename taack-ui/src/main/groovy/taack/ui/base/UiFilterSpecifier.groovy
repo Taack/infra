@@ -38,7 +38,7 @@ final class UiFilterSpecifier {
      *
      * @param aClass class to filter after
      * @param closure closure describing the filter (see {@link FilterSpec})
-     * @param fieldInfos add other parameters to the action targeted by the filter (see {@link taack.base.TaackUiSimpleService#ajaxBind(java.lang.Class)}
+     * @param fieldInfos add other parameters to the action targeted by the filter (see {@link taack.render.TaackUiSimpleService#ajaxBind(java.lang.Class)}
      * @return return itself
      */
     UiFilterSpecifier ui(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FilterSpec) final Closure closure, final FieldInfo<?>... fieldInfos) {

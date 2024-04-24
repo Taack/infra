@@ -6,7 +6,7 @@ import taack.ui.base.block.IUiBlockVisitor
 
 /**
  * Class assembling graphical elements to display. All graphical elements are displayed in a block.
- * A block is drawn with {@link taack.base.TaackUiSimpleService#show(taack.ui.base.UiBlockSpecifier)}
+ * A block is drawn with {@link taack.render.TaackUiSimpleService#show(taack.ui.base.UiBlockSpecifier)}
  * to the browser.
  *
  * <p>A simple code sample:

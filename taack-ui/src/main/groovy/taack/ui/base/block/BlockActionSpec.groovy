@@ -3,7 +3,7 @@ package taack.ui.base.block
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.base.TaackUiEnablerService
+import taack.render.TaackUiEnablerService
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.helper.Utils
 

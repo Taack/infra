@@ -3,10 +3,9 @@ package taack.ui.base.table
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.base.TaackUiEnablerService
+import taack.render.TaackUiEnablerService
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils

@@ -2,14 +2,11 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.UiTableSpecifier.SelectMode
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
-import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.base.table.IUiTableVisitor
 import taack.ui.style.EnumStyle
 
@@ -23,10 +20,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     final private Parameter parameter
 
     final String blockId
-    private List<String> fieldNames = []
     private static Integer currentFormId = 0
     private Object currentObject
-    private Class aClass
 
     private int indent = -1
     private int colCount = 0
@@ -35,7 +30,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private Object[] latestGroups = null
     int level = 0
     private Style rowStyle = null
-    private SelectMode selectMode
     int stripped = 0
 
     RawHtmlTableDump(final String id, final ByteArrayOutputStream out, final Parameter parameter) {
@@ -46,32 +40,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitTable(Class aClass, SelectMode selectMode = SelectMode.NONE) {
-        this.aClass = aClass
-        this.selectMode = selectMode
+    void visitTable() {
         out << """
-                <div class='${aClass.simpleName}-table-div' style='overflow: auto;'><form><table class='pure-table ${aClass.simpleName}-table taackTable' taackTableId='${blockId}'>
+                <div style='overflow: auto;'><form><table class='pure-table taackTable' taackTableId='${blockId}'>
                """
-    }
-
-    @Override
-    void visitTableWithoutFilter(Class aClass, SelectMode selectMode) {
-        parameter.aClassSimpleName = aClass.simpleName
-        this.aClass = aClass
-        this.selectMode = selectMode
-        out << """
-                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.originController}/${parameter.originAction}" name="${aClass.simpleName}_Filter" class="pure-form pure-form-aligned ${aClass.simpleName.uncapitalize()}-filters filter taackTableFilter" taackFilterId="${blockId}">
-                    <input type="hidden" name="sort" value="${parameter.map["sort"] ?: ''}">
-                    <input type="hidden" name="order" value="${parameter.map["order"] ?: ''}">
-                    <input type="hidden" name="grouping" value="${parameter.map["grouping"] ?: ''}">
-                    <input type="hidden" name="offset" value="${parameter.offset ?: '0'}">
-                    <input type="hidden" name="max" value="${parameter.max ?: '20'}">
-                    ${parameter.beanId ? '<input type="hidden" name="id" value=' + parameter.beanId + '>' : ''}
-                </form>
-                <form>
-            """
-
-        out << "<div class='${aClass.simpleName}-table-div' style='overflow: auto;'><table class='pure-table ${aClass.simpleName}-table taackTable' taackTableId='${blockId}'>\n"
     }
 
     @Override
@@ -111,16 +83,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitHeader() {
         isInHeader = true
         out << "\n<tr>"
-        if (selectMode == SelectMode.MULTIPLE) {
-            out << """<th>
-                <input type="checkbox" id="selectAll" name="selectAll" class="taackTableSelectAll">
-                <label for="selectAll">All</label>
-            </th>"""
-        } else if (selectMode == SelectMode.SINGLE) {
-            out << """<th>
-                Select
-            </th>"""
-        }
     }
 
     @Override
@@ -137,16 +99,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         out << """
             <tr class="taackTableRow ${stripped % 2 == 1 ? "pure-table-odd" : ""}" ${indent > -1 ? "${indent > 0 ? "style='display: none'" : ""}; taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
         """
-        if (selectMode == SelectMode.MULTIPLE) {
-            if (currentObject)
-                out << """
-                    <td>
-                    <input type="checkbox" class="taackTableSelectItem" ${currentObject["id"] ? "" : "disabled"} id="selectItem-${currentObject["id"] ?: ""}" name="selectItem" value="${currentObject["id"] ?: ""}"
-                    </td>
-                """
-            else
-                out << "<td></td>"
-        }
     }
 
     @Override
@@ -156,21 +108,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitSortableFieldHeader(String i18n, final FieldInfo fieldInfo, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
-        i18n ?= parameter.trField(fieldInfo)
-        fieldHeader()
-        out << """
-            <span class="sortable sortColumn taackSortableColumn ${defaultDirection ? defaultDirection.className : ''}" property="${fieldInfo.fieldName}" formid="${fieldInfo.fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
-        """
-        fieldFooter()
-    }
-
-    @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo[] fields, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+    void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
         fieldHeader()
         out << """
-            <span class="sortable sortColumn taackSortableColumn ${defaultDirection ? defaultDirection.className : ''}" property="${RawHtmlFilterDump.getQualifiedName(fields)}" formid="${aClass.simpleName}_Filter"><a>${i18n}</a></span>
+            <span class="sortable sortColumn taackSortableColumn " property="${RawHtmlFilterDump.getQualifiedName(fields)}" formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
         """
         fieldFooter()
     }
@@ -179,6 +121,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitFieldHeader(final String i18n) {
         fieldHeader()
         out << " ${i18n} <br>"
+        fieldFooter()
+    }
+
+    @Override
+    void visitFieldHeader(FieldInfo[] fields) {
+        fieldHeader()
+        out << parameter.trField(fields) + ' <br>'
         fieldFooter()
     }
 
@@ -198,44 +147,35 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         }
     }
 
-    @Override
-    void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
-        switch (fieldInfo.fieldConstraint.field.type) {
+    void visitRowFieldCommon(Class type, Object value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
+        switch (type) {
             case Long:
             case Integer:
-                visitRowField((Long) fieldInfo.value, style, controller, action, id)
+                visitRowField((Long)value, style, controller, action, id)
                 break
             case Double:
             case Float:
             case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, format, style, controller, action, id)
+                visitRowField((BigDecimal)value, format, style, controller, action, id)
                 break
             case Date:
-                visitRowField((Date) fieldInfo.value, format, style, controller, action, id)
+                visitRowField((Date)value, format, style, controller, action, id)
                 break
             default:
-                visitRowField((String) fieldInfo.value, style, controller, action, id)
+                visitRowField((String)value, style, controller, action, id)
         }
+
     }
 
     @Override
+    void visitRowField(final FieldInfo fieldInfo, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
+        visitRowFieldCommon (fieldInfo.fieldConstraint.field.type, fieldInfo.value, format, style, controller, action, id)
+    }
+
+
+    @Override
     void visitRowField(final GetMethodReturn fieldInfo, final Style style, final String controller = null, final String action = null, final Long id = null) {
-        switch (fieldInfo.getMethod().returnType) {
-            case Long:
-            case Integer:
-                visitRowField((Long) fieldInfo.value, style, controller, action, id)
-                break
-            case Double:
-            case Float:
-            case BigDecimal:
-                visitRowField((BigDecimal) fieldInfo.value, (String) null, style, controller, action, id)
-                break
-            case Date:
-                visitRowField((Date) fieldInfo.value, null, style, controller, action, id)
-                break
-            default:
-                visitRowField((String) fieldInfo.value, style, controller, action, id)
-        }
+        visitRowFieldCommon (fieldInfo.getMethod().returnType, fieldInfo.value, null, style, controller, action, id)
     }
 
     private static String surroundCell(final String cell, final Style style = null, final String url = null) {
@@ -366,11 +306,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitPaginate(Number max, Number offset, Number count) {
-        out << """<div class="taackTablePaginate" taackMax="$max" taackOffset="$offset" taackCount="$count"></div>"""
-    }
-
-    @Override
     void visitRowIndent() {
         indent++
     }
@@ -381,11 +316,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitGroupFieldHeader(String i18n, FieldInfo field) {
-        out << """
-            <span class="sortable sortColumn taackGroupableColumn" property="${field.fieldName}" formid="${field.fieldConstraint.field.declaringClass.simpleName}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
-        """
+    void visitGroupFieldHeader(String i18n, FieldInfo[] fields) {
+        i18n ?= parameter.trField(fields)
 
+        String name = RawHtmlFilterDump.getQualifiedName(fields)
+        out << """
+            <span class="sortable sortColumn taackGroupableColumn" property="${name}" formid="${name}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
+        """
     }
 
     @Override

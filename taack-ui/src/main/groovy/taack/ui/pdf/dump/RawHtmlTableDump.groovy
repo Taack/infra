@@ -4,11 +4,9 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.UiTableSpecifier.SelectMode
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
-import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.base.table.IUiTableVisitor
 import taack.ui.dump.Parameter
 import taack.ui.style.EnumStyle
@@ -26,7 +24,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private List<String> fieldNames = []
     private static Integer currentFormId = 0
     private Object currentObject
-    private Class aClass
 
     private int indent = -1
     private int colCount = 0
@@ -42,15 +39,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitTable(Class aClass, SelectMode selectMode = null) {
-        this.aClass = aClass
-        out << "<table class='pure-table pure-table-horizontal ${aClass.simpleName}-table taackTable' style='repeat-header: yes;'>\n"
-    }
-
-    @Override
-    void visitTableWithoutFilter(Class aClass, SelectMode selectMode) {
-        this.aClass = aClass
-        out << "<table class='pure-table pure-table-horizontal ${aClass.simpleName}-table taackTable' style='repeat-header: yes;'>\n"
+    void visitTable() {
+        out << "<table class='pure-table pure-table-horizontal taackTable' style='repeat-header: yes;'>\n"
     }
 
     @Override
@@ -117,13 +107,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitSortableFieldHeader(String i18n, final FieldInfo fieldInfo, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
-        i18n ?= parameter.trField(fieldInfo)
-        visitFieldHeader(i18n)
-    }
-
-    @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo[] fields, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+    void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
         visitFieldHeader(i18n)
     }
@@ -131,6 +115,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitFieldHeader(final String i18n) {
         out << " ${i18n} <br>"
+    }
+
+    @Override
+    void visitFieldHeader(FieldInfo[] fields) {
+        out << " ${parameter.trField(fields)} <br>"
     }
 
     @Override
@@ -251,10 +240,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitPaginate(Number max, Number offset, Number count) {
-    }
-
-    @Override
     void visitRowIndent() {
         indent++
     }
@@ -265,9 +250,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitGroupFieldHeader(String i18n, FieldInfo field) {
+    void visitGroupFieldHeader(String i18n, FieldInfo[] fields) {
         out << """
-            <span class="sortable sortColumn taackGroupableColumn" property="${field.fieldName}" formid="${field.fieldConstraint.field.declaringClass.simpleName}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
+            <span class="sortable sortColumn taackGroupableColumn" property="${fields*.fieldName.join('.')}" formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
         """
 
     }

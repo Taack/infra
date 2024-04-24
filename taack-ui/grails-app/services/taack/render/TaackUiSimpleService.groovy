@@ -1,4 +1,4 @@
-package taack.base
+package taack.render
 
 
 import grails.artefact.controller.support.ResponseRenderer
@@ -401,7 +401,7 @@ final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, Dat
 
     /**
      * Retrieve hidden field passed with {@link UiFilterSpecifier#ui(java.lang.Class, groovy.lang.Closure, taack.ast.type.FieldInfo[])}.
-     * The latest parameter allow to pass additional data that will not be interpreted by {@link TaackSimpleFilterService#list(java.lang.Class)}
+     * The latest parameter allow to pass additional data that will not be interpreted by {@link taack.domain.TaackFilterService#list(java.lang.Class)}
      *
      * @param aClass
      * @return objectClass initialized

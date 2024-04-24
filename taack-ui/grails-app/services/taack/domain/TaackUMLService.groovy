@@ -1,4 +1,4 @@
-package taack.base
+package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import org.springframework.beans.factory.annotation.Autowired

@@ -90,14 +90,4 @@ final class TableSpec {
         tableVisitor.visitRowEnd()
     }
 
-    /**
-     * Root element, must appear only once or zero time in the table closure
-     *
-     * @param max Max number of row to display
-     * @param offset Record offset
-     * @param count Number of object after a query, see {@link taack.base.TaackSimpleFilterService#list(java.lang.Class, int)}
-     */
-    void paginate(final Number max, final Number offset, final Number count) {
-        tableVisitor.visitPaginate(max?:20, offset?:0, count?:20)
-    }
 }

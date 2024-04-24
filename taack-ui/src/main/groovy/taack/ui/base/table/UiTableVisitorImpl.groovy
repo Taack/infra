@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.UiTableSpecifier.SelectMode
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.style.EnumStyle
@@ -14,7 +13,7 @@ import java.text.NumberFormat
 @CompileStatic
 class UiTableVisitorImpl implements IUiTableVisitor {
     @Override
-    void visitTable(Class aClass, SelectMode selectMode = null) {
+    void visitTable() {
 
     }
 
@@ -48,19 +47,18 @@ class UiTableVisitorImpl implements IUiTableVisitor {
 
     }
 
-
     @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo fieldInfo, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
-
-    }
-
-    @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo[] fields, final ColumnHeaderFieldSpec.DefaultSortingDirection defaultDirection) {
+    void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
 
     }
 
     @Override
     void visitFieldHeader(String i18n) {
+
+    }
+
+    @Override
+    void visitFieldHeader(FieldInfo[] fields) {
 
     }
 
@@ -115,11 +113,6 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitPaginate(Number max, Number offset, Number count) {
-
-    }
-
-    @Override
     void visitRowIndent() {
 
     }
@@ -130,7 +123,7 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitGroupFieldHeader(String i18n, FieldInfo field) {
+    void visitGroupFieldHeader(String i18n, FieldInfo[] field) {
 
     }
 
@@ -174,8 +167,4 @@ class UiTableVisitorImpl implements IUiTableVisitor {
 
     }
 
-    @Override
-    void visitTableWithoutFilter(Class aClass, SelectMode selectMode) {
-
-    }
 }

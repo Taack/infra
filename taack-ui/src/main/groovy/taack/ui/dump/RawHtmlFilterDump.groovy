@@ -4,7 +4,7 @@ import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
-import taack.base.TaackSimpleFilterService
+
 import taack.ui.EnumOption
 import taack.ui.base.filter.IUiFilterVisitor
 import taack.ui.base.filter.expression.FilterExpression
@@ -138,13 +138,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterField(final String i18n, final FieldInfo field, EnumOption[] enumOptions) {
-        final String qualifiedName = getQualifiedName(field)
-        filterField(i18n ?: parameter.trField(field), qualifiedName, parameter.map[qualifiedName]?.toString(), field, enumOptions)
-    }
-
-    @Override
-    void visitFilterField(String i18n, FieldInfo[] fields, EnumOption[] enumOptions) {
+    void visitFilterField(String i18n, EnumOption[] enumOptions, FieldInfo[] fields) {
         final String qualifiedName = getQualifiedName(fields)
         filterField(i18n ?: parameter.trField(fields), qualifiedName, parameter.map[qualifiedName]?.toString(), fields?.last(), enumOptions)
     }
@@ -156,27 +150,12 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterFieldExpressionBool(FilterExpression filterExpression) {
-        if (filterExpression.operand)
-            visitFilterFieldExpressionBool(null, filterExpression, true)
+    void visitFilterFieldExpressionBool(FilterExpression... filterExpression) {
+        visitFilterFieldExpressionBool(null, null, filterExpression)
     }
 
     @Override
-    void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
-        final String qualifiedId = filterExpression.qualifiedName + '-' + parameter.modalId
-        out << htmlTheme.expressionBoolLabel(filterExpression.qualifiedName, i18n ?: parameter.trField(filterExpression.operand))
-        boolean isChecked = parameter.map[filterExpression.qualifiedName + 'Default'] ? parameter.map[filterExpression.qualifiedName] == '1' : defaultValue
-        out << """
-                ${htmlTheme.expressionBoolHeader()}
-                    <input type="checkbox" name="${filterExpression.qualifiedName}" value="1" id="${qualifiedId}Check" ${isChecked ? 'checked=""' : ''} class="${htmlTheme.getCheckboxCssTheme()}">
-                    <input type="hidden" name="${filterExpression.qualifiedName}Default" value="1" id="${qualifiedId}Default">
-                </div>
-                    """
-        out << htmlTheme.expressionBoolFooter()
-    }
-
-    @Override
-    void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue) {
+    void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         final String qualifiedId = qualifiedName + '-' + parameter.modalId
         out << htmlTheme.expressionBoolLabel(qualifiedName, i18n)
@@ -202,24 +181,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         final String qualifiedId = qualifiedName + '-' + parameter.modalId
         out << htmlTheme.filterFieldHeader(i18n, qualifiedId, false)
 
-        def choices = TaackSimpleFilterService.filterExtensionMap[fieldInfo.last().fieldConstraint.field.type].enumChoices()
-
-        if (choices) {
-            out << htmlTheme.selectHeader()
-            out << """
-                <select class="${htmlTheme.getSelectCssTheme()}" name="${qualifiedName}" id="${qualifiedId}Select">
-                <option value="">-${i18n}-</option>
-                """
-            choices.each {
-                out << """<option value="${it.key}" ${parameter.map[qualifiedName.toString()]?.toString()?.equals(it.key?.toString()) ? 'selected="selected"' : ''}>${it.value}</option>"""
-            }
-            out << '</select>'
-            out << htmlTheme.selectFooter()
-        } else {
-            out << """
+        out << """
                 <input class="${htmlTheme.getFilterInputCssTheme()}" id="${qualifiedId}" name="${qualifiedName}" type="text" value="" autocomplete="off" autofocus placeholder="${i18n?.replace('"', '\\u0027')}">
                 """
-            out << htmlTheme.filterFieldFooter(i18n, qualifiedId, false)
-        }
+        out << htmlTheme.filterFieldFooter(i18n, qualifiedId, false)
     }
 }

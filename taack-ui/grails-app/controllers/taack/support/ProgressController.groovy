@@ -2,8 +2,8 @@ package taack.support
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
-import taack.base.TaackUiProgressBarService
-import taack.base.TaackUiSimpleService
+import taack.render.TaackUiProgressBarService
+import taack.render.TaackUiSimpleService
 import taack.ui.base.UiBlockSpecifier
 
 /**

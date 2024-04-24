@@ -4,7 +4,7 @@ import grails.util.Holders
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.base.TaackUiEnablerService
+import taack.render.TaackUiEnablerService
 import taack.ui.EnumOption
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.helper.Utils

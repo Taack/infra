@@ -90,8 +90,7 @@ class RawHtmlMailDump extends UiBlockVisitor {
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
         visitCloseTitle()
-//        UiFilterSpecifier f = new UiFilterSpecifier()
-        tableSpecifier.visitTableWithNoFilter(new taack.ui.dump.RawHtmlTableDump(id, out, parameter))
+        tableSpecifier.visitTable(new taack.ui.dump.RawHtmlTableDump(id, out, parameter))
         visitInnerBlockEnd()
         visitInnerBlockEnd()
     }

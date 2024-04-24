@@ -1,4 +1,4 @@
-package taack.base
+package taack.render
 
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes

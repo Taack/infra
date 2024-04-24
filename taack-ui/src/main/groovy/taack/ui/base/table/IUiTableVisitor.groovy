@@ -2,22 +2,17 @@ package taack.ui.base.table
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.UiTableSpecifier.SelectMode
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
-import taack.ui.base.table.ColumnHeaderFieldSpec.DefaultSortingDirection
 import taack.ui.style.EnumStyle
 
 import java.text.NumberFormat
 
 @CompileStatic
 interface IUiTableVisitor {
-    void visitTable(Class aClass, SelectMode selectMode)
-
-    void visitTableWithoutFilter(Class aClass, SelectMode selectMode)
+    void visitTable()
 
     void visitTableEnd()
 
@@ -31,11 +26,11 @@ interface IUiTableVisitor {
 
     void visitRowEnd()
 
-    void visitSortableFieldHeader(String i18n, FieldInfo fieldInfo, DefaultSortingDirection direction)
-
-    void visitSortableFieldHeader(String i18n, FieldInfo[] fields, DefaultSortingDirection direction)
+    void visitSortableFieldHeader(String i18n, FieldInfo[] fields)
 
     void visitFieldHeader(String i18n)
+
+    void visitFieldHeader(FieldInfo[] fields)
 
     void visitRowColumnEnd()
 
@@ -59,13 +54,11 @@ interface IUiTableVisitor {
 
     void visitSortableFieldHeader(String i18n, String controller, String action, Map<String, ?> params, Map<String, ?> additionalParams)
 
-    void visitPaginate(Number max, Number offset, Number count)
-
     void visitRowIndent()
 
     void visitRowIndentEnd()
 
-    void visitGroupFieldHeader(String i18n, FieldInfo field)
+    void visitGroupFieldHeader(String i18n, FieldInfo[] field)
 
     void visitRowGroupHeader(Object groups, MethodClosure show, Long id)
 

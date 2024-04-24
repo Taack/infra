@@ -8,7 +8,7 @@ import taack.ast.type.FieldInfo
  * {@link SolrSpecifier} delegated class
  *
  * Describe how the fields should be indexed, scored and faceted.
- * See {@link taack.base.TaackSearchService} for a code sample.
+ * See {@link taack.domain.TaackSearchService} for a code sample.
  */
 @CompileStatic
 final class SolrIndexerFieldSpec {

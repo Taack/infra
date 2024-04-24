@@ -9,27 +9,17 @@ import taack.ui.base.filter.expression.FilterExpression
 @CompileStatic
 class UiFilterVisitorImpl implements IUiFilterVisitor {
     @Override
-    void visitFilterField(String i18n, FieldInfo[] fields, EnumOption[] enumOptions = null) {
-
-    }
-
-    @Override
     void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
 
     }
 
     @Override
-    void visitFilterFieldExpressionBool(FilterExpression filterExpression) {
+    void visitFilterFieldExpressionBool(FilterExpression... filterExpression) {
 
     }
 
     @Override
-    void visitFilterFieldExpressionBool(String i18n, FilterExpression filterExpression, Boolean defaultValue) {
-
-    }
-
-    @Override
-    void visitFilterFieldExpressionBool(String i18n, FilterExpression[] filterExpressions, Boolean defaultValue) {
+    void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
 
     }
 
@@ -69,7 +59,7 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterField(final String i18n, final FieldInfo field, EnumOption[] enumOptions = null) {
+    void visitFilterField(String i18n, EnumOption[] enumOptions, FieldInfo... fields) {
 
     }
 }

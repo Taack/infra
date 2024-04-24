@@ -61,13 +61,7 @@ final class RenderingTable extends UiTableVisitorImpl {
     }
 
     @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo fieldInfo, ColumnHeaderFieldSpec.DefaultSortingDirection direction) {
-        headers.add i18n
-        sortableHeaders.put i18n, fieldInfo
-    }
-
-    @Override
-    void visitSortableFieldHeader(String i18n, FieldInfo[] fields, ColumnHeaderFieldSpec.DefaultSortingDirection direction) {
+    void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         headers.add i18n
         sortableHeaders2.put i18n, fields
     }
@@ -105,14 +99,6 @@ final class RenderingTable extends UiTableVisitorImpl {
     @Override
     void visitRowField(Date value, String format, Style style, String controller, String action, Long id) {
         drawCell(value.toString())
-    }
-
-    @Override
-    void visitPaginate(Number max, Number offset, Number count) {
-        // Todo: manage Paginate control here
-        // ─────────────────────────────────┼─
-        // Becomes (refresh, top, bottom) Page Number:Number of pages
-        // ⟳⇱⇲32:42─────────────────────────┼─
     }
 
     @Override
