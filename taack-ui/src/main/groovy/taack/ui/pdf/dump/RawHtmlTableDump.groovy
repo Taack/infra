@@ -64,6 +64,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitPaginate(Number max, Number count) {
+
+    }
+
+    @Override
     void visitColumnEnd() {
         out << "</th>"
     }

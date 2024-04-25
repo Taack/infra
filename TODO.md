@@ -5,18 +5,11 @@
 
 # 4.0
 
-- Improve Filter / Form DSLs
-  - implicit or declarative: okButton, saveButton, defaultButton ...
-- Improve Table / Filter
+- ~~Improve Table / Filter~~
   - ~~add `loop` (a `for` merged with `list`)~~
     - ~~builders for additional filters~~
-    - **custom paginate**
-  - add top level `condition` (`if`, branch on 2 closures)
-    - Test, debug, offline capabilities
+  - ~~auto-paginate~~
 - ~~Auto-labeling for menus~~ 
-- Secured Solr Search
-- More Secured TQL
-
 
 # 4.1
 
@@ -31,10 +24,15 @@
 - Remove Chart.js
   - Need server side rendering (simpler)
   - Why not JFreeCharts ? NO... but why ??
+- Secured Solr Search
+- More Secured TQL
 
 # 4.2
 
 - PoC PDF forms ...
+- Improve Table / Filter
+  - add top level `condition` (`if`, branch on 2 closures)
+    - Test, debug, offline capabilities
 
 # 4.3
 

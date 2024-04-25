@@ -168,6 +168,11 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
+    void visitPaginate(Number max, Number count) {
+
+    }
+
+    @Override
     void visitRowLink(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
 
     }

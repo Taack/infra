@@ -36,7 +36,7 @@ final class TaackFilter<T extends GormEntity> {
 
     private final Class<T> cClass
     private final T oObject
-    private Integer maxNumberOfLine = 20
+    Integer maxNumberOfLine = 0
     private List<UiFilterSpecifier> additionalFilters
     private List<Long> restrictedIds
     private FieldInfo[] sortFields

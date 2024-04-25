@@ -291,6 +291,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitPaginate(Number max, Number count) {
+        if (max != 0)
+            out << """<div class="taackTablePaginate" taackMax="$max" taackOffset="${parameter.params.long('offset')}" taackCount="$count"></div>"""
+    }
+
+    @Override
     void visitSortableFieldHeader(final String i18n, String controller, String action, Map<String, ?> parameters, Map<String, ?> additionalParams) {
         fieldHeader()
         String direction = additionalParams["order"] ?: ''

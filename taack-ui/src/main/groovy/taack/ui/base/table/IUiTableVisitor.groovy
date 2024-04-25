@@ -75,4 +75,6 @@ interface IUiTableVisitor {
     void visitColumn(Integer colSpan, Integer rowSpan)
 
     void visitFooterButton(String i18n, String controller, String action, Long id, Map<String, ?> additionalParams)
+
+    void visitPaginate(Number max, Number count)
 }
