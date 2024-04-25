@@ -25,6 +25,7 @@
     - custom paginate
   - add top level `condition` (`if`, branch on 2 closures)
     - Test, debug, offline capabilities
+  - Auto-labeling for menus 
 
 # 4.1
 
