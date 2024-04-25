@@ -1,34 +1,29 @@
 # 3.9
 
-- Grails 6.2.0
-- Cleaner deps
-
-# 3.10
-
-- AsciidoctorJ
-  - remove external kotlin code transpiled
-  - support offline plugins
-  - allow code on TQL like language
-
-# 3.11
-
-- Secured Solr Search
-- More Secured TQL
+- ~~Grails 6.2.0~~
+- ~~Cleaner deps~~
 
 # 4.0
 
 - Improve Filter / Form DSLs
   - implicit or declarative: okButton, saveButton, defaultButton ...
 - Improve Table / Filter
-  - add `loop` (a `for` merged with `list`)
-    - builders for additional filters
-    - custom paginate
+  - ~~add `loop` (a `for` merged with `list`)~~
+    - ~~builders for additional filters~~
+    - **custom paginate**
   - add top level `condition` (`if`, branch on 2 closures)
     - Test, debug, offline capabilities
-  - Auto-labeling for menus 
+- Auto-labeling for menus 
+- Secured Solr Search
+- More Secured TQL
+
 
 # 4.1
 
+- AsciidoctorJ
+  - remove external kotlin code transpiled
+  - support offline plugins
+  - allow code on TQL like language
 - Remove PlantUML deps for Gantt / graphs
   - Server side raster and SVG
   - Low level first
