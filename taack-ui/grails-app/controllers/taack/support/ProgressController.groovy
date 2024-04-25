@@ -3,7 +3,7 @@ package taack.support
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import taack.render.TaackUiProgressBarService
-import taack.render.TaackUiSimpleService
+import taack.render.TaackUiService
 import taack.ui.base.UiBlockSpecifier
 
 /**
@@ -31,7 +31,7 @@ import taack.ui.base.UiBlockSpecifier
 class ProgressController {
 
     TaackUiProgressBarService taackUiProgressBarService
-    TaackUiSimpleService taackUiSimpleService
+    TaackUiService taackUiService
 
     def drawProgress(String id) {
         if (id && taackUiProgressBarService.progressMax(id)) {
@@ -39,13 +39,13 @@ class ProgressController {
             int value = taackUiProgressBarService.progress(id)
             boolean ended = taackUiProgressBarService.progressHasEnded(id)
             if (!ended) {
-                response.outputStream << taackUiSimpleService.visit(new UiBlockSpecifier().ui {
+                response.outputStream << taackUiService.visit(new UiBlockSpecifier().ui {
                     closeModalAndUpdateBlock(TaackUiProgressBarService.buildProgressBlock(id, max, value).closure)
                 }, true)
                 response.outputStream.flush()
                 response.outputStream.close()
             } else {
-                taackUiSimpleService.show(new UiBlockSpecifier().ui {
+                taackUiService.show(new UiBlockSpecifier().ui {
                     closeModalAndUpdateBlock(taackUiProgressBarService.progressEnds(id).closure)
                 })
             }
@@ -56,7 +56,7 @@ class ProgressController {
 
     def echoSelect(Long id, String label) {
         if (id && label)
-            taackUiSimpleService.show(
+            taackUiService.show(
                     new UiBlockSpecifier().ui {
                         closeModal id, label
                     }

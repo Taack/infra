@@ -32,10 +32,10 @@ import javax.annotation.PostConstruct
  * <p>
  * <ul>
  * <li>A full web page is rendered when calling
- * {@link TaackUiSimpleService#show(UiBlockSpecifier, UiMenuSpecifier)}
+ * {@link TaackUiService#show(UiBlockSpecifier, UiMenuSpecifier)}
  *
  * <li>An ajax render is returned to the browser if calling
- * {@link TaackUiSimpleService#show(UiBlockSpecifier)}
+ * {@link TaackUiService#show(UiBlockSpecifier)}
  * </ul>
  * <pre>{@code
  *  taackUiSimpleService.show(new UiBlockSpecifier() {
@@ -51,7 +51,7 @@ import javax.annotation.PostConstruct
  * @since taack-ui 0.1
  */
 @GrailsCompileStatic
-final class TaackUiSimpleService implements WebAttributes, ResponseRenderer, DataBinder {
+final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinder {
 
     static lazyInit = false
 

@@ -1,10 +1,6 @@
 package taack.ui.base
 
-
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
-import taack.ast.type.FieldInfo
-import taack.ui.base.table.ColumnHeaderFieldSpec
 import taack.ui.base.table.IUiTableVisitor
 import taack.ui.base.table.TableSpec
 /**

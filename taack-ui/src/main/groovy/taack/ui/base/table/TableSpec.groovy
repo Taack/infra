@@ -1,7 +1,10 @@
 package taack.ui.base.table
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
+import taack.domain.TaackFilter
 import taack.ui.base.common.Style
 
 /**
@@ -88,6 +91,14 @@ final class TableSpec {
         closure.delegate = new RowColumnSpec(tableVisitor)
         closure.call()
         tableVisitor.visitRowEnd()
+    }
+
+    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec.class) Closure c) {
+        c.delegate = new TableSpec(tableVisitor)
+        Pair<List<T>, Long> res = taackFilter.list()
+        for (T t in res.aValue)
+            c.call(t)
+        res.bValue
     }
 
 }

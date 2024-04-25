@@ -316,6 +316,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitGroupFieldHeader(FieldInfo[] fields) {
+        visitGroupFieldHeader(parameter.trField(fields), fields)
+    }
+
+    @Override
     void visitGroupFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
 

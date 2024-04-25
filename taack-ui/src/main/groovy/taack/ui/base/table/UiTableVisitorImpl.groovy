@@ -123,6 +123,11 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
+    void visitGroupFieldHeader(FieldInfo[] fields) {
+
+    }
+
+    @Override
     void visitGroupFieldHeader(String i18n, FieldInfo[] field) {
 
     }

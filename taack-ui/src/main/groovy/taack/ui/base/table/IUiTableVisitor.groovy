@@ -58,7 +58,9 @@ interface IUiTableVisitor {
 
     void visitRowIndentEnd()
 
-    void visitGroupFieldHeader(String i18n, FieldInfo[] field)
+    void visitGroupFieldHeader(FieldInfo[] fields)
+
+    void visitGroupFieldHeader(String i18n, FieldInfo[] fields)
 
     void visitRowGroupHeader(Object groups, MethodClosure show, Long id)
 

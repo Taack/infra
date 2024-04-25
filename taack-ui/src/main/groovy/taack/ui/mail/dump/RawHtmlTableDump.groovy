@@ -240,6 +240,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitGroupFieldHeader(FieldInfo[] fields) {
+        visitGroupFieldHeader(parameter.trField(fields), fields)
+    }
+    
+    @Override
     void visitGroupFieldHeader(String i18n, FieldInfo[] fields) {
         out << """
             <span class="sortable sortColumn taackGroupableColumn" property="${fields*.fieldName.join('.')}" formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>

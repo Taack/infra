@@ -34,7 +34,7 @@ class TaackUiProgressBarService {
     private Map<String, UiBlockSpecifier> endsRegister = [:]
     private Set<String> endedProgress = []
 
-    TaackUiSimpleService taackUiSimpleService
+    TaackUiService taackUiService
 
     static UiBlockSpecifier buildProgressBlock(String ret, int max, int value) {
         new UiBlockSpecifier().ui {
@@ -63,7 +63,7 @@ class TaackUiProgressBarService {
         endsRegister.put(ret, ends)
 
         GrailsWebRequest webRequest = WebUtils.retrieveGrailsWebRequest()
-        webRequest.currentResponse.outputStream << taackUiSimpleService.visit(buildProgressBlock(ret, max, 0), true)
+        webRequest.currentResponse.outputStream << taackUiService.visit(buildProgressBlock(ret, max, 0), true)
         webRequest.currentResponse.outputStream.flush()
         webRequest.currentResponse.outputStream.close()
 

@@ -2,7 +2,6 @@ package taack.domain
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.SessionFactory
 import org.hibernate.query.Query
@@ -38,8 +37,8 @@ final class TaackFilter<T extends GormEntity> {
     private final Class<T> cClass
     private final T oObject
     private Integer maxNumberOfLine = 20
-    private List<UiFilterSpecifier> additionalFilters = []
-    private List<Long> restrictedIds = []
+    private List<UiFilterSpecifier> additionalFilters
+    private List<Long> restrictedIds
     private FieldInfo[] sortFields
     private Order order
 
@@ -49,10 +48,27 @@ final class TaackFilter<T extends GormEntity> {
         this.cClass = filterBuilder.cClass
         this.oObject = filterBuilder.oObject
         this.maxNumberOfLine = filterBuilder.maxNumberOfLine
-        this.additionalFilters = filterBuilder.additionalFilters
-        this.restrictedIds = filterBuilder.restrictedIds
+        this.additionalFilters = filterBuilder.additionalFilters.empty ? null : filterBuilder.additionalFilters
+        this.restrictedIds = filterBuilder.restrictedIds.empty ? null : filterBuilder.restrictedIds
         this.sortFields = filterBuilder.sortFields
         this.order = filterBuilder.order
+    }
+
+    @Override
+    String toString() {
+        return "TaackFilter{" +
+                "sessionFactory=" + sessionFactory +
+                ", theParams=" + theParams +
+                ", joinEntityMap=" + joinEntityMap +
+                ", joinEntityOrder=" + joinEntityOrder +
+                ", cClass=" + cClass +
+                ", oObject=" + oObject +
+                ", maxNumberOfLine=" + maxNumberOfLine +
+                ", additionalFilters=" + additionalFilters +
+                ", restrictedIds=" + restrictedIds +
+                ", sortFields=" + Arrays.toString(sortFields) +
+                ", order=" + order +
+                '}'
     }
 
     private final class JoinEntity {
@@ -170,12 +186,12 @@ final class TaackFilter<T extends GormEntity> {
      * @param offset
      * @return
      */
-    final <T> T executeQueryUniqueResult(final Class<T> aClass, Map<String, Object> namedParams, final String query, final Integer max = null, final Integer offset = null) {
-        Query<T> q = sessionFactory.currentSession.createQuery(query, aClass)
+    final Long executeQueryUniqueResult(final Class aClass, Map<String, Object> namedParams, final String query, final Integer max = null, final Integer offset = null) {
+        Query q = sessionFactory.currentSession.createQuery(query, aClass)
         namedParams.each { q.setParameter(it.key, it.value) }
         if (max) q.maxResults = max
         if (offset) q.firstResult = offset
-        q.uniqueResult()
+        q.uniqueResult() as Long
     }
 
     private final static List<String> filterMeta = ['offset', 'max', 'sort', 'order', 'grouping']
@@ -327,7 +343,7 @@ final class TaackFilter<T extends GormEntity> {
      * @param idsInList (optional) restrict the results to those ids
      * @return pair that contains the max results and the total number of objects reached by the filter
      */
-    final <T extends GormEntity> Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final UiFilterSpecifier filterSpecifier = null, final T tInstance = null, final FieldInfo[] fields = null, final Order order = null, final Collection<Long> idsInList = null) {
+    final Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final UiFilterSpecifier filterSpecifier = null, final T tInstance = null, final FieldInfo[] fields = null, final Order order = null, final Collection<Long> idsInList = null) {
         if (idsInList != null && idsInList.empty) return new Pair<>([], 0)
         def fieldNames = aClass.declaredFields*.name.findAll { it != "id" }
         def superClass = aClass.superclass
@@ -517,6 +533,10 @@ final class TaackFilter<T extends GormEntity> {
         String whereClause = where.empty ? " " : " where ${where.join(' and ')} "
         String query = "select distinct sc ${selectOrder}" + from.toString() + join.toString() + removeBrackets(whereClause) + sortOrder
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
+
+        println query
+        println count
+
         List<T> res
         try {
             if (simpleSort && simpleOrder) {
@@ -534,12 +554,11 @@ final class TaackFilter<T extends GormEntity> {
      * When a group header is present in the table, list the distinct values for the selected group
      * (without applying the filter)
      *
-     * @param aClass class displayed in the table
      * @return list of distinct value
      */
-    List listGroup(final Class aClass) {
+    List listGroup() {
         if (theParams['grouping']) {
-            final String simpleClassName = aClass.name.substring(aClass.name.lastIndexOf('.') + 1)
+            final String simpleClassName = cClass.name.substring(cClass.name.lastIndexOf('.') + 1)
 
             final def groupList = (theParams['grouping'] as String).tokenize(' ')
             final def columnsName = groupList.join(', sc.')
@@ -558,23 +577,22 @@ final class TaackFilter<T extends GormEntity> {
     /**
      * List objects in the given group
      *
-     * @param group the group (from {@link #listGroup(Class)}
      * @param aClass class displayed in the table
      * @param f filter to apply while retrieving the list
      * @param t object instance of type aClass that add filter criteria
      * @return pair that contains list of objects and the number of objects reached by the query
      */
-    final <T extends GormEntity> Pair<List<T>, Long> listInGroup(def group, Class<T> aClass, final UiFilterSpecifier f = null, final T t = null) {
+    final Pair<List<T>, Long> listInGroup(def group, final UiFilterSpecifier f = null, final T t = null) {
         if (theParams['grouping']) {
             if (group.class.isArray()) {
                 final def groupList = (theParams['grouping'] as String).tokenize(' ')
                 groupList.eachWithIndex { it, i ->
                     theParams.put(it.trim(), (group as List)[i])
                 }
-                return list(aClass, 20, f, t)
+                return list(cClass, 20, f, t)
             } else {
                 theParams.put((theParams['grouping'] as String).trim(), group)
-                return list(aClass, 20, f, t)
+                return list(cClass, 20, f, t)
             }
         } else return null
     }
@@ -590,19 +608,16 @@ final class TaackFilter<T extends GormEntity> {
     }
 
 
-    final void iterate(Closure c) {
-        final Pair<List<T>, Long> res = list(
+    final Pair<List<T>, Long> list() {
+        list(
                 cClass as Class<T>,
                 maxNumberOfLine,
-                additionalFilters?.first() as UiFilterSpecifier,
+                additionalFilters?.empty ? null : additionalFilters?.first() as UiFilterSpecifier,
                 oObject as T,
                 sortFields,
                 order,
                 restrictedIds
         )
-        for (T item : res.aValue) {
-            c.call(item, res.bValue)
-        }
     }
 
     static final class FilterBuilder<T extends GormEntity> {
