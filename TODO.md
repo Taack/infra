@@ -13,7 +13,7 @@
     - **custom paginate**
   - add top level `condition` (`if`, branch on 2 closures)
     - Test, debug, offline capabilities
-- Auto-labeling for menus 
+- ~~Auto-labeling for menus~~ 
 - Secured Solr Search
 - More Secured TQL
 

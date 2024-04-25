@@ -34,9 +34,14 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
 //        out << htmlTheme.menuStartFooter()
     }
 
+    @Override
+    void visitMenu(String controller, String action, Map<String, ?> params) {
+        String i18n = parameter.trField(controller, action)
+        visitMenu(i18n, controller, action, params)
+    }
 
     @Override
-    void visitMenu(String i18n, String controller, String action, Map<String, ? extends Object> params) {
+    void visitMenu(String i18n, String controller, String action, Map<String, ?> params) {
         if (controller && action && params) {
             out << """
             <li class="nav-item dropdown">
@@ -59,7 +64,13 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitSubMenu(String i18n, String controller, String action, Map<String, ? extends Object> params) {
+    void visitSubMenu(String controller, String action, Map<String, ?> params) {
+        String i18n = parameter.trField(controller, action)
+        visitSubMenu(i18n, controller, action, params)
+    }
+
+    @Override
+    void visitSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
         out << """
             <li class="nav-item dropdown">
                 <a class="nav-link" href="${parameter.urlMapped(controller, action, params)}">${i18n}</a>
@@ -121,7 +132,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
         out << """
             <form class="solrSearch-input" action="${parameter.urlMapped(Utils.getControllerName(action), action.method)}">
                 <div class="input-group rounded">
-                    <input type="search" id="form1" name="q" value="${q? q.replace('"', "&quot;") : ''}" class="form-control rounded bg-white" placeholder="Search" aria-label="Search"/>
+                    <input type="search" id="form1" name="q" value="${q ? q.replace('"', "&quot;") : ''}" class="form-control rounded bg-white" placeholder="Search" aria-label="Search"/>
                 </div>
             </form>
         """

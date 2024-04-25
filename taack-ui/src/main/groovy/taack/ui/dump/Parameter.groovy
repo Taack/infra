@@ -122,6 +122,15 @@ final class Parameter implements WebAttributes {
         }
     }
 
+    String trField(final String controller, final String action) {
+        if (!testI18n) {
+            String rv = tr(controller.uncapitalize() + '.' + action + '.label')
+            if (rv) return rv
+        } else {
+            "${controller.uncapitalize() + '.' + action + '.label'}"
+        }
+    }
+
     String trField(final FieldInfo... fieldInfo) {
         def fieldNames = fieldInfo*.fieldName
         def fieldTypes = fieldInfo*.fieldConstraint.field*.type

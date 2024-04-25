@@ -19,12 +19,22 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
+    void visitMenu(String controller, String action, Map<String, ?> params) {
+
+    }
+
+    @Override
     void visitMenu(String i18n, String controller, String action, Map<String, ? extends Object> params) {
 
     }
 
     @Override
     void visitMenuEnd() {
+
+    }
+
+    @Override
+    void visitSubMenu(String controller, String action, Map<String, ?> params) {
 
     }
 
