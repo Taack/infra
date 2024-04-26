@@ -12,13 +12,13 @@ import taack.ui.base.UiFilterSpecifier
  *
  */
 @CompileStatic
-final class TaackFilterService<T extends GormEntity> implements WebAttributes {
+final class TaackFilterService implements WebAttributes {
 
     @Autowired
     SessionFactory sessionFactory
 
-    TaackFilter.FilterBuilder getBuilder(Class<T> cClass) {
-        new TaackFilter.FilterBuilder(cClass, sessionFactory, params)
+    final<T extends GormEntity<T>> TaackFilter.FilterBuilder<T> getBuilder(Class<T> cClass) {
+        new TaackFilter.FilterBuilder<T>(cClass, sessionFactory, params.toSorted())
     }
 
 }

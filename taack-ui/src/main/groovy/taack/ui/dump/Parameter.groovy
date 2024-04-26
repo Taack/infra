@@ -80,28 +80,6 @@ final class Parameter implements WebAttributes {
         }
     }
 
-    /*String trField(final FieldInfo fieldInfo) {
-        final String label = '.label'
-        final String prefix = 'default'
-        final String ob = '{'
-        final String cb = '}'
-        final String d = '.'
-        def fieldName = fieldInfo.fieldName
-        String cn = aClassSimpleName.uncapitalize()
-        if (!testI18n) {
-            String rv = tr cn + d + fieldName + label
-            if (rv) return rv
-            rv = tr prefix + d + fieldName.join('.') + label
-            if (rv) return rv
-        } else {
-            String rv = ''
-            rv += ob + cn + d + fieldName + label + cb
-            rv += ob + prefix + d + fieldName + label + cb
-            return rv
-        }
-        return null
-    }*/
-
     private static String classNameUncap(Type aType) {
         if (aType instanceof ParameterizedType) {
             return (aType.actualTypeArguments[0] as Class).simpleName.uncapitalize()
@@ -123,11 +101,11 @@ final class Parameter implements WebAttributes {
     }
 
     String trField(final String controller, final String action) {
+        String key = controller.uncapitalize() + '.' + action + '.label'
         if (!testI18n) {
-            String rv = tr(controller.uncapitalize() + '.' + action + '.label')
-            if (rv) return rv
+            tr(key)
         } else {
-            "${controller.uncapitalize() + '.' + action + '.label'}"
+            key
         }
     }
 

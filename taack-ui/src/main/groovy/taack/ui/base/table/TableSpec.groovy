@@ -96,7 +96,7 @@ final class TableSpec {
     final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec.class) Closure c) {
         c.delegate = new TableSpec(tableVisitor)
         Pair<List<T>, Long> res = taackFilter.list()
-        tableVisitor.visitPaginate(taackFilter.maxNumberOfLine, res.bValue)
+        tableVisitor.visitPaginate(taackFilter.max, res.bValue)
         for (T t in res.aValue)
             c.call(t)
         res.bValue

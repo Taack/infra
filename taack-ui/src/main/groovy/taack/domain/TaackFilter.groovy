@@ -26,7 +26,7 @@ import java.lang.reflect.ParameterizedType
  * allow to restrict the list of objects returned.
  */
 @CompileStatic
-final class TaackFilter<T extends GormEntity> {
+final class TaackFilter<T extends GormEntity<T>> {
 
     private final SessionFactory sessionFactory
     private final Map<String, ? extends Object> theParams
@@ -36,7 +36,7 @@ final class TaackFilter<T extends GormEntity> {
 
     private final Class<T> cClass
     private final T oObject
-    Integer maxNumberOfLine = 0
+    int max
     private List<UiFilterSpecifier> additionalFilters
     private List<Long> restrictedIds
     private FieldInfo[] sortFields
@@ -46,8 +46,8 @@ final class TaackFilter<T extends GormEntity> {
         this.theParams = theParams
         this.sessionFactory = sessionFactory
         this.cClass = filterBuilder.cClass
-        this.oObject = filterBuilder.oObject
-        this.maxNumberOfLine = filterBuilder.maxNumberOfLine
+        this.oObject = (filterBuilder.oObject ?: null) as T
+        this.max = filterBuilder.maxNumberOfLine ?: 0 as int
         this.additionalFilters = filterBuilder.additionalFilters.empty ? null : filterBuilder.additionalFilters
         this.restrictedIds = filterBuilder.restrictedIds.empty ? null : filterBuilder.restrictedIds
         this.sortFields = filterBuilder.sortFields
@@ -63,7 +63,7 @@ final class TaackFilter<T extends GormEntity> {
                 ", joinEntityOrder=" + joinEntityOrder +
                 ", cClass=" + cClass +
                 ", oObject=" + oObject +
-                ", maxNumberOfLine=" + maxNumberOfLine +
+                ", max=" + max +
                 ", additionalFilters=" + additionalFilters +
                 ", restrictedIds=" + restrictedIds +
                 ", sortFields=" + Arrays.toString(sortFields) +
@@ -526,16 +526,13 @@ final class TaackFilter<T extends GormEntity> {
 
         join = buildJoinClause() ? buildJoinClause().append(join) : join
         String simpleOrder = filter['order'] ?: order?.toString()
-        String simpleSort = filter['sort'] ?: RawHtmlFilterDump.getQualifiedName(fields)
+        String simpleSort = filter['sort'] ?: fields ? RawHtmlFilterDump.getQualifiedName(fields) : null
         String sortOrder = simpleSort && simpleOrder ? " order by sc.$simpleSort $simpleOrder" : ""
         String selectOrder = simpleSort && simpleOrder ? " ,sc.$simpleSort " : ""
 
         String whereClause = where.empty ? " " : " where ${where.join(' and ')} "
         String query = "select distinct sc ${selectOrder}" + from.toString() + join.toString() + removeBrackets(whereClause) + sortOrder
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
-
-        println query
-        println count
 
         List<T> res
         try {
@@ -611,7 +608,7 @@ final class TaackFilter<T extends GormEntity> {
     final Pair<List<T>, Long> list() {
         list(
                 cClass as Class<T>,
-                maxNumberOfLine,
+                max,
                 additionalFilters?.empty ? null : additionalFilters?.first() as UiFilterSpecifier,
                 oObject as T,
                 sortFields,
@@ -620,31 +617,32 @@ final class TaackFilter<T extends GormEntity> {
         )
     }
 
-    static final class FilterBuilder<T extends GormEntity> {
-        private final Class<T> cClass
-        private final T oObject
+    final static class FilterBuilder<U extends GormEntity<U>> {
+        private final Class<U> cClass
+        private final U oObject
         private final SessionFactory sessionFactory
-        private final Map<String, ? extends Object> theParams
-        private Integer maxNumberOfLine = 20
+        private final Map<String, ?> theParams
+        private int maxNumberOfLine = 0
         private List<UiFilterSpecifier> additionalFilters = []
         private List<Long> restrictedIds = []
         private FieldInfo[] sortFields
         private Order order
 
-        FilterBuilder(Class<T> cClass, SessionFactory sessionFactory, Map<String, ? extends Object> theParams) {
+        FilterBuilder(Class<U> cClass, SessionFactory sessionFactory, Map<String, ?> theParams) {
             this.cClass = cClass
             this.oObject = null
             this.sessionFactory = sessionFactory
             this.theParams = theParams
         }
 
-        FilterBuilder(T oObject, SessionFactory sessionFactory) {
+        FilterBuilder(U oObject, SessionFactory sessionFactory, Map<String, ?> theParams) {
             this.oObject = oObject
-            this.cClass = (oObject.class) as Class<T>
+            this.cClass = (oObject.class) as Class<U>
             this.sessionFactory = sessionFactory
+            this.theParams = theParams
         }
 
-        FilterBuilder setMaxNumberOfLine(Integer maxNumberOfLine) {
+        FilterBuilder setMaxNumberOfLine(int maxNumberOfLine) {
             this.maxNumberOfLine = maxNumberOfLine
             this
         }
@@ -666,7 +664,7 @@ final class TaackFilter<T extends GormEntity> {
         }
 
         TaackFilter build() {
-            new TaackFilter(this, sessionFactory, theParams)
+            new TaackFilter<U>(this, sessionFactory, theParams)
         }
     }
 }
