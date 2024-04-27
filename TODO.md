@@ -10,6 +10,8 @@
     - ~~builders for additional filters~~
   - ~~auto-paginate~~
 - ~~Auto-labeling for menus~~ 
+- Remove isAjax parameter
+- rowLink and buttons without i18n
 
 # 4.1
 
