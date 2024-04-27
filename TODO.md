@@ -13,6 +13,7 @@
 - ~~Remove isAjax parameter~~
 - ~~rowLink~~ and buttons without i18n
 - ~~remove rowField direct value (to force ability to mask results)~~
+- Avoid ajaxBlock when if possible
 
 # 4.1
 
