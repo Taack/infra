@@ -95,18 +95,16 @@ final class Parameter implements WebAttributes {
             if (rv) return rv
             rv = tr 'default' + '.' + methodReturn.method.name + '.label'
             if (rv) return rv
-        } else {
-            "${methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label'}, ${'default' + '.' + methodReturn.method.name + '.label'}"
         }
+        return "${methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label'}, ${'default' + '.' + methodReturn.method.name + '.label'}"
     }
 
     String trField(final String controller, final String action) {
         String key = controller.uncapitalize() + '.' + action + '.label'
         if (!testI18n) {
-            tr(key)
-        } else {
-            key
+            return tr(key)
         }
+        return key
     }
 
     String trField(final FieldInfo... fieldInfo) {
@@ -122,22 +120,20 @@ final class Parameter implements WebAttributes {
                 if (rv) return rv
                 cn = classNameUncap fieldTypes[i]
             }
-        } else {
-            StringBuffer rvl = new StringBuffer()
-            for (int i = 0; i <= s; i++) {
-                String rv = cn + '.' + fieldNames[i..s].join('.') + '.label'
-                def found = tr(rv) == null
-                rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
-                rvl << ', '
-                rv = 'default' + '.' + fieldNames[i..s].join('.') + '.label'
-                found = tr(rv) == null
-                rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
-                rvl << ', '
-                cn = classNameUncap fieldTypes[i]
-            }
-            return rvl.toString()
         }
-        return null
+        StringBuffer rvl = new StringBuffer()
+        for (int i = 0; i <= s; i++) {
+            String rv = cn + '.' + fieldNames[i..s].join('.') + '.label'
+            def found = tr(rv) == null
+            rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
+            rvl << ', '
+            rv = 'default' + '.' + fieldNames[i..s].join('.') + '.label'
+            found = tr(rv) == null
+            rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
+            rvl << ', '
+            cn = classNameUncap fieldTypes[i]
+        }
+        return rvl.toString()
     }
 
     final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
