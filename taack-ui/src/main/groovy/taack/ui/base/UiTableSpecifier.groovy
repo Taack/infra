@@ -68,4 +68,13 @@ final class UiTableSpecifier {
         }
     }
 
+    void visitTableWithNoFilter(final IUiTableVisitor tableVisitor) {
+        if (tableVisitor && closure) {
+            tableVisitor.visitTableWithoutFilter()
+            closure.delegate = new TableSpec(tableVisitor)
+            closure.call()
+            tableVisitor.visitTableEnd()
+        }
+    }
+
 }

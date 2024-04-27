@@ -18,6 +18,11 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
+    void visitTableWithoutFilter() {
+
+    }
+
+    @Override
     void visitTableEnd() {
 
     }
