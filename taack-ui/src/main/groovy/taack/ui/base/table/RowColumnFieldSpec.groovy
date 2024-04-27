@@ -62,11 +62,11 @@ class RowColumnFieldSpec {
         tableVisitor.visitRowField(value, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
-    void rowLink(final String i18n, final ActionIcon icon, final Long id, String label, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final Long id, String label, final Boolean isAjax = true) {
         tableVisitor.visitRowLink(i18n, icon, id, label, null, isAjax)
     }
 
-    void rowLink(final String i18n, final ActionIcon icon, final String controller, final String action, final Long id = null, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final String controller, final String action, final Long id = null, final Boolean isAjax = true) {
         if (taackUiEnablerService.hasAccess(controller, action, id, null)) tableVisitor.visitRowLink(i18n, icon, controller, action, id, null, isAjax)
     }
 
@@ -79,11 +79,11 @@ class RowColumnFieldSpec {
      * @param id (optional) ID parameter
      * @param isAjax Default to true, if true the target action is an ajax one, if false, the target action will redraw the entire page.
      */
-    void rowLink(final String i18n, final ActionIcon icon, final MethodClosure action, final Long id = null, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id = null, final Boolean isAjax = true) {
         if (taackUiEnablerService.hasAccess(action, id)) tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, id, null, isAjax)
     }
 
-    void rowLink(final String i18n, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> params, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> params, final Boolean isAjax = true) {
         if (taackUiEnablerService.hasAccess(action, id, params)) {
             Map<String, ?> p = params ?: [:]
             p.put('id', id)
@@ -91,15 +91,15 @@ class RowColumnFieldSpec {
         }
     }
 
-    void rowLink(final String i18n, final ActionIcon icon, final String controller, final String action, final Map<String, ?> params, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final String controller, final String action, final Map<String, ?> params, final Boolean isAjax = true) {
         if (taackUiEnablerService.hasAccess(controller, action, null, params)) tableVisitor.visitRowLink(i18n, icon, controller, action, null, params, isAjax)
     }
 
-    void rowLink(final String i18n, final ActionIcon icon, final MethodClosure action, final Map<String, ?> params, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map<String, ?> params, final Boolean isAjax = true) {
         if (taackUiEnablerService.hasAccess(action, params)) tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, params, isAjax)
     }
 
-    void footerButton(String i18n, MethodClosure action, Long id = null, Map<String, ?> additionalParams = null) {
+    void footerButton(String i18n = null, MethodClosure action, Long id = null, Map<String, ?> additionalParams = null) {
         if (taackUiEnablerService.hasAccess(action, id, additionalParams)) tableVisitor.visitFooterButton(i18n, Utils.getControllerName(action), action.method, id, additionalParams)
     }
 }

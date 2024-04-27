@@ -254,7 +254,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowLink(final String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, final Boolean isAjax) {
+    void visitRowLink(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, final Boolean isAjax) {
+        i18n ?= parameter.trField(controller, action)
+
         fieldHeader()
         params ?= [:]
         if (parameter.map.containsKey('recordState')) {
@@ -282,6 +284,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitFooterButton(String i18n, String controller, String action, Long id, Map<String, ?> additionalParams) {
+        i18n ?= parameter.trField(controller, action)
+
         additionalParams?.each {
             out << """<input type="hidden" name="${it.key}" value="${it.value}">"""
         }
