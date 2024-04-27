@@ -10,12 +10,13 @@
     - ~~builders for additional filters~~
   - ~~auto-paginate~~
 - ~~Auto-labeling for menus~~ 
-- Remove isAjax parameter
-- rowLink and buttons without i18n
-- remove rowField direct value (to force ability to mask results)
+- ~~Remove isAjax parameter~~
+- ~~rowLink~~ and buttons without i18n
+- ~~remove rowField direct value (to force ability to mask results)~~
 
 # 4.1
 
+- Improve restore state
 - AsciidoctorJ
   - remove external kotlin code transpiled
   - support offline plugins
