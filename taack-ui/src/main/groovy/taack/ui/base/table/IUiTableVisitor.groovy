@@ -14,6 +14,8 @@ import java.text.NumberFormat
 interface IUiTableVisitor {
     void visitTable()
 
+    void visitTableWithoutFilter()
+
     void visitTableEnd()
 
     void visitColumnEnd()

@@ -154,7 +154,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
         visitCloseTitle()
-        tableSpecifier.visitTable(new RawHtmlTableDump(id, out, parameter))
+        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(id, out, parameter))
         visitInnerBlockEnd()
         visitInnerBlockEnd()
     }

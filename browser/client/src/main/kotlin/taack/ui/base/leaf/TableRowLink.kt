@@ -5,13 +5,11 @@ import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.Node
 import org.w3c.dom.asList
 import org.w3c.dom.events.Event
-import org.w3c.dom.url.URL
 import org.w3c.xhr.XMLHttpRequest
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.TableRow
-import taack.ui.base.record.RecordState
 
 class TableRowLink(private val parent: TableRow, private val a: HTMLAnchorElement) : LeafElement {
     companion object {
@@ -39,7 +37,14 @@ class TableRowLink(private val parent: TableRow, private val a: HTMLAnchorElemen
             ev.preventDefault()
             trace("TableRowLink::onclick: Load End")
             val text = xhr.responseText
-            processAjaxLink(text, parent.parent.parent.parent)
+            trace("|$text|")
+            if (text.contains(Regex(".{0,4}<html"))) {
+                trace("AUO response identified like full page ...")
+                window.document.write(text)
+                window.history.pushState("", "Intranet ", action)
+            } else {
+                processAjaxLink(text, parent.parent.parent.parent)
+            }
         }
         if (action != null) {
             xhr.open("GET", AjaxLink.createUrl(action).toString())

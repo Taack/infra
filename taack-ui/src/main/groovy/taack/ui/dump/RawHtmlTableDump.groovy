@@ -47,6 +47,24 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitTableWithoutFilter() {
+        out << """
+                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.originController}/${parameter.originAction}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter taackTableFilter" taackFilterId="${blockId}">
+                    <input type="hidden" name="sort" value="${parameter.map["sort"] ?: ''}">
+                    <input type="hidden" name="order" value="${parameter.map["order"] ?: ''}">
+                    <input type="hidden" name="grouping" value="${parameter.map["grouping"] ?: ''}">
+                    <input type="hidden" name="offset" value="${parameter.offset ?: '0'}">
+                    <input type="hidden" name="max" value="${parameter.max ?: '20'}">
+                    ${parameter.beanId ? '<input type="hidden" name="id" value=' + parameter.beanId + '>' : ''}
+                </form>
+                <form>
+            """
+
+        out << "<div class='table-div' style='overflow: auto;'><table class='pure-table taackTable' taackTableId='${blockId}'>\n"
+    }
+
+
+    @Override
     void visitTableEnd() {
         out << "</table></div></form>\n"
     }

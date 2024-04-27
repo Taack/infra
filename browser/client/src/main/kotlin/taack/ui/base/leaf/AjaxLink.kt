@@ -41,6 +41,8 @@ class AjaxLink(private val parent: AjaxBlock, private val a: HTMLAnchorElement) 
 
     private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value
 
+    private var isFullpage = false
+
     private fun onclick(e: Event) {
         trace("AjaxLink::onclick")
         val xhr = XMLHttpRequest()
@@ -48,10 +50,16 @@ class AjaxLink(private val parent: AjaxBlock, private val a: HTMLAnchorElement) 
             trace("AjaxLink::onclick: Load End $action")
             e.preventDefault()
             val text = xhr.responseText
-            processAjaxLink(text, parent.parent)
+            if (text.startsWith("<html")) {
+                isFullpage = true
+                window.document.write(text)
+                window.history.pushState("", "Intranet ", action)
+            } else {
+                processAjaxLink(text, parent.parent)
+            }
 
         }
-        if (action != null) {
+        if (action != null && !isFullpage) {
             xhr.open("GET", createUrl(action).toString())
             xhr.send()
         }

@@ -44,6 +44,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitTableWithoutFilter() {
+
+    }
+
+    @Override
     void visitTableEnd() {
         out << "</tbody></table>\n"
     }

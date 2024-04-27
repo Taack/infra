@@ -31,11 +31,9 @@ class TableAjaxInput(private val parent: TableRow, private val i: HTMLInputEleme
         Helper.trace("TableAjaxInput::init ${i.name}")
         i.onblur = { e ->
             e.preventDefault()
-            synchronized(isLocked) {
-                if (!isLocked) {
-                    isLocked = true
-                    onclick(e)
-                }
+            if (!isLocked) {
+                isLocked = true
+                onclick(e)
             }
         }
     }
@@ -73,7 +71,7 @@ class TableAjaxInput(private val parent: TableRow, private val i: HTMLInputEleme
         val fd = FormData(f)
         fd.append("isAjax", "true")
         val ajaxParams = i.attributes.getNamedItem("ajaxParams")?.value
-        window.fetch("${f.action}?${ajaxParams?:""}", RequestInit(method = "POST", body = fd)).then {
+        window.fetch("${f.action}?${ajaxParams ?: ""}", RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {
                 it.text()
             } else {
@@ -81,10 +79,13 @@ class TableAjaxInput(private val parent: TableRow, private val i: HTMLInputEleme
                 Promise.reject(Throwable())
             }
         }.then {
-            processAjaxLink(it, parent.parent.parent.parent)
-//            mapAjaxText(it).map { me ->
-//                parent.parent.d.innerHTML = me.value
-//            }
+            if (it.startsWith("<html")) {
+                window.document.write(it)
+                window.history.pushState("", "Intranet ", "${f.action}?${ajaxParams ?: ""}")
+                Promise.resolve("Done ...")
+            } else {
+                processAjaxLink(it, parent.parent.parent.parent)
+            }
         }.then {
             AjaxBlock.getSiblingAjaxBlock(parent.parent.parent.parent)
             isLocked = false

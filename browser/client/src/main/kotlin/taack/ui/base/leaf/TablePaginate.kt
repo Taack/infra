@@ -21,8 +21,17 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
     companion object {
         fun getSiblingTablePaginate(p: Table): TablePaginate? {
             val d = p.t.parentElement!!.querySelector("div.taackTablePaginate")
-            return if (d != null) TablePaginate(p, d as HTMLDivElement)
-            else null
+            if (d != null) {
+                try {
+                    return TablePaginate(p, d as HTMLDivElement)
+                } catch (e: Throwable) {
+                    trace("Exception in TablePaginate")
+                    trace(e.message?:"No message")
+                    trace("table: $p")
+                    trace("div: $d")
+                }
+            }
+            return null
         }
     }
 
@@ -34,6 +43,9 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
     private val state: RecordState = RecordState()
 
     init {
+        trace("TablePaginate1 max: ${max}, offset: ${offset}, count: ${count}")
+        trace("TablePaginate2 currentPage: ${currentPage}, numberOfPage: ${numberOfPage}")
+        trace("TablePaginate3 state: ${state}")
         if (numberOfPage <= 1) {
             val f = count.toDouble() / max.toDouble()
             if (f > 1) {
