@@ -26,6 +26,10 @@ class RowColumnFieldSpec {
         this.tableVisitor = tableVisitor
     }
 
+    void rowField(final String value, final Style style = null, final MethodClosure action = null, final Long id = null) {
+        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
+    }
+
     void rowField(final FieldInfo field, final String format = null, final Style style = null, final MethodClosure action = null, final Long id = null) {
         tableVisitor.visitRowField(field, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
@@ -34,72 +38,22 @@ class RowColumnFieldSpec {
         tableVisitor.visitRowField(field, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
-    void rowField(final String value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
+    void rowLink(final String i18n, final ActionIcon icon, final Long id, String label) {
+        tableVisitor.visitRowLink(i18n, icon, id, label, null, true)
     }
 
-    void rowField(final Long value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
+    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map params) {
+        rowLink(i18n, icon, action, null, params)
     }
-
-    void rowField(final BigDecimal value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, null as NumberFormat, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
-    }
-
-    void rowField(final BigDecimal value, final NumberFormat format, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
-    }
-
-    void rowField(final Map value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id)  ? Utils.getControllerName(action) : null, action?.method, id)
-    }
-
-    void rowField(final EnumStyle value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id)  ? Utils.getControllerName(action) : null, action?.method, id)
-    }
-
-    void rowField(final Date value, final String format = null, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
-    }
-
-    void rowLink(final String i18n = null, final ActionIcon icon, final Long id, String label, final Boolean isAjax = true) {
-        tableVisitor.visitRowLink(i18n, icon, id, label, null, isAjax)
-    }
-
-    void rowLink(final String i18n = null, final ActionIcon icon, final String controller, final String action, final Long id = null, final Boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(controller, action, id, null)) tableVisitor.visitRowLink(i18n, icon, controller, action, id, null, isAjax)
-    }
-
-    /**
-     * Add a link to the target action in a table
-     *
-     * @param i18n Hover text
-     * @param icon Icon to use
-     * @param action Target action
-     * @param id (optional) ID parameter
-     * @param isAjax Default to true, if true the target action is an ajax one, if false, the target action will redraw the entire page.
-     */
-    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id = null, final Boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(action, id)) tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, id, null, isAjax)
-    }
-
-    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> params, final Boolean isAjax = true) {
+    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map params = null) {
         if (taackUiEnablerService.hasAccess(action, id, params)) {
             Map<String, ?> p = params ?: [:]
             p.put('id', id)
-            tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, p, isAjax)
+            tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, p, true)
         }
     }
 
-    void rowLink(final String i18n = null, final ActionIcon icon, final String controller, final String action, final Map<String, ?> params, final Boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(controller, action, null, params)) tableVisitor.visitRowLink(i18n, icon, controller, action, null, params, isAjax)
-    }
-
-    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map<String, ?> params, final Boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(action, params)) tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, params, isAjax)
-    }
-
-    void footerButton(String i18n = null, MethodClosure action, Long id = null, Map<String, ?> additionalParams = null) {
+    void footerButton(String i18n = null, MethodClosure action, Long id = null, Map additionalParams = null) {
         if (taackUiEnablerService.hasAccess(action, id, additionalParams)) tableVisitor.visitFooterButton(i18n, Utils.getControllerName(action), action.method, id, additionalParams)
     }
 }

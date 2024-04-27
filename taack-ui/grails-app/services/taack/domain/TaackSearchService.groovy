@@ -15,7 +15,7 @@ import org.apache.solr.client.solrj.response.GroupResponse
 import org.apache.solr.client.solrj.response.QueryResponse
 import org.apache.solr.client.solrj.response.RangeFacet
 import org.apache.solr.common.SolrInputDocument
-import org.codehaus.groovy.runtime.MethodClosure
+import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import taack.solr.SolrIndexerVisitor
@@ -43,7 +43,7 @@ import javax.annotation.PostConstruct
  *
  *      @PostConstruct
  *      private void init() {
- *          taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MethodClosure, this.&labeling as MethodClosure, { User u ->
+ *          taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MC, this.&labeling as MC, { User u ->
  *              u ?= new User()
  *              indexField "User Name (without Accents)", SolrFieldType.TXT_NO_ACCENT, u.username_
  *              indexField "User Name", SolrFieldType.TXT_GENERAL, u.username_
@@ -98,7 +98,7 @@ final class TaackSearchService implements WebAttributes {
         mapSolrSpecifier.putIfAbsent(solrSpecifier.type, new Pair(indexService, solrSpecifier))
     }
 
-    final UiBlockSpecifier search(String q, MethodClosure search, Class<? extends GormEntity>... classes) {
+    final UiBlockSpecifier search(String q, MC search, Class<? extends GormEntity>... classes) {
         List<String> facetsClicked = params.list("facetsClicked")
         List<String> rangesClicked = params.list("rangesClicked")
         SolrQuery sq = new SolrQuery(q)
@@ -177,8 +177,8 @@ final class TaackSearchService implements WebAttributes {
                                     String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
                                     row {
                                         rowField c.value + "(${c.count})"
-                                        if (rangesClicked.contains(currentRange)) rowLink "Remove Filter", ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q], false
-                                        else rowLink "Filter", ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q], false
+                                        if (rangesClicked.contains(currentRange)) rowLink ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
+                                        else rowLink ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
                                     }
                                 }
                             }
@@ -197,8 +197,8 @@ final class TaackSearchService implements WebAttributes {
                                 String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                 row {
                                     rowField v.name + "(${v.count})"
-                                    if (facetsClicked.contains(currentFacet)) rowLink "Remove Filter", ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q], false
-                                    else rowLink "Filter", ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q], false
+                                    if (facetsClicked.contains(currentFacet)) rowLink ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
+                                    else rowLink ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
                                 }
                             }
                         }
