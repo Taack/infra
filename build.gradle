@@ -189,24 +189,28 @@ subprojects {
             from sourceSets.main.allSource
         }
     }
-    afterEvaluate {
-        artifacts {
-            archives javadocJar, sourcesJar
+    if (isReleaseVersion()) {
+        println "isReleaseVersion() ${isReleaseVersion()}"
+        println "isReleaseVersion ${isReleaseVersion}"
+        afterEvaluate {
+            artifacts {
+                archives javadocJar, sourcesJar
+            }
+
+            signing {
+                required { isReleaseVersion() && gradle.taskGraph.hasTask("publish") }
+                sign publishing.publications.maven
+            }
         }
 
-        signing {
-            required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
-            sign publishing.publications.maven
+        tasks.withType(Sign) {
+            onlyIf { isReleaseVersion() }
+        }
+        //do not generate extra load on Nexus with new staging repository if signing fails
+        tasks.withType(io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository).configureEach {
+            shouldRunAfter(tasks.withType(Sign))
         }
     }
 
-    tasks.withType(Sign) {
-        onlyIf { isReleaseVersion }
-    }
-
-    //do not generate extra load on Nexus with new staging repository if signing fails
-    tasks.withType(io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository).configureEach {
-        shouldRunAfter(tasks.withType(Sign))
-    }
 }
 
