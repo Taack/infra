@@ -1,6 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.js' version '1.7.20'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.20'
+    id 'org.jetbrains.kotlin.js' version '1.9.23'
 }
 
 group = 'org.example'
@@ -13,17 +12,19 @@ repositories {
 dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0'
-
 }
 
 
 kotlin {
-    js(IR) {
-        binaries.executable()
+    js {
         browser {
-            commonWebpackConfig {
-                cssSupport.enabled = true
-            }
         }
+        binaries.executable()
     }
+}
+
+rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin) {
+    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).lockFileDirectory =
+            file("my-kotlin-js-store")
+    rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension).lockFileName = 'my-yarn.lock'
 }
