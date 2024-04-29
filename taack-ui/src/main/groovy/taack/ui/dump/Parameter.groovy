@@ -102,7 +102,10 @@ final class Parameter implements WebAttributes {
     String trField(final String controller, final String action) {
         String key = controller.uncapitalize() + '.' + action + '.label'
         if (!testI18n) {
-            return tr(key)
+            String rv = tr(key)
+            if (rv) return rv
+            rv = tr 'default' + '.' + action + '.label'
+            if (rv) return rv
         }
         return key
     }
