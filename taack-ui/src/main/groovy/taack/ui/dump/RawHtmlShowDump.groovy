@@ -116,6 +116,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowAction(String i18n, String controller, String action, Long id, Map additionalParams, boolean isAjax = true) {
+        i18n ?= parameter.trField(controller, action)
         additionalParams ?= [:]
         additionalParams['isAjax'] = isAjax
         out << """<a class="taackShowAction" ${isAjax ? "taackShowActionLink" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""

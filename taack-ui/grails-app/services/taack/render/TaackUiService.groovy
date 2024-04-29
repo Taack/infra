@@ -402,7 +402,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     /**
-     * Retrieve hidden field passed with {@link UiFilterSpecifier#ui(java.lang.Class, groovy.lang.Closure, taack.ast.type.FieldInfo[])}.
+     * Retrieve hidden field passed with {@link UiFilterSpecifier#ui(java.lang.Class, groovy.lang.Closure, taack.ast.type.FieldInf o [])}.
      *
      * @param aClass
      * @return objectClass initialized
@@ -459,43 +459,5 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 root : taackUiPluginConfiguration.root
         ]
         html
-    }
-
-    /**
-     * Helper displaying a dialog allowing to confirm before processing the action.
-     *
-     * <pre>{@code
-     * Long option = taackUiSimpleService.showOptions(tr('default.button.confirm.message'), ['Yes', 'No'])
-     * if (option == 0) // do things
-     * }</pre>
-     * @param i18n content of the text
-     * @param options list of options
-     * @param isAjax set to true if the next action is ajax
-     * @return the index, starting from zero the user click on
-     */
-    final Long showOptions(String i18n, List<String> options, boolean isAjax = true) {
-        final String confirmKey = 'showOptions'
-        Long confirm = params.containsKey(confirmKey) ? params.long(confirmKey) : null
-        params.remove(confirmKey)
-        def b = new UiBlockSpecifier()
-        if (confirm == null)
-            show(b.ui {
-                modal {
-                    ajaxBlock "showConfirm", {
-                        delegate.show("Action Options", new UiShowSpecifier().ui({
-                            field(i18n)
-                            int i = 0
-                            for (String opt in options) {
-                                showAction("<br><b>${opt}</b>", controllerName, actionName, null, params + [showOptions: "${i}"], isAjax)
-                                i++
-                            }
-                        }), BlockSpec.Width.MAX)
-                    }
-                }
-            })
-        else {
-            closeModal()
-        }
-        return confirm
     }
 }

@@ -31,6 +31,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     int level = 0
     private Style rowStyle = null
     int stripped = 0
+    private boolean firstSurround = false
 
     RawHtmlTableDump(final String id, final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
@@ -151,6 +152,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowColumnEnd() {
+        firstSurround = false
+
         isInCol = false
         out << "</td>"
     }
@@ -163,6 +166,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         } else {
             out << """<td ${style ? "style='${style.cssStyleString}'" : (rowStyle ? "style='${rowStyle.cssStyleString}'" : "")}>"""
         }
+        firstSurround = true
     }
 
     void visitRowFieldCommon(Class type, Object value, final String format = null, final Style style, final String controller = null, final String action = null, final Long id = null) {
@@ -196,7 +200,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         visitRowFieldCommon (fieldInfo.getMethod().returnType, fieldInfo.value, null, style, controller, action, id)
     }
 
-    private static String surroundCell(final String cell, final Style style = null, final String url = null) {
+    private String surroundCell(final String cell, final Style style = null, final String url = null) {
         if (style) {
             if (!cell || cell.empty) return ""
             return """
@@ -204,7 +208,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                     ${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell ?: ''}"}
                 </div>
             """
-        } else return "${cell && !cell.empty ? "${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell}"} <br>" : ''}"
+        } else {
+            String ret = "${cell && !cell.empty ? "${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell}"}" : ''}"
+            ret = ret.empty ? '' : ((!firstSurround ? '<br>' : '') + ret)
+            firstSurround = false
+            return ret
+        }
     }
 
     @Override

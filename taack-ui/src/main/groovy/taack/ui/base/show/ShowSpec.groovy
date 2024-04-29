@@ -29,22 +29,8 @@ class ShowSpec extends SectionSpec {
         showVisitor.visitSectionEnd()
     }
 
-    /**
-     * Link action to insert in the show block
-     *
-     * @param i18n label of the action
-     * @param controller controller targeted by a click on the link
-     * @param action action targeted by a click on the link
-     * @param id object ID to pass
-     * @param params additional params
-     * @param isAjax if true, target action is an ajax one
-     */
-    void showAction(final String i18n, final String controller, final String action, final Long id = null, final Map params = null, boolean isAjax = true) {
-        showVisitor.visitShowAction(i18n, controller, action, id, params, isAjax)
-    }
 
     /**
-     * see {@link #showAction(java.lang.String, java.lang.String, java.lang.String, java.lang.Long, java.util.Map)}
      *
      * @param i18n
      * @param action action closure
@@ -52,20 +38,7 @@ class ShowSpec extends SectionSpec {
      * @param params
      * @param isAjax
      */
-    void showAction(final String i18n, final MethodClosure action, final Long id = null, final Map params = null, boolean isAjax = true) {
-        showVisitor.visitShowAction(i18n, Utils.getControllerName(action), action.method, id, params, isAjax)
+    void showAction(final MethodClosure action, final Long id = null, final Map params = null) {
+        showVisitor.visitShowAction(null, Utils.getControllerName(action), action.method, id, params, true)
     }
-
-    /**
-     * see {@link #showAction(java.lang.String, java.lang.String, java.lang.String, java.lang.Long, java.util.Map)}
-     *
-     * @param i18n
-     * @param action
-     * @param id
-     * @param isAjax
-     */
-    void showAction(final String i18n, final MethodClosure action, final Long id, boolean isAjax) {
-        showVisitor.visitShowAction(i18n, Utils.getControllerName(action), action.method, id, null, isAjax)
-    }
-
 }
