@@ -177,8 +177,8 @@ final class TaackSearchService implements WebAttributes {
                                     String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
                                     row {
                                         rowField c.value + "(${c.count})"
-                                        if (rangesClicked.contains(currentRange)) rowLink ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
-                                        else rowLink ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
+                                        if (rangesClicked.contains(currentRange)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
+                                        else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
                                     }
                                 }
                             }
@@ -197,8 +197,8 @@ final class TaackSearchService implements WebAttributes {
                                 String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                 row {
                                     rowField v.name + "(${v.count})"
-                                    if (facetsClicked.contains(currentFacet)) rowLink ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
-                                    else rowLink ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
+                                    if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
+                                    else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
                                 }
                             }
                         }

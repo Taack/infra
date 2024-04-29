@@ -176,10 +176,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menu
      * @return
      */
-    final def show(UiFormSpecifier formSpecifier, String i18n = null, UiMenuSpecifier menu = null) {
+    final def show(UiFormSpecifier formSpecifier, UiMenuSpecifier menu = null) {
         show(new UiBlockSpecifier().ui {
             ajaxBlock actionName, {
-                form(i18n, formSpecifier)
+                form(formSpecifier)
             }
         }, menu)
     }
@@ -191,11 +191,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param i18n title of the form
      * @return
      */
-    final def showModal(UiFormSpecifier formSpecifier, String i18n = null) {
+    final def showModal(UiFormSpecifier formSpecifier) {
         show(new UiBlockSpecifier().ui {
             modal {
                 ajaxBlock actionName, {
-                    form(i18n, formSpecifier)
+                    form(formSpecifier)
                 }
             }
         })
@@ -403,7 +403,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     /**
      * Retrieve hidden field passed with {@link UiFilterSpecifier#ui(java.lang.Class, groovy.lang.Closure, taack.ast.type.FieldInfo[])}.
-     * The latest parameter allow to pass additional data that will not be interpreted by {@link taack.domain.TaackFilterService#list(java.lang.Class)}
      *
      * @param aClass
      * @return objectClass initialized

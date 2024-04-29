@@ -100,6 +100,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitForm(final String i18n, final BlockSpec.Width width) {
         visitInnerBlock(null, width)
+        parameter.trField(parameter.params['controller'] as String, parameter.params['action'] as String)
         visitInnerBlock(i18n, width)
     }
 
@@ -315,7 +316,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitAction(final String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, boolean isAjaxRendering) {
+    void visitAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, boolean isAjaxRendering) {
+        i18n ?= parameter.trField(controller, action)
         if (isAjaxRendering) {
             out << """
                 <a class='ajaxLink taackAjaxLink' ajaxAction='${parameter.urlMapped(controller, action, id, params, true)}'>

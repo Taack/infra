@@ -99,61 +99,13 @@ final class FormSpec extends FormSectionSpec {
      * form action. The form is POSTed to the target action.
      *
      * @param i18n label of the button
-     * @param controller controller holding the action
-     * @param action name of the action in the controller
-     * @param id id param
-     * @param params additional params
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
-     */
-    void formAction(final String i18n, final String controller, final String action, final Long id = null, final Map params = null, final boolean isAjax = false) {
-        if (taackUiEnablerService.hasAccess(controller, action, id, params)) formVisitor.visitFormAction(i18n, controller, action, id, params, isAjax)
-    }
-
-    /**
-     * form action. The form is POSTed to the target action.
-     *
-     * @param i18n label of the button
      * @param action methodClosure pointing to the action
      * @param id id param
      * @param params additional params
      * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
      */
-    void formAction(final String i18n, final MethodClosure action, final Long id = null, final Map params = null, final boolean isAjax = false) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(i18n, Utils.getControllerName(action), action.method, id, params, isAjax)
+    void formAction(final MethodClosure action, final Long id = null, final Map params = null) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, true)
     }
 
-    /**
-     * form action. The form is POSTed to the target action.
-     *
-     * @param i18n label of the button
-     * @param action methodClosure pointing to the action
-     * @param id id param
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
-     */
-    void formAction(final String i18n, final MethodClosure action, final Long id, final boolean isAjax) {
-        if (taackUiEnablerService.hasAccess(action, id)) formVisitor.visitFormAction(i18n, Utils.getControllerName(action), action.method, id, null, isAjax)
-    }
-
-    /**
-     * form action. The form is POSTed to the target action.
-     *
-     * @param i18n label of the button
-     * @param action methodClosure pointing to the action
-     * @param params additional params
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
-     */
-    void formAction(final String i18n, final MethodClosure action, final Map params, final boolean isAjax = false) {
-        if (taackUiEnablerService.hasAccess(action, params)) formVisitor.visitFormAction(i18n, Utils.getControllerName(action), action.method, null as Long, params, isAjax)
-    }
-
-    /**
-     * form action. The form is POSTed to the target action.
-     *
-     * @param i18n label of the button
-     * @param action methodClosure pointing to the action
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
-     */
-    void formAction(final String i18n, final MethodClosure action, final boolean isAjax) {
-        if (taackUiEnablerService.hasAccess(action)) formVisitor.visitFormAction(i18n, Utils.getControllerName(action), action.method, null, null, isAjax)
-    }
 }

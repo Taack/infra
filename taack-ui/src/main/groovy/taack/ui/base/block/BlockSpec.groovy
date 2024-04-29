@@ -170,12 +170,12 @@ final class BlockSpec {
      * @param width
      * @param closure list of action in the header to add. See {@link BlockActionSpec}
      */
-    void form(final String i18n, final UiFormSpecifier formSpecifier, final Width width = Width.MAX,
+    void form(final UiFormSpecifier formSpecifier, final Width width = Width.MAX,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
         if (displayElement("form$counter")) {
             id = "form$counter"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitForm(i18n, width)
+            blockVisitor.visitForm(null, width)
             if (closure) {
                 blockVisitor.visitActionStart()
                 closure.delegate = blockActionSpec

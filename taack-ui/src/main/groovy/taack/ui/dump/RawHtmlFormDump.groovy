@@ -397,6 +397,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormAction(String i18n, String controller, String action, Long id, Map params, boolean isAjax) {
+        i18n ?= parameter.trField(controller, action)
         if (isActionButtonPrimary) out << "<fieldset style=\"width: 100%; text-align: right;\">"
         out << """<button type="submit" class="pure-button ${isActionButtonPrimary ? 'pure-button-primary' : ''} ${isAjax ? "taackFormAction" : ""}" formaction="${parameter.urlMapped(controller, action, id, params)}">${i18n}</button>"""
         isActionButtonPrimary = false

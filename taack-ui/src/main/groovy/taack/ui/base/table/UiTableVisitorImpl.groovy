@@ -108,7 +108,7 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowLink(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+    void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
 
     }
 
@@ -178,7 +178,7 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowLink(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
+    void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
 
     }
 

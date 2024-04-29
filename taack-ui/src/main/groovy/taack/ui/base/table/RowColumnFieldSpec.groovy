@@ -9,9 +9,6 @@ import taack.render.TaackUiEnablerService
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
-import taack.ui.style.EnumStyle
-
-import java.text.NumberFormat
 
 /**
  * Specify fields to be drawn in a row or a rowColumn.
@@ -38,23 +35,23 @@ class RowColumnFieldSpec {
         tableVisitor.visitRowField(field, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
     }
 
-    void rowLink(final String i18n, final ActionIcon icon, final Long id, String label) {
-        tableVisitor.visitRowLink(i18n, icon, id, label, null, true)
+    void rowAction(final String i18n, final ActionIcon icon, final Long id, String label) {
+        tableVisitor.visitRowAction(i18n, icon, id, label, null, true)
     }
 
-    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map params) {
-        rowLink(i18n, icon, action, null, params)
+    void rowAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map params) {
+        rowAction(i18n, icon, action, null, params)
     }
 
-    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
-        rowLink(i18n, icon, action, id, null)
+    void rowAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
+        rowAction(i18n, icon, action, id, null)
     }
 
-    void rowLink(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map params) {
+    void rowAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map params) {
         if (taackUiEnablerService.hasAccess(action, id, params)) {
             Map<String, ?> p = params ?: [:]
             p.put('id', id)
-            tableVisitor.visitRowLink(i18n, icon, Utils.getControllerName(action), action.method, null, p, true)
+            tableVisitor.visitRowAction(i18n, icon, Utils.getControllerName(action), action.method, null, p, true)
         }
     }
 

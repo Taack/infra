@@ -29,12 +29,11 @@ final class BlockActionSpec {
      * @param id ID parameter
      * @param isAjaxRendering has to be true if target action is ajax
      */
-    void action(String i18n, ActionIcon icon, MethodClosure action, Long id, boolean isAjaxRendering = false) {
-        if (taackUiEnablerService.hasAccess(action, id)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, id, null, isAjaxRendering)
+    void action(String i18n = null, ActionIcon icon, MethodClosure action, Long id) {
+        if (taackUiEnablerService.hasAccess(action, id)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, id, null, true)
     }
 
     /**
-     * See {@link #action(java.lang.String, taack.ui.base.common.ActionIcon, org.codehaus.groovy.runtime.MethodClosure, java.lang.Long, boolean)}
      *
      * @param i18n
      * @param icon
@@ -42,20 +41,19 @@ final class BlockActionSpec {
      * @param params
      * @param isAjaxRendering
      */
-    void action(String i18n, ActionIcon icon, MethodClosure action, Map params, boolean isAjaxRendering = false) {
-        if (taackUiEnablerService.hasAccess(action, params)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, null, params, isAjaxRendering)
+    void action(String i18n = null, ActionIcon icon, MethodClosure action, Map params) {
+        if (taackUiEnablerService.hasAccess(action, params)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, null, params, true)
     }
 
     /**
-     * See {@link #action(java.lang.String, taack.ui.base.common.ActionIcon, org.codehaus.groovy.runtime.MethodClosure, java.lang.Long, boolean)}
      *
      * @param i18n
      * @param icon
      * @param action
      * @param isAjaxRendering Default to False
      */
-    void action(String i18n, ActionIcon icon, MethodClosure action, boolean isAjaxRendering = false) {
-        if (taackUiEnablerService.hasAccess(action)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, null, null, isAjaxRendering)
+    void action(String i18n = null, ActionIcon icon, MethodClosure action) {
+        if (taackUiEnablerService.hasAccess(action)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, null, null, true)
     }
 
     /**
