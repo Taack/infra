@@ -231,7 +231,9 @@ final class BlockSpec {
      */
     void table(final String i18n, final UiTableSpecifier tableSpecifier, final Width width = Width.MAX,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        if (displayElement()) {
+        if (displayElement("table$counter")) {
+            id = "tableFilter$counter"
+            blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTable(id, i18n, width)
             if (closure) {
                 blockVisitor.visitActionStart()
@@ -241,6 +243,7 @@ final class BlockSpec {
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitTableEnd(tableSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
         }
     }
 
@@ -262,8 +265,8 @@ final class BlockSpec {
                      final String i18nTable, final UiTableSpecifier tableSpecifier,
                      final Width width,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        if (displayElement("table$counter")) {
-            id = "table$counter"
+        if (displayElement("tableFilter$counter")) {
+            id = "tableFilter$counter"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTableFilter(id, i18nFilter, filterSpecifier, i18nTable, width)
             if (closure) {
