@@ -172,7 +172,9 @@ final class BlockSpec {
      */
     void form(final String i18n, final UiFormSpecifier formSpecifier, final Width width = Width.MAX,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        if (displayElement()) {
+        if (displayElement("form$counter")) {
+            id = "form$counter"
+            blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitForm(i18n, width)
             if (closure) {
                 blockVisitor.visitActionStart()
@@ -182,6 +184,7 @@ final class BlockSpec {
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitFormEnd(formSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
         }
     }
 
