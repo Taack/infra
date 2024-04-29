@@ -115,28 +115,28 @@ final class Parameter implements WebAttributes {
         def fieldTypes = fieldInfo*.fieldConstraint.field*.type
         String cn = aClassSimpleName?.uncapitalize() ?: fieldInfo[0].fieldConstraint.field.declaringClass.simpleName.uncapitalize()
         final int s = fieldNames.size() - 1
-        if (!testI18n) {
-            for (int i = 0; i <= s; i++) {
-                String rv = tr cn + '.' + fieldNames[i..s].join('.') + '.label'
-                if (rv) return rv
-                rv = tr 'default' + '.' + fieldNames[i..s].join('.') + '.label'
-                if (rv) return rv
-                cn = classNameUncap fieldTypes[i]
-            }
-        }
-        StringBuffer rvl = new StringBuffer()
+
+        List<String> keys = []
         for (int i = 0; i <= s; i++) {
-            String rv = cn + '.' + fieldNames[i..s].join('.') + '.label'
-            def found = tr(rv) == null
-            rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
-            rvl << ', '
-            rv = 'default' + '.' + fieldNames[i..s].join('.') + '.label'
-            found = tr(rv) == null
-            rvl << (found ? '<b>' : '') + rv + (found ? '</b>' : '')
-            rvl << ', '
+            String keySuffix = fieldNames[i..s].join('.') + '.label'
+            String rv = tr cn + '.' + keySuffix
+            if (rv) {
+                if (!testI18n)
+                    return rv
+                else
+                    keys.add("<b>${cn + '.' + keySuffix}</b>" as String)
+            } else keys.add("${cn + '.' + keySuffix}" as String)
+            String rvd = tr 'default' + '.' + keySuffix
+            if (rvd) {
+                if (!testI18n)
+                    return rvd
+                else
+                    keys.add("<b>${'default' + '.' + keySuffix}</b>" as String)
+            } else keys.add("${'default' + '.' + keySuffix}" as String)
             cn = classNameUncap fieldTypes[i]
         }
-        return rvl.toString()
+
+        return keys.join(',')
     }
 
     final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
