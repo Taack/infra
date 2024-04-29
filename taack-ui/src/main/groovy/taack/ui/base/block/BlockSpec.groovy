@@ -23,6 +23,7 @@ final class BlockSpec {
     final BlockActionSpec blockActionSpec
     final String filterTableId
 
+    int counter = 0
     String id
     String currentBlockId
 
@@ -94,6 +95,7 @@ final class BlockSpec {
         if (displayElement()) blockVisitor.visitBlockTabs(width)
         closure.delegate = this
         closure.call()
+        counter ++
         if (displayElement()) blockVisitor.visitBlockTabsEnd()
     }
 
@@ -107,6 +109,7 @@ final class BlockSpec {
         if (displayElement()) blockVisitor.visitBlockTab(i18n)
         closure.delegate = this
         closure.call()
+        counter ++
         if (displayElement()) blockVisitor.visitBlockTabEnd()
     }
 
@@ -120,6 +123,7 @@ final class BlockSpec {
         if (displayElement()) blockVisitor.anonymousBlock(width)
         closure.delegate = this
         closure.call()
+        counter ++
         if (displayElement()) blockVisitor.anonymousBlockEnd()
     }
 
@@ -138,6 +142,7 @@ final class BlockSpec {
             if (visitAjax) blockVisitor.visitAjaxBlock(id)
             closure.delegate = this
             closure.call()
+            counter ++
             if (visitAjax) blockVisitor.visitAjaxBlockEnd()
         }
         displayElement("_-DoNotDisplayAnything-_")
@@ -153,6 +158,7 @@ final class BlockSpec {
         if (firstPass && displayElement()) blockVisitor.visitModal()
         closure.delegate = this
         closure.call()
+        counter ++
         if (firstPass && displayElement()) blockVisitor.visitModalEnd()
     }
 
@@ -172,6 +178,7 @@ final class BlockSpec {
                 blockVisitor.visitActionStart()
                 closure.delegate = blockActionSpec
                 closure.call()
+                counter ++
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitFormEnd(formSpecifier)
@@ -195,6 +202,7 @@ final class BlockSpec {
                 blockVisitor.visitActionStart()
                 closure.delegate = blockActionSpec
                 closure.call()
+                counter ++
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitShowEnd(showSpecifier)
@@ -229,6 +237,7 @@ final class BlockSpec {
                 blockVisitor.visitActionStart()
                 closure.delegate = blockActionSpec
                 closure.call()
+                counter ++
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitTableEnd(tableSpecifier)
@@ -253,15 +262,19 @@ final class BlockSpec {
                      final String i18nTable, final UiTableSpecifier tableSpecifier,
                      final Width width,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        if (displayElement()) {
+        if (displayElement("table$counter")) {
+            id = "table$counter"
+            blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTableFilter(id, i18nFilter, filterSpecifier, i18nTable, width)
             if (closure) {
                 blockVisitor.visitActionStart()
                 closure.delegate = blockActionSpec
                 closure.call()
+                counter ++
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitTableFilterEnd(tableSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
         }
     }
 
@@ -277,14 +290,18 @@ final class BlockSpec {
     void chart(final String i18n, final UiChartSpecifier chartSpecifier, final Width width = Width.MAX,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
         if (displayElement()) {
+            id = "chart${counter}"
+            blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitChart(i18n, width)
             if (closure) {
                 blockVisitor.visitActionStart()
                 closure.delegate = blockActionSpec
                 closure.call()
+                counter ++
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitChartEnd(chartSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
         }
     }
 
@@ -372,6 +389,7 @@ final class BlockSpec {
             blockVisitor.visitCloseModalAndUpdateBlock()
             closure.delegate = this
             closure.call()
+            counter ++
             blockVisitor.visitCloseModalAndUpdateBlockEnd()
         }
     }

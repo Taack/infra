@@ -97,6 +97,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return String that contains the HTML snippet
      */
     String visit(final UiBlockSpecifier blockSpecifier, final boolean isAjaxRendering = false) {
+
         ByteArrayOutputStream blockStream = new ByteArrayOutputStream()
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(blockStream, new Parameter(isAjaxRendering, LocaleContextHolder.locale, messageSource))
 
@@ -148,8 +149,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null) {
-        def recordState = decodeCookie(params['recordState'] as String) as Map<String, Map>
-        params['recordStateDecoded'] = recordState
+        Map recordState = decodeCookie(params['recordState'] as String) as Map<String, Map>
+        if (recordState && !recordState.empty) params['recordStateDecoded'] = recordState
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
@@ -158,6 +159,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 language = LocaleContextHolder.locale.language.split("_")[0]?.toUpperCase()?.replace("ZH", "CN") as Language
             } catch (ignored) {
             }
+
             return new ModelAndView("/taackUi/block", [block   : visit(block),
                                                        menu    : visitMenu(menu),
                                                        conf    : taackUiPluginConfiguration,

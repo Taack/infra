@@ -38,14 +38,16 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlock() {
-        if (!parameter.isAjaxRendering || isModal)
+        if (!parameter.isAjaxRendering || isModal) {
             out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.map['controller']}-${parameter.map['action']}'>"
+        }
     }
 
     @Override
     void visitBlockEnd() {
-        if (!parameter.isAjaxRendering || isModal)
+        if (!parameter.isAjaxRendering || isModal) {
             out << "</div>"
+        }
     }
 
     @Override
@@ -162,6 +164,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitTableFilter(final String id, final String i18nFilter,
                           final UiFilterSpecifier filterSpecifier, final String i18nTable, final BlockSpec.Width width) {
+
         def recordStateForId = parameter.map['recordStateDecoded']?[id] as Map
         if (recordStateForId) {
             parameter.map.putAll(recordStateForId)
