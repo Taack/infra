@@ -199,7 +199,9 @@ final class BlockSpec {
      */
     void show(final String i18n, final UiShowSpecifier showSpecifier, final Width width,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        if (displayElement()) {
+        if (displayElement("show$counter")) {
+            id = "show$counter"
+            blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitShow(i18n, width)
             if (closure) {
                 blockVisitor.visitActionStart()
@@ -209,6 +211,7 @@ final class BlockSpec {
                 blockVisitor.visitActionEnd()
             }
             blockVisitor.visitShowEnd(showSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
         }
     }
 
