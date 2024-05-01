@@ -1,9 +1,9 @@
-# 3.9
+# 0.3.9
 
 - ~~Grails 6.2.0~~
 - ~~Cleaner deps~~
 
-# 4.0
+# 0.4.0
 
 - ~~Improve Table / Filter~~
   - ~~add `loop` (a `for` merged with `list`)~~
@@ -13,12 +13,13 @@
 - ~~Remove isAjax parameter~~
 - ~~rowLink~~ and buttons without i18n
 - ~~remove rowField direct value (to force ability to mask results)~~
-- Avoid ajaxBlock when possible
-- optional form i18n params
-- optional formAction i18n
+- ~~Avoid ajaxBlock when possible~~
+- ~~optional form i18n params~~
+- ~~optional formAction i18n~~
 
-# 4.1
+# 0.4.1
 
+- Fix file path when updating. The same way than for O2M
 - Improve restore state
 - AsciidoctorJ
   - remove external kotlin code transpiled
@@ -34,14 +35,14 @@
 - Secured Solr Search
 - More Secured TQL
 
-# 4.2
+# 0.4.2
 
 - PoC PDF forms ...
 - Improve Table / Filter
   - add top level `condition` (`if`, branch on 2 closures)
     - Test, debug, offline capabilities
 
-# 4.3
+# 0.4.3
 
 - Allow dynamic graphs for Web only
   - manage picking, hover
