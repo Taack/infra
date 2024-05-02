@@ -16,24 +16,9 @@
     color: #000099;
 }
 
-/*html * {
-    margin: 0;
-}*/
-
-h1, h2, h3, h4, h5, h6 {
-    line-height: 1.1;
-}
-
 a {
     color: #49759b;
     text-decoration: none;
-}
-
-h1 {
-    color: #48802c;
-    font-weight: normal;
-    font-size: 1.25em;
-    margin: 0.8em 0 0.3em 0;
 }
 
 .taackTable {

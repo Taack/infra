@@ -290,7 +290,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         final StringBuffer css = new StringBuffer()
         final listCss = [
                 'pure-min.css',
-                'taack.css',
+                //'taack.css',
                 'taack-pdf.css',
                 'custom-pdf.css'
         ]
