@@ -324,7 +324,16 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param brutHtml
      * @return
      */
-    final def downloadPdf(final UiPrintableSpecifier printableSpecifier, final String fileName, final Boolean isHtml = false, final String brutHtml = null) {
+    final def downloadPdf(final UiPrintableSpecifier printableSpecifier, final String fileNamePrefix, final Boolean isHtml = false) {
+        Calendar cal = Calendar.getInstance()
+        int y = cal.get(Calendar.YEAR)
+        int m = cal.get(Calendar.MONTH)
+        int dm = cal.get(Calendar.DAY_OF_MONTH)
+        int hd = cal.get(Calendar.HOUR_OF_DAY)
+        int mn = cal.get(Calendar.MINUTE)
+        int sec = cal.get(Calendar.SECOND)
+        String date = "$y$m$dm$hd$mn$sec"
+        String fileName = fileNamePrefix + "-${date}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
         webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=\"${fileName}${isHtml ? ".html" : ""}\"")
