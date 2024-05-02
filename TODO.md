@@ -19,6 +19,10 @@
 
 # 0.4.1
 
+- Move supported Language into menus
+- Merge search menu, icon menu, and language Menu
+- More DSL level for tables
+- Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL
 - fiw style for tableRow, add class list
 - Fix file path when updating. The same way than for O2M
 - Improve restore state
