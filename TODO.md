@@ -19,6 +19,7 @@
 
 # 0.4.1
 
+- fiw style for tableRow, add class list
 - Fix file path when updating. The same way than for O2M
 - Improve restore state
 - AsciidoctorJ
