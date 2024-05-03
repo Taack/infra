@@ -646,29 +646,5 @@ enum Country {
     String getId() {
         this.name()
     }
-}
-
-enum Language {
-    FR("fr", "fr", "French", Locale.FRENCH),
-    EN("en", "en", "US/English", Locale.US),
-    DE("de", "de", "German", Locale.GERMAN),
-    ES("es", "es", "Spanish"),
-    RU("ru", "ru", "Russian"),
-    CN("cn", "cn", "Chinese")
-
-    Language(String codeLanguage, String iso2, String labeling, Locale locale = null) {
-        this.codeLanguage = codeLanguage
-        this.iso2 = iso2
-        this.labeling = labeling
-        this.locale = locale
-    }
-    final String codeLanguage
-    final String iso2
-    final String labeling
-    final Locale locale
-
-    String getAsset() {
-        "/assets/icons/countries/${iso2}.webp"
-    }
 
 }

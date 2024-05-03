@@ -70,7 +70,7 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption selectedOption, IEnumOption defaultOption) {
+    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption defaultOption) {
 
     }
 

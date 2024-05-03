@@ -140,14 +140,18 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption selectedOption, IEnumOption defaultOption) {
+    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption defaultOption) {
 
-        if (selectedOption) {
+        String selectedOptionKey = parameter.params[enumOptions.paramKey]
+
+        if (selectedOptionKey) {
+            IEnumOption option = enumOptions.options.find { it.key == selectedOptionKey }
+            String selectedOptionValue = option ? option.value : selectedOptionKey
             out << """\
-            <li class="nav-item" taackOptionKey="${selectedOption.key}" taackOptionParamKey="${enumOptions.paramKey}">
+            <li class="nav-item" taackOptionKey="${selectedOptionKey}" taackOptionParamKey="${enumOptions.paramKey}">
                 <a class="nav-link dropdown-toggle show" id="navbarLang" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
-                    <img src="${selectedOption.asset}" width="20">
-                    ${selectedOption.value}
+                    <img src="${option.asset}" width="20">
+                    ${selectedOptionValue}
                 </a>
             </li>
             """.stripIndent()

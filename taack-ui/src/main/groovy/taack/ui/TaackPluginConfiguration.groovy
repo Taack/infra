@@ -2,7 +2,6 @@ package taack.ui
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.ui.config.Language
 
 /**
  * Taack Plugin configuration holder.
@@ -63,16 +62,14 @@ final class TaackPluginConfiguration {
     final String name
     final String imageResource
     final String mainControllerName
-    final List<Language> supportedLanguage
     final IPluginRole pluginRole
     final ITaackLinkClass linkClass
     final boolean hideIcon
 
-    TaackPluginConfiguration(String name, String imageResource, String mainControllerName, List<Language> supportedLanguage, IPluginRole pluginRole, ITaackLinkClass linkClass = null, Boolean hideIcon = false) {
+    TaackPluginConfiguration(String name, String imageResource, String mainControllerName, IPluginRole pluginRole, ITaackLinkClass linkClass = null, Boolean hideIcon = false) {
         this.name = name
         this.imageResource = imageResource
         this.mainControllerName = mainControllerName
-        this.supportedLanguage = supportedLanguage
         this.pluginRole = pluginRole
         this.linkClass = linkClass
         this.hideIcon = hideIcon

@@ -20,7 +20,6 @@ import org.springframework.web.servlet.ModelAndView
 import taack.ui.TaackUiConfiguration
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec
-import taack.ui.config.Language
 import taack.ui.dump.*
 import taack.ui.mail.dump.RawHtmlMailDump
 import taack.ui.pdf.dump.RawHtmlPrintableDump
@@ -154,16 +153,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
-            Language language = Language.EN
-            try {
-                language = LocaleContextHolder.locale.language.split("_")[0]?.toUpperCase()?.replace("ZH", "CN") as Language
-            } catch (ignored) {
-            }
 
             return new ModelAndView("/taackUi/block", [block   : visit(block),
                                                        menu    : visitMenu(menu),
                                                        conf    : taackUiPluginConfiguration,
-                                                       language: language])
+                                                       ])
         }
     }
 
