@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ast.type.WidgetKind
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
@@ -122,7 +122,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         out << """<a class="taackShowAction" ${isAjax ? "taackShowActionLink" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""
     }
 
-    private static String inputField(final String qualifiedName, final FieldInfo field, final EnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
+    private static String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
         final String showClass = 'taackShowInput'
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
@@ -136,7 +136,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
                     <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">
                     """
         } else if (eos) {
-            EnumOption[] enumConstraints = eos
+            IEnumOption[] enumConstraints = eos
             result.append """
                 <div class="center-flex pure-u-1">
                 <select $ajax name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} class="${showClass}" >

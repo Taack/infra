@@ -2,7 +2,7 @@ package taack.ui.base.filter
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
 
 @CompileStatic
@@ -21,11 +21,11 @@ class SectionSpec {
         filterVisitor.visitFilterFieldExpressionBool(i18n, defaultValue, filterExpressions)
     }
 
-    void filterField(final String i18n, final EnumOption[] enumOptions, final FieldInfo... fields) {
+    void filterField(final String i18n, final IEnumOption[] enumOptions, final FieldInfo... fields) {
         filterVisitor.visitFilterField(i18n, enumOptions, fields)
     }
 
-    void filterField(final EnumOption[] enumOptions, final FieldInfo... fields) {
+    void filterField(final IEnumOption[] enumOptions, final FieldInfo... fields) {
         filterVisitor.visitFilterField(null, enumOptions, fields)
     }
 

@@ -4,23 +4,25 @@
 package taack.ui.config
 
 import groovy.transform.CompileStatic
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 
 @CompileStatic
 final enum Continent {
-    AF(30_065_000, 1_216_130_000),
-    AN(13_209_000, 1_500),
-    AS(44_579_000, 4_436_224_000),
-    EU(9_938_000, 738_849_000),
-    NA(24_256_000, 410_013_492),
-    OC(7_687_000, 39_901_000),
-    SA(17_819_000, 410_013_492)
+    AF('Africa', 30_065_000, 1_216_130_000),
+    AN('Antarctica', 13_209_000, 1_500),
+    AS('Asia', 44_579_000, 4_436_224_000),
+    EU('Europe', 9_938_000, 738_849_000),
+    NA('North America', 24_256_000, 410_013_492),
+    OC('Oceania', 7_687_000, 39_901_000),
+    SA('South America', 17_819_000, 410_013_492)
 
-    Continent(final int areaKm2, final long population) {
+    Continent(final String name, final int areaKm2, final long population) {
+        this.name = name
         this.areaKm2 = areaKm2
         this.population = population
     }
 
+    final String name
     final int areaKm2
     final long population
 }
@@ -582,12 +584,57 @@ enum Country {
         return locale.getDisplayCountry(new Locale(lang, this.alphaIso2))
     }
 
-    static EnumOption[] getEnumOptions() {
-        EnumOption[] res = new EnumOption[values().size()]
+    static IEnumOption[] getEnumOptions() {
+        IEnumOption[] res = new IEnumOption[values().size() + Continent.values().size()]
         int i = 0
-        for (def option in values()) {
-            res[i++] = new EnumOption(option.alphaIso2, option.name)
+
+        for (def c in Continent.values()) {
+            res[i++] = new IEnumOption() {
+                @Override
+                String getKey() {
+                    return c.toString()
+                }
+
+                @Override
+                String getValue() {
+                    return c.name
+                }
+
+                @Override
+                String getAsset() {
+                    return null
+                }
+
+                @Override
+                Boolean isSection() {
+                    return true
+                }
+            }
+            for (def country in values().findAll { it.continent == c }.sort({ it.name })) {
+                res[i++] = new IEnumOption() {
+                    @Override
+                    String getKey() {
+                        return country.alphaIso2
+                    }
+
+                    @Override
+                    String getValue() {
+                        return country.name
+                    }
+
+                    @Override
+                    String getAsset() {
+                        return "taack/icons/countries/4x3/${country.alphaIso2.toLowerCase()}.webp"
+                    }
+
+                    @Override
+                    Boolean isSection() {
+                        return false
+                    }
+                }
+            }
         }
+
         return res
     }
 

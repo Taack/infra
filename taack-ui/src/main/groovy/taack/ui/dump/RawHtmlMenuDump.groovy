@@ -3,7 +3,8 @@ package taack.ui.dump
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.helper.Utils
 import taack.ui.base.menu.IUiMenuVisitor
@@ -114,13 +115,13 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuSelect(String paramName, EnumOption[] enumOptions, Map<String, ?> params) {
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
         String valueSelected = params[paramName]
-        EnumOption enumSelected = enumOptions.find { it.key == valueSelected }
+        IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
         String controller = params['controller'] as String
         String action = params['action'] as String
         visitMenu(enumSelected.value, controller, action, params)
-        for (def eo in enumOptions) {
+        for (def eo in enumOptions.getOptions()) {
             params.put(paramName, eo.key)
             visitSubMenu(eo.value, controller, action, params)
         }
@@ -136,5 +137,56 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
                 </div>
             </form>
         """
+    }
+
+    @Override
+    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption selectedOption, IEnumOption defaultOption) {
+
+        if (selectedOption) {
+            out << """\
+            <li class="nav-item" taackOptionKey="${selectedOption.key}" taackOptionParamKey="${enumOptions.paramKey}">
+                <a class="nav-link dropdown-toggle show" id="navbarLang" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
+                    <img src="${selectedOption.asset}" width="20">
+                    ${selectedOption.value}
+                </a>
+            </li>
+            """.stripIndent()
+        }
+
+        out << """\
+        <li class="nav-item dropdown">
+            <ul class="dropdown-menu" aria-labelledby="navbarLang">
+        """.stripIndent()
+
+        String controller = parameter.params['controller'] as String
+        String action = parameter.params['action'] as String
+
+        for (IEnumOption option in enumOptions.options) {
+            parameter.params.put(enumOptions.paramKey, option.key)
+            if (option.section) {
+                out << """\
+                    <li class="nav-item">
+                        <a class='taackAjaxMenuLink pure-menu-link' style="color: #887700">
+                            <asset:image src="${option.asset}" width="20"/>
+                            <b>${option.value}</b>
+                        </g:link>
+                    </li>
+                """.stripIndent()
+
+            } else {
+                out << """\
+                    <li class="nav-item">
+                        <a class='taackAjaxMenuLink pure-menu-link' ajaxAction='${parameter.urlMapped(controller, action, parameter.params, true)}' }>
+                            <asset:image src="${option.asset}" width="20"/>
+                            ${option.value}
+                        </g:link>
+                    </li>
+                """.stripIndent()
+            }
+        }
+        out << """\\     
+            </ul>
+        </li>
+        """.stripIndent()
     }
 }

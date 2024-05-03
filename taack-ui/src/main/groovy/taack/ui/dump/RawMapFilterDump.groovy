@@ -3,7 +3,7 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 import taack.ui.base.filter.UiFilterVisitorImpl
 
 @CompileStatic
@@ -24,7 +24,7 @@ final class RawMapFilterDump extends UiFilterVisitorImpl {
         fieldInfoList*.fieldName.join('.')
     }
 
-    private filterField(final String qualifiedName, final FieldInfo fieldInfo = null, final EnumOption[] enumOptions = null) {
+    private filterField(final String qualifiedName, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final boolean isBoolean = fieldInfo?.fieldConstraint?.field?.type == Boolean
         final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
         if (!qualifiedName || fieldInfo?.value?.toString() == null) return
@@ -42,7 +42,7 @@ final class RawMapFilterDump extends UiFilterVisitorImpl {
     }
 
     @Override
-    void visitFilterField(String i18n, EnumOption[] enumOptions, FieldInfo[] fields) {
+    void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo[] fields) {
         final String qualifiedName = getQualifiedName(fields)
         filterField(qualifiedName, fields?.last(), enumOptions)
     }

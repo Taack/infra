@@ -13,7 +13,7 @@ final class TaackPluginService {
 
     List<TaackPlugin> taackPlugins = []
 
-    static EnumOption[] enumOptions
+    static IEnumOption[] enumOptions
 
     @PostConstruct
     void init() {
@@ -44,13 +44,34 @@ final class TaackPluginService {
         taackPlugins.find { it.getTaackPluginControllerConfigurations().name.contains(name) }
     }
 
-    private EnumOption[] buildEnumOptions() {
+    private IEnumOption[] buildEnumOptions() {
         def controllers = taackPlugins.taackPluginControllerConfigurations.flatten() as List<TaackPluginConfiguration>
         def shownControllers = controllers.findAll { it.hideIcon == false }
-        EnumOption[] ret = new EnumOption[shownControllers.size()]
+        IEnumOption[] ret = new IEnumOption[shownControllers.size()]
         int i = 0
         for (def c in shownControllers) {
-            ret[i++] = new EnumOption(c.mainControllerName, c.name)
+            ret[i++] = new IEnumOption() {
+                @Override
+                String getKey() {
+                    return null
+                }
+
+                @Override
+                String getValue() {
+                    return null
+                }
+
+                @Override
+                String getAsset() {
+                    return null
+                }
+
+                @Override
+                Boolean isSection() {
+                    return null
+                }
+            }
+            //EnumOption(c.mainControllerName, c.name)
         }
         ret
     }

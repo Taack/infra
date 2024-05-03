@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
 
@@ -100,7 +100,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         out << '</div></fieldset></div>'
     }
 
-    private String inputField(final String qualifiedName, final FieldInfo field, final EnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
+    private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
         final boolean isListOrSet = Collection.isAssignableFrom(type)
@@ -113,7 +113,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">
                     """
         } else if (eos) {
-            EnumOption[] enumConstraints = eos
+            IEnumOption[] enumConstraints = eos
             result.append """
                 <div class="pure-u-1">
                 <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
@@ -205,7 +205,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormField(final String i18n, final FieldInfo field, final EnumOption[] eos = null, NumberFormat numberFormat = null) {
+    void visitFormField(final String i18n, final FieldInfo field, final IEnumOption[] eos = null, NumberFormat numberFormat = null) {
         final String trI18n = i18n ?: parameter.trField(field)
 
         if (field.fieldConstraint.constraints) {
@@ -296,14 +296,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, EnumOption[] enumOptions, FieldInfo[] fieldInfos) {
+    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, IEnumOption[] enumOptions, FieldInfo[] fieldInfos) {
         final String trI18n = i18n ?: parameter.trField(field)
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
         formAjaxFieldLabel(trI18n, qualifiedName)
 
-        EnumOption[] enumConstraints = enumOptions
+        IEnumOption[] enumConstraints = enumOptions
         out << """
                 <div class="pure-u-1">
                 ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.nextElementSibling.value='';">"""}

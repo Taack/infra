@@ -315,6 +315,16 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         html
     }
 
+    static final String getDateFileName() {
+        Calendar cal = Calendar.getInstance()
+        int y = cal.get(Calendar.YEAR)
+        int m = cal.get(Calendar.MONTH)
+        int dm = cal.get(Calendar.DAY_OF_MONTH)
+        int hd = cal.get(Calendar.HOUR_OF_DAY)
+        int mn = cal.get(Calendar.MINUTE)
+        int sec = cal.get(Calendar.SECOND)
+        "$y$m$dm$hd$mn$sec"
+    }
     /**
      * Allow to upload the PDF to the client browser
      * 
@@ -325,15 +335,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final def downloadPdf(final UiPrintableSpecifier printableSpecifier, final String fileNamePrefix, final Boolean isHtml = false) {
-        Calendar cal = Calendar.getInstance()
-        int y = cal.get(Calendar.YEAR)
-        int m = cal.get(Calendar.MONTH)
-        int dm = cal.get(Calendar.DAY_OF_MONTH)
-        int hd = cal.get(Calendar.HOUR_OF_DAY)
-        int mn = cal.get(Calendar.MINUTE)
-        int sec = cal.get(Calendar.SECOND)
-        String date = "$y$m$dm$hd$mn$sec"
-        String fileName = fileNamePrefix + "-${date}.pdf"
+        String fileName = fileNamePrefix + "-${dateFileName}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
         webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=\"${fileName}${isHtml ? ".html" : ""}\"")

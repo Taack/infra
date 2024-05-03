@@ -3,7 +3,8 @@ package taack.ui.base.menu
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.base.common.ActionIcon
 
 @CompileStatic
@@ -59,7 +60,7 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuSelect(String paramName = null, EnumOption[] enumOptions, Map<String, ?> params = null) {
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
 
     }
 
@@ -67,4 +68,10 @@ class UiMenuVisitor implements IUiMenuVisitor {
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
 
     }
+
+    @Override
+    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption selectedOption, IEnumOption defaultOption) {
+
+    }
+
 }

@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 import taack.ui.base.filter.IUiFilterVisitor
 import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.helper.Utils
@@ -79,13 +79,13 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         out << htmlTheme.filterSectionFooter()
     }
 
-    private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final EnumOption[] enumOptions = null) {
+    private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final boolean isBoolean = fieldInfo?.fieldConstraint?.field?.type == Boolean
         final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
         final String qualifiedId = qualifiedName + "-" + parameter.modalId
         out << htmlTheme.filterFieldHeader(i18n, qualifiedId, (!isBoolean))
         if (enumOptions) {
-            EnumOption[] enumConstraints = enumOptions
+            IEnumOption[] enumConstraints = enumOptions
 
             out << htmlTheme.selectHeader()
             out << """
@@ -138,7 +138,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterField(String i18n, EnumOption[] enumOptions, FieldInfo[] fields) {
+    void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo[] fields) {
         final String qualifiedName = getQualifiedName(fields)
         filterField(i18n ?: parameter.trField(fields), qualifiedName, parameter.map[qualifiedName]?.toString(), fields?.last(), enumOptions)
     }

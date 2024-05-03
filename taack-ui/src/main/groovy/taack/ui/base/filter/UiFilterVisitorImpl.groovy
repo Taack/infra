@@ -3,7 +3,7 @@ package taack.ui.base.filter
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
 
 @CompileStatic
@@ -59,7 +59,7 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterField(String i18n, EnumOption[] enumOptions, FieldInfo... fields) {
+    void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo... fields) {
 
     }
 }

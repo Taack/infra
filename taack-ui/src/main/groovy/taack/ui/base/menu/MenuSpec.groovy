@@ -5,7 +5,8 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.render.TaackUiEnablerService
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.helper.Utils
 
@@ -60,12 +61,16 @@ final class MenuSpec {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(i18n, icon, Utils.getControllerName(action), action.method.toString(), params, isModal)
     }
 
-    void menuSelect(String paramName, EnumOption[] selects, GrailsParameterMap params = null) {
+    void menuSelect(String paramName, IEnumOptions selects, GrailsParameterMap params = null) {
         menuVisitor.visitMenuSelect(paramName, selects, params as Map)
     }
 
     void menuSearch(final MethodClosure action, String q) {
         menuVisitor.visitMenuSearch action, q, null
+    }
+
+    void menuOptions(IEnumOptions options, IEnumOption selectedOption, IEnumOption defaultOption) {
+        menuVisitor.visitMenuOptions(options, selectedOption, defaultOption)
     }
 
     void section(final String i18n, final MenuPosition position = MenuPosition.TOP_LEFT,

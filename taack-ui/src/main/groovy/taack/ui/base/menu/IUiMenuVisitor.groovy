@@ -1,8 +1,10 @@
 package taack.ui.base.menu
 
+
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
-import taack.ui.EnumOption
+import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.base.common.ActionIcon
 
 interface IUiMenuVisitor {
@@ -27,7 +29,8 @@ interface IUiMenuVisitor {
 
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ? extends Object> params, final boolean isModal)
 
-    void visitMenuSelect(String paramName, EnumOption[] enumOptions, Map<String, ?> params)
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params)
 
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses)
-}
+
+    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption selectedOption, IEnumOption defaultOption)}
