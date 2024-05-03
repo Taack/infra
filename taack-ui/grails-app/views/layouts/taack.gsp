@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="${(language as String)?.toLowerCase()}">
+<html lang="${lang}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
@@ -61,7 +61,6 @@
                 ${raw(menu)}
             </ul>
             <ul class="navbar-nav flex-row ml-md-auto ">
-                <taack:displayTaackMenu language="${language}" id="${id}" params="${params}"/>
                 <g:if test="${conf.hasMenuLogin}">
                     <sec:ifLoggedIn>
                         <sec:ifSwitched>
