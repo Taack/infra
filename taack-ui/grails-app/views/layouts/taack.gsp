@@ -57,9 +57,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                ${raw(menu)}
-            </ul>
+            ${raw(menu)}
             <ul class="navbar-nav flex-row ml-md-auto ">
                 <g:if test="${conf.hasMenuLogin}">
                     <sec:ifLoggedIn>

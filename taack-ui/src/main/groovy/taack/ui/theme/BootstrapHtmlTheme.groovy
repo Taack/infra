@@ -240,7 +240,7 @@ final class BootstrapHtmlTheme implements IHtmlTheme {
         }
         """
         <div class="filter buttons text-center">
-        <button type="submit" formaction="/${parameter.originController}/${parameter.originAction}" onclick="document.querySelector('[name=offset]').remove();" class="taackFilterAction w-75 btn btn-sm btn-success mb-2" name="filter" id="filter" value="Filter">Filter</button>
+        <button type="submit" formaction="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" onclick="document.querySelector('[name=offset]').remove();" class="taackFilterAction w-75 btn btn-sm btn-success mb-2" name="filter" id="filter" value="Filter">Filter</button>
         ${ab}
         <button type="reset" value="Reset" class="w-75 btn btn-sm btn-warning">Reset</button>
         </div>

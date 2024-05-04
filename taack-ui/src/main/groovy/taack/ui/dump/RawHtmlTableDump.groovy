@@ -50,10 +50,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitTableWithoutFilter() {
         out << """
-                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.originController}/${parameter.originAction}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter taackTableFilter" taackFilterId="${blockId}">
-                    <input type="hidden" name="sort" value="${parameter.map["sort"] ?: ''}">
-                    <input type="hidden" name="order" value="${parameter.map["order"] ?: ''}">
-                    <input type="hidden" name="grouping" value="${parameter.map["grouping"] ?: ''}">
+                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter taackTableFilter" taackFilterId="${blockId}">
+                    <input type="hidden" name="sort" value="${parameter.applicationTagLib.params['sort'] ?: ''}">
+                    <input type="hidden" name="order" value="${parameter.applicationTagLib.params['order'] ?: ''}">
+                    <input type="hidden" name="grouping" value="${parameter.applicationTagLib.params['grouping'] ?: ''}">
                     <input type="hidden" name="offset" value="${parameter.offset ?: '0'}">
                     <input type="hidden" name="max" value="${parameter.max ?: '20'}">
                     ${parameter.beanId ? '<input type="hidden" name="id" value=' + parameter.beanId + '>' : ''}
@@ -286,8 +286,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
         fieldHeader()
         params ?= [:]
-        if (parameter.map.containsKey('recordState')) {
-            params.put('recordState', parameter.map['recordState'])
+        if (parameter.applicationTagLib.params.containsKey('recordState')) {
+            params.put('recordState', parameter.applicationTagLib.params['recordState'])
         }
         if (isAjax) {
             out << """

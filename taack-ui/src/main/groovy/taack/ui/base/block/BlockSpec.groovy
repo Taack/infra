@@ -30,7 +30,7 @@ final class BlockSpec {
     BlockSpec(final IUiBlockVisitor blockVisitor) {
         this.blockVisitor = blockVisitor
         this.blockActionSpec = new BlockActionSpec(blockVisitor)
-        this.filterTableId = blockVisitor.parameterMap["filterTableId"]
+        this.filterTableId = blockVisitor.parameterMap['filterTableId']
     }
 
     private final boolean displayElement(final String id = null) {

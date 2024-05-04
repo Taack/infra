@@ -31,15 +31,12 @@ final class Parameter implements WebAttributes {
     final Integer offset
     final Integer max
     final String brand
-    final String originController
-    final String originAction
     final Long additionalId
     final Long beanId
     final Boolean isAjaxRendering
     final String fieldName
     final Long modalId = System.currentTimeMillis()
     final NumberFormat nf
-    final GrailsParameterMap map
     final MessageSource messageSource
     final Locale lcl
     final boolean testI18n
@@ -48,7 +45,6 @@ final class Parameter implements WebAttributes {
     String aClassSimpleName
 
     Parameter(final Boolean isAjaxRendering = false, final Locale lcl = null, MessageSource messageSource = null) {
-        this.map = params
         this.messageSource = messageSource
         this.sort = params.get(P_SORT) ?: null
         this.order = params.get(P_ORDER) ?: null
@@ -57,8 +53,6 @@ final class Parameter implements WebAttributes {
         this.additionalId = params.long(P_ADDITIONAL_ID) ?: null
         this.beanId = params.long(P_ID) ?: null
         this.brand = params.get(P_BRAND) ?: null
-        this.originController = params.get(P_ORIGINAL_CONT) ?: controllerName ?: null
-        this.originAction = params.get(P_ORIGINAL_ACTION) ?: actionName ?: null
         this.fieldName = params.get(P_FIELD_NAME) ?: null
         this.isAjaxRendering = isAjaxRendering
         this.lcl = lcl

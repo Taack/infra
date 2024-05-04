@@ -39,7 +39,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.map['controller']}-${parameter.map['action']}'>"
+            out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
         }
     }
 
@@ -146,9 +146,9 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitTable(final String id, final String i18n, final BlockSpec.Width width) {
         this.id = id
-        def recordStateForId = parameter.map['recordStateDecoded']?[id] as Map
+        def recordStateForId = parameter.applicationTagLib.params['recordStateDecoded']?[id] as Map
         if (recordStateForId) {
-            parameter.map.putAll(recordStateForId)
+            parameter.applicationTagLib.params.putAll(recordStateForId)
         }
         visitInnerBlock(null, width)
         visitInnerBlock(i18n, BlockSpec.Width.MAX)
@@ -166,9 +166,9 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitTableFilter(final String id, final String i18nFilter,
                           final UiFilterSpecifier filterSpecifier, final String i18nTable, final BlockSpec.Width width) {
 
-        def recordStateForId = parameter.map['recordStateDecoded']?[id] as Map
+        def recordStateForId = parameter.applicationTagLib.params['recordStateDecoded']?[id] as Map
         if (recordStateForId) {
-            parameter.map.putAll(recordStateForId)
+            parameter.applicationTagLib.params.putAll(recordStateForId)
         }
         visitInnerBlock(null, width)
         visitInnerBlock(i18nFilter, BlockSpec.Width.QUARTER)
@@ -356,7 +356,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     Map getParameterMap() {
-        parameter.map
+        parameter.applicationTagLib.params
     }
 
 }

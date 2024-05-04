@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
@@ -15,8 +16,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     final private ByteArrayOutputStream out
     final private String modalId
     final Parameter parameter
-
-    private int menuLevel = 0
+    boolean splitted = false
 
     RawHtmlMenuDump(final ByteArrayOutputStream out, final String modalId, final Parameter parameter) {
         this.out = out
@@ -26,13 +26,26 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
-//        out << htmlTheme.menuStartHeader()
-//        menuMode
+        out << """<ul class="navbar-nav me-auto mb-2 mb-lg-0">"""
     }
 
     @Override
     void visitMenuStartEnd() {
-//        out << htmlTheme.menuStartFooter()
+        splitMenuStop()
+        out << """</ul>"""
+    }
+
+    private void splitMenuStart() {
+        if (!splitted) {
+            splitted = true
+            out << """</ul><ul class="navbar-nav flex-row ml-md-auto ">"""
+        }
+    }
+
+    private void splitMenuStop() {
+        if (splitted) {
+            out <<"</ul>"
+        }
     }
 
     @Override
@@ -98,18 +111,19 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
+        splitMenuStart()
         if (isModal)
             out << """
-                 <li class='pure-menu-item' style='float: right;'>
-                    <a class='taackAjaxMenuLink pure-menu-link' ajaxAction='${parameter.urlMapped(controller, action, params, true)}' }>
+                 <li class='pure-menu-item'>
+                    <a class='taackAjaxMenuLink pure-menu-link' style="padding: .5em .5em;" ajaxAction='${parameter.urlMapped(controller, action, params, true)}'>
                         ${actionIcon.getHtml(i18n, 24)}
                     </a>
                  </li>
             """
         else
             out << """
-                <li class="pure-menu-item" style='float: right;'>
-                    <a class="pure-menu-link" href="${parameter.urlMapped(controller, action, params)}">${actionIcon.getHtml(i18n, 24)}</a>
+                <li class="pure-menu-item">
+                    <a class="pure-menu-link" style="padding: .5em .5em;" href="${parameter.urlMapped(controller, action, params)}">${actionIcon.getHtml(i18n, 24)}</a>
                 </li>
             """
     }
@@ -130,6 +144,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
+        splitMenuStart()
         out << """
             <form class="solrSearch-input" action="${parameter.urlMapped(Utils.getControllerName(action), action.method)}">
                 <div class="input-group rounded">
@@ -140,55 +155,56 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption defaultOption) {
-
+    void visitMenuOptions(IEnumOptions enumOptions) {
+        splitMenuStart()
         String selectedOptionKey = parameter.params[enumOptions.paramKey]
 
-        if (selectedOptionKey) {
-            IEnumOption option = enumOptions.options.find { it.key == selectedOptionKey }
-            String selectedOptionValue = option ? option.value : selectedOptionKey
-            out << """\
-            <li class="nav-item" taackOptionKey="${selectedOptionKey}" taackOptionParamKey="${enumOptions.paramKey}">
-                <a class="nav-link dropdown-toggle show" id="navbarLang" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
-                    <img src="${option.asset}" width="20">
-                    ${selectedOptionValue}
-                </a>
-            </li>
-            """.stripIndent()
-        }
+        IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey } ?: enumOptions) : enumOptions
+        String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
+        String current = """\
+            <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ${parameter.applicationTagLib.img(src: currentOption.asset, width: "20")}
+                ${selectedOptionValue}
+            </a>
+        """.stripIndent()
 
         out << """\
         <li class="nav-item dropdown">
-            <ul class="dropdown-menu" aria-labelledby="navbarLang">
+            $current
+            <ul class="dropdown-menu" aria-labelledby="navbar${enumOptions.paramKey.capitalize()}">
         """.stripIndent()
 
         String controller = parameter.params['controller'] as String
         String action = parameter.params['action'] as String
 
-        for (IEnumOption option in enumOptions.options) {
+        final IEnumOption[] options = enumOptions.options
+        final int im = options.size()
+
+        int i = 0
+        for (i; i < im;) {
+            IEnumOption option = options[i++]
             parameter.params.put(enumOptions.paramKey, option.key)
             if (option.section) {
                 out << """\
-                    <li class="nav-item">
-                        <a class='taackAjaxMenuLink pure-menu-link' style="color: #887700">
-                            <asset:image src="${option.asset}" width="20"/>
+                    <li class="nav-item dropdown">
+                        <a class="taackAjaxMenuLink pure-menu-link" style="color: #887700">
+                            ${parameter.applicationTagLib.img(src: option.asset, width: 20, style: "padding: .5em 0em;")}
                             <b>${option.value}</b>
-                        </g:link>
+                        </a>
                     </li>
                 """.stripIndent()
-
             } else {
                 out << """\
-                    <li class="nav-item">
-                        <a class='taackAjaxMenuLink pure-menu-link' ajaxAction='${parameter.urlMapped(controller, action, parameter.params, true)}' }>
-                            <asset:image src="${option.asset}" width="20"/>
+                    <li class="nav-item dropdown">
+                        <a class='taackAjaxMenuLink pure-menu-link' href='${parameter.urlMapped(controller, action, parameter.params, false)}'>
+                            ${parameter.applicationTagLib.img(src: option.asset, width: 20, style: "padding: .5em 0em;")}
                             ${option.value}
-                        </g:link>
+                        </a>
                     </li>
                 """.stripIndent()
             }
         }
-        out << """\\     
+        out << """\
             </ul>
         </li>
         """.stripIndent()

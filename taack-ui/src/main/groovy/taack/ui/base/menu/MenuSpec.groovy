@@ -69,8 +69,8 @@ final class MenuSpec {
         menuVisitor.visitMenuSearch action, q, null
     }
 
-    void menuOptions(IEnumOptions options, IEnumOption defaultOption = null) {
-        menuVisitor.visitMenuOptions(options, defaultOption)
+    void menuOptions(IEnumOptions options) {
+        menuVisitor.visitMenuOptions(options)
     }
 
     void section(final String i18n, final MenuPosition position = MenuPosition.TOP_LEFT,

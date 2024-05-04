@@ -23,7 +23,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
-        this.testI18n = parameter.map['lang'] == 'test'
+        this.testI18n = parameter.applicationTagLib.params['lang'] == 'test'
     }
 
     static String getQualifiedName(final FieldInfo fieldInfo) {
@@ -93,7 +93,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
                 <option value="">-${i18n}-</option>
                 """
             enumConstraints.each {
-                out << """<option value="${it.key}" ${parameter.map[qualifiedName]?.toString()?.equals(it.key) || fieldInfo?.value?.toString()?.equals(it.key) ? 'selected="selected"' : ''}>${it.value}</option>"""
+                out << """<option value="${it.key}" ${parameter.applicationTagLib.params[qualifiedName]?.toString()?.equals(it.key) || fieldInfo?.value?.toString()?.equals(it.key) ? 'selected="selected"' : ''}>${it.value}</option>"""
             }
             out << '</select>'
             out << htmlTheme.selectFooter()
@@ -108,13 +108,13 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
             def values = type.invokeMethod('values', null) as List
             values.each {
-                out << """<option value="${it}" ${parameter.map[qualifiedName]?.toString()?.equals(it.toString()) || fieldInfo?.value?.toString()?.equals(it.toString()) ? 'selected="selected"' : ''}>${it}</option>"""
+                out << """<option value="${it}" ${parameter.applicationTagLib.params[qualifiedName]?.toString()?.equals(it.toString()) || fieldInfo?.value?.toString()?.equals(it.toString()) ? 'selected="selected"' : ''}>${it}</option>"""
             }
             out << '</select>'
             out << htmlTheme.selectFooter()
         } else if (isBoolean) {
-            Boolean isChecked = parameter.map[qualifiedName + 'Default'] ?
-                    ((parameter.map[qualifiedName] && parameter.map[qualifiedName] == '1') ? true : (parameter.map[qualifiedName] && parameter.map[qualifiedName] == '0') ? false : null) : fieldInfo.value
+            Boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ?
+                    ((parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '1') ? true : (parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '0') ? false : null) : fieldInfo.value
             out << htmlTheme.radioHeader()
             out << """
                 <div class="${htmlTheme.getRadioDivCssTheme()}">
@@ -140,13 +140,13 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo[] fields) {
         final String qualifiedName = getQualifiedName(fields)
-        filterField(i18n ?: parameter.trField(fields), qualifiedName, parameter.map[qualifiedName]?.toString(), fields?.last(), enumOptions)
+        filterField(i18n ?: parameter.trField(fields), qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString(), fields?.last(), enumOptions)
     }
 
     @Override
     void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
         final String qualifiedName = getQualifiedName(reverseClass, reverseField, fields)
-        filterField(i18n, qualifiedName, parameter.map[qualifiedName]?.toString())
+        filterField(i18n, qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString())
     }
 
     @Override
@@ -159,7 +159,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         final String qualifiedId = qualifiedName + '-' + parameter.modalId
         out << htmlTheme.expressionBoolLabel(qualifiedName, i18n)
-        boolean isChecked = parameter.map[qualifiedName + 'Default'] ? parameter.map[qualifiedName] == '1' : defaultValue
+        boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
         out << """
                 ${htmlTheme.expressionBoolHeader()}
                     <input type="checkbox" name="${qualifiedName}" value="1" id="${qualifiedId}Check" ${isChecked ? 'checked=""' : ''} class="${htmlTheme.getCheckboxCssTheme()}">

@@ -151,6 +151,6 @@ class RawHtmlMailDump extends UiBlockVisitor {
 
     @Override
     Map getParameterMap() {
-        parameter.map
+        parameter.applicationTagLib.params
     }
 }

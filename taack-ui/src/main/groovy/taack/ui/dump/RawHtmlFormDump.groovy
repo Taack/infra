@@ -68,8 +68,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 <form method="post" enctype="multipart/form-data" class="pure-form pure-form-stacked forms taackForm">
                     <input name="id" type="hidden" value="${id}"/>
                     <input name="className" type="hidden" value="${aObject.class.name ?: ''}"/>
-                    <input name="originController" type="hidden" value="${parameter.originController}"/>
-                    <input name="originAction" type="hidden" value="${parameter.originAction}"/>
+                    <input name="originController" type="hidden" value="${parameter.applicationTagLib.controllerName}"/>
+                    <input name="originAction" type="hidden" value="${parameter.applicationTagLib.actionName}"/>
                     <input name="originBrand" type="hidden" value="${parameter.brand}"/>
                     <div class="pure-g">
                 """

@@ -1,6 +1,5 @@
 package taack.render
 
-
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
@@ -465,4 +464,5 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ]
         html
     }
+
 }

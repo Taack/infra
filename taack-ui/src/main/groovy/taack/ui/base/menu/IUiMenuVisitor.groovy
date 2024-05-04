@@ -33,4 +33,4 @@ interface IUiMenuVisitor {
 
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses)
 
-    void visitMenuOptions(IEnumOptions enumOptions, IEnumOption defaultOption)}
+    void visitMenuOptions(IEnumOptions enumOptions)}

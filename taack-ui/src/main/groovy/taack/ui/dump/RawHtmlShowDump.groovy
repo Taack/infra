@@ -220,7 +220,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
             if (field.fieldConstraint.widget == WidgetKind.AJAX.name) {
                 widget = """
                 <img class="close" src="/assets/delete.png" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">
-                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24" autocomplete="off" id="${qualifiedName}${parameter.modalId}" inputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" onclick="openAutocompleteSelect(this, 'ajaxBlock${parameter.modalId}Modal', '${parameter.originController}', '${field.fieldConstraint.field.declaringClass.name}', '${qualifiedName}');"/>
+                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24" autocomplete="off" id="${qualifiedName}${parameter.modalId}" inputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" onclick="openAutocompleteSelect(this, 'ajaxBlock${parameter.modalId}Modal', '${parameter.applicationTagLib.controllerName}', '${field.fieldConstraint.field.declaringClass.name}', '${qualifiedName}');"/>
                 <input value="${field.value ? field.value["id"] : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>
             """
             } else {
