@@ -100,7 +100,7 @@ final class TaackJdbcService {
         }
 
         static final Map<Class<? extends GormEntity>, FieldInfo[]> getFieldInfoMap() {
-            fieldInfoMap
+            TaackJdbcService.fieldInfoMap
         }
     }
 
