@@ -19,6 +19,7 @@
 
 # 0.4.1
 
+- Solr indexField auto-labeling
 - Move supported Language into menus
 - Merge search menu, icon menu, and language Menu
 - More DSL level for tables
