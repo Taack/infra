@@ -26,6 +26,7 @@
 - ~~fix style for tableRow, add class list~~
 - Fix file path when updating. The same way as for O2M
 - Improve restore state
+- Test mac runtime and devel cold auto-restart
 
 # 0.4.2
 
