@@ -19,13 +19,29 @@
 
 # 0.4.1
 
-- Move supported Language into menus
-- Merge search menu, icon menu, and language Menu
-- More DSL level for tables
-- Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL
-- fiw style for tableRow, add class list
-- Fix file path when updating. The same way than for O2M
+- ~~Move supported Language into menus~~
+- ~~Merge search menu, icon menu, and language Menu~~
+- _~~More DSL level for tables~~_ (not needed)
+- ~~Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL~~
+- ~~fix style for tableRow, add class list~~
+- Fix file path when updating. The same way as for O2M
 - Improve restore state
+
+# 0.4.2
+
+- Fix table grouping / trees with paginate
+- Modern Graph DSL (groupBy, sortBy)
+  - timeSeries
+  - areaChart
+  - boxPot
+  - bubbleChart
+  - calendar
+  - gantt
+  - countries
+  - webGl charts
+- Attachment renderer
+  - WebGL STEP via FreeCAD
+  - QCad / libreCAD 2D Drawing
 - AsciidoctorJ
   - remove external kotlin code transpiled
   - support offline plugins
@@ -39,9 +55,6 @@
   - Why not JFreeCharts ? NO... but why ??
 - Secured Solr Search
 - More Secured TQL
-
-# 0.4.2
-
 - PoC PDF forms ...
 - Improve Table / Filter
   - add top level `condition` (`if`, branch on 2 closures)
