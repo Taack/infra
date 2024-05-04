@@ -38,7 +38,7 @@ class TableRowLink(private val parent: TableRow, private val a: HTMLAnchorElemen
             trace("TableRowLink::onclick: Load End")
             val text = xhr.responseText
             trace("|$text|")
-            if (text.contains(Regex(".{0,4}<html"))) {
+            if (!text.startsWith("__")) {
                 trace("AUO response identified like full page ...")
                 window.document.write(text)
                 window.history.pushState("", "Intranet ", action)
