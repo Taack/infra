@@ -1,7 +1,11 @@
 package taack.ui.base
 
 import kotlinx.browser.window
+import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.asList
+import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.url.URL
+import org.w3c.files.Blob
 import taack.ui.base.element.Block
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
@@ -135,7 +139,6 @@ class Helper {
                         else block.modal.open(text.substring(29))
 
                     } else if (text.substring(29) == rel) {
-                        println("RELOAD")
                         window.location.href = Block.href ?: ""
                     }
                 }
@@ -166,7 +169,14 @@ class Helper {
 //                    }
                 }
             }
-
         }
+
+        fun saveOrOpenBlob(blob: Blob, fileName: String) {
+            var a = window.document.createElement("a") as HTMLAnchorElement
+            a.href = URL.createObjectURL(blob)
+            a.download = fileName
+            a.dispatchEvent(MouseEvent("click"))
+        }
+
     }
 }

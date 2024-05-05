@@ -30,35 +30,6 @@ class ShowAjaxInput(private val parent: Show, private val i: HTMLInputElement) :
         i.addEventListener("change", { e -> onclick(e) })
     }
 
-//
-//    private fun processAjaxLink(text: String) {
-//        val abs = "__ajaxBlockStart__"
-//        val m = "closeLastModal:"
-//
-//        when {
-//            text.startsWith(m) -> {
-//                val pos = text.indexOf(':', m.length)
-//                val id = text.substring(m.length, pos)
-//                val value = text.substring(pos + 1)
-//                trace("ShowAjaxInput::closing Modal")
-//                parent.parent.parent.modal.close()
-//            }
-//            text.startsWith(abs) -> {
-//                mapAjaxText(text).map {
-//                    println("AUO321 ${it.key}:${it.key.substring(abs.length)}")
-//                    println("AUO322 ${parent.parent.parent.ajaxBlockElements}")
-//                    val target = parent.parent.parent.ajaxBlockElements?.get(it.key)
-//                    target!!.d.innerHTML = it.value
-//                    target.refresh()
-//                }
-//            }
-//            else -> {
-//                trace("ShowAjaxInput::opening Modal")
-//                parent.parent.parent.modal.open(text)
-//            }
-//        }
-//    }
-
     private fun onclick(e: Event) {
         e.preventDefault()
         trace("ShowAjaxInput::onclick")

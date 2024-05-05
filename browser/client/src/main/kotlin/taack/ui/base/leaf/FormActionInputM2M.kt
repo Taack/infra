@@ -48,14 +48,12 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         val additionalParams = mutableMapOf<String, String>()
         i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
             val v = parent.f[it]
-            println("AUO3 onClick, v: $v, it: $it")
             if (v is HTMLSelectElement) {
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
 //                    ajaxParams.append("ajaxParams.$it=${v.value}&")
             }
             if (v is HTMLInputElement) {
-                println("AUO31 v.value = ${v.value}")
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
 //                    ajaxParams.append("ajaxParams.$it=${v.value}&")

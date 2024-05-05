@@ -1,0 +1,1 @@
+* remove `XMLHttpRequest` for `window.fetch` code style

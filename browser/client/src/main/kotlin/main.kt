@@ -10,8 +10,6 @@ fun main() {
     } else {
         Block.href = window.location.href
     }
-    println("main+++ ${Block.href}")
     RecordState.restoreClientState()
-    val blocks = Block.getSiblingBlock(null)
-    println("main--- ${Block.href}")
+    Block.getSiblingBlock(null)
 }

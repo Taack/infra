@@ -95,7 +95,6 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     }
 
     private fun collapse() {
-        println(r.innerHTML)
         isExpended = false
         var collapse = false
         var rg = rowGroup!! + 1
