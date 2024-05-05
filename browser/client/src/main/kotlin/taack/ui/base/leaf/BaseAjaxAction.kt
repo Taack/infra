@@ -5,9 +5,13 @@ import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.url.URL
+import org.w3c.files.Blob
+import org.w3c.xhr.BLOB
 import org.w3c.xhr.XMLHttpRequest
+import org.w3c.xhr.XMLHttpRequestResponseType
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.processAjaxLink
+import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.record.RecordState
@@ -41,13 +45,21 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement)
         xhr.onloadend = { ev: Event ->
             ev.preventDefault()
             trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, responseType: '${xhr.responseType}'")
-            val text = xhr.responseText
-            if (text.contains(Regex(".{0,4}<html"))) {
-                trace("AUO response identified like full page ...")
-                window.document.write(text)
-                window.history.pushState("", "Intranet ", action)
+            if (action?.contains("downloadBin") == true) {
+//                xhr.responseType = XMLHttpRequestResponseType.BLOB
+//                var contentDispo = xhr.getResponseHeader("Content-Disposition");
+//                var fileName = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
+//
+//                saveOrOpenBlob(xhr.response as Blob, )
             } else {
-                processAjaxLink(text, parent)
+                val text = xhr.responseText
+                if (text.contains(Regex(".{0,4}<html"))) {
+                    trace("AUO response identified like full page ...")
+                    window.document.write(text)
+                    window.history.pushState("", "Intranet ", action)
+                } else {
+                    processAjaxLink(text, parent)
+                }
             }
         }
         if (action != null) {

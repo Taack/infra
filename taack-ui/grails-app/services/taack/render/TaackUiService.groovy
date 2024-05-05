@@ -3,6 +3,7 @@ package taack.render
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
+import grails.io.IOUtils
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
@@ -157,11 +158,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
-            return new ModelAndView("/taackUi/block", [block   : visit(block),
-                                                       menu    : visitMenu(menu),
-                                                       conf    : taackUiPluginConfiguration,
+            return new ModelAndView("/taackUi/block", [block       : visit(block),
+                                                       menu        : visitMenu(menu),
+                                                       conf        : taackUiPluginConfiguration,
                                                        clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
-                                                       ])
+            ])
         }
     }
 
@@ -309,7 +310,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 headerHeight: htmlPdf.headerHeight
         ]
 
-        if (outputStream) taackPdfConverterFromHtmlService.generatePdfFromHtml(outputStream, html)
+        if (outputStream)
+            taackPdfConverterFromHtmlService.generatePdfFromHtml(outputStream, html)
         html
     }
 
@@ -325,7 +327,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
     /**
      * Allow to upload the PDF to the client browser
-     * 
+     *
      * @param printableSpecifier PDF descriptor
      * @param fileName
      * @param isHtml
@@ -342,6 +344,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         try {
             webUtils.currentResponse.outputStream.flush()
             webUtils.currentResponse.outputStream.close()
+            webRequest.renderView = false
         } catch (e) {
             log.error "${e.message}"
         }
