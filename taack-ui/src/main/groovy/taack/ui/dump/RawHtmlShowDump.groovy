@@ -119,7 +119,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         i18n ?= parameter.trField(controller, action)
         additionalParams ?= [:]
         additionalParams['isAjax'] = isAjax
-        out << """<a class="taackShowAction" ${isAjax ? "taackShowActionLink" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""
+        out << """<a class="taackShowAction" ${isAjax ? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""
     }
 
     private static String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
@@ -261,7 +261,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (isAjax) {
             out << """
                      <div class='icon'>
-                        <a class='ajaxLink taackShowAction' taackShowActionLink='${parameter.urlMapped(controller, action, id, additionalParams)}'>
+                        <a class='ajaxLink taackShowAction' ajaxAction='${parameter.urlMapped(controller, action, id, additionalParams)}'>
                             ${actionIcon.getHtml(i18n)}
                         </a>
                      </div>

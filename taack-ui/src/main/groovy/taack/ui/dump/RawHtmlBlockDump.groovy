@@ -128,7 +128,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitCloseModalAndUpdateBlock() {
-        out << "closeLastModalAndUpdateBlock:"
+        out << "__closeLastModalAndUpdateBlock__:"
     }
 
     @Override
@@ -226,7 +226,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitCloseModal(final String id, final String value, FieldInfo[] fields = null) {
-        out << "closeLastModal:${id?:""}:${value?:""}"
+        out << "__closeLastModal__:${id?:""}:${value?:""}"
         for (FieldInfo fi : fields) {
             if (fi.value) {
                 if (parameter.nf && fi.value instanceof Number) out << ":__FieldInfo__:${fi.fieldName}:${parameter.nf.format(fi.value)}:__FieldInfoEnd__"
@@ -337,21 +337,11 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitModal() {
         isModal = true
-//        out << """
-//          <a class="close">&times;</a>
-//        """
     }
 
     @Override
     void visitModalEnd() {
         isModal = false
-//        out << """
-//            <div id="ajaxBlock${parameter.modalId}Modal" class="modal">
-//                <div class="modal-content">
-//
-//                </div>
-//            </div>
-//        """
     }
 
     @Override
