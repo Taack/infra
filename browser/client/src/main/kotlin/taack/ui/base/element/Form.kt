@@ -44,4 +44,8 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             errorInput.d.innerHTML = ""
         }
     }
+
+    override fun getParentBlock(): Block {
+        return parent.getParentBlock()
+    }
 }

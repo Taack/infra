@@ -71,8 +71,8 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                     target!!.d.innerHTML = me.value
                     target.refresh()
                 }
-            } else if (it.startsWith("closeLastModal:")) {
-                val m = "closeLastModal:"
+            } else if (it.startsWith("__closeLastModal__:")) {
+                val m = "__closeLastModal__:"
                 val fi = ":__FieldInfo__:"
                 val fie = ":__FieldInfoEnd__"
                 val text = it
@@ -106,7 +106,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 if (parent.parent.parent.parent != null) parent.parent.parent.parent.close()
                 else parent.parent.parent.modal.close()
 
-            } else if (it.startsWith("closeLastModalAndUpdateBlock:")) {
+            } else if (it.startsWith("__closeLastModalAndUpdateBlock__:")) {
                 if (parent.parent.parent.parent != null) parent.parent.parent.parent.close()
                 else parent.parent.parent.modal.close()
                 val m = Helper.mapAjaxText(it.substring(29))

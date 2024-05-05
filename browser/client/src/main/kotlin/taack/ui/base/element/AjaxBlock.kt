@@ -122,4 +122,8 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         }
         Helper.traceDeIndent("AjaxBlock::refresh --- blockId: $blockId")
     }
+
+    override fun getParentBlock(): Block {
+        return parent
+    }
 }

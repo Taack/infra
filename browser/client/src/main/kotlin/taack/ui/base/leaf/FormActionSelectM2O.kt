@@ -35,28 +35,22 @@ class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectE
     private fun onClick(e: Event) {
         e.preventDefault()
         trace("FormActionInputM2O::onclick")
-//        val controller = sel.attributes.getNamedItem("taackAjaxFormM2OController")!!.value
         val action = sel.attributes.getNamedItem("taackAjaxFormM2OAction")!!.value
-//        val params = sel.attributes.getNamedItem("taackAjaxFormM2OParams")?.value
-//        val ajaxParams = StringBuilder()
         val additionalParams = mutableMapOf<String, String>()
         sel.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
             val v = parent.f[it]
             if (v is HTMLSelectElement) {
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
-//                    ajaxParams.append("ajaxParams.$it=${v.value}&")
             }
             if (v is HTMLInputElement) {
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
-//                    ajaxParams.append("ajaxParams.$it=${v.value}&")
             }
         }
         // TODO: change to Post (see FilterActionButton.kt)
-        val url = AjaxLink.createUrl(action, additionalParams)
+        val url = BaseAjaxAction.createUrl(action, additionalParams)
         window.fetch(url.toString(),
-//            "$action?isAjax=true&${params ?: ""}&${ajaxParams}",
             RequestInit(method = "GET")
         ).then {
             if (it.ok) {

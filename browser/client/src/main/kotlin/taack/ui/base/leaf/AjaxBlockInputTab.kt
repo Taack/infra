@@ -39,4 +39,8 @@ class AjaxBlockInputTab(val parent: Block, val i: HTMLInputElement) :
         }
         traceDeIndent("AjaxBlockInputTab::init --- id: ${i.id}")
     }
+
+    override fun getParentBlock(): Block {
+        return parent
+    }
 }

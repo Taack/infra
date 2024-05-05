@@ -1,4 +1,7 @@
 package taack.ui.base
 
-interface BaseElement: LeafElement {
+import taack.ui.base.element.Block
+
+interface BaseElement : LeafElement {
+    fun getParentBlock(): Block
 }

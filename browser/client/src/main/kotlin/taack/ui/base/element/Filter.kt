@@ -28,4 +28,8 @@ class Filter(val parent: AjaxBlock, val f: HTMLFormElement):
         actions = FilterActionButton.getSiblingFilterAction(this)
         Helper.traceDeIndent("Filter::init --- formName: $formName, filterId: $filterId")
     }
+
+    override fun getParentBlock(): Block {
+        return parent.getParentBlock()
+    }
 }

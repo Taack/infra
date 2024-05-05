@@ -43,4 +43,8 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
         paginate = TablePaginate.getSiblingTablePaginate(this)
         traceDeIndent("Table::init --- tableId: $tableId")
     }
+
+    override fun getParentBlock(): Block {
+        return parent.getParentBlock()
+    }
 }
