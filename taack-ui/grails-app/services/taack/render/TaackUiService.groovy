@@ -12,6 +12,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
@@ -60,6 +61,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     @Autowired
     PageRenderer g
+
+    @Value('${client.js.path}')
+    String clientJsPath
+
 
     @Autowired
     ResourceLocator assetResourceLocator
@@ -156,6 +161,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             return new ModelAndView("/taackUi/block", [block   : visit(block),
                                                        menu    : visitMenu(menu),
                                                        conf    : taackUiPluginConfiguration,
+                                                       clientJsPath: clientJsPath,
                                                        ])
         }
     }

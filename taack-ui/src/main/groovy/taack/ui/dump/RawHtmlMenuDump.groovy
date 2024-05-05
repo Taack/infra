@@ -166,7 +166,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
         String current = """\
             <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                ${parameter.applicationTagLib.img(src: currentOption.asset, width: "20")}
+                ${parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;")}
                 ${selectedOptionValue}
             </a>
         """.stripIndent()
@@ -190,8 +190,8 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
             if (option.section) {
                 out << """\
                     <li class="nav-item dropdown">
-                        <a class="taackAjaxMenuLink pure-menu-link" style="color: #887700">
-                            ${parameter.applicationTagLib.img(src: option.asset, width: 20, style: "padding: .5em 0em;")}
+                        <a class="pure-menu-link" style="color: #887700">
+                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
                             <b>${option.value}</b>
                         </a>
                     </li>
@@ -199,8 +199,8 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
             } else {
                 out << """\
                     <li class="nav-item dropdown">
-                        <a class='taackAjaxMenuLink pure-menu-link' href='${parameter.urlMapped(controller, action, parameter.params, false)}'>
-                            ${parameter.applicationTagLib.img(src: option.asset, width: 20, style: "padding: .5em 0em;")}
+                        <a class='pure-menu-link' href='${parameter.urlMapped(controller, action, parameter.params, false)}'>
+                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
                             ${option.value}
                         </a>
                     </li>
