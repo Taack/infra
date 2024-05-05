@@ -111,6 +111,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
+        i18n ?= parameter.trField(controller, action)
         splitMenuStart()
         if (isModal)
             out << """
@@ -123,7 +124,9 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
         else
             out << """
                 <li class="pure-menu-item">
-                    <a class="pure-menu-link" style="padding: .5em .5em;" href="${parameter.urlMapped(controller, action, params)}">${actionIcon.getHtml(i18n, 24)}</a>
+                    <a class="pure-menu-link" style="padding: .5em .5em;" href="${parameter.urlMapped(controller, action, params)}">
+                        ${actionIcon.getHtml(i18n, 24)}
+                    </a>
                 </li>
             """
     }

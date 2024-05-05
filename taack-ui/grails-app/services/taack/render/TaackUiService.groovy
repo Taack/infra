@@ -406,8 +406,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     /**
-     * Retrieve hidden field passed with {@link UiFilterSpecifier#ui(java.lang.Class, groovy.lang.Closure, taack.ast.type.FieldInf o [])}.
-     *
      * @param aClass
      * @return objectClass initialized
      */

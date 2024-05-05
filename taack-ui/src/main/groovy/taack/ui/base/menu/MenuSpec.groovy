@@ -53,12 +53,12 @@ final class MenuSpec {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenu(Utils.getControllerName(action), action.method.toString(), params)
     }
 
-    void menuIcon(final String i18n, final ActionIcon icon, final MethodClosure action, final boolean isModal) {
-        if (taackUiEnablerService.hasAccess(action)) menuVisitor.visitSubMenuIcon(i18n, icon, Utils.getControllerName(action), action.method.toString(), null, isModal)
+    void menuIcon(final ActionIcon icon, final MethodClosure action, Long id = null) {
+        if (taackUiEnablerService.hasAccess(action)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), [id: id], true)
     }
 
-    void menuIcon(final String i18n, final ActionIcon icon, final MethodClosure action, Map<String, ? extends Object> params = null, final boolean isModal = false) {
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(i18n, icon, Utils.getControllerName(action), action.method.toString(), params, isModal)
+    void menuIcon(final ActionIcon icon, final MethodClosure action, Map<String, ? extends Object> params) {
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
     }
 
     void menuSelect(String paramName, IEnumOptions selects, GrailsParameterMap params = null) {

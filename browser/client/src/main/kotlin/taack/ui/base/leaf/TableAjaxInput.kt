@@ -79,7 +79,7 @@ class TableAjaxInput(private val parent: TableRow, private val i: HTMLInputEleme
                 Promise.reject(Throwable())
             }
         }.then {
-            if (it.startsWith("<html")) {
+            if (!it.startsWith("__")) {
                 window.document.write(it)
                 window.history.pushState("", "Intranet ", "${f.action}?${ajaxParams ?: ""}")
                 Promise.resolve("Done ...")
