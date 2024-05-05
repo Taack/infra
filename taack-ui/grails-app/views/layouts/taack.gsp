@@ -97,7 +97,7 @@
 </nav>
 
 <g:layoutBody/>
-<g:if test="${clientJsPath}">
+<g:if test="${clientJsPath != null}">
     <script src="${clientJsPath}"></script>
     <asset:javascript src="application-taack-debug.js"/>
 </g:if>

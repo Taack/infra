@@ -157,11 +157,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
-
             return new ModelAndView("/taackUi/block", [block   : visit(block),
                                                        menu    : visitMenu(menu),
                                                        conf    : taackUiPluginConfiguration,
-                                                       clientJsPath: clientJsPath,
+                                                       clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
                                                        ])
         }
     }
