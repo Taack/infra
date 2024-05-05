@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.response.RangeFacet
 import org.apache.solr.common.SolrInputDocument
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.beans.factory.annotation.Autowired
 import taack.solr.SolrIndexerVisitor
 import taack.solr.SolrSearcherVisitor
@@ -27,6 +28,7 @@ import taack.ui.base.UiTableSpecifier
 import taack.ui.base.block.BlockSpec
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.IconStyle
+import taack.ui.dump.Parameter
 
 import javax.annotation.PostConstruct
 

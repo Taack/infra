@@ -20,7 +20,7 @@ class SolrIndexerVisitor implements ISolrIndexerVisitor {
     }
 
     @Override
-    void index(String i18n, SolrFieldType fieldType, String fieldPrefix, Object value, boolean faceted = true, float boost) {
+    void index(SolrFieldType fieldType, String fieldPrefix, Object value, boolean faceted = true, float boost) {
         document.addField(fieldPrefix + fieldType.suffix, value)
     }
 }

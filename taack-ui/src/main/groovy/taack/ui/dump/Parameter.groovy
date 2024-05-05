@@ -1,7 +1,6 @@
 package taack.ui.dump
 
 import grails.web.api.WebAttributes
-import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileStatic
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
@@ -22,8 +21,6 @@ final class Parameter implements WebAttributes {
     final static String P_MAX = 'max'
     final static String P_BRAND = 'brand'
     final static String P_ADDITIONAL_ID = 'additionalId'
-    final static String P_ORIGINAL_CONT = 'originController'
-    final static String P_ORIGINAL_ACTION = 'originAction'
     final static String P_FIELD_NAME = 'fieldName'
 
     final String sort
@@ -57,7 +54,7 @@ final class Parameter implements WebAttributes {
         this.isAjaxRendering = isAjaxRendering
         this.lcl = lcl
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
-        this.nf = NumberFormat.getInstance(lcl)
+        this.nf = lcl ? NumberFormat.getInstance(lcl) : null
         this.applicationTagLib = grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 
