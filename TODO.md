@@ -28,7 +28,7 @@
 - Fix file path when updating. The same way as for O2M, with preview
 - Improve restore state
 - Test mac runtime and devel cold auto-restart
-- Solr indexField auto-labeling
+- ~~Solr indexField auto-labeling~~
 
 # 0.4.2
 
