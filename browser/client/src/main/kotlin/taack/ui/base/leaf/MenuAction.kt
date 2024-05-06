@@ -4,6 +4,7 @@ import kotlinx.browser.document
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.Node
 import org.w3c.dom.asList
+import taack.ui.base.Helper
 import taack.ui.base.element.Block
 
 class MenuAction(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a) {
@@ -12,6 +13,7 @@ class MenuAction(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a
             val elements: List<Node>?
             elements = document.querySelectorAll("a.taackAjaxLink").asList()
             return elements.map {
+                Helper.trace("Create MenuAction")
                 MenuAction(p, it as HTMLAnchorElement)
             }
         }

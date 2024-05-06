@@ -19,7 +19,7 @@ import taack.ui.base.record.RecordState
 open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement) : LeafElement {
 
     companion object {
-        fun createUrl(action: String, additionalParams: Map<String, String>? = null) : URL {
+        fun createUrl(action: String, additionalParams: Map<String, String>? = null): URL {
             val url = URL(action, "${window.location.protocol}//${window.location.host}")
             url.searchParams.set("isAjax", "true")
             additionalParams?.forEach {
@@ -42,15 +42,23 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement)
         e.preventDefault()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
         val xhr = XMLHttpRequest()
+        if (action?.contains("downloadBin") == true) {
+            trace("Binary Action ... $action")
+            xhr.responseType = XMLHttpRequestResponseType.BLOB
+        }
         xhr.onloadend = { ev: Event ->
             ev.preventDefault()
-            trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, responseType: '${xhr.responseType}'")
-            if (action?.contains("downloadBin") == true) {
-//                xhr.responseType = XMLHttpRequestResponseType.BLOB
-//                var contentDispo = xhr.getResponseHeader("Content-Disposition");
-//                var fileName = contentDispo.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
-//
-//                saveOrOpenBlob(xhr.response as Blob, )
+            trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}'")
+            if (xhr.responseType == XMLHttpRequestResponseType.BLOB) {
+                val contentDispo = xhr.getResponseHeader("Content-Disposition")
+                if (contentDispo != null) {
+                    val fileName =
+                        Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
+                    if (fileName != null) {
+                        trace("saveOrOpenBlog $fileName")
+                        saveOrOpenBlob(xhr.response as Blob, fileName)
+                    }
+                }
             } else {
                 val text = xhr.responseText
                 if (text.contains(Regex(".{0,4}<html"))) {
