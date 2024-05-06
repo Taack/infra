@@ -1,4 +1,4 @@
-package taack.ui.mail.dump
+package taack.ui.dump.mail
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo

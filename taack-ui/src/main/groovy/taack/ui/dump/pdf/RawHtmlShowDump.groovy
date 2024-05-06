@@ -1,4 +1,4 @@
-package taack.ui.pdf.dump
+package taack.ui.dump.pdf
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo

@@ -18,13 +18,15 @@ interface IUiTableVisitor {
 
     void visitTableEnd()
 
-    void visitColumnEnd()
-
     void visitHeader()
 
     void visitHeaderEnd()
 
-    void visitRow(Object current, Style style, boolean hasChildren)
+    void visitColumn(Integer colSpan, Integer rowSpan)
+
+    void visitColumnEnd()
+
+    void visitRow(Style style, boolean hasChildren)
 
     void visitRowEnd()
 
@@ -34,27 +36,19 @@ interface IUiTableVisitor {
 
     void visitFieldHeader(FieldInfo[] fields)
 
-    void visitRowColumnEnd()
-
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style)
 
-    void visitRowField(FieldInfo fieldInfo, String format, final Style style, final String controller, final String action, final Long id)
+    void visitRowColumnEnd()
 
-    void visitRowField(GetMethodReturn fieldInfo, final Style style, final String controller, final String action, final Long id)
+    void visitRowField(FieldInfo fieldInfo, String format, final Style style)
 
-    void visitRowField(String value, final Style style, final String controller, final String action, final Long id)
+    void visitRowField(GetMethodReturn fieldInfo, String format, final Style style)
 
-    void visitRowField(Long value, final Style style, final String controller, final String action, final Long id)
-
-    void visitRowField(BigDecimal value, String format, final Style style, final String controller, final String action, final Long id)
-
-    void visitRowField(Date value, String format, final Style style, final String controller, final String action, final Long id)
+    void visitRowField(String value, final Style style)
 
     void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax)
 
     void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax)
-
-    void visitSortableFieldHeader(String i18n, String controller, String action, Map<String, ?> params, Map<String, ?> additionalParams)
 
     void visitRowIndent()
 
@@ -64,17 +58,11 @@ interface IUiTableVisitor {
 
     void visitGroupFieldHeader(String i18n, FieldInfo[] fields)
 
-    void visitRowGroupHeader(Object groups, MethodClosure show, Long id)
+    void visitRowGroupHeader(String label)
+
+    void visitRowGroupHeader(String groups, MethodClosure show, long id)
 
     void visitRowGroupFooter(String content)
-
-    void visitRowField(Map value, Style style, String controller, String action, Long id)
-
-    void visitRowField(EnumStyle value, Style style, String controller, String action, Long id)
-
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller, String action, Long id)
-
-    void visitColumn(Integer colSpan, Integer rowSpan)
 
     void visitFooterButton(String i18n, String controller, String action, Long id, Map<String, ?> additionalParams)
 

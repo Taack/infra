@@ -50,10 +50,12 @@ final class TableSpec {
      * Display a row that has the width of the table and contains group as label.
      *
      * @param label Label to display
-     * @param show Action that point to a show
-     * @param id The ID to pass to the show action
      */
-    void rowGroupHeader(def label, MethodClosure show = null, Long id = null) {
+    void rowGroupHeader(String label) {
+        tableVisitor.visitRowGroupHeader(label)
+    }
+
+    void rowGroupHeader(String label, MethodClosure show, long id) {
         tableVisitor.visitRowGroupHeader(label, show, id)
     }
 
@@ -73,8 +75,8 @@ final class TableSpec {
      * @param style
      * @param closure Contains columns
      */
-    void row(Object currentObject = null, final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
-        tableVisitor.visitRow(currentObject, style, false)
+    void row(final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
+        tableVisitor.visitRow(style, false)
         closure.delegate = new RowColumnSpec(tableVisitor)
         closure.call()
         tableVisitor.visitRowEnd()
@@ -87,7 +89,7 @@ final class TableSpec {
      * @param closure Contains columns
      */
     void rowTree(boolean hasChildren, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
-        tableVisitor.visitRow(null, null, hasChildren)
+        tableVisitor.visitRow(null, hasChildren)
         closure.delegate = new RowColumnSpec(tableVisitor)
         closure.call()
         tableVisitor.visitRowEnd()

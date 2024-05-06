@@ -3,7 +3,6 @@ package taack.render
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
-import grails.io.IOUtils
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
@@ -22,8 +21,8 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec
 import taack.ui.dump.*
-import taack.ui.mail.dump.RawHtmlMailDump
-import taack.ui.pdf.dump.RawHtmlPrintableDump
+import taack.ui.dump.mail.RawHtmlMailDump
+import taack.ui.dump.pdf.RawHtmlPrintableDump
 
 import javax.annotation.PostConstruct
 

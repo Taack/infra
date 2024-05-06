@@ -12,6 +12,7 @@ import java.text.NumberFormat
 
 @CompileStatic
 class UiTableVisitorImpl implements IUiTableVisitor {
+
     @Override
     void visitTable() {
 
@@ -28,11 +29,6 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitColumnEnd() {
-
-    }
-
-    @Override
     void visitHeader() {
 
     }
@@ -43,7 +39,17 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRow(Object current, Style style, boolean hasChildren) {
+    void visitColumn(Integer colSpan, Integer rowSpan) {
+
+    }
+
+    @Override
+    void visitColumnEnd() {
+
+    }
+
+    @Override
+    void visitRow(Style style, boolean hasChildren) {
 
     }
 
@@ -68,42 +74,27 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowColumnEnd() {
-
-    }
-
-    @Override
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
 
     }
 
     @Override
-    void visitRowField(FieldInfo fieldInfo, String format, Style style, String controller, String action, Long id) {
+    void visitRowColumnEnd() {
 
     }
 
     @Override
-    void visitRowField(GetMethodReturn fieldInfo, Style style, String controller, String action, Long id) {
+    void visitRowField(FieldInfo fieldInfo, String format, Style style) {
 
     }
 
     @Override
-    void visitRowField(String value, Style style, String controller, String action, Long id) {
+    void visitRowField(GetMethodReturn fieldInfo, String format, Style style) {
 
     }
 
     @Override
-    void visitRowField(Long value, Style style, String controller, String action, Long id) {
-
-    }
-
-    @Override
-    void visitRowField(BigDecimal value, String format, Style style, String controller, String action, Long id) {
-
-    }
-
-    @Override
-    void visitRowField(Date value, String format, Style style, String controller, String action, Long id) {
+    void visitRowField(String value, Style style) {
 
     }
 
@@ -113,7 +104,7 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitSortableFieldHeader(String i18n, String controller, String action, Map<String, ?> params, Map<String, ?> additionalParams) {
+    void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
 
     }
 
@@ -133,37 +124,22 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitGroupFieldHeader(String i18n, FieldInfo[] field) {
+    void visitGroupFieldHeader(String i18n, FieldInfo[] fields) {
 
     }
 
     @Override
-    void visitRowGroupHeader(Object groups, MethodClosure show, Long id) {
+    void visitRowGroupHeader(String label) {
+
+    }
+
+    @Override
+    void visitRowGroupHeader(String groups, MethodClosure show, long id) {
 
     }
 
     @Override
     void visitRowGroupFooter(String content) {
-
-    }
-
-    @Override
-    void visitRowField(Map value, Style style, String controller, String action, Long id) {
-
-    }
-
-    @Override
-    void visitRowField(EnumStyle value, Style style, String controller, String action, Long id) {
-
-    }
-
-    @Override
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller, String action, Long id) {
-
-    }
-
-    @Override
-    void visitColumn(Integer colSpan, Integer rowSpan) {
 
     }
 
@@ -176,10 +152,4 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     void visitPaginate(Number max, Number count) {
 
     }
-
-    @Override
-    void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
-
-    }
-
 }

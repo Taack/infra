@@ -23,16 +23,16 @@ class RowColumnFieldSpec {
         this.tableVisitor = tableVisitor
     }
 
-    void rowField(final String value, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(value, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
+    void rowField(final String value, final Style style = null) {
+        tableVisitor.visitRowField(value, style)
     }
 
-    void rowField(final FieldInfo field, final String format = null, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(field, format, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
+    void rowField(final FieldInfo field, final String format = null, final Style style = null) {
+        tableVisitor.visitRowField(field, format, style)
     }
 
-    void rowField(final GetMethodReturn field, final Style style = null, final MethodClosure action = null, final Long id = null) {
-        tableVisitor.visitRowField(field, style, action && taackUiEnablerService.hasAccess(action, id) ? Utils.getControllerName(action) : null, action?.method, id)
+    void rowField(final GetMethodReturn field, final String format = null, final Style style = null) {
+        tableVisitor.visitRowField(field, format, style)
     }
 
     void rowAction(final String i18n, final ActionIcon icon, final Long id, String label) {
