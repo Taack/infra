@@ -24,7 +24,8 @@
 - _~~More DSL level for tables~~_ (not needed)
 - ~~Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL~~
 - ~~fix style for tableRow, add class list~~
-- Fix file path when updating. The same way as for O2M
+- ~~Allow debugging Kotlin JS code~~ 
+- Fix file path when updating. The same way as for O2M, with preview
 - Improve restore state
 - Test mac runtime and devel cold auto-restart
 - Solr indexField auto-labeling
