@@ -32,6 +32,7 @@
 
 # 0.4.2
 
+- re-add href instead of ajaxAction, improve history when browsing, allow to see opened modals ...
 - Fix table grouping / trees with paginate
 - Modern Graph DSL (groupBy, sortBy)
   - timeSeries
