@@ -67,7 +67,7 @@ final class RenderingTable extends UiTableVisitorImpl {
     }
 
     @Override
-    void visitRow(Object current, Style style, boolean hasChildren) {
+    void visitRow(Style style, boolean hasChildren) {
         dm.gotoNextLine()
 
         currentLineSize = 0
@@ -82,22 +82,7 @@ final class RenderingTable extends UiTableVisitorImpl {
     }
 
     @Override
-    void visitRowField(String value, Style style, String controller, String action, Long id) {
-        drawCell(value.toString())
-    }
-
-    @Override
-    void visitRowField(Long value, Style style, String controller, String action, Long id) {
-        drawCell(value.toString(), false)
-    }
-
-    @Override
-    void visitRowField(BigDecimal value, String format, Style style, String controller, String action, Long id) {
-        drawCell(value.toString(), false)
-    }
-
-    @Override
-    void visitRowField(Date value, String format, Style style, String controller, String action, Long id) {
+    void visitRowField(String value, Style style) {
         drawCell(value.toString())
     }
 
@@ -106,10 +91,5 @@ final class RenderingTable extends UiTableVisitorImpl {
         dm.draw()
 //        dm.goTo(tablePos)
         dm.nav()
-    }
-
-    @Override
-    void visitRowField(BigDecimal value, NumberFormat numberFormat, Style style, String controller, String action, Long id) {
-        drawCell(value.toString(), false)
     }
 }

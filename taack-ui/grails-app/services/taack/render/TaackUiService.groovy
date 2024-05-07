@@ -21,8 +21,8 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec
 import taack.ui.dump.*
-import taack.ui.mail.dump.RawHtmlMailDump
-import taack.ui.pdf.dump.RawHtmlPrintableDump
+import taack.ui.dump.mail.RawHtmlMailDump
+import taack.ui.dump.pdf.RawHtmlPrintableDump
 
 import javax.annotation.PostConstruct
 
@@ -157,11 +157,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
-            return new ModelAndView("/taackUi/block", [block   : visit(block),
-                                                       menu    : visitMenu(menu),
-                                                       conf    : taackUiPluginConfiguration,
+            return new ModelAndView("/taackUi/block", [block       : visit(block),
+                                                       menu        : visitMenu(menu),
+                                                       conf        : taackUiPluginConfiguration,
                                                        clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
-                                                       ])
+            ])
         }
     }
 
@@ -309,7 +309,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 headerHeight: htmlPdf.headerHeight
         ]
 
-        if (outputStream) taackPdfConverterFromHtmlService.generatePdfFromHtml(outputStream, html)
+        if (outputStream)
+            taackPdfConverterFromHtmlService.generatePdfFromHtml(outputStream, html)
         html
     }
 
@@ -325,7 +326,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
     /**
      * Allow to upload the PDF to the client browser
-     * 
+     *
      * @param printableSpecifier PDF descriptor
      * @param fileName
      * @param isHtml
@@ -342,6 +343,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         try {
             webUtils.currentResponse.outputStream.flush()
             webUtils.currentResponse.outputStream.close()
+            webRequest.renderView = false
         } catch (e) {
             log.error "${e.message}"
         }

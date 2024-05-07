@@ -24,37 +24,20 @@
 - _~~More DSL level for tables~~_ (not needed)
 - ~~Keep some params ... (lang, subsidiary, stock, others ...) via menu DSL~~
 - ~~fix style for tableRow, add class list~~
-- Fix file path when updating. The same way as for O2M
-- Improve restore state
-- Test mac runtime and devel cold auto-restart
-- Solr indexField auto-labeling
+- ~~Allow debugging Kotlin JS code~~ 
+- ~~Test mac runtime and devel cold auto-restart~~
+- ~~Solr indexField auto-labeling~~
 
 # 0.4.2
 
+- Fix file path when updating. The same way as for O2M, with preview
+- Improve restore state
+- re-add href instead of ajaxAction, improve history when browsing, allow to see opened modals ...
 - Fix table grouping / trees with paginate
-- Modern Graph DSL (groupBy, sortBy)
-  - timeSeries
-  - areaChart
-  - boxPot
-  - bubbleChart
-  - calendar
-  - gantt
-  - countries
-  - webGl charts
 - Attachment renderer
   - WebGL STEP via FreeCAD
   - QCad / libreCAD 2D Drawing
-- AsciidoctorJ
-  - remove external kotlin code transpiled
-  - support offline plugins
-  - allow code on TQL like language
-- Remove PlantUML deps for Gantt / graphs
-  - Server side raster and SVG
-  - Low level first
 - Bump CSS, improve theming
-- Remove Chart.js
-  - Need server side rendering (simpler)
-  - Why not JFreeCharts ? NO... but why ??
 - Secured Solr Search
 - More Secured TQL
 - PoC PDF forms ...
@@ -64,6 +47,25 @@
 
 # 0.4.3
 
+- Modern Graph DSL (groupBy, sortBy)
+  - timeSeries
+  - areaChart
+  - boxPot
+  - bubbleChart
+  - calendar
+  - gantt
+  - countries
+  - webGl charts
+- Remove Chart.js
+  - Need server side rendering (simpler)
+  - Why not JFreeCharts ? NO... but why ??
+- AsciidoctorJ
+  - remove external kotlin code transpiled
+  - support offline plugins
+  - allow code on TQL like language
+- Remove PlantUML deps for Gantt / graphs
+  - Server side raster and SVG
+  - Low level first
 - Allow dynamic graphs for Web only
   - manage picking, hover
   - manage moving, freedom degrees, constraints ...

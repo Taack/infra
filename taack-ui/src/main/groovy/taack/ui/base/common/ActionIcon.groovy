@@ -1,6 +1,7 @@
 package taack.ui.base.common
 
 import groovy.transform.CompileStatic
+import org.apache.commons.lang.StringEscapeUtils
 
 @CompileStatic
 enum IconStyle {
@@ -82,7 +83,7 @@ class ActionIcon {
     String getHtml(final String title, final Integer width = 40) {
         boolean hasNextMult = src.contains("*")
         boolean hasNextAdd = src.contains("+")
-        if (!hasNextMult && !hasNextAdd) return "<img src='$src' title='$title' ${style?"style='${style.inlineStyle}'":" width='${width}'"}/>"
+        if (!hasNextMult && !hasNextAdd) return "<img src='$src' title='${StringEscapeUtils.escapeHtml(title)}' ${style?"style='${style.inlineStyle}'":" width='${width}'"}/>"
         StringBuffer res = new StringBuffer()
         res << """<span class="iconStack">"""
         String currentSrc

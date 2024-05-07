@@ -80,13 +80,14 @@ class Helper {
 
         val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
 
-        fun processAjaxLink(text: String, block: Block, process: CloseModalPostProcessing? = null) {
+        fun processAjaxLink(text: String, base: BaseElement, process: CloseModalPostProcessing? = null) {
             val abs = "__ajaxBlockStart__"
-            val m = "closeLastModal:"
-            val m2 = "closeLastModalAndUpdateBlock:"
+            val m = "__closeLastModal__:"
+            val m2 = "__closeLastModalAndUpdateBlock__:"
             val fi = ":__FieldInfo__:"
             val fie = ":__FieldInfoEnd__"
             val rel = "__reload__"
+            val block = base.getParentBlock()
             when {
                 text.contains(rel) -> {
                     window.location.href = (Block.href ?: "")// + "?recordState=${RecordState.dumpServerState()}"
@@ -134,7 +135,6 @@ class Helper {
                             target.refresh()
                         }
                     } else if (text[29] == '<') {
-//                        block.modal.open(text.substring(29))
                         if (block.parent != null) block.parent.open(text.substring(29))
                         else block.modal.open(text.substring(29))
 
@@ -157,21 +157,12 @@ class Helper {
                     block.modal.open(text)
                     val s = block.modal.innerModal.getElementsByTagName("script").asList()
                     trace("Executing $s")
-
-//                  See ajaxBlock ..
-//                    s.map {
-//                        trace("Evaluating ${it.innerHTML}")
-//                        eval(it.innerHTML)
-//                    }
-//
-//                    if (s != null) {
-//                        eval(s.innerHTML)
-//                    }
                 }
             }
         }
 
         fun saveOrOpenBlob(blob: Blob, fileName: String) {
+            trace("Helper::saveOrOpenBlob blob.size: ${blob.size}, fileName: ${fileName}")
             var a = window.document.createElement("a") as HTMLAnchorElement
             a.href = URL.createObjectURL(blob)
             a.download = fileName

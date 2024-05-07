@@ -2,7 +2,6 @@ package taack.ui.base.element
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.Location
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
@@ -52,6 +51,10 @@ class Block(val parent: Modal?, val d: HTMLDivElement):
         }
 
         traceDeIndent("Block::init --- ${d.id}")
+    }
+
+    override fun getParentBlock(): Block {
+        return this
     }
 
     override fun toString(): String {

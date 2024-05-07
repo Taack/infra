@@ -1,4 +1,4 @@
-package taack.ui.pdf.dump
+package taack.ui.dump.pdf
 
 import groovy.transform.CompileStatic
 import taack.ui.base.UiShowSpecifier
@@ -36,7 +36,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     @Override
     void visitTable(UiTableSpecifier tableSpecifier, final BlockSpec.Width width) {
         visitInnerBlock(width)
-        tableSpecifier.visitTable(new RawHtmlTableDump(id, out, parameter))
+        tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
         visitInnerBlockEnd()
     }
 

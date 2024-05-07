@@ -340,7 +340,13 @@ final class BlockSpec {
      */
     void custom(final String i18n, final String html, final Style style = null, final Width width = Width.MAX,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        if (displayElement()) blockVisitor.visitCustom(i18n, html, style, width)
+        if (displayElement("custom$counter")) {
+            id = "custom$counter"
+            blockVisitor.visitAjaxBlock(id)
+            blockVisitor.visitCustom(i18n, html, style, width)
+            counter ++
+            blockVisitor.visitAjaxBlockEnd()
+        }
     }
 
     /**
@@ -351,7 +357,13 @@ final class BlockSpec {
      * @param width
      */
     void custom(final String html, final Style style = null, final Width width = Width.MAX) {
-        if (displayElement()) blockVisitor.visitCustom(null, html, style, width)
+        if (displayElement("custom$counter")) {
+            id = "custom$counter"
+            blockVisitor.visitAjaxBlock(id)
+            blockVisitor.visitCustom(null, html, style, width)
+            counter ++
+            blockVisitor.visitAjaxBlockEnd()
+        }
     }
 
     /**

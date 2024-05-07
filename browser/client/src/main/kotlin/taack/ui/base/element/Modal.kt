@@ -8,11 +8,12 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.record.RecordState
 
-class Modal(val parent: Block): BaseElement {
+class Modal(val parent: Block) : BaseElement {
     companion object {
         fun buildModal(p: Block): Modal {
             return Modal(p)
         }
+
         var id: Int = 0
     }
 
@@ -21,6 +22,7 @@ class Modal(val parent: Block): BaseElement {
     val d3: HTMLDivElement
     val innerModal: HTMLDivElement
     val mId = id++
+
     init {
         trace("Modal::init $mId")
         d1 = document.createElement("div") as HTMLDivElement
@@ -34,7 +36,7 @@ class Modal(val parent: Block): BaseElement {
         val divA = document.createElement("div") as HTMLDivElement
         a.innerText = "X"
         a.addClass("close")
-        a.onclick = { e->
+        a.onclick = { e ->
             RecordState.clearServerState()
             close()
         }
@@ -60,6 +62,10 @@ class Modal(val parent: Block): BaseElement {
         d1.style.display = "none"
         d3.innerHTML = ""
 //        if (parent.parent != null) d1.remove()
+    }
+
+    override fun getParentBlock(): Block {
+        return parent
     }
 
     override fun toString(): String {

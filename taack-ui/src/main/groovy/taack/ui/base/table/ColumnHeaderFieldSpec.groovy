@@ -75,17 +75,4 @@ class ColumnHeaderFieldSpec {
         tableVisitor.visitSortableFieldHeader(i18n, fields)
     }
 
-    /**
-     *
-     * @param i18n
-     * @param controller
-     * @param action
-     * @param params
-     * @param additionalParams
-     */
-    void sortableFieldHeader(final String i18n, final String controller, final String action, final Map<String, ? extends Object> params,
-                             final Map<String, ? extends Object> additionalParams) {
-        tableVisitor.visitSortableFieldHeader(i18n, controller, action, params, additionalParams)
-    }
-
 }

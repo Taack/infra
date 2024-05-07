@@ -76,7 +76,6 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
         }.then {
             b?.disabled = false
             if (innerText != null) b?.innerText = innerText
-//            AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
         }
     }
 }

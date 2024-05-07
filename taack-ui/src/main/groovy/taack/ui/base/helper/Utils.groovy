@@ -52,10 +52,6 @@ final class Utils {
         additionalFields
     }
 
-    static String getAdditionalInputs(Object currentObject, final FieldInfo field = null, final List<String> toExcludes = [], final String formId = null) {
-        getAdditionalInputs getAdditionalFields(currentObject, field, toExcludes), formId
-    }
-
     static String getAdditionalInputs(Map<String, ? extends Object> p, final String formId = null) {
         if (p) p.collect { """<input ${formId ? "form='${formId}'" : ''} name="${it.key}" type="hidden" value="${it.value ?: ""}" autocomplete="off">""" }.join('\n')
         else ""

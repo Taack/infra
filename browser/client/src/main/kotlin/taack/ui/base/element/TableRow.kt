@@ -7,8 +7,6 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.TableRowLink
-import taack.ui.base.leaf.TableAjaxInput
-import taack.ui.base.leaf.TableRowButton
 
 class TableRow(val parent: Table, val r: HTMLTableRowElement) :
         BaseElement {
@@ -23,8 +21,6 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     }
 
     private val rowLink: List<TableRowLink>
-    private val rowButton: List<TableRowButton>
-    private val rowAjaxInput: List<TableAjaxInput>
     private val rowGroup: Int? = r.attributes.getNamedItem("taackTableRowGroup")?.value?.toInt()
     private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
     private var isExpended: Boolean = false
@@ -52,8 +48,6 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")
         rowLink = TableRowLink.getSiblingTableRowLink(this)
         innerButt.type = "button"
-        rowButton = TableRowButton.getSiblingTableRowButton(this)
-        rowAjaxInput = TableAjaxInput.getSiblingTableAjaxInput(this)
         if (rowGroup != null) {
             val firstCell = r.firstElementChild!! as HTMLTableCellElement
             firstCell.classList.add("firstCellInGroup")
@@ -118,5 +112,9 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
         if (isExpended) collapse()
         else expends()
         return false
+    }
+
+    override fun getParentBlock(): Block {
+        return parent.getParentBlock()
     }
 }
