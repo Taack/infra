@@ -32,6 +32,11 @@
     display: block;
 }
 
+.wysiwyg-locked .wysiwyg-content-span {
+    display: flex;
+    align-items: center;
+}
+
 .wysiwyg-action-menu {
     width: 90%;
     display: flex;
@@ -47,7 +52,10 @@
 }
 
 .wysiwyg-action-menu .main-group .sub-group {
-    display: inline-block;
+    display: flex;
+    flex-wrap: wrap-reverse;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
     border: 1px solid #cccccc;
     border-radius: 4px;
     padding: 3px;
@@ -68,6 +76,7 @@
     padding: 0 10px;
     border-radius: .25rem;
     height: 30px;
+    font-weight: bold;
 }
 
 .wysiwyg-action-button.wysiwyg-action-button-dropdown {
@@ -107,6 +116,32 @@
     margin: 0 4px;
 }
 
+.wysiwyg-dropdown-header {
+    display: block;
+    padding: 0 .5rem .25rem .5rem;
+    margin-bottom: 0;
+    font-size: 120%;
+    font-weight: bold;
+    color: #6c757d;
+    white-space: nowrap;
+    border-bottom: 1px solid #dddddf;
+}
+
+.wysiwyg-dropdown-confirm {
+    width: 20px;
+    float: right;
+    cursor: pointer;
+    margin-top: .25rem;
+}
+
+.wysiwyg-action-button-dropdown-divider {
+    display: block;
+    width: 95%;
+    height: 1px;
+    background: #33333336;
+    margin: .25rem auto;
+}
+
 .wysiwyg-content-source-code {
     height: 500px;
     vertical-align: top !important;
@@ -117,18 +152,11 @@
     display: inline-block;
     height: 15px;
     width: 15px;
-    margin: 1px;
     border: 1px solid #0000008f;
 }
 
 .wysiwyg-table-unit:hover {
     cursor: pointer;
-}
-
-.wysiwyg-table-input {
-    display: inline !important;
-    width: 57px;
-    height: 30px;
 }
 
 .wysiwyg-content-cell {
