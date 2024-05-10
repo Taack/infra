@@ -30,6 +30,14 @@
 
 # 0.4.2
 
+- Improve DSL hierarchy
+  - hidden fields on top only for readability
+  - no redundant parameter passing in form
+  - no redundant parameter passing in filter
+  - filterField only under section only
+  - form top level field only on header
+- hook for form fields to display M2M nicely
+- hook to register typical object filter
 - Fix file path when updating. The same way as for O2M, with preview
 - Improve restore state
 - re-add href instead of ajaxAction, improve history when browsing, allow to see opened modals ...
