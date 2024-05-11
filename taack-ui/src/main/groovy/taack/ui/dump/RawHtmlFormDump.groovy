@@ -319,47 +319,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void comment(String i18n, String comment) {
-        out << """
-            <div class="pure-u-1">
-                <label class="label-top">${i18n}</label>
-                    ${comment}
-            </div>
-        """
-
-    }
-
-    @Override
-    void reverseField(String i18n, Class<? extends Object> targetClass, FieldInfo targetField, Collection<? extends Object> constraints, List<FieldInfo> displayField) {
-        if (aObject[ST_ID]) {
-            String qualifiedName = "__ReverseField__:${targetClass.simpleName}:${targetField.fieldName}"
-            out << """
-            <div class="pure-u-1">
-                <label class="label-top" for="${qualifiedName}Select">${i18n}</label>
-                <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" multiple="true">
-            """
-            constraints.each {
-                Object fio = it
-                displayField.each { fi ->
-                    if (fio[fi.fieldName]) fio = fio[fi.fieldName]
-                }
-                out << """
-                <option value="${it[ST_ID]}" ${it[targetField.fieldName][ST_ID] == aObject[ST_ID] ? 'selected' : ''}>${fio?.toString()}</option>
-                """
-            }
-            out << ST_CL_DIV
-        } else {
-            out << """
-            <div class="pure-u-1">
-                <label class="label-top">${i18n}</label>
-                    Cannot determine Object Id
-            </div>
-        """
-        }
-    }
-
-    @Override
-    void visitFormSectionTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
+    void visitFormTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
         out << """<div class="pc-tab ${width.sectionCss}">"""
         names.eachWithIndex { it, occ ->
             out << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-f${tabIds}" class="inputTab${occ + 1}" type="radio" name="pct-${tabIds}" />"""
@@ -378,7 +338,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormSectionTabsEnd() {
+    void visitFormTabsEnd() {
         if (!isActionButtonPrimary) out << "</fieldset>"
         isActionButtonPrimary = true
         tabOccurrence = 0
@@ -386,12 +346,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormSectionTab(String name) {
+    void visitFormTab(String name) {
         out << """<div class="tab${++tabOccurrence} pure-g">"""
     }
 
     @Override
-    void visitFormSectionTabEnd() {
+    void visitFormTabEnd() {
         out << ST_CL_DIV
     }
 
@@ -435,29 +395,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormFieldFromColl(String i18n, FieldInfo field, Object collEntry) {
-        final String trI18n = i18n ?: parameter.trField(field)
-        final boolean isListOrSet = Collection.isAssignableFrom(field.fieldConstraint.field.type)
-        final String qualifiedName = field.fieldName
-
-        if (isListOrSet) {
-            out << """
-                <div class="pure-u-1">
-                <div class="pure-u-1 taackFieldError" taackFieldError="${qualifiedName}" style="display: none;"></div>
-                <div class="pure-u-1 ${qualifiedName}-field-form vertical-center">
-                    <label for="${qualifiedName}">
-                        ${trI18n}
-                    </label>
-            """
-            out << """
-                    <input type="checkbox" name="${qualifiedName}" value="${collEntry}" id="${qualifiedName}Check" ${(field.value as Collection)?.contains(collEntry)? 'checked=""' : ''} class="many-to-one " ${isDisabled(field) ? "disabled" : ""}>
-                    <input type="hidden" name="${qualifiedName}" value="" id="${qualifiedName}Check" ${!(field.value as Collection)?.contains(collEntry) ? 'checked=""' : ''} class="many-to-one pure-u-22-24">
-                    """
-            out << '</div></div>'
-        }
-    }
-
-    @Override
     void visitCol() {
         out << "<div class='pure-u-1 pure-u-md-1-2'>"
     }
@@ -488,8 +425,4 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         }
     }
 
-    @Override
-    void visitFormHiddenField(final String qualifiedName, String value) {
-        out << "<input type=\"hidden\" name=\"${qualifiedName}\" value=\"${value}\"/>"
-    }
 }

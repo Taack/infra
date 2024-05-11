@@ -40,11 +40,6 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormFieldFromColl(String i18n, FieldInfo fieldInfo, Object collEntry) {
-
-    }
-
-    @Override
     void visitCol() {
 
     }
@@ -56,11 +51,6 @@ class UiFormVisitorImpl implements IUiFormVisitor {
 
     @Override
     void visitFormHiddenField(FieldInfo fieldInfo) {
-
-    }
-
-    @Override
-    void visitFormHiddenField(String name, String value) {
 
     }
 
@@ -80,37 +70,27 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void comment(String i18n, String comment) {
-
-    }
-
-    @Override
-    void reverseField(String i18n, Class<? extends Object> targetClass, FieldInfo targetField, Collection<? extends Object> constraints, List<FieldInfo> displayField) {
-
-    }
-
-    @Override
     void visitFormSection(String i18n, FormSpec.Width width) {
 
     }
 
     @Override
-    void visitFormSectionTabs(List<String> names, FormSpec.Width width) {
+    void visitFormTabs(List<String> names, FormSpec.Width width) {
 
     }
 
     @Override
-    void visitFormSectionTabsEnd() {
+    void visitFormTabsEnd() {
 
     }
 
     @Override
-    void visitFormSectionTab(String name) {
+    void visitFormTab(String name) {
 
     }
 
     @Override
-    void visitFormSectionTabEnd() {
+    void visitFormTabEnd() {
 
     }
 }

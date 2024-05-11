@@ -21,10 +21,6 @@ class FormAjaxFieldSpec {
         formVisitor.visitFormHiddenField(field)
     }
 
-    void hiddenField(final String name, final String value) {
-        formVisitor.visitFormHiddenField(name, value)
-    }
-
     void field(final String i18n = null, final FieldInfo field) {
         formVisitor.visitFormField(i18n, field)
     }
@@ -57,23 +53,8 @@ class FormAjaxFieldSpec {
         formVisitor.visitFormField(i18n, field, enumOptions, null)
     }
 
-    void field(final String i18n, final FieldInfo field, final FieldInfo constrainedField, final Collection<? extends Object> fromCollection) {
-        // TODO: for Attachments
-    }
-
-    void reverseField(final String i18n, final Class<? extends Object> targetClass, final FieldInfo constrainedField, final Collection<? extends Object> fromCollection, final List<FieldInfo<?>> displayField = null) {
-        formVisitor.reverseField(i18n, targetClass, constrainedField, fromCollection, displayField)
-    }
-
-    void comment(final String i18n, final String comment) {
-        formVisitor.comment(i18n, comment)
-    }
-
     void fieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry) {
         formVisitor.visitFormFieldFromMap(i18n, field, mapEntry)
     }
 
-    void fieldFromColl(final String i18n = null, final FieldInfo field, Object collEntry) {
-        formVisitor.visitFormFieldFromColl(i18n, field, collEntry)
-    }
 }

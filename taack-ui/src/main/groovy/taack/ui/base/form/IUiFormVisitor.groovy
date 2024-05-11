@@ -19,19 +19,9 @@ interface IUiFormVisitor {
 
     void visitFormField(final String i18n, final FieldInfo field)
 
-    void visitFormAction(String i18n, String controller, String action, Long id, Map params, boolean isAjax)
-
     void visitFormFieldFromMap(String i18n, FieldInfo fieldInfo, String mapEntry)
 
-    void visitFormFieldFromColl(String i18n, FieldInfo fieldInfo, Object mapEntry)
-
-    void visitCol()
-
-    void visitColEnd()
-
     void visitFormHiddenField(FieldInfo fieldInfo)
-
-    void visitFormHiddenField(String name, String value)
 
     void visitFormField(String i18n, FieldInfo fieldInfo, IEnumOption[] enumOptions, NumberFormat numberFormat)
 
@@ -39,15 +29,17 @@ interface IUiFormVisitor {
 
     void visitFormAjaxField(String i18n, String controller, String action, FieldInfo fieldInfo, IEnumOption[] enumOptions, FieldInfo[] fieldInfos)
 
-    void comment(String i18n, String comment)
+    void visitFormAction(String i18n, String controller, String action, Long id, Map params, boolean isAjax)
 
-    void reverseField(String i18n, Class<? extends Object> targetClass, FieldInfo targetField, Collection<? extends Object> constraints, List<FieldInfo> displayField)
+    void visitCol()
 
-    void visitFormSectionTabs(List<String> names, FormSpec.Width width)
+    void visitColEnd()
 
-    void visitFormSectionTabsEnd()
+    void visitFormTabs(List<String> names, FormSpec.Width width)
 
-    void visitFormSectionTab(String name)
+    void visitFormTabsEnd()
 
-    void visitFormSectionTabEnd()
+    void visitFormTab(String name)
+
+    void visitFormTabEnd()
 }

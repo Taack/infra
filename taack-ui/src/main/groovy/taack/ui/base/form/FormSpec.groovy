@@ -44,20 +44,6 @@ final class FormSpec extends FormSectionSpec {
     }
 
     /**
-     * Add a tabulation to a section tabs. Can only be children of {@link #sectionTabs(groovy.lang.Closure)}.
-     *
-     * @param sectionName the label in the tab
-     * @param closure describe the content of the tabulation
-     */
-    void sectionTab(String sectionName,
-                    @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormSpec) Closure closure) {
-        formVisitor.visitFormSectionTab(sectionName)
-        closure.delegate = this
-        closure.call()
-        formVisitor.visitFormSectionTabEnd()
-    }
-
-    /**
      * Add a section to enclose fields to display. Can be nested.
      *
      * @param sectionName the label of the section
@@ -73,26 +59,26 @@ final class FormSpec extends FormSectionSpec {
     }
 
     /**
-     * {@link #sectionTabs(groovy.lang.Closure)} container.
+     * {@link #tabs(groovy.lang.Closure)} container.
      *
      * @param width relative total width
-     * @param closure list of {@link #sectionTab(java.lang.String, groovy.lang.Closure)}
+     * @param closure list of {@link FormTabSpec#tab(java.lang.String, groovy.lang.Closure)}
      */
-    void sectionTabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormSpec) Closure closure) {
+    void tabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormTabSpec) Closure closure) {
         List<String> tabNames = []
         UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {
             @Override
-            void visitFormSectionTab(String i18n) {
+            void visitFormTab(String i18n) {
                 tabNames << i18n
             }
         }
         closure.delegate = new FormSpec(tabNameVisitor)
         closure.call()
 
-        formVisitor.visitFormSectionTabs(tabNames, width)
+        formVisitor.visitFormTabs(tabNames, width)
         closure.delegate = this
         closure.call()
-        formVisitor.visitFormSectionTabsEnd()
+        formVisitor.visitFormTabsEnd()
     }
 
     /**
