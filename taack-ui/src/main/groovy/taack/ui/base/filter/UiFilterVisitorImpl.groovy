@@ -29,11 +29,6 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterExtension(String i18n, FieldInfo... field) {
-
-    }
-
-    @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
 
     }

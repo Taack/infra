@@ -4,9 +4,11 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 
 @CompileStatic
-final class FilterSpec extends SectionSpec {
+final class FilterSpec {
+    final IUiFilterVisitor filterVisitor
+
     FilterSpec(final IUiFilterVisitor filterVisitor) {
-        super(filterVisitor)
+        this.filterVisitor = filterVisitor
     }
 
     void hiddenId(final Long id) {
@@ -16,7 +18,7 @@ final class FilterSpec extends SectionSpec {
     void section(final String i18n,
                  @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SectionSpec) final Closure closure) {
         filterVisitor.visitSection(i18n)
-        closure.delegate = this
+        closure.delegate = new SectionSpec(filterVisitor)
         closure.call()
         filterVisitor.visitSectionEnd()
     }

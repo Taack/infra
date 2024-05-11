@@ -44,7 +44,4 @@ class SectionSpec {
         filterVisitor.visitFilterFieldReverse(i18n, reverseClass, field, fields)
     }
 
-    final <U> void filterExtension(final String i18n, final FieldInfo... field) {
-        filterVisitor.visitFilterExtension(i18n, field)
-    }
 }

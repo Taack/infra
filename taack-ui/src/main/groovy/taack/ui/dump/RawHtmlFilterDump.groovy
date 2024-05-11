@@ -174,16 +174,4 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         filterActions.add new Pair<String, MethodClosure>(i18n, action)
     }
 
-    @Override
-    void visitFilterExtension(String i18n, FieldInfo... fieldInfo) {
-        def qualifiedName = "_extension_${getQualifiedName(fieldInfo)}"
-
-        final String qualifiedId = qualifiedName + '-' + parameter.modalId
-        out << htmlTheme.filterFieldHeader(i18n, qualifiedId, false)
-
-        out << """
-                <input class="${htmlTheme.getFilterInputCssTheme()}" id="${qualifiedId}" name="${qualifiedName}" type="text" value="" autocomplete="off" autofocus placeholder="${i18n?.replace('"', '\\u0027')}">
-                """
-        out << htmlTheme.filterFieldFooter(i18n, qualifiedId, false)
-    }
 }
