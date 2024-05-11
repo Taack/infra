@@ -15,12 +15,12 @@ final class FilterSpec {
         filterVisitor.visitHiddenId(id)
     }
 
-    void section(final String i18n,
+    void section(final String i18n = null,
                  @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SectionSpec) final Closure closure) {
-        filterVisitor.visitSection(i18n)
+        if (i18n) filterVisitor.visitSection(i18n)
         closure.delegate = new SectionSpec(filterVisitor)
         closure.call()
-        filterVisitor.visitSectionEnd()
+        if (i18n) filterVisitor.visitSectionEnd()
     }
 
     void filterAction(final String i18n, final MethodClosure action) {

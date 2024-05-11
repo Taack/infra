@@ -104,10 +104,6 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     }
 
     @Override
-    void visitFooterButton(String i18n, String controller, String action, Long id, Map<String, ?> additionalParams) {
-    }
-
-    @Override
     void visitGroupFieldHeader(FieldInfo[] fields) {
         visitGroupFieldHeader(parameter.trField(fields), fields)
     }

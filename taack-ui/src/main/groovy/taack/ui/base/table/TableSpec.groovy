@@ -39,7 +39,7 @@ final class TableSpec {
      *
      * @param Closure contain the list of {@link TableSpec#row(groovy.lang.Closure)}
      */
-    void rowIndent(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) Closure closure) {
+    void rowIndent(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
         tableVisitor.visitRowIndent()
         closure.delegate = this
         closure.call()
@@ -95,7 +95,7 @@ final class TableSpec {
         tableVisitor.visitRowEnd()
     }
 
-    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec.class) Closure c) {
+    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec.class) Closure c) {
         c.delegate = new TableSpec(tableVisitor)
         Pair<List<T>, Long> res = taackFilter.list()
         tableVisitor.visitPaginate(taackFilter.max, res.bValue)

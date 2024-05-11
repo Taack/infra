@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.base.filter.FilterSpec
 import taack.ui.base.filter.IUiFilterVisitor
+import taack.ui.base.filter.SectionSpec
 
 /**
  * Class describing a filter to display. A filter only lives with a table {@link UiTableSpecifier}, they are
@@ -50,6 +51,19 @@ final class UiFilterSpecifier {
             else
                 new MapEntry("ajaxParams." + it.fieldName, it.value.toString())
         }
+        this
+    }
+
+    /**
+     * Security Filter
+     *
+     * @param aClass class to filter after
+     * @param closure closure describing the filter (see {@link FilterSpec})
+     * @return return itself
+     */
+    UiFilterSpecifier sec(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SectionSpec) final Closure closure, final FieldInfo<?>... fieldInfos) {
+        this.closure = closure
+        this.aClass = aClass
         this
     }
 

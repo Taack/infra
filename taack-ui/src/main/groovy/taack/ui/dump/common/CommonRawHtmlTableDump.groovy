@@ -179,18 +179,6 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitFooterButton(String i18n, String controller, String action, Long id, Map<String, ?> additionalParams) {
-        i18n ?= parameter.trField(controller, action)
-
-        additionalParams?.each {
-            out << """<input type="hidden" name="${it.key}" value="${it.value}">"""
-        }
-        out << """
-            <button type="submit" class="pure-button pure-button-secondary " formaction="${parameter.urlMapped(controller, action, id)}">${i18n}</button>
-        """
-    }
-
-    @Override
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
         isInCol = true
         if (colSpan) {

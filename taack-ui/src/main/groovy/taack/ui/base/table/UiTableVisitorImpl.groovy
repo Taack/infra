@@ -144,11 +144,6 @@ class UiTableVisitorImpl implements IUiTableVisitor {
     }
 
     @Override
-    void visitFooterButton(String i18n, String controller, String action, Long id, Map<String, ?> additionalParams) {
-
-    }
-
-    @Override
     void visitPaginate(Number max, Number count) {
 
     }

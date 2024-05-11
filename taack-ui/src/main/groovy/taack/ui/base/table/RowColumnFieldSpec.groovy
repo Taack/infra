@@ -55,7 +55,4 @@ class RowColumnFieldSpec {
         }
     }
 
-    void footerButton(String i18n = null, MethodClosure action, Long id = null, Map additionalParams = null) {
-        if (taackUiEnablerService.hasAccess(action, id, additionalParams)) tableVisitor.visitFooterButton(i18n, Utils.getControllerName(action), action.method, id, additionalParams)
-    }
 }
