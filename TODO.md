@@ -30,16 +30,15 @@
 
 # 0.4.2
 
-- Improve DSL hierarchy
+- ~~Improve DSL hierarchy~~
   - ~~hidden fields on top only for readability~~
-  - no redundant parameter passing in form
   - ~~filterField only under section only~~
-  - form top level field only on header
-- hook for form fields to display M2M nicely
+  - ~~clean up form / table / filter DSLs~~
+- Hook for form fields to display M2M nicely
   - Attachment renderer
     - WebGL STEP via FreeCAD
     - QCad / libreCAD 2D Drawing
-- hook to register typical object filter
+- Hook to register typical object filter
 - Fix the file path when updating. The same way as for O2M, with preview
 - Improve restore state
 - re-add href instead of ajaxAction, improve history when browsing, allow seeing opened modals ...
