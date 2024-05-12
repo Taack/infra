@@ -23,7 +23,7 @@ final class UiFormSpecifier {
      * @param closure description of the form
      * @return itself
      */
-    UiFormSpecifier ui(final Object aObject, final FieldInfo[] lockedFields = null, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormSpec) final Closure closure) {
+    UiFormSpecifier ui(final Object aObject, final FieldInfo[] lockedFields = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSpec) final Closure closure) {
         this.closure = closure
         this.aObject = aObject
         this.lockedFields = lockedFields

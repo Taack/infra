@@ -9,7 +9,7 @@ class FormSectionSpec extends FormAjaxFieldSpec {
         super(formVisitor)
     }
 
-    void col(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormAjaxFieldSpec) final Closure closure) {
+    void col(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormAjaxFieldSpec) final Closure closure) {
         formVisitor.visitCol()
         closure.delegate = this
         closure.call()

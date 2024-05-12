@@ -51,7 +51,7 @@ final class FormSpec extends FormSectionSpec {
      * @param closure Description of the content of this section
      */
     void section(String sectionName, Width width = Width.DEFAULT_WIDTH,
-                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormSectionSpec) Closure closure) {
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSectionSpec) Closure closure) {
         formVisitor.visitFormSection(sectionName, width)
         closure.delegate = this
         closure.call()
@@ -64,7 +64,7 @@ final class FormSpec extends FormSectionSpec {
      * @param width relative total width
      * @param closure list of {@link FormTabSpec#tab(java.lang.String, groovy.lang.Closure)}
      */
-    void tabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FormTabSpec) Closure closure) {
+    void tabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
         List<String> tabNames = []
         UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {
             @Override
