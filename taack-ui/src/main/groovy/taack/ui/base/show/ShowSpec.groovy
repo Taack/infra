@@ -22,7 +22,7 @@ class ShowSpec extends SectionSpec {
      * @param sectionName label of the section
      * @param closure list of fields to display
      */
-    void section(String sectionName, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SectionSpec) Closure closure) {
+    void section(String sectionName, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) Closure closure) {
         showVisitor.visitSection(sectionName)
         closure.delegate = this
         closure.call()

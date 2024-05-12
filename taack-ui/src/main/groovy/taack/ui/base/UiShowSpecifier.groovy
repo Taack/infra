@@ -48,7 +48,7 @@ final class UiShowSpecifier {
      * @param closure description of what to show
      * @return itself
      */
-    UiShowSpecifier ui(final Object aObject = null, final String controller = null, final String action = null, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ShowSpec) Closure closure) {
+    UiShowSpecifier ui(final Object aObject = null, final String controller = null, final String action = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
         this.closure = closure
         this.object = aObject
         this.controller = controller
@@ -64,7 +64,7 @@ final class UiShowSpecifier {
      * @param closure description of what to show
      * @return itself
      */
-    UiShowSpecifier ui(final Object aObject = null, final MethodClosure action, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ShowSpec) Closure closure) {
+    UiShowSpecifier ui(final Object aObject = null, final MethodClosure action, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
         this.closure = closure
         this.object = aObject
         this.controller = Utils.getControllerName(action)
