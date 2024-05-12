@@ -17,6 +17,7 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
 import org.springframework.web.servlet.ModelAndView
+import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec
@@ -90,6 +91,18 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 code
             }
         }
+    }
+
+    static final String tr(final FieldInfo fieldInfo, final Locale locale = null, final String... args) {
+        String[] keys = ['default.' + fieldInfo.fieldName + '.label', fieldInfo.fieldConstraint.field.type.simpleName.uncapitalize() + fieldInfo.fieldName + '.label']
+        if (LocaleContextHolder.locale.language == "test") return keys.join(',')
+
+        for (String key in keys) {
+            String i18n = tr(key, locale, args)
+            if (i18n && i18n != key)
+                return i18n
+        }
+        return keys.join(',')
     }
 
     /**
