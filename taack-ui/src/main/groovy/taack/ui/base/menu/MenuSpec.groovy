@@ -5,7 +5,6 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.render.TaackUiEnablerService
-import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.helper.Utils
@@ -36,7 +35,7 @@ final class MenuSpec {
     }
 
     void menu(final String i18n, final MethodClosure action = null, Map<String, ? extends Object> params = null,
-              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SubMenuSpec) final Closure closure) {
+              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
         if (closure) {
             menuVisitor.visitMenu(i18n, Utils.getControllerName(action), action?.method?.toString(), params)
             closure.delegate = subMenuSpec
@@ -74,7 +73,7 @@ final class MenuSpec {
     }
 
     void section(final String i18n, final MenuPosition position = MenuPosition.TOP_LEFT,
-                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SubMenuSpec) final Closure closure) {
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
         menuVisitor.visitSection(i18n, position)
         closure.delegate = subMenuSpec
         closure.call()

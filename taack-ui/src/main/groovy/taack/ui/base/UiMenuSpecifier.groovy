@@ -8,7 +8,7 @@ import taack.ui.base.menu.MenuSpec
 final class UiMenuSpecifier {
     Closure closure
 
-    UiMenuSpecifier ui(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) Closure closure) {
+    UiMenuSpecifier ui(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = MenuSpec) Closure closure) {
         this.closure = closure
         this
     }
