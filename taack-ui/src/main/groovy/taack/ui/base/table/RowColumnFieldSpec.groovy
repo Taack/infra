@@ -6,6 +6,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
+import taack.ui.base.branching.BranchingSpec
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
@@ -14,7 +15,7 @@ import taack.ui.base.helper.Utils
  * Specify fields to be drawn in a row or a rowColumn.
  */
 @CompileStatic
-class RowColumnFieldSpec {
+class RowColumnFieldSpec implements BranchingSpec {
     final IUiTableVisitor tableVisitor
 
     TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService

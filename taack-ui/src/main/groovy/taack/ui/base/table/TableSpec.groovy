@@ -8,7 +8,6 @@ import taack.domain.TaackFilter
 import taack.ui.base.common.Style
 
 /**
- * {@link taack.ui.base.UiTableSpecifier#ui(java.lang.Class, groovy.lang.Closure)} delegated class
  *
  * <p>This class allows to draw a table. A table is composed of a header and rows.
  */
@@ -27,7 +26,7 @@ final class TableSpec {
      *
      * @param Closure header content
      */
-    void header(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ColumnHeaderSpec) Closure closure) {
+    void header(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ColumnHeaderSpec) Closure closure) {
         tableVisitor.visitHeader()
         closure.delegate = new ColumnHeaderSpec(tableVisitor)
         closure.call()
@@ -39,7 +38,7 @@ final class TableSpec {
      *
      * @param Closure contain the list of {@link TableSpec#row(groovy.lang.Closure)}
      */
-    void rowIndent(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
+    void rowIndent(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowIndentTreeSpec) Closure closure) {
         tableVisitor.visitRowIndent()
         closure.delegate = this
         closure.call()
@@ -75,27 +74,14 @@ final class TableSpec {
      * @param style
      * @param closure Contains columns
      */
-    void row(final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
+    void row(final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure closure) {
         tableVisitor.visitRow(style, false)
         closure.delegate = new RowColumnSpec(tableVisitor)
         closure.call()
         tableVisitor.visitRowEnd()
     }
 
-    /**
-     * Row container that can be expended as a tree. Can be nested.
-     *
-     * @param hasChildren If true, the subsequent rows will be collapsed under the current row
-     * @param closure Contains columns
-     */
-    void rowTree(boolean hasChildren, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure closure) {
-        tableVisitor.visitRow(null, hasChildren)
-        closure.delegate = new RowColumnSpec(tableVisitor)
-        closure.call()
-        tableVisitor.visitRowEnd()
-    }
-
-    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = RowColumnSpec) Closure c) {
+    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
         c.delegate = new RowColumnSpec(tableVisitor)
         Pair<List<T>, Long> res = taackFilter.list()
         tableVisitor.visitPaginate(taackFilter.max, res.bValue)
