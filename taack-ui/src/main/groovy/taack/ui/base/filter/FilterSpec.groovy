@@ -16,7 +16,7 @@ final class FilterSpec {
     }
 
     void section(final String i18n = null,
-                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SectionSpec) final Closure closure) {
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
         if (i18n) filterVisitor.visitSection(i18n)
         closure.delegate = new SectionSpec(filterVisitor)
         closure.call()

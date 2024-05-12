@@ -42,7 +42,7 @@ final class UiFilterSpecifier {
      * @param fieldInfos add other parameters to the action targeted by the filter (see {@link taack.render.TaackUiService#ajaxBind(java.lang.Class)}
      * @return return itself
      */
-    UiFilterSpecifier ui(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FilterSpec) final Closure closure, final FieldInfo<?>... fieldInfos) {
+    UiFilterSpecifier ui(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FilterSpec) final Closure closure, final FieldInfo<?>... fieldInfos) {
         this.closure = closure
         this.aClass = aClass
         this.additionalParams = fieldInfos.findAll {it.value }.collectEntries {
