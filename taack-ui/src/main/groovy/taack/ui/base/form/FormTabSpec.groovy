@@ -20,7 +20,7 @@ final class FormTabSpec {
     void tab(String sectionName,
              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSpec) Closure closure) {
         formVisitor.visitFormTab(sectionName)
-        closure.delegate = this
+        closure.delegate = new FormSpec(formVisitor)
         closure.call()
         formVisitor.visitFormTabEnd()
     }

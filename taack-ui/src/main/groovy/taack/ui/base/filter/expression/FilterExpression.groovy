@@ -29,26 +29,6 @@ final class FilterExpression {
         this.value = ids
     }
 
-    @Deprecated
-    FilterExpression(final FieldInfo operand, final Operator operator, final Object value = null) {
-        this.operand = [operand]
-        this.isCollection = operand.fieldConstraint.field?.type ? Collection.isAssignableFrom(operand.fieldConstraint.field?.type) : false
-        this.operator = operator
-        this.value = value
-    }
-
-    @Deprecated
-    FilterExpression(final FieldInfo[] operand, final Operator operator, final Object value = null) {
-        this.operand = operand
-        boolean t = false
-        for (def o in operand) {
-            if (o.fieldConstraint.field?.type && Collection.isAssignableFrom(o.fieldConstraint.field?.type)) t = true
-        }
-        this.isCollection = t
-        this.operator = operator
-        this.value = value
-    }
-
     FilterExpression(final Object value = null, final Operator operator, final FieldInfo... operand) {
         this.operand = operand
         boolean t = false

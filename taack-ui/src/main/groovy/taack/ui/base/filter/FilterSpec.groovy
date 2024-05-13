@@ -4,11 +4,10 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 
 @CompileStatic
-final class FilterSpec {
-    final IUiFilterVisitor filterVisitor
+final class FilterSpec extends FilterCommon {
 
     FilterSpec(final IUiFilterVisitor filterVisitor) {
-        this.filterVisitor = filterVisitor
+        super(filterVisitor)
     }
 
     void hiddenId(final Long id) {

@@ -2,6 +2,7 @@ package taack.ui.base
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
+import taack.ui.base.filter.FilterCommon
 import taack.ui.base.filter.FilterSpec
 import taack.ui.base.filter.IUiFilterVisitor
 import taack.ui.base.filter.SectionSpec
@@ -18,6 +19,7 @@ final class UiFilterSpecifier {
     Closure<FilterSpec> closure
     Class aClass
     Map<String, ? extends Object> additionalParams
+    boolean hasSec = false
 
     /**
      * Allow to draw the filter
@@ -61,9 +63,10 @@ final class UiFilterSpecifier {
      * @param closure closure describing the filter (see {@link FilterSpec})
      * @return return itself
      */
-    UiFilterSpecifier sec(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SectionSpec) final Closure closure, final FieldInfo<?>... fieldInfos) {
+    UiFilterSpecifier sec(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FilterCommon) final Closure closure, final FieldInfo<?>... fieldInfos) {
         this.closure = closure
         this.aClass = aClass
+        this.hasSec = true
         this
     }
 
@@ -75,7 +78,8 @@ final class UiFilterSpecifier {
     void visitFilter(final IUiFilterVisitor filterVisitor) {
         if (filterVisitor && closure) {
             filterVisitor.visitFilter(aClass, additionalParams)
-            closure.delegate = new FilterSpec(filterVisitor)
+            if (hasSec) closure.delegate = new FilterCommon(filterVisitor)
+            else closure.delegate = new FilterSpec(filterVisitor)
             closure.call()
             filterVisitor.visitFilterEnd()
         }

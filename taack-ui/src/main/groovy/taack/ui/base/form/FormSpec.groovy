@@ -66,17 +66,18 @@ final class FormSpec extends FormSectionSpec {
      */
     void tabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
         List<String> tabNames = []
+
         UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {
             @Override
             void visitFormTab(String i18n) {
                 tabNames << i18n
             }
         }
-        closure.delegate = new FormSpec(tabNameVisitor)
+        closure.delegate = new FormTabSpec(tabNameVisitor)
         closure.call()
 
         formVisitor.visitFormTabs(tabNames, width)
-        closure.delegate = this
+        closure.delegate = new FormTabSpec(formVisitor)
         closure.call()
         formVisitor.visitFormTabsEnd()
     }

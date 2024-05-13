@@ -15,7 +15,7 @@ final class ConditionBool {
 @CompileStatic
 trait BranchingSpec {
 
-    IBranchingExecute branchingExecute
+    IBranchingExecute branchingExecute = new BranchingExecute()
 
     BranchingSpec ifCondition(ConditionBool conditionSpec, Closure cOk) {
         branchingExecute.ifCondition conditionSpec, cOk

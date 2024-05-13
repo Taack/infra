@@ -6,15 +6,9 @@ import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
 
 @CompileStatic
-class SectionSpec {
-    final IUiFilterVisitor filterVisitor
-
+final class SectionSpec extends FilterCommon {
     SectionSpec(final IUiFilterVisitor filterVisitor) {
-        this.filterVisitor = filterVisitor
-    }
-
-    void filterFieldExpressionBool(final FilterExpression filterExpression) {
-        filterVisitor.visitFilterFieldExpressionBool(filterExpression)
+        super(filterVisitor)
     }
 
     void filterFieldExpressionBool(final String i18n, final Boolean defaultValue = true, final FilterExpression... filterExpressions) {
