@@ -44,15 +44,15 @@
 - re-add href instead of ajaxAction, improve history when browsing, allow seeing opened modals ...
 - Fix table grouping / trees with paginating
 - Bump CSS, improve theming
-- Secured Solr Search
-- More Secured TQL
-- PoC PDF forms ...
-- Improve Table / Filter
-  - add top level `condition` (`if`, branch on 2 closures)
-    - Test, debug, offline capabilities
+- ~~Improve Table / Filter~~
+  - ~~add top level `condition` (`if`, branch on 2 closures)~~
+    - ~~Test, debug, offline capabilities~~
 
 # 0.4.3
 
+- Secured Solr Search
+- More Secured TQL
+- PoC PDF forms ...
 - Modern Graph DSL (groupBy, sortBy)
   - timeSeries
   - areaChart
