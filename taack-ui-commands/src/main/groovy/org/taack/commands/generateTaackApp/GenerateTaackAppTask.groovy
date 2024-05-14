@@ -13,7 +13,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 @CompileStatic
-abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Project> {
+abstract class GenerateTaackAppTask extends DefaultTask {
 
     @OutputDirectory
     abstract DirectoryProperty getOutputDirectory();
@@ -28,42 +28,36 @@ abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Pr
         createAppFolder(appName.get(), p.toString())
     }
 
-
-//    @Override
-//    void apply(Project project) {
-//        TaskProvider taskContainer = project.tasks.register('generateTaackModule', CreateTaackPlugin, task -> {
-//            setGroup('help')
-//            setDescription('Create a Taack app module')
-//            generateSources()
-//        })
-//    }
+    private static String toPkgName(String appName) {
+        appName = appName.uncapitalize()
+        appName.replaceAll("([A-Z])",'.$1').toLowerCase()
+    }
 
     static void createControllersFolder(String appName, String appPath) {
-        new File("$appPath/grails-app/controllers/$appName").mkdirs()
-        File file = new File("$appPath/grails-app/controllers/$appName/${appName.capitalize()}Controller.groovy")
+        String pkgName = toPkgName(appName)
+        String pathName = pkgName.replace('.', '/')
+        new File("$appPath/grails-app/controllers/$pathName").mkdirs()
+        File file = new File("$appPath/grails-app/controllers/$pathName/${appName.capitalize()}Controller.groovy")
         String content = """\
-        package $appName
+        package $pkgName
          
         import grails.web.api.WebAttributes
         import grails.compiler.GrailsCompileStatic
         import grails.plugin.springsecurity.annotation.Secured
-        import taack.base.TaackUiSimpleService
+        import taack.render.TaackUiService
         import taack.ui.base.UiBlockSpecifier
          
         @GrailsCompileStatic
         @Secured(['ROLE_ADMIN'])
         class ${appName.capitalize()}Controller implements WebAttributes {
-            TaackUiSimpleService taackUiSimpleService
+            TaackUiService taackUiService
             ${appName.capitalize()}UiService ${appName}UiService
             
             def index() {
-              UiBlockSpecifier b = new UiBlockSpecifier()
-              b.ui {
-                  ajaxBlock "helloWorld", {
-                      custom "Hello World!"
-                  }
-              }
-              taackUiSimpleService.show(b, ${appName}UiService.buildMenu())
+                UiBlockSpecifier b = new UiBlockSpecifier().ui {
+                  custom "Hello World!"
+                }
+                taackUiService.show(b, ${appName}UiService.buildMenu())
             }
         }
          
@@ -81,10 +75,12 @@ abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Pr
     }
 
     static void createServicesFolder(String appName, String appPath) {
-        new File("$appPath/grails-app/services/$appName").mkdirs()
-        File file = new File("$appPath/grails-app/services/$appName/${appName.capitalize()}UiService.groovy")
+        String pkgName = toPkgName(appName)
+        String pathName = pkgName.replace('.', '/')
+        new File("$appPath/grails-app/services/$pathName").mkdirs()
+        File file = new File("$appPath/grails-app/services/$pathName/${appName.capitalize()}UiService.groovy")
         String content = """\
-        package $appName
+        package $pkgName
          
         import grails.compiler.GrailsCompileStatic
         import grails.web.api.WebAttributes
@@ -92,30 +88,18 @@ abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Pr
         import org.springframework.context.MessageSource
         import org.springframework.context.i18n.LocaleContextHolder
         import taack.ui.base.UiMenuSpecifier
-         
+
+        import static taack.render.TaackUiService.tr
+ 
         @GrailsCompileStatic
         class ${appName.capitalize()}UiService implements WebAttributes {
-            MessageSource messageSource
-            
-            protected String tr(final String code, final Locale locale = null, final Object[] args = null) {
-              if (LocaleContextHolder.locale.language == "test") return code
-              try {
-                  messageSource.getMessage(code, args, locale ?: LocaleContextHolder.locale)
-              } catch (e1) {
-                  try {
-                      messageSource.getMessage(code, args, new Locale("en"))
-                  } catch (e2) {
-                      code
-                  }
-              }
-            }
-            
+
             UiMenuSpecifier buildMenu() {
-              UiMenuSpecifier m = new UiMenuSpecifier()
-              m.ui {
-                  menu tr("default.home.label"), ${appName.capitalize()}Controller.&index as MethodClosure
-              }
-              m
+                UiMenuSpecifier m = new UiMenuSpecifier()
+                m.ui {
+                    menu tr("default.home.label"), ${appName.capitalize()}Controller.&index as MethodClosure
+                }
+                m
             }
         }
          
@@ -131,15 +115,17 @@ abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Pr
     }
 
     static void createGrailsPluginFile(String appName, String appPath) {
-        File file = new File("$appPath/src/main/groovy/$appName/${appName.capitalize()}GrailsPlugin.groovy")
+        String pkgName = toPkgName(appName)
+        String pathName = pkgName.replace('.', '/')
+        new File("$appPath/src/main/groovy/$pathName").mkdirs()
+        File file = new File("$appPath/src/main/groovy/${pathName}/${appName.capitalize()}GrailsPlugin.groovy")
         String content = """\
-        package $appName
+        package ${pkgName}
          
         import grails.compiler.GrailsCompileStatic
         import grails.plugins.Plugin
         import taack.ui.TaackPlugin
         import taack.ui.TaackPluginConfiguration
-        import taack.ui.config.Language
          
         /*
         TODO: put user extra configuration accessible to server to centralize configuration
@@ -194,7 +180,7 @@ abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Pr
             ]
             
             static final TaackPluginConfiguration pluginConfiguration = new TaackPluginConfiguration("${appName.capitalize()}",
-                   "/$appName/${appName}.svg", "$appName", Language.values() as List,
+                   "/$appName/${appName}.svg", "$appName",
                    new TaackPluginConfiguration.IPluginRole() {
                        @Override
                        List<TaackPluginConfiguration.PluginRole> getPluginRoles() {
@@ -285,7 +271,6 @@ abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Pr
     }
 
     static void createSrcFolder(String appName, String appPath) {
-        new File("$appPath/src/main/groovy/$appName").mkdirs()
         createGrailsPluginFile(appName, appPath)
         new File("$appPath/src/main/resources/$appName").mkdirs()
         createIcon(appName, appPath)
