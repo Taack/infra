@@ -1,35 +1,42 @@
-package taack.ui.commands
+package org.taack.commands.generateTaackApp
 
-import grails.compiler.GrailsCompileStatic
-import grails.dev.commands.GrailsApplicationCommand
-import org.grails.build.parsing.CommandLine
+import groovy.transform.CompileStatic
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-@GrailsCompileStatic
-class TaackCreateAppCommand implements GrailsApplicationCommand {
+@CompileStatic
+abstract class GenerateTaackAppTask extends DefaultTask {// implements Plugin<Project> {
 
-    final String nameOption = 'name'
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDirectory();
 
-    boolean handle() {
-        CommandLine commandLine = executionContext.commandLine
-        def p = Paths.get('').toAbsolutePath().parent
-        if (commandLine.hasOption(nameOption)) {
-            println "Creating new App Module: ${commandLine.optionValue(nameOption)} in ${p.toString()}."
-            createAppFolder(commandLine.optionValue(nameOption) as String, p.toString())
-        } else {
-            println """\
-                Usage:
-                
-                ./gradlew server:taackCreateApp -Pargs='-name=nameOfTheAppModule'
-            """.stripIndent()
-        }
+    @Input
+    abstract Property<String> getAppName()
 
-        return true
+    @TaskAction
+    void generateSources() {
+        def p = Paths.get(outputDirectory.get().toString()).toAbsolutePath().parent
+        println "Creating new App Module: ${name} in ${p.toString()}."
+        createAppFolder(appName.get(), p.toString())
     }
 
+
+//    @Override
+//    void apply(Project project) {
+//        TaskProvider taskContainer = project.tasks.register('generateTaackModule', CreateTaackPlugin, task -> {
+//            setGroup('help')
+//            setDescription('Create a Taack app module')
+//            generateSources()
+//        })
+//    }
 
     static void createControllersFolder(String appName, String appPath) {
         new File("$appPath/grails-app/controllers/$appName").mkdirs()
