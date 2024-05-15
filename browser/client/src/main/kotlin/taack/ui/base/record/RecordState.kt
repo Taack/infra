@@ -101,6 +101,8 @@ class RecordState() {
         val it = form.asDynamic().keys()
         var nit = it.next()
         while (nit.done == false) {
+            val vv = form.get(nit.value as String)
+
             val v = form.get(nit.value as String) as String
             if (v.isNotEmpty()) {
                 addServerState(nit.value as String, v)

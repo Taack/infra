@@ -62,7 +62,9 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
             if (it.startsWith("__redirect__")) {
                 window.location.href = it.substring("__redirect__".length)
             } else if (it.startsWith("__reload__")) {
-                window.location.href = (Block.href ?: "") + "${(if (Block.href!!.contains("?")) "&" else "?")}recordState=${RecordState.dumpServerState()}"
+                val sep = if (Block.href!!.contains("?")) "&" else "?"
+                val rs = if (RecordState.serverState.isNotEmpty()) "${sep}recordState=${RecordState.dumpServerState()}" else ""
+                window.location.href = (Block.href ?: "") + rs
             } else if (it.startsWith("__ajaxBlockStart__")) {
                 trace("__ajaxBlockStart__ ${parent.parent.parent.ajaxBlockElements}")
                 Helper.mapAjaxText(it).map { me ->
