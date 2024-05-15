@@ -25,7 +25,7 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement)
             additionalParams?.forEach {
                 url.searchParams.set(it.key, it.value)
             }
-            if (!url.searchParams.has("recordState")) url.searchParams.set("recordState", RecordState.dumpServerState())
+            if (!url.searchParams.has("recordState") && RecordState.serverState.isNotEmpty()) url.searchParams.set("recordState", RecordState.dumpServerState())
             return url
         }
     }

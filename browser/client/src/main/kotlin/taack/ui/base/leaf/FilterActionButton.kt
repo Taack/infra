@@ -58,15 +58,15 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                 Promise.reject(Throwable())
             }
         }.then {
-            trace("AUO1")
             trace(it)
-            trace("AUO1")
             if (it.startsWith("__redirect__")) {
+                trace("FilterActionButton::onclick __redirect__ ${it.substring("__redirect__".length)}")
                 window.location.href = it.substring("__redirect__".length)
             } else if (it.startsWith("__reload__")) {
-                window.location.href = (Block.href ?: "") + "?recordState=${RecordState.dumpServerState()}"
+                trace("FilterActionButton::onclick __reload__ ${RecordState.serverState.isNotEmpty()}, RecordState.serverState=${RecordState.serverState}")
+                window.location.href = (Block.href ?: "") + if (RecordState.serverState.isNotEmpty()) "?recordState=${RecordState.dumpServerState()}" else ""
             } else if (it.startsWith("__ajaxBlockStart__")) {
-                trace("__ajaxBlockStart__")
+                trace("FilterActionButton::onclick __ajaxBlockStart__")
                 Helper.mapAjaxText(it).map { me ->
                     val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
                     target!!.d.innerHTML = me.value

@@ -2,7 +2,6 @@ package taack.ui.base.record
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.xhr.FormData
@@ -21,18 +20,30 @@ class RecordState() {
         fun restoreClientState() {
             trace("RecordState::restoreClientState ${document.cookie}")
             val previousState = getPreviousClientState()
-            if (previousState != null) clientState.putAll(previousState)
+            if (previousState != null) {
+                trace("RecordState::restoreClientState previousState=${previousState.entries}")
+                clientState.putAll(previousState)
+            }
         }
 
         fun restoreServerState(recordStateString: String) {
-            trace("RecordState::restoreServerState $recordStateString")
+            trace("RecordState::restoreServerState recordStateString=$recordStateString")
             if (recordStateString.isNotEmpty()) {
+
                 serverState.clear()
                 try {
-                    val recordData: String? = try { decodeURIComponent(window.atob(recordStateString)) } catch (e: Throwable) { null }
-                    if (!recordData.isNullOrEmpty()) serverState.putAll(Json.decodeFromString(recordData))
+                    val recordData: String? = try {
+                        decodeURIComponent(window.atob(recordStateString))
+                    } catch (e: Throwable) {
+                        trace("RecordState::restoreServerState catch1 ${e.message}")
+                        null
+                    }
+                    if (!recordData.isNullOrEmpty()) {
+                        trace("RecordState::restoreServerState recordData=$recordData")
+                        serverState.putAll(Json.decodeFromString(recordData))
+                    }
                 } catch (e: Exception) {
-                    trace("RecordState ERROR => atob failed for $recordStateString")
+                    trace("RecordState::restoreServerState catch2 ${e.message}")
                 }
             }
         }
@@ -78,7 +89,8 @@ class RecordState() {
     private val blockId = currentBlockId
     private val blockDivId = currentBlockDivId
 
-    fun addServerState(key: String, value: String) {
+    private fun addServerState(key: String, value: String) {
+        trace("RecordState::addServerState key=$key, value=$value")
         if (!serverState.containsKey(blockId)) {
             serverState[blockId] = mutableMapOf()
         }
@@ -99,7 +111,6 @@ class RecordState() {
     }
 
     fun addClientStateAjaxBlock() {
-//        val d = document.getElementById(blockDivId)
         val d = document.querySelector("div[ajaxblockid=$blockId]")?.closest("div.taackModal")
         clientState[blockId] = listOf(
             window.scrollX.toString(),

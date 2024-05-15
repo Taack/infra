@@ -50,7 +50,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         val f = parent.f
         val fd = FormData(f)
         fd.append("isAjax", "true")
-        if (!fd.has("recordState")) fd.append("recordState", RecordState.dumpServerState())
+        if (!fd.has("recordState") && RecordState.serverState.isNotEmpty()) fd.append("recordState", RecordState.dumpServerState())
         window.fetch(b.formAction, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {
                 it.text()
