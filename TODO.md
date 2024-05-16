@@ -34,12 +34,8 @@
   - ~~hidden fields on top only for readability~~
   - ~~filterField only under section only~~
   - ~~clean up form / table / filter DSLs~~
-- Hook for form fields to display M2M nicely
-  - Attachment renderer
-    - WebGL STEP via FreeCAD
-    - QCad / libreCAD 2D Drawing
-- Hook to register typical object filter
-- Fix the file path when updating. The same way as for O2M, with preview
+- Hook to register typical object filter (list, secure)
+- Hook to register form field (view, update, remove, secure)
 - ~~Improve restore state~~
 - re-add href instead of ajaxAction, improve history when browsing, allow seeing opened modals ...
 - Fix table grouping / trees with paginating
