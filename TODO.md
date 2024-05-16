@@ -40,7 +40,7 @@
     - QCad / libreCAD 2D Drawing
 - Hook to register typical object filter
 - Fix the file path when updating. The same way as for O2M, with preview
-- Improve restore state
+- ~~Improve restore state~~
 - re-add href instead of ajaxAction, improve history when browsing, allow seeing opened modals ...
 - Fix table grouping / trees with paginating
 - Bump CSS, improve theming
