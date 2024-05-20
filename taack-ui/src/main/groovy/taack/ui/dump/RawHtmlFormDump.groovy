@@ -101,6 +101,28 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         out << '</div></fieldset></div>'
     }
 
+    private String inputOverride(final String qualifiedName, final FieldInfo field, String result) {
+        if (aObject instanceof GormEntity) {
+            GormEntity entity = aObject as GormEntity
+            if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
+                String img = TaackUiOverriderService.formInputPreview(entity, field)
+                String txt = TaackUiOverriderService.formInputSnippet(entity, field)
+                String val = TaackUiOverriderService.formInputValue(entity, field)
+                String image = img ? """<img src="$img" style="max-height: 112px; max-width: 112px">""" : ''
+                return """
+                     <span class="M2MParent">
+                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}"/>
+                        <span style="font-size: smaller;">$txt</span>
+                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerHTML='${result.replace('"', '&quot;').replace('\'', '\\&#39;').replace('\n', '').replace('\r', '')}';" style="margin: 5px 15px 0 0;">
+                        ${image}
+                        
+                    </span>
+                """
+            }
+        }
+        null
+    }
+
     private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
@@ -206,25 +228,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 """.stripIndent().strip()
             }
         }
-        if (aObject instanceof GormEntity) {
-            GormEntity entity = aObject as GormEntity
-            if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
-                String img = TaackUiOverriderService.formInputPreview(entity, field)
-                String txt = TaackUiOverriderService.formInputSnippet(entity, field)
-                String val = TaackUiOverriderService.formInputValue(entity, field)
-                String image = img ? """<img src="$img" max-height="128px" max-width="128px">""" : ''
-                return """
-                     <span class="M2MParent">
-                        ${image}
-                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerHTML='${result.toString().replace('"', '&quot;')}';" style="margin: 5px 15px 0 0;">
-                        <input value="${txt ?: ''}" readonly="on" class="many-to-one pure-u-22-24 taackAjaxFormM2M" autocomplete="off" id="${qualifiedName}${parameter.modalId}-${entity.ident()}" taackAjaxFormM2MInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}" />
-                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}"/>
-                    </span>
-                """
-            }
-        }
-
-        result.toString()
+        return inputOverride(qualifiedName, field, result.toString()) ?: result.toString()
     }
 
     @Override
@@ -305,11 +309,16 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             """
             out << ST_CL_DIV
         } else {
-            out << """
+            String rep = """\
                 ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">"""}
                 <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2O"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}" taackAjaxFormM2OInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" taackAjaxFormM2OAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
-                <input value="${field.value ? field.value[ST_ID] : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>
-            """
+                <input value="${field.value ? field.value[ST_ID] : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>\
+            """.stripIndent().strip()
+
+            String res = inputOverride(qualifiedName, field, rep)
+
+            res ?= rep
+            out <<  res
             out << ST_CL_DIV
         }
     }
