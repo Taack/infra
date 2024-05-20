@@ -110,17 +110,17 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            result.append """
+            result.append """\
                     <input type="checkbox" ${ajax ?: ''} name="${qualifiedName}" value="1" id="${qualifiedName}Check" ${field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24 " ${isDisabled(field) ? "disabled" : ""}>
-                    <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">
-                    """
+                    <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">\
+                    """.stripIndent().strip()
         } else if (eos) {
             IEnumOption[] enumConstraints = eos
-            result.append """
+            result.append """\
                 <div class="pure-u-1">
                 <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
-                ${field.fieldConstraint.nullable ? '<option value=""></option>' : ""}
-                """
+                ${field.fieldConstraint.nullable ? '<option value=""></option>' : ""}\
+                """.stripIndent().strip()
 
             def valId = isEnum ? (field.value as Enum)?.name() : field.value?.toString()
 
@@ -133,11 +133,11 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             }
             result.append ST_CL_SELECT + ST_CL_DIV
         } else if (isEnum || isListOrSet) {
-            result.append """
+            result.append """\
                 <div class="pure-u-1">
                 <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
-                <option value=""></option>
-                """
+                <option value=""></option>\
+                """.stripIndent().strip()
 
             if (isEnum) {
                 List<String> values = type.invokeMethod(ST_VALUES, null) as List<String>
@@ -169,38 +169,41 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             result.append ST_CL_SELECT_DIV
         } else if (isDate) {
             String date = field.value ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(field.value) : null
-            result.append """
-                <input id="${qualifiedName}" $ajax name="${qualifiedName}" type="datetime-local" class="many-to-one pure-u-22-24 " autocomplete="off" ${date ?: ''} ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${date ?: ''}" ${isDisabled(field) ? "disabled" : ""}>
-                """
+            result.append """\
+                <input id="${qualifiedName}" $ajax name="${qualifiedName}" type="datetime-local" class="many-to-one pure-u-22-24 " autocomplete="off" ${date ?: ''} ${field.fieldConstraint.nullable ? "" : "required"} value="${date ?: ''}" ${isDisabled(field) ? "disabled" : ""}>\
+                """.stripIndent().strip()
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                result.append """<textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="many-to-one pure-u-22-24 " autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ''}</textarea>"""
+                result.append """<textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="many-to-one pure-u-22-24 " autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>"""
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                result.append """
-                <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${field.value ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>"""
+                result.append """\
+                <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? "" : "required"} list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
+                """.stripIndent().strip()
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
-                result.append """<div id="${qualifiedName}-editor">
-                    <textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ''}</textarea>
+                result.append """\
+                <div id="${qualifiedName}-editor">
+                    <textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>
                     <div id="${qualifiedName}-markdown-preview" class="pure-u-10-24 markdown-body wysiwyg-markdown-preview"></div>
                     <input value="" readonly="on" class="many-to-one taackAjaxFormM2O" autocomplete="off" id="${qualifiedName}-attachment-select" taackAjaxFormM2OInputId="${qualifiedName}-attachment-link" taackAjaxFormM2OAction="${parameter.urlMapped('markdown', 'selectAttachment')}"/>
                     <input value="" type="hidden" id="${qualifiedName}-attachment-link"/>
-                </div>
-                """
+                </div>\
+                """.stripIndent().strip()
             } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
-                result.append """<div id="${qualifiedName}-editor">
+                result.append """\
+                <div id="${qualifiedName}-editor">
                     <div id="${qualifiedName}" contenteditable="true" class="wysiwyg-content asciidoctor" style="width: 90%" ${isDisabled(field) ? "disabled" : ""}>${field.value ?: ''}</div>
-                </div>
-                """
+                </div>\
+                """.stripIndent().strip()
             } else {
 
                 String valueString = inputEscape(field.value?.toString())
                 if (nf && field.value instanceof Number) {
                     valueString = nf.format(field.value)
                 }
-                result.append """
+                result.append """\
                 <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="${field.fieldConstraint.widget == WidgetKind.PASSWD.name ? "password" : field.value instanceof Number? "text" :"text"}" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${valueString ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
-                <datalist id="${qualifiedName}List"></datalist>
-                """
+                <datalist id="${qualifiedName}List"></datalist>\
+                """.stripIndent().strip()
             }
         }
         if (aObject instanceof GormEntity) {
@@ -213,7 +216,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 return """
                      <span class="M2MParent">
                         ${image}
-                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerText='${result.toString()}';" style="margin: 5px 15px 0 0;">'}
+                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerHTML='${result.toString().replace('"', '&quot;')}';" style="margin: 5px 15px 0 0;">
                         <input value="${txt ?: ''}" readonly="on" class="many-to-one pure-u-22-24 taackAjaxFormM2M" autocomplete="off" id="${qualifiedName}${parameter.modalId}-${entity.ident()}" taackAjaxFormM2MInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}" />
                         <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}"/>
                     </span>
@@ -277,7 +280,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 boolean isString = String.isAssignableFrom(it.class)
                 out << """
                     <span class="M2MParent">
-                        ${isFieldDisabled ? "" : '<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerText=\'\';" style="margin: 5px 15px 0 0;">'}
+                        ${isFieldDisabled ? "" : '<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerText="";" style="margin: 5px 15px 0 0;">'}
                         <input value="${it ? inputEscape(it.toString()) : ''}" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2M"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}-${occ}" taackAjaxFormM2MInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${occ}" taackAjaxFormM2MAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
                         <input value="${it ? (isString ? it : it[ST_ID]) : ''}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${occ}"/>
                     </span>

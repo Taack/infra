@@ -6,13 +6,13 @@ import taack.ast.type.FieldInfo
 
 import java.lang.reflect.Field
 
-interface IShowOverrider<T extends GormEntity> {
+interface IShowOverrider<T> {
     String getImagePreview(T t, FieldInfo fieldInfo)
     String getTextSnippet(T t, FieldInfo fieldInfo)
 }
 
-interface IFormInputOverrider<T extends GormEntity> extends IShowOverrider {
-    String getValue(T t, FieldInfo fieldInfo)
+interface IFormInputOverrider<U> extends IShowOverrider<U> {
+    String getValue(U t, FieldInfo fieldInfo)
 }
 
 @GrailsCompileStatic
@@ -33,11 +33,11 @@ final class TaackUiOverriderService {
         inputToOverrides.put(fieldInfo.fieldConstraint.field, inputOverrider)
     }
 
-    static<T extends GormEntity> void addInputToOverride(IFormInputOverrider inputOverrider, Class<T> aClass) {
+    static<Z extends GormEntity<Z>> void addInputToOverride(IFormInputOverrider inputOverrider, Class<Z> aClass) {
         inputToOverridesClasses.put(aClass, inputOverrider)
     }
 
-    static<T extends GormEntity> void addShowToOverride(IFormInputOverrider inputOverrider, Class<T> aClass) {
+    static<Z extends GormEntity<Z>> void addShowToOverride(IFormInputOverrider inputOverrider, Class<Z> aClass) {
         showOverridesClasses.put(aClass, inputOverrider)
     }
 
@@ -45,15 +45,15 @@ final class TaackUiOverriderService {
         inputToOverrides.containsKey(fieldInfo.fieldConstraint.field) || inputToOverridesClasses.containsKey(fieldInfo.fieldConstraint.field.type)
     }
 
-    static<T extends GormEntity> String formInputPreview(T t, FieldInfo fieldInfo) {
+    static<Z extends GormEntity<Z>> String formInputPreview(Z t, FieldInfo fieldInfo) {
         inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getImagePreview(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getImagePreview(t, fieldInfo)
     }
 
-    static<T extends GormEntity> String formInputSnippet(T t, FieldInfo fieldInfo) {
+    static<Z extends GormEntity<Z>> String formInputSnippet(Z t, FieldInfo fieldInfo) {
         inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getTextSnippet(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getTextSnippet(t, fieldInfo)
     }
 
-    static<T extends GormEntity> String formInputValue(T t, FieldInfo fieldInfo) {
+    static<Z extends GormEntity<Z>> String formInputValue(Z t, FieldInfo fieldInfo) {
         inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getValue(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getValue(t, fieldInfo)
     }
 }
