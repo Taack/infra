@@ -6,6 +6,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.render.TaackUiOverriderService
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -37,7 +38,8 @@ final class Parameter implements WebAttributes {
     final MessageSource messageSource
     final Locale lcl
     final boolean testI18n
-    final ApplicationTagLib applicationTagLib
+    static ApplicationTagLib applicationTagLib
+    static TaackUiOverriderService uiOverriderService
 
     String aClassSimpleName
 
@@ -55,7 +57,8 @@ final class Parameter implements WebAttributes {
         this.lcl = lcl
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null
-        this.applicationTagLib = grailsApplication.mainContext.getBean(ApplicationTagLib)
+        if (!applicationTagLib) applicationTagLib = grailsApplication.mainContext.getBean(ApplicationTagLib)
+        if (!uiOverriderService) uiOverriderService = grailsApplication.mainContext.getBean(TaackUiOverriderService)
     }
 
     String tr(final String code, final Locale locale = null, final Object[] args = null) {

@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
+import taack.render.TaackUiOverriderService
 import taack.ui.IEnumOption
 import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
@@ -107,6 +108,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isBoolean = type == boolean || type == Boolean
         final boolean isDate = Date.isAssignableFrom(type)
         StringBuffer result = new StringBuffer()
+
         if (isBoolean) {
             result.append """
                     <input type="checkbox" ${ajax ?: ''} name="${qualifiedName}" value="1" id="${qualifiedName}Check" ${field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24 " ${isDisabled(field) ? "disabled" : ""}>
@@ -201,6 +203,24 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 """
             }
         }
+        if (aObject instanceof GormEntity) {
+            GormEntity entity = aObject as GormEntity
+            if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
+                String img = TaackUiOverriderService.formInputPreview(entity, field)
+                String txt = TaackUiOverriderService.formInputSnippet(entity, field)
+                String val = TaackUiOverriderService.formInputValue(entity, field)
+                String image = img ? """<img src="$img" max-height="128px" max-width="128px">""" : ''
+                return """
+                     <span class="M2MParent">
+                        ${image}
+                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerText='${result.toString()}';" style="margin: 5px 15px 0 0;">'}
+                        <input value="${txt ?: ''}" readonly="on" class="many-to-one pure-u-22-24 taackAjaxFormM2M" autocomplete="off" id="${qualifiedName}${parameter.modalId}-${entity.ident()}" taackAjaxFormM2MInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}" />
+                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}"/>
+                    </span>
+                """
+            }
+        }
+
         result.toString()
     }
 
