@@ -111,7 +111,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 String image = img ? """<img src="$img" style="max-height: 112px; max-width: 112px">""" : ''
                 return """
                      <span class="M2MParent">
-                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}"/>
+                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}" class="taackFormFieldOverrideM2O"/>
                         <span style="font-size: smaller;">$txt</span>
                         <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerHTML='${result.replace('"', '&quot;').replace('\'', '\\&#39;').replace('\n', '').replace('\r', '')}';" style="margin: 5px 15px 0 0;">
                         ${image}
