@@ -279,7 +279,6 @@ final class TaackJdbcService {
                     c.javaType = TaackResultSetOuterClass.Column.JavaType.BYTES
                     break
                 default: // Default to String
-                    println "AUOAUOAOU default ${columnDesc.fieldInfo?.fieldConstraint?.field?.type} ${columnDesc.colName}"
                     c.javaType = TaackResultSetOuterClass.Column.JavaType.STRING
                     c.sqlType = 12
                     c.sqlTypeName = 'varchar'

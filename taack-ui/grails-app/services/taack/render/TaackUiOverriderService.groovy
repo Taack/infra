@@ -46,14 +46,14 @@ final class TaackUiOverriderService {
     }
 
     static<Z extends GormEntity<Z>> String formInputPreview(Z t, FieldInfo fieldInfo) {
-        inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getImagePreview(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getImagePreview(t, fieldInfo)
+        inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getImagePreview(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getImagePreview(fieldInfo.value, fieldInfo)
     }
 
     static<Z extends GormEntity<Z>> String formInputSnippet(Z t, FieldInfo fieldInfo) {
-        inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getTextSnippet(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getTextSnippet(t, fieldInfo)
+        inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getTextSnippet(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getTextSnippet(fieldInfo.value, fieldInfo)
     }
 
     static<Z extends GormEntity<Z>> String formInputValue(Z t, FieldInfo fieldInfo) {
-        inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getValue(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getValue(t, fieldInfo)
+        inputToOverrides.get(fieldInfo.fieldConstraint.field)?.getValue(t, fieldInfo) ?: inputToOverridesClasses.get(fieldInfo.fieldConstraint.field.type)?.getValue(fieldInfo.value, fieldInfo)
     }
 }

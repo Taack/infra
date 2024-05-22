@@ -21,17 +21,27 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
 
     private val formName = f.attributes.getNamedItem("name")?.value
     private val actions: List<FormActionButton>
-    private val m2oList: List<FormActionInputM2O>
-    private val m2oSelectM2OList: List<FormActionSelectM2O>
-    private val m2mList: List<FormActionInputM2M>
+    private var m2oList: List<FormActionInputM2O>
+    private val overrideFields: List<FormOverrideField>
+    private var m2oSelectM2OList: List<FormActionSelectM2O>
+    private var m2mList: List<FormActionInputM2M>
     val errorPlaceHolders: Map<String, FormErrorInput>
+
+    fun rescanOverridableInputs() {
+        Helper.traceIndent("Form::rescanOverridableInputs +++ formName: $formName")
+        m2oList = FormActionInputM2O.getSiblingFormActionInputO2M(this)
+        m2mList = FormActionInputM2M.getSiblingFormActionInputM2M(this)
+        m2oSelectM2OList = FormActionSelectM2O.getSiblingFormActionSelectO2M(this)
+        Helper.traceDeIndent("Form::rescanOverridableInputs --- formName: $formName")
+    }
 
     init {
         Helper.traceIndent("Form::init +++ formName: $formName")
         actions = FormActionButton.getSiblingFormAction(this)
         m2oList = FormActionInputM2O.getSiblingFormActionInputO2M(this)
-        m2oSelectM2OList = FormActionSelectM2O.getSiblingFormActionSelectO2M(this)
         m2mList = FormActionInputM2M.getSiblingFormActionInputM2M(this)
+        overrideFields = FormOverrideField.getSiblingFormOverrideField(this)
+        m2oSelectM2OList = FormActionSelectM2O.getSiblingFormActionSelectO2M(this)
         errorPlaceHolders = FormErrorInput.getSiblingErrorInput(this).map {
             it.fieldName to it
         }.toMap()

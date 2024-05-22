@@ -156,8 +156,6 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         fieldHeader()
         params ?= [:]
         if (parameter.applicationTagLib.params.containsKey('recordState')) {
-            println "AUOAUOOOOO1 ${parameter.applicationTagLib.params['recordState']}"
-            println "AUOAUOOOOO2 ${parameter.applicationTagLib.params['recordStateDecoded']}"
             params.put('recordState', parameter.applicationTagLib.params['recordState'])
         }
         if (isAjax) {
