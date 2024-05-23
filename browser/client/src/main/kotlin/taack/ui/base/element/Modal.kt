@@ -18,6 +18,7 @@ class Modal(val parent: Block) : BaseElement {
     }
 
     private var d1: HTMLDivElement
+    private var d12: HTMLDivElement
     private val d2: HTMLDivElement
     val d3: HTMLDivElement
     val innerModal: HTMLDivElement
@@ -27,8 +28,11 @@ class Modal(val parent: Block) : BaseElement {
         trace("Modal::init $mId")
         d1 = document.createElement("div") as HTMLDivElement
         d1.classList.add("modal")
+        d12 = document.createElement("div") as HTMLDivElement
+        d12.addClass("modal-dialog")
         d2 = document.createElement("div") as HTMLDivElement
         d3 = document.createElement("div") as HTMLDivElement
+        d3.addClass("modal-body")
         innerModal = document.createElement("div") as HTMLDivElement
         d2.classList.add("modal-content")
         d2.classList.add("taackModal")
@@ -41,11 +45,13 @@ class Modal(val parent: Block) : BaseElement {
             close()
         }
         divA.addClass("taack-close")
+        divA.addClass("modal-header")
         divA.appendChild(a)
         d2.appendChild(divA)
         d2.appendChild(d3)
         d2.appendChild(innerModal)
-        d1.appendChild(d2)
+        d12.appendChild(d2)
+        d1.appendChild(d12)
         parent.d.appendChild(d1)
         //        parent.modal.innerModal.appendChild(d1)
 

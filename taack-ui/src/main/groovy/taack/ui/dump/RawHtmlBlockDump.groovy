@@ -39,7 +39,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
+            out << "<div id='blockId${blockId}' class='taackBlock' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
         }
     }
 
@@ -62,8 +62,6 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
         } else {
             if (!parameter.isAjaxRendering || isModal)
                 out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
-            if (hasPureG == 0)
-                out << "<div class='pure-g'>"
             else
                 out << "<div>"
         }
@@ -238,7 +236,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockTab(final String i18n) {
         currentTabNames << i18n
-        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0?"Inner":""} pure-g">"""
+        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0?"Inner":""}">"""
     }
 
     @Override
