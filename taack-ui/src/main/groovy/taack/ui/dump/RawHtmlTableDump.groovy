@@ -8,12 +8,15 @@ import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
 import taack.ui.dump.common.CommonRawHtmlTableDump
+import taack.ui.dump.theme.TaackBootstrapTheme
+import taack.ui.dump.theme.TaackPureCSSTheme
 
 @CompileStatic
 final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     final String blockId
     private static Integer currentFormId = 0
+
 
     private Object[] latestGroups = null
 
@@ -26,7 +29,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTable() {
         out << """
-                <div style='overflow: auto;'><table class='pure-table taackTable' taackTableId='${blockId}'>
+                <div style='overflow: auto;'><table class='${tableTheme.getTableClasses()} taackTable' taackTableId='${blockId}'>
                """
     }
 

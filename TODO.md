@@ -37,6 +37,8 @@
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
 - Fix table grouping / trees with paginating
+- Bump CSS, improve theming
+- improve block caption
 - Bootstrap
 - Add menus to Blocks
 - ~~Improve Table / Filter~~
@@ -50,7 +52,6 @@
 - Hook to register typical object filter (list, secure)
 - Secured Solr Search
 - More Secured TQL
-- Bump CSS, improve theming
 - PoC PDF forms ...
 - Modern Graph DSL (groupBy, sortBy)
   - timeSeries

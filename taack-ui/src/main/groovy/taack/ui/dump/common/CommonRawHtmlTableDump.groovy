@@ -2,10 +2,15 @@ package taack.ui.dump.common
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.ui.ITableTheme
+import taack.ui.ThemeName
+import taack.ui.ThemeSelector
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.table.IUiTableVisitor
 import taack.ui.dump.Parameter
+import taack.ui.dump.theme.TaackBootstrapTheme
+import taack.ui.dump.theme.TaackPureCSSTheme
 
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -15,6 +20,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     final ByteArrayOutputStream out
     final Parameter parameter
+    final ITableTheme tableTheme
 
     private int indent = -1
     int colCount = 0
@@ -28,6 +34,15 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     CommonRawHtmlTableDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
+        switch (ts.themeName) {
+            case ThemeName.PURE:
+                this.tableTheme = new TaackPureCSSTheme()
+                break
+            case ThemeName.BOOTSTRAP:
+                this.tableTheme = new TaackBootstrapTheme(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
+                break
+        }
     }
 
     static final <T> String dataFormat(T value, String format) {
@@ -109,7 +124,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         rowStyle = style
         stripped++
         out << """
-            <tr class="taackTableRow ${stripped % 2 == 1 ? "pure-table-odd" : ""}" ${indent > -1 ? "${indent > 0 ? "style='display: none'" : ""}; taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
+            <tr class="taackTableRow ${tableTheme.getTableRowClasses(stripped % 2 == 1)}" ${indent > -1 ? "${indent > 0 ? "style='display: none'" : ""}; taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
         """
     }
 
@@ -117,7 +132,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         rowStyle = style
         stripped++
         out << """
-            <tr class="taackTableRow ${stripped % 2 == 1 ? "pure-table-odd" : ""}" ${indent > -1 ? "taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
+            <tr class="taackTableRow ${tableTheme.getTableRowClasses(stripped % 2 == 1)}" ${indent > -1 ? "taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
         """
     }
 

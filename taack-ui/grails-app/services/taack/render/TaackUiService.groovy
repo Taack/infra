@@ -19,6 +19,10 @@ import org.springframework.core.io.Resource
 import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
+import taack.ui.ThemeMode
+import taack.ui.ThemeName
+import taack.ui.ThemeSize
+import taack.ui.ThemeSelector
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec
 import taack.ui.dump.*
@@ -56,6 +60,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     static lazyInit = false
 
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
+    ThemeService themeService
 
     @Autowired
     TaackUiConfiguration taackUiPluginConfiguration
@@ -170,10 +175,19 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
-            return new ModelAndView("/taackUi/block", [block       : visit(block),
-                                                       menu        : visitMenu(menu),
-                                                       conf        : taackUiPluginConfiguration,
-                                                       clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
+            ThemeSelector themeSelector = themeService.themeSelector
+            ThemeName tableThemeName = themeSelector.themeName
+            ThemeSize tableThemeSize = themeSelector.themeSize
+            ThemeMode tableThemeMode = themeSelector.themeMode
+
+            return new ModelAndView("/taackUi/block", [
+                    themeName   : tableThemeName,
+                    themeSize   : tableThemeSize,
+                    themeMode   : tableThemeName,
+                    block       : visit(block),
+                    menu        : visitMenu(menu),
+                    conf        : taackUiPluginConfiguration,
+                    clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
             ])
         }
     }

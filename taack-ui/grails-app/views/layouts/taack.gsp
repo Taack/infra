@@ -1,18 +1,30 @@
+<%@ page import="taack.ui.ThemeMode; taack.ui.ThemeName" %>
 <!DOCTYPE html>
 
 <html lang="${lang}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <meta name="color-scheme" content="dark light">
-    %{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-unlit.min.css" rel="stylesheet">--}%
+
+    <g:if test="${themeMode == ThemeMode.DARK}">
+        <meta name="color-scheme" content="dark">
+        <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
+    </g:if>
+    <g:else>
+        <meta name="color-scheme" content="light">
+        <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+    </g:else>
 
     <title>${conf.defaultTitle}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <asset:stylesheet href="application-taack.css"/>
-    <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+%{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"--}%
+%{--          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">--}%
+
+    <g:if test="${themeName == ThemeName.BOOTSTRAP}">
+        <asset:stylesheet href="application-taack-bootstrap.css"/>
+    </g:if>
+    <g:elseif test="${themeName == ThemeName.PURE}">
+        <asset:stylesheet href="application-taack.css"/>
+    </g:elseif>
     <style>
     .navbar-nav > li > .dropdown-menu {
         background-color: ${conf.bgColor};
@@ -78,9 +90,13 @@
 
                                 <ul class="dropdown-menu" aria-labelledby="navbarUser">
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link" href="/logout">Logout</a>
+                                        <a class="nav-link ajaxLink taackAjaxLink" ajaxaction="/theme?isAjax=true"><g:message code="theme.label"/></a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link" href="/logout"><g:message code="logout.label"/></a>
                                     </li>
                                 </ul>
+
                             </li>
                         </sec:ifNotSwitched>
 
@@ -90,6 +106,7 @@
                             <a class="nav-link" href="/login">Login</a>
                         </li>
                     </sec:ifNotLoggedIn>
+
                 </g:if>
             </ul>
         </div>
