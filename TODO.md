@@ -34,20 +34,21 @@
   - ~~hidden fields on top only for readability~~
   - ~~filterField only under section only~~
   - ~~clean up form / table / filter DSLs~~
-- Hook to register typical object filter (list, secure)
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
-- re-add href instead of ajaxAction, improve history when browsing, allow seeing opened modals ...
 - Fix table grouping / trees with paginating
-- Bump CSS, improve theming
+- Add menus to Blocks
 - ~~Improve Table / Filter~~
   - ~~add top level `condition` (`if`, branch on 2 closures)~~
     - ~~Test, debug, offline capabilities~~
 
 # 0.4.3
 
+- improve history when browsing, allow seeing opened modals ...
+- Hook to register typical object filter (list, secure)
 - Secured Solr Search
 - More Secured TQL
+- Bump CSS, improve theming
 - PoC PDF forms ...
 - Modern Graph DSL (groupBy, sortBy)
   - timeSeries
