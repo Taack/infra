@@ -37,10 +37,12 @@
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
 - Fix table grouping / trees with paginating
+- Bootstrap
 - Add menus to Blocks
 - ~~Improve Table / Filter~~
   - ~~add top level `condition` (`if`, branch on 2 closures)~~
     - ~~Test, debug, offline capabilities~~
+- Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 
 # 0.4.3
 

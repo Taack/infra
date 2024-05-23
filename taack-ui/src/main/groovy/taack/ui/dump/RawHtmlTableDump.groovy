@@ -105,7 +105,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitPaginate(Number max, Number count) {
         if (max != 0)
-            out << """<div class="taackTablePaginate" taackMax="$max" taackOffset="${parameter.params.long('offset')}" taackCount="$count"></div>"""
+            out << """<div class="taackTablePaginate" taackMax="$max" taackOffset="${parameter.params.long('offset')?:0}" taackCount="$count"></div>"""
     }
 
     @Override

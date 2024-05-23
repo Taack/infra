@@ -41,42 +41,57 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
     private val currentPage = (offset.toDouble() / max.toDouble()).toInt()
     private val numberOfPage = (count.toDouble() / max.toDouble()).toInt()
     private val state: RecordState = RecordState()
-
+    private val ul = document.createElement("ul") as HTMLUListElement
+    /*
+        <nav aria-label="...">
+            <ul class="pagination pagination-sm">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">1</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+            </ul>
+        </nav> 
+    *
+    */
+    
     init {
-        trace("TablePaginate1 max: ${max}, offset: ${offset}, count: ${count}")
-        trace("TablePaginate2 currentPage: ${currentPage}, numberOfPage: ${numberOfPage}")
-        trace("TablePaginate3 state: ${state}")
+        trace("TablePaginate1 max: $max, offset: $offset, count: $count")
+        trace("TablePaginate2 currentPage: $currentPage, numberOfPage: $numberOfPage")
+        trace("TablePaginate3 state: $state")
+
+        val nav = document.createElement("nav") as HTMLElement
+        ul.addClass("pagination")
+        ul.addClass("pagination-sm")
+        nav.appendChild(ul)
         if (numberOfPage <= 1) {
             val f = count.toDouble() / max.toDouble()
             if (f > 1) {
-                createAnchor("Start", 0)
-                createAnchor("Page 1", 1)
+                createAnchor(0)
+                createAnchor(1)
             }
         } else if (numberOfPage in 2..9) {
             for (i in 0..numberOfPage) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
         } else if (numberOfPage in 10..19) {
-            createAnchor("Start", 0)
+            createAnchor(0)
             for (i in 1..(if (currentPage < 5) 5 else 3)) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
             appendSpan()
             if (currentPage >= 5 && currentPage <= numberOfPage - 5) {
                 for (i in (currentPage - 2)..(currentPage + 2)) {
-                    createAnchor(i.toString(), i)
+                    createAnchor(i)
                 }
                 appendSpan()
             }
             for (i in (numberOfPage - (if (currentPage <= numberOfPage - 5) 5 else 3))..numberOfPage) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
-            createAnchor("End", numberOfPage)
+            createAnchor(numberOfPage)
         } else {
-            createAnchor("Start", 0)
-//            for (i in 1..5) {
-//                createAnchor(i.toString(), i)
-//            }
+            createAnchor(0)
             appendSpan()
             val minInterval = 20
 
@@ -102,40 +117,50 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
                 i3 = min(currentPage - 3, numberOfPage - 3)
             }
             for (i in i1 - 2..i1 + 2) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
             appendSpan()
             for (i in i2 - 2..i2 + 2) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
             appendSpan()
             for (i in i3 - 2..i3 + 2) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
             appendSpan()
             for (i in (numberOfPage - 5) until numberOfPage) {
-                createAnchor(i.toString(), i)
+                createAnchor(i)
             }
-            createAnchor("End", numberOfPage)
+            createAnchor(numberOfPage)
         }
+        d.appendChild(nav)
     }
 
     private fun appendSpan() {
+        trace("appendSpan")
         val s = document.createElement("span") as HTMLSpanElement
         s.innerText = " ... "
-        d.appendChild(s)
+        ul.appendChild(s)
     }
 
-    private fun createAnchor(caption: String, pageOffset: Int) {
+    private fun createAnchor(pageOffset: Int) {
+        trace("createAnchor $pageOffset")
+        val li = document.createElement("li") as HTMLLIElement
+        li.addClass("page-item")
         val a = document.createElement("a") as HTMLAnchorElement
-        a.innerText = " $caption "
+        a.innerText = " ${pageOffset + 1} "
         a.addClass("taackPageOffset")
-        if (pageOffset == currentPage) a.style.fontWeight = "bold"
+        a.addClass("page-link")
+        if (pageOffset == currentPage) {
+            a.style.fontWeight = "bold"
+            li.addClass("active")
+        }
         a.setAttribute("taackPageOffset", pageOffset.toString())
         a.onclick = {
             onClick(it, a)
         }
-        d.appendChild(a)
+        li.appendChild(a)
+        ul.appendChild(li)
     }
 
     private fun onClick(e: MouseEvent, a: HTMLAnchorElement) {
