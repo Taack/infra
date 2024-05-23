@@ -115,16 +115,16 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
         splitMenuStart()
         if (isModal)
             out << """
-                 <li class='pure-menu-item'>
-                    <a class='taackAjaxLink pure-menu-link' style="padding: .5em .5em;" ajaxAction='${parameter.urlMapped(controller, action, params, true)}'>
+                 <li>
+                    <a class='taackAjaxLink nav-link' ajaxAction='${parameter.urlMapped(controller, action, params, true)}'>
                         ${actionIcon.getHtml(i18n, 24)}
                     </a>
                  </li>
             """
         else
             out << """
-                <li class="pure-menu-item">
-                    <a class="pure-menu-link" style="padding: .5em .5em;" href="${parameter.urlMapped(controller, action, params)}">
+                <li>
+                    <a class="nav-link" href="${parameter.urlMapped(controller, action, params)}">
                         ${actionIcon.getHtml(i18n, 24)}
                     </a>
                 </li>
@@ -149,7 +149,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
         splitMenuStart()
         out << """
-            <form class="solrSearch-input" action="${parameter.urlMapped(Utils.getControllerName(action), action.method)}">
+            <form class="solrSearch-input py-1" action="${parameter.urlMapped(Utils.getControllerName(action), action.method)}">
                 <div class="input-group rounded">
                     <input type="search" id="form1" name="q" value="${q ? q.replace('"', "&quot;") : ''}" class="form-control rounded bg-white" placeholder="Search" aria-label="Search"/>
                 </div>
@@ -189,8 +189,8 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
             parameter.params.put(enumOptions.paramKey, option.key)
             if (option.section) {
                 out << """\
-                    <li class="nav-item dropdown">
-                        <a class="pure-menu-link" style="color: #887700">
+                    <li>
+                        <a class="dropdown-item" style="color: #887700">
                             ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
                             <b>${option.value}</b>
                         </a>
@@ -198,8 +198,8 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
                 """.stripIndent()
             } else {
                 out << """\
-                    <li class="nav-item dropdown">
-                        <a class='pure-menu-link' href='${parameter.urlMapped(controller, action, parameter.params, false)}'>
+                    <li>
+                        <a class='dropdown-item' href='${parameter.urlMapped(controller, action, parameter.params, false)}'>
                             ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
                             ${option.value}
                         </a>
