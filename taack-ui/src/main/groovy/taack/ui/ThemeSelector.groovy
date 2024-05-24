@@ -4,6 +4,9 @@ import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldConstraint
 import taack.ast.type.FieldInfo
+import taack.ui.dump.theme.ThemeMode
+import taack.ui.dump.theme.ThemeName
+import taack.ui.dump.theme.ThemeSize
 
 import javax.servlet.http.HttpSession
 

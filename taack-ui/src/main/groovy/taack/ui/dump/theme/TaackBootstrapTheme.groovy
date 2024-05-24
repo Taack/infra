@@ -1,8 +1,6 @@
 package taack.ui.dump.theme
 
 import groovy.transform.CompileStatic
-import taack.ui.ThemeMode
-import taack.ui.ThemeSize
 
 @CompileStatic
 final class TaackBootstrapTheme extends TableThemeImpl {

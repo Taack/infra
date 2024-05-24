@@ -2,8 +2,8 @@ package taack.ui.dump.common
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.ui.ITableTheme
-import taack.ui.ThemeName
+import taack.ui.dump.theme.ITableTheme
+import taack.ui.dump.theme.ThemeName
 import taack.ui.ThemeSelector
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style

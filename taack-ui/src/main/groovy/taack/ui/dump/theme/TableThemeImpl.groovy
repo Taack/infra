@@ -1,7 +1,6 @@
 package taack.ui.dump.theme
 
 import groovy.transform.CompileStatic
-import taack.ui.ITableTheme
 
 @CompileStatic
 class TableThemeImpl implements ITableTheme {
