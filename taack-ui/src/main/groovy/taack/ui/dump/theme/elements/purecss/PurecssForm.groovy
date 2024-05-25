@@ -12,6 +12,16 @@ final class PurecssForm implements IFormThemed {
     }
 
     @Override
+    IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement) {
+        return null
+    }
+
+    @Override
+    IHTMLElement section(IHTMLElement topElement, String... classes) {
+        return null
+    }
+
+    @Override
     IHTMLElement booleanInput() {
         return null
     }

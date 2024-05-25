@@ -50,7 +50,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     static String inputEscape(final String val) {
-        val?.replace('"', '&quot;')
+        val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
     }
 
     private boolean isDisabled(FieldInfo field) {
@@ -92,12 +92,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         IHTMLElement top = topElement
         topElement = new HTMLDiv()
         top.builder.addChildren(
-                new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(width.sectionCss.split(' '))
-                        .addChildren(
-                                new HTMLFieldset().builder.addChildren(
-                                        topElement
-                                ).build()
-                        ).build()
+                formThemed.section(topElement, width.sectionCss.split(' '))
         )
     }
 
@@ -117,29 +112,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 String img = TaackUiOverriderService.formInputPreview(entity, field)
                 String txt = TaackUiOverriderService.formInputSnippet(entity, field)
                 String val = TaackUiOverriderService.formInputValue(entity, field)
-                String image = img ? """<img src="$img" style="max-height: 112px; max-width: 112px">""" : ''
-//                return """
-//                     <span class="M2MParent">
-//                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}" />
-//                        <span style="font-size: smaller;">$txt</span>
-//                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" class="taackFormFieldOverrideM2O" taackOnclickInnerHTML='${result.replace('"', '&quot;').replace('\'', '&#39;').replace('\n', '').replace('\r', '')}';" style="margin: 5px 15px 0 0;">
-//                        ${image}
-//
-//                    </span>
-//                """
-                new HTMLSpan().builder.addClasses('M2MParent').addChildren(
-                        new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.setId("ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}").build(),
-                        new HTMLSpan().builder.addChildren(
-                                new HTMLTxtContent(txt)
-                        ).build()
-                )
-
+                topElement.addChildren(formThemed.inputOverride(qualifiedName, val, txt, img, inputEscape(result)))
             }
         }
         null
     }
 
-    private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
+    private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final NumberFormat nf = null) {
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
         final boolean isListOrSet = Collection.isAssignableFrom(type)
@@ -148,15 +127,15 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            result.append """\
-                    <input type="checkbox" ${ajax ?: ''} name="${qualifiedName}" value="1" id="${qualifiedName}Check" ${field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24 " ${isDisabled(field) ? "disabled" : ""}>
-                    <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">\
-                    """.stripIndent().strip()
+            topElement.addChildren(
+                    HTMLInput.inputCheck('1', qualifiedName, field.value == true).builder.setId("${qualifiedName}Check").build(),
+                    new HTMLInput(InputType.HIDDEN, '0', qualifiedName).builder.setId("${qualifiedName}Check").putAttribute(field.value != true ? 'checked':'unchecked', '').build(),
+            )
         } else if (eos) {
             IEnumOption[] enumConstraints = eos
             result.append """\
                 <div class="pure-u-1">
-                <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
+                <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
                 ${field.fieldConstraint.nullable ? '<option value=""></option>' : ""}\
                 """.stripIndent().strip()
 
@@ -173,7 +152,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         } else if (isEnum || isListOrSet) {
             result.append """\
                 <div class="pure-u-1">
-                <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
+                <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
                 <option value=""></option>\
                 """.stripIndent().strip()
 
@@ -208,19 +187,19 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         } else if (isDate) {
             String date = field.value ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(field.value) : null
             result.append """\
-                <input id="${qualifiedName}" $ajax name="${qualifiedName}" type="datetime-local" class="many-to-one pure-u-22-24 " autocomplete="off" ${date ?: ''} ${field.fieldConstraint.nullable ? "" : "required"} value="${date ?: ''}" ${isDisabled(field) ? "disabled" : ""}>\
+                <input id="${qualifiedName}" name="${qualifiedName}" type="datetime-local" class="many-to-one pure-u-22-24 " autocomplete="off" ${date ?: ''} ${field.fieldConstraint.nullable ? "" : "required"} value="${date ?: ''}" ${isDisabled(field) ? "disabled" : ""}>\
                 """.stripIndent().strip()
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                result.append """<textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="many-to-one pure-u-22-24 " autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>"""
+                result.append """<textarea id="${qualifiedName}" name="${qualifiedName}" class="many-to-one pure-u-22-24 " autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>"""
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
                 result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? "" : "required"} list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
+                <input id="${qualifiedName}" name="${qualifiedName}" type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? "" : "required"} list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
                 """.stripIndent().strip()
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """\
                 <div id="${qualifiedName}-editor">
-                    <textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>
+                    <textarea id="${qualifiedName}" name="${qualifiedName}" class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>
                     <div id="${qualifiedName}-markdown-preview" class="pure-u-10-24 markdown-body wysiwyg-markdown-preview"></div>
                     <input value="" readonly="on" class="many-to-one taackAjaxFormM2O" autocomplete="off" id="${qualifiedName}-attachment-select" taackAjaxFormM2OInputId="${qualifiedName}-attachment-link" taackAjaxFormM2OAction="${parameter.urlMapped('markdown', 'selectAttachment')}"/>
                     <input value="" type="hidden" id="${qualifiedName}-attachment-link"/>
@@ -239,7 +218,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     valueString = nf.format(field.value)
                 }
                 result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="${field.fieldConstraint.widget == WidgetKind.PASSWD.name ? "password" : field.value instanceof Number ? "text" : "text"}" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${valueString ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
+                <input id="${qualifiedName}" name="${qualifiedName}" type="${field.fieldConstraint.widget == WidgetKind.PASSWD.name ? "password" : field.value instanceof Number ? "text" : "text"}" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${valueString ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
                 <datalist id="${qualifiedName}List"></datalist>\
                 """.stripIndent().strip()
             }
@@ -270,7 +249,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     </label>
                 </div>
             """
-        out << inputField(qualifiedName, field, eos, null, numberFormat ?: parameter.nf)
+        out << inputField(qualifiedName, field, eos, numberFormat ?: parameter.nf)
         out << ST_CL_DIV
     }
 

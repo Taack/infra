@@ -7,7 +7,7 @@ enum HTMLButtonType {
 }
 
 @CompileStatic
-class HTMLButton implements IHTMLElement {
+final class HTMLButton implements IHTMLElement {
     HTMLButton(HTMLButtonType buttonType) {
         tag = 'button'
     }

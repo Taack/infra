@@ -42,6 +42,8 @@ trait IFormThemed implements IHTMLElement {
     abstract <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder()
 
     abstract IHTMLElement enumInput()
+    abstract IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement)
+    abstract IHTMLElement section(IHTMLElement topElement, String... classes)
     abstract IHTMLElement booleanInput()
     abstract IHTMLElement listOrSetInput()
     abstract IHTMLElement dateInput()

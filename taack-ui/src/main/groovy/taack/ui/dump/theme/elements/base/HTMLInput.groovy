@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 enum InputType {
     STRING('text'),
     EMAIL('email'),
+    CHECK('checkbox'),
     HIDDEN('hidden'),
     TEXTAREA('textarea')
 
@@ -17,7 +18,7 @@ enum InputType {
 }
 
 @CompileStatic
-class HTMLInput implements IHTMLElement {
+final class HTMLInput implements IHTMLElement {
 
     final Object value
 
@@ -31,4 +32,9 @@ class HTMLInput implements IHTMLElement {
         if (disabled) attributes.put('disabled', null)
     }
 
+    static HTMLInput inputCheck(Object value, String name, boolean checked = false) {
+        HTMLInput ret = new HTMLInput(InputType.CHECK, value, name)
+        if (checked) ret.attributes.put('checked', null)
+        ret
+    }
 }

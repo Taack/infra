@@ -3,7 +3,7 @@ package taack.ui.dump.theme.elements.base
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class HTMLTxtContent implements IHTMLElement {
+final class HTMLTxtContent implements IHTMLElement {
 
     final String content
 
