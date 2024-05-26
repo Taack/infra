@@ -46,6 +46,7 @@
     - ~~Test, debug, offline capabilities~~
 - Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Add title to modal / menu / size
+- For GormEntity, propose a default M2O or M2M in forms (field) / shows
 
 # 0.4.3
 
