@@ -130,24 +130,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         if (isBoolean) {
             formThemed.booleanInput(topElement, qualifiedName, field.value as boolean)
         } else if (eos) {
-            IEnumOption[] enumConstraints = eos.options
-            result.append """\
-                <div class="pure-u-1">
-                <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
-                ${field.fieldConstraint.nullable ? '<option value=""></option>' : ""}\
-                """.stripIndent().strip()
-
-            def valId = isEnum ? (field.value as Enum)?.name() : field.value?.toString()
-
-            enumConstraints.each {
-                if (isListOrSet) {
-                    result.append """<option value="${it.key}" ${(field.value as Collection)*.toString().contains(it.key) ? 'selected' : ''}>${it.value}</option>"""
-                } else {
-                    result.append """<option value="${it.key}" ${valId == it.key ? 'selected' : ''}>${it.value}</option>"""
-                }
-            }
-            result.append ST_CL_SELECT + ST_CL_DIV
+            formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
         } else if (isEnum || isListOrSet) {
+            eos =
             result.append """\
                 <div class="pure-u-1">
                 <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
@@ -161,6 +146,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final String name = it.hasProperty(ST_NAME) ? it.getAt(ST_NAME) : it
                     result.append """<option value="${inputEscape(it)}" ${field.value == it ? 'selected="selected"' : ''}>${name}</option>"""
                 }
+                formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
