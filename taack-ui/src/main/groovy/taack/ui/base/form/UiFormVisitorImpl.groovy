@@ -3,6 +3,7 @@ package taack.ui.base.form
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 
 import java.text.NumberFormat
 
@@ -55,7 +56,7 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormField(String i18n, FieldInfo fieldInfo, IEnumOption[] enumOptions, NumberFormat numberFormat) {
+    void visitFormField(String i18n, FieldInfo fieldInfo, IEnumOptions enumOptions, NumberFormat numberFormat) {
 
     }
 
@@ -65,7 +66,7 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo fieldInfo, IEnumOption[] enumOptions, FieldInfo[] fieldInfos) {
+    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo fieldInfo, IEnumOptions enumOptions, FieldInfo[] fieldInfos) {
 
     }
 

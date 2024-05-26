@@ -1,11 +1,14 @@
 package taack.ui.dump.theme.elements.purecss
 
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
+import taack.ui.IEnumOptions
 import taack.ui.dump.theme.elements.base.IHTMLElement
 import taack.ui.dump.theme.elements.form.IFormThemed
 
 @CompileStatic
-final class PurecssForm implements IFormThemed {
+final class PurecssForm<T extends GormEntity<T>> implements IFormThemed<T> {
+
     @Override
     IHTMLElement enumInput() {
         return null
@@ -22,7 +25,12 @@ final class PurecssForm implements IFormThemed {
     }
 
     @Override
-    IHTMLElement booleanInput() {
+    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value) {
+        return null
+    }
+
+    @Override
+    IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable) {
         return null
     }
 

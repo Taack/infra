@@ -1,6 +1,8 @@
 package taack.ui.dump.theme.elements.form
 
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
+import taack.ui.IEnumOptions
 import taack.ui.dump.theme.elements.base.IHTMLElement
 
 @CompileStatic
@@ -31,7 +33,7 @@ enum FormMethod {
 }
 
 @CompileStatic
-trait IFormThemed implements IHTMLElement {
+trait IFormThemed<T extends GormEntity<T>> implements IHTMLElement {
 
     void constructorIFormThemed(InputMode inputMode = InputMode.POST, EncType encType = EncType.DATA) {
         attributes.put('method', inputMode.modeText)
@@ -44,7 +46,8 @@ trait IFormThemed implements IHTMLElement {
     abstract IHTMLElement enumInput()
     abstract IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement)
     abstract IHTMLElement section(IHTMLElement topElement, String... classes)
-    abstract IHTMLElement booleanInput()
+    abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value)
+    abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable)
     abstract IHTMLElement listOrSetInput()
     abstract IHTMLElement dateInput()
     abstract IHTMLElement textareaInput()

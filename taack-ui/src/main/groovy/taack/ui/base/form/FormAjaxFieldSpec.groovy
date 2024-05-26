@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.base.helper.Utils
 
 import java.text.NumberFormat
@@ -45,11 +46,11 @@ class FormAjaxFieldSpec {
         formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, null, null, fieldInfos)
     }
 
-    void ajaxField(final String i18n = null, final FieldInfo field, IEnumOption[] enumOptions, final MethodClosure action, final FieldInfo<?>... fieldInfos) {
+    void ajaxField(final String i18n = null, final FieldInfo field, IEnumOptions enumOptions, final MethodClosure action, final FieldInfo<?>... fieldInfos) {
         formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, enumOptions, fieldInfos)
     }
 
-    void field(final String i18n = null, final FieldInfo field, IEnumOption[] enumOptions) {
+    void field(final String i18n = null, final FieldInfo field, IEnumOptions enumOptions) {
         formVisitor.visitFormField(i18n, field, enumOptions, null)
     }
 

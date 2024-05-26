@@ -6,6 +6,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.render.TaackUiOverriderService
 import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
 import taack.ui.dump.Parameter
@@ -118,7 +119,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         null
     }
 
-    private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final NumberFormat nf = null) {
+    private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOptions eos = null, final NumberFormat nf = null) {
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
         final boolean isListOrSet = Collection.isAssignableFrom(type)
@@ -127,12 +128,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            topElement.addChildren(
-                    HTMLInput.inputCheck('1', qualifiedName, field.value == true).builder.setId("${qualifiedName}Check").build(),
-                    new HTMLInput(InputType.HIDDEN, '0', qualifiedName).builder.setId("${qualifiedName}Check").putAttribute(field.value != true ? 'checked':'unchecked', '').build(),
-            )
+            formThemed.booleanInput(topElement, qualifiedName, field.value as boolean)
         } else if (eos) {
-            IEnumOption[] enumConstraints = eos
+            IEnumOption[] enumConstraints = eos.options
             result.append """\
                 <div class="pure-u-1">
                 <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
@@ -227,7 +225,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormField(final String i18n, final FieldInfo field, final IEnumOption[] eos = null, NumberFormat numberFormat = null) {
+    void visitFormField(final String i18n, final FieldInfo field, final IEnumOptions eos = null, NumberFormat numberFormat = null) {
         final String trI18n = i18n ?: parameter.trField(field)
 
         if (field.fieldConstraint.constraints) {
@@ -323,14 +321,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, IEnumOption[] enumOptions, FieldInfo[] fieldInfos) {
+    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, IEnumOptions enumOptions, FieldInfo[] fieldInfos) {
         final String trI18n = i18n ?: parameter.trField(field)
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
         formAjaxFieldLabel(trI18n, qualifiedName)
 
-        IEnumOption[] enumConstraints = enumOptions
+        IEnumOption[] enumConstraints = enumOptions.options
         out << """
                 <div class="pure-u-1">
                 ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.nextElementSibling.value='';">"""}

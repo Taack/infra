@@ -1,19 +1,13 @@
 package taack.ui.dump.theme.elements.bootstrap
 
 import groovy.transform.CompileStatic
-import taack.ui.dump.theme.elements.base.HTMLDiv
-import taack.ui.dump.theme.elements.base.HTMLFieldset
-import taack.ui.dump.theme.elements.base.HTMLImg
-import taack.ui.dump.theme.elements.base.HTMLInput
-import taack.ui.dump.theme.elements.base.HTMLSpan
-import taack.ui.dump.theme.elements.base.HTMLTxtContent
-import taack.ui.dump.theme.elements.base.IHTMLElement
-import taack.ui.dump.theme.elements.base.InputType
-import taack.ui.dump.theme.elements.base.TaackTag
+import org.grails.datastore.gorm.GormEntity
+import taack.ui.IEnumOptions
+import taack.ui.dump.theme.elements.base.*
 import taack.ui.dump.theme.elements.form.IFormThemed
 
 @CompileStatic
-final class BootstrapForm implements IFormThemed {
+final class BootstrapForm<T extends GormEntity<T>> implements IFormThemed<T> {
 
     BootstrapForm() {
         constructorIFormThemed()
@@ -26,7 +20,7 @@ final class BootstrapForm implements IFormThemed {
 
     @Override
     IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement) {
-        IHTMLElement.HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
+        HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
                 new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.build(),
                 new HTMLSpan().builder.addChildren(
                         new HTMLTxtContent(txt)
@@ -43,17 +37,26 @@ final class BootstrapForm implements IFormThemed {
 
     @Override
     IHTMLElement section(IHTMLElement topElement, String... classes) {
-        new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
-                .addChildren(
-                        new HTMLFieldset().builder.addChildren(
-                                topElement
+        topElement.addChildren(
+                new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
+                        .addChildren(
+                                new HTMLFieldset().builder.addChildren(
+                                ).build()
                         ).build()
-                ).build()
+        )
     }
 
     @Override
-    IHTMLElement booleanInput() {
-        return null
+    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value) {
+        topElement.addChildren(
+                HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.setId("${qualifiedName}Check").build(),
+        )
+    }
+
+    @Override
+    IHTMLElement selects(IHTMLElement topElement, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
+        HTMLSelect s = new HTMLSelect(options, multiple, false, disable)
+        topElement.addChildren(s)
     }
 
     @Override
