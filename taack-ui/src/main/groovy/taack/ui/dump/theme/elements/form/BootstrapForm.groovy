@@ -53,8 +53,8 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement selects(IHTMLElement topElement, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
-        HTMLSelect s = new HTMLSelect(options, multiple, false, disable)
+    IHTMLElement selects(IHTMLElement topElement, IEnumOptions options, boolean multiple, boolean disable, boolean nullable, String... val) {
+        HTMLSelect s = new HTMLSelect(options, multiple, false, disable, val)
         topElement.addChildren(s)
     }
 

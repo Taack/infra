@@ -29,7 +29,7 @@ final class PurecssForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable) {
+    IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable, String... val) {
         return null
     }
 

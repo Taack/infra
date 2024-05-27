@@ -47,7 +47,7 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement)
     abstract IHTMLElement section(IHTMLElement topElement, String... classes)
     abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value)
-    abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable)
+    abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable, String... val)
     abstract IHTMLElement listOrSetInput()
     abstract IHTMLElement dateInput()
     abstract IHTMLElement textareaInput()

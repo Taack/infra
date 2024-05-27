@@ -5,6 +5,7 @@ import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.render.TaackUiOverriderService
+import taack.ui.EnumOptions
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.base.form.FormSpec
@@ -132,22 +133,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         } else if (eos) {
             formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
         } else if (isEnum || isListOrSet) {
-            //eos =
-            result.append """\
-                <div class="pure-u-1">
-                <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
-                <option value=""></option>\
-                """.stripIndent().strip()
-
             if (isEnum) {
-                List<String> values = type.invokeMethod(ST_VALUES, null) as List<String>
-
-                values.each {
-                    final String name = it.hasProperty(ST_NAME) ? it.getAt(ST_NAME) : it
-                    result.append """<option value="${inputEscape(it)}" ${field.value == it ? 'selected="selected"' : ''}>${name}</option>"""
-                }
-                formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
-
+                formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, field.value?.toString())
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
@@ -155,20 +142,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final Class actualClass = Class.forName(actualType.typeName)
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
-                        List values = actualClass.invokeMethod(ST_VALUES, null) as List
-                        values.each {
-                            final String name = it.hasProperty(ST_NAME) ? it.getAt(ST_NAME) : it
-                            result.append """<option value="${inputEscape(it.toString())}" ${(field.value as Collection)*.toString().contains(it.toString()) ? 'selected="selected"' : ''}>${name}</option>"""
-                        }
+                        String[] values = actualClass.invokeMethod(ST_VALUES, null) as String[]
+                        formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, values)
                     } else {
-                        List values = actualClass.invokeMethod(ST_LIST, null) as List
-                        values.each {
-                            result.append """<option value="${it[ST_ID]}" ${((field.value as Collection)*.getAt(ST_ID) as List)?.contains(it[ST_ID]) ? 'selected="selected"' : ''}>${it}</option>"""
-                        }
+                        String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
+                        formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, values)
                     }
                 }
             }
-            result.append ST_CL_SELECT_DIV
         } else if (isDate) {
             String date = field.value ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(field.value) : null
             result.append """\
