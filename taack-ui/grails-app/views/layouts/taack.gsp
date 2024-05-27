@@ -1,4 +1,4 @@
-<%@ page import="taack.ui.dump.theme.ThemeName; taack.ui.dump.theme.ThemeMode" %>
+<%@ page import="taack.ui.dump.theme.elements.table.ThemeName; taack.ui.dump.theme.elements.table.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}">

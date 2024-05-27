@@ -1,14 +1,14 @@
-package taack.ui.dump.theme
+package taack.ui.dump.theme.elements.table
 
 import groovy.transform.CompileStatic
 
 @CompileStatic
-final class TaackBootstrapTheme extends TableThemeImpl {
+final class BootstrapTable extends TableThemeImpl {
 
     final ThemeMode themeMode
     final ThemeSize themeSize
 
-    TaackBootstrapTheme(ThemeMode themeMode, ThemeSize themeSize) {
+    BootstrapTable(ThemeMode themeMode, ThemeSize themeSize) {
         this.themeMode = themeMode
         this.themeSize = themeSize
     }

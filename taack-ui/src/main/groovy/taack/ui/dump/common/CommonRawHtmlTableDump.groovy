@@ -2,15 +2,15 @@ package taack.ui.dump.common
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.ui.dump.theme.ITableTheme
-import taack.ui.dump.theme.ThemeName
+import taack.ui.dump.theme.elements.table.ITableTheme
+import taack.ui.dump.theme.elements.table.ThemeName
 import taack.ui.ThemeSelector
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.table.IUiTableVisitor
 import taack.ui.dump.Parameter
-import taack.ui.dump.theme.TaackBootstrapTheme
-import taack.ui.dump.theme.TaackPureCSSTheme
+import taack.ui.dump.theme.elements.table.BootstrapTable
+import taack.ui.dump.theme.elements.table.PureCSSTable
 
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -37,10 +37,10 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         switch (ts.themeName) {
             case ThemeName.PURE:
-                this.tableTheme = new TaackPureCSSTheme()
+                this.tableTheme = new PureCSSTable()
                 break
             case ThemeName.BOOTSTRAP:
-                this.tableTheme = new TaackBootstrapTheme(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
+                this.tableTheme = new BootstrapTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
                 break
         }
     }

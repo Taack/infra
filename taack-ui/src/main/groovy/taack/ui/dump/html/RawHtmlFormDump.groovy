@@ -11,8 +11,8 @@ import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.theme.elements.base.*
-import taack.ui.dump.theme.elements.bootstrap.BootstrapForm
-import taack.ui.dump.theme.elements.form.IFormThemed
+import taack.ui.dump.theme.elements.form.BootstrapForm
+import taack.ui.dump.theme.elements.form.IFormTheme
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -42,7 +42,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private int tabIds = 0
     private FieldInfo[] lockedFields
 
-    IFormThemed formThemed
+    IFormTheme formThemed
     IHTMLElement topElement
 
     RawHtmlFormDump(final ByteArrayOutputStream out, final Parameter parameter) {
@@ -78,7 +78,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
                 new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
-        ).build() as IFormThemed
+        ).build() as IFormTheme
         topElement = formThemed
     }
 
@@ -132,7 +132,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         } else if (eos) {
             formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
         } else if (isEnum || isListOrSet) {
-            eos =
+            //eos =
             result.append """\
                 <div class="pure-u-1">
                 <select class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>

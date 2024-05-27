@@ -1,13 +1,12 @@
-package taack.ui.dump.theme.elements.bootstrap
+package taack.ui.dump.theme.elements.form
 
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.dump.theme.elements.base.*
-import taack.ui.dump.theme.elements.form.IFormThemed
 
 @CompileStatic
-final class BootstrapForm<T extends GormEntity<T>> implements IFormThemed<T> {
+final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     BootstrapForm() {
         constructorIFormThemed()

@@ -19,9 +19,9 @@ import org.springframework.core.io.Resource
 import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
-import taack.ui.dump.theme.ThemeMode
-import taack.ui.dump.theme.ThemeName
-import taack.ui.dump.theme.ThemeSize
+import taack.ui.dump.theme.elements.table.ThemeMode
+import taack.ui.dump.theme.elements.table.ThemeName
+import taack.ui.dump.theme.elements.table.ThemeSize
 import taack.ui.ThemeSelector
 import taack.ui.base.*
 import taack.ui.base.block.BlockSpec

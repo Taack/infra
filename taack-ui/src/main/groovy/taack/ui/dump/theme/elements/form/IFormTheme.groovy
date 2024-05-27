@@ -33,7 +33,7 @@ enum FormMethod {
 }
 
 @CompileStatic
-trait IFormThemed<T extends GormEntity<T>> implements IHTMLElement {
+trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     void constructorIFormThemed(InputMode inputMode = InputMode.POST, EncType encType = EncType.DATA) {
         attributes.put('method', inputMode.modeText)

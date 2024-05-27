@@ -4,9 +4,9 @@ import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackUiService
-import taack.ui.dump.theme.ThemeMode
-import taack.ui.dump.theme.ThemeName
-import taack.ui.dump.theme.ThemeSize
+import taack.ui.dump.theme.elements.table.ThemeMode
+import taack.ui.dump.theme.elements.table.ThemeName
+import taack.ui.dump.theme.elements.table.ThemeSize
 import taack.ui.ThemeSelector
 import taack.ui.base.UiBlockSpecifier
 import taack.ui.base.UiFormSpecifier

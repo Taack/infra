@@ -1,9 +1,9 @@
-package taack.ui.dump.theme
+package taack.ui.dump.theme.elements.table
 
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class TaackPureCSSTheme extends TableThemeImpl {
+class PureCSSTable extends TableThemeImpl {
     @Override
     String getTableClasses() {
         return " pure-table pure-table-bordered "
