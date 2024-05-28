@@ -18,7 +18,6 @@ import taack.ui.dump.theme.elements.form.IFormTheme
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 
 @CompileStatic
 final class RawHtmlFormDump implements IUiFormVisitor {
@@ -94,7 +93,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         IHTMLElement top = topElement
         topElement = new HTMLDiv()
         top.builder.addChildren(
-                formThemed.section(topElement, width.sectionCss.split(' '))
+                topElement = formThemed.section(topElement, width.sectionCss.split(' '))
         )
     }
 
@@ -114,7 +113,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 String img = TaackUiOverriderService.formInputPreview(entity, field)
                 String txt = TaackUiOverriderService.formInputSnippet(entity, field)
                 String val = TaackUiOverriderService.formInputValue(entity, field)
-                topElement.addChildren(formThemed.inputOverride(qualifiedName, val, txt, img, inputEscape(result)))
+                topElement.addChildren(formThemed.inputOverride(topElement, qualifiedName, val, txt, img, inputEscape(result)))
             }
         }
         null
@@ -129,12 +128,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            formThemed.booleanInput(topElement, qualifiedName, field.value as boolean)
+            topElement = formThemed.booleanInput(topElement, qualifiedName, field.value as boolean)
         } else if (eos) {
-            formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+            topElement = formThemed.selects(topElement, eos, isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, field.value?.toString())
+                topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, field.value?.toString())
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
@@ -143,20 +142,20 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
                         String[] values = actualClass.invokeMethod(ST_VALUES, null) as String[]
-                        formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, values)
+                        topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, values)
                     } else {
                         String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
-                        formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, values)
+                        topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName), isListOrSet, isDisabled(field), field.fieldConstraint.nullable, values)
                     }
                 }
             }
         } else if (isDate) {
-            formThemed.dateInput(topElement, qualifiedName, field.value as Date)
+            topElement = formThemed.dateInput(topElement, qualifiedName, field.value as Date)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                formThemed.textareaInput(topElement, qualifiedName, field.value as String)
+                topElement = formThemed.textareaInput(topElement, qualifiedName, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                formThemed.fileInput(topElement, qualifiedName, field.value as String)
+                topElement = formThemed.fileInput(topElement, qualifiedName, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """\
                 <div id="${qualifiedName}-editor">
@@ -177,7 +176,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 if (nf && field.value instanceof Number) {
                     valueString = nf.format(field.value)
                 }
-                formThemed.fileInput(topElement, qualifiedName, valueString)
+                topElement = formThemed.fileInput(topElement, qualifiedName, valueString)
             }
         }
         return inputOverride(qualifiedName, field, result.toString()) ?: result.toString()
@@ -197,27 +196,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final Class type = field.fieldConstraint.field.type
         final boolean isBoolean = type == boolean || type == Boolean
 
-        out << """
-                <div class="pure-u-1">
-                <div class="pure-u-1 taackFieldError" taackFieldError="${qualifiedName}" style="display: none;"></div>
-                <div class="pure-u-1 ${qualifiedName}-field-form ${isBoolean ? 'vertical-center ' : ''}">
-                    <label for="${qualifiedName}">
-                        ${trI18n}
-                    </label>
-                </div>
-            """
-        out << inputField(qualifiedName, field, eos, numberFormat ?: parameter.nf)
-        out << ST_CL_DIV
+        topElement = formThemed.formLabel(topElement, qualifiedName, i18n)
+        inputField(qualifiedName, field, eos, numberFormat ?: parameter.nf)
     }
 
     private void formAjaxFieldLabel(final String i18n, final String qualifiedName) {
-        out << """
-                <div class="pure-u-1">
-                    <div class="pure-u-1 taackFieldError" taackFieldError="${qualifiedName}" style="display: none;"></div>
-                    <label for="${qualifiedName}">
-                        ${i18n}
-                    </label>
-            """
+        topElement = formThemed.formLabel(topElement, qualifiedName, i18n)
     }
 
     @Override
@@ -304,39 +288,31 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        out << """<div class="pc-tab ${width.sectionCss}">"""
-        names.eachWithIndex { it, occ ->
-            out << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-f${tabIds}" class="inputTab${occ + 1}" type="radio" name="pct-${tabIds}" />"""
-        }
-        out << '<nav><ul>'
-        names.eachWithIndex { it, occ ->
-            out << """
-                <li class="tab${occ + 1}">
-                    <label for="tab${occ + 1}-f${tabIds}">${it}</label>
-                </li>
-            """
-        }
-        out << '</ul></nav>'
-        out << '<section>'
+        topElement = formThemed.formTabs(topElement, tabIds, names, width)
         tabIds++
     }
 
     @Override
     void visitFormTabsEnd() {
-        if (!isActionButtonPrimary) out << "</fieldset>"
-        isActionButtonPrimary = true
-        tabOccurrence = 0
-        out << '</section></div>'
+        IHTMLElement top = topElement
+        while (top.taackTag != TaackTag.TABS) {
+            top = top.parent
+        }
+        topElement = top
     }
 
     @Override
     void visitFormTab(String name) {
-        out << """<div class="tab${++tabOccurrence} pure-g">"""
+        topElement = formThemed.formTab(topElement, ++tabOccurrence)
     }
 
     @Override
     void visitFormTabEnd() {
-        out << ST_CL_DIV
+        IHTMLElement top = topElement
+        while (top.taackTag != TaackTag.TAB) {
+            top = top.parent
+        }
+        topElement = top
     }
 
     @Override

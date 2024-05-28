@@ -3,6 +3,7 @@ package taack.ui.dump.theme.elements.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
+import taack.ui.base.form.FormSpec
 import taack.ui.dump.theme.elements.base.IHTMLElement
 
 @CompileStatic
@@ -44,7 +45,7 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder()
 
     abstract IHTMLElement enumInput()
-    abstract IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement)
+    abstract IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, String previousElement)
     abstract IHTMLElement section(IHTMLElement topElement, String... classes)
     abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value)
     abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable, String... val)
@@ -53,9 +54,9 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String value)
     abstract IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String value)
     abstract IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String value)
-    abstract IHTMLElement formSection(IHTMLElement inner)
-    abstract IHTMLElement formTabs(IHTMLElement inner)
-    abstract IHTMLElement formTab(IHTMLElement inner)
-    abstract IHTMLElement formCol(IHTMLElement inner)
+    abstract IHTMLElement formLabel(IHTMLElement topElement, String qualifiedName, String value)
+    abstract IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width)
+    abstract IHTMLElement formTab(IHTMLElement topElement, int occ)
+    abstract IHTMLElement formCol(IHTMLElement topElement)
     abstract IHTMLElement formAction()
 }

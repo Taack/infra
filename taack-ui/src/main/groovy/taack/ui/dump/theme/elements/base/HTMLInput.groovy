@@ -8,6 +8,7 @@ enum InputType {
     DATE('date'),
     EMAIL('email'),
     CHECK('checkbox'),
+    RADIO('radio'),
     HIDDEN('hidden'),
     TEXTAREA('textarea')
 
@@ -36,6 +37,12 @@ final class HTMLInput implements IHTMLElement {
     static HTMLInput inputCheck(Object value, String name, boolean checked = false) {
         HTMLInput ret = new HTMLInput(InputType.CHECK, value, name)
         if (checked) ret.attributes.put('checked', null)
+        ret
+    }
+
+    static HTMLInput inputRadio(String name, boolean checked = false) {
+        HTMLInput ret = new HTMLInput(InputType.RADIO, null, name)
+        if (checked) ret.attributes.put('checked', 'checked')
         ret
     }
 }

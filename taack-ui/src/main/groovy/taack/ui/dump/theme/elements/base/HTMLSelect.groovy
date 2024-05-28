@@ -33,5 +33,4 @@ final class HTMLSelect implements IHTMLElement {
         if (readOnly) attributes.put('readonly', null)
         if (disabled) attributes.put('disabled', null)
     }
-
 }

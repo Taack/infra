@@ -2,10 +2,14 @@ package taack.ui.dump.theme.elements.base
 
 import groovy.transform.CompileStatic
 import taack.ui.dump.theme.elements.IJavascriptDescriptor
+import taack.ui.dump.theme.elements.StyleDescriptor
 
 @CompileStatic
 enum TaackTag {
     FORM,
+    COL,
+    TAB,
+    TABS,
     SECTION
 }
 
@@ -16,6 +20,7 @@ trait IHTMLElement {
     String[] classes = []
     final Map<String, String> attributes = [:]
     IJavascriptDescriptor onClick
+    StyleDescriptor styleDescriptor
     IHTMLElement[] children = []
     IHTMLElement parent
     String tag
@@ -43,7 +48,7 @@ trait IHTMLElement {
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {
-        return new HTMLElementBuilder(this)
+        return new HTMLElementBuilder<T>(this as T)
     }
 
     static final class HTMLElementBuilder<T extends IHTMLElement> {
@@ -53,32 +58,37 @@ trait IHTMLElement {
             this.element = element
         }
 
-        HTMLElementBuilder setId(String id) {
+        HTMLElementBuilder<T> setId(String id) {
             element.id = id
             this
         }
 
-        HTMLElementBuilder setTaackTag(TaackTag taackTag) {
+        HTMLElementBuilder<T> setTaackTag(TaackTag taackTag) {
             element.taackTag = taackTag
             this
         }
 
-        HTMLElementBuilder addClasses(String... aClasses) {
+        HTMLElementBuilder<T> addClasses(String... aClasses) {
             element.addClasses aClasses
             this
         }
 
-        HTMLElementBuilder putAttribute(String key, String value) {
+        HTMLElementBuilder<T> putAttribute(String key, String value) {
             element.attributes.put key, value
             this
         }
 
-        HTMLElementBuilder setOnclick(IJavascriptDescriptor onClick) {
+        HTMLElementBuilder<T> setOnclick(IJavascriptDescriptor onClick) {
             element.onClick = onClick
             this
         }
 
-        HTMLElementBuilder addChildren(IHTMLElement... elements) {
+        HTMLElementBuilder<T> setStyle(StyleDescriptor styleDescriptor) {
+            element.styleDescriptor = styleDescriptor
+            this
+        }
+
+        HTMLElementBuilder<T> addChildren(IHTMLElement... elements) {
             for (IHTMLElement e in elements) {
                 e.parent = this.element
             }

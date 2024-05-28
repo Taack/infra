@@ -8,4 +8,8 @@ final class HTMLImg implements IHTMLElement {
         tag = 'img'
         attributes.put('src', src)
     }
+
+    HTMLElementBuilder<HTMLImg> getBuilder() {
+        return new HTMLElementBuilder<HTMLImg>(this)
+    }
 }

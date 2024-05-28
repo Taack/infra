@@ -7,4 +7,8 @@ final class HTMLFieldset implements IHTMLElement {
     HTMLFieldset() {
         tag = 'fieldset'
     }
+
+    HTMLElementBuilder<HTMLFieldset> getBuilder() {
+        return new HTMLElementBuilder<HTMLFieldset>(this)
+    }
 }

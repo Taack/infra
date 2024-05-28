@@ -3,10 +3,16 @@ package taack.ui.dump.theme.elements.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
+import taack.ui.base.form.FormSpec
 import taack.ui.dump.theme.elements.base.IHTMLElement
 
 @CompileStatic
 final class PurecssForm<T extends GormEntity<T>> implements IFormTheme<T> {
+
+    @Override
+    public <T1 extends IHTMLElement> HTMLElementBuilder<T1> getBuilder() {
+        return null
+    }
 
     @Override
     IHTMLElement enumInput() {
@@ -14,7 +20,7 @@ final class PurecssForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement inputOverride(String qualifiedName, String val, String txt, String imgSrc, String previousElement) {
+    IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, String previousElement) {
         return null
     }
 
@@ -29,7 +35,9 @@ final class PurecssForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable, String... val) {
+    IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices,
+                         boolean multiple, boolean disable,
+                         boolean nullable, String... val) {
         return null
     }
 
@@ -39,37 +47,37 @@ final class PurecssForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement dateInput() {
+    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, Date value) {
         return null
     }
 
     @Override
-    IHTMLElement textareaInput() {
+    IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String value) {
         return null
     }
 
     @Override
-    IHTMLElement fileInput() {
+    IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String value) {
         return null
     }
 
     @Override
-    IHTMLElement normalInput() {
+    IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String value) {
         return null
     }
 
     @Override
-    IHTMLElement formSection(IHTMLElement inner) {
+    IHTMLElement formLabel(IHTMLElement topElement, String qualifiedName, String value) {
         return null
     }
 
     @Override
-    IHTMLElement formTabs(IHTMLElement inner) {
+    IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width) {
         return null
     }
 
     @Override
-    IHTMLElement formTab(IHTMLElement inner) {
+    IHTMLElement formTab(IHTMLElement topElement, int occ) {
         return null
     }
 

@@ -7,4 +7,9 @@ final class HTMLDatalist implements IHTMLElement {
     HTMLDatalist() {
         tag = 'datalist'
     }
+
+    HTMLElementBuilder<HTMLDatalist> getBuilder() {
+        return new HTMLElementBuilder<HTMLDatalist>(this)
+    }
+
 }
