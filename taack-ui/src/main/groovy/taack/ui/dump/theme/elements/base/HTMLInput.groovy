@@ -9,7 +9,9 @@ enum InputType {
     EMAIL('email'),
     CHECK('checkbox'),
     RADIO('radio'),
+    PASSWD('password'),
     HIDDEN('hidden'),
+    FILE('file'),
     TEXTAREA('textarea')
 
     InputType(String typeText) {
@@ -30,18 +32,18 @@ final class HTMLInput implements IHTMLElement {
         attributes.put('type', inputType.typeText)
         attributes.put('name', name)
         if (placeHolder) attributes.put('placeHolder', placeHolder)
-        if (readOnly) attributes.put('readonly', null)
+        if (readOnly) attributes.put('readOnly', null)
         if (disabled) attributes.put('disabled', null)
     }
 
-    static HTMLInput inputCheck(Object value, String name, boolean checked = false) {
-        HTMLInput ret = new HTMLInput(InputType.CHECK, value, name)
+    static HTMLInput inputCheck(Object value, String name, boolean checked = false, boolean readOnly = false, boolean disabled = false) {
+        HTMLInput ret = new HTMLInput(InputType.CHECK, value, name, null, readOnly, disabled)
         if (checked) ret.attributes.put('checked', null)
         ret
     }
 
-    static HTMLInput inputRadio(String name, boolean checked = false) {
-        HTMLInput ret = new HTMLInput(InputType.RADIO, null, name)
+    static HTMLInput inputRadio(String name, boolean checked = false, boolean readOnly = false, boolean disabled = false) {
+        HTMLInput ret = new HTMLInput(InputType.RADIO, null, name, null, readOnly, disabled)
         if (checked) ret.attributes.put('checked', 'checked')
         ret
     }

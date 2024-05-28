@@ -45,18 +45,38 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder()
 
     abstract IHTMLElement enumInput()
-    abstract IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, String previousElement)
+
+    abstract IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, IHTMLElement previousElement)
+
     abstract IHTMLElement section(IHTMLElement topElement, String... classes)
-    abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value)
+
+    abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, boolean value)
+
     abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable, String... val)
+
     abstract IHTMLElement listOrSetInput()
-    abstract IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, Date value)
-    abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String value)
-    abstract IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String value)
-    abstract IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String value)
+
+    abstract IHTMLElement ajaxField(IHTMLElement topElement, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable)
+
+    abstract IHTMLElement ajaxField(IHTMLElement topElement, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple)
+
+    abstract IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, Date value)
+
+    abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value)
+
+    abstract IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value)
+
+    abstract IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value)
+
+    abstract IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value)
+
     abstract IHTMLElement formLabel(IHTMLElement topElement, String qualifiedName, String value)
+
     abstract IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width)
+
     abstract IHTMLElement formTab(IHTMLElement topElement, int occ)
+
     abstract IHTMLElement formCol(IHTMLElement topElement)
-    abstract IHTMLElement formAction()
+
+    abstract IHTMLElement formAction(IHTMLElement topElement, String url, String i18n)
 }

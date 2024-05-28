@@ -21,13 +21,13 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, String previousElement) {
+    IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, IHTMLElement previousElement) {
         HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
                 new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.build(),
                 new HTMLSpan().builder.addChildren(
                         new HTMLTxtContent(txt)
                 ).build(),
-                new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M', 'taackFormFieldOverrideM2O').putAttribute('taackOnclickInnerHTML', previousElement).build()
+                new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M', 'taackFormFieldOverrideM2O')./*putAttribute('taackOnclickInnerHTML', previousElement).*/build()
         )
         if (imgSrc) {
             span.addChildren(
@@ -51,7 +51,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean value) {
+    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, boolean value) {
         topElement.addChildren(
                 HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.setId("${qualifiedName}Check").build(),
         )
@@ -71,23 +71,71 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, Date value) {
+    IHTMLElement ajaxField(IHTMLElement topElement, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable) {
+        HTMLSelect s = new HTMLSelect(choices, false, false, disable, val as String)
+        HTMLDiv d = new HTMLDiv()
+        if (!disable) {
+            d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M').build())
+        }
+        d.addChildren(s)
+        topElement.addChildren(s)
+        topElement
+    }
+
+    private static String inputEscape(final String val) {
+        val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
+    }
+
+    @Override
+    IHTMLElement ajaxField(IHTMLElement topElement, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
+
+        vals.each {
+            boolean isString = String.isAssignableFrom(it.class)
+
+            HTMLSpan span = new HTMLSpan().builder.addClasses('M2MParent').build() as HTMLSpan
+            if (disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg')
+            span.addChildren(new HTMLInput(InputType.STRING, it ? inputEscape(it.toString()) : '', qualifiedName, null, nullable, disabled))
+            span.addChildren(new HTMLInput(InputType.HIDDEN, it ? (isString ? it : it['id']) : '', qualifiedName, null, nullable, disabled))
+            topElement.addChildren(span)
+        }
+        if (!disabled && isMultiple) {
+            HTMLSpan span2 = new HTMLSpan().builder.addClasses('M2MToDuplicate').build() as HTMLSpan
+            span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg')
+            span2.addChildren(new HTMLInput(InputType.STRING, '', qualifiedName, null, nullable, disabled))
+            span2.addChildren(new HTMLInput(InputType.HIDDEN, '', qualifiedName, null, nullable, disabled))
+            topElement.addChildren(span2)
+
+        }
+        topElement
+    }
+
+    @Override
+    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, Date value) {
         return null
     }
 
     @Override
-    IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String value) {
-        return null
+    IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(new HTMLInput(InputType.TEXTAREA, qualifiedName, value, null, disable, nullable))
+        topElement
     }
 
     @Override
-    IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String value) {
-        return null
+    IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(new HTMLInput(InputType.FILE, qualifiedName, value, null, disable, nullable))
+        topElement
     }
 
     @Override
-    IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String value) {
-        return null
+    IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(new HTMLInput(InputType.STRING, qualifiedName, value, null, disable, nullable))
+        topElement
+    }
+
+    @Override
+    IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(new HTMLInput(InputType.PASSWD, qualifiedName, value, null, disable, nullable))
+        topElement
     }
 
     @Override
@@ -141,13 +189,16 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement formCol(IHTMLElement topElement) {
-//        . setTaackTag(TaackTag.COL)
+        topElement.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.COL).build())
         topElement.children.last()
     }
 
     @Override
-    IHTMLElement formAction() {
-        return null
+    IHTMLElement formAction(IHTMLElement topElement, String url, String i18n) {
+        topElement.addChildren(
+                new HTMLButton(url, i18n)
+        )
+        topElement
     }
 
 }
