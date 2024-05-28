@@ -151,17 +151,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 }
             }
         } else if (isDate) {
-            String date = field.value ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(field.value) : null
-            result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" type="datetime-local" class="many-to-one pure-u-22-24 " autocomplete="off" ${date ?: ''} ${field.fieldConstraint.nullable ? "" : "required"} value="${date ?: ''}" ${isDisabled(field) ? "disabled" : ""}>\
-                """.stripIndent().strip()
+            formThemed.dateInput(topElement, qualifiedName, field.value as Date)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                result.append """<textarea id="${qualifiedName}" name="${qualifiedName}" class="many-to-one pure-u-22-24 " autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>"""
+                formThemed.textareaInput(topElement, qualifiedName, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? "" : "required"} list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
-                """.stripIndent().strip()
+                formThemed.fileInput(topElement, qualifiedName, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """\
                 <div id="${qualifiedName}-editor">
@@ -178,15 +173,11 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 </div>\
                 """.stripIndent().strip()
             } else {
-
                 String valueString = inputEscape(field.value?.toString())
                 if (nf && field.value instanceof Number) {
                     valueString = nf.format(field.value)
                 }
-                result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" type="${field.fieldConstraint.widget == WidgetKind.PASSWD.name ? "password" : field.value instanceof Number ? "text" : "text"}" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${valueString ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
-                <datalist id="${qualifiedName}List"></datalist>\
-                """.stripIndent().strip()
+                formThemed.fileInput(topElement, qualifiedName, valueString)
             }
         }
         return inputOverride(qualifiedName, field, result.toString()) ?: result.toString()
