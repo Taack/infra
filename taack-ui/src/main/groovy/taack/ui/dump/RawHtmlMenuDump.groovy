@@ -166,7 +166,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
         String current = """\
             <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                ${parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;")}
+                ${currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''}
                 ${selectedOptionValue}
             </a>
         """.stripIndent()
