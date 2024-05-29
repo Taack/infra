@@ -11,4 +11,9 @@ final class HTMLTxtContent implements IHTMLElement {
         tag = null
         this.content = content
     }
+
+    @Override
+    String getOutput() {
+        content
+    }
 }

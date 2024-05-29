@@ -1,6 +1,7 @@
 package taack.ui
 
-interface IEnumOptions extends IEnumOption {
+interface IEnumOptions {
     IEnumOption[] getOptions()
+    IEnumOption[] getCurrents()
     String getParamKey()
 }

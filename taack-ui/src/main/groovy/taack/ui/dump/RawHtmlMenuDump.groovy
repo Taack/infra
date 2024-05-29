@@ -162,7 +162,7 @@ final class RawHtmlMenuDump implements IUiMenuVisitor {
         splitMenuStart()
         String selectedOptionKey = parameter.params[enumOptions.paramKey]
 
-        IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions
+        IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
         String current = """\
             <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

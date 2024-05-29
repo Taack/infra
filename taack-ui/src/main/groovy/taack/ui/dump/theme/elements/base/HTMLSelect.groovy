@@ -24,11 +24,11 @@ final class HTMLOption implements IHTMLElement {
 @CompileStatic
 final class HTMLSelect implements IHTMLElement {
 
-    final List<HTMLOption> options
-
-    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean readOnly = false, boolean disabled = false, String... val) {
+    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean readOnly = false, boolean disabled = false) {
         tag = 'select'
-        this.options = options.options.collect { new HTMLOption(it, val.contains(it.key)) }
+        addChildren(options.options.toList().collect {
+            new HTMLOption(it, options.currents.contains(it.key))
+        } as HTMLOption[])
         attributes.put('name', options.paramKey)
         if (readOnly) attributes.put('readonly', null)
         if (disabled) attributes.put('disabled', null)

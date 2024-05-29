@@ -16,11 +16,6 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement enumInput() {
-        return null
-    }
-
-    @Override
     IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, IHTMLElement previousElement) {
         HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
                 new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.build(),
@@ -59,20 +54,15 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement selects(IHTMLElement topElement, IEnumOptions options, boolean multiple, boolean disable, boolean nullable, String... val) {
-        HTMLSelect s = new HTMLSelect(options, multiple, false, disable, val)
+    IHTMLElement selects(IHTMLElement topElement, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
+        HTMLSelect s = new HTMLSelect(options, multiple, false, disable)
         topElement.addChildren(s)
         topElement
     }
 
     @Override
-    IHTMLElement listOrSetInput() {
-        return null
-    }
-
-    @Override
     IHTMLElement ajaxField(IHTMLElement topElement, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable) {
-        HTMLSelect s = new HTMLSelect(choices, false, false, disable, val as String)
+        HTMLSelect s = new HTMLSelect(choices, false, false, disable)
         HTMLDiv d = new HTMLDiv()
         if (!disable) {
             d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M').build())
@@ -89,7 +79,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement ajaxField(IHTMLElement topElement, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
 
-        vals.each {
+        vals?.each {
             boolean isString = String.isAssignableFrom(it.class)
 
             HTMLSpan span = new HTMLSpan().builder.addClasses('M2MParent').build() as HTMLSpan

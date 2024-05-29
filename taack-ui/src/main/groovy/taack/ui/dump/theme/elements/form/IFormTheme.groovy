@@ -37,6 +37,7 @@ enum FormMethod {
 trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     void constructorIFormThemed(InputMode inputMode = InputMode.POST, EncType encType = EncType.DATA) {
+        tag = 'form'
         attributes.put('method', inputMode.modeText)
         attributes.put('enctype', encType.text)
         addClasses('taackForm')
@@ -44,17 +45,13 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder()
 
-    abstract IHTMLElement enumInput()
-
     abstract IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, IHTMLElement previousElement)
 
     abstract IHTMLElement section(IHTMLElement topElement, String... classes)
 
     abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, boolean value)
 
-    abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable, String... val)
-
-    abstract IHTMLElement listOrSetInput()
+    abstract IHTMLElement selects(IHTMLElement topElement, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable)
 
     abstract IHTMLElement ajaxField(IHTMLElement topElement, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable)
 

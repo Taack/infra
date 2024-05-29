@@ -5,32 +5,27 @@ import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.render.TaackUiOverriderService
-import taack.ui.IEnumOption
+import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
 import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
+import taack.ui.dump.theme.elements.base.*
+import taack.ui.dump.theme.elements.form.BootstrapForm
+import taack.ui.dump.theme.elements.form.IFormTheme
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 
 @CompileStatic
 final class RawHtmlFormDump implements IUiFormVisitor {
+
     private final static String ST_ID = 'id'
-    private final static String ST_NAME = 'name'
     private final static String ST_VALUES = 'values'
     private final static String ST_LIST = 'list'
-    private final static String ST_CL_DIV = '</div>'
-    private final static String ST_CL_SELECT = '</select>'
-    private final static String ST_CL_FIELDSET = '</fieldset>'
-    private final static String ST_CL_SELECT_DIV = ST_CL_SELECT + ST_CL_DIV
 
     final private ByteArrayOutputStream out
     final private Parameter parameter
-
-    private StringBuffer postForm = new StringBuffer()
-    boolean isActionButtonPrimary = true
 
     private Object aObject
 
@@ -38,13 +33,24 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private int tabIds = 0
     private FieldInfo[] lockedFields
 
+    IFormTheme formThemed
+    IHTMLElement topElement
+
     RawHtmlFormDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
     }
 
     static String inputEscape(final String val) {
-        val?.replace('"', '&quot;')
+        val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
+    }
+
+    private void closeTags(TaackTag tag) {
+        IHTMLElement top = topElement
+        while (top.taackTag != tag) {
+            top = top.parent
+        }
+        topElement = top
     }
 
     private boolean isDisabled(FieldInfo field) {
@@ -65,115 +71,61 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        out << """
-                <div class='form'>
-                <form method="post" enctype="multipart/form-data" class=" taackForm">
-                    <input name="id" type="hidden" value="${id}"/>
-                    <input name="className" type="hidden" value="${aObject.class.name ?: ''}"/>
-                    <input name="originController" type="hidden" value="${parameter.applicationTagLib.controllerName}"/>
-                    <input name="originAction" type="hidden" value="${parameter.applicationTagLib.actionName}"/>
-                    <input name="originBrand" type="hidden" value="${parameter.brand}"/>
-                    <div class="pure-g">
-                """
+        formThemed = new BootstrapForm().builder.setTaackTag(TaackTag.FORM).addChildren(
+                new HTMLInput(InputType.HIDDEN, id, 'id'),
+                new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
+                new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
+        ).build() as IFormTheme
+        topElement = formThemed
     }
 
     @Override
     void visitFormEnd() {
-        if (!isActionButtonPrimary) out << ST_CL_FIELDSET
-        out << '</div></form></div>'
-        out << postForm
+        out << formThemed.output
         tabIds = 0
     }
 
     @Override
     void visitFormSection(String i18n, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        out << """
-            <div class="${width.sectionCss}">
-                    <fieldset>
-                    <legend>${i18n}</legend>
-                    <div class="pure-g">
-            """
+        topElement = formThemed.section(topElement, width.sectionCss.split(' '))
     }
 
     @Override
     void visitFormSectionEnd() {
-        if (!isActionButtonPrimary) out << ST_CL_FIELDSET
-        isActionButtonPrimary = true
-        out << '</div></fieldset></div>'
+        closeTags(TaackTag.SECTION)
     }
 
-    @Override
-    void visitFormField(String i18n, FieldInfo field) {
-
-    }
-
-    private String inputOverride(final String qualifiedName, FieldInfo field, String result) {
+    private void inputOverride(final String qualifiedName, FieldInfo field) {
         if (aObject instanceof GormEntity) {
             GormEntity entity = aObject as GormEntity
             if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
                 String img = TaackUiOverriderService.formInputPreview(entity, field)
                 String txt = TaackUiOverriderService.formInputSnippet(entity, field)
                 String val = TaackUiOverriderService.formInputValue(entity, field)
-                String image = img ? """<img src="$img" style="max-height: 112px; max-width: 112px">""" : ''
-                return """
-                     <span class="M2MParent">
-                        <input value="${val}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${entity.ident()}" />
-                        <span style="font-size: smaller;">$txt</span>
-                        <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" class="taackFormFieldOverrideM2O" taackOnclickInnerHTML='${result.replace('"', '&quot;').replace('\'', '&#39;').replace('\n', '').replace('\r', '')}';" style="margin: 5px 15px 0 0;">
-                        ${image}
-                        
-                    </span>
-                """
+                topElement = formThemed.inputOverride(topElement, qualifiedName, val, txt, img, topElement.parent)
             }
         }
-        null
     }
 
-    private String inputField(final String qualifiedName, final FieldInfo field, final IEnumOptions eos = null, final String ajax = '', final NumberFormat nf = null) {
+    private void inputField(final String qualifiedName, final FieldInfo field, final IEnumOptions eos = null, final NumberFormat nf = null) {
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
         final boolean isListOrSet = Collection.isAssignableFrom(type)
         final boolean isBoolean = type == boolean || type == Boolean
         final boolean isDate = Date.isAssignableFrom(type)
+        final boolean isNullable = field.fieldConstraint.nullable
+        final boolean isFieldDisabled = isDisabled(field)
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            result.append """\
-                    <input type="checkbox" ${ajax ?: ''} name="${qualifiedName}" value="1" id="${qualifiedName}Check" ${field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24 " ${isDisabled(field) ? "disabled" : ""}>
-                    <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">\
-                    """.stripIndent().strip()
+            topElement = formThemed.booleanInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as boolean)
         } else if (eos) {
-            IEnumOption[] enumConstraints = eos.options
-            result.append """\
-                <div class="pure-u-1">
-                <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
-                ${field.fieldConstraint.nullable ? '<option value=""></option>' : ""}\
-                """.stripIndent().strip()
-
-            def valId = isEnum ? (field.value as Enum)?.name() : field.value?.toString()
-
-            enumConstraints.each {
-                if (isListOrSet) {
-                    result.append """<option value="${it.key}" ${(field.value as Collection)*.toString().contains(it.key) ? 'selected' : ''}>${it.value}</option>"""
-                } else {
-                    result.append """<option value="${it.key}" ${valId == it.key ? 'selected' : ''}>${it.value}</option>"""
-                }
-            }
-            result.append ST_CL_SELECT + ST_CL_DIV
+            topElement = formThemed.selects(topElement, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
-            result.append """\
-                <div class="pure-u-1">
-                <select ${ajax ?: ''} class="pure-u-22-24" name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} ${isDisabled(field) ? "disabled" : ""}>
-                <option value=""></option>\
-                """.stripIndent().strip()
-
             if (isEnum) {
-                List<String> values = type.invokeMethod(ST_VALUES, null) as List<String>
-
-                values.each {
-                    final String name = it.hasProperty(ST_NAME) ? it.getAt(ST_NAME) : it
-                    result.append """<option value="${inputEscape(it)}" ${field.value == it ? 'selected="selected"' : ''}>${name}</option>"""
-                }
+                topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
@@ -181,36 +133,25 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final Class actualClass = Class.forName(actualType.typeName)
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
-                        List values = actualClass.invokeMethod(ST_VALUES, null) as List
-                        values.each {
-                            final String name = it.hasProperty(ST_NAME) ? it.getAt(ST_NAME) : it
-                            result.append """<option value="${inputEscape(it.toString())}" ${(field.value as Collection)*.toString().contains(it.toString()) ? 'selected="selected"' : ''}>${name}</option>"""
-                        }
+                        Enum[] values = actualClass.invokeMethod(ST_VALUES, null) as Enum[]
+                        topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
                     } else {
-                        List values = actualClass.invokeMethod(ST_LIST, null) as List
-                        values.each {
-                            result.append """<option value="${it[ST_ID]}" ${((field.value as Collection)*.getAt(ST_ID) as List)?.contains(it[ST_ID]) ? 'selected="selected"' : ''}>${it}</option>"""
-                        }
+                        String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
+                        topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
                     }
                 }
             }
-            result.append ST_CL_SELECT_DIV
         } else if (isDate) {
-            String date = field.value ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(field.value) : null
-            result.append """\
-                <input id="${qualifiedName}" $ajax name="${qualifiedName}" type="datetime-local" class="many-to-one pure-u-22-24 " autocomplete="off" ${date ?: ''} ${field.fieldConstraint.nullable ? "" : "required"} value="${date ?: ''}" ${isDisabled(field) ? "disabled" : ""}>\
-                """.stripIndent().strip()
+            topElement = formThemed.dateInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as Date)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                result.append """<textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="many-to-one pure-u-22-24 " autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>"""
+                topElement = formThemed.textareaInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="file" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? "" : "required"} list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
-                """.stripIndent().strip()
+                topElement = formThemed.fileInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """\
                 <div id="${qualifiedName}-editor">
-                    <textarea id="${qualifiedName}" name="${qualifiedName}" $ajax class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>
+                    <textarea id="${qualifiedName}" name="${qualifiedName}" class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>
                     <div id="${qualifiedName}-markdown-preview" class="pure-u-10-24 markdown-body wysiwyg-markdown-preview"></div>
                     <input value="" readonly="on" class="many-to-one taackAjaxFormM2O" autocomplete="off" id="${qualifiedName}-attachment-select" taackAjaxFormM2OInputId="${qualifiedName}-attachment-link" taackAjaxFormM2OAction="${parameter.urlMapped('markdown', 'selectAttachment')}"/>
                     <input value="" type="hidden" id="${qualifiedName}-attachment-link"/>
@@ -223,22 +164,18 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 </div>\
                 """.stripIndent().strip()
             } else {
-
                 String valueString = inputEscape(field.value?.toString())
                 if (nf && field.value instanceof Number) {
                     valueString = nf.format(field.value)
                 }
-                result.append """\
-                <input id="${qualifiedName}" name="${qualifiedName}" $ajax type="${field.fieldConstraint.widget == WidgetKind.PASSWD.name ? "password" : field.value instanceof Number? "text" :"text"}" class="many-to-one pure-u-22-24 " autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${valueString ?: ''}" list="${qualifiedName}List" ${isDisabled(field) ? "disabled" : ""}>
-                <datalist id="${qualifiedName}List"></datalist>\
-                """.stripIndent().strip()
+                topElement = formThemed.fileInput(topElement, qualifiedName, isFieldDisabled, isNullable, valueString)
             }
         }
-        return inputOverride(qualifiedName, field, result.toString()) ?: result.toString()
+        inputOverride(qualifiedName, field)
     }
 
     @Override
-    void visitFormField(String i18n, FieldInfo field, IEnumOptions enumOptions, NumberFormat numberFormat) {
+    void visitFormField(final String i18n, final FieldInfo field, final IEnumOptions eos = null, NumberFormat numberFormat = null) {
         final String trI18n = i18n ?: parameter.trField(field)
 
         if (field.fieldConstraint.constraints) {
@@ -251,27 +188,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final Class type = field.fieldConstraint.field.type
         final boolean isBoolean = type == boolean || type == Boolean
 
-        out << """
-                <div class="pure-u-1">
-                <div class="pure-u-1 taackFieldError" taackFieldError="${qualifiedName}" style="display: none;"></div>
-                <div class="pure-u-1 ${qualifiedName}-field-form ${isBoolean ? 'vertical-center ' : ''}">
-                    <label for="${qualifiedName}">
-                        ${trI18n}
-                    </label>
-                </div>
-            """
-        out << inputField(qualifiedName, field, enumOptions, null, numberFormat ?: parameter.nf)
-        out << ST_CL_DIV
+        formThemed.formLabel(topElement, qualifiedName, trI18n)
+        inputField(qualifiedName, field, eos, numberFormat ?: parameter.nf)
     }
 
     private void formAjaxFieldLabel(final String i18n, final String qualifiedName) {
-        out << """
-                <div class="pure-u-1">
-                    <div class="pure-u-1 taackFieldError" taackFieldError="${qualifiedName}" style="display: none;"></div>
-                    <label for="${qualifiedName}">
-                        ${i18n}
-                    </label>
-            """
+        formThemed.formLabel(topElement, qualifiedName, i18n)
     }
 
     @Override
@@ -282,51 +204,10 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String qualifiedName = field.fieldName
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
         final boolean isFieldDisabled = isDisabled(field)
+        final boolean isNullable = field.fieldConstraint.nullable
         formAjaxFieldLabel(trI18n, qualifiedName)
-
-        if (isListOrSet) {
-            int occ = 0
-            field.value.each {
-                boolean isString = String.isAssignableFrom(it.class)
-                out << """
-                    <span class="M2MParent">
-                        ${isFieldDisabled ? "" : '<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerText="";" style="margin: 5px 15px 0 0;">'}
-                        <input value="${it ? inputEscape(it.toString()) : ''}" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2M"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}-${occ}" taackAjaxFormM2MInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${occ}" taackAjaxFormM2MAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
-                        <input value="${it ? (isString ? it : it[ST_ID]) : ''}" type="hidden" name="${qualifiedName}" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${occ}"/>
-                    </span>
-                    """
-                occ++
-            }
-            if (!isFieldDisabled) {
-                out << """
-                <span class="M2MToDuplicate">
-                    <img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.parentElement.innerText='';">
-                    <input value="" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2M"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}-${occ}" taackAjaxFormM2MInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${occ}" taackAjaxFormM2MAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
-                    <input value="" type="hidden" attr-name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}-${occ}"/>
-                </span>
-                """
-            }
-            out << ST_CL_DIV
-        } else if (String.isAssignableFrom(field.fieldConstraint.field.type)) {
-            out << """
-                ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">"""}
-                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2O"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}" taackAjaxFormM2OInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" taackAjaxFormM2OAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
-                <input value="${field.value ? field.value : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>
-            """
-            out << ST_CL_DIV
-        } else {
-            String rep = """\
-                ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">"""}
-                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : "taackAjaxFormM2O"}" autocomplete="off" id="${qualifiedName}${parameter.modalId}" taackAjaxFormM2OInputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" taackAjaxFormM2OAction="${parameter.urlMapped(controller, action, id, params)}" $fieldInfoParams/>
-                <input value="${field.value ? field.value[ST_ID] : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>\
-            """.stripIndent().strip()
-
-            String res = inputOverride(qualifiedName, field, rep)
-
-            res ?= rep
-            out <<  res
-            out << ST_CL_DIV
-        }
+        formThemed.ajaxField(topElement, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable, isListOrSet)
+        inputOverride(qualifiedName, field)
     }
 
     private static String fieldInfoParams(FieldInfo[] fieldInfos) {
@@ -340,65 +221,34 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isFieldDisabled = isDisabled(field)
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
         formAjaxFieldLabel(trI18n, qualifiedName)
-
-        IEnumOption[] enumConstraints = enumOptions.options
-        out << """
-                <div class="pure-u-1">
-                ${isFieldDisabled ? "" : """<img class="deleteIconM2M" src="/assets/taack/icons/actions/delete.svg" width="16" onclick="this.nextElementSibling.value='';">"""}
-                <select name="${qualifiedName}" id="${qualifiedName}Select" ${isFieldDisabled ? "disabled" : ""} class="many-to-one pure-u-22-24 ${isFieldDisabled ? "" : 'taackAjaxFormSelectM2O'}" autocomplete="off" id="${qualifiedName}${parameter.modalId}" taackAjaxFormM2OSelectId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" taackAjaxFormM2OAction="${parameter.urlMapped(controller, action)}" $fieldInfoParams/>
-                <option value=""></option>
-                """
-
-        enumConstraints.each {
-            out << """<option value="${it.key}" ${field.value == it.key ? 'selected' : ''}>${it.value}</option>"""
-        }
-        out << ST_CL_SELECT_DIV
-
+        formThemed.ajaxField(topElement, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoParams, isFieldDisabled)
     }
 
     @Override
     void visitFormTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        out << """<div class="pc-tab ${width.sectionCss}">"""
-        names.eachWithIndex { it, occ ->
-            out << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-f${tabIds}" class="inputTab${occ + 1}" type="radio" name="pct-${tabIds}" />"""
-        }
-        out << '<nav><ul>'
-        names.eachWithIndex { it, occ ->
-            out << """
-                <li class="tab${occ + 1}">
-                    <label for="tab${occ + 1}-f${tabIds}">${it}</label>
-                </li>
-            """
-        }
-        out << '</ul></nav>'
-        out << '<section>'
+        topElement = formThemed.formTabs(topElement, tabIds, names, width)
         tabIds++
     }
 
     @Override
     void visitFormTabsEnd() {
-        if (!isActionButtonPrimary) out << "</fieldset>"
-        isActionButtonPrimary = true
-        tabOccurrence = 0
-        out << '</section></div>'
+        closeTags(TaackTag.TABS)
     }
 
     @Override
     void visitFormTab(String name) {
-        out << """<div class="tab${++tabOccurrence} pure-g">"""
+        topElement = formThemed.formTab(topElement, ++tabOccurrence)
     }
 
     @Override
     void visitFormTabEnd() {
-        out << ST_CL_DIV
+        closeTags(TaackTag.TAB)
     }
 
     @Override
     void visitFormAction(String i18n, String controller, String action, Long id, Map params, boolean isAjax) {
         i18n ?= parameter.trField(controller, action)
-        if (isActionButtonPrimary) out << "<fieldset style=\"width: 100%; text-align: right;\">"
-        out << """<button type="submit" class="pure-button ${isActionButtonPrimary ? 'pure-button-primary' : ''} ${isAjax ? "taackFormAction" : ""}" formaction="${parameter.urlMapped(controller, action, id, params)}">${i18n}</button>"""
-        isActionButtonPrimary = false
+        formThemed.formAction(topElement, parameter.urlMapped(controller, action, id, params), i18n)
     }
 
 
@@ -406,41 +256,32 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry) {
         final String trI18n = i18n ?: parameter.trField(field) ?: mapEntry
         final String qualifiedName = field.fieldName + '.' + mapEntry
-        final String value = (field.value as Map<String, String>)?.get(mapEntry)
-        out << """
-                <div class="pure-u-1">
-                <div class="pure-u-1 taackFieldError" taackFieldError="${qualifiedName}" style="display: none;"></div>
-                    <label for="${qualifiedName}">
-                        ${trI18n}
-                    </label>
-            """
+        String value = (field.value as Map<String, String>)?.get(mapEntry)
+        value = value ? inputEscape(value) : ''
+        final boolean isFieldDisabled = isDisabled(field)
+        final boolean isNullable = field.fieldConstraint.nullable
+        formThemed.formLabel(topElement, qualifiedName, trI18n)
         if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-            out << """<textarea name="${qualifiedName}" class="many-to-one pure-u-1" autocomplete="off" rows="8">${value ?: ''}</textarea>"""
+            formThemed.textareaInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
         } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-            out << """
-                <input id="${qualifiedName}" name="${qualifiedName}"  type="file" class="many-to-one pure-u-1" autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${value ?: ''}" list="${qualifiedName}List">
-                <datalist id="${qualifiedName}List"></datalist>
-                """
+            formThemed.fileInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
         } else {
-            out << """
-                <input id="${qualifiedName}" name="${qualifiedName}"  type="${field.fieldConstraint.widget == WidgetKind.PASSWD.name ? "password" : "text"}" class="many-to-one pure-u-1" autocomplete="off" ${field.fieldConstraint.nullable ? '' : 'required=""'} value="${value ? inputEscape(value) : ''}" list="${qualifiedName}List">
-                <datalist id="${qualifiedName}List"></datalist>
-                """
+            if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
+                formThemed.passwdInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
+            } else {
+                formThemed.normalInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
+            }
         }
-
-        out << ST_CL_DIV
-
     }
 
     @Override
     void visitCol() {
-        out << "<div class='pure-u-1 pure-u-md-1-2'>"
+        topElement = formThemed.formCol(topElement)
     }
 
     @Override
     void visitColEnd() {
-        isActionButtonPrimary = true
-        out << ST_CL_DIV
+        closeTags(TaackTag.COL)
     }
 
     @Override

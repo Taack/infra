@@ -43,8 +43,7 @@ trait IHTMLElement {
     }
 
     String getOutput() {
-        """
-        """
+        "<$tag ${attributes.collect { "${it.key}=\"${it.value}\""}.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {

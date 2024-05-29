@@ -30,16 +30,29 @@ final class EnumOptions implements IEnumOptions {
     private final static String ST_NAME = 'name'
 
     final IEnumOption[] options
-    final IEnumOption current
+    final IEnumOption[] currents
     final String paramKey
 
-    EnumOptions(IEnumOption[] options, String paramKey, EnumOption current) {
-        this.current = current
+    EnumOptions(IEnumOption[] options, String paramKey, EnumOption... currents) {
+        this.currents = currents
         this.options = options
         this.paramKey = paramKey
     }
 
-    EnumOptions(Class<? extends Enum> options, String paramKey) {
+    EnumOptions(Class<? extends Enum> options, String paramKey, EnumOption... currents) {
+        Object[] values = options.invokeMethod('values', null) as Object[]
+        this.options = new EnumOption[values.size()]
+
+        for (int i = 0; i < values.size(); i++) {
+            final String v = values[i]
+            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
+            this.options[i] = new EnumOption(v, name, null, false)
+        }
+        this.currents = currents
+        this.paramKey = paramKey
+    }
+
+    EnumOptions(Class<? extends Enum> options, String paramKey, Enum... currents) {
         String[] values = options.invokeMethod('values', null) as String[]
         this.options = new EnumOption[values.size()]
 
@@ -49,27 +62,63 @@ final class EnumOptions implements IEnumOptions {
             this.options[i] = new EnumOption(v, name, null, false)
         }
 
+        if (currents && currents.size() > 0) {
+            this.currents = new EnumOption[currents.size()]
+
+            for (int i = 0; i < currents.size(); i++) {
+                final String v = currents[i]
+                if (v) {
+                    final String name = v?.hasProperty(ST_NAME) ? values[i]?.getAt(ST_NAME) : v
+                    this.currents[i] = new EnumOption(v, name, null, false)
+                }
+            }
+        }
+
         this.paramKey = paramKey
     }
 
-    @Override
-    String getKey() {
-        return current.key
+    EnumOptions(Class<? extends Enum> options, String paramKey, String... currents) {
+        String[] values = options.invokeMethod('values', null) as String[]
+        this.options = new EnumOption[values.size()]
+
+        for (int i = 0; i < values.size(); i++) {
+            final String v = values[i]
+            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
+            this.options[i] = new EnumOption(v, name, null, false)
+        }
+
+        if (currents && currents.size() > 0) {
+            this.currents = new EnumOption[currents.size()]
+
+            for (int i = 0; i < currents.size(); i++) {
+                final String v = currents[i]
+                final String name = v
+                if (v) this.currents[i] = new EnumOption(v, name, null, false)
+            }
+        }
+
+        this.paramKey = paramKey
     }
 
-    @Override
-    String getValue() {
-        return current.value
-    }
+    EnumOptions(Enum[] values, String paramKey, Enum... currents) {
+        this.options = new EnumOption[values.size()]
 
-    @Override
-    String getAsset() {
-        return current.asset
-    }
+        for (int i = 0; i < values.size(); i++) {
+            final String v = values[i]
+            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
+            this.options[i] = new EnumOption(v, name, null, false)
+        }
 
-    @Override
-    Boolean isSection() {
-        return current.section
+        if (currents && currents.size() > 0) {
+            this.currents = new EnumOption[currents.size()]
+
+            for (int i = 0; i < currents.size(); i++) {
+                final String v = currents[i]
+                final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
+                this.currents[i] = new EnumOption(v, name, null, false)
+            }
+        }
+        this.paramKey = paramKey
     }
 
 }
