@@ -56,15 +56,4 @@ final class BlockActionSpec {
         if (taackUiEnablerService.hasAccess(action)) blockVisitor.visitAction(i18n, icon, Utils.getControllerName(action), action.method, null, null, true)
     }
 
-    /**
-     * Display a button that opens an url outside of the intranet in a new tab
-     *
-     * @param i18n Translation that will be displayed when hovering the button
-     * @param icon Button icon
-     * @param baseUrl The base url of the website which will be opened
-     * @param params A map of the params that will be passed as GET, directly after baseUrl (See Utils.paramsString for parsing of the map into GET params)
-     */
-    void outsideAction(String i18n, ActionIcon icon, String baseUrl, Map params) {
-        blockVisitor.visitOutsideAction(i18n, icon, baseUrl, params)
-    }
 }

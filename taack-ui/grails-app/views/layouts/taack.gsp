@@ -48,7 +48,7 @@
     <g:layoutHead/>
 </head>
 
-<body class="day">
+<body class="${themeMode == ThemeMode.DARK ? 'night' : 'day'}" data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
 
 <nav class="navbar navbar-expand-md"
      style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">

@@ -44,11 +44,6 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitOutsideAction(String i18n, ActionIcon actionIcon, String baseUrl, Map<String, ?> params) {
-
-    }
-
-    @Override
     void visitModal() {
 
     }

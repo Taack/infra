@@ -23,8 +23,6 @@ interface IUiBlockVisitor {
 
     void visitAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ? extends Object> params, boolean isAjaxRendering)
 
-    void visitOutsideAction(String i18n, ActionIcon actionIcon, String baseUrl, Map<String, ? extends Object> params)
-
     void visitModal()
 
     void visitModalEnd()

@@ -98,7 +98,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitForm(final String i18n, final BlockSpec.Width width) {
         visitInnerBlock(null, width)
-        parameter.trField(parameter.params['controller'] as String, parameter.params['action'] as String)
+        //parameter.trField(parameter.params['controller'] as String, parameter.params['action'] as String)
         visitInnerBlock(i18n, width)
     }
 
@@ -325,11 +325,6 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
         } else {
             out << "<a href='${parameter.urlMapped(controller, action, id, params)}'>${actionIcon.getHtml(i18n)}</a>"
         }
-    }
-
-    @Override
-    void visitOutsideAction(final String i18n, final ActionIcon actionIcon, final String baseUrl, Map<String, ? extends Object> params) {
-        out << "<a target='_blank' href='${baseUrl}${params ? "?${Utils.paramsString params}'" : ''}'>${actionIcon.getHtml(i18n)}</a>"
     }
 
     @Override
