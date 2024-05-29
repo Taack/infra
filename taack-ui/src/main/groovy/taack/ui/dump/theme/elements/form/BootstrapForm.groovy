@@ -4,8 +4,6 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.base.form.FormSpec
-import taack.ui.dump.theme.elements.DisplayEnum
-import taack.ui.dump.theme.elements.StyleDescriptor
 import taack.ui.dump.theme.elements.base.*
 import taack.ui.dump.theme.elements.table.ThemeMode
 import taack.ui.dump.theme.elements.table.ThemeSize
@@ -23,7 +21,8 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String val, String txt, String imgSrc, IHTMLElement previousElement) {
+    IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String trI18n, String val, String txt, String imgSrc, IHTMLElement previousElement) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
                 new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.build(),
                 new HTMLSpan().builder.addChildren(
@@ -37,11 +36,12 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             )
         }
         topElement.addChildren(span.build())
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement section(IHTMLElement topElement, String... classes) {
+    IHTMLElement section(IHTMLElement topElement, String trI18n, String... classes) {
         topElement.addChildren(
                 new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
                         .addChildren(
@@ -53,22 +53,27 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, boolean value) {
+    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, boolean value) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(
                 HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.setId("${qualifiedName}Check").build(),
         )
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement selects(IHTMLElement topElement, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
+    IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLSelect s = new HTMLSelect(options, multiple, false, disable)
         topElement.addChildren(s)
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement ajaxField(IHTMLElement topElement, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable) {
+    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLSelect s = new HTMLSelect(choices, false, false, disable)
         HTMLDiv d = new HTMLDiv()
         if (!disable) {
@@ -76,6 +81,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         }
         d.addChildren(s)
         topElement.addChildren(s)
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -84,7 +90,8 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement ajaxField(IHTMLElement topElement, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
+    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
 
         vals?.each {
             boolean isString = String.isAssignableFrom(it.class)
@@ -103,53 +110,60 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             topElement.addChildren(span2)
 
         }
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, Date value) {
-        return null
+    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
+        topElement.addChildren(new HTMLInput(InputType.DATE, qualifiedName, value?.toString(), null, disable, nullable))
+        topElement.addChildren(divError(qualifiedName))
+        topElement
     }
 
     @Override
-    IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+    IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(new HTMLInput(InputType.TEXTAREA, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+    IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(new HTMLInput(InputType.FILE, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+    IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(new HTMLInput(InputType.STRING, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
-    IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, boolean disable, boolean nullable, String value) {
+    IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(new HTMLInput(InputType.PASSWD, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
-    @Override
-    IHTMLElement formLabel(IHTMLElement topElement, String qualifiedName, String value) {
-        topElement.addChildren(
-                new HTMLDiv().builder
-                        .addClasses('taackFieldError')
-                        .putAttribute('taackFieldError', qualifiedName)
-                        .setStyle(new StyleDescriptor()
-                                .setDisplay(DisplayEnum.NONE)).build(),
-                new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(value)).build())
-        topElement
+    private static IHTMLElement formLabelInput(String qualifiedName, String i18n) {
+        new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).build()
+    }
+
+    private static IHTMLElement divError(String qualifiedName) {
+        new HTMLDiv().builder.putAttribute('taackfielderror', qualifiedName).build()
     }
 
     @Override
     IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width) {
-
         HTMLInput[] radioList = new HTMLInput[names.size()]
         HTMLLi[] liList = new HTMLLi[names.size()]
         names.eachWithIndex { it, occ ->

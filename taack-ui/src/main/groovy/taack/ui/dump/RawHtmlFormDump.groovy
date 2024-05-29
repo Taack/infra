@@ -91,7 +91,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormSection(String i18n, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        topElement = formThemed.section(topElement, width.sectionCss.split(' '))
+        topElement = formThemed.section(topElement, i18n, width.sectionCss.split(' '))
     }
 
     @Override
@@ -99,35 +99,46 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         closeTags(TaackTag.SECTION)
     }
 
-    private void inputOverride(final String qualifiedName, FieldInfo field) {
+    private void inputOverride(final String qualifiedName, String i18n, FieldInfo field) {
         if (aObject instanceof GormEntity) {
             GormEntity entity = aObject as GormEntity
             if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
                 String img = TaackUiOverriderService.formInputPreview(entity, field)
                 String txt = TaackUiOverriderService.formInputSnippet(entity, field)
                 String val = TaackUiOverriderService.formInputValue(entity, field)
-                topElement = formThemed.inputOverride(topElement, qualifiedName, val, txt, img, topElement.parent)
+                topElement = formThemed.inputOverride(topElement, qualifiedName, i18n, val, txt, img, topElement.parent)
             }
         }
     }
 
-    private void inputField(final String qualifiedName, final FieldInfo field, final IEnumOptions eos = null, final NumberFormat nf = null) {
+    @Override
+    void visitFormField(final String i18n, final FieldInfo field, final IEnumOptions eos = null, NumberFormat numberFormat = null) {
+        final String trI18n = i18n ?: parameter.trField(field)
+
+        if (field.fieldConstraint.constraints) {
+            if (field.fieldConstraint.constraints.widget == WidgetKind.AJAX.name) {
+                visitFormAjaxField(trI18n, null, null, field, null, null)
+                return
+            }
+        }
+        final String qualifiedName = field.fieldName
         final Class type = field.fieldConstraint.field.type
+        final boolean isBoolean = type == boolean || type == Boolean
+
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
         final boolean isListOrSet = Collection.isAssignableFrom(type)
-        final boolean isBoolean = type == boolean || type == Boolean
         final boolean isDate = Date.isAssignableFrom(type)
         final boolean isNullable = field.fieldConstraint.nullable
         final boolean isFieldDisabled = isDisabled(field)
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            topElement = formThemed.booleanInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as boolean)
+            topElement = formThemed.booleanInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as boolean)
         } else if (eos) {
-            topElement = formThemed.selects(topElement, eos, isListOrSet, isFieldDisabled, isNullable)
+            topElement = formThemed.selects(topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+                topElement = formThemed.selects(topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
@@ -136,20 +147,20 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
                         Enum[] values = actualClass.invokeMethod(ST_VALUES, null) as Enum[]
-                        topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+                        topElement = formThemed.selects(topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
                     } else {
                         String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
-                        topElement = formThemed.selects(topElement, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+                        topElement = formThemed.selects(topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
                     }
                 }
             }
         } else if (isDate) {
-            topElement = formThemed.dateInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as Date)
+            topElement = formThemed.dateInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                topElement = formThemed.textareaInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as String)
+                topElement = formThemed.textareaInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                topElement = formThemed.fileInput(topElement, qualifiedName, isFieldDisabled, isNullable, field.value as String)
+                topElement = formThemed.fileInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """\
                 <div id="${qualifiedName}-editor">
@@ -167,35 +178,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 """.stripIndent().strip()
             } else {
                 String valueString = inputEscape(field.value?.toString())
-                if (nf && field.value instanceof Number) {
-                    valueString = nf.format(field.value)
+                if (numberFormat && field.value instanceof Number) {
+                    valueString = numberFormat.format(field.value)
                 }
-                topElement = formThemed.normalInput(topElement, qualifiedName, isFieldDisabled, isNullable, valueString)
+                topElement = formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
             }
         }
-        inputOverride(qualifiedName, field)
-    }
+        inputOverride(qualifiedName, trI18n, field)
 
-    @Override
-    void visitFormField(final String i18n, final FieldInfo field, final IEnumOptions eos = null, NumberFormat numberFormat = null) {
-        final String trI18n = i18n ?: parameter.trField(field)
-
-        if (field.fieldConstraint.constraints) {
-            if (field.fieldConstraint.constraints.widget == WidgetKind.AJAX.name) {
-                visitFormAjaxField(trI18n, null, null, field, null, null)
-                return
-            }
-        }
-        final String qualifiedName = field.fieldName
-        final Class type = field.fieldConstraint.field.type
-        final boolean isBoolean = type == boolean || type == Boolean
-
-        formThemed.formLabel(topElement, qualifiedName, trI18n)
-        inputField(qualifiedName, field, eos, numberFormat ?: parameter.nf)
-    }
-
-    private void formAjaxFieldLabel(final String i18n, final String qualifiedName) {
-        formThemed.formLabel(topElement, qualifiedName, i18n)
     }
 
     @Override
@@ -207,9 +197,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
-        formAjaxFieldLabel(trI18n, qualifiedName)
-        formThemed.ajaxField(topElement, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable, isListOrSet)
-        inputOverride(qualifiedName, field)
+        formThemed.ajaxField(topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable, isListOrSet)
+        inputOverride(qualifiedName, trI18n, field)
     }
 
     private static String fieldInfoParams(FieldInfo[] fieldInfos) {
@@ -222,8 +211,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
-        formAjaxFieldLabel(trI18n, qualifiedName)
-        formThemed.ajaxField(topElement, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoParams, isFieldDisabled)
+        formThemed.ajaxField(topElement, trI18n, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoParams, isFieldDisabled)
     }
 
     @Override
@@ -262,16 +250,15 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         value = value ? inputEscape(value) : ''
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
-        formThemed.formLabel(topElement, qualifiedName, trI18n)
         if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-            formThemed.textareaInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
+            formThemed.textareaInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-            formThemed.fileInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
+            formThemed.fileInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
-                formThemed.passwdInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
+                formThemed.passwdInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             } else {
-                formThemed.normalInput(topElement, qualifiedName, isFieldDisabled, isNullable, value)
+                formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             }
         }
     }
