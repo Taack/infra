@@ -40,10 +40,18 @@ trait IHTMLElement {
             ret += ret
             p = p.parent
         }
+        ret
+    }
+
+    Map<String, String> getAllAttributes() {
+        Map res = ['class': classes.join(' ')] + this.attributes
+        if (taackTag)
+            res = res + ['taackTag': taackTag.toString()]
+        res
     }
 
     String getOutput() {
-        "<$tag ${attributes.collect { "${it.key}=\"${it.value}\""}.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
+        "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> "${it.key}=\"${it.value}\"" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {

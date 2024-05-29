@@ -24,7 +24,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String trI18n, String val, String txt, String imgSrc, IHTMLElement previousElement) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
-                new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.build(),
+                new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.addClasses('form-control').build(),
                 new HTMLSpan().builder.addChildren(
                         new HTMLTxtContent(txt)
                 ).build(),
@@ -56,7 +56,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, boolean value) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(
-                HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.setId("${qualifiedName}Check").build(),
+                HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-control').setId("${qualifiedName}Check").build(),
         )
         topElement.addChildren(divError(qualifiedName))
         topElement
@@ -65,7 +65,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        HTMLSelect s = new HTMLSelect(options, multiple, false, disable)
+        HTMLSelect s = new HTMLSelect(options, multiple, false, disable).builder.addClasses('form-select').build() as HTMLSelect
         topElement.addChildren(s)
         topElement.addChildren(divError(qualifiedName))
         topElement
@@ -117,7 +117,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.DATE, qualifiedName, value?.toString(), null, disable, nullable))
+        topElement.addChildren(new HTMLInput(InputType.DATE, qualifiedName, value?.toString(), null, disable, nullable).builder.addClasses('form-control').build())
         topElement.addChildren(divError(qualifiedName))
         topElement
     }
@@ -125,7 +125,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.TEXTAREA, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(new HTMLInput(InputType.TEXTAREA, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
         topElement.addChildren(divError(qualifiedName))
         topElement
     }
@@ -133,7 +133,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.FILE, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(new HTMLInput(InputType.FILE, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
         topElement.addChildren(divError(qualifiedName))
         topElement
     }
@@ -141,7 +141,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.STRING, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(new HTMLInput(InputType.STRING, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
         topElement.addChildren(divError(qualifiedName))
         topElement
     }
@@ -149,17 +149,17 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.PASSWD, qualifiedName, value, null, disable, nullable))
+        topElement.addChildren(new HTMLInput(InputType.PASSWD, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
         topElement.addChildren(divError(qualifiedName))
         topElement
     }
 
     private static IHTMLElement formLabelInput(String qualifiedName, String i18n) {
-        new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).build()
+        new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
     }
 
     private static IHTMLElement divError(String qualifiedName) {
-        new HTMLDiv().builder.putAttribute('taackfielderror', qualifiedName).build()
+        new HTMLDiv().builder.putAttribute('taackfielderror', qualifiedName).addClasses('form-text').build()
     }
 
     @Override
