@@ -6,6 +6,9 @@ import taack.ui.dump.theme.elements.StyleDescriptor
 
 @CompileStatic
 enum TaackTag {
+    BLOCK,
+    INNER_BLOCK,
+    AJAX_BLOCK,
     FORM,
     COL,
     TAB,

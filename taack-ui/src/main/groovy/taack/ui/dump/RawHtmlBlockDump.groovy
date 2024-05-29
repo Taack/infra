@@ -39,7 +39,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            out << "<div id='blockId${blockId}' class='taackBlock' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
+            out << "<div id='blockId${blockId}' class='taackBlock' 'blockId'='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
         }
     }
 
