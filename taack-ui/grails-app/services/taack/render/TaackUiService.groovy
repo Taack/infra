@@ -183,7 +183,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             return new ModelAndView("/taackUi/block", [
                     themeName   : tableThemeName,
                     themeSize   : tableThemeSize,
-                    themeMode   : tableThemeName,
+                    themeMode   : tableThemeMode,
                     block       : visit(block),
                     menu        : visitMenu(menu),
                     conf        : taackUiPluginConfiguration,

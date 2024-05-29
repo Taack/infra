@@ -30,9 +30,11 @@ final class EnumOptions implements IEnumOptions {
     private final static String ST_NAME = 'name'
 
     final IEnumOption[] options
+    final IEnumOption current
     final String paramKey
 
-    EnumOptions(IEnumOption[] options, String paramKey) {
+    EnumOptions(IEnumOption[] options, String paramKey, EnumOption current) {
+        this.current = current
         this.options = options
         this.paramKey = paramKey
     }
@@ -49,4 +51,25 @@ final class EnumOptions implements IEnumOptions {
 
         this.paramKey = paramKey
     }
+
+    @Override
+    String getKey() {
+        return current.key
+    }
+
+    @Override
+    String getValue() {
+        return current.value
+    }
+
+    @Override
+    String getAsset() {
+        return current.asset
+    }
+
+    @Override
+    Boolean isSection() {
+        return current.section
+    }
+
 }
