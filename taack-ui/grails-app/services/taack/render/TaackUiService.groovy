@@ -20,7 +20,6 @@ import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
 import taack.ui.dump.theme.elements.table.ThemeMode
-import taack.ui.dump.theme.elements.table.ThemeName
 import taack.ui.dump.theme.elements.table.ThemeSize
 import taack.ui.ThemeSelector
 import taack.ui.base.*
@@ -176,12 +175,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             render visit(block, true)
         } else {
             ThemeSelector themeSelector = themeService.themeSelector
-            ThemeName tableThemeName = themeSelector.themeName
             ThemeSize tableThemeSize = themeSelector.themeSize
             ThemeMode tableThemeMode = themeSelector.themeMode
 
             return new ModelAndView("/taackUi/block", [
-                    themeName   : tableThemeName,
                     themeSize   : tableThemeSize,
                     themeMode   : tableThemeMode,
                     block       : visit(block),

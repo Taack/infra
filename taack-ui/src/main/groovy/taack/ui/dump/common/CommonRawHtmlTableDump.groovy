@@ -3,7 +3,6 @@ package taack.ui.dump.common
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dump.theme.elements.table.ITableTheme
-import taack.ui.dump.theme.elements.table.ThemeName
 import taack.ui.ThemeSelector
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
@@ -34,15 +33,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     CommonRawHtmlTableDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
-        ThemeSelector ts = parameter.uiThemeService.themeSelector
-        switch (ts.themeName) {
-            case ThemeName.PURE:
-                this.tableTheme = new PureCSSTable()
-                break
-            case ThemeName.BOOTSTRAP:
-                this.tableTheme = new BootstrapTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
-                break
-        }
+        this.tableTheme = new BootstrapTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
     }
 
     static final <T> String dataFormat(T value, String format) {

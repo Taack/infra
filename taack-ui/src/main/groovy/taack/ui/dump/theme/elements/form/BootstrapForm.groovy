@@ -7,11 +7,18 @@ import taack.ui.base.form.FormSpec
 import taack.ui.dump.theme.elements.DisplayEnum
 import taack.ui.dump.theme.elements.StyleDescriptor
 import taack.ui.dump.theme.elements.base.*
+import taack.ui.dump.theme.elements.table.ThemeMode
+import taack.ui.dump.theme.elements.table.ThemeSize
 
 @CompileStatic
 final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
-    BootstrapForm() {
+    final ThemeMode themeMode
+    final ThemeSize themeSize
+
+    BootstrapForm(ThemeMode themeMode, ThemeSize themeSize) {
+        this.themeMode = themeMode
+        this.themeSize = themeSize
         constructorIFormThemed()
     }
 

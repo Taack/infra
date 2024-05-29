@@ -1,4 +1,4 @@
-<%@ page import="taack.ui.dump.theme.elements.table.ThemeName; taack.ui.dump.theme.elements.table.ThemeMode" %>
+<%@ page import="taack.ui.dump.theme.elements.table.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}">
@@ -19,12 +19,7 @@
 %{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"--}%
 %{--          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">--}%
 
-    <g:if test="${themeName == ThemeName.BOOTSTRAP}">
-        <asset:stylesheet href="application-taack-bootstrap.css"/>
-    </g:if>
-    <g:elseif test="${themeName == ThemeName.PURE}">
-        <asset:stylesheet href="application-taack.css"/>
-    </g:elseif>
+    <asset:stylesheet href="application-taack-bootstrap.css"/>
     <style>
     .navbar-nav > li > .dropdown-menu {
         background-color: ${conf.bgColor};

@@ -13,11 +13,6 @@ enum ThemeSize {
 }
 
 @CompileStatic
-enum ThemeName {
-    PURE, BOOTSTRAP
-}
-
-@CompileStatic
 interface ITableTheme {
     String getTableClasses()
     String getTableHeadClasses()

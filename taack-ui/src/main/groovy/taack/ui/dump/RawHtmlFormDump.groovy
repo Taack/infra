@@ -7,6 +7,7 @@ import taack.ast.type.WidgetKind
 import taack.render.TaackUiOverriderService
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
+import taack.ui.ThemeSelector
 import taack.ui.base.form.FormSpec
 import taack.ui.base.form.IUiFormVisitor
 import taack.ui.dump.theme.elements.base.*
@@ -70,8 +71,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.lockedFields = lockedFields
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        formThemed = new BootstrapForm().builder.setTaackTag(TaackTag.FORM).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addChildren(
                 new HTMLInput(InputType.HIDDEN, id, 'id'),
                 new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
@@ -168,7 +170,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 if (nf && field.value instanceof Number) {
                     valueString = nf.format(field.value)
                 }
-                topElement = formThemed.fileInput(topElement, qualifiedName, isFieldDisabled, isNullable, valueString)
+                topElement = formThemed.normalInput(topElement, qualifiedName, isFieldDisabled, isNullable, valueString)
             }
         }
         inputOverride(qualifiedName, field)
