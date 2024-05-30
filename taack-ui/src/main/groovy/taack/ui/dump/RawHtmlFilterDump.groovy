@@ -55,9 +55,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        HTMLInput[] addedInputs = additionalParams.collect {
-            new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
-        } as HTMLInput[]
         formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                 new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
@@ -67,7 +64,15 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
                 new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand'),
                 new HTMLInput(InputType.HIDDEN, aClass.name, 'className'),
                 new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-        ).addChildren(addedInputs).build() as IFormTheme
+        ).build() as IFormTheme
+
+        HTMLInput[] addedInputs = additionalParams?.collect {
+            new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
+        } as HTMLInput[]
+
+        if(addedInputs)
+            formThemed.addChildren(addedInputs)
+
         topElement = formThemed
     }
 

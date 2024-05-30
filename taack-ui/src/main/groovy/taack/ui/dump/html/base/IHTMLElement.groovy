@@ -47,14 +47,16 @@ trait IHTMLElement {
     }
 
     Map<String, String> getAllAttributes() {
-        Map res = ['class': classes.join(' ')] + this.attributes
+        Map res = this.attributes
         if (taackTag)
-            res = res + ['taackTag': taackTag.toString()]
+            res += ['taackTag': taackTag.toString()]
+        if (classes)
+            res += ['class': classes.join(' ')]
         res
     }
 
     String getOutput() {
-        "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> "${it.key}=\"${it.value}\"" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
+        "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\"" : "${it.key}" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {

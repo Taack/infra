@@ -8,6 +8,10 @@ import taack.ui.IEnumOptions
 @CompileStatic
 final class HTMLOption implements IHTMLElement {
 
+    HTMLOption() {
+        tag = 'option'
+    }
+
     HTMLOption(IEnumOption option, boolean selected) {
         if (option.isSection()) {
             tag = 'optgroup'
@@ -24,13 +28,14 @@ final class HTMLOption implements IHTMLElement {
 @CompileStatic
 final class HTMLSelect implements IHTMLElement {
 
-    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean readOnly = false, boolean disabled = false) {
+    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean disabled = false, boolean nullable = false) {
         tag = 'select'
+        if (nullable) addChildren(new HTMLOption())
         addChildren(options.options.toList().collect {
             new HTMLOption(it, options.currents.contains(it.key))
         } as HTMLOption[])
         attributes.put('name', options.paramKey)
-        if (readOnly) attributes.put('readonly', null)
+//        if (readOnly) attributes.put('readonly', null)
         if (disabled) attributes.put('disabled', null)
     }
 }

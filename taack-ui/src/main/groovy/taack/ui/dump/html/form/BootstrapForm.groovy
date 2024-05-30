@@ -28,10 +28,13 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     final ThemeMode themeMode
     final ThemeSize themeSize
+    final boolean floating
 
-    BootstrapForm(ThemeMode themeMode, ThemeSize themeSize) {
+    BootstrapForm(ThemeMode themeMode, ThemeSize themeSize, boolean floating = true) {
         this.themeMode = themeMode
         this.themeSize = themeSize
+        this.floating = floating
+        if (floating) addClasses 'form-floating', 'mb-1'
         constructorIFormThemed()
     }
 
@@ -61,42 +64,46 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
                 new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
                         .addChildren(
                                 new HTMLFieldset().builder.addChildren(
+                                        new HTMLTxtContent(trI18n)
                                 ).build()
                         ).build()
         )
-        topElement.children.last()
+        topElement.children.last().children.last()
     }
 
     @Override
     IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, boolean value) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(
-                HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-control').setId("${qualifiedName}Check").build(),
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(
+                HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
         )
-        topElement.addChildren(divError(qualifiedName))
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        HTMLSelect s = new HTMLSelect(options, multiple, false, disable).builder.addClasses('form-select').build() as HTMLSelect
-        topElement.addChildren(s)
-        topElement.addChildren(divError(qualifiedName))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.addClasses('form-select').build() as HTMLSelect
+        el.addChildren(s)
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLSelect s = new HTMLSelect(choices, false, false, disable)
         HTMLDiv d = new HTMLDiv()
         if (!disable) {
             d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M').build())
         }
         d.addChildren(s)
-        topElement.addChildren(s)
-        topElement.addChildren(divError(qualifiedName))
+        el.addChildren(s)
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -106,71 +113,87 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
+         IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
 
         vals?.each {
             boolean isString = String.isAssignableFrom(it.class)
 
             HTMLSpan span = new HTMLSpan().builder.addClasses('M2MParent').build() as HTMLSpan
             if (disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg')
-            span.addChildren(new HTMLInput(InputType.STRING, it ? inputEscape(it.toString()) : '', qualifiedName, null, nullable, disabled))
-            span.addChildren(new HTMLInput(InputType.HIDDEN, it ? (isString ? it : it['id']) : '', qualifiedName, null, nullable, disabled))
+            span.addChildren(new HTMLInput(InputType.STRING, it ? inputEscape(it.toString()) : '', qualifiedName, null, disabled))
+            span.addChildren(new HTMLInput(InputType.HIDDEN, it ? (isString ? it : it['id']) : '', qualifiedName, null, disabled))
             topElement.addChildren(span)
         }
         if (!disabled && isMultiple) {
             HTMLSpan span2 = new HTMLSpan().builder.addClasses('M2MToDuplicate').build() as HTMLSpan
             span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg')
-            span2.addChildren(new HTMLInput(InputType.STRING, '', qualifiedName, null, nullable, disabled))
-            span2.addChildren(new HTMLInput(InputType.HIDDEN, '', qualifiedName, null, nullable, disabled))
+            span2.addChildren(new HTMLInput(InputType.STRING, '', qualifiedName, null, disabled))
+            span2.addChildren(new HTMLInput(InputType.HIDDEN, '', qualifiedName, null, disabled))
             topElement.addChildren(span2)
 
         }
-        topElement.addChildren(divError(qualifiedName))
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.DATE, qualifiedName, value?.toString(), null, disable, nullable).builder.addClasses('form-control').build())
-        topElement.addChildren(divError(qualifiedName))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(new HTMLInput(InputType.DATE, value?.toString(), qualifiedName, null, disable).builder.addClasses('form-control').build())
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.TEXTAREA, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
-        topElement.addChildren(divError(qualifiedName))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(new HTMLInput(InputType.TEXTAREA, value, qualifiedName, null, disable).builder.addClasses('form-control').build())
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.FILE, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
-        topElement.addChildren(divError(qualifiedName))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.addClasses('form-control').build())
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.STRING, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
-        topElement.addChildren(divError(qualifiedName))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.addClasses('form-control').build())
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(new HTMLInput(InputType.PASSWD, qualifiedName, value, null, disable, nullable).builder.addClasses('form-control').build())
-        topElement.addChildren(divError(qualifiedName))
+        IHTMLElement el = themeStartInputs(topElement)
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.addClasses('form-control').build())
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
+
     private static IHTMLElement formLabelInput(String qualifiedName, String i18n) {
         new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
+    }
+
+    private IHTMLElement themeStartInputs(IHTMLElement topElement) {
+        IHTMLElement ret = topElement
+        if (floating) {
+            ret = new HTMLDiv().builder.addClasses('form-floating', 'mb-1').build() as IHTMLElement
+            topElement.addChildren(ret)
+        }
+        ret
     }
 
     private static IHTMLElement divError(String qualifiedName) {
