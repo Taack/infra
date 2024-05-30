@@ -48,9 +48,15 @@
 - Add title to modal / menu / size
 - For GormEntity, propose a default M2O or M2M in forms (field) / shows
 - Ajax scrollable tables
+- PDF / Docx / pptx / HTML from Asciidoc
+- PoC new Charts DSL
+- PoC inline DSL JS (IJavascriptDescriptor.groovy)
+- PoC inline DSL CSS (with params)
 
 # 0.4.3
 
+- Asciidoc online editor (paragraph only)
+- inlineForms custom in show and tables (row or cells)
 - improve history when browsing, allow seeing opened modals ...
 - Hook to register typical object filter (list, secure)
 - Secured Solr Search

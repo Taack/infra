@@ -6,9 +6,6 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
-import taack.ui.style.EnumStyle
-
-import java.text.NumberFormat
 
 @CompileStatic
 interface IUiTableVisitor {

@@ -1,7 +1,6 @@
 package taack.ui
 
 import groovy.transform.CompileStatic
-import taack.ui.dump.theme.elements.base.IHTMLElement
 
 @CompileStatic
 final class EnumOption implements IEnumOption {

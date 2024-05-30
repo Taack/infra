@@ -2,6 +2,7 @@ package taack.ui.base.filter
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
+import taack.ui.EnumOptions
 import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
 

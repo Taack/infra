@@ -4,12 +4,17 @@ import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
-
+import taack.ui.EnumOptions
 import taack.ui.IEnumOption
+import taack.ui.dump.html.base.HTMLInput
+import taack.ui.dump.html.base.IHTMLElement
+import taack.ui.dump.html.base.InputType
+import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.base.filter.IUiFilterVisitor
 import taack.ui.base.filter.expression.FilterExpression
-import taack.ui.base.helper.Utils
-import taack.ui.theme.BootstrapHtmlTheme
+import taack.ui.dump.html.form.BootstrapForm
+import taack.ui.dump.html.form.IFormTheme
 
 @CompileStatic
 final class RawHtmlFilterDump implements IUiFilterVisitor {
@@ -17,13 +22,21 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     final private ByteArrayOutputStream out
     final private Parameter parameter
     final private List<Pair<String, MethodClosure>> filterActions = []
-    final private BootstrapHtmlTheme htmlTheme = new BootstrapHtmlTheme()
-    final private boolean testI18n
+
+    IFormTheme formThemed
+    IHTMLElement topElement
+
+    private void closeTags(TaackTag tag) {
+        IHTMLElement top = topElement
+        while (top.taackTag != tag) {
+            top = top.parent
+        }
+        topElement = top
+    }
 
     RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
-        this.testI18n = parameter.applicationTagLib.params['lang'] == 'test'
     }
 
     static String getQualifiedName(final FieldInfo fieldInfo) {
@@ -41,100 +54,61 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
-        out << htmlTheme.formContainerHeader()
-        out << """
-                <form name="${parameter.aClassSimpleName}_Filter" class="${htmlTheme.getFilterFormCssTheme(aClass)}" taackFilterId="${parameter.modalId}">
-                <input type="hidden" name="sort" value="${parameter.sort ?: ''}">
-                <input type="hidden" name="order" value="${parameter.order ?: ''}">
-                <input type="hidden" name="offset" value="${parameter.offset}">
-                <input type="hidden" name="max" value="${parameter.max}">
-                <input type="hidden" name="additionalId" value="${parameter.additionalId ?: ''}">
-                <input type="hidden" name="brand" value="${parameter.brand ?: ''}">
-                <input type="hidden" name="className" value="${aClass.name ?: ''}">
-                <input type="hidden" name="fieldName" value="${parameter.fieldName ?: ''}">
-                ${Utils.getAdditionalInputs(additionalParams)}
-                """
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
+        HTMLInput[] addedInputs = additionalParams.collect {
+            new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
+        } as HTMLInput[]
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addChildren(
+                new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
+                new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
+                new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
+                new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
+                new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId'),
+                new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand'),
+                new HTMLInput(InputType.HIDDEN, aClass.name, 'className'),
+                new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
+        ).addChildren(addedInputs).build() as IFormTheme
+        topElement = formThemed
     }
 
     @Override
     void visitHiddenId(Long id) {
-        out << """<input type="hidden" name="id" value="$id">"""
+        formThemed.addChildren(
+                new HTMLInput(InputType.HIDDEN, id, 'id'),
+        )
     }
 
     @Override
     void visitFilterEnd() {
-        out << """
-            ${htmlTheme.filterButtons(parameter, filterActions)}
-            ${htmlTheme.formContainerFooter()}   
-            """
+        out << formThemed.output
     }
 
     @Override
     void visitSection(final String i18n) {
-        out << htmlTheme.filterSectionHeader(i18n)
+        topElement = formThemed.section(topElement, i18n)
     }
 
     @Override
     void visitSectionEnd() {
-        out << htmlTheme.filterSectionFooter()
+        closeTags(TaackTag.SECTION)
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final boolean isBoolean = fieldInfo?.fieldConstraint?.field?.type == Boolean
         final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
         final String qualifiedId = qualifiedName + "-" + parameter.modalId
-        out << htmlTheme.filterFieldHeader(i18n, qualifiedId, (!isBoolean))
         if (enumOptions) {
-            IEnumOption[] enumConstraints = enumOptions
-
-            out << htmlTheme.selectHeader()
-            out << """
-                <select class="${htmlTheme.getSelectCssTheme()}" name="${qualifiedName}" id="${qualifiedId}Select">
-                <option value="">-${i18n}-</option>
-                """
-            enumConstraints.each {
-                out << """<option value="${it.key}" ${parameter.applicationTagLib.params[qualifiedName]?.toString()?.equals(it.key) || fieldInfo?.value?.toString()?.equals(it.key) ? 'selected="selected"' : ''}>${it.value}</option>"""
-            }
-            out << '</select>'
-            out << htmlTheme.selectFooter()
+            topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), true, false, true)
         } else if (isEnum) {
             final Class type = fieldInfo.fieldConstraint.field.type
-
-            out << htmlTheme.selectHeader()
-            out << """
-                <select class="${htmlTheme.getSelectCssTheme()}" name="${qualifiedName}" id="${qualifiedId}Select">
-                <option value="">-${i18n}-</option>
-                """
-
-            def values = type.invokeMethod('values', null) as List
-            values.each {
-                out << """<option value="${it}" ${parameter.applicationTagLib.params[qualifiedName]?.toString()?.equals(it.toString()) || fieldInfo?.value?.toString()?.equals(it.toString()) ? 'selected="selected"' : ''}>${it}</option>"""
-            }
-            out << '</select>'
-            out << htmlTheme.selectFooter()
+            topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value as Enum), true, false, true)
         } else if (isBoolean) {
             Boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ?
                     ((parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '1') ? true : (parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '0') ? false : null) : fieldInfo.value
-            out << htmlTheme.radioHeader()
-            out << """
-                <div class="${htmlTheme.getRadioDivCssTheme()}">
-                    <input type="radio" name="${qualifiedName}" value="1" id="${qualifiedId}Check1" class="${htmlTheme.getRadioCssTheme()}" ${isChecked ? 'checked=""' : ''}>${htmlTheme.radioLabel('Yes', qualifiedName, '1')}
-                </div>
-                <div class="${htmlTheme.getRadioDivCssTheme()}">
-                    <input type="radio" name="${qualifiedName}" value="0" id="${qualifiedId}Check0" class="${htmlTheme.getRadioCssTheme()}" ${(isChecked != null && isChecked == false) ? 'checked=""' : ''}>${htmlTheme.radioLabel('No', qualifiedName, '0')}
-                </div>
-                <div class="${htmlTheme.getRadioDivCssTheme()}">
-                    <input type="radio" name="${qualifiedName}" value="" id="${qualifiedId}CheckNull" class="${htmlTheme.getRadioCssTheme()}" ${isChecked == null ? 'checked=""' : ''}>${htmlTheme.radioLabel("Unset", qualifiedName, "")}
-                </div>
-                <input type="hidden" name="${qualifiedName}Default" value="1" id="${qualifiedId}Default">
-                """
-            out << htmlTheme.radioFooter()
+            topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, true, isChecked)
         } else {
-            out << """
-                <input class="${htmlTheme.getFilterInputCssTheme()}" id="${qualifiedId}" name="${qualifiedName}" type="text" value="${value ?: fieldInfo?.value ?: ''}" autocomplete="off" autofocus placeholder="${i18n?.replace('"', '\\u0027')}">
-                """
+            topElement = formThemed.normalInput(topElement, qualifiedName, i18n, false, true, value)
         }
-        out << htmlTheme.filterFieldFooter(i18n, qualifiedId, (!enumOptions && !isEnum && !isBoolean))
     }
 
     @Override
@@ -158,15 +132,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         final String qualifiedId = qualifiedName + '-' + parameter.modalId
-        out << htmlTheme.expressionBoolLabel(qualifiedName, i18n)
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
-        out << """
-                ${htmlTheme.expressionBoolHeader()}
-                    <input type="checkbox" name="${qualifiedName}" value="1" id="${qualifiedId}Check" ${isChecked ? 'checked=""' : ''} class="${htmlTheme.getCheckboxCssTheme()}">
-                    <input type="hidden" name="${qualifiedName}Default" value="1" id="${qualifiedId}Default">
-                </div>
-                    """
-        out << htmlTheme.expressionBoolFooter()
+        topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, true, isChecked)
     }
 
     @Override
