@@ -3,8 +3,8 @@ package taack.ui.base.printable
 import groovy.transform.CompileStatic
 import taack.ui.base.UiShowSpecifier
 import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockActionSpec
 import taack.ui.base.block.BlockSpec
+import taack.ui.base.menu.MenuSpec
 
 @CompileStatic
 class PrintableSpec {
@@ -61,12 +61,12 @@ class PrintableSpec {
     }
 
     void table(final UiTableSpecifier tableSpecifier, final BlockSpec.Width width,
-               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         printableVisitor.visitTable(tableSpecifier, width)
     }
 
     void custom(final String html, final BlockSpec.Width width,
-                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         printableVisitor.visitCustom(html, width)
     }
 }

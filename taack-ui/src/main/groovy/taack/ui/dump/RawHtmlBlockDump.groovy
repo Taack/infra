@@ -15,10 +15,7 @@ import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
 
 @CompileStatic
-class RawHtmlBlockDump implements IUiBlockVisitor {
-    private ByteArrayOutputStream out
-    final Parameter parameter
-
+class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     private String id
 
     private boolean hasTitle = false
@@ -31,9 +28,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     private int tabOccurrencePrevious = 0
     private int tabIds = 0
 
-    RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        this.out = out
-        this.parameter = parameter
+    RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter, final String modalId = null) {
+        super(out, modalId, parameter)
     }
 
     @Override
@@ -51,36 +47,21 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerBlock(final String i18n, final BlockSpec.Width width) {
-        if (!(!i18n || i18n.isEmpty())) {
-            hasTitle = true
-            out << """
-                <div class='${width.css}'><div>
-                <div class='grid-left-title grid-title'>
-                    <div class='title'>${i18n}</div>
-            """
-        } else {
+    void visitInnerBlock(final BlockSpec.Width width) {
             if (!parameter.isAjaxRendering || isModal)
                 out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
             else
                 out << "<div>"
-        }
-        hasPureG++
     }
 
     @Override
     void visitInnerBlockEnd() {
-        hasPureG--
         out << "</div>"
         out << "</div>"
     }
 
     @Override
     void visitCloseTitle() {
-        if (hasTitle) {
-            out << "</div>"
-            hasTitle = false
-        }
     }
 
     @Override
@@ -96,10 +77,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitForm(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        //parameter.trField(parameter.params['controller'] as String, parameter.params['action'] as String)
-        visitInnerBlock(i18n, width)
+    void visitForm(final BlockSpec.Width width) {
+        visitInnerBlock(width)
     }
 
     @Override
@@ -111,9 +90,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitShow(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitShow(final BlockSpec.Width width) {
+        visitInnerBlock(width)
     }
 
     @Override
@@ -142,14 +120,13 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTable(final String id, final String i18n, final BlockSpec.Width width) {
+    void visitTable(final String id, final BlockSpec.Width width) {
         this.id = id
         def recordStateForId = parameter.applicationTagLib.params['recordStateDecoded']?[id] as Map
         if (recordStateForId) {
             parameter.applicationTagLib.params.putAll(recordStateForId)
         }
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+        visitInnerBlock(width)
     }
 
     @Override
@@ -161,19 +138,20 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTableFilter(final String id, final String i18nFilter,
-                          final UiFilterSpecifier filterSpecifier, final String i18nTable, final BlockSpec.Width width) {
+    void visitTableFilter(final String id,
+                          final UiFilterSpecifier filterSpecifier,
+                          final BlockSpec.Width width) {
 
         def recordStateForId = parameter.applicationTagLib.params['recordStateDecoded']?[id] as Map
         if (recordStateForId) {
             parameter.applicationTagLib.params.putAll(recordStateForId)
         }
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18nFilter, BlockSpec.Width.QUARTER)
+        visitInnerBlock(width)
+        visitInnerBlock(BlockSpec.Width.QUARTER)
         visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
         visitInnerBlockEnd()
-        visitInnerBlock(i18nTable, BlockSpec.Width.THREE_QUARTER)
+        visitInnerBlock(BlockSpec.Width.THREE_QUARTER)
     }
 
     @Override
@@ -185,9 +163,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitChart(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitChart(final BlockSpec.Width width) {
+        visitInnerBlock(width)
     }
 
     @Override
@@ -199,19 +176,16 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitDiagram(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitDiagram(final BlockSpec.Width width) {
+        visitInnerBlock(width)
     }
 
     @Override
-    void visitDiagramFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier, final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18nFilter, BlockSpec.Width.QUARTER)
+    void visitDiagramFilter(final UiFilterSpecifier filterSpecifier, final BlockSpec.Width width) {
+        visitInnerBlock(width)
         visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
         visitInnerBlockEnd()
-        visitInnerBlock(i18n, BlockSpec.Width.THREE_QUARTER)
     }
 
     @Override
@@ -251,7 +225,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockTabs(final BlockSpec.Width width) {
         outBkup = out
-        out = new ByteArrayOutputStream()
+//        out = new ByteArrayOutputStream()
         blockTabWidth = width
         currentTabNames = []
     }
@@ -276,7 +250,7 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
         if (tabOccurrence != 0) tabOccurrencePrevious = tabOccurrence
         tabOccurrence = 0
         out.writeTo(outBkup)
-        out = outBkup
+//        out = outBkup
 
         tabOccurrence = tabOccurrencePrevious
         tabOccurrencePrevious = 0
@@ -284,9 +258,8 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCustom(final String i18n, final String html, Style style, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitCustom(final String html, Style style, final BlockSpec.Width width) {
+        visitInnerBlock(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
         visitInnerBlockEnd()
@@ -301,30 +274,6 @@ class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void anonymousBlockEnd() {
         out << "</div>"
-    }
-
-    @Override
-    void visitActionStart() {
-        out << "<div class='icon right'>"
-    }
-
-    @Override
-    void visitActionEnd() {
-        out << "</div>"
-    }
-
-    @Override
-    void visitAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, boolean isAjaxRendering) {
-        i18n ?= parameter.trField(controller, action)
-        if (isAjaxRendering) {
-            out << """
-                <a class='ajaxLink taackAjaxLink' ajaxAction='${parameter.urlMapped(controller, action, id, params, true)}'>
-                    ${actionIcon.getHtml(i18n)}
-                </a>
-            """
-        } else {
-            out << "<a href='${parameter.urlMapped(controller, action, id, params)}'>${actionIcon.getHtml(i18n)}</a>"
-        }
     }
 
     @Override

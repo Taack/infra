@@ -167,7 +167,7 @@ final class TaackSearchService implements WebAttributes {
         new UiBlockSpecifier().ui {
             anonymousBlock BlockSpec.Width.THIRD, {
                 ajaxBlock "range", {
-                    table "Ranges", new UiTableSpecifier().ui {
+                    table new UiTableSpecifier().ui {
                         header {
                             fieldHeader "Value"
                             fieldHeader "Action"
@@ -188,7 +188,7 @@ final class TaackSearchService implements WebAttributes {
                     }
                 }
                 ajaxBlock "faceting", {
-                    table "Facets", new UiTableSpecifier().ui {
+                    table new UiTableSpecifier().ui {
                         header {
                             fieldHeader "Value"
                             fieldHeader "Action"
@@ -209,7 +209,7 @@ final class TaackSearchService implements WebAttributes {
             }
             anonymousBlock BlockSpec.Width.TWO_THIRD, {
                 ajaxBlock "results", {
-                    table "Highlighting", new UiTableSpecifier().ui {
+                    table new UiTableSpecifier().ui {
                         header {
                             fieldHeader "Field"
                             fieldHeader "Value"

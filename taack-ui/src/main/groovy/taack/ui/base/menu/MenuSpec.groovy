@@ -34,6 +34,10 @@ final class MenuSpec {
         menuVisitor.visitMenuStart(menuMode)
     }
 
+    void labelBrand(final String i18n) {
+
+    }
+
     void menu(final String i18n, final MethodClosure action = null, Map<String, ? extends Object> params = null,
               @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
         if (closure) {

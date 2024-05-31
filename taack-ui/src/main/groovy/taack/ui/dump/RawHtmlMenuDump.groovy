@@ -12,9 +12,9 @@ import taack.ui.base.menu.IUiMenuVisitor
 import taack.ui.base.menu.MenuSpec
 
 @CompileStatic
-final class RawHtmlMenuDump implements IUiMenuVisitor {
-    final private ByteArrayOutputStream out
-    final private String modalId
+class RawHtmlMenuDump implements IUiMenuVisitor {
+    final ByteArrayOutputStream out
+    final String modalId
     final Parameter parameter
     boolean splitted = false
 

@@ -5,23 +5,18 @@ import taack.ast.type.FieldInfo
 import taack.ui.base.*
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
+import taack.ui.base.menu.IUiMenuVisitor
 
 @CompileStatic
-interface IUiBlockVisitor {
+interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitBlock()
 
     void visitBlockEnd()
 
-    void visitInnerBlock(String i18n, BlockSpec.Width width)
+    void visitInnerBlock(BlockSpec.Width width)
 
     void visitInnerBlockEnd()
-
-    void visitActionStart()
-
-    void visitActionEnd()
-
-    void visitAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ? extends Object> params, boolean isAjaxRendering)
 
     void visitModal()
 
@@ -33,27 +28,27 @@ interface IUiBlockVisitor {
 
     void visitAjaxBlockEnd()
 
-    void visitForm(String i18n, BlockSpec.Width width)
+    void visitForm(BlockSpec.Width width)
 
     void visitFormEnd(UiFormSpecifier formSpecifier)
 
-    void visitShow(String i18n, BlockSpec.Width width)
+    void visitShow(BlockSpec.Width width)
 
-    void visitTable(String id, String i18n, BlockSpec.Width width)
+    void visitTable(String id, BlockSpec.Width width)
 
     void visitTableEnd(UiTableSpecifier tableSpecifier)
 
-    void visitTableFilter(String id, String i18nFilter, UiFilterSpecifier filterSpecifier, String i18nTable, BlockSpec.Width width)
+    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, BlockSpec.Width width)
 
     void visitTableFilterEnd(UiTableSpecifier tableSpecifier)
 
-    void visitChart(String i18n, BlockSpec.Width width)
+    void visitChart(BlockSpec.Width width)
 
     void visitChartEnd(UiChartSpecifier chartSpecifier)
 
-    void visitDiagram(String i18n, BlockSpec.Width width)
+    void visitDiagram(BlockSpec.Width width)
 
-    void visitDiagramFilter(String i18nFilter, UiFilterSpecifier filterSpecifier, String i18n, BlockSpec.Width width)
+    void visitDiagramFilter(UiFilterSpecifier filterSpecifier, BlockSpec.Width width)
 
     void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier, BlockSpec.Width width)
 
@@ -67,7 +62,7 @@ interface IUiBlockVisitor {
 
     void visitBlockTabsEnd()
 
-    void visitCustom(String i18n, String html, Style style, BlockSpec.Width width)
+    void visitCustom(String html, Style style, BlockSpec.Width width)
 
     void anonymousBlock(BlockSpec.Width width)
 

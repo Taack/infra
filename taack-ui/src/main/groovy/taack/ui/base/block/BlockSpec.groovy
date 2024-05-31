@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.base.*
 import taack.ui.base.common.Style
+import taack.ui.base.menu.MenuSpec
 
 // TODO: try to remove ajaxBlock
 // TODO: try to remove modal first param
@@ -20,7 +21,7 @@ import taack.ui.base.common.Style
 @CompileStatic
 final class BlockSpec {
     final IUiBlockVisitor blockVisitor
-    final BlockActionSpec blockActionSpec
+    final MenuSpec menuSpec
     final String filterTableId
 
     int counter = 0
@@ -29,7 +30,7 @@ final class BlockSpec {
 
     BlockSpec(final IUiBlockVisitor blockVisitor) {
         this.blockVisitor = blockVisitor
-        this.blockActionSpec = new BlockActionSpec(blockVisitor)
+        this.menuSpec = new MenuSpec(blockVisitor)
         this.filterTableId = blockVisitor.parameterMap['filterTableId']
     }
 
@@ -168,20 +169,20 @@ final class BlockSpec {
      * @param i18n label in the header of the form
      * @param formSpecifier the form description see {@link UiFormSpecifier}
      * @param width
-     * @param closure list of action in the header to add. See {@link BlockActionSpec}
+     * @param closure list of action in the header to add. See {@link MenuSpec}
      */
     void form(final UiFormSpecifier formSpecifier, final Width width = Width.MAX,
-              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement("form$counter")) {
             id = "form$counter"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitForm(null, width)
+            blockVisitor.visitForm(width)
             if (closure) {
-                blockVisitor.visitActionStart()
-                closure.delegate = blockActionSpec
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
+                closure.delegate = menuSpec
                 closure.call()
                 counter ++
-                blockVisitor.visitActionEnd()
+                blockVisitor.visitMenuEnd()
             }
             blockVisitor.visitFormEnd(formSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -195,58 +196,38 @@ final class BlockSpec {
      * @param i18n label in the header of the show
      * @param showSpecifier the object data to display
      * @param width
-     * @param closure list of action in the header to add. See {@link BlockActionSpec}
+     * @param closure list of action in the header to add. See {@link MenuSpec}
      */
-    void show(final String i18n, final UiShowSpecifier showSpecifier, final Width width,
-              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+    void show(final UiShowSpecifier showSpecifier, final Width width,
+              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement("show$counter")) {
             id = "show$counter"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitShow(i18n, width)
+            blockVisitor.visitShow(width)
             if (closure) {
-                blockVisitor.visitActionStart()
-                closure.delegate = blockActionSpec
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
+                closure.delegate = menuSpec
                 closure.call()
                 counter ++
-                blockVisitor.visitActionEnd()
+                blockVisitor.visitMenuEnd()
             }
             blockVisitor.visitShowEnd(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
 
-    /**
-     * Add a table to the block
-     *
-     * @param tableSpecifier the description of the table
-     * @param width the width
-     * @param closure actions to display in the header. Should use {@link #table(java.lang.String, taack.ui.base.UiTableSpecifier)} if you want to add actions into the header
-     */
     void table(final UiTableSpecifier tableSpecifier, final Width width = Width.MAX,
-               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        table(null as String, tableSpecifier, width, closure)
-    }
-
-    /**
-     * Add a table to the block with a header. If you intent to use the table with a filter, use {@link #tableFilter(java.lang.String, taack.ui.base.UiFilterSpecifier, java.lang.String, taack.ui.base.UiTableSpecifier)}
-     *
-     * @param i18n label in the block header
-     * @param tableSpecifier the description of the table
-     * @param width the width of the table in the block
-     * @param closure actions to display in the header
-     */
-    void table(final String i18n, final UiTableSpecifier tableSpecifier, final Width width = Width.MAX,
-               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement("table$counter")) {
             id = "tableFilter$counter"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitTable(id, i18n, width)
+            blockVisitor.visitTable(id, width)
             if (closure) {
-                blockVisitor.visitActionStart()
-                closure.delegate = blockActionSpec
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
+                closure.delegate = menuSpec
                 closure.call()
                 counter ++
-                blockVisitor.visitActionEnd()
+                blockVisitor.visitMenuEnd()
             }
             blockVisitor.visitTableEnd(tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -262,25 +243,20 @@ final class BlockSpec {
      * @param tableSpecifier description of the table
      * @param closure action ot display along with the label in the header
      */
-    void tableFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier,
-                     final String i18nTable, final UiTableSpecifier tableSpecifier,
-                     @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
-        tableFilter(i18nFilter, filterSpecifier, i18nTable, tableSpecifier, Width.MAX, closure)
-    }
-    void tableFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier,
-                     final String i18nTable, final UiTableSpecifier tableSpecifier,
+    void tableFilter(final UiFilterSpecifier filterSpecifier,
+                     final UiTableSpecifier tableSpecifier,
                      final Width width,
-                     @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+                     @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement("tableFilter$counter")) {
             id = "tableFilter$counter"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitTableFilter(id, i18nFilter, filterSpecifier, i18nTable, width)
+            blockVisitor.visitTableFilter(id, filterSpecifier, width)
             if (closure) {
-                blockVisitor.visitActionStart()
-                closure.delegate = blockActionSpec
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
+                closure.delegate = menuSpec
                 closure.call()
                 counter ++
-                blockVisitor.visitActionEnd()
+                blockVisitor.visitMenuEnd()
             }
             blockVisitor.visitTableFilterEnd(tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -296,35 +272,35 @@ final class BlockSpec {
      * @param width the with of the chart in the block
      * @param closure actions to add in the header of the chart
      */
-    void chart(final String i18n, final UiChartSpecifier chartSpecifier, final Width width = Width.MAX,
-               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+    void chart(final UiChartSpecifier chartSpecifier, final Width width = Width.MAX,
+               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement()) {
             id = "chart${counter}"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitChart(i18n, width)
+            blockVisitor.visitChart(width)
             if (closure) {
-                blockVisitor.visitActionStart()
-                closure.delegate = blockActionSpec
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
+                closure.delegate = menuSpec
                 closure.call()
                 counter ++
-                blockVisitor.visitActionEnd()
+                blockVisitor.visitMenuEnd()
             }
             blockVisitor.visitChartEnd(chartSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
 
-    void diagram(final String i18n, final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
+    void diagram(final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
         if (displayElement()) {
-            blockVisitor.visitDiagram(i18n, width)
+            blockVisitor.visitDiagram(width)
             blockVisitor.visitDiagramEnd(diagramSpecifier, width)
         }
     }
 
-    void diagramFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier,
-                       final String i18nDiagram, final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
+    void diagramFilter(final UiFilterSpecifier filterSpecifier,
+                       final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
         if (displayElement()) {
-            blockVisitor.visitDiagramFilter(i18nFilter, filterSpecifier, i18nDiagram, width)
+            blockVisitor.visitDiagramFilter(filterSpecifier, width)
             blockVisitor.visitDiagramEnd(diagramSpecifier, Width.THREE_QUARTER)
         }
     }
@@ -338,29 +314,12 @@ final class BlockSpec {
      * @param width width inside the block
      * @param closure actions to display in the header
      */
-    void custom(final String i18n, final String html, final Style style = null, final Width width = Width.MAX,
-                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockActionSpec) final Closure closure = null) {
+    void custom(final String html, final Style style = null, final Width width = Width.MAX,
+                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement("custom$counter")) {
             id = "custom$counter"
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitCustom(i18n, html, style, width)
-            counter ++
-            blockVisitor.visitAjaxBlockEnd()
-        }
-    }
-
-    /**
-     * Add custom HTML code in a block
-     *
-     * @param html code
-     * @param style
-     * @param width
-     */
-    void custom(final String html, final Style style = null, final Width width = Width.MAX) {
-        if (displayElement("custom$counter")) {
-            id = "custom$counter"
-            blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitCustom(null, html, style, width)
+            blockVisitor.visitCustom(html, style, width)
             counter ++
             blockVisitor.visitAjaxBlockEnd()
         }

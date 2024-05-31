@@ -19,7 +19,6 @@ class RawHtmlMailDump extends UiBlockVisitor {
 
     private String id
 
-    private boolean hasTitle = false
     private String ajaxBlockId = null
     final private Long blockId = System.currentTimeMillis()
     boolean isModal = false
@@ -44,25 +43,12 @@ class RawHtmlMailDump extends UiBlockVisitor {
     }
 
     @Override
-    void visitInnerBlock(final String i18n, final BlockSpec.Width width) {
-        if (!(!i18n || i18n.isEmpty())) {
-            hasTitle = true
-            out << """
-                <div style="background-color: #50768d !important;width=100%">
-                <div style="font-weight: bolder; font-size: larger;">${i18n}</div>
-            """
-        }
-    }
-
-    @Override
     void visitCloseTitle() {
         out << "</div>"
     }
 
     @Override
-    void visitShow(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitShow(final BlockSpec.Width width) {
     }
 
     @Override
@@ -81,10 +67,9 @@ class RawHtmlMailDump extends UiBlockVisitor {
     }
 
     @Override
-    void visitTable(final String id, final String i18n, final BlockSpec.Width width) {
+    void visitTable(final String id, final BlockSpec.Width width) {
         this.id = id
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+        visitInnerBlock(width)
     }
 
     @Override
@@ -96,9 +81,7 @@ class RawHtmlMailDump extends UiBlockVisitor {
     }
 
     @Override
-    void visitChart(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitChart(final BlockSpec.Width width) {
     }
 
     @Override
@@ -110,9 +93,8 @@ class RawHtmlMailDump extends UiBlockVisitor {
     }
 
     @Override
-    void visitCustom(final String i18n, final String html, Style style, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitCustom(final String html, Style style, final BlockSpec.Width width) {
+        visitInnerBlock(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
         visitInnerBlockEnd()
@@ -132,21 +114,6 @@ class RawHtmlMailDump extends UiBlockVisitor {
     @Override
     void visitInnerBlockEnd() {
         out << "</div></div>"
-    }
-
-    @Override
-    void visitActionStart() {
-        out << "<div class='icon right'>"
-    }
-
-    @Override
-    void visitActionEnd() {
-        out << "</div>"
-    }
-
-    @Override
-    void visitAction(final String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, boolean isAjaxRendering) {
-        out << "<a href='https://$serverUrl/${controller}/${action}${id ? "/${id}" : ''}${params ? "?${Utils.paramsString params}'" : ''}'>${i18n}</a> "
     }
 
     @Override

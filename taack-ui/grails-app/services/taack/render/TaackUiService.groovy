@@ -237,8 +237,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final def show(UiTableSpecifier tableSpecifier, String i18nTable, UiFilterSpecifier filterSpecifier = null, String i18nTableFilter = null, UiMenuSpecifier menuSpecifier) {
         show(new UiBlockSpecifier().ui {
             ajaxBlock actionName, {
-                if (filterSpecifier) tableFilter(i18nTableFilter, filterSpecifier, i18nTable, tableSpecifier, BlockSpec.Width.MAX)
-                else table i18nTable, tableSpecifier
+                if (filterSpecifier) tableFilter(filterSpecifier, tableSpecifier, BlockSpec.Width.MAX)
+                else table tableSpecifier
             }
         }, menuSpecifier)
     }
@@ -256,8 +256,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         show(new UiBlockSpecifier().ui {
             modal {
                 ajaxBlock actionName, {
-                    if (filterSpecifier) tableFilter(i18nTableFilter, filterSpecifier, i18nTable, tableSpecifier, BlockSpec.Width.MAX)
-                    else table(i18nTable, tableSpecifier, BlockSpec.Width.MAX)
+                    if (filterSpecifier) tableFilter(filterSpecifier, tableSpecifier, BlockSpec.Width.MAX)
+                    else table(tableSpecifier, BlockSpec.Width.MAX)
                 }
             }
         })

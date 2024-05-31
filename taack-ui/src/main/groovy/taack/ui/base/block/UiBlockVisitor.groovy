@@ -1,13 +1,19 @@
 package taack.ui.base.block
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
+import taack.ui.IEnumOptions
 import taack.ui.base.*
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
+import taack.ui.base.menu.MenuSpec
+import taack.ui.base.menu.UiMenuVisitor
 
 @CompileStatic
-class UiBlockVisitor implements IUiBlockVisitor {
+class UiBlockVisitor extends UiMenuVisitor implements IUiBlockVisitor {
+
     @Override
     void visitBlock() {
 
@@ -19,27 +25,12 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerBlock(String i18n, BlockSpec.Width width) {
+    void visitInnerBlock(BlockSpec.Width width) {
 
     }
 
     @Override
     void visitInnerBlockEnd() {
-
-    }
-
-    @Override
-    void visitActionStart() {
-
-    }
-
-    @Override
-    void visitActionEnd() {
-
-    }
-
-    @Override
-    void visitAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, boolean isAjaxRendering) {
 
     }
 
@@ -69,7 +60,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitForm(String i18n, BlockSpec.Width width) {
+    void visitForm(BlockSpec.Width width) {
 
     }
 
@@ -79,12 +70,12 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitShow(String i18n, BlockSpec.Width width) {
+    void visitShow(BlockSpec.Width width) {
 
     }
 
     @Override
-    void visitTable(String id, String i18n, BlockSpec.Width width) {
+    void visitTable(String id, BlockSpec.Width width) {
 
     }
 
@@ -94,32 +85,32 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTableFilter(String id, String i18nFilter, UiFilterSpecifier filterSpecifier, String i18nTable, BlockSpec.Width width) {
+    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, BlockSpec.Width width) {
 
     }
 
     @Override
-    void visitTableFilterEnd(UiTableSpecifier tableSpecifier = null) {
+    void visitTableFilterEnd(UiTableSpecifier tableSpecifier) {
 
     }
 
     @Override
-    void visitChart(String i18n, BlockSpec.Width width) {
+    void visitChart(BlockSpec.Width width) {
 
     }
 
     @Override
-    void visitChartEnd(UiChartSpecifier chartSpecifier = null) {
+    void visitChartEnd(UiChartSpecifier chartSpecifier) {
 
     }
 
     @Override
-    void visitDiagram(String i18n, BlockSpec.Width width) {
+    void visitDiagram(BlockSpec.Width width) {
 
     }
 
     @Override
-    void visitDiagramFilter(String i18nFilter, UiFilterSpecifier filterSpecifier, String i18n, BlockSpec.Width width) {
+    void visitDiagramFilter(UiFilterSpecifier filterSpecifier, BlockSpec.Width width) {
 
     }
 
@@ -129,7 +120,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCloseModal(String id, String value, FieldInfo[] fields = null) {
+    void visitCloseModal(String id, String value, FieldInfo[] fields) {
 
     }
 
@@ -154,7 +145,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCustom(String i18n, String html, Style style, BlockSpec.Width width) {
+    void visitCustom(String html, Style style, BlockSpec.Width width) {
 
     }
 
@@ -190,6 +181,6 @@ class UiBlockVisitor implements IUiBlockVisitor {
 
     @Override
     Map getParameterMap() {
-
+        return null
     }
 }
