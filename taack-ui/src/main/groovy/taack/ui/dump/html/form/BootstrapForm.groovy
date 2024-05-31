@@ -10,6 +10,7 @@ import taack.ui.dump.html.base.HTMLFieldset
 import taack.ui.dump.html.base.HTMLImg
 import taack.ui.dump.html.base.HTMLInput
 import taack.ui.dump.html.base.HTMLLabel
+import taack.ui.dump.html.base.HTMLLegend
 import taack.ui.dump.html.base.HTMLLi
 import taack.ui.dump.html.base.HTMLNav
 import taack.ui.dump.html.base.HTMLSection
@@ -64,7 +65,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
                 new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
                         .addChildren(
                                 new HTMLFieldset().builder.addChildren(
-                                        new HTMLTxtContent(trI18n)
+                                        new HTMLLegend().builder.addChildren(new HTMLTxtContent(trI18n)).build()
                                 ).build()
                         ).build()
         )

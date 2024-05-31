@@ -1,5 +1,6 @@
 package taack.domain
 
+import grails.util.Environment
 import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -536,13 +537,15 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         List<T> res
         try {
+            Integer offset = (theParams["offset"] ?: "0") as Integer
             if (simpleSort && simpleOrder) {
-                res = (executeQuery(query, namedParams, (max == -1) ? null : max, theParams["offset"] as Integer) as List<List>)*.first() as List<T>
+                res = (executeQuery(query, namedParams, (max == -1) ? null : max, offset) as List<List>)*.first() as List<T>
             } else {
-                res = executeQuery(query, namedParams, (max == -1) ? null : max, theParams["offset"] as Integer) as List<T>
+                res = executeQuery(query, namedParams, (max == -1) ? null : max, offset) as List<T>
             }
         } catch (e) {
             println "ERROR: $e Filter KO: $query"
+            if (Environment.current == Environment.DEVELOPMENT) e.printStackTrace()
         }
         return new Pair<List<T>, Long>(res, executeQueryUniqueResult(Long, namedParams, count) as Long)
     }

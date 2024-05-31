@@ -6,7 +6,11 @@ import groovy.transform.CompileStatic
 final class HTMLButton implements IHTMLElement {
     HTMLButton(String url, String i18n) {
         tag = 'button'
-        attributes.put('formaction', url)
+        if (url) attributes.put('formaction', url)
         addChildren(new HTMLTxtContent(i18n))
+    }
+
+    static HTMLButton reset() {
+        new HTMLButton(null, 'Reset').builder.putAttribute('type', 'reset').build() as HTMLButton
     }
 }

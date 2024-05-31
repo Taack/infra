@@ -6,15 +6,12 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.EnumOptions
 import taack.ui.IEnumOption
-import taack.ui.dump.html.base.HTMLInput
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.InputType
-import taack.ui.dump.html.base.TaackTag
-import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.base.filter.IUiFilterVisitor
 import taack.ui.base.filter.expression.FilterExpression
+import taack.ui.dump.html.base.*
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.IFormTheme
+import taack.ui.dump.html.theme.ThemeSelector
 
 @CompileStatic
 final class RawHtmlFilterDump implements IUiFilterVisitor {
@@ -31,7 +28,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         while (top.taackTag != tag) {
             top = top.parent
         }
-        topElement = top
+        topElement = top.taackTag == tag ? top.parent : top
+        if (!topElement) topElement = formThemed
     }
 
     RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
@@ -55,7 +53,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addClasses('filter', 'taackTableFilter').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                 new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                 new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
@@ -85,6 +83,15 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterEnd() {
+        filterActions.each {
+
+        }
+        topElement.addChildren(
+                new HTMLDiv().builder.addClasses('filter', 'buttons', 'text-center').addChildren(
+                        new HTMLButton("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}", 'Filter'),
+                        HTMLButton.reset()
+                ).build()
+        )
         out << formThemed.output
     }
 
@@ -106,7 +113,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), true, false, true)
         } else if (isEnum) {
             final Class type = fieldInfo.fieldConstraint.field.type
-            topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value as Enum), true, false, true)
+            topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value), true, false, true)
         } else if (isBoolean) {
             Boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ?
                     ((parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '1') ? true : (parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '0') ? false : null) : fieldInfo.value
@@ -139,6 +146,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         final String qualifiedId = qualifiedName + '-' + parameter.modalId
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
         topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, true, isChecked)
+        topElement.addChildren(new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default"))
     }
 
     @Override

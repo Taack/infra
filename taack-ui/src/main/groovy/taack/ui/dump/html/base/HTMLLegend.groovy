@@ -5,6 +5,6 @@ import groovy.transform.CompileStatic
 @CompileStatic
 final class HTMLLegend implements IHTMLElement {
     HTMLLegend() {
-        tag = 'fieldset'
+        tag = 'legend'
     }
 }

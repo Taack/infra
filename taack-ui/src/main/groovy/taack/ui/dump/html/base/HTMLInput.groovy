@@ -24,11 +24,10 @@ enum InputType {
 @CompileStatic
 final class HTMLInput implements IHTMLElement {
 
-    final Object value
 
     HTMLInput(InputType inputType, Object value, String name, String placeHolder = null, boolean disabled = false) {
         tag = 'input'
-        this.value = value
+        if (value) attributes.put('value', value.toString())
         attributes.put('type', inputType.typeText)
         attributes.put('name', name)
         if (placeHolder) attributes.put('placeHolder', placeHolder)

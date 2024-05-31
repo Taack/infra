@@ -54,7 +54,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         while (top.taackTag != tag) {
             top = top.parent
         }
-        topElement = top
+        topElement = top.taackTag == tag ? top.parent : top
+        if (!topElement) topElement = formThemed
     }
 
     private boolean isDisabled(FieldInfo field) {
