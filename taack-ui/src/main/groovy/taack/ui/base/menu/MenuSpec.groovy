@@ -56,6 +56,11 @@ final class MenuSpec {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenu(Utils.getControllerName(action), action.method.toString(), params)
     }
 
+    void menu(final MethodClosure action, Long id) {
+        Map params = [id: id]
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenu(Utils.getControllerName(action), action.method.toString(), params)
+    }
+
     void menuIcon(final ActionIcon icon, final MethodClosure action, Long id = null) {
         if (taackUiEnablerService.hasAccess(action)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), [id: id], true)
     }

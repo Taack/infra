@@ -116,7 +116,7 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
         if (isModal)
             out << """
                  <li>
-                    <a class='taackAjaxLink nav-link' ajaxAction='${parameter.urlMapped(controller, action, params, true)}'>
+                    <a class='nav-link' ajaxAction='${parameter.urlMapped(controller, action, params, true)}'>
                         ${actionIcon.getHtml(i18n, 24)}
                     </a>
                  </li>

@@ -7,7 +7,6 @@ final class HTMLAnchor implements IHTMLElement {
     HTMLAnchor(boolean isAjax, String url) {
         tag = 'a'
         if (isAjax) {
-            addClasses('taackAjaxLink')
             attributes.put('ajaxAction', url)
         }
         else

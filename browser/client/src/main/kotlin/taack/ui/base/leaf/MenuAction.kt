@@ -11,7 +11,7 @@ class MenuAction(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a
     companion object {
         fun getAjaxMenu(p: Block): List<MenuAction> {
             val elements: List<Node>?
-            elements = document.querySelectorAll("a.taackAjaxLink").asList()
+            elements = document.querySelectorAll("a[ajaxaction]").asList()
             return elements.map {
                 Helper.trace("Create MenuAction")
                 MenuAction(p, it as HTMLAnchorElement)

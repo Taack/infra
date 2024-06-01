@@ -12,7 +12,7 @@ class Filter(val parent: AjaxBlock, val f: HTMLFormElement):
     companion object {
         fun getSiblingFilterBlock(p: AjaxBlock): List<Filter> {
             val elements: List<Node>?
-            elements = p.d.querySelectorAll("form.taackTableFilter").asList()
+            elements = p.d.querySelectorAll("form[taackfilterid]").asList()
             return elements.map {
                 Filter(p, it as HTMLFormElement)
             }

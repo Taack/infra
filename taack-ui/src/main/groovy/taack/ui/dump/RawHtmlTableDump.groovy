@@ -34,7 +34,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTableWithoutFilter() {
         out << """
-                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter taackTableFilter" taackFilterId="${blockId}">
+                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter" taackFilterId="${blockId}">
                     <input type="hidden" name="sort" value="${parameter.applicationTagLib.params['sort'] ?: ''}">
                     <input type="hidden" name="order" value="${parameter.applicationTagLib.params['order'] ?: ''}">
                     <input type="hidden" name="grouping" value="${parameter.applicationTagLib.params['grouping'] ?: ''}">

@@ -10,7 +10,7 @@ import taack.ui.base.leaf.AjaxBlockInputTab
 import taack.ui.base.leaf.MenuAction
 import taack.ui.base.record.RecordState
 
-class Block(val parent: Modal?, val d: HTMLDivElement):
+class Block(val parent: Modal?, val d: HTMLDivElement) :
     BaseElement {
     companion object {
         var href: String? = null
@@ -60,4 +60,9 @@ class Block(val parent: Modal?, val d: HTMLDivElement):
     override fun toString(): String {
         return "Block{ajaxBlockElements: $ajaxBlockElements, parent: ${parent}}"
     }
+
+    fun refresh() {
+        MenuAction.getAjaxMenu(this)
+    }
+
 }

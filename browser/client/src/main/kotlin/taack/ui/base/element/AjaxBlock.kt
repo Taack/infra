@@ -9,7 +9,6 @@ import org.w3c.dom.*
 import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
-import taack.ui.base.leaf.AjaxLink
 import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 
@@ -31,7 +30,6 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     var forms: List<Form>
     var shows: List<Show>
     var progressId: String = ""
-    private var ajaxLink: List<AjaxLink>
     private val innerScripts = d.getElementsByTagName("script")
 
     init {
@@ -39,7 +37,6 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         RecordState.setCurrentBlockId(blockId)
         filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
         tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
-        ajaxLink = AjaxLink.getSiblingAjaxLink(this)
         forms = Form.getSiblingForm(this)
         shows = Show.getSiblingShow(this)
         Helper.trace("innerScripts ${innerScripts.length}")
@@ -115,11 +112,11 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.traceIndent("AjaxBlock::refresh +++ blockId: $blockId")
         filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
         tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
-        ajaxLink = AjaxLink.getSiblingAjaxLink(this)
         forms = Form.getSiblingForm(this)
         for (i in 0 until innerScripts.length) {
             eval(innerScripts.get(i)!!.innerHTML);
         }
+        parent.refresh()
         Helper.traceDeIndent("AjaxBlock::refresh --- blockId: $blockId")
     }
 

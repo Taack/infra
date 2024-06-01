@@ -219,7 +219,7 @@ final class BlockSpec {
     void table(final UiTableSpecifier tableSpecifier, final Width width = Width.MAX,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         if (displayElement("table$counter")) {
-            id = "tableFilter$counter"
+            id = "table$counter"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTable(id, width)
             if (closure) {

@@ -48,10 +48,12 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitInnerBlock(final BlockSpec.Width width) {
-            if (!parameter.isAjaxRendering || isModal)
-                out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
-            else
-                out << "<div>"
+//            if (!parameter.isAjaxRendering || isModal)
+//                out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
+//            else
+//                out << "<div>"
+        out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''}' >"
+
     }
 
     @Override
@@ -148,7 +150,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
         }
         visitInnerBlock(width)
         visitInnerBlock(BlockSpec.Width.QUARTER)
-        visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
         visitInnerBlockEnd()
         visitInnerBlock(BlockSpec.Width.THREE_QUARTER)
@@ -156,7 +157,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
-        visitCloseTitle()
         tableSpecifier.visitTable(new RawHtmlTableDump(id, out, parameter))
         visitInnerBlockEnd()
         visitInnerBlockEnd()
