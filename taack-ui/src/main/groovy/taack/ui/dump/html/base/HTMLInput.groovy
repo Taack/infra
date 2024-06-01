@@ -41,8 +41,8 @@ final class HTMLInput implements IHTMLElement {
         ret
     }
 
-    static HTMLInput inputRadio(String name, boolean checked = false, boolean disabled = false) {
-        HTMLInput ret = new HTMLInput(InputType.RADIO, null, name, null,  disabled)
+    static HTMLInput inputRadio(Object value, String name, boolean checked = false, boolean disabled = false) {
+        HTMLInput ret = new HTMLInput(InputType.RADIO, value, name, null,  disabled)
         if (checked) ret.attributes.put('checked', 'checked')
         ret
     }

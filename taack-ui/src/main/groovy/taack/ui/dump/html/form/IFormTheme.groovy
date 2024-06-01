@@ -49,7 +49,7 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract IHTMLElement section(IHTMLElement topElement, String trI18n, String... classes)
 
-    abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, boolean value)
+    abstract IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Boolean value)
 
     abstract IHTMLElement selects(IHTMLElement topElement, String trI18n, String qualifiedName, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable)
 

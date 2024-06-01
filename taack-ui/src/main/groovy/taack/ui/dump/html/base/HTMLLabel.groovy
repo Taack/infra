@@ -8,4 +8,9 @@ final class HTMLLabel implements IHTMLElement{
         tag = 'label'
         attributes.put('for', forEntry)
     }
+
+    HTMLLabel(String forEntry, String i18n) {
+        this(forEntry)
+        addChildren(new HTMLTxtContent(i18n))
+    }
 }

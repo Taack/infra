@@ -22,7 +22,7 @@ final class BootstrapBlock implements IBlockTheme {
 
     @Override
     IHTMLElement block(IHTMLElement topElement, String blockId) {
-        topElement.addChildren(new HTMLDiv().builder.addClasses('taackBlock').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build())
+        topElement.addChildren(new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build())
         topElement.children.first()
     }
 

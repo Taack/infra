@@ -30,11 +30,13 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     final ThemeMode themeMode
     final ThemeSize themeSize
     final boolean floating
+    final boolean noLabel
 
-    BootstrapForm(ThemeMode themeMode, ThemeSize themeSize, boolean floating = true) {
+    BootstrapForm(ThemeMode themeMode, ThemeSize themeSize, boolean floating = true, boolean noLabel = false) {
         this.themeMode = themeMode
         this.themeSize = themeSize
         this.floating = floating
+        this.noLabel = noLabel
         if (floating) addClasses 'form-floating', 'mb-1'
         constructorIFormThemed()
     }
@@ -63,26 +65,25 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     private String getFormControl() {
         switch (themeSize) {
             case ThemeSize.SM:
-                'form-control-sm'
+                'form-control form-control-sm'
                 break
             case ThemeSize.LG:
-                'form-control-lg'
+                'form-control form-control-lg'
                 break
             case ThemeSize.NONE:
-                'form-control'
+                'form-control form-control'
                 break
         }
     }
 
     @Override
     IHTMLElement inputOverride(IHTMLElement topElement, String qualifiedName, String trI18n, String val, String txt, String imgSrc, IHTMLElement previousElement) {
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLElementBuilder span = new HTMLSpan().builder.addClasses('M2MParent').addChildren(
                 new HTMLInput(InputType.HIDDEN, val, qualifiedName).builder.addClasses(formControl).build(),
                 new HTMLSpan().builder.addChildren(
                         new HTMLTxtContent(txt)
                 ).build(),
-                new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M', 'taackFormFieldOverrideM2O')./*putAttribute('taackOnclickInnerHTML', previousElement).*/build()
+                new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M', 'taackFormFieldOverrideM2O')./*putAttribute('taackOnclickInnerHTML', previousElement).*/ build()
         )
         if (imgSrc) {
             span.addChildren(
@@ -90,6 +91,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             )
         }
         topElement.addChildren(span.build())
+        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
         topElement.addChildren(divError(qualifiedName))
         topElement
     }
@@ -108,12 +110,31 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, boolean value) {
+    IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Boolean value) {
         IHTMLElement el = themeStartInputs(topElement)
+        if (!nullable)
+            el.addChildren(
+                    HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
+            )
+        else
+            el.addChildren(
+                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                            HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
+                            new HTMLLabel(qualifiedName, '1').builder.addClasses('form-check-label').build(),
+
+                    ).build(),
+                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                            HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
+                            new HTMLLabel(qualifiedName, '0').builder.addClasses('form-check-label').build(),
+
+                    ).build(),
+                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                            HTMLInput.inputRadio('?', qualifiedName, value == null).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
+                            new HTMLLabel(qualifiedName, '""').builder.addClasses('form-check-label').build()
+                    ).build(),
+            )
+
         el.addChildren(formLabelInput(qualifiedName, trI18n))
-        el.addChildren(
-                HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-        )
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -145,8 +166,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
-         IHTMLElement el = themeStartInputs(topElement)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        IHTMLElement el = themeStartInputs(topElement)
 
         vals?.each {
             boolean isString = String.isAssignableFrom(it.class)
@@ -165,6 +185,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             topElement.addChildren(span2)
 
         }
+        el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -184,9 +205,9 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.TEXTAREA, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
-        if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -195,9 +216,9 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
-        if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -206,9 +227,9 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
-        if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -217,9 +238,9 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
-        if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -229,7 +250,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         HTMLInput[] radioList = new HTMLInput[names.size()]
         HTMLLi[] liList = new HTMLLi[names.size()]
         names.eachWithIndex { it, occ ->
-            radioList[occ] = HTMLInput.inputRadio("pct-${tabIds}", occ == 0).builder.setId("tab${occ + 1}-f${tabIds}").addClasses("inputTab${occ + 1}").build() as HTMLInput
+            radioList[occ] = HTMLInput.inputRadio(occ, "pct-${tabIds}", occ == 0).builder.setId("tab${occ + 1}-f${tabIds}").addClasses("inputTab${occ + 1}").build() as HTMLInput
             liList[occ] = new HTMLLi().builder.addClasses("tab${occ + 1}").addChildren(
                     new HTMLLabel("tab${occ + 1}-f${tabIds}").builder.addChildren(
                             new HTMLTxtContent(it)

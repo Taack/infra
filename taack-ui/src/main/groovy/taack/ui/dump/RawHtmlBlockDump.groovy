@@ -36,7 +36,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            out << "<div id='blockId${blockId}' class='taackBlock' 'blockId'='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
+            out << "<div id='blockId${blockId}' class='taackBlock container-fluid' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
         }
     }
 
@@ -77,13 +77,12 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 //                out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
 //            else
 //                out << "<div>"
-        out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''}' >"
+        out << "<div class='${width.bootstrapCss} ${!isModal ? 'taackContainer row align-items-start' : ''}' >"
 
     }
 
     @Override
     void visitInnerBlockEnd() {
-        out << "</div>"
         out << "</div>"
     }
 
@@ -257,7 +256,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTabsEnd() {
-        outBkup << """<div class="pc-tab ${blockTabWidth.css} taackContainer">"""
+        outBkup << """<div class="pc-tab ${blockTabWidth.bootstrapCss} taackContainer">"""
         currentTabNames.eachWithIndex { it, occ ->
             outBkup << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-${tabIds}" type="radio" class="taackBlockInputTab inputTab${occ + 1}${/*tabOccurrence != 0*/ false ?"Inner":""}" name="pct-${tabIds}" />"""
         }
@@ -293,7 +292,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void anonymousBlock(BlockSpec.Width width) {
-        out << """<div class="${width.css}">"""
+        out << """<div class="${width.bootstrapCss}">"""
     }
 
     @Override

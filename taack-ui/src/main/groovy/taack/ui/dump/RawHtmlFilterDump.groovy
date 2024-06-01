@@ -53,7 +53,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addClasses('filter').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FORM).addClasses('filter', 'bg-light', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                 new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                 new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
@@ -145,7 +145,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         final String qualifiedId = qualifiedName + '-' + parameter.modalId
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
-        topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, true, isChecked)
+        topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, false, isChecked)
         topElement.addChildren(new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default"))
     }
 

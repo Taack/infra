@@ -33,7 +33,7 @@ trait IHTMLElement {
     }
 
     void addChildren(IHTMLElement... elements) {
-        children += elements
+        if (elements) children += elements
     }
 
     String indent() {
