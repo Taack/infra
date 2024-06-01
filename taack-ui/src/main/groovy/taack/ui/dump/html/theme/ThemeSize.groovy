@@ -4,5 +4,5 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 enum ThemeSize {
-    SM, NONE
+    LG, SM, NONE
 }
