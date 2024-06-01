@@ -172,7 +172,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.DATE, value?.toString(), qualifiedName, null, disable).builder.addClasses(formControl).build()
+        HTMLInput input = new HTMLInput(InputType.DATE, value?.toString(), qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -183,7 +183,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.TEXTAREA, value, qualifiedName, null, disable).builder.addClasses(formControl).build()
+        HTMLInput input = new HTMLInput(InputType.TEXTAREA, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -194,7 +194,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.addClasses(formControl).build()
+        HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -205,7 +205,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.addClasses(formControl).build()
+        HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -216,7 +216,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.addClasses(formControl).build()
+        HTMLInput input = new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
