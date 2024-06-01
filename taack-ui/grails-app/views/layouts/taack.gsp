@@ -50,8 +50,7 @@
 
 <body class="${themeMode == ThemeMode.DARK ? 'night' : 'day'}" data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
 
-<nav class="navbar navbar-expand-md"
-     style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
+<nav class="navbar navbar-expand-md" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><asset:image src='${conf.logoFileName}' width='${conf.logoWidth}'
                                                       height='${conf.logoHeight}' alt="Logo"/>

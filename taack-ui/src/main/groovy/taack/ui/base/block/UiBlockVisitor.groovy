@@ -25,6 +25,16 @@ class UiBlockVisitor extends UiMenuVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitBlockHeader() {
+
+    }
+
+    @Override
+    void visitBlockHeaderEnd() {
+
+    }
+
+    @Override
     void visitInnerBlock(BlockSpec.Width width) {
 
     }

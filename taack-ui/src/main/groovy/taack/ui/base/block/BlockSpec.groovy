@@ -163,6 +163,19 @@ final class BlockSpec {
         if (firstPass && displayElement()) blockVisitor.visitModalEnd()
     }
 
+
+    private void processMenuBlock(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure) {
+        if (closure) {
+            blockVisitor.visitBlockHeader()
+            blockVisitor.visitMenuStart(null)
+            closure.delegate = new MenuSpec(blockVisitor) //menuSpec
+            closure.call()
+            counter ++
+            blockVisitor.visitMenuEnd()
+            blockVisitor.visitBlockHeaderEnd()
+        }
+    }
+
     /**
      * Add a form in a block
      *
@@ -177,13 +190,7 @@ final class BlockSpec {
             id = "form$counter"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitForm(width)
-            if (closure) {
-                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
-                closure.delegate = menuSpec
-                closure.call()
-                counter ++
-                blockVisitor.visitMenuEnd()
-            }
+            processMenuBlock(closure)
             blockVisitor.visitFormEnd(formSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
@@ -204,13 +211,7 @@ final class BlockSpec {
             id = "show$counter"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitShow(width)
-            if (closure) {
-                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
-                closure.delegate = menuSpec
-                closure.call()
-                counter ++
-                blockVisitor.visitMenuEnd()
-            }
+            processMenuBlock(closure)
             blockVisitor.visitShowEnd(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
@@ -222,13 +223,7 @@ final class BlockSpec {
             id = "table$counter"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTable(id, width)
-            if (closure) {
-                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
-                closure.delegate = menuSpec
-                closure.call()
-                counter ++
-                blockVisitor.visitMenuEnd()
-            }
+            processMenuBlock(closure)
             blockVisitor.visitTableEnd(tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
@@ -251,13 +246,7 @@ final class BlockSpec {
             id = "tableFilter$counter"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTableFilter(id, filterSpecifier, width)
-            if (closure) {
-                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
-                closure.delegate = menuSpec
-                closure.call()
-                counter ++
-                blockVisitor.visitMenuEnd()
-            }
+            processMenuBlock(closure)
             blockVisitor.visitTableFilterEnd(tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
@@ -278,13 +267,7 @@ final class BlockSpec {
             id = "chart${counter}"
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitChart(width)
-            if (closure) {
-                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL)
-                closure.delegate = menuSpec
-                closure.call()
-                counter ++
-                blockVisitor.visitMenuEnd()
-            }
+            processMenuBlock(closure)
             blockVisitor.visitChartEnd(chartSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }

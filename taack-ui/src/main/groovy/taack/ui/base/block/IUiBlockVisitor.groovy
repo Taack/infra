@@ -3,7 +3,6 @@ package taack.ui.base.block
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.base.*
-import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.menu.IUiMenuVisitor
 
@@ -13,6 +12,10 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitBlock()
 
     void visitBlockEnd()
+
+    void visitBlockHeader()
+
+    void visitBlockHeaderEnd()
 
     void visitInnerBlock(BlockSpec.Width width)
 

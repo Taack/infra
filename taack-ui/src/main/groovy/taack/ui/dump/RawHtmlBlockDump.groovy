@@ -13,6 +13,7 @@ import taack.ui.base.block.IUiBlockVisitor
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
 import taack.ui.base.helper.Utils
+import taack.ui.dump.html.theme.ThemeSelector
 
 @CompileStatic
 class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
@@ -44,6 +45,30 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
         if (!parameter.isAjaxRendering || isModal) {
             out << "</div>"
         }
+    }
+
+    @Override
+    void visitBlockHeader() {
+        out << """
+            <nav class="navbar navbar-expand-md" >
+                <div id="dropdownNav" class="container-fluid">
+                    <button id="dLabel" class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent"
+                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                            data-bs-toggle="dropdownNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        """
+    }
+
+    @Override
+    void visitBlockHeaderEnd() {
+        out << """
+                    </div>
+                </div>
+            </nav>
+        """
     }
 
     @Override
