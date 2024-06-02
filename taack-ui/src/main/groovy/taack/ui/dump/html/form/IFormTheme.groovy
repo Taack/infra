@@ -55,7 +55,9 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disable)
 
-    abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple)
+    abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable)
+
+    abstract<T extends GormEntity> IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, T vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable)
 
     abstract IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value)
 

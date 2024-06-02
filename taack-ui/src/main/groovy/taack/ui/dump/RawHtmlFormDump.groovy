@@ -201,7 +201,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
-        formThemed.ajaxField(topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable, isListOrSet)
+        if (isListOrSet)
+            formThemed.ajaxField(topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
+        else {
+            GormEntity v = (field?.value ?: field.fieldConstraint.field.type.getDeclaredConstructor().newInstance()) as GormEntity
+            formThemed.ajaxField(topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
+        }
+
         inputOverride(qualifiedName, trI18n, field)
     }
 

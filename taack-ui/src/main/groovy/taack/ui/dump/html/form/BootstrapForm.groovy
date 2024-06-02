@@ -165,7 +165,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable, boolean isMultiple) {
+    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
 
         vals?.each {
@@ -175,17 +175,32 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             if (disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg')
             span.addChildren(new HTMLInput(InputType.STRING, it ? inputEscape(it.toString()) : '', qualifiedName, null, disabled))
             span.addChildren(new HTMLInput(InputType.HIDDEN, it ? (isString ? it : it['id']) : '', qualifiedName, null, disabled))
-            topElement.addChildren(span)
+            el.addChildren(span)
         }
-        if (!disabled && isMultiple) {
+        if (!disabled) {
             HTMLSpan span2 = new HTMLSpan().builder.addClasses('M2MToDuplicate').build() as HTMLSpan
             span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg')
             span2.addChildren(new HTMLInput(InputType.STRING, '', qualifiedName, null, disabled))
             span2.addChildren(new HTMLInput(InputType.HIDDEN, '', qualifiedName, null, disabled))
-            topElement.addChildren(span2)
+            el.addChildren(span2)
 
         }
         el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(divError(qualifiedName))
+        topElement
+    }
+
+    @Override
+    def <T1 extends GormEntity> IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, T1 val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable) {
+        IHTMLElement el = themeStartInputs(topElement)
+
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName , null, disabled).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), qualifiedName, null, disabled, true).builder.addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        el.addChildren(inputHidden)
+        if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').build()
+        el.addChildren(input)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
