@@ -14,7 +14,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
     companion object {
         fun getSiblingFormActionInputO2M(f: Form): List<FormActionInputM2O> {
             val elements: List<Node>?
-            elements = f.f.querySelectorAll("input[taackajaxformm2oaction]").asList()
+            elements = f.f.querySelectorAll("input[taackAjaxFormM2OAction]").asList()
             return elements.map {
                 FormActionInputM2O(f, it as HTMLInputElement)
             }

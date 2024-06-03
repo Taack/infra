@@ -24,7 +24,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         }
     }
 
-    val blockId = d.attributes.getNamedItem("ajaxBlockId")!!.value
+    val blockId = parent.blockId
     var filters: Map<String, Filter>
     var tables: Map<String, Table>
     var forms: List<Form>
@@ -34,7 +34,6 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
 
     init {
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
-        RecordState.setCurrentBlockId(blockId)
         filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
         tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
         forms = Form.getSiblingForm(this)
@@ -65,15 +64,20 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
                 }
             }
         }
-        if (blockId.startsWith("drawProgress:")) {
-            poolDrawProgress(blockId)
+
+        if (blockId != null) {
+            RecordState.setCurrentBlockId(blockId)
+            if (blockId.startsWith("drawProgress:")) {
+                poolDrawProgress(blockId)
+            }
+            val clientState = RecordState.getPreviousClientState()?.get(blockId)
+            Helper.trace("clientState = $clientState")
+            if (clientState != null) {
+                window.scrollTo(clientState[0]?.toDouble() ?: 0.0, clientState[1]?.toDouble() ?: 0.0)
+                RecordState.clearClientState(blockId)
+            }
         }
-        val clientState = RecordState.getPreviousClientState()?.get(blockId)
-        Helper.trace("clientState = $clientState")
-        if (clientState != null) {
-            window.scrollTo(clientState[0]?.toDouble() ?: 0.0, clientState[1]?.toDouble() ?: 0.0)
-            RecordState.clearClientState(blockId)
-        }
+
 
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }

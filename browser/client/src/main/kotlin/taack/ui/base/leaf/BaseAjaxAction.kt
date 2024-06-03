@@ -30,13 +30,12 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement)
         }
     }
 
+    private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value
 
     init {
-        trace("BaseAjaxAction::init")
+        trace("BaseAjaxAction::init $action")
         a.onclick = { e -> onclickBaseAjaxAction(e) }
     }
-
-    private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value
 
     private fun onclickBaseAjaxAction(e: MouseEvent) {
         e.preventDefault()

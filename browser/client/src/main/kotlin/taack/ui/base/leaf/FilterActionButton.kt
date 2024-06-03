@@ -17,7 +17,7 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
     companion object {
         fun getSiblingFilterAction(f: Filter): List<FilterActionButton> {
             val elements: List<Node>?
-            elements = f.f.querySelectorAll("button.taackFilterAction").asList()
+            elements = f.f.querySelectorAll("button[formaction]").asList()
             return elements.map {
                 FilterActionButton(f, it as HTMLButtonElement)
             }
@@ -43,22 +43,18 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
         val fd = FormData(pf)
         fd.append("isAjax", "true")
         fd.append("refresh", "true")
-        fd.append("filterTableId", parent.parent.blockId)
+        fd.append("filterTableId", parent.filterId)
         fd.set("offset", "0")
         state.addClientStateAjaxBlock()
         state.addServerState(fd)
         window.fetch(b?.formAction ?: pf.action, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {
-                trace("OK")
-                val t = it.text()
-                t
+                it.text()
             } else {
-                trace("NOK")
                 trace(it.statusText)
                 Promise.reject(Throwable())
             }
         }.then {
-            trace(it)
             if (it.startsWith("__redirect__")) {
                 trace("FilterActionButton::onclick __redirect__ ${it.substring("__redirect__".length)}")
                 window.location.href = it.substring("__redirect__".length)
@@ -72,6 +68,8 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                     target!!.d.innerHTML = me.value
                     target.refresh()
                 }
+            } else {
+                trace("FilterActionButton::onclick NOTHING |$it|")
             }
         }.then {
             b?.disabled = false

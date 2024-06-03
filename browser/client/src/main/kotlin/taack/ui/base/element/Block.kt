@@ -23,23 +23,32 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     val ajaxBlockElements: Map<String, AjaxBlock>?
     val modal: Modal
     var tabs: List<AjaxBlockInputTab>
-    val blockId = d.attributes.getNamedItem("blockId")?.value
+    val blockId: String
+    var modalNumber = 0
 
     init {
         traceIndent("Block::init +++ ${d.id}")
-        if (blockId != null) RecordState.setCurrentBlockDivId(blockId)
+        val tmpBlockId= d.attributes.getNamedItem("blockId")?.value
+        if (tmpBlockId != null && tmpBlockId != "") {
+            blockId = tmpBlockId
+        } else {
+            blockId = "modal${modalNumber++}"
+        }
         tabs = AjaxBlockInputTab.getSiblingBlockInputTab(this)
         val abe = AjaxBlock.getSiblingAjaxBlock(this)
-        ajaxBlockElements = abe.map { it.blockId to it }.toMap()
+        ajaxBlockElements = abe.map {
+            if (it.blockId != null) it.blockId to it
+            else it.toString() to it
+        }.toMap()
         modal = Modal.buildModal(this)
         if (parent == null) {
             MenuAction.getAjaxMenu(this)
         }
 
-        val clientBlockState = RecordState.getPreviousClientState()?.get(blockId)
-        Helper.trace("clientBlockState = $clientBlockState for ${d.id}")
-        if (blockId != null && clientBlockState != null && tabs.isNotEmpty()) {
-            if (tabs.size == clientBlockState.size) {
+        if (tmpBlockId != null) {
+            val clientBlockState = RecordState.getPreviousClientState()?.get(blockId)
+            Helper.trace("clientBlockState = $clientBlockState for ${d.id}")
+            if (tabs.isNotEmpty() && tabs.size == clientBlockState?.size) {
                 Helper.trace("restoring active tab ...")
                 val indexChecked = clientBlockState.indexOf("true")
                 if (indexChecked != -1) tabs[indexChecked].i.checked = true
@@ -48,6 +57,9 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
                 Helper.trace("tabs.size != clientBlockState.size ...")
                 RecordState.clearClientState(blockId)
             }
+        } else {
+            Helper.trace("Block::init in modal ...")
+            AjaxBlock(this, d)
         }
 
         traceDeIndent("Block::init --- ${d.id}")

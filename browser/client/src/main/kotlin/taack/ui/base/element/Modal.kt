@@ -59,6 +59,7 @@ class Modal(val parent: Block) : BaseElement {
     }
 
     fun open(htmlContent: String) {
+        trace("Modal::open $mId")
         d3.innerHTML = htmlContent
         d1.style.display = "block"
         Block.getSiblingBlock(this)

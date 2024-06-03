@@ -19,14 +19,13 @@ class Filter(val parent: AjaxBlock, val f: HTMLFormElement):
         }
     }
 
-    private val formName = f.attributes.getNamedItem("name")?.value
     val filterId = f.attributes.getNamedItem("taackFilterId")!!.value
     private val actions: List<FilterActionButton>
 
     init {
-        Helper.traceIndent("Filter::init +++ formName: $formName, filterId: $filterId")
+        Helper.traceIndent("Filter::init +++ filterId: $filterId")
         actions = FilterActionButton.getSiblingFilterAction(this)
-        Helper.traceDeIndent("Filter::init --- formName: $formName, filterId: $filterId")
+        Helper.traceDeIndent("Filter::init --- filterId: $filterId")
     }
 
     override fun getParentBlock(): Block {
