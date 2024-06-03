@@ -204,7 +204,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         if (isListOrSet)
             formThemed.ajaxField(topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         else {
-            GormEntity v = (field?.value ?: field.fieldConstraint.field.type.getDeclaredConstructor().newInstance()) as GormEntity
+            GormEntity v = (field?.value) as GormEntity
             formThemed.ajaxField(topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         }
 
