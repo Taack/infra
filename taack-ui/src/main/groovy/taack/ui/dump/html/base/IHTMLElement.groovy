@@ -1,8 +1,8 @@
 package taack.ui.dump.html.base
 
 import groovy.transform.CompileStatic
-import taack.ui.dump.html.IJavascriptDescriptor
-import taack.ui.dump.html.StyleDescriptor
+import taack.ui.dump.html.script.IJavascriptDescriptor
+import taack.ui.dump.html.style.IStyleDescriptor
 
 @CompileStatic
 enum TaackTag {
@@ -23,7 +23,7 @@ trait IHTMLElement {
     String[] classes = []
     final Map<String, String> attributes = [:]
     IJavascriptDescriptor onClick
-    StyleDescriptor styleDescriptor
+    IStyleDescriptor styleDescriptor
     IHTMLElement[] children = []
     IHTMLElement parent
     String tag
@@ -52,6 +52,10 @@ trait IHTMLElement {
             res += ['taackTag': taackTag.toString()]
         if (classes)
             res += ['class': classes.join(' ')]
+        if (onClick)
+            res += ['onclick': onClick.output]
+        if (styleDescriptor)
+            res += ['style': styleDescriptor.output]
         res
     }
 
@@ -95,7 +99,7 @@ trait IHTMLElement {
             this
         }
 
-        HTMLElementBuilder<T> setStyle(StyleDescriptor styleDescriptor) {
+        HTMLElementBuilder<T> setStyle(IStyleDescriptor styleDescriptor) {
             element.styleDescriptor = styleDescriptor
             this
         }

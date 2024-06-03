@@ -21,6 +21,8 @@ import taack.ui.dump.html.base.HTMLUl
 import taack.ui.dump.html.base.IHTMLElement
 import taack.ui.dump.html.base.InputType
 import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.script.DeleteSiblingInputContent
+import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 
@@ -197,10 +199,10 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName , null, disabled).builder.addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), qualifiedName, null, disabled, true).builder.addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
-        el.addChildren(inputHidden)
-        if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').build()
+        if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(inputHidden)
         el.addChildren(divError(qualifiedName))
         topElement
     }

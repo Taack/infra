@@ -1,5 +1,6 @@
-package taack.ui.dump.html
+package taack.ui.dump.html.script
 
 interface IJavascriptDescriptor {
+
     String getOutput()
 }

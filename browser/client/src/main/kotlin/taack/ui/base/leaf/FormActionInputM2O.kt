@@ -14,7 +14,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
     companion object {
         fun getSiblingFormActionInputO2M(f: Form): List<FormActionInputM2O> {
             val elements: List<Node>?
-            elements = f.f.querySelectorAll("input.taackAjaxFormM2O").asList()
+            elements = f.f.querySelectorAll("input[taackajaxformm2oaction]").asList()
             return elements.map {
                 FormActionInputM2O(f, it as HTMLInputElement)
             }
@@ -28,16 +28,10 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         }
     }
 
-    private val inputId = i.attributes.getNamedItem("taackAjaxFormM2OInputId")!!.value
-
     private fun onClick(e: Event) {
         e.preventDefault()
         trace("FormActionInputM2O::onclick")
-//        val controller = i.attributes.getNamedItem("taackAjaxFormM2OController")!!.value
         val action = i.attributes.getNamedItem("taackAjaxFormM2OAction")!!.value
-        val id = i.attributes.getNamedItem("taackAjaxFormM2OId")?.value
-//        val params = i.attributes.getNamedItem("taackAjaxFormM2OParams")?.value
-//        val ajaxParams = StringBuilder()
         val additionalParams = mutableMapOf<String, String>()
         i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
             var v = parent.f[it.replace(".id", "")]
@@ -51,9 +45,6 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
             }
-        }
-        if (id != null) {
-            additionalParams["id"] = id
         }
         val url = BaseAjaxAction.createUrl(action, additionalParams)
         // TODO: change to Post (see FilterActionButton.kt)
@@ -75,7 +66,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
         trace("FormActionInputM2O::modalReturnSelect $key $value")
         i.value = value
-        val i2 = i.parentElement!!.querySelector("#${inputId}")!! as HTMLInputElement
+        val i2 = i.parentElement!!.querySelector("input[type=hidden]")!! as HTMLInputElement
         i2.value = key
         for (field in otherField) {
             val taOrI = parent.f.querySelector("#${field.key}")
