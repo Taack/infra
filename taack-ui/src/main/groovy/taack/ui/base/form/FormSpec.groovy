@@ -25,11 +25,11 @@ final class FormSpec extends FormSectionSpec {
      * Form sections relative Width
      */
     enum Width {
-        DEFAULT_WIDTH("pure-u-1 pure-u-sm-1-2 pure-u-md-1-4"),
-        DOUBLE_WIDTH("pure-u-1 pure-u-md-1-2"),
-        ONE_THIRD("pure-u-1 pure-u-md-1-3"),
-        TWO_THIRD("pure-u-1 pure-u-md-2-3"),
-        FULL_WIDTH("pure-u-1")
+        DEFAULT_WIDTH("col"),
+        DOUBLE_WIDTH("col-6"),
+        ONE_THIRD("col-4"),
+        TWO_THIRD("col-3"),
+        FULL_WIDTH("col-12")
 
         Width(final String sectionCss) {
             this.sectionCss = sectionCss

@@ -77,7 +77,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         parameter.aClassSimpleName = aObject.class.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.setTaackTag(TaackTag.FORM).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.addClasses('row').setTaackTag(TaackTag.FORM).addChildren(
                 new HTMLInput(InputType.HIDDEN, id, 'id'),
                 new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
