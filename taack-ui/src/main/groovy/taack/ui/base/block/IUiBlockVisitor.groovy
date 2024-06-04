@@ -17,9 +17,13 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitBlockHeaderEnd()
 
-    void visitInnerBlock(BlockSpec.Width width)
+    void visitInnerRowBlock()
 
-    void visitInnerBlockEnd()
+    void visitInnerRowBlockEnd()
+
+    void visitInnerColBlock(BlockSpec.Width width)
+
+    void visitInnerColBlockEnd()
 
     void visitModal()
 
@@ -66,10 +70,6 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitBlockTabsEnd()
 
     void visitCustom(String html, Style style, BlockSpec.Width width)
-
-    void anonymousBlock(BlockSpec.Width width)
-
-    void anonymousBlockEnd()
 
     void visitShowEnd(UiShowSpecifier uiShowSpecifier)
 

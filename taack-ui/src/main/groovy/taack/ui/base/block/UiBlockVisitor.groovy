@@ -35,12 +35,22 @@ class UiBlockVisitor extends UiMenuVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerBlock(BlockSpec.Width width) {
+    void visitInnerRowBlock() {
 
     }
 
     @Override
-    void visitInnerBlockEnd() {
+    void visitInnerRowBlockEnd() {
+
+    }
+
+    @Override
+    void visitInnerColBlock(BlockSpec.Width width) {
+
+    }
+
+    @Override
+    void visitInnerColBlockEnd() {
 
     }
 
@@ -156,16 +166,6 @@ class UiBlockVisitor extends UiMenuVisitor implements IUiBlockVisitor {
 
     @Override
     void visitCustom(String html, Style style, BlockSpec.Width width) {
-
-    }
-
-    @Override
-    void anonymousBlock(BlockSpec.Width width) {
-
-    }
-
-    @Override
-    void anonymousBlockEnd() {
 
     }
 

@@ -6,9 +6,7 @@ import taack.ui.base.UiShowSpecifier
 import taack.ui.base.UiTableSpecifier
 import taack.ui.base.block.BlockSpec
 import taack.ui.base.block.UiBlockVisitor
-import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawHtmlChartDump
 
@@ -55,8 +53,8 @@ class RawHtmlMailDump extends UiBlockVisitor {
     void visitShowEnd(final UiShowSpecifier uiShowSpecifier) {
         visitCloseTitle()
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+        visitInnerColBlockEnd()
+        visitInnerColBlockEnd()
     }
 
     @Override
@@ -69,15 +67,15 @@ class RawHtmlMailDump extends UiBlockVisitor {
     @Override
     void visitTable(final String id, final BlockSpec.Width width) {
         this.id = id
-        visitInnerBlock(width)
+        visitInnerColBlock(width)
     }
 
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
         visitCloseTitle()
         tableSpecifier.visitTable(new taack.ui.dump.RawHtmlTableDump(id, out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+        visitInnerColBlockEnd()
+        visitInnerColBlockEnd()
     }
 
     @Override
@@ -88,31 +86,21 @@ class RawHtmlMailDump extends UiBlockVisitor {
     void visitChartEnd(final UiChartSpecifier chartSpecifier) {
         visitCloseTitle()
         chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+        visitInnerColBlockEnd()
+        visitInnerColBlockEnd()
     }
 
     @Override
     void visitCustom(final String html, Style style, final BlockSpec.Width width) {
-        visitInnerBlock(width)
+        visitInnerColBlock(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+        visitInnerColBlockEnd()
+        visitInnerColBlockEnd()
     }
 
     @Override
-    void anonymousBlock(BlockSpec.Width width) {
-        out << """<div class="${width.css}">"""
-    }
-
-    @Override
-    void anonymousBlockEnd() {
-        out << "</div>"
-    }
-
-    @Override
-    void visitInnerBlockEnd() {
+    void visitInnerColBlockEnd() {
         out << "</div></div>"
     }
 

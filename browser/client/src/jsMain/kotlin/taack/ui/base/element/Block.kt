@@ -15,7 +15,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     companion object {
         var href: String? = null
         fun getSiblingBlock(p: Modal?): Block? {
-            val div = p?.d3 ?: document.querySelector("div.taackBlock") as HTMLDivElement? ?: return null
+            val div = p?.d3 ?: document.querySelector("div[blockId]") as HTMLDivElement? ?: return null
             return Block(p, div)
         }
     }

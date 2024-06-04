@@ -62,11 +62,6 @@ final class BlockSpec {
         blockSpecClosure.call()
     }
 
-    /**
-     * Width ratio of the block into the parent block (should be the page itself most of the time).
-     * Blocks can be nested with {@link #anonymousBlock(taack.ui.base.block.BlockSpec.Width, groovy.lang.Closure)}
-     * if a more complex layout is required.
-     */
     enum Width {
         MAX("pure-u-1", "pure-u-1", 'col-12'),
         THREE_QUARTER("pure-u-1 pure-u-md-3-4", "pure-u-3-4", 'col-12 col-md-9'),
@@ -120,12 +115,26 @@ final class BlockSpec {
      * @param width
      * @param closure
      */
-    void anonymousBlock(final Width width, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (displayElement()) blockVisitor.anonymousBlock(width)
+    void innerBlock(final Width width, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        if (displayElement()) blockVisitor.visitInnerColBlock(width)
         closure.delegate = this
         closure.call()
         counter ++
-        if (displayElement()) blockVisitor.anonymousBlockEnd()
+        if (displayElement()) blockVisitor.visitInnerColBlockEnd()
+    }
+
+    /**
+     * invisible blocks that enable complex layout. Can be nested.
+     *
+     * @param width
+     * @param closure
+     */
+    void innerRowBlock(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        if (displayElement()) blockVisitor.visitInnerRowBlock()
+        closure.delegate = this
+        closure.call()
+        counter ++
+        if (displayElement()) blockVisitor.visitInnerRowBlockEnd()
     }
 
     /**
