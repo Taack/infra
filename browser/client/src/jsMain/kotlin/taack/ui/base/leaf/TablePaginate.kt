@@ -172,7 +172,7 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
         val offset = (a.attributes["taackPageOffset"]!!.value.toDouble() * max.toDouble()).toLong().toString()
         fd.set("offset", offset)
         fd.append("refresh", "true")
-        fd.append("filterTableId", parent.parent.blockId!!)
+        fd.append("filterTableId", parent.parent.blockId)
         state.addClientStateAjaxBlock()
         state.addServerState(fd)
 //        RecordState.storeState()

@@ -65,17 +65,15 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
             }
         }
 
-        if (blockId != null) {
-            RecordState.setCurrentBlockId(blockId)
-            if (blockId.startsWith("drawProgress:")) {
-                poolDrawProgress(blockId)
-            }
-            val clientState = RecordState.getPreviousClientState()?.get(blockId)
-            Helper.trace("clientState = $clientState")
-            if (clientState != null) {
-                window.scrollTo(clientState[0]?.toDouble() ?: 0.0, clientState[1]?.toDouble() ?: 0.0)
-                RecordState.clearClientState(blockId)
-            }
+        RecordState.setCurrentBlockId(blockId)
+        if (blockId.startsWith("drawProgress:")) {
+            poolDrawProgress(blockId)
+        }
+        val clientState = RecordState.getPreviousClientState()?.get(blockId)
+        Helper.trace("clientState = $clientState")
+        if (clientState != null) {
+            window.scrollTo(clientState[0]?.toDouble() ?: 0.0, clientState[1]?.toDouble() ?: 0.0)
+            RecordState.clearClientState(blockId)
         }
 
 

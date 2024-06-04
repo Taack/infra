@@ -43,7 +43,6 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
 
 //        val controller = i.attributes.getNamedItem("taackAjaxFormM2MController")!!.value
         val action = i.attributes.getNamedItem("taackAjaxFormM2MAction")!!.value
-        val id = i.attributes.getNamedItem("taackAjaxFormM2MId")?.value
 
         val additionalParams = mutableMapOf<String, String>()
         i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {

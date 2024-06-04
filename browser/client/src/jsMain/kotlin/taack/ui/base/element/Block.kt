@@ -37,8 +37,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         tabs = AjaxBlockInputTab.getSiblingBlockInputTab(this)
         val abe = AjaxBlock.getSiblingAjaxBlock(this)
         ajaxBlockElements = abe.map {
-            if (it.blockId != null) it.blockId to it
-            else it.toString() to it
+            it.blockId to it
         }.toMap()
         modal = Modal.buildModal(this)
         if (parent == null) {

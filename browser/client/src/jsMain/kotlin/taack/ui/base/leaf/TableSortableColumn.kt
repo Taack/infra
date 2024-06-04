@@ -54,7 +54,7 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
         else fd.delete("order")
         fd.append("isAjax", "true")
         fd.append("refresh", "true")
-        fd.append("filterTableId", parent.parent.blockId!!)
+        fd.append("filterTableId", parent.parent.blockId)
         state.addClientStateAjaxBlock()
         state.addServerState(fd)
 

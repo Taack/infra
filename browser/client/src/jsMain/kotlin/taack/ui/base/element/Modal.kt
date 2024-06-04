@@ -41,7 +41,7 @@ class Modal(val parent: Block) : BaseElement {
         val divA = document.createElement("div") as HTMLDivElement
         a.innerText = "X"
         a.addClass("close")
-        a.onclick = { e ->
+        a.onclick = { _ ->
             RecordState.clearServerState()
             close()
         }

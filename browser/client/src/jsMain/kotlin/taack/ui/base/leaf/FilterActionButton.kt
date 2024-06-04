@@ -69,7 +69,8 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                     target.refresh()
                 }
             } else {
-                trace("FilterActionButton::onclick NOTHING |$it|")
+                trace("FilterActionButton::onclick other content")
+
             }
         }.then {
             b?.disabled = false
