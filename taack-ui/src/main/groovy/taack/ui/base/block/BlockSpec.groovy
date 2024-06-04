@@ -37,7 +37,7 @@ final class BlockSpec {
     private final boolean displayElement(final String id = null) {
         if (!filterTableId) return true
         if (id) currentBlockId = id
-        currentBlockId == filterTableId
+        else currentBlockId = filterTableId
     }
 
     /**

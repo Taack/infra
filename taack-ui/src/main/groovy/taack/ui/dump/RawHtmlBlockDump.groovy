@@ -31,6 +31,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter, final String modalId = null) {
         super(out, modalId, parameter)
+        if (modalId) isModal = true
     }
 
     @Override
