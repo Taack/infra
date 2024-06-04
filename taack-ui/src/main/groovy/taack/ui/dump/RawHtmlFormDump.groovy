@@ -292,15 +292,21 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         String value
         if (fieldInfo.value?.hasProperty(ST_ID)) {
             value = "${fieldInfo.value.getAt(ST_ID)}"
-            out << "<input type=\"hidden\" name=\"${qualifiedName}.id\" value=\"${value}\"/>"
+            formThemed.addChildren(
+                    new HTMLInput(InputType.HIDDEN, value, qualifiedName)
+            )
         } else if (isListOrSet) {
             fieldInfo.value.eachWithIndex { Object it, Integer occ ->
                 if (it instanceof GormEntity)
-                    out << "<input type=\"hidden\" name=\"${qualifiedName}[$occ].id\" value=\"${it.ident()}\"/>"
+                    formThemed.addChildren(
+                            new HTMLInput(InputType.HIDDEN, it.ident(), "${qualifiedName}[$occ].id")
+                    )
             }
         } else {
             value = fieldInfo.value ?: ''
-            out << "<input type=\"hidden\" name=\"${qualifiedName}\" value=\"${value}\"/>"
+            formThemed.addChildren(
+                    new HTMLInput(InputType.HIDDEN, value, qualifiedName)
+            )
         }
     }
 
