@@ -27,9 +27,9 @@ final class HTMLInput implements IHTMLElement {
 
     HTMLInput(InputType inputType, Object value, String name, String placeHolder = null, boolean disabled = false, boolean readonly = false) {
         tag = 'input'
-        if (value) attributes.put('value', value.toString())
+        attributes.put('value', value?.toString())
         attributes.put('type', inputType.typeText)
-        attributes.put('name', name)
+        if (name) attributes.put('name', name)
         if (placeHolder) attributes.put('placeHolder', placeHolder)
         if (readonly) attributes.put('readonly', null)
         if (disabled) attributes.put('disabled', null)

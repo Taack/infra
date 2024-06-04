@@ -10,6 +10,7 @@ enum TaackTag {
     INNER_BLOCK,
     AJAX_BLOCK,
     FORM,
+    FILTER,
     COL,
     TAB,
     TABS,

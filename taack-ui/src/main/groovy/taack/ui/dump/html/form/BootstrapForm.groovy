@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.base.form.FormSpec
+import taack.ui.dump.html.base.ButtonStyle
 import taack.ui.dump.html.base.HTMLButton
 import taack.ui.dump.html.base.HTMLDiv
 import taack.ui.dump.html.base.HTMLFieldset
@@ -132,7 +133,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
                     ).build(),
                     new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
                             HTMLInput.inputRadio('?', qualifiedName, value == null).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, '""').builder.addClasses('form-check-label').build()
+                            new HTMLLabel(qualifiedName, '?').builder.addClasses('form-check-label').build()
                     ).build(),
             )
 
@@ -196,8 +197,8 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     def <T1 extends GormEntity> IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, T1 val, String qualifiedName, Long modalId, String url, String fieldInfoParams, boolean disabled, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
 
-        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName , null, disabled).builder.addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), qualifiedName, null, disabled, true).builder.addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName, null, disabled).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), null, null, disabled, true).builder.addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
@@ -305,9 +306,15 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement formAction(IHTMLElement topElement, String url, String i18n) {
+    IHTMLElement formActionBlock(IHTMLElement topElement) {
+        topElement.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap').build())
+        topElement.children.last()
+    }
+
+    @Override
+    IHTMLElement addFormAction(IHTMLElement topElement, String url, String i18n, ButtonStyle style) {
         topElement.addChildren(
-                new HTMLButton(url, i18n)
+                new HTMLButton(url, i18n, style)
         )
         topElement
     }

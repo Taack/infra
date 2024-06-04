@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.render.TaackUiEnablerService
 import taack.ui.base.helper.Utils
+import taack.ui.dump.html.base.ButtonStyle
 
 // TODO: Isolate sectionTab
 /**
@@ -91,8 +92,8 @@ final class FormSpec extends FormSectionSpec {
      * @param params additional params
      * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
      */
-    void formAction(final MethodClosure action, final Long id = null, final Map params = null) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, true)
+    void formAction(final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
     }
 
 }

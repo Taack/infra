@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.base.form.FormSpec
+import taack.ui.dump.html.base.ButtonStyle
 import taack.ui.dump.html.base.IHTMLElement
 
 @CompileStatic
@@ -40,7 +41,6 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
         tag = 'form'
         attributes.put('method', inputMode.modeText)
         attributes.put('enctype', encType.text)
-        addClasses('taackForm')
     }
 
     abstract <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder()
@@ -75,5 +75,7 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract IHTMLElement formCol(IHTMLElement topElement)
 
-    abstract IHTMLElement formAction(IHTMLElement topElement, String url, String i18n)
+    abstract IHTMLElement formActionBlock(IHTMLElement topElement)
+
+    abstract IHTMLElement addFormAction(IHTMLElement topElement, String url, String i18n, ButtonStyle style)
 }

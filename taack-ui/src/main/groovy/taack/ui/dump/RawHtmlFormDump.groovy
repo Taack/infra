@@ -4,9 +4,9 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
-import taack.render.TaackUiOverriderService
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
+import taack.ui.dump.html.base.ButtonStyle
 import taack.ui.dump.html.base.HTMLInput
 import taack.ui.dump.html.base.IHTMLElement
 import taack.ui.dump.html.base.InputType
@@ -77,7 +77,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         parameter.aClassSimpleName = aObject.class.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.addClasses('row').setTaackTag(TaackTag.FORM).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
                 new HTMLInput(InputType.HIDDEN, id, 'id'),
                 new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
@@ -89,6 +89,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormEnd() {
+        closeTags(TaackTag.FORM)
         out << formThemed.output
         tabIds = 0
     }
@@ -103,17 +104,17 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         closeTags(TaackTag.SECTION)
     }
 
-    private void inputOverride(final String qualifiedName, String i18n, FieldInfo field) {
-        if (aObject instanceof GormEntity) {
-            GormEntity entity = aObject as GormEntity
-            if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
-                String img = TaackUiOverriderService.formInputPreview(entity, field)
-                String txt = TaackUiOverriderService.formInputSnippet(entity, field)
-                String val = TaackUiOverriderService.formInputValue(entity, field)
-                topElement = formThemed.inputOverride(topElement, qualifiedName, i18n, val, txt, img, topElement.parent)
-            }
-        }
-    }
+//    private void inputOverride(final String qualifiedName, String i18n, FieldInfo field) {
+//        if (aObject instanceof GormEntity) {
+//            GormEntity entity = aObject as GormEntity
+//            if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
+//                String img = TaackUiOverriderService.formInputPreview(entity, field)
+//                String txt = TaackUiOverriderService.formInputSnippet(entity, field)
+//                String val = TaackUiOverriderService.formInputValue(entity, field)
+//                topElement = formThemed.inputOverride(topElement, qualifiedName, i18n, val, txt, img, topElement.parent)
+//            }
+//        }
+//    }
 
     @Override
     void visitFormField(final String i18n, final FieldInfo field, final IEnumOptions eos = null, NumberFormat numberFormat = null) {
@@ -188,7 +189,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 topElement = formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
             }
         }
-        inputOverride(qualifiedName, trI18n, field)
+        //inputOverride(qualifiedName, trI18n, field)
 
     }
 
@@ -208,7 +209,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             formThemed.ajaxField(topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         }
 
-        inputOverride(qualifiedName, trI18n, field)
+        //inputOverride(qualifiedName, trI18n, field)
     }
 
     private static String fieldInfoParams(FieldInfo[] fieldInfos) {
@@ -246,9 +247,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormAction(String i18n, String controller, String action, Long id, Map params, boolean isAjax) {
+    void visitFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
         i18n ?= parameter.trField(controller, action)
-        formThemed.formAction(topElement, parameter.urlMapped(controller, action, id, params), i18n)
+        formThemed.addFormAction(topElement, parameter.urlMapped(controller, action, id, params), i18n, style)
     }
 
 

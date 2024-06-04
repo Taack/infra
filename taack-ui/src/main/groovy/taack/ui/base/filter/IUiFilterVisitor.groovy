@@ -5,6 +5,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
+import taack.ui.dump.html.base.ButtonStyle
 
 @CompileStatic
 interface IUiFilterVisitor {
@@ -27,5 +28,5 @@ interface IUiFilterVisitor {
 
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression... filterExpressions)
 
-    void visitFilterAction(String i18n, MethodClosure action)
+    void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style)
 }

@@ -1,6 +1,7 @@
 package taack.ui.dump
 
 import grails.util.Pair
+import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
@@ -18,7 +19,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     final private ByteArrayOutputStream out
     final private Parameter parameter
-    final private List<Pair<String, MethodClosure>> filterActions = []
+    final private List<Triple<String, ButtonStyle, String>> filterActions = []
 
     IFormTheme formThemed
     IHTMLElement topElement
@@ -35,6 +36,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
+        filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
+        filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
     }
 
     static String getQualifiedName(final FieldInfo fieldInfo) {
@@ -53,7 +56,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FORM).addClasses('filter', 'bg-light', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'bg-light', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                 new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                 new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
@@ -68,7 +71,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
         } as HTMLInput[]
 
-        if(addedInputs)
+        if (addedInputs)
             formThemed.addChildren(addedInputs)
 
         topElement = formThemed
@@ -83,15 +86,12 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterEnd() {
+        formThemed.addFormAction(topElement, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}", 'Filter', ButtonStyle.SUCCESS)
+        formThemed.addFormAction(topElement, null, 'Reset', ButtonStyle.SECONDARY)
         filterActions.each {
 
         }
-        topElement.addChildren(
-                new HTMLDiv().builder.addClasses('filter', 'buttons', 'text-center').addChildren(
-                        new HTMLButton("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}", 'Filter'),
-                        HTMLButton.reset()
-                ).build()
-        )
+        closeTags(TaackTag.FILTER)
         out << formThemed.output
     }
 
@@ -143,15 +143,14 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
-        final String qualifiedId = qualifiedName + '-' + parameter.modalId
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
         topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, false, isChecked)
         topElement.addChildren(new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default"))
     }
 
     @Override
-    void visitFilterAction(String i18n, MethodClosure action) {
-        filterActions.add new Pair<String, MethodClosure>(i18n, action)
+    void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style = ButtonStyle.SUCCESS) {
+        filterActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${action.toString()}/${action.method}" as String)
     }
 
 }

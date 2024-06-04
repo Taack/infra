@@ -6,6 +6,8 @@ import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLDivElement
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.trace
+import taack.ui.base.Helper.Companion.traceIndent
+import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.record.RecordState
 
 class Modal(val parent: Block) : BaseElement {
@@ -59,14 +61,14 @@ class Modal(val parent: Block) : BaseElement {
     }
 
     fun open(htmlContent: String) {
-        trace("Modal::open $mId")
+        traceIndent("Modal::open $mId")
         d3.innerHTML = htmlContent
         d1.style.display = "block"
         Block.getSiblingBlock(this)
     }
 
     fun close() {
-        trace("Modal::close $mId")
+        traceDeIndent("Modal::close $mId")
         d1.style.display = "none"
         d3.innerHTML = ""
 //        if (parent.parent != null) d1.remove()

@@ -2,6 +2,7 @@ package taack.ui.base.filter
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.ui.dump.html.base.ButtonStyle
 
 @CompileStatic
 final class FilterSpec extends FilterCommon {
@@ -23,6 +24,6 @@ final class FilterSpec extends FilterCommon {
     }
 
     void filterAction(final String i18n, final MethodClosure action) {
-        filterVisitor.visitFilterAction(i18n, action)
+        filterVisitor.visitFilterAction(i18n, action, ButtonStyle.SECONDARY)
     }
 }

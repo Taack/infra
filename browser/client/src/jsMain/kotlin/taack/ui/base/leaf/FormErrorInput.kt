@@ -11,7 +11,7 @@ class FormErrorInput(private val parent: Form, val d: HTMLDivElement) : LeafElem
     companion object {
         fun getSiblingErrorInput(p: Form): List<FormErrorInput> {
             val elements: List<Node>?
-            elements = p.f.querySelectorAll("div.taackFieldError").asList()
+            elements = p.f.querySelectorAll("div[taackfielderror]").asList()
             return elements.map {
                 FormErrorInput(p, it as HTMLDivElement)
             }

@@ -3,6 +3,7 @@ package taack.ui.base.form
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
+import taack.ui.dump.html.base.ButtonStyle
 
 import java.text.NumberFormat
 
@@ -29,7 +30,7 @@ interface IUiFormVisitor {
 
     void visitFormAjaxField(String i18n, String controller, String action, FieldInfo fieldInfo, IEnumOptions enumOptions, FieldInfo[] fieldInfos)
 
-    void visitFormAction(String i18n, String controller, String action, Long id, Map params, boolean isAjax)
+    void visitFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style)
 
     void visitCol()
 

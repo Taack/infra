@@ -18,7 +18,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
     companion object {
         fun getSiblingFormAction(f: Form): List<FormActionButton> {
             val elements: List<Node>?
-            elements = f.f.querySelectorAll("button.taackFormAction").asList()
+            elements = f.f.querySelectorAll("button[formaction]").asList()
             return elements.map {
                 FormActionButton(f, it as HTMLButtonElement)
             }
