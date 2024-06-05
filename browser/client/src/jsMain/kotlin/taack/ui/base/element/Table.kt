@@ -15,7 +15,7 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
     companion object {
         fun getSiblingTable(p: AjaxBlock): List<Table> {
             val elements: List<Node>?
-            elements = p.d.querySelectorAll("table.taackTable").asList()
+            elements = p.d.querySelectorAll("table[taackTableId]").asList()
             return elements.map {
                 Table(p, it as HTMLTableElement)
             }
@@ -35,10 +35,6 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
         filter = f!!
         tableSortableColumns = TableSortableColumn.getSiblingSortableColumn(this)
         tableGroupableColumns = TableGroupableColumn.getSiblingGroupableColumn(this)
-        if (tableGroupableColumns != null && tableGroupableColumns.isNotEmpty()) {
-            t.classList.remove("pure-table-striped")
-            t.classList.add("pure-table-bordered")
-        }
         rows = TableRow.getSiblingRows(this)
         paginate = TablePaginate.getSiblingTablePaginate(this)
         traceDeIndent("Table::init --- tableId: $tableId")

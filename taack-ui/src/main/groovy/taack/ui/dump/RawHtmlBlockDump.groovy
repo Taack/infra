@@ -16,8 +16,6 @@ import taack.ui.base.common.Style
 class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     private String id
 
-    private boolean hasTitle = false
-    private int hasPureG = 0
     private String ajaxBlockId = null
     final private Long blockId = System.currentTimeMillis()
     boolean isModal = false
@@ -71,14 +69,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitInnerColBlock(final BlockSpec.Width width) {
-//            if (!parameter.isAjaxRendering || isModal)
-//                out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
-//            else
-//                out << "<div>"
         out << """<div class="${width.bootstrapCss} align-items-start">"""
-
-//        out << "<div class='${width.bootstrapCss} ${!isModal ? 'taackContainer row align-items-start' : ''}' >"
-
     }
 
     @Override
@@ -112,7 +103,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
         visitCloseTitle()
         formSpecifier.visitForm(new RawHtmlFormDump(out, parameter))
         visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
     }
 
     @Override
@@ -124,7 +114,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     void visitShowEnd(final UiShowSpecifier uiShowSpecifier) {
         visitCloseTitle()
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
-        visitInnerColBlockEnd()
         visitInnerColBlockEnd()
     }
 
@@ -157,9 +146,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
-        visitCloseTitle()
         tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(id, out, parameter))
-        visitInnerColBlockEnd()
         visitInnerColBlockEnd()
     }
 
@@ -258,8 +245,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     void visitBlockTabsEnd() {
         outBkup << """<div class="pc-tab ${blockTabWidth.bootstrapCss} taackContainer">"""
         currentTabNames.eachWithIndex { it, occ ->
-            outBkup << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-${tabIds}" type="radio" class="taackBlockInputTab inputTab${occ + 1}${/*tabOccurrence != 0*/
-                false ? "Inner" : ""}" name="pct-${tabIds}" />"""
+            outBkup << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-${tabIds}" type="radio" class="taackBlockInputTab inputTab${occ + 1}${false ? "Inner" : ""}" name="pct-${tabIds}" />"""
         }
         outBkup << "<nav><ul>"
         currentTabNames.eachWithIndex { it, occ ->
