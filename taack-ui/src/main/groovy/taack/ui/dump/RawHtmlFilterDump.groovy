@@ -26,10 +26,10 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     private void closeTags(TaackTag tag) {
         IHTMLElement top = topElement
-        while (top.taackTag != tag) {
+        while (top && top.taackTag != tag) {
             top = top.parent
         }
-        topElement = top.taackTag == tag ? top.parent : top
+        topElement = top?.taackTag == tag ? top?.parent : top
         if (!topElement) topElement = formThemed
     }
 
@@ -56,7 +56,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'bg-light', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                 new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                 new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
@@ -86,10 +86,11 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterEnd() {
-        formThemed.addFormAction(topElement, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}", 'Filter', ButtonStyle.SUCCESS)
-        formThemed.addFormAction(topElement, null, 'Reset', ButtonStyle.SECONDARY)
+        topElement = formThemed.formActionBlock(topElement)
+//        addFormAction(topElement, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}", 'Filter', ButtonStyle.SUCCESS)
+//        formThemed.addFormAction(topElement, null, 'Reset', ButtonStyle.SECONDARY)
         filterActions.each {
-
+            formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
         closeTags(TaackTag.FILTER)
         out << formThemed.output

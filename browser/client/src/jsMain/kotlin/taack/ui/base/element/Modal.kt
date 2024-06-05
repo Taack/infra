@@ -31,8 +31,7 @@ class Modal(val parent: Block) : BaseElement {
         d1 = document.createElement("div") as HTMLDivElement
         d1.classList.add("modal")
         d12 = document.createElement("div") as HTMLDivElement
-        d12.addClass("modal-dialog")
-        d12.addClass("modal-lg")
+        d12.addClass("modal-dialog", "modal-xl", "modal-dialog-scrollable")
         d2 = document.createElement("div") as HTMLDivElement
         d3 = document.createElement("div") as HTMLDivElement
         d3.addClass("modal-body")
