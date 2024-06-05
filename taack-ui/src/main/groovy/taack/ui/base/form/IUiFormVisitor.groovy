@@ -4,11 +4,14 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
 import taack.ui.dump.html.base.ButtonStyle
+import taack.ui.dump.html.base.IHTMLElement
+import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.form.IFormTheme
 
 import java.text.NumberFormat
 
 @CompileStatic
-interface IUiFormVisitor {
+interface IUiFormVisitor extends IBaseFormVisitor {
 
     void visitForm(Object aObject, FieldInfo[] lockedFields)
 
@@ -43,4 +46,5 @@ interface IUiFormVisitor {
     void visitFormTab(String name)
 
     void visitFormTabEnd()
+
 }

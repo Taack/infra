@@ -114,7 +114,9 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Boolean value) {
-        IHTMLElement el = themeStartInputs(topElement)
+        //IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = topElement
+
         if (!nullable)
             el.addChildren(
                     HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),

@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
@@ -27,6 +28,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private final static String ST_ID = 'id'
     private final static String ST_VALUES = 'values'
     private final static String ST_LIST = 'list'
+    final private List<Triple<String, ButtonStyle, String>> formActions = []
+
 
     final private ByteArrayOutputStream out
     final private Parameter parameter
@@ -49,14 +52,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
     }
 
-    private void closeTags(TaackTag tag) {
-        IHTMLElement top = topElement
-        while (top.taackTag != tag) {
-            top = top.parent
-        }
-        topElement = top.taackTag == tag ? top.parent : top
-        if (!topElement) topElement = formThemed
-    }
+//    private void closeTags(TaackTag tag) {
+//        IHTMLElement top = topElement
+//        while (top && top.taackTag != tag) {
+//            top = top.parent
+//        }
+//        topElement = top?.taackTag == tag ? top?.parent : top
+//        if (!topElement) topElement = formThemed
+//    }
 
     private boolean isDisabled(FieldInfo field) {
         if (lockedFields == null) {
@@ -89,7 +92,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormEnd() {
-        closeTags(TaackTag.FORM)
+        topElement = closeTags(TaackTag.SECTION)
+
+        topElement = formThemed.formActionBlock(topElement)
+        formActions.each {
+            formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
+        }
+
+        topElement = closeTags(TaackTag.FORM)
         out << formThemed.output
         tabIds = 0
     }
@@ -101,20 +111,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormSectionEnd() {
-        closeTags(TaackTag.SECTION)
+        topElement = closeTags(TaackTag.SECTION)
     }
-
-//    private void inputOverride(final String qualifiedName, String i18n, FieldInfo field) {
-//        if (aObject instanceof GormEntity) {
-//            GormEntity entity = aObject as GormEntity
-//            if (entity.ident() && TaackUiOverriderService.hasInputOverride(field)) {
-//                String img = TaackUiOverriderService.formInputPreview(entity, field)
-//                String txt = TaackUiOverriderService.formInputSnippet(entity, field)
-//                String val = TaackUiOverriderService.formInputValue(entity, field)
-//                topElement = formThemed.inputOverride(topElement, qualifiedName, i18n, val, txt, img, topElement.parent)
-//            }
-//        }
-//    }
 
     @Override
     void visitFormField(final String i18n, final FieldInfo field, final IEnumOptions eos = null, NumberFormat numberFormat = null) {
@@ -233,7 +231,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabsEnd() {
-        closeTags(TaackTag.TABS)
+        topElement = closeTags(TaackTag.TABS)
     }
 
     @Override
@@ -243,13 +241,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabEnd() {
-        closeTags(TaackTag.TAB)
+        topElement = closeTags(TaackTag.TAB)
     }
 
     @Override
     void visitFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
         i18n ?= parameter.trField(controller, action)
-        formThemed.addFormAction(topElement, parameter.urlMapped(controller, action, id, params), i18n, style)
+        formActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${controller}/${action}" as String)
     }
 
 
@@ -281,7 +279,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitColEnd() {
-        closeTags(TaackTag.COL)
+        topElement = closeTags(TaackTag.COL)
     }
 
     @Override

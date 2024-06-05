@@ -5,10 +5,11 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
+import taack.ui.base.form.IBaseFormVisitor
 import taack.ui.dump.html.base.ButtonStyle
 
 @CompileStatic
-interface IUiFilterVisitor {
+interface IUiFilterVisitor extends IBaseFormVisitor {
 
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams)
 

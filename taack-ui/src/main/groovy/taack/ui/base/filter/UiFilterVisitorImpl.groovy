@@ -6,6 +6,8 @@ import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
 import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.dump.html.base.ButtonStyle
+import taack.ui.dump.html.base.IHTMLElement
+import taack.ui.dump.html.form.IFormTheme
 
 @CompileStatic
 class UiFilterVisitorImpl implements IUiFilterVisitor {
@@ -57,5 +59,15 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     @Override
     void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo... fields) {
 
+    }
+
+    @Override
+    IFormTheme getFormThemed() {
+        return null
+    }
+
+    @Override
+    IHTMLElement getTopElement() {
+        return null
     }
 }

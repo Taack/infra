@@ -5,6 +5,8 @@ import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.dump.html.base.ButtonStyle
+import taack.ui.dump.html.base.IHTMLElement
+import taack.ui.dump.html.form.IFormTheme
 
 import java.text.NumberFormat
 
@@ -94,5 +96,15 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     @Override
     void visitFormTabEnd() {
 
+    }
+
+    @Override
+    IFormTheme getFormThemed() {
+        return null
+    }
+
+    @Override
+    IHTMLElement getTopElement() {
+        return null
     }
 }

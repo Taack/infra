@@ -24,15 +24,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     IFormTheme formThemed
     IHTMLElement topElement
 
-    private void closeTags(TaackTag tag) {
-        IHTMLElement top = topElement
-        while (top && top.taackTag != tag) {
-            top = top.parent
-        }
-        topElement = top?.taackTag == tag ? top?.parent : top
-        if (!topElement) topElement = formThemed
-    }
-
     RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
@@ -92,7 +83,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         filterActions.each {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
-        closeTags(TaackTag.FILTER)
+        topElement = closeTags(TaackTag.FILTER)
         out << formThemed.output
     }
 
@@ -103,7 +94,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitSectionEnd() {
-        closeTags(TaackTag.SECTION)
+        topElement = closeTags(TaackTag.SECTION)
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {

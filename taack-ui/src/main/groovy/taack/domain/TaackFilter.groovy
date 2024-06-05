@@ -13,7 +13,6 @@ import taack.ui.base.filter.UiFilterVisitorImpl
 import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.filter.expression.Operator
 import taack.ui.dump.RawHtmlFilterDump
-import taack.ui.dump.RawMapFilterDump
 import taack.utils.DateFormat
 
 import java.lang.reflect.Field
@@ -595,12 +594,6 @@ final class TaackFilter<T extends GormEntity<T>> {
                 return list(cClass, 20, f, t)
             }
         } else return null
-    }
-
-    final Map mapFilterDump(UiFilterSpecifier filter) {
-        def v = new RawMapFilterDump(theParams)
-        filter.visitFilter(v)
-        v.theResults
     }
 
     static enum Order {
