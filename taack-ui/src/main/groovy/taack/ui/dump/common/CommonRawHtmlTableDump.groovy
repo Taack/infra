@@ -76,7 +76,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableEnd() {
-        out << "</table></div>\n"
+        out << "</table></div></div>\n"
     }
 
     @Override

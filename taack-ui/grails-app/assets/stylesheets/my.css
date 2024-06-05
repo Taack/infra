@@ -2287,10 +2287,6 @@ li.liSelected {
 	height: calc(100vh - 44px); /* 44px is the height of the main-topbar */
 }
 
-table:not(.pure-table) td, table:not(.pure-table) th {
-	padding: 0.5em 0.6em !important;
-}
-
 /* RJN todoList table */
 .todo-table tr {
 	border-top: 1px solid #dbdbdb;
@@ -2307,21 +2303,6 @@ table:not(.pure-table) td, table:not(.pure-table) th {
 
 tr.highlight-red td {
 	background: #FFD1D6 !important;
-}
-
-/* RJN pure-table compact */
-/*.pure-table {*/
-    /*min-width: 100% !important;*/
-	/*max-width: 100% !important;*/
-/*}*/
-
-.pure-table td, .pure-table th {
-    font-size: small !important;
-}
-
-.pure-table td {
-	line-height: 24px;
-    padding: .25em 1em !important;
 }
 
 /* RJN fixed table header */

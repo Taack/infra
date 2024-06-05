@@ -27,6 +27,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTable() {
         out << """
+                <div>
                 <div style='overflow: auto;'><table class='${tableTheme.getTableClasses()} taackTable' taackTableId='${blockId}'>
                """
     }
@@ -34,7 +35,8 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTableWithoutFilter() {
         out << """
-                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter" taackFilterId="${blockId}">
+                <div ajaxBlockId="${blockId}">
+                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" name="${currentFormId}_Filter" class="filter" taackFilterId="${blockId}">
                     <input type="hidden" name="sort" value="${parameter.applicationTagLib.params['sort'] ?: ''}">
                     <input type="hidden" name="order" value="${parameter.applicationTagLib.params['order'] ?: ''}">
                     <input type="hidden" name="grouping" value="${parameter.applicationTagLib.params['grouping'] ?: ''}">
@@ -44,7 +46,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
                 </form>
             """
 
-        out << "<div class='table-div' style='overflow: auto;'><table class='pure-table taackTable' taackTableId='${blockId}'>\n"
+        out << "<div class='table-div' style='overflow: auto;'><table class='taackTable' taackTableId='${blockId}'>\n"
     }
 
 

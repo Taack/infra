@@ -24,13 +24,13 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTable() {
         out << """
-                <div style='overflow: auto;'><table class='pure-table taackTable'>
+                <div style='overflow: auto;'><table class='taackTable'>
                """
     }
 
     @Override
     void visitTableWithoutFilter() {
-        out << "<div class='table-div' style='overflow: auto;'><table class='pure-table taackTable'>\n"
+        out << "<div class='table-div' style='overflow: auto;'><table class='taackTable'>\n"
     }
 
     @Override
