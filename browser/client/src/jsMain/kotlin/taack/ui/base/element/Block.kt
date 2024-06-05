@@ -7,7 +7,7 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.AjaxBlockInputTab
-import taack.ui.base.leaf.MenuAction
+import taack.ui.base.leaf.ActionLink
 import taack.ui.base.record.RecordState
 
 class Block(val parent: Modal?, val d: HTMLDivElement) :
@@ -41,7 +41,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         }.toMap()
         modal = Modal.buildModal(this)
         if (parent == null) {
-            MenuAction.getAjaxMenu(this)
+            ActionLink.getAjaxMenu(this)
         }
 
         if (tmpBlockId != null) {
@@ -73,7 +73,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     }
 
     fun refresh() {
-        MenuAction.getAjaxMenu(this)
+        ActionLink.getAjaxMenu(this)
     }
 
 }

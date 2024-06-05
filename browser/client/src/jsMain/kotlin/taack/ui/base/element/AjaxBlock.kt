@@ -18,12 +18,13 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         fun getSiblingAjaxBlock(p: Block): List<AjaxBlock> {
             val divElements: List<Node>?
             divElements = p.d.querySelectorAll("div[ajaxBlockId]").asList()
+//            return (divElements + p.d).map {
             return divElements.map {
                 AjaxBlock(p, it as HTMLDivElement)
             }
         }
     }
-    val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")?.value
+    val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")?.value ?:  d.attributes.getNamedItem("blockId")?.value
     val blockId = ajaxBlockId ?: parent.blockId
     var filters: Map<String, Filter>
     var tables: Map<String, Table>

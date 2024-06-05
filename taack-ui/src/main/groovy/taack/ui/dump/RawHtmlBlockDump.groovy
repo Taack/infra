@@ -19,6 +19,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     private String ajaxBlockId = null
     final private Long blockId = System.currentTimeMillis()
     boolean isModal = false
+    boolean isModalRefresh = false
 
     private int tabOccurrence = 0
     private int tabOccurrencePrevious = 0
@@ -27,18 +28,23 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter, final String modalId = null) {
         super(out, modalId, parameter)
         if (modalId) isModal = true
+        if (parameter.params.boolean('refresh'))
+            isModalRefresh = true
+        println "isModalRefresh = ${isModalRefresh}"
     }
 
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
             out << "<div id='blockId${blockId}' class='container-fluid' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
+            out << "<div ajaxBlockId='blockId${blockId}'>"
         }
     }
 
     @Override
     void visitBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) {
+            out << "</div>"
             out << "</div>"
         }
     }
@@ -83,14 +89,16 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitAjaxBlock(final String id) {
-        if (!parameter.isAjaxRendering || isModal) ajaxBlockId = id
-        else out << "__ajaxBlockStart__$id:"
+        if (!parameter.isAjaxRendering || isModal) {
+            ajaxBlockId = id
+        }
+        if (isModalRefresh) out << "__ajaxBlockStart__$id:"
     }
 
     @Override
     void visitAjaxBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
-        else out << "__ajaxBlockEnd__"
+        if (isModalRefresh) out << "__ajaxBlockEnd__"
     }
 
     @Override
@@ -280,11 +288,16 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     @Override
     void visitModal() {
         isModal = true
+        if (!isModalRefresh)
+            out << "<div ajaxBlockId='modal${blockId}'>"
+
     }
 
     @Override
     void visitModalEnd() {
         isModal = false
+        if (!isModalRefresh)
+            out << "</div>"
     }
 
     @Override

@@ -44,6 +44,7 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
         fd.append("isAjax", "true")
         fd.append("refresh", "true")
         fd.append("filterTableId", parent.filterId)
+        fd.append("ajaxBlockId", parent.parent.blockId)
         fd.set("offset", "0")
         state.addClientStateAjaxBlock()
         state.addServerState(fd)
