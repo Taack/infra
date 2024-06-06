@@ -1,5 +1,8 @@
 if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
     apply plugin: "org.grails.grails-plugin"
+    apply plugin: "idea"
+    apply plugin: "asset-pipeline"
+    apply plugin: "org.grails.grails-gsp"
 
     if (rootProject.name == 'taack-ui-test') {
         apply plugin: 'java-library'
@@ -8,10 +11,6 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
             mavenCentral()
             maven { url "https://repo.grails.org/grails/core/" }
         }
-    } else {
-        apply plugin: "idea"
-        apply plugin: "asset-pipeline"
-        apply plugin: "org.grails.grails-gsp"
     }
 
     configurations {

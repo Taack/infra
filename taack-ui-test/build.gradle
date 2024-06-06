@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
     repositories {
         mavenCentral()
@@ -14,8 +16,8 @@ buildscript {
 
 plugins {
     id "groovy"
-    id "war"
-    id "idea"
+    id "org.grails.grails-web"
+    id "org.grails.grails-gsp"
     id "org.grails.grails-plugin"
     id "application"
 }
@@ -37,42 +39,58 @@ configurations {
     }
 }
 
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
 dependencies {
+    if (Os.isFamily(Os.FAMILY_MAC)) {
+        runtimeOnly 'net.java.dev.jna:jna:5.14.0'
+        implementation 'io.methvin:directory-watcher:0.18.0'
+    }
+    developmentOnly('org.springframework.boot:spring-boot-devtools')
+    console 'org.grails:grails-console'
+    implementation 'org.grails.plugins:gsp'
+    profile 'org.grails.profiles:web'
+
+    compileOnly("io.micronaut:micronaut-inject-groovy")
     implementation("org.grails:grails-core")
     implementation("org.grails:grails-logging")
     implementation("org.grails:grails-plugin-databinding")
     implementation("org.grails:grails-plugin-i18n")
     implementation("org.grails:grails-plugin-interceptors")
+    implementation("org.grails.plugins:async")
     implementation("org.grails:grails-plugin-rest")
     implementation("org.grails:grails-plugin-services")
     implementation("org.grails:grails-plugin-url-mappings")
     implementation("org.grails:grails-web-boot")
     implementation("org.grails.plugins:gsp")
     implementation("org.grails.plugins:hibernate5")
-    implementation("org.grails.plugins:scaffolding")
+    implementation("org.hibernate:hibernate-core:5.6.14.Final")
+    implementation "org.grails.plugins:events"
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-logging")
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("javax.xml.bind:jaxb-api:2.3.1")
+    runtimeOnly("org.apache.tomcat:tomcat-jdbc")
+    runtimeOnly("org.glassfish.web:el-impl:2.2.1-b05")
+    runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
 
     implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
-
-    compileOnly("io.micronaut:micronaut-inject-groovy")
-    runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.apache.tomcat:tomcat-jdbc")
-    runtimeOnly("org.fusesource.jansi:jansi:1.18")
-
-    implementation project(':taack-ui')
 }
 
 grails {
     // should use gradle -Dgrails.run.active=true bootRun
     exploded = true
     plugins {
-//        implementation project(':taack-ui')
+        implementation project(':taack-ui')
     }
 }
 
