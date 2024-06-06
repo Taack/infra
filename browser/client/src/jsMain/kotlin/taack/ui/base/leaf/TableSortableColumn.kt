@@ -54,11 +54,12 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
         else fd.delete("order")
         fd.append("isAjax", "true")
         fd.append("refresh", "true")
+        trace("filterTableId = ${parent.parent.blockId}")
         fd.append("filterTableId", parent.parent.blockId)
         state.addClientStateAjaxBlock()
         state.addServerState(fd)
-
-        window.fetch(f.action, RequestInit(method = "POST", body = fd)).then {
+        val button = f.querySelector("button[formaction]") as HTMLButtonElement
+        window.fetch(button.formAction, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {
                 it.text()
             } else {

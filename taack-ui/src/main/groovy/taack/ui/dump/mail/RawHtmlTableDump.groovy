@@ -1,12 +1,10 @@
 package taack.ui.dump.mail
 
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.base.common.ActionIcon
 import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
 import taack.ui.dump.Parameter
 import taack.ui.dump.common.CommonRawHtmlTableDump
 
@@ -26,13 +24,15 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTable() {
         out << """
-                <div style='overflow: auto;'><form><table class='pure-table taackTable'>
+                <div>
+                <div style='overflow: auto;'><form><table class='taackTable'>
                """
     }
 
     @Override
     void visitTableWithoutFilter() {
-        out << "<div class='table-div' style='overflow: auto;'><table class='pure-table taackTable'>\n"
+        out << "<div>\n"
+        out << "<div class='table-div' style='overflow: auto;'><table class='taackTable'>\n"
     }
 
     @Override

@@ -25,6 +25,7 @@ final class BlockSpec {
     final String filterTableId
 
     int counter = 0
+    static int ajaxCounter = 0
     String id
     String currentBlockId
 
@@ -38,6 +39,12 @@ final class BlockSpec {
         if (!filterTableId) return true
         if (id) currentBlockId = id
         else currentBlockId = filterTableId
+    }
+
+    private final String getAjaxBlockId() {
+        if (ajaxCounter > 2>>30)
+            ajaxCounter = 0
+        blockVisitor.parameterMap['ajaxBlockId'] ?: "ajaxBlockId${ajaxCounter++}"
     }
 
     /**
@@ -195,8 +202,9 @@ final class BlockSpec {
      */
     void form(final UiFormSpecifier formSpecifier, final Width width = Width.MAX,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
-        if (displayElement("form$counter")) {
-            id = "form$counter"
+        String aId  = ajaxBlockId
+        if (displayElement(aId)) {
+            id = aId
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitForm(width)
             processMenuBlock(closure)
@@ -216,8 +224,9 @@ final class BlockSpec {
      */
     void show(final UiShowSpecifier showSpecifier, final Width width,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
-        if (displayElement("show$counter")) {
-            id = "show$counter"
+        String aId  = ajaxBlockId
+        if (displayElement(aId)) {
+            id = aId
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitShow(width)
             processMenuBlock(closure)
@@ -228,8 +237,9 @@ final class BlockSpec {
 
     void table(final UiTableSpecifier tableSpecifier, final Width width = Width.MAX,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
-        if (displayElement("table$counter")) {
-            id = "table$counter"
+        String aId  = ajaxBlockId
+        if (displayElement(aId)) {
+            id = aId
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTable(id, width)
             processMenuBlock(closure)
@@ -251,8 +261,9 @@ final class BlockSpec {
                      final UiTableSpecifier tableSpecifier,
                      final Width width,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
-        if (displayElement("tableFilter$counter")) {
-            id = "tableFilter$counter"
+        String aId  = ajaxBlockId
+        if (displayElement(aId)) {
+            id = aId
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitTableFilter(id, filterSpecifier, width)
             processMenuBlock(closure)
@@ -272,8 +283,9 @@ final class BlockSpec {
      */
     void chart(final UiChartSpecifier chartSpecifier, final Width width = Width.MAX,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
-        if (displayElement()) {
-            id = "chart${counter}"
+        String aId  = ajaxBlockId
+        if (displayElement(aId)) {
+            id = aId
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitChart(width)
             processMenuBlock(closure)
@@ -308,8 +320,9 @@ final class BlockSpec {
      */
     void custom(final String html, final Style style = null, final Width width = Width.MAX,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
-        if (displayElement("custom$counter")) {
-            id = "custom$counter"
+        String aId  = ajaxBlockId
+        if (displayElement(aId)) {
+            id = aId
             blockVisitor.visitAjaxBlock(id)
             blockVisitor.visitCustom(html, style, width)
             counter ++
