@@ -1,8 +1,5 @@
 if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
-    apply plugin: "idea"
     apply plugin: "org.grails.grails-plugin"
-    apply plugin: "asset-pipeline"
-    apply plugin: "org.grails.grails-gsp"
 
     if (rootProject.name == 'taack-ui-test') {
         apply plugin: 'java-library'
@@ -11,6 +8,10 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
             mavenCentral()
             maven { url "https://repo.grails.org/grails/core/" }
         }
+    } else {
+        apply plugin: "idea"
+        apply plugin: "asset-pipeline"
+        apply plugin: "org.grails.grails-gsp"
     }
 
     configurations {
@@ -39,28 +40,29 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
         runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
     }
 
-    bootRun {
-        ignoreExitValue true
-        jvmArgs(
-                '-Dspring.output.ansi.enabled=always',
-                '-noverify',
-                '-XX:TieredStopAtLevel=1',
-                '-Xmx1024m')
-        sourceResources sourceSets.main
-        String springProfilesActive = 'spring.profiles.active'
-        systemProperty springProfilesActive, System.getProperty(springProfilesActive)
-    }
-
-    tasks.withType(GroovyCompile) {
-        configure(groovyOptions) {
-            forkOptions.jvmArgs = ['-Xmx1024m']
+    if (rootProject.name == 'infra') {
+        bootRun {
+            ignoreExitValue true
+            jvmArgs(
+                    '-Dspring.output.ansi.enabled=always',
+                    '-noverify',
+                    '-XX:TieredStopAtLevel=1',
+                    '-Xmx1024m')
+            sourceResources sourceSets.main
+            String springProfilesActive = 'spring.profiles.active'
+            systemProperty springProfilesActive, System.getProperty(springProfilesActive)
         }
-    }
+        tasks.withType(GroovyCompile) {
+            configure(groovyOptions) {
+                forkOptions.jvmArgs = ['-Xmx1024m']
+            }
+        }
 
-    tasks.withType(Test) {
-        useJUnitPlatform()
-    }
-//    bootJar.enabled = false
+        tasks.withType(Test) {
+            useJUnitPlatform()
+        }
+    } else
+        bootJar.enabled = false
 }
 
 dependencies {
@@ -107,31 +109,27 @@ if (rootProject.name != 'infra') {
     }
 } else {
     assets {
-        if (rootProject.name == 'taack-ui-test') {
-            minifyJs = false
-            minifyCss = false
-        } else {
-            minifyJs = true
-            minifyCss = true
-            configOptions = [
-                    commonJs: false,
-                    babel   : [
-                            enabled       : false,
-                            processJsFiles: false
-                    ]
-            ] //useful for custom config on extension libraries
+        minifyJs = true
+        minifyCss = true
+        configOptions = [
+                commonJs: false,
+                babel   : [
+                        enabled       : false,
+                        processJsFiles: false
+                ]
+        ] //useful for custom config on extension libraries
 
-            excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
+        excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
 
-            //for plugin packaging
-            packagePlugin = true //set to true if this is a library
+        //for plugin packaging
+        packagePlugin = true //set to true if this is a library
 
-            //developmentRuntime can be turned off
-            developmentRuntime = false
+        //developmentRuntime can be turned off
+        developmentRuntime = false
 
-            //if you want to customize the jar task this task runs on you can specify a jarTaskName
-            jarTaskName = null
-        }
-
+        //if you want to customize the jar task this task runs on you can specify a jarTaskName
+        jarTaskName = null
     }
+
 }
+

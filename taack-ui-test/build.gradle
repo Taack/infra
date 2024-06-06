@@ -20,10 +20,6 @@ plugins {
     id "application"
 }
 
-application {
-    mainClass.set("taack.ui.test.Application")
-}
-
 group = "taack.ui.test"
 
 repositories {
@@ -60,20 +56,23 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-logging")
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
+
     compileOnly("io.micronaut:micronaut-inject-groovy")
     runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.apache.tomcat:tomcat-jdbc")
     runtimeOnly("org.fusesource.jansi:jansi:1.18")
 
-//    implementation project('ui')
+    implementation project(':taack-ui')
 }
 
 grails {
     // should use gradle -Dgrails.run.active=true bootRun
     exploded = true
     plugins {
-        implementation project(':taack-ui')
+//        implementation project(':taack-ui')
     }
 }
 

@@ -1,6 +1,0 @@
-rootProject.name="taack-ui-test"
-
-include 'taack-jdbc-common', 'taack-ui'
-project(':taack-jdbc-common').projectDir = file('../taack-jdbc-common')
-project(':taack-ui').projectDir = file('../taack-ui')
-//project(":taack-ui").name = "ui"
