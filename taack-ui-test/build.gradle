@@ -1,0 +1,94 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.grails.org/grails/core/" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
+        classpath "org.grails.plugins:hibernate5:${grailsHibernate5}"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipeline}"
+    }
+}
+
+plugins {
+    id "groovy"
+    id "war"
+    id "idea"
+    id "org.grails.grails-plugin"
+    id "application"
+}
+
+application {
+    mainClass.set("taack.ui.test.Application")
+}
+
+group = "taack.ui.test"
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.grails.org/grails/core/" }
+}
+
+configurations {
+    all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details->
+            if (details.requested.group == 'org.seleniumhq.selenium') {
+                details.useVersion('4.19.1')
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation("org.grails:grails-core")
+    implementation("org.grails:grails-logging")
+    implementation("org.grails:grails-plugin-databinding")
+    implementation("org.grails:grails-plugin-i18n")
+    implementation("org.grails:grails-plugin-interceptors")
+    implementation("org.grails:grails-plugin-rest")
+    implementation("org.grails:grails-plugin-services")
+    implementation("org.grails:grails-plugin-url-mappings")
+    implementation("org.grails:grails-web-boot")
+    implementation("org.grails.plugins:gsp")
+    implementation("org.grails.plugins:hibernate5")
+    implementation("org.grails.plugins:scaffolding")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-logging")
+    implementation("org.springframework.boot:spring-boot-starter-tomcat")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    compileOnly("io.micronaut:micronaut-inject-groovy")
+    runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.apache.tomcat:tomcat-jdbc")
+    runtimeOnly("org.fusesource.jansi:jansi:1.18")
+
+//    implementation project('ui')
+}
+
+grails {
+    // should use gradle -Dgrails.run.active=true bootRun
+    exploded = true
+    plugins {
+        implementation project(':taack-ui')
+    }
+}
+
+application {
+    mainClass.set("taack.ui.test.Application")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    systemProperty "geb.env", System.getProperty('geb.env')
+    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
+    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
+    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
+}

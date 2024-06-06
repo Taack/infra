@@ -1,8 +1,17 @@
-if (rootProject.name == 'infra') {
+if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
     apply plugin: "idea"
     apply plugin: "org.grails.grails-plugin"
     apply plugin: "asset-pipeline"
     apply plugin: "org.grails.grails-gsp"
+
+    if (rootProject.name == 'taack-ui-test') {
+        apply plugin: 'java-library'
+
+        repositories {
+            mavenCentral()
+            maven { url "https://repo.grails.org/grails/core/" }
+        }
+    }
 
     configurations {
         developmentOnly
@@ -82,7 +91,7 @@ dependencies {
     implementation "org.apache.sshd:sshd-git:${minaSshd}"
     implementation "org.apache.sshd:sshd-cli:${minaSshd}"
 
-    if (rootProject.name != 'infra') {
+    if (rootProject.name != 'infra' && rootProject.name != 'taack-ui-test') {
         implementation project(':infra:taack-jdbc-common')
     } else {
         implementation project(':taack-jdbc-common')
@@ -98,26 +107,31 @@ if (rootProject.name != 'infra') {
     }
 } else {
     assets {
-        minifyJs = true
-        minifyCss = true
+        if (rootProject.name == 'taack-ui-test') {
+            minifyJs = false
+            minifyCss = false
+        } else {
+            minifyJs = true
+            minifyCss = true
+            configOptions = [
+                    commonJs: false,
+                    babel   : [
+                            enabled       : false,
+                            processJsFiles: false
+                    ]
+            ] //useful for custom config on extension libraries
 
-        configOptions = [
-                commonJs: false,
-                babel: [
-                        enabled: false,
-                        processJsFiles: false
-                ]
-        ] //useful for custom config on extension libraries
+            excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
 
-        excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
+            //for plugin packaging
+            packagePlugin = true //set to true if this is a library
 
-        //for plugin packaging
-        packagePlugin = true //set to true if this is a library
+            //developmentRuntime can be turned off
+            developmentRuntime = false
 
-        //developmentRuntime can be turned off
-        developmentRuntime = false
+            //if you want to customize the jar task this task runs on you can specify a jarTaskName
+            jarTaskName = null
+        }
 
-        //if you want to customize the jar task this task runs on you can specify a jarTaskName
-        jarTaskName = null
     }
 }
