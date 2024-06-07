@@ -76,6 +76,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableEnd() {
+        out << "</tbody>"
         out << "</table></div></div>\n"
     }
 
@@ -93,6 +94,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitHeader() {
         isInHeader = true
+        out << "\n<thead>"
         out << "\n<tr>"
     }
 
@@ -100,6 +102,8 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     void visitHeaderEnd() {
         isInHeader = false
         out << "</tr>\n"
+        out << "</thead>\n"
+        out << "<tbody>\n"
     }
 
     @Override

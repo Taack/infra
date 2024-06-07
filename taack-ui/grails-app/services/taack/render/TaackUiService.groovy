@@ -361,7 +361,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         String fileName = fileNamePrefix + "-${dateFileName}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
-        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=\"${fileName}${isHtml ? ".html" : ""}\"")
+        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}${isHtml ? ".html" : ""}")
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
         try {
