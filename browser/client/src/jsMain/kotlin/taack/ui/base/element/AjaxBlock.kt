@@ -12,7 +12,6 @@ import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
-import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 
 class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
@@ -39,44 +38,10 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     init {
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
         refresh()
-//        filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
-//        tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
-//        forms = Form.getSiblingForm(this)
-//        shows = Show.getSiblingShow(this)
-//        Helper.trace("innerScripts ${innerScripts.length}")
-        //Ugly as Hell
-//        for (i in 0 until innerScripts.length) {
-//            val s = innerScripts.get(i) as HTMLScriptElement
-//            if (s.type == "module") {
-//                console.log("AUO detecting a module")
-//                document.body!!.appendChild(s)
-//            } else {
-//                if (!s.hasAttribute("postExecute")) continue
-//
-//                if (s.hasAttribute("src")) {
-//                    console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
-//                    val script = document.createElement("script") as HTMLScriptElement
-//                    script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
-//                    document.head?.appendChild(script)
-//
-//                } else {
-//                    console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
-//                    eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
-//                }
-//            }
-//        }
 
-        RecordState.setCurrentBlockId(blockId)
         if (blockId.startsWith("drawProgress:")) {
             poolDrawProgress(blockId)
         }
-        val clientState = RecordState.getPreviousClientState()?.get(blockId)
-        Helper.trace("clientState = $clientState")
-        if (clientState != null) {
-            window.scrollTo(clientState[0]?.toDouble() ?: 0.0, clientState[1]?.toDouble() ?: 0.0)
-            RecordState.clearClientState(blockId)
-        }
-
         parent.ajaxBlockElements.put(blockId, this)
 
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")

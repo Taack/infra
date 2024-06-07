@@ -11,7 +11,6 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Block
 import taack.ui.base.element.Form
-import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 
 class FormActionButton(private val parent: Form, private val b: HTMLButtonElement) : LeafElement {
@@ -50,7 +49,6 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         val f = parent.f
         val fd = FormData(f)
         fd.append("isAjax", "true")
-        if (!fd.has("recordState") && RecordState.serverState.isNotEmpty()) fd.append("recordState", RecordState.dumpServerState())
         window.fetch(b.formAction, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {
                 it.text()
@@ -62,14 +60,11 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
             if (it.startsWith("__redirect__")) {
                 window.location.href = it.substring("__redirect__".length)
             } else if (it.startsWith("__reload__")) {
-                val sep = if (Block.href!!.contains("?")) "&" else "?"
-                val rs = if (RecordState.serverState.isNotEmpty()) "${sep}recordState=${RecordState.dumpServerState()}" else ""
-                window.location.href = (Block.href ?: "") + rs
+                window.location.href = (Block.href ?: "")
             } else if (it.startsWith("__ajaxBlockStart__")) {
                 trace("__ajaxBlockStart__ ${parent.parent.parent.ajaxBlockElements}")
                 Helper.mapAjaxText(it).map { me ->
                     val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
-                    //parent.parent.parent.ajaxBlockElements?.get(me.key)
                     target!!.d.innerHTML = me.value
                     target.refresh()
                 }

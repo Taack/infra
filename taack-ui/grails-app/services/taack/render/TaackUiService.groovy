@@ -169,8 +169,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null) {
-        Map recordState = decodeCookie(params['recordState'] as String) as Map<String, Map>
-        if (recordState && !recordState.empty) params['recordStateDecoded'] = recordState
         if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {

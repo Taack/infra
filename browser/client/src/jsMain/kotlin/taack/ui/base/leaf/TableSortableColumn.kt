@@ -8,9 +8,7 @@ import org.w3c.xhr.FormData
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Table
-import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 
 class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElement) : LeafElement {
@@ -26,7 +24,6 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
 
     private val property: String = s.attributes["sortField"]!!.value
     private val direction: String?
-    private val state: RecordState = RecordState()
 
     init {
         val fd = FormData(parent.filter.f)
@@ -56,8 +53,6 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
         fd.append("refresh", "true")
         trace("filterTableId = ${parent.parent.blockId}")
         fd.append("filterTableId", parent.parent.blockId)
-        state.addClientStateAjaxBlock()
-        state.addServerState(fd)
         val button = f.querySelector("button[formaction]") as HTMLButtonElement
         window.fetch(button.formAction, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {

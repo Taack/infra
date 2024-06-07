@@ -8,7 +8,6 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.Helper.Companion.traceDeIndent
-import taack.ui.base.record.RecordState
 
 class Modal(val parent: Block) : BaseElement {
     companion object {
@@ -43,7 +42,6 @@ class Modal(val parent: Block) : BaseElement {
         a.innerText = "X"
         a.addClass("close")
         a.onclick = { _ ->
-            RecordState.clearServerState()
             close()
         }
         dClose.addClass("taack-close")

@@ -91,7 +91,7 @@ class Helper {
             val block = base.getParentBlock()
             when {
                 text.contains(rel) -> {
-                    window.location.href = (Block.href ?: "")// + "?recordState=${RecordState.dumpServerState()}"
+                    window.location.href = (Block.href ?: "")
                 }
                 text.startsWith(m) -> {
                     val pos = text.indexOf(':', m.length)

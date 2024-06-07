@@ -9,7 +9,6 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AjaxBlockInputTab
-import taack.ui.base.record.RecordState
 
 class Block(val parent: Modal?, val d: HTMLDivElement) :
     BaseElement {
@@ -41,21 +40,6 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         modal = Modal.buildModal(this)
 
         AjaxBlock(this, d)
-
-        if (tmpBlockId != null) {
-            val clientBlockState = RecordState.getPreviousClientState()?.get(blockId)
-            Helper.trace("clientBlockState = $clientBlockState for ${d.id}")
-            if (tabs.isNotEmpty() && tabs.size == clientBlockState?.size) {
-                Helper.trace("restoring active tab ...")
-                val indexChecked = clientBlockState.indexOf("true")
-                if (indexChecked != -1) tabs[indexChecked].i.checked = true
-                else Helper.trace("indexChecked == -1 ...")
-            } else {
-                Helper.trace("tabs.size != clientBlockState.size ...")
-                RecordState.clearClientState(blockId)
-            }
-        }
-
         traceDeIndent("Block::init --- ${d.id}")
     }
 

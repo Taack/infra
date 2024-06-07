@@ -15,7 +15,6 @@ import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.record.RecordState
 
 open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : LeafElement {
 
@@ -26,7 +25,6 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
             additionalParams?.forEach {
                 url.searchParams.set(it.key, it.value)
             }
-            if (!url.searchParams.has("recordState") && RecordState.serverState.isNotEmpty()) url.searchParams.set("recordState", RecordState.dumpServerState())
             return url
         }
     }

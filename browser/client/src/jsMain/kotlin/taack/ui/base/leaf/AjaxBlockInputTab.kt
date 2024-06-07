@@ -10,7 +10,6 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.element.Block
-import taack.ui.base.record.RecordState
 
 class AjaxBlockInputTab(val parent: Block, val i: HTMLInputElement) :
     BaseElement {
@@ -24,7 +23,6 @@ class AjaxBlockInputTab(val parent: Block, val i: HTMLInputElement) :
         }
     }
 
-    private val state: RecordState = RecordState()
     private val label: HTMLLabelElement
 
     init {
@@ -35,7 +33,6 @@ class AjaxBlockInputTab(val parent: Block, val i: HTMLInputElement) :
             val checked = parent.tabs.map {
                 (it.i == i).toString()
             }
-            state.addClientStateBlock(checked)
         }
         traceDeIndent("AjaxBlockInputTab::init --- id: ${i.id}")
     }

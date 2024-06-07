@@ -145,10 +145,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     @Override
     void visitTable(final String id, final BlockSpec.Width width) {
         this.id = id
-        def recordStateForId = parameter.applicationTagLib.params['recordStateDecoded']?[id] as Map
-        if (recordStateForId) {
-            parameter.applicationTagLib.params.putAll(recordStateForId)
-        }
         visitInnerColBlock(width)
     }
 
@@ -163,10 +159,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
                           final UiFilterSpecifier filterSpecifier,
                           final BlockSpec.Width width) {
 
-        def recordStateForId = parameter.applicationTagLib.params['recordStateDecoded']?[id] as Map
-        if (recordStateForId) {
-            parameter.applicationTagLib.params.putAll(recordStateForId)
-        }
         visitInnerRowBlock()
         visitInnerColBlock(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
