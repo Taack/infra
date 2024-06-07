@@ -171,12 +171,12 @@ final class BlockSpec {
      * @param firstPass (optional) if true create a new modal, if false, replace the content of the top modal.
      * @param closure content of the modal
      */
-    void modal(final boolean firstPass = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (firstPass && displayElement()) blockVisitor.visitModal()
+    void modal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        blockVisitor.visitModal()
         closure.delegate = this
         closure.call()
         counter ++
-        if (firstPass && displayElement()) blockVisitor.visitModalEnd()
+        blockVisitor.visitModalEnd()
     }
 
 

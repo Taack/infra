@@ -21,8 +21,8 @@ class Modal(val parent: Block) : BaseElement {
 
     private var dModal: HTMLDivElement
     private var dModalDialog: HTMLDivElement
-    private var dModalBody: HTMLDivElement
-    val dModalContent: HTMLDivElement
+    var dModalBody: HTMLDivElement
+    private val dModalContent: HTMLDivElement
 
     val mId = id++
 

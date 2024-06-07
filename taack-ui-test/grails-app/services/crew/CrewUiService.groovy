@@ -78,8 +78,6 @@ class CrewUiService implements WebAttributes {
         }
     }
 
-
-
     UiTableSpecifier buildRoleTable(User user) {
         Role role = new Role()
         new UiTableSpecifier().ui {

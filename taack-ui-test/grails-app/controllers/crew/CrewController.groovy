@@ -243,14 +243,14 @@ class CrewController implements WebAttributes {
         println "addRoleToUser $params"
         def ur = UserRole.create(User.read(params.long("userId")), Role.read(params.long("roleId")))
         if (ur.hasErrors()) log.error "${ur.errors}"
-        chain(action: "editUserRoles", id: params.long("userId"), params: [isAjax: true])
+        chain(action: "editUserRoles", id: params.long("userId"), params: [isAjax: true, refresh: true])
     }
 
     @Secured("ROLE_ADMIN")
     @Transactional
     def removeRoleToUser() {
         UserRole.remove(User.read(params.long("userId")), Role.read(params.long("roleId")))
-        chain(action: "editUserRoles", id: params.long("userId"), params: [isAjax: true])
+        chain(action: "editUserRoles", id: params.long("userId"), params: [isAjax: true, refresh: true])
     }
 
     @Transactional
