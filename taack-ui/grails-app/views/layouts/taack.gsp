@@ -10,10 +10,10 @@
         <meta name="color-scheme" content="dark">
         <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
     </g:if>
-    <g:else>
+    <g:elseif test="${themeMode == ThemeMode.LIGHT}">
         <meta name="color-scheme" content="light">
         <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
-    </g:else>
+    </g:elseif>
 
     <title>${conf.defaultTitle}</title>
 %{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"--}%
@@ -39,16 +39,30 @@
         background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='${URLEncoder.encode(conf.fgColor, "UTF-8")}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
     }
 
-    %{--.navbar-toggler.navbar-toggler {--}%
-    %{--    border-color: ${c.fgColor};--}%
-    %{--}--}%
+    /*:root {*/
+    /*    color-scheme: light dark;*/
+    /*}*/
+
+    /*@media (prefers-color-scheme: light) {*/
+    /*    .element {*/
+    /*        color: black;*/
+    /*        background-color: white;*/
+    /*    }*/
+    /*}*/
+
+    /*@media (prefers-color-scheme: dark) {*/
+    /*    .element {*/
+    /*        color: white;*/
+    /*        background-color: black;*/
+    /*    }*/
+    /*}*/
     </style>
 
     <link rel="icon" type="image/png" href="/assets/favicon.png"/>
     <g:layoutHead/>
 </head>
 
-<body class="${themeMode == ThemeMode.DARK ? 'night' : 'day'}" data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
+<body data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
 
 <nav class="navbar navbar-expand-md" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
     <div id="dropdownNav" class="container-fluid">

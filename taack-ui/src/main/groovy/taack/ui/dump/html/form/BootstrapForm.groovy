@@ -73,7 +73,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             case ThemeSize.LG:
                 'form-control form-control-lg'
                 break
-            case ThemeSize.NONE:
+            case ThemeSize.NORMAL:
                 'form-control form-control'
                 break
         }
