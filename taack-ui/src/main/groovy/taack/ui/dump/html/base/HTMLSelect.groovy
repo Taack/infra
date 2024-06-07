@@ -32,7 +32,7 @@ final class HTMLSelect implements IHTMLElement {
         tag = 'select'
         if (nullable) addChildren(new HTMLOption())
         addChildren(options.options.toList().collect {
-            new HTMLOption(it, options.currents.contains(it.key))
+            new HTMLOption(it, options.currents*.key.contains(it.key))
         } as HTMLOption[])
         attributes.put('name', options.paramKey)
 //        if (readOnly) attributes.put('readonly', null)
