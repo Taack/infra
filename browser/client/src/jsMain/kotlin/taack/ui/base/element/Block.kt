@@ -7,8 +7,8 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
-import taack.ui.base.leaf.AjaxBlockInputTab
 import taack.ui.base.leaf.ActionLink
+import taack.ui.base.leaf.AjaxBlockInputTab
 import taack.ui.base.record.RecordState
 
 class Block(val parent: Modal?, val d: HTMLDivElement) :
@@ -32,6 +32,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         traceIndent("Block::init +++ ${d.id}, ${tmpBlockId}.")
         if (tmpBlockId != null && tmpBlockId != "") {
             blockId = tmpBlockId
+            ActionLink.getActionLink(this)
         } else {
             blockId = "modal${modalNumber++}"
         }
