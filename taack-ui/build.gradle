@@ -39,7 +39,7 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
         runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
     }
 
-    if (rootProject.name == 'infra') {
+    if (rootProject.name == 'infraFalse') {
         bootRun {
             ignoreExitValue true
             jvmArgs(

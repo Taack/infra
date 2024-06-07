@@ -30,7 +30,6 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
         if (modalId) isModal = true
         if (parameter.params.boolean('refresh'))
             isModalRefresh = true
-        println "isModalRefresh = ${isModalRefresh}"
     }
 
     @Override

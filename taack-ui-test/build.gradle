@@ -18,6 +18,7 @@ plugins {
     id "groovy"
     id "org.grails.grails-web"
     id "org.grails.grails-gsp"
+    id 'com.bertramlabs.asset-pipeline'
     id "org.grails.grails-plugin"
     id "application"
 }
@@ -27,16 +28,6 @@ group = "taack.ui.test"
 repositories {
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core/" }
-}
-
-configurations {
-    all {
-        resolutionStrategy.eachDependency { DependencyResolveDetails details->
-            if (details.requested.group == 'org.seleniumhq.selenium') {
-                details.useVersion('4.19.1')
-            }
-        }
-    }
 }
 
 configurations {

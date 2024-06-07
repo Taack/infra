@@ -24,6 +24,8 @@ import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.filter.expression.Operator
 import taack.ui.base.form.FormSpec
 
+import static taack.render.TaackUiService.tr
+
 @GrailsCompileStatic
 @Secured(['isAuthenticated()'])
 class CrewController implements WebAttributes {
@@ -131,6 +133,7 @@ class CrewController implements WebAttributes {
     }
 
     def index() {
+
         User cu = authenticatedUser as User
 
         UiFilterSpecifier f = CrewUiService.buildUserTableFilter cu
