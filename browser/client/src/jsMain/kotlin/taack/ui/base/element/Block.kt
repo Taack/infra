@@ -2,6 +2,7 @@ package taack.ui.base.element
 
 import kotlinx.browser.document
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.get
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
@@ -20,15 +21,15 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         }
     }
 
-    val ajaxBlockElements: Map<String, AjaxBlock>?
+    val ajaxBlockElements = mutableMapOf<String, AjaxBlock>()
     val modal: Modal
     var tabs: List<AjaxBlockInputTab>
     val blockId: String
     var modalNumber = 0
 
     init {
-        traceIndent("Block::init +++ ${d.id}")
         val tmpBlockId= d.attributes.getNamedItem("blockId")?.value
+        traceIndent("Block::init +++ ${d.id} ${tmpBlockId}")
         if (tmpBlockId != null && tmpBlockId != "") {
             blockId = tmpBlockId
         } else {
@@ -36,12 +37,10 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         }
         tabs = AjaxBlockInputTab.getSiblingBlockInputTab(this)
         val abe = AjaxBlock.getSiblingAjaxBlock(this)
-        ajaxBlockElements = abe.map {
-            it.blockId to it
-        }.toMap()
         modal = Modal.buildModal(this)
         if (parent == null) {
-            ActionLink.getAjaxMenu(this)
+            ActionLink.getActionLink(this)
+            AjaxBlock(this, d.children[0]!! as HTMLDivElement)
         }
 
         if (tmpBlockId != null) {
@@ -58,7 +57,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
             }
         } else {
             Helper.trace("Block::init in modal ...")
-            AjaxBlock(this, d)
+            AjaxBlock(this, d.children[0]!! as HTMLDivElement)
         }
 
         traceDeIndent("Block::init --- ${d.id}")
@@ -72,8 +71,17 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         return "Block{ajaxBlockElements: $ajaxBlockElements, parent: ${parent}}"
     }
 
+    fun updateContent(newContent: String) {
+        Helper.trace("Block::updateContent ...")
+        if (d.children[0] != null)
+            d.children[0]!!.innerHTML = newContent
+        else
+            Helper.trace("Block::updateContent no DIV ...")
+        refresh()
+    }
+
     fun refresh() {
-        ActionLink.getAjaxMenu(this)
+        ActionLink.getActionLink(this)
     }
 
 }

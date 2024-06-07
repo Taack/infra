@@ -8,7 +8,7 @@ import taack.ui.base.element.Block
 
 class ActionLink(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a) {
     companion object {
-        fun getAjaxMenu(p: Block): List<ActionLink> {
+        fun getActionLink(p: Block): List<ActionLink> {
             val elements: List<Node>?
             elements = document.querySelectorAll("a[ajaxaction]").asList()
             return elements.map {

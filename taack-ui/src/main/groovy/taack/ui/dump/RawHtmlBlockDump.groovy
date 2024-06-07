@@ -36,14 +36,12 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
             out << "<div id='blockId${blockId}' class='container-fluid' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
-            out << "<div ajaxBlockId='blockId${blockId}'>"
         }
     }
 
     @Override
     void visitBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) {
-            out << "</div>"
             out << "</div>"
         }
     }

@@ -80,10 +80,14 @@ class ActionIcon {
         return new ActionIcon(this.src, other)
     }
 
+    static private String escapeHtml(String input) {
+        StringEscapeUtils.escapeHtml(input).replace("'", "&apos;")
+    }
+
     String getHtml(final String title, final Integer width = 40) {
         boolean hasNextMult = src.contains("*")
         boolean hasNextAdd = src.contains("+")
-        if (!hasNextMult && !hasNextAdd) return "<img src='$src' title='${StringEscapeUtils.escapeHtml(title)}' ${style?"style='${style.inlineStyle}'":" width='${width}'"}/>"
+        if (!hasNextMult && !hasNextAdd) return "<img src='$src' title='${escapeHtml(title)}' ${style?"style='${style.inlineStyle}'":" width='${width}'"}/>"
         StringBuffer res = new StringBuffer()
         res << """<span class="iconStack">"""
         String currentSrc
@@ -104,9 +108,9 @@ class ActionIcon {
             currentSrc = remainingSrc.substring(0, indexNextSign)
             remainingSrc = remainingSrc.substring(indexNextSign + 1)
             if (previousSign == "+") {
-                res << "<img class='iconStackElement' src='$currentSrc' width='${width}' title='$title'/>"
+                res << "<img class='iconStackElement' src='$currentSrc' width='${width}' title='${escapeHtml(title)}'/>"
             } else {
-                res << "<img class='iconStackElementExponent' src='$currentSrc' width='${width / 2}' title='$title'/>"
+                res << "<img class='iconStackElementExponent' src='$currentSrc' width='${width / 2}' title='${escapeHtml(title)}'/>"
             }
             hasNextMult = remainingSrc.contains("*")
             hasNextAdd = remainingSrc.contains("+")
@@ -114,9 +118,9 @@ class ActionIcon {
         }
 
         if (previousSign == "+") {
-            res << "<img class='iconStackElement' src='$remainingSrc' width='${width}' title='$title'/>"
+            res << "<img class='iconStackElement' src='$remainingSrc' width='${width}' title='${escapeHtml(title)}'/>"
         } else {
-            res << "<img class='iconStackElementExponent' src='$remainingSrc' width='${width / 2}' title='$title'/>"
+            res << "<img class='iconStackElementExponent' src='$remainingSrc' width='${width / 2}' title='${escapeHtml(title)}'/>"
         }
         res << "</span>"
         res.toString()

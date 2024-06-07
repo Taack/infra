@@ -17,14 +17,14 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
     companion object {
         fun getSiblingSortableColumn(p: Table): List<TableSortableColumn>? {
             val elements: List<Node>?
-            elements = p.t.querySelectorAll("span.taackSortableColumn").asList()
+            elements = p.t.querySelectorAll("span[sortField]").asList()
             return elements.map {
                 TableSortableColumn(p, it as HTMLSpanElement)
             }
         }
     }
 
-    private val property: String = s.attributes["property"]!!.value
+    private val property: String = s.attributes["sortField"]!!.value
     private val direction: String?
     private val state: RecordState = RecordState()
 
@@ -68,10 +68,10 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
             }
         }.then {
             Helper.mapAjaxText(it).map { me ->
-                parent.parent.d.innerHTML = me.value
+                parent.parent.updateContent(me.value)
             }
-        }.then {
-            AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
+//        }.then {
+//            AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
         }
     }
 }

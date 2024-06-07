@@ -77,6 +77,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
             RecordState.clearClientState(blockId)
         }
 
+        parent.ajaxBlockElements.put(blockId, this)
 
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }
@@ -122,6 +123,13 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         parent.refresh()
         Helper.traceDeIndent("AjaxBlock::refresh --- blockId: $blockId")
     }
+
+    fun updateContent(newContent: String) {
+        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
+        d.innerHTML = newContent
+        refresh()
+    }
+
 
     override fun getParentBlock(): Block {
         return parent

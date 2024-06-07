@@ -16,7 +16,7 @@ class TableGroupableColumn(private val parent: Table, private val s: HTMLSpanEle
     companion object {
         fun getSiblingGroupableColumn(p: Table): List<TableGroupableColumn>? {
             val elements: List<Node>?
-            elements = p.t.querySelectorAll("span.taackGroupableColumn").asList()
+            elements = p.t.querySelectorAll("span[groupField]").asList()
             return elements.map {
                 TableGroupableColumn(p, it as HTMLSpanElement)
             }
@@ -24,7 +24,7 @@ class TableGroupableColumn(private val parent: Table, private val s: HTMLSpanEle
         var grouping = 0
     }
 
-    private val property: String = s.attributes["property"]!!.value
+    private val property: String = s.attributes["groupField"]!!.value
     private val direction: String?
     private val groupCheck: HTMLInputElement = s.querySelector("input")!! as HTMLInputElement
 

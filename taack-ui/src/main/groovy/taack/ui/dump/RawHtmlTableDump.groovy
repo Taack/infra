@@ -55,7 +55,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
         i18n ?= parameter.trField(fields)
         fieldHeader()
         out << """
-            <span class="sortable sortColumn taackSortableColumn " property="${RawHtmlFilterDump.getQualifiedName(fields)}" formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
+            <span class="sortable sortColumn " sortField="${RawHtmlFilterDump.getQualifiedName(fields)}"><a>${i18n}</a></span>
         """
         fieldFooter()
     }
@@ -122,7 +122,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
         String name = RawHtmlFilterDump.getQualifiedName(fields)
         out << """
-            <span class="sortable sortColumn taackGroupableColumn" property="${name}" formid="${name}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
+            <span class="sortable sortColumn taackGroupableColumn" groupField="${name}"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
         """
     }
 

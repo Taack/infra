@@ -51,7 +51,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
         i18n ?= parameter.trField(fields)
         fieldHeader()
         out << """
-            <span class="sortable sortColumn taackSortableColumn " formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
+            <span class="sortable sortColumn "><a>${i18n}</a></span>
         """
         fieldFooter()
     }

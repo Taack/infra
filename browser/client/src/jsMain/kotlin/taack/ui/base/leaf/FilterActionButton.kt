@@ -66,13 +66,15 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                 trace("FilterActionButton::onclick __ajaxBlockStart__")
                 Helper.mapAjaxText(it).map { me ->
                     val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
-                    target!!.d.innerHTML = me.value
-                    target.refresh()
+                    if (target != null) {
+                        target.updateContent(me.value)
+                    } else {
+                        trace("FilterActionButton::onclick no target ${me.key}")
+                    }
                 }
             } else {
                 trace("FilterActionButton::onclick other content")
-                parent.parent.d.innerHTML = it
-                parent.parent.refresh()
+                parent.parent.parent.updateContent(it)
             }
         }.then {
             b?.disabled = false
