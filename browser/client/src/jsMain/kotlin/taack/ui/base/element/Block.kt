@@ -39,7 +39,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         val abe = AjaxBlock.getSiblingAjaxBlock(this)
         modal = Modal.buildModal(this)
         if (parent == null) {
-            AjaxBlock(this, d.children[0]!! as HTMLDivElement)
+            AjaxBlock(this, d)
         }
 
         if (tmpBlockId != null) {
@@ -56,7 +56,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
             }
         } else {
             Helper.trace("Block::init in modal ...")
-            AjaxBlock(this, d.children[0]!! as HTMLDivElement)
+            AjaxBlock(this, d)
         }
 
         traceDeIndent("Block::init --- ${d.id}")

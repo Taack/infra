@@ -90,12 +90,15 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
             ajaxBlockId = id
         }
         if (isModalRefresh) out << "__ajaxBlockStart__$id:"
+//        else
+//            out << "<div blockId='$ajaxBlockId'>"
     }
 
     @Override
     void visitAjaxBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
         if (isModalRefresh) out << "__ajaxBlockEnd__"
+        //else out << "</div>"
     }
 
     @Override
@@ -285,16 +288,11 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     @Override
     void visitModal() {
         isModal = true
-        if (!isModalRefresh)
-            out << "<div ajaxBlockId='modal${blockId}'>"
-
     }
 
     @Override
     void visitModalEnd() {
         isModal = false
-        if (!isModalRefresh)
-            out << "</div>"
     }
 
     @Override

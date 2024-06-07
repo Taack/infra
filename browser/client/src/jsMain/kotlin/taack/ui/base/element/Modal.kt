@@ -54,7 +54,7 @@ class Modal(val parent: Block) : BaseElement {
         d2.appendChild(innerModal)
         d12.appendChild(d2)
         d1.appendChild(d12)
-        parent.d.appendChild(d1)
+        parent.d.parentElement?.appendChild(d1)
         //        parent.modal.innerModal.appendChild(d1)
 
     }

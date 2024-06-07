@@ -113,7 +113,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         rowStyle = style
         stripped++
         out << """
-            <tr class="taackTableRow ${tableTheme.getTableRowClasses(stripped % 2 == 1)}" ${indent > -1 ? "${indent > 0 ? "style='display: none'" : ""}; taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
+            <tr class="taackTableRow" ${indent > -1 ? "${indent > 0 ? "style='display: none'" : ""}; taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
         """
     }
 
@@ -121,7 +121,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         rowStyle = style
         stripped++
         out << """
-            <tr class="taackTableRow ${tableTheme.getTableRowClasses(stripped % 2 == 1)}" ${indent > -1 ? "taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
+            <tr class="taackTableRow" ${indent > -1 ? "taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
         """
     }
 

@@ -27,45 +27,42 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     }
     val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")?.value ?:  d.attributes.getNamedItem("blockId")?.value
     val blockId = ajaxBlockId ?: parent.blockId
-    var filters: Map<String, Filter>
-    var tables: Map<String, Table>
-    var forms: List<Form>
-    var shows: List<Show>
+    var filters: Map<String, Filter> = mutableMapOf()
+    var tables: Map<String, Table> = mutableMapOf()
+    var forms: List<Form> = mutableListOf()
+    var shows: List<Show> = mutableListOf()
     var progressId: String = ""
     private val innerScripts = d.getElementsByTagName("script")
 
     init {
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
-        filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
-        tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
-        forms = Form.getSiblingForm(this)
-        shows = Show.getSiblingShow(this)
-        Helper.trace("innerScripts ${innerScripts.length}")
+        refresh()
+//        filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
+//        tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
+//        forms = Form.getSiblingForm(this)
+//        shows = Show.getSiblingShow(this)
+//        Helper.trace("innerScripts ${innerScripts.length}")
         //Ugly as Hell
-        for (i in 0 until innerScripts.length) {
-            val s = innerScripts.get(i) as HTMLScriptElement
-            if (s.type == "module") {
-                console.log("AUO detecting a module")
-                document.body!!.appendChild(s)
-
-//                val code: Any = s.innerHTML
-//                js("const dataUri = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code);const module = await import(dataUri);console.log(module);const myHello = module.default;myHello();")
-            } else {
-                if (!s.hasAttribute("postExecute")) continue
-
-                if (s.hasAttribute("src")) {
-                    console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
-                    val script = document.createElement("script") as HTMLScriptElement
-                    script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
-                    document.head?.appendChild(script)
-
-                } else {
-                    console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
-                    eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
-//                    document.body?.appendChild(innerScripts.get(i)!!)
-                }
-            }
-        }
+//        for (i in 0 until innerScripts.length) {
+//            val s = innerScripts.get(i) as HTMLScriptElement
+//            if (s.type == "module") {
+//                console.log("AUO detecting a module")
+//                document.body!!.appendChild(s)
+//            } else {
+//                if (!s.hasAttribute("postExecute")) continue
+//
+//                if (s.hasAttribute("src")) {
+//                    console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
+//                    val script = document.createElement("script") as HTMLScriptElement
+//                    script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
+//                    document.head?.appendChild(script)
+//
+//                } else {
+//                    console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
+//                    eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
+//                }
+//            }
+//        }
 
         RecordState.setCurrentBlockId(blockId)
         if (blockId.startsWith("drawProgress:")) {
@@ -118,6 +115,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
         tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
         forms = Form.getSiblingForm(this)
+        shows = Show.getSiblingShow(this)
         for (i in 0 until innerScripts.length) {
             eval(innerScripts.get(i)!!.innerHTML);
         }

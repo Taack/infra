@@ -85,12 +85,12 @@ final class TableSpec {
     final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
         c.delegate = new RowColumnSpec(tableVisitor)
         Pair<List<T>, Long> res = taackFilter.list()
-        tableVisitor.visitPaginate(taackFilter.max, res.bValue)
         for (T t in res.aValue) {
             tableVisitor.visitRow(null, false)
             c.call(t)
             tableVisitor.visitRowEnd()
         }
+        tableVisitor.visitPaginate(taackFilter.max, res.bValue)
         res.bValue
     }
 
