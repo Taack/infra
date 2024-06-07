@@ -19,57 +19,55 @@ class Modal(val parent: Block) : BaseElement {
         var id: Int = 0
     }
 
-    private var d1: HTMLDivElement
-    private var d12: HTMLDivElement
-    private val d2: HTMLDivElement
-    val d3: HTMLDivElement
-    val innerModal: HTMLDivElement
+    private var dModal: HTMLDivElement
+    private var dModalDialog: HTMLDivElement
+    private var dModalBody: HTMLDivElement
+    val dModalContent: HTMLDivElement
+
     val mId = id++
 
     init {
         trace("Modal::init $mId")
-        d1 = document.createElement("div") as HTMLDivElement
-        d1.classList.add("modal")
-        d12 = document.createElement("div") as HTMLDivElement
-        d12.addClass("modal-dialog", "modal-xl", "modal-dialog-scrollable")
-        d2 = document.createElement("div") as HTMLDivElement
-        d3 = document.createElement("div") as HTMLDivElement
-        d3.addClass("modal-body")
-        innerModal = document.createElement("div") as HTMLDivElement
-        d2.classList.add("modal-content")
-        d2.classList.add("taackModal")
+        dModal = document.createElement("div") as HTMLDivElement
+        dModal.classList.add("modal")
+        dModalDialog = document.createElement("div") as HTMLDivElement
+        dModalDialog.addClass("modal-dialog", "modal-xl", "modal-dialog-scrollable")
+        dModalContent = document.createElement("div") as HTMLDivElement
+        dModalBody = document.createElement("div") as HTMLDivElement
+        dModalBody.addClass("modal-body")
+//        val innerModal = document.createElement("div") as HTMLDivElement
+        dModalContent.classList.add("modal-content")
+        dModalContent.classList.add("taackModal")
         val a = document.createElement("a") as HTMLAnchorElement
-        val divA = document.createElement("div") as HTMLDivElement
+        val dClose = document.createElement("div") as HTMLDivElement
         a.innerText = "X"
         a.addClass("close")
         a.onclick = { _ ->
             RecordState.clearServerState()
             close()
         }
-        divA.addClass("taack-close")
-        divA.addClass("modal-header")
-        divA.appendChild(a)
-        d2.appendChild(divA)
-        d2.appendChild(d3)
-        d2.appendChild(innerModal)
-        d12.appendChild(d2)
-        d1.appendChild(d12)
-        parent.d.parentElement?.appendChild(d1)
-        //        parent.modal.innerModal.appendChild(d1)
-
+        dClose.addClass("taack-close")
+        dClose.addClass("modal-header")
+        dClose.appendChild(a)
+        dModalContent.appendChild(dClose)
+        dModalContent.appendChild(dModalBody)
+//        dModalContent.appendChild(innerModal)
+        dModalDialog.appendChild(dModalContent)
+        dModal.appendChild(dModalDialog)
+        parent.d.parentElement?.appendChild(dModal)
     }
 
     fun open(htmlContent: String) {
-        traceIndent("Modal::open $mId")
-        d3.innerHTML = htmlContent
-        d1.style.display = "block"
+        traceIndent("Modal::open $id")
+        dModalBody.innerHTML = htmlContent
+        dModal.style.display = "block"
         Block.getSiblingBlock(this)
     }
 
     fun close() {
         traceDeIndent("Modal::close $mId")
-        d1.style.display = "none"
-        d3.innerHTML = ""
+        dModal.style.display = "none"
+        dModalBody.innerHTML = ""
 //        if (parent.parent != null) d1.remove()
     }
 

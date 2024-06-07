@@ -231,7 +231,7 @@ class CrewController implements WebAttributes {
     @Secured("ROLE_ADMIN")
     def editUserRoles(User user) {
         taackUiService.show(new UiBlockSpecifier().ui {
-            modal !params.boolean("refresh"), {
+            modal {
                 table crewUiService.buildRoleTable(user), BlockSpec.Width.MAX
             }
         }, buildMenu())
@@ -243,14 +243,14 @@ class CrewController implements WebAttributes {
         println "addRoleToUser $params"
         def ur = UserRole.create(User.read(params.long("userId")), Role.read(params.long("roleId")))
         if (ur.hasErrors()) log.error "${ur.errors}"
-        chain(action: "editUserRoles", id: params.long("userId"), params: [refresh: true, isAjax: true, recordState: params['recordState']])
+        chain(action: "editUserRoles", id: params.long("userId"), params: [isAjax: true])
     }
 
     @Secured("ROLE_ADMIN")
     @Transactional
     def removeRoleToUser() {
         UserRole.remove(User.read(params.long("userId")), Role.read(params.long("roleId")))
-        chain(action: "editUserRoles", id: params.long("userId"), params: [refresh: true, isAjax: true, recordState: params['recordState']])
+        chain(action: "editUserRoles", id: params.long("userId"), params: [isAjax: true])
     }
 
     @Transactional

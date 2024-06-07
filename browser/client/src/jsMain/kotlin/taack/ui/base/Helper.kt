@@ -156,7 +156,7 @@ class Helper {
                         processingStack.add(process)
                     }
                     block.modal.open(text)
-                    val s = block.modal.innerModal.getElementsByTagName("script").asList()
+                    val s = block.modal.dModalContent.getElementsByTagName("script").asList()
                     trace("Executing $s")
                 }
             }

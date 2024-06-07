@@ -16,7 +16,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     companion object {
         var href: String? = null
         fun getSiblingBlock(p: Modal?): Block? {
-            val div = p?.d3 ?: document.querySelector("div[blockId]") as HTMLDivElement? ?: return null
+            val div = p?.dModalContent ?: document.querySelector("div[blockId]") as HTMLDivElement? ?: return null
             return Block(p, div)
         }
     }
@@ -38,9 +38,8 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         tabs = AjaxBlockInputTab.getSiblingBlockInputTab(this)
         val abe = AjaxBlock.getSiblingAjaxBlock(this)
         modal = Modal.buildModal(this)
-        if (parent == null) {
-            AjaxBlock(this, d)
-        }
+
+        AjaxBlock(this, d)
 
         if (tmpBlockId != null) {
             val clientBlockState = RecordState.getPreviousClientState()?.get(blockId)
@@ -54,9 +53,6 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
                 Helper.trace("tabs.size != clientBlockState.size ...")
                 RecordState.clearClientState(blockId)
             }
-        } else {
-            Helper.trace("Block::init in modal ...")
-            AjaxBlock(this, d)
         }
 
         traceDeIndent("Block::init --- ${d.id}")
