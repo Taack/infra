@@ -29,7 +29,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
 
     init {
         val tmpBlockId= d.attributes.getNamedItem("blockId")?.value
-        traceIndent("Block::init +++ ${d.id} ${tmpBlockId}")
+        traceIndent("Block::init +++ ${d.id}, ${tmpBlockId}.")
         if (tmpBlockId != null && tmpBlockId != "") {
             blockId = tmpBlockId
         } else {
@@ -39,7 +39,6 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         val abe = AjaxBlock.getSiblingAjaxBlock(this)
         modal = Modal.buildModal(this)
         if (parent == null) {
-            ActionLink.getActionLink(this)
             AjaxBlock(this, d.children[0]!! as HTMLDivElement)
         }
 
@@ -77,11 +76,5 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
             d.children[0]!!.innerHTML = newContent
         else
             Helper.trace("Block::updateContent no DIV ...")
-        refresh()
     }
-
-    fun refresh() {
-        ActionLink.getActionLink(this)
-    }
-
 }

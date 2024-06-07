@@ -9,6 +9,7 @@ import org.w3c.dom.*
 import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
+import taack.ui.base.leaf.ActionLink
 import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 
@@ -120,7 +121,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         for (i in 0 until innerScripts.length) {
             eval(innerScripts.get(i)!!.innerHTML);
         }
-        parent.refresh()
+        ActionLink.getActionLink(this)
         Helper.traceDeIndent("AjaxBlock::refresh --- blockId: $blockId")
     }
 
