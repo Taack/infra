@@ -9,19 +9,17 @@ import taack.ui.base.common.ActionIcon
 
 interface IUiMenuVisitor {
 
+    void visitLabel(String i18n)
+
+    void visitLabelEnd()
+
     void visitMenuStart(MenuSpec.MenuMode menuMode)
 
     void visitMenuStartEnd()
 
     void visitMenu(final String controller, final String action, final Map<String, ? extends Object> params)
 
-    void visitMenu(final String i18n, final String controller, final String action, final Map<String, ? extends Object> params)
-
-    void visitMenuEnd()
-
     void visitSubMenu(final String controller, final String action, final Map<String, ? extends Object> params)
-
-    void visitSubMenu(final String i18n, final String controller, final String action, final Map<String, ? extends Object> params)
 
     void visitSection(final String i18n, final MenuSpec.MenuPosition position)
 

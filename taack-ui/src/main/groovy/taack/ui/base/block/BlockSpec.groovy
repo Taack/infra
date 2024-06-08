@@ -89,12 +89,12 @@ final class BlockSpec {
     }
 
     /**
-     * Embeds tab. The closure should contains only {@link #blockTab(java.lang.String, groovy.lang.Closure)} children.
+     * Embeds tab. The closure should contains only {@link #tab(java.lang.String, groovy.lang.Closure)} children.
      *
      * @param width width of the tabulation block
      * @param closure description of the tabulations
      */
-    void blockTabs(final Width width = Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+    void tabs(final Width width = Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         if (displayElement()) blockVisitor.visitBlockTabs(width)
         closure.delegate = this
         closure.call()
@@ -103,12 +103,12 @@ final class BlockSpec {
     }
 
     /**
-     * Allow to describe the content of a tab. must be children of {@link #blockTabs(taack.ui.base.block.BlockSpec.Width, groovy.lang.Closure)}
+     * Allow to describe the content of a tab. must be children of {@link #tabs(taack.ui.base.block.BlockSpec.Width, groovy.lang.Closure)}
      *
      * @param i18n label
      * @param closure content of the tabulation.
      */
-    void blockTab(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+    void tab(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         if (displayElement()) blockVisitor.visitBlockTab(i18n)
         closure.delegate = this
         closure.call()
@@ -187,7 +187,7 @@ final class BlockSpec {
             closure.delegate = new MenuSpec(blockVisitor) //menuSpec
             closure.call()
             counter ++
-            blockVisitor.visitMenuEnd()
+            blockVisitor.visitMenuStartEnd()
             blockVisitor.visitBlockHeaderEnd()
         }
     }

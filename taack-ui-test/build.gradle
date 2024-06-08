@@ -75,6 +75,13 @@ dependencies {
     runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
 
     implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
+
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'org.asciidoctor:asciidoctorj:2.5.7'
+    implementation 'org.asciidoctor:asciidoctorj-pdf:2.3.4'
+    implementation 'org.asciidoctor:asciidoctorj-diagram:2.2.4'
+    implementation 'org.asciidoctor:asciidoctorj-revealjs:5.0.0.rc1'
+
 }
 
 grails {

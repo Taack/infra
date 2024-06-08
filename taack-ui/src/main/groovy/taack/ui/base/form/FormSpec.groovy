@@ -63,7 +63,7 @@ final class FormSpec extends FormSectionSpec {
      * {@link #tabs(groovy.lang.Closure)} container.
      *
      * @param width relative total width
-     * @param closure list of {@link FormTabSpec#tab(java.lang.String, groovy.lang.Closure)}
+     * @param closure list of {@link FormTabSpec#tabLabel(java.lang.String, groovy.lang.Closure)}
      */
     void tabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
         List<String> tabNames = []

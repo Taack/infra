@@ -20,7 +20,7 @@ final class TableSpec {
     }
 
     /**
-     * Draw the header of the table. Should only contains {@link ColumnHeaderFieldSpec#fieldHeader(java.lang.String)},
+     * Draw the header of the table. Should only contains {@link ColumnHeaderFieldSpec#label(java.lang.String)},
      * {@link ColumnHeaderFieldSpec#sortableFieldHeader(java.lang.String, taack.ast.type.FieldInfo[])} or
      * {@link ColumnHeaderSpec#column(groovy.lang.Closure)}
      *

@@ -35,15 +35,15 @@ class CrewPdfService implements WebAttributes {
             header {
                 User u = new User()
                 column {
-                    fieldHeader 'Photo'
+                    label 'Photo'
                 }
                 column {
-                    fieldHeader u.username_
-                    fieldHeader u.businessUnit_
+                    label u.username_
+                    label u.businessUnit_
                 }
                 column {
-                    fieldHeader u.lastName_
-                    fieldHeader u.firstName_
+                    label u.lastName_
+                    label u.firstName_
                 }
             }
 

@@ -24,8 +24,6 @@ import taack.ui.base.common.IconStyle
 import taack.ui.base.common.Style
 import taack.ui.dump.markdown.Markdown
 
-import static taack.render.TaackUiService.tr
-
 @GrailsCompileStatic
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class AttachmentController {
@@ -45,9 +43,9 @@ class AttachmentController {
 
         m.ui {
             menu AttachmentController.&index as MC
-            menu 'Tagged', {
+            label 'Tagged', {
                 for (def tagGroup : TermGroupConfig.values().findAll { it.active }) {
-                    subMenu tagGroup.toString(), AttachmentController.&showTermGroup as MC, [group: tagGroup.toString()]
+                    subMenu AttachmentController.&showTermGroup as MC, [group: tagGroup.toString()]
                 }
             }
             menu AttachmentController.&listTerm as MC
@@ -236,8 +234,8 @@ class AttachmentController {
 
         ts.ui {
             header {
-                fieldHeader 'Name'
-                fieldHeader 'Action'
+                label 'Name'
+                label 'Action'
             }
             Closure rec
 
@@ -280,7 +278,7 @@ class AttachmentController {
         def ts = new UiTableSpecifier().ui {
             header {
                 column {
-                    fieldHeader 'Preview'
+                    label 'Preview'
                 }
                 column {
                     sortableFieldHeader a.originalName_
@@ -295,7 +293,7 @@ class AttachmentController {
                     sortableFieldHeader a.userCreated_, u.subsidiary_
                 }
                 column {
-                    fieldHeader 'Actions'
+                    label 'Actions'
                 }
             }
 
@@ -339,11 +337,11 @@ class AttachmentController {
                 ajaxBlock 'selectDocumentAccessTable', {
                     table new UiTableSpecifier().ui({
                         header {
-                            fieldHeader documentAccess.isInternal_
-                            fieldHeader documentAccess.isRestrictedToMyManagers_
-                            fieldHeader documentAccess.isRestrictedToMyBusinessUnit_
-                            fieldHeader documentAccess.isRestrictedToMySubsidiary_
-                            fieldHeader documentAccess.isRestrictedToEmbeddingObjects_
+                            label documentAccess.isInternal_
+                            label documentAccess.isRestrictedToMyManagers_
+                            label documentAccess.isRestrictedToMyBusinessUnit_
+                            label documentAccess.isRestrictedToMySubsidiary_
+                            label documentAccess.isRestrictedToEmbeddingObjects_
                         }
                         for (DocumentAccess da in DocumentAccess.list()) {
                             row {
@@ -387,9 +385,9 @@ class AttachmentController {
 
         UiTableSpecifier ts = new UiTableSpecifier().ui {
             header {
-                fieldHeader t.name_
-                fieldHeader t.termGroupConfig_
-                fieldHeader 'Action'
+                label t.name_
+                label t.termGroupConfig_
+                label 'Action'
             }
             Closure rec
 

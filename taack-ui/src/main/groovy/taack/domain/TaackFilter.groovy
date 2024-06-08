@@ -655,7 +655,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         }
 
         FilterBuilder addRestrictedIds(Long... ids) {
-            this.restrictedIds.addAll ids
+            if (ids) this.restrictedIds.addAll ids
             this
         }
 

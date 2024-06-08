@@ -10,6 +10,16 @@ import taack.ui.base.common.ActionIcon
 @CompileStatic
 class UiMenuVisitor implements IUiMenuVisitor {
     @Override
+    void visitLabel(String i18n) {
+
+    }
+
+    @Override
+    void visitLabelEnd() {
+
+    }
+
+    @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
 
     }
@@ -25,22 +35,7 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenu(String i18n, String controller, String action, Map<String, ? extends Object> params) {
-
-    }
-
-    @Override
-    void visitMenuEnd() {
-
-    }
-
-    @Override
     void visitSubMenu(String controller, String action, Map<String, ?> params) {
-
-    }
-
-    @Override
-    void visitSubMenu(String i18n, String controller, String action, Map<String, ? extends Object> params) {
 
     }
 

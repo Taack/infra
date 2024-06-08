@@ -12,7 +12,7 @@ final class SubMenuSpec {
         this.menuVisitor = menuVisitor
     }
 
-    void subMenu(final String i18n, final MethodClosure action, final Map<String, ? extends Object> params = null) {
-        menuVisitor.visitSubMenu(i18n, Utils.getControllerName(action), action.method, params)
+    void subMenu(final MethodClosure action, final Map<String, ? extends Object> params = null) {
+        menuVisitor.visitSubMenu(Utils.getControllerName(action), action.method, params)
     }
 }

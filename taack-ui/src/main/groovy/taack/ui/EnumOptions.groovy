@@ -10,7 +10,7 @@ final class EnumOption implements IEnumOption {
     final String asset
     final Boolean section
 
-    EnumOption(String key, String value, String asset, Boolean isSection) {
+    EnumOption(String key, String value, String asset = null, Boolean isSection = false) {
         this.key = key?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
         this.value = value
         this.asset = asset

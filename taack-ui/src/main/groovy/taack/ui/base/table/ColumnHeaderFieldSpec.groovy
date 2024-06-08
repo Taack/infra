@@ -22,7 +22,7 @@ class ColumnHeaderFieldSpec {
      *
      * @param i18n The label
      */
-    void fieldHeader(final String i18n) {
+    void label(final String i18n) {
         tableVisitor.visitFieldHeader(i18n)
     }
 
@@ -31,7 +31,7 @@ class ColumnHeaderFieldSpec {
      *
      * @param i18n The label
      */
-    void fieldHeader(final FieldInfo... fields) {
+    void label(final FieldInfo... fields) {
         tableVisitor.visitFieldHeader(fields)
     }
 

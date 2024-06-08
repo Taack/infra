@@ -11,6 +11,8 @@ import taack.ui.base.helper.Utils
 import taack.ui.base.menu.IUiMenuVisitor
 import taack.ui.base.menu.MenuSpec
 
+// TODO: Construct menu using IHTMLElement
+
 @CompileStatic
 class RawHtmlMenuDump implements IUiMenuVisitor {
     final ByteArrayOutputStream out
@@ -22,6 +24,20 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
         this.out = out
         this.modalId = modalId
         this.parameter = parameter
+    }
+
+    @Override
+    void visitLabel(String i18n) {
+        out << """
+             <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">${i18n}</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            """
+    }
+
+    @Override
+    void visitLabelEnd() {
+        out << "</ul></li>"
     }
 
     @Override
@@ -44,47 +60,24 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
 
     private void splitMenuStop() {
         if (splitted) {
-            out <<"</ul>"
+            out << "</ul>"
         }
     }
 
     @Override
     void visitMenu(String controller, String action, Map<String, ?> params) {
         String i18n = parameter.trField(controller, action)
-        visitMenu(i18n, controller, action, params)
+        visitLabeledSubMenu(i18n, controller, action, params)
     }
 
-    @Override
-    void visitMenu(String i18n, String controller, String action, Map<String, ?> params) {
-        if (controller && action && params) {
-            out << """
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" href="${parameter.urlMapped(controller, action, params)}">${i18n}</a>
-                <ul class="dropdown-menu">
-            """
-        } else {
-            out << """
-             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">${i18n}</a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            """
-        }
-    }
-
-    @Override
-    void visitMenuEnd() {
-        out << "</ul></li>"
-
-    }
 
     @Override
     void visitSubMenu(String controller, String action, Map<String, ?> params) {
         String i18n = parameter.trField(controller, action)
-        visitSubMenu(i18n, controller, action, params)
+        visitLabeledSubMenu(i18n, controller, action, params)
     }
 
-    @Override
-    void visitSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+    private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
         out << """
             <li class="nav-item dropdown">
                 <a class="nav-link" href="${parameter.urlMapped(controller, action, params)}">${i18n}</a>
@@ -137,12 +130,11 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
         IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
         String controller = params['controller'] as String
         String action = params['action'] as String
-        visitMenu(enumSelected.value, controller, action, params)
+        visitLabeledSubMenu(enumSelected.value, controller, action, params)
         for (def eo in enumOptions.getOptions()) {
             params.put(paramName, eo.key)
-            visitSubMenu(eo.value, controller, action, params)
+            visitLabeledSubMenu(eo.value, controller, action, params)
         }
-        visitMenuEnd()
     }
 
     @Override

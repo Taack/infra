@@ -111,7 +111,7 @@ final class AttachmentUiService implements WebAttributes {
         t.ui {
             header {
                 column {
-                    fieldHeader "Preview"
+                    label "Preview"
                 }
                 column {
                     sortableFieldHeader a.originalName_
@@ -126,7 +126,7 @@ final class AttachmentUiService implements WebAttributes {
                     sortableFieldHeader a.userCreated_, u.subsidiary_
                 }
                 column {
-                    fieldHeader "Actions"
+                    label "Actions"
                 }
             }
             iterate(taackFilterService.getBuilder(Attachment)
@@ -280,7 +280,7 @@ final class AttachmentUiService implements WebAttributes {
             ajaxField term.parent_, AttachmentController.&selectTermM2O as MC
             tabs FormSpec.Width.FULL_WIDTH, {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
-                    tab "Translation ${language.label}", {
+                    tabLabel "Translation ${language.label}", {
                         fieldFromMap "Translation ${language.toString().toLowerCase()}", term.translations_, language.toString().toLowerCase()
                     }
                 }
@@ -313,7 +313,7 @@ final class AttachmentUiService implements WebAttributes {
                 sortableFieldHeader ti.parent_, ti.parent.name_
                 sortableFieldHeader ti.display_
                 sortableFieldHeader ti.active_
-                fieldHeader "Actions"
+                label "Actions"
             }
 
             iterate(taackFilterService.getBuilder(Term)

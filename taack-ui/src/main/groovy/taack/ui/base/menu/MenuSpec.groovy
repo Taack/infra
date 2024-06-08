@@ -34,22 +34,13 @@ final class MenuSpec {
         menuVisitor.visitMenuStart(menuMode)
     }
 
-    void labelBrand(final String i18n) {
-
-    }
-
-    void menu(final String i18n, final MethodClosure action = null, Map<String, ? extends Object> params = null,
-              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
+    void label(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure = null) {
+        menuVisitor.visitLabel(i18n)
         if (closure) {
-            menuVisitor.visitMenu(i18n, Utils.getControllerName(action), action?.method?.toString(), params)
             closure.delegate = subMenuSpec
             closure.call()
-            menuVisitor.visitMenuEnd()
         }
-    }
-
-    void menu(final String i18n, final MethodClosure action, Map<String, ? extends Object> params = null) {
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
+        menuVisitor.visitLabelEnd()
     }
 
     void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {

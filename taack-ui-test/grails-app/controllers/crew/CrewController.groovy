@@ -24,8 +24,6 @@ import taack.ui.base.filter.expression.FilterExpression
 import taack.ui.base.filter.expression.Operator
 import taack.ui.base.form.FormSpec
 
-import static taack.render.TaackUiService.tr
-
 @GrailsCompileStatic
 @Secured(['isAuthenticated()'])
 class CrewController implements WebAttributes {
@@ -60,16 +58,16 @@ class CrewController implements WebAttributes {
         new UiTableSpecifier().ui {
             header {
                 column {
-                    fieldHeader u.username_
+                    label u.username_
                     groupFieldHeader u.businessUnit_
                 }
                 column {
                     groupFieldHeader u.subsidiary_
-                    fieldHeader u.manager_
+                    label u.manager_
                 }
                 column {
-                    fieldHeader u.lastName_
-                    fieldHeader u.firstName_
+                    label u.lastName_
+                    label u.firstName_
                 }
             }
 
@@ -294,11 +292,11 @@ class CrewController implements WebAttributes {
                     sortableFieldHeader new Role().authority_
                 }
                 column {
-                    fieldHeader "Users"
+                    label "Users"
                 }
                 if (hasActions) {
                     column {
-                        fieldHeader "Edit"
+                        label "Edit"
                     }
                 }
             }

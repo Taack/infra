@@ -86,7 +86,7 @@ class CrewUiService implements WebAttributes {
                     sortableFieldHeader role.authority_
                 }
                 column {
-                    fieldHeader "Action"
+                    label "Action"
                 }
             }
             iterate(taackFilterService.getBuilder(Role)
@@ -114,7 +114,7 @@ class CrewUiService implements WebAttributes {
             header {
                 if (!hasSelect) {
                     column {
-                        fieldHeader tr('picture.header.label')
+                        label tr('picture.header.label')
                     }
                 }
                 column {
@@ -130,7 +130,7 @@ class CrewUiService implements WebAttributes {
                     sortableFieldHeader u.firstName_
                 }
                 column {
-                    fieldHeader tr('default.roles.label')
+                    label tr('default.roles.label')
                 }
             }
             boolean canSwitchUser = crewSecurityService.canSwitchUser()

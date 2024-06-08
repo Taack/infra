@@ -17,8 +17,8 @@ final class FormTabSpec {
      * @param sectionName the label in the tab
      * @param closure describe the content of the tabulation
      */
-    void tab(String sectionName,
-             @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSpec) Closure closure) {
+    void tabLabel(String sectionName,
+                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSpec) Closure closure) {
         formVisitor.visitFormTab(sectionName)
         closure.delegate = new FormSpec(formVisitor)
         closure.call()
