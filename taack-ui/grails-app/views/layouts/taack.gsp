@@ -25,7 +25,7 @@
         background-color: ${conf.bgColor};
     }
 
-    .navbar-nav a.nav-link {
+    body>nav .navbar-nav a.nav-link {
         color: ${conf.fgColor};
     }
 
