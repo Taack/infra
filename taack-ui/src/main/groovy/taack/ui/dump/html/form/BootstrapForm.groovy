@@ -56,7 +56,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         IHTMLElement ret = topElement
         if (floating) {
             ret = new HTMLDiv().builder.addClasses('form-floating', 'mb-1').build() as IHTMLElement
-            topElement.addChildren(ret)
+            topElement.builder.addChildren(ret)
         }
         ret
     }
@@ -93,15 +93,15 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
                     new HTMLImg(imgSrc).builder.putAttribute('style', 'max-height: 112px; max-width: 112px;').build()
             )
         }
-        topElement.addChildren(span.build())
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(divError(qualifiedName))
+        topElement.builder.addChildren(span.build())
+        topElement.builder.addChildren(formLabelInput(qualifiedName, trI18n))
+        topElement.builder.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement section(IHTMLElement topElement, String trI18n, String... classes) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
                         .addChildren(
                                 new HTMLFieldset().builder.addChildren(
@@ -270,7 +270,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         HTMLInput[] radioList = new HTMLInput[names.size()]
         HTMLLi[] liList = new HTMLLi[names.size()]
         names.eachWithIndex { it, occ ->
-            radioList[occ] = HTMLInput.inputRadio(occ, "pct-${tabIds}", occ == 0).builder.setId("tab${occ + 1}-f${tabIds}").addClasses("inputTab${occ + 1}").build() as HTMLInput
+            radioList[occ] = HTMLInput.inputRadio(null, "pct-${tabIds}", occ == 0).builder.setId("tab${occ + 1}-f${tabIds}").addClasses("inputTab${occ + 1}").setId("tab$occ-f0").build() as HTMLInput
             liList[occ] = new HTMLLi().builder.addClasses("tab${occ + 1}").addChildren(
                     new HTMLLabel("tab${occ + 1}-f${tabIds}").builder.addChildren(
                             new HTMLTxtContent(it)
@@ -278,7 +278,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             ).build() as HTMLLi
         }
 
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLDiv().builder
                         .setTaackTag(TaackTag.TABS)
                         .addClasses('pc-tab', width.sectionCss)
@@ -295,7 +295,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement formTab(IHTMLElement topElement, int occ) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLDiv().builder.setTaackTag(TaackTag.TAB).addClasses('tab' + occ).build()
         )
         topElement.children.last()
@@ -303,19 +303,19 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement formCol(IHTMLElement topElement) {
-        topElement.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.COL).build())
+        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.COL).build())
         topElement.children.last()
     }
 
     @Override
     IHTMLElement formActionBlock(IHTMLElement topElement) {
-        topElement.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap').build())
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap').build())
         topElement.children.last()
     }
 
     @Override
     IHTMLElement addFormAction(IHTMLElement topElement, String url, String i18n, ButtonStyle style) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLButton(url, i18n, style)
         )
         topElement

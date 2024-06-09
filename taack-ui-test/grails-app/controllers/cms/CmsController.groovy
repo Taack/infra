@@ -853,9 +853,9 @@ class CmsController implements WebAttributes {
                 }
             else {
                 innerBlock BlockSpec.Width.HALF, {
-                    ajaxBlock "cmsPageForm", {
+//                    ajaxBlock "cmsPageForm", {
                         form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
-                    }
+//                    }
                 }
 
                 tabs BlockSpec.Width.HALF, {

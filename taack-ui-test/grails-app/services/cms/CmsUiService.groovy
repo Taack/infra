@@ -376,9 +376,9 @@ class CmsUiService implements WebAttributes {
                 listOfPdf += (CmsPdfFile.findAllByCmsPage(cmsPage) as List<CmsImage>)*.id
             }
 
-            iterate(taackFilterService.getBuilder(CmsPage)
+            iterate(taackFilterService.getBuilder(CmsPdfFile)
                     .setMaxNumberOfLine(20).addRestrictedIds(listOfPdf)
-                    .setSortOrder(TaackFilter.Order.DESC, new Role().authority_)
+                    .setSortOrder(TaackFilter.Order.DESC, new CmsPdfFile().dateCreated_)
                     .build()) { CmsPdfFile ci ->
                 rowColumn {
                     rowField this.previewPdf(ci.id)
