@@ -7,7 +7,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
 import org.asciidoctor.*
 import org.asciidoctor.ast.Document
-import org.codehaus.groovy.runtime.MethodClosure
+import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
 import taack.ui.base.UiFilterSpecifier
@@ -127,8 +127,8 @@ class CmsUiService implements WebAttributes {
                     rowField o.userUpdated_
                 }
                 rowColumn {
-                    if (!filter) rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editSlideshow as MethodClosure, o.id
-                    else rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2oPageCloseModal as MethodClosure, o.id
+                    if (!filter) rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editSlideshow as MC, o.id
+                    else rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2oPageCloseModal as MC, o.id
                     rowField o.name
                     rowField o.subsidiary.toString()
                 }
@@ -191,8 +191,8 @@ class CmsUiService implements WebAttributes {
                     rowField cp.userUpdated_
                 }
                 rowColumn {
-                    if (!filter) rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editPage as MethodClosure, cp.id
-                    else rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2oPageCloseModal as MethodClosure, cp.id
+                    if (!filter) rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editPage as MC, cp.id
+                    else rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2oPageCloseModal as MC, cp.id
                     rowField cp.name
                     rowField cp.bodyContent?.keySet()?.join(', ')
                 }
@@ -299,10 +299,10 @@ class CmsUiService implements WebAttributes {
             if (cmsPage && tableMode == CmsTableMode.NONE) {
                 listOfImages = new Long[cmsPage.bodyImages.size() + (CmsImage.findAllByCmsPage(cmsPage) as List<CmsImage>).size()]
                 listOfImages += cmsPage.bodyImages*.id
-                listOfImages += (CmsImage.findAllByCmsPage(cmsPage) as List<CmsImage>)*.id
+                listOfImages += (CmsImage.findAllByCmsPage(cmsPage) as List<CmsPage>)*.id
             }
 
-            iterate(taackFilterService.getBuilder(CmsPage)
+            iterate(taackFilterService.getBuilder(CmsImage)
                     .setMaxNumberOfLine(20).addRestrictedIds(listOfImages)
                     .setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_)
                     .build()) { CmsImage ci ->
@@ -324,12 +324,12 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (tableMode == CmsTableMode.NONE) {
-                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsImageForm as MethodClosure, ci.id
-                        if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsImageFromPage as MethodClosure, [cmsImageId: ci.id, cmsPageId: cmsPage.id]
+                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsImageForm as MC, ci.id
+                        if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsImageFromPage as MC, [cmsImageId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && cmsPage) {
-                        if (!cmsPage?.bodyImages*.id?.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsImageToPage as MethodClosure, [cmsImageId: ci.id, cmsPageId: cmsPage.id]
+                        if (!cmsPage?.bodyImages*.id?.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsImageToPage as MC, [cmsImageId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && !cmsPage) {
-                        rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectPageImageCloseModal as MethodClosure, ci.id
+                        rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectPageImageCloseModal as MC, ci.id
                     }
                     rowField ci.originalName
                     rowField ci.cmsPage?.name
@@ -396,12 +396,12 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (tableMode == CmsTableMode.NONE) {
-                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsPdfForm as MethodClosure, ci.id
-                        if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsPdfFromPage as MethodClosure, [cmsPdfId: ci.id, cmsPageId: cmsPage.id]
+                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsPdfForm as MC, ci.id
+                        if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsPdfFromPage as MC, [cmsPdfId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && cmsPage) {
-                        if (!cmsPage.bodyPdfs*.id.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsPdfToPage as MethodClosure, [cmsPdfId: ci.id, cmsPageId: cmsPage.id]
+                        if (!cmsPage.bodyPdfs*.id.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsPdfToPage as MC, [cmsPdfId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && !cmsPage) {
-                        rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2mCmsPdfCloseModal as MethodClosure, ci.id
+                        rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2mCmsPdfCloseModal as MC, ci.id
                     }
 
                     rowField ci.originalName
@@ -456,7 +456,7 @@ class CmsUiService implements WebAttributes {
                     rowField ci.subFamilyId_
                     rowField ci.rangeId_
                 }
-                rowAction ActionIcon.EDIT, CmsController.&cmsInsertForm as MethodClosure, ci.id
+                rowAction ActionIcon.EDIT, CmsController.&cmsInsertForm as MC, ci.id
             }
         }
     }
@@ -513,12 +513,12 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (tableMode == CmsTableMode.NONE) {
-                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsVideoForm as MethodClosure, ci.id
-                        if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsVideoFromPage as MethodClosure, [cmsVideoId: ci.id, cmsPageId: cmsPage.id]
+                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsVideoForm as MC, ci.id
+                        if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsVideoFromPage as MC, [cmsVideoId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && cmsPage) {
-                        if (!cmsPage.bodyVideos*.id.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsVideoToPage as MethodClosure, [cmsVideoId: ci.id, cmsPageId: cmsPage.id]
+                        if (!cmsPage.bodyVideos*.id.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsVideoToPage as MC, [cmsVideoId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && !cmsPage) {
-                        rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2mCmsVideoCloseModal as MethodClosure, ci.id
+                        rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&selectM2mCmsVideoCloseModal as MC, ci.id
                     }
 
                     rowField ci.originalName
