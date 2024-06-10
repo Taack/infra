@@ -136,7 +136,7 @@ final class BlockSpec {
      * @param width
      * @param closure
      */
-    void innerRowBlock(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+    void row(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         if (displayElement()) blockVisitor.visitInnerRowBlock()
         closure.delegate = this
         closure.call()
