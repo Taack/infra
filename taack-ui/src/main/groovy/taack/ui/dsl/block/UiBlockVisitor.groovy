@@ -2,12 +2,7 @@ package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.dsl.UiChartSpecifier
-import taack.ui.dsl.UiDiagramSpecifier
-import taack.ui.dsl.UiFilterSpecifier
-import taack.ui.dsl.UiFormSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.*
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.menu.UiMenuVisitor
 

@@ -21,7 +21,7 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
     final ByteArrayOutputStream out
     final String modalId
     final Parameter parameter
-    boolean splitted = false
+//    boolean splitted = false
 
     IHTMLElement topElement
     final BootstrapMenu menu
@@ -127,18 +127,22 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
 
         IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
-        String current = """\
-            <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                ${currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''}
-                ${selectedOptionValue}
-            </a>
-        """.stripIndent()
+//        String current = """\
+//            <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//                ${currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''}
+//                ${selectedOptionValue}
+//            </a>
+//        """.stripIndent()
 
-        out << """\
-        <li class="nav-item dropdown">
-            $current
-            <ul class="dropdown-menu" aria-labelledby="navbar${enumOptions.paramKey.capitalize()}">
-        """.stripIndent()
+//        out << """\
+//        <li class="nav-item dropdown">
+//            $current
+//            <ul class="dropdown-menu" aria-labelledby="navbar${enumOptions.paramKey.capitalize()}">
+//        """.stripIndent()
+
+        String img = currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
+
+        topElement = menu.menuOptions(topElement, img, selectedOptionValue)
 
         String controller = parameter.params['controller'] as String
         String action = parameter.params['action'] as String
@@ -151,28 +155,34 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
             IEnumOption option = options[i++]
             parameter.params.put(enumOptions.paramKey, option.key)
             if (option.section) {
-                out << """\
-                    <li>
-                        <a class="dropdown-item" style="color: #887700">
-                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
-                            <b>${option.value}</b>
-                        </a>
-                    </li>
-                """.stripIndent()
+                img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
+//                out << """\
+//                    <li>
+//                        <a class="dropdown-item" style="color: #887700">
+//                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
+//                            <b>${option.value}</b>
+//                        </a>
+//                    </li>
+//                """.stripIndent()
+                menu.menuOptionSection(topElement, img, option.value)
             } else {
-                out << """\
-                    <li>
-                        <a class='dropdown-item' href='${parameter.urlMapped(controller, action, parameter.params as Map, false)}'>
-                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
-                            ${option.value}
-                        </a>
-                    </li>
-                """.stripIndent()
+//                out << """\
+//                    <li>
+//                        <a class='dropdown-item' href='${parameter.urlMapped(controller, action, parameter.params as Map, false)}'>
+//                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
+//                            ${option.value}
+//                        </a>
+//                    </li>
+//                """.stripIndent()
+                String url = parameter.urlMapped(controller, action, parameter.params as Map, false)
+                menu.menuOption(topElement, img, option.value, url)
             }
         }
-        out << """\
-            </ul>
-        </li>
-        """.stripIndent()
+//        out << """\
+//            </ul>
+//        </li>
+//        """.stripIndent()
+        closeTags(TaackTag.MENU_OPTION)
+
     }
 }

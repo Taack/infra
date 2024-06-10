@@ -1,6 +1,8 @@
 package taack.ui.dump.html.menu
 
 import groovy.transform.CompileStatic
+import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.form.FormSpec
@@ -107,7 +109,35 @@ final class BootstrapMenu implements IHTMLElement {
         topElement
     }
 
-    static IHTMLElement menuOptions(IHTMLElement topElement) {
+    static IHTMLElement menuOption(IHTMLElement topElement, String img, String value, String url) {
+        topElement.addChildren(
+                new HTMLAnchor(false, url).builder.addClasses('nav-link').addChildren(
+                        new HTMLTxtContent(img),
+                        new HTMLTxtContent(value)
+                ).build()
+        )
+        topElement
+    }
 
+    static IHTMLElement menuOptionSection(IHTMLElement topElement, String img, String value) {
+        topElement.addChildren(
+                new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
+                        new HTMLTxtContent(img),
+                        new HTMLTxtContent(value)
+                ).build()
+        )
+        topElement
+    }
+
+    static IHTMLElement menuOptions(IHTMLElement topElement, String img, String value) {
+        topElement.addChildren(
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown').setTaackTag(TaackTag.MENU_OPTION).addChildren(
+                        new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
+                                new HTMLTxtContent(img),
+                                new HTMLTxtContent(value)
+                        ).build()
+                ).build()
+        )
+        topElement.children.first()
     }
 }
