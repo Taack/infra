@@ -4,7 +4,7 @@ package taack.ui.dsl.form
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dsl.helper.Utils
-import taack.ui.dump.html.base.ButtonStyle
+import taack.ui.dump.html.element.ButtonStyle
 
 // TODO: Isolate sectionTab
 /**

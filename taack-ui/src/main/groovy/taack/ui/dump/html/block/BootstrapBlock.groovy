@@ -3,9 +3,9 @@ package taack.ui.dump.html.block
 import groovy.transform.CompileStatic
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.form.FormSpec
-import taack.ui.dump.html.base.HTMLDiv
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 

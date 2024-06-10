@@ -1,7 +1,7 @@
 package taack.ui.dsl.form
 
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.form.IFormTheme
 
 interface IBaseFormVisitor {

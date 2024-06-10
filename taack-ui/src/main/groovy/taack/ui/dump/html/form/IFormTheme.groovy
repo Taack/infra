@@ -3,9 +3,8 @@ package taack.ui.dump.html.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
-import taack.ui.dsl.form.FormSpec
-import taack.ui.dump.html.base.ButtonStyle
-import taack.ui.dump.html.base.IHTMLElement
+import taack.ui.dump.html.element.ButtonStyle
+import taack.ui.dump.html.element.IHTMLElement
 
 @CompileStatic
 enum InputMode {
@@ -68,14 +67,6 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
 
     abstract IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
-
-    abstract IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width)
-
-    abstract IHTMLElement formTab(IHTMLElement topElement, int occ)
-
-    abstract IHTMLElement formCol(IHTMLElement topElement)
-
-    abstract IHTMLElement formRow(IHTMLElement topElement)
 
     abstract IHTMLElement formActionBlock(IHTMLElement topElement)
 

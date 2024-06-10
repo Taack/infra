@@ -3,33 +3,15 @@ package taack.ui.dump.html.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
-import taack.ui.dsl.form.FormSpec
-import taack.ui.dump.html.base.ButtonStyle
-import taack.ui.dump.html.base.HTMLButton
-import taack.ui.dump.html.base.HTMLDiv
-import taack.ui.dump.html.base.HTMLFieldset
-import taack.ui.dump.html.base.HTMLImg
-import taack.ui.dump.html.base.HTMLInput
-import taack.ui.dump.html.base.HTMLLabel
-import taack.ui.dump.html.base.HTMLLegend
-import taack.ui.dump.html.base.HTMLLi
-import taack.ui.dump.html.base.HTMLNav
-import taack.ui.dump.html.base.HTMLSection
-import taack.ui.dump.html.base.HTMLSelect
-import taack.ui.dump.html.base.HTMLSpan
-import taack.ui.dump.html.base.HTMLTextarea
-import taack.ui.dump.html.base.HTMLTxtContent
-import taack.ui.dump.html.base.HTMLUl
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.InputType
-import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.element.*
+import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.script.DeleteSiblingInputContent
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
-final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
+final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout implements IFormTheme<T> {
 
     final ThemeMode themeMode
     final ThemeSize themeSize
@@ -264,55 +246,6 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
-    }
-
-    @Override
-    IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width) {
-        HTMLInput[] radioList = new HTMLInput[names.size()]
-        HTMLLi[] liList = new HTMLLi[names.size()]
-        names.eachWithIndex { it, occ ->
-            int tabOcc = occ + 1
-            radioList[occ] = HTMLInput.inputRadio(null, "pct-${tabIds}", occ == 0).builder.addClasses("inputTab${tabOcc}").setId("tab$tabOcc-f${tabIds}").build() as HTMLInput
-            liList[occ] = new HTMLLi().builder.addClasses("tab${tabOcc}").addChildren(
-                    new HTMLLabel("tab${tabOcc}-f${tabIds}").builder.addChildren(
-                            new HTMLTxtContent(it)
-                    ).build()
-            ).build() as HTMLLi
-        }
-
-        topElement.builder.addChildren(
-                new HTMLDiv().builder
-                        .setTaackTag(TaackTag.TABS)
-                        .addClasses('pc-tab', width.sectionCss)
-                        .addChildren(radioList)
-                        .addChildren(
-                                new HTMLNav().builder.addChildren(
-                                        new HTMLUl().builder.addChildren(liList).build()
-                                ).build())
-                        .addChildren(new HTMLSection())
-                        .build()
-        )
-        topElement.children.last().children.last()
-    }
-
-    @Override
-    IHTMLElement formTab(IHTMLElement topElement, int occ) {
-        topElement.builder.addChildren(
-                new HTMLDiv().builder.setTaackTag(TaackTag.TAB).addClasses('tab' + occ).build()
-        )
-        topElement.children.last()
-    }
-
-    @Override
-    IHTMLElement formCol(IHTMLElement topElement) {
-        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.COL).addClasses('flex-fill').build())
-        topElement.children.last()
-    }
-
-    @Override
-    IHTMLElement formRow(IHTMLElement topElement) {
-        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.ROW).addClasses('d-flex', 'flex-row').build())
-        topElement.children.last()
     }
 
     @Override

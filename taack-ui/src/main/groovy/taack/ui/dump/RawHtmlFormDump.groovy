@@ -7,11 +7,12 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
-import taack.ui.dump.html.base.ButtonStyle
-import taack.ui.dump.html.base.HTMLInput
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.InputType
-import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.element.ButtonStyle
+import taack.ui.dump.html.element.HTMLInput
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.InputType
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dsl.form.FormSpec
 import taack.ui.dsl.form.IUiFormVisitor
@@ -212,7 +213,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        topElement = formThemed.formTabs(topElement, tabIds, names, width)
+        topElement = BootstrapLayout.tabs(topElement, tabIds, names, width)
         tabIds++
     }
 
@@ -223,7 +224,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTab(String name) {
-        topElement = formThemed.formTab(topElement, ++tabOccurrence)
+        topElement = BootstrapLayout.tab(topElement, ++tabOccurrence)
     }
 
     @Override
@@ -268,7 +269,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitCol() {
-        topElement = formThemed.formCol(topElement)
+        topElement = BootstrapLayout.col(topElement)
     }
 
     @Override
@@ -278,7 +279,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitRow() {
-        topElement = formThemed.formRow(topElement)
+        topElement = BootstrapLayout.row(topElement)
     }
 
     @Override

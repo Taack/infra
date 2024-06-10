@@ -3,7 +3,7 @@ package taack.ui.dump.html.block
 import groovy.transform.CompileStatic
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.form.FormSpec
-import taack.ui.dump.html.base.IHTMLElement
+import taack.ui.dump.html.element.IHTMLElement
 
 @CompileStatic
 trait IBlockTheme implements IHTMLElement {

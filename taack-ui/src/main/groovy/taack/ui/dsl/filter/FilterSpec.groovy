@@ -2,7 +2,7 @@ package taack.ui.dsl.filter
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.ui.dump.html.base.ButtonStyle
+import taack.ui.dump.html.element.ButtonStyle
 
 @CompileStatic
 final class FilterSpec extends FilterCommon {
