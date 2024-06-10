@@ -41,6 +41,10 @@ interface IUiFormVisitor extends IBaseFormVisitor {
 
     void visitColEnd()
 
+    void visitRow()
+
+    void visitRowEnd()
+
     void visitFormTabs(List<String> names, FormSpec.Width width)
 
     void visitFormTabsEnd()

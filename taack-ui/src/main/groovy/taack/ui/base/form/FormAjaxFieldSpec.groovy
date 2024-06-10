@@ -1,27 +1,36 @@
 package taack.ui.base.form
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
+import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.base.helper.Utils
+import taack.ui.dump.html.base.ButtonStyle
 
 import java.text.NumberFormat
 
 @CompileStatic
-class FormAjaxFieldSpec {
-    final IUiFormVisitor formVisitor
-
-    void col(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormAjaxFieldSpec) final Closure closure) {
-        formVisitor.visitCol()
-        closure.delegate = this
-        closure.call()
-        formVisitor.visitColEnd()
-    }
+class FormAjaxFieldSpec extends FormVisitable {
+    final static TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
 
     FormAjaxFieldSpec(final IUiFormVisitor formVisitor) {
-        this.formVisitor = formVisitor
+        super(formVisitor)
+    }
+
+    /**
+     * form action. The form is POSTed to the target action.
+     *
+     * @param i18n label of the button
+     * @param action methodClosure pointing to the action
+     * @param id id param
+     * @param params additional params
+     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
+     */
+    void innerFormAction(final MethodClosure action, final Long id = null, final Map params = null) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitInnerFormAction(null, Utils.getControllerName(action), action.method, id, params, ButtonStyle.SECONDARY)
     }
 
     void hiddenField(final FieldInfo field) {

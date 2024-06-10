@@ -96,12 +96,26 @@ final class Parameter implements WebAttributes {
         return "${methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label'}, ${'default' + '.' + methodReturn.method.name + '.label'}"
     }
 
+    String actionFirstElement(String action) {
+        char ch
+        for (int i = 0; i < action.length(); i++) {
+            ch = action.charAt(i)
+            if (Character.isUpperCase(ch)) {
+                return action.substring(0, i)
+            }
+        }
+        return action
+
+    }
+
     String trField(final String controller, final String action) {
         String key = controller.uncapitalize() + '.' + action + '.label'
         if (!testI18n) {
             String rv = tr(key)
             if (rv) return rv
             rv = tr 'default' + '.' + action + '.label'
+            if (rv) return rv
+            rv = tr 'default' + '.' + actionFirstElement(action) + '.label'
             if (rv) return rv
         }
         return key

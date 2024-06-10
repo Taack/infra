@@ -120,29 +120,34 @@ class CmsController implements WebAttributes {
 
         f.ui cmsPage, {
             section "Page Information", FormSpec.Width.FULL_WIDTH, {
-                col {
-                    field cmsPage.name_
+                row {
                     col {
-                        field cmsPage.published_
+                        field cmsPage.name_
+                        row {
+                            col {
+                                field cmsPage.published_
+                            }
+                            col {
+                                field cmsPage.pageLayout_
+                            }
+                        }
                     }
                     col {
-                        field cmsPage.pageLayout_
+                        field cmsPage.subsidiary_
+                        field cmsPage.pageType_
                     }
                 }
-                col {
-                    field cmsPage.subsidiary_
-                    field cmsPage.pageType_
+                row {
+                    col {
+                        ajaxField cmsPage.mainImage_, this.&selectPageImage as MC
+                        innerFormAction this.&previewImage as MC
+                    }
+                    col {
+                        ajaxField cmsPage.mainVideo_, this.&selectM2mCmsVideo as MC
+                        innerFormAction this.&previewVideo as MC
+                    }
                 }
-                col {
-                    ajaxField cmsPage.mainImage_, this.&selectPageImage as MC
-                }
-                col {
-                    ajaxField cmsPage.mainVideo_, this.&selectM2mCmsVideo as MC
-                }
-
             }
-            formAction this.&previewImage as MC
-            formAction this.&previewVideo as MC
 
             if (cmsPage.subsidiary)
                 tabs FormSpec.Width.FULL_WIDTH, {
@@ -168,17 +173,19 @@ class CmsController implements WebAttributes {
         f.ui cmsPage, {
             hiddenField(cmsPage.pageType_)
             section "Slideshow Information", FormSpec.Width.FULL_WIDTH, {
-                col {
-                    field cmsPage.name_
-                    field cmsPage.published_
-                    field cmsPage.subsidiary_
-                }
-                col {
-                    field cmsPage.width_
-                    field cmsPage.height_
-                    field cmsPage.controls_
-                    field cmsPage.progress_
-                    field cmsPage.autoSlide_
+                row {
+                    col {
+                        field cmsPage.name_
+                        field cmsPage.published_
+                        field cmsPage.subsidiary_
+                    }
+                    col {
+                        field cmsPage.width_
+                        field cmsPage.height_
+                        field cmsPage.controls_
+                        field cmsPage.progress_
+                        field cmsPage.autoSlide_
+                    }
                 }
             }
             if (cmsPage.subsidiary)
@@ -847,9 +854,9 @@ class CmsController implements WebAttributes {
         b.ui {
             if (createNew)
                 modal {
-                    ajaxBlock "createNew", {
+//                    ajaxBlock "createNew", {
                         form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
-                    }
+//                    }
                 }
             else {
                 innerBlock BlockSpec.Width.HALF, {

@@ -1,12 +1,10 @@
 package taack.ui.base.form
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.render.TaackUiEnablerService
 import taack.ui.base.helper.Utils
 import taack.ui.dump.html.base.ButtonStyle
-
 // TODO: Isolate sectionTab
 /**
  * {@link taack.ui.base.UiFormSpecifier#ui(java.lang.Object, groovy.lang.Closure)} delegated class.

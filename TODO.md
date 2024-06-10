@@ -28,7 +28,7 @@
 - ~~Test mac runtime and devel cold auto-restart~~
 - ~~Solr indexField auto-labeling~~
 
-# 0.4.2
+# 0.5.0
 
 - ~~Improve DSL hierarchy~~
   - ~~hidden fields on top only for readability~~
@@ -36,25 +36,29 @@
   - ~~clean up form / table / filter DSLs~~
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
-- Fix table grouping / trees with paginating
-- Bump CSS, improve theming
-- improve block caption
-- Bootstrap
-- Add menus to Blocks
+- Fix table grouping / trees with pagination
+- Improve form layout, add row in DSL
+- More coherent button style in forms
+- More restrictive DSL
+- Simplify i18n, default action with naming convention starting with save, select, preview ... should be auto-translated
+- ~~Bump CSS, improve theming~~
+- ~~improve block caption~~
+- ~~Bootstrap~~
+- ~~Add menus to Blocks~~
 - ~~Improve Table / Filter~~
   - ~~add top level `condition` (`if`, branch on 2 closures)~~
     - ~~Test, debug, offline capabilities~~
-- Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Add title to modal / menu / size
 - For GormEntity, propose a default M2O or M2M in forms (field) / shows
+
+# 0.5.x
+
+- Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Ajax scrollable tables
 - PDF / Docx / pptx / HTML from Asciidoc
 - PoC new Charts DSL
 - PoC inline DSL JS (IJavascriptDescriptor.groovy)
 - PoC inline DSL CSS (with params)
-
-# 0.4.3
-
 - Asciidoc online editor (paragraph only)
 - inlineForms custom in show and tables (row or cells)
 - improve history when browsing, allow seeing opened modals ...

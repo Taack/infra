@@ -75,6 +75,8 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract IHTMLElement formCol(IHTMLElement topElement)
 
+    abstract IHTMLElement formRow(IHTMLElement topElement)
+
     abstract IHTMLElement formActionBlock(IHTMLElement topElement)
 
     abstract IHTMLElement addFormAction(IHTMLElement topElement, String url, String i18n, ButtonStyle style)

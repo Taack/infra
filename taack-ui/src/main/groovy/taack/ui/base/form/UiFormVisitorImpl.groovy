@@ -49,6 +49,16 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
+    void visitRow() {
+
+    }
+
+    @Override
+    void visitRowEnd() {
+
+    }
+
+    @Override
     void visitFormHiddenField(FieldInfo fieldInfo) {
 
     }

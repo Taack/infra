@@ -12,6 +12,7 @@ enum TaackTag {
     FORM,
     FILTER,
     COL,
+    ROW,
     TAB,
     TABS,
     SECTION

@@ -178,8 +178,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 topElement = formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
             }
         }
-        //inputOverride(qualifiedName, trI18n, field)
-
     }
 
     @Override
@@ -197,8 +195,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             GormEntity v = (field?.value) as GormEntity
             formThemed.ajaxField(topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         }
-
-        //inputOverride(qualifiedName, trI18n, field)
     }
 
     private static String fieldInfoParams(FieldInfo[] fieldInfos) {
@@ -278,6 +274,16 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     @Override
     void visitColEnd() {
         topElement = closeTags(TaackTag.COL)
+    }
+
+    @Override
+    void visitRow() {
+        topElement = formThemed.formRow(topElement)
+    }
+
+    @Override
+    void visitRowEnd() {
+        topElement = closeTags(TaackTag.ROW)
     }
 
     @Override
