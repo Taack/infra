@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Pair
 import grails.web.api.WebAttributes
 import groovy.transform.CompileStatic
 import org.grails.plugins.web.taglib.ApplicationTagLib
@@ -96,15 +97,15 @@ final class Parameter implements WebAttributes {
         return "${methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label'}, ${'default' + '.' + methodReturn.method.name + '.label'}"
     }
 
-    String actionFirstElement(String action) {
+    static Pair<String, String> actionTrParams(String action) {
         char ch
         for (int i = 0; i < action.length(); i++) {
             ch = action.charAt(i)
             if (Character.isUpperCase(ch)) {
-                return action.substring(0, i)
+                return new Pair<>(action.substring(0, i), action.substring(i).uncapitalize())
             }
         }
-        return action
+        return new Pair<>(action, null)
 
     }
 
@@ -115,7 +116,9 @@ final class Parameter implements WebAttributes {
             if (rv) return rv
             rv = tr 'default' + '.' + action + '.label'
             if (rv) return rv
-            rv = tr 'default' + '.' + actionFirstElement(action) + '.label'
+            Pair p = actionTrParams(action)
+            String trClass = tr('default' + '.' + p.bValue + '.label')
+            rv = tr('default' + '.' + p.aValue + '.label', null, trClass ?: p.bValue)
             if (rv) return rv
         }
         return key
