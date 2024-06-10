@@ -50,6 +50,8 @@ trait IHTMLElement {
 
     Map<String, String> getAllAttributes() {
         Map res = this.attributes
+        if (id)
+            res += ['id': id]
         if (taackTag)
             res += ['taackTag': taackTag.toString()]
         if (classes)

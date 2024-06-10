@@ -270,9 +270,10 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         HTMLInput[] radioList = new HTMLInput[names.size()]
         HTMLLi[] liList = new HTMLLi[names.size()]
         names.eachWithIndex { it, occ ->
-            radioList[occ] = HTMLInput.inputRadio(null, "pct-${tabIds}", occ == 0).builder.setId("tab${occ + 1}-f${tabIds}").addClasses("inputTab${occ + 1}").setId("tab$occ-f0").build() as HTMLInput
-            liList[occ] = new HTMLLi().builder.addClasses("tab${occ + 1}").addChildren(
-                    new HTMLLabel("tab${occ + 1}-f${tabIds}").builder.addChildren(
+            int tabOcc = occ + 1
+            radioList[occ] = HTMLInput.inputRadio(null, "pct-${tabIds}", occ == 0).builder.addClasses("inputTab${tabOcc}").setId("tab$tabOcc-f${tabIds}").build() as HTMLInput
+            liList[occ] = new HTMLLi().builder.addClasses("tab${tabOcc}").addChildren(
+                    new HTMLLabel("tab${tabOcc}-f${tabIds}").builder.addChildren(
                             new HTMLTxtContent(it)
                     ).build()
             ).build() as HTMLLi
