@@ -22,11 +22,11 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitBlockHeaderEnd()
 
-    void visitInnerRowBlock()
+    void visitRow()
 
-    void visitInnerRowBlockEnd()
+    void visitRowEnd()
 
-    void visitInnerColBlock(BlockSpec.Width width)
+    void visitCol(BlockSpec.Width width)
 
     void visitInnerColBlockEnd()
 

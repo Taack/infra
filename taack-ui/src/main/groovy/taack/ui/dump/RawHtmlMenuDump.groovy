@@ -10,6 +10,11 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.menu.IUiMenuVisitor
 import taack.ui.dsl.menu.MenuSpec
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.form.BootstrapForm
+import taack.ui.dump.html.menu.BootstrapMenu
+import taack.ui.dump.html.theme.ThemeSelector
 
 // TODO: Construct menu using IHTMLElement
 
@@ -20,44 +25,44 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
     final Parameter parameter
     boolean splitted = false
 
+    IHTMLElement topElement
+    final BootstrapMenu menu
+
     RawHtmlMenuDump(final ByteArrayOutputStream out, final String modalId, final Parameter parameter) {
         this.out = out
         this.modalId = modalId
         this.parameter = parameter
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
+        menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
+    }
+
+    private IHTMLElement closeTags(TaackTag tag) {
+        IHTMLElement top = topElement
+        while (top && top.taackTag != tag) {
+            top = top.parent
+        }
+        (top?.taackTag == tag ? top?.parent : top) ?: menu
     }
 
     @Override
     void visitLabel(String i18n, boolean hasClosure) {
-        if (hasClosure) {
-            out << """
-             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">${i18n}</a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            """
-        } else {
-            out << """
-             <li class="nav-item">
-                <a class="nav-link" href="#">${i18n}</a>
-            </li>
-            """
-
-        }
+        topElement = menu.label(this, i18n, hasClosure)
     }
 
     @Override
     void visitLabelEnd() {
-        out << "</ul></li>"
+        closeTags(TaackTag.LABEL)
     }
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
-        out << """<ul class="navbar-nav me-auto mb-2 mb-lg-0">"""
+        menu
     }
 
     @Override
     void visitMenuStartEnd() {
         splitMenuStop()
-        out << """</ul>"""
+        closeTags(TaackTag.MENU)
     }
 
     private void splitMenuStart() {

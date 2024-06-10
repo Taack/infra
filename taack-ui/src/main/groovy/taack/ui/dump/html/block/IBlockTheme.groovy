@@ -8,7 +8,7 @@ import taack.ui.dump.html.element.IHTMLElement
 @CompileStatic
 trait IBlockTheme implements IHTMLElement {
 
-    abstract IHTMLElement block(IHTMLElement topElement, String blockId)
+    abstract IHTMLElement block(String blockId)
 
     abstract IHTMLElement blockAjax(IHTMLElement topElement, String blockId)
 

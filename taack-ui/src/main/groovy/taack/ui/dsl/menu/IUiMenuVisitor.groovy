@@ -5,8 +5,9 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dump.html.element.IHTMLElement
 
-interface IUiMenuVisitor {
+interface IUiMenuVisitor extends IHTMLElement {
 
     void visitLabel(String i18n, boolean hasClosure)
 

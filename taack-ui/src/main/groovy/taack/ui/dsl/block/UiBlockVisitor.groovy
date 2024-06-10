@@ -35,17 +35,17 @@ class UiBlockVisitor extends UiMenuVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerRowBlock() {
+    void visitRow() {
 
     }
 
     @Override
-    void visitInnerRowBlockEnd() {
+    void visitRowEnd() {
 
     }
 
     @Override
-    void visitInnerColBlock(BlockSpec.Width width) {
+    void visitCol(BlockSpec.Width width) {
 
     }
 

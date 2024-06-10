@@ -7,6 +7,7 @@ import taack.ui.dump.html.style.IStyleDescriptor
 @CompileStatic
 enum TaackTag {
     BLOCK,
+    MENU,
     INNER_BLOCK,
     AJAX_BLOCK,
     FORM,
@@ -15,6 +16,7 @@ enum TaackTag {
     ROW,
     TAB,
     TABS,
+    LABEL,
     SECTION
 }
 

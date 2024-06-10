@@ -128,7 +128,7 @@ final class BlockSpec {
      * @param closure
      */
     void innerBlock(final Width width, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (displayElement()) blockVisitor.visitInnerColBlock(width)
+        if (displayElement()) blockVisitor.visitCol(width)
         closure.delegate = this
         closure.call()
         counter ++
@@ -142,11 +142,11 @@ final class BlockSpec {
      * @param closure
      */
     void row(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (displayElement()) blockVisitor.visitInnerRowBlock()
+        blockVisitor.visitRow()
         closure.delegate = this
         closure.call()
         counter ++
-        if (displayElement()) blockVisitor.visitInnerRowBlockEnd()
+        blockVisitor.visitRowEnd()
     }
 
     /**

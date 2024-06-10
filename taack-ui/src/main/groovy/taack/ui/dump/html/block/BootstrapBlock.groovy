@@ -6,11 +6,12 @@ import taack.ui.dsl.form.FormSpec
 import taack.ui.dump.html.element.HTMLDiv
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
-final class BootstrapBlock implements IBlockTheme {
+final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
 
     final ThemeMode themeMode
     final ThemeSize themeSize
@@ -21,9 +22,8 @@ final class BootstrapBlock implements IBlockTheme {
     }
 
     @Override
-    IHTMLElement block(IHTMLElement topElement, String blockId) {
-        topElement.addChildren(new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build())
-        topElement.children.first()
+    IHTMLElement block(String blockId) {
+        new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build()
     }
 
     @Override

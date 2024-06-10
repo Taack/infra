@@ -67,7 +67,7 @@ class RawHtmlMailDump extends UiBlockVisitor {
     @Override
     void visitTable(final String id, final BlockSpec.Width width) {
         this.id = id
-        visitInnerColBlock(width)
+        visitCol(width)
     }
 
     @Override
@@ -92,7 +92,7 @@ class RawHtmlMailDump extends UiBlockVisitor {
 
     @Override
     void visitCustom(final String html, Style style, final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
         visitInnerColBlockEnd()

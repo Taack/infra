@@ -11,6 +11,10 @@ import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 import taack.ui.dsl.common.Style
+import taack.ui.dump.html.block.BootstrapBlock
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.theme.ThemeSelector
 
 @CompileStatic
 class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
@@ -25,25 +29,38 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     private int tabOccurrencePrevious = 0
     private int tabIds = 0
 
+    final BootstrapBlock bootstrapBlock
+    IHTMLElement topElement
+
     RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter, final String modalId = null) {
         super(out, modalId, parameter)
+
         if (modalId) isModal = true
         if (parameter.params.boolean('refresh'))
             isModalRefresh = true
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
+        bootstrapBlock = new BootstrapBlock(ts.themeMode, ts.themeSize)
+    }
+
+    private IHTMLElement closeTags(TaackTag tag) {
+        IHTMLElement top = topElement
+        while (top && top.taackTag != tag) {
+            top = top.parent
+        }
+        (top?.taackTag == tag ? top?.parent : top) ?: bootstrapBlock
     }
 
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-
-            out << "<div id='blockId${blockId}' class='container-fluid' blockId='${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}'>"
+            topElement = bootstrapBlock.block("${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
         }
     }
 
     @Override
     void visitBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) {
-            out << "</div>"
+            topElement = closeTags(TaackTag.BLOCK)
         }
     }
 
@@ -72,7 +89,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerColBlock(final BlockSpec.Width width) {
+    void visitCol(final BlockSpec.Width width) {
         out << """<div class="${width.bootstrapCss} align-items-start">"""
     }
 
@@ -104,7 +121,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitForm(final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
     }
 
     @Override
@@ -116,7 +133,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitShow(final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
     }
 
     @Override
@@ -146,7 +163,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     @Override
     void visitTable(final String id, final BlockSpec.Width width) {
         this.id = id
-        visitInnerColBlock(width)
+        visitCol(width)
     }
 
     @Override
@@ -160,23 +177,23 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
                           final UiFilterSpecifier filterSpecifier,
                           final BlockSpec.Width width) {
 
-        visitInnerRowBlock()
-        visitInnerColBlock(BlockSpec.Width.QUARTER)
+        visitRow()
+        visitCol(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
         visitInnerColBlockEnd()
-        visitInnerColBlock(BlockSpec.Width.THREE_QUARTER)
+        visitCol(BlockSpec.Width.THREE_QUARTER)
     }
 
     @Override
     void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
         tableSpecifier.visitTable(new RawHtmlTableDump(id, out, parameter))
         visitInnerColBlockEnd()
-        visitInnerRowBlockEnd()
+        visitRowEnd()
     }
 
     @Override
     void visitChart(final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
     }
 
     @Override
@@ -189,12 +206,12 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitDiagram(final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
     }
 
     @Override
     void visitDiagramFilter(final UiFilterSpecifier filterSpecifier, final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
         visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
         visitInnerColBlockEnd()
@@ -271,7 +288,7 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
 
     @Override
     void visitCustom(final String html, Style style, final BlockSpec.Width width) {
-        visitInnerColBlock(width)
+        visitCol(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
         visitInnerColBlockEnd()
@@ -294,12 +311,12 @@ class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerRowBlock() {
+    void visitRow() {
         out << """<div class="row align-items-start">"""
     }
 
     @Override
-    void visitInnerRowBlockEnd() {
+    void visitRowEnd() {
         out << "</div>"
     }
 }
