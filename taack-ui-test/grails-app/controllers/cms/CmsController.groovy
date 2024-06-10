@@ -67,14 +67,15 @@ class CmsController implements WebAttributes {
             menu this.&images as MC
             menu this.&pdfs as MC
             menu this.&videos as MC
-            menu this.&menuEntries as MC
             menu this.&blocks as MC
-            menu this.&inserts as MC
+//            menu this.&inserts as MC
             menu this.&slideshows as MC
             label "Admin", {
                 subMenu this.&confSites as MC
+                subMenu this.&menuEntries as MC
             }
             menuSearch CmsController.&search as MC, q
+            menuOptions(SupportedLanguage.fromContext())
         }
         m
     }

@@ -9,8 +9,9 @@ import taack.ui.base.common.ActionIcon
 
 @CompileStatic
 class UiMenuVisitor implements IUiMenuVisitor {
+
     @Override
-    void visitLabel(String i18n) {
+    void visitLabel(String i18n, boolean hasClosure) {
 
     }
 

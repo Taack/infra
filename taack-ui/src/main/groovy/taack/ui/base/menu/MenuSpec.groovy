@@ -35,12 +35,12 @@ final class MenuSpec {
     }
 
     void label(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure = null) {
-        menuVisitor.visitLabel(i18n)
         if (closure) {
+            menuVisitor.visitLabel(i18n, true)
             closure.delegate = subMenuSpec
             closure.call()
-        }
-        menuVisitor.visitLabelEnd()
+            menuVisitor.visitLabelEnd()
+        } else menuVisitor.visitLabel(i18n, false)
     }
 
     void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {

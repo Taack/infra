@@ -27,12 +27,21 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitLabel(String i18n) {
-        out << """
+    void visitLabel(String i18n, boolean hasClosure) {
+        if (hasClosure) {
+            out << """
              <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">${i18n}</a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             """
+        } else {
+            out << """
+             <li class="nav-item">
+                <a class="nav-link" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">${i18n}</a>
+            </li>
+            """
+
+        }
     }
 
     @Override

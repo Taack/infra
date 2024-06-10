@@ -9,7 +9,7 @@ import taack.ui.base.common.ActionIcon
 
 interface IUiMenuVisitor {
 
-    void visitLabel(String i18n)
+    void visitLabel(String i18n, boolean hasClosure)
 
     void visitLabelEnd()
 
