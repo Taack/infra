@@ -151,7 +151,7 @@ class Helper {
                     }
                 }
                 else -> {
-                    trace("Helper::opening Modal")
+                    trace("Helper::redirect")
                     if (process != null) {
                         processingStack.add(process)
                     }

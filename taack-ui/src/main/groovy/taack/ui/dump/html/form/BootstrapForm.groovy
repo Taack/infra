@@ -309,7 +309,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
 
     @Override
     IHTMLElement formActionBlock(IHTMLElement topElement) {
-        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap').build())
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap', 'justify-content-end').build())
         topElement.children.last()
     }
 

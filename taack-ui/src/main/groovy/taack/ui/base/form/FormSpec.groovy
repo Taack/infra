@@ -20,7 +20,6 @@ import taack.ui.dump.html.base.ButtonStyle
  */
 @CompileStatic
 final class FormSpec extends FormSectionSpec {
-    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
 
     /**
      * Form sections relative Width
@@ -42,21 +41,6 @@ final class FormSpec extends FormSectionSpec {
 
     FormSpec(IUiFormVisitor formVisitor) {
         super(formVisitor)
-    }
-
-    /**
-     * Add a section to enclose fields to display. Can be nested.
-     *
-     * @param sectionName the label of the section
-     * @param width its relative width
-     * @param closure Description of the content of this section
-     */
-    void section(String sectionName, Width width = Width.DEFAULT_WIDTH,
-                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSectionSpec) Closure closure) {
-        formVisitor.visitFormSection(sectionName, width)
-        closure.delegate = this
-        closure.call()
-        formVisitor.visitFormSectionEnd()
     }
 
     /**
@@ -95,5 +79,6 @@ final class FormSpec extends FormSectionSpec {
     void formAction(final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
         if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
     }
+
 
 }

@@ -13,6 +13,12 @@ import java.text.NumberFormat
 class FormAjaxFieldSpec {
     final IUiFormVisitor formVisitor
 
+    void col(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormAjaxFieldSpec) final Closure closure) {
+        formVisitor.visitCol()
+        closure.delegate = this
+        closure.call()
+        formVisitor.visitColEnd()
+    }
 
     FormAjaxFieldSpec(final IUiFormVisitor formVisitor) {
         this.formVisitor = formVisitor

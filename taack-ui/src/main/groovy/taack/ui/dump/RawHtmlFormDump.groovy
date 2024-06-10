@@ -52,15 +52,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
     }
 
-//    private void closeTags(TaackTag tag) {
-//        IHTMLElement top = topElement
-//        while (top && top.taackTag != tag) {
-//            top = top.parent
-//        }
-//        topElement = top?.taackTag == tag ? top?.parent : top
-//        if (!topElement) topElement = formThemed
-//    }
-
     private boolean isDisabled(FieldInfo field) {
         if (lockedFields == null) {
             return false
@@ -250,6 +241,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         formActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${controller}/${action}" as String)
     }
 
+    @Override
+    void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
+        topElement = formThemed.formActionBlock topElement
+        i18n ?= parameter.trField(controller, action)
+        formThemed.addFormAction(topElement, "/${controller}/${action}", i18n, style)
+        topElement = topElement.parent
+    }
 
     @Override
     void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry) {

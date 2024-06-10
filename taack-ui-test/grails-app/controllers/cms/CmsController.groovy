@@ -151,7 +151,7 @@ class CmsController implements WebAttributes {
                             fieldFromMap cmsPage.title_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.hatContent_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.bodyContent_, language.toString().toLowerCase()
-                            formAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase()]
+                            innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase()]
                         }
                     }
                 }
@@ -186,7 +186,7 @@ class CmsController implements WebAttributes {
                     for (SupportedLanguage language : cmsPage.subsidiary.languages) {
                         tabLabel "${language.label}", {
                             fieldFromMap cmsPage.bodyContent_, language.toString().toLowerCase()
-                            formAction this.&previewBodySlideshow as MC, null, [previewLanguage: language.toString().toLowerCase()]
+                            innerFormAction this.&previewBodySlideshow as MC, null, [previewLanguage: language.toString().toLowerCase()]
                         }
                     }
                 }

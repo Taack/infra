@@ -35,6 +35,8 @@ interface IUiFormVisitor extends IBaseFormVisitor {
 
     void visitFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style)
 
+    void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style)
+
     void visitCol()
 
     void visitColEnd()
