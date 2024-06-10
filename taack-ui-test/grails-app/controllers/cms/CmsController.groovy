@@ -85,7 +85,7 @@ class CmsController implements WebAttributes {
                 table cmsUiService.buildCmsImageTable(cmsPage), BlockSpec.Width.MAX, {
                     menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
                     menu this.&selectM2mCmsImage as MC, cmsPage.id
-                    menu this.&cmsImageForm as MC, [cmsPageId: cmsPage.id]
+                    menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
                 }
             }
         }
@@ -97,7 +97,7 @@ class CmsController implements WebAttributes {
                 table cmsUiService.buildCmsVideoTable(cmsPage), BlockSpec.Width.MAX, {
                     menu this.&refreshCmsPageCmsVideos as MC, cmsPage.id
                     menu this.&selectM2mCmsVideo as MC, cmsPage.id
-                    menu this.&cmsVideoForm as MC, [cmsPageId: cmsPage.id]
+                    menu this.&editCmsVideo as MC, [cmsPageId: cmsPage.id]
                 }
             }
         }
@@ -109,7 +109,7 @@ class CmsController implements WebAttributes {
                 table cmsUiService.buildCmsPdfTable(cmsPage), BlockSpec.Width.MAX, {
                     menu this.&refreshCmsPageCmsPdfs as MC, [id: cmsPage.id]
                     menu this.&selectM2mCmsPdf as MC, [id: cmsPage.id]
-                    menu this.&cmsPdfForm as MC, [cmsPageId: cmsPage.id]
+                    menu this.&editCmsPdf as MC, [cmsPageId: cmsPage.id]
                 }
             }
         }
@@ -339,7 +339,7 @@ class CmsController implements WebAttributes {
         b.ui {
             ajaxBlock "imagesBlockAction", {
                 tableFilter CmsUiService.buildCmsImageFilter(), cmsUiService.buildCmsImageTable(), BlockSpec.Width.MAX, {
-                    menu this.&cmsImageForm as MC
+                    menu this.&editCmsImage as MC
                 }
             }
         }
@@ -449,7 +449,7 @@ class CmsController implements WebAttributes {
 
     }
 
-    def cmsImageForm(CmsImage cmsImage) {
+    def editCmsImage(CmsImage cmsImage) {
         UiBlockSpecifier b = new UiBlockSpecifier()
         boolean removeModal = false
         if (!cmsImage)
@@ -478,7 +478,7 @@ class CmsController implements WebAttributes {
         taackUiService.show(b, buildMenu())
     }
 
-    def cmsVideoForm(CmsVideoFile videoFile) {
+    def editCmsVideo(CmsVideoFile videoFile) {
         UiBlockSpecifier b = new UiBlockSpecifier()
         if (!videoFile) videoFile = new CmsVideoFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
         b.ui {
@@ -491,7 +491,7 @@ class CmsController implements WebAttributes {
         taackUiService.show(b, buildMenu())
     }
 
-    def cmsPdfForm(CmsPdfFile pdfFile) {
+    def editCmsPdf(CmsPdfFile pdfFile) {
         UiBlockSpecifier b = new UiBlockSpecifier()
         if (!pdfFile) pdfFile = new CmsPdfFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
         b.ui {
@@ -666,7 +666,7 @@ class CmsController implements WebAttributes {
             modal {
                 ajaxBlock "selectPageImage", {
                     tableFilter filter, cmsUiService.buildCmsImageTable(null, CmsUiService.CmsTableMode.MANY_2_MANY, filter), BlockSpec.Width.MAX, {
-                        menu this.&cmsImageForm as MC
+                        menu this.&editCmsImage as MC
                     }
                 }
             }
@@ -859,16 +859,18 @@ class CmsController implements WebAttributes {
 //                    }
                 }
             else {
-                innerBlock BlockSpec.Width.HALF, {
+                row {
+                    innerBlock BlockSpec.Width.HALF, {
 //                    ajaxBlock "cmsPageForm", {
                         form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
 //                    }
-                }
+                    }
 
-                tabs BlockSpec.Width.HALF, {
-                    tab "Images", buildImagesTab(cmsPage)
-                    tab "Pdfs", buildPdfsTab(cmsPage)
-                    tab "Videos", buildVideosTab(cmsPage)
+                    tabs BlockSpec.Width.HALF, {
+                        tab "Images", buildImagesTab(cmsPage)
+                        tab "Pdfs", buildPdfsTab(cmsPage)
+                        tab "Videos", buildVideosTab(cmsPage)
+                    }
                 }
             }
         }

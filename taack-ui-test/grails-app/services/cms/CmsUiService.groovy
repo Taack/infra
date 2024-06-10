@@ -1,6 +1,6 @@
 package cms
 
-import crew.Role
+
 import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
@@ -324,7 +324,7 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (tableMode == CmsTableMode.NONE) {
-                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsImageForm as MC, ci.id
+                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editCmsImage as MC, ci.id
                         if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsImageFromPage as MC, [cmsImageId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && cmsPage) {
                         if (!cmsPage?.bodyImages*.id?.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsImageToPage as MC, [cmsImageId: ci.id, cmsPageId: cmsPage.id]
@@ -396,7 +396,7 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (tableMode == CmsTableMode.NONE) {
-                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsPdfForm as MC, ci.id
+                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editCmsPdf as MC, ci.id
                         if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsPdfFromPage as MC, [cmsPdfId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && cmsPage) {
                         if (!cmsPage.bodyPdfs*.id.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsPdfToPage as MC, [cmsPdfId: ci.id, cmsPageId: cmsPage.id]
@@ -513,7 +513,7 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (tableMode == CmsTableMode.NONE) {
-                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&cmsVideoForm as MC, ci.id
+                        rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, CmsController.&editCmsVideo as MC, ci.id
                         if (cmsPage && ci.cmsPage != cmsPage) rowAction ActionIcon.UNSELECT * IconStyle.SCALE_DOWN, CmsController.&removeCmsVideoFromPage as MC, [cmsVideoId: ci.id, cmsPageId: cmsPage.id]
                     } else if (tableMode == CmsTableMode.MANY_2_MANY && cmsPage) {
                         if (!cmsPage.bodyVideos*.id.contains(ci.id)) rowAction ActionIcon.SELECT * IconStyle.SCALE_DOWN, CmsController.&addCmsVideoToPage as MC, [cmsVideoId: ci.id, cmsPageId: cmsPage.id]

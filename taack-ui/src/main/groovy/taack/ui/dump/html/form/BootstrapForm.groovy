@@ -17,6 +17,7 @@ import taack.ui.dump.html.base.HTMLNav
 import taack.ui.dump.html.base.HTMLSection
 import taack.ui.dump.html.base.HTMLSelect
 import taack.ui.dump.html.base.HTMLSpan
+import taack.ui.dump.html.base.HTMLTextarea
 import taack.ui.dump.html.base.HTMLTxtContent
 import taack.ui.dump.html.base.HTMLUl
 import taack.ui.dump.html.base.IHTMLElement
@@ -224,7 +225,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.TEXTAREA, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
+        HTMLTextarea input = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLTextarea
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
