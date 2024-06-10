@@ -1,6 +1,5 @@
 package taack.ui.dump
 
-
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
@@ -12,7 +11,6 @@ import taack.ui.dsl.menu.IUiMenuVisitor
 import taack.ui.dsl.menu.MenuSpec
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
-import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.menu.BootstrapMenu
 import taack.ui.dump.html.theme.ThemeSelector
 
@@ -51,31 +49,22 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitLabelEnd() {
-        closeTags(TaackTag.LABEL)
+        topElement = closeTags(TaackTag.LABEL)
     }
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
-        menu
+        topElement = menu.menuStart(topElement)
     }
 
     @Override
     void visitMenuStartEnd() {
-        splitMenuStop()
-        closeTags(TaackTag.MENU)
+        topElement = closeTags(TaackTag.MENU)
     }
 
     private void splitMenuStart() {
-        if (!splitted) {
-            splitted = true
-            out << """</ul><ul class="navbar-nav flex-row ml-md-auto ">"""
-        }
-    }
-
-    private void splitMenuStop() {
-        if (splitted) {
-            out << "</ul>"
-        }
+        topElement = closeTags(TaackTag.MENU)
+        topElement = menu.splitMenuStart(topElement)
     }
 
     @Override
@@ -92,23 +81,12 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
     }
 
     private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
-        out << """
-            <li class="nav-item dropdown">
-                <a class="nav-link" href="${parameter.urlMapped(controller, action, params)}">${i18n}</a>
-            </li>
-        """
-
+        menu.menu(topElement, i18n, parameter.urlMapped(controller, action, params))
     }
 
     @Override
     void visitSection(String i18n, MenuSpec.MenuPosition position) {
-        out << """
-            <li class="nav-item dropdown">
-                <span class="navbar-text">
-                  <b>${i18n}</b>
-                </span>
-            </li>
-        """
+        menu.section(topElement, i18n)
     }
 
     @Override
@@ -120,22 +98,7 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
         i18n ?= parameter.trField(controller, action)
         splitMenuStart()
-        if (isModal)
-            out << """
-                 <li>
-                    <a class='nav-link' ajaxAction='${parameter.urlMapped(controller, action, params, true)}'>
-                        ${actionIcon.getHtml(i18n, 24)}
-                    </a>
-                 </li>
-            """
-        else
-            out << """
-                <li>
-                    <a class="nav-link" href="${parameter.urlMapped(controller, action, params)}">
-                        ${actionIcon.getHtml(i18n, 24)}
-                    </a>
-                </li>
-            """
+        menu.menuIcon(topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
     }
 
     @Override
@@ -154,13 +117,7 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
     @Override
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
         splitMenuStart()
-        out << """
-            <form class="solrSearch-input py-1" action="${parameter.urlMapped(Utils.getControllerName(action), action.method)}">
-                <div class="input-group rounded">
-                    <input type="search" id="form1" name="q" value="${q ? q.replace('"', "&quot;") : ''}" class="form-control rounded bg-white" placeholder="Search" aria-label="Search"/>
-                </div>
-            </form>
-        """
+        menu.menuSearch(topElement, q.replace('"', "&quot;"), parameter.urlMapped(Utils.getControllerName(action), action.method))
     }
 
     @Override

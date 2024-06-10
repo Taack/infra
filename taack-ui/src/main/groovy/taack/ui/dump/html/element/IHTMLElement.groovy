@@ -66,7 +66,10 @@ trait IHTMLElement {
     }
 
     String getOutput() {
-        "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\"" : "${it.key}" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
+        if (tag)
+            "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\"" : "${it.key}" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
+        else
+            children*.output.join("\n")
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {
