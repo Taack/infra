@@ -6,7 +6,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
-import taack.ui.base.helper.Utils
+import taack.ui.dsl.helper.Utils
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.

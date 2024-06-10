@@ -1,6 +1,6 @@
 package taack.ui.diagram.render
 
-import taack.ui.base.common.Style
+import taack.ui.dsl.common.Style
 
 import java.awt.Color
 

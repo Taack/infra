@@ -7,14 +7,14 @@ import grails.web.api.WebAttributes
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
-import taack.ui.base.UiBlockSpecifier
-import taack.ui.base.UiFilterSpecifier
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.IconStyle
-import taack.ui.base.filter.expression.FilterExpression
-import taack.ui.base.filter.expression.Operator
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiFilterSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
+import taack.ui.dsl.filter.expression.FilterExpression
+import taack.ui.dsl.filter.expression.Operator
 
 import static taack.render.TaackUiService.tr
 

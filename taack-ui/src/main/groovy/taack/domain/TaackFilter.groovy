@@ -8,10 +8,10 @@ import org.hibernate.SessionFactory
 import org.hibernate.query.Query
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.UiFilterSpecifier
-import taack.ui.base.filter.UiFilterVisitorImpl
-import taack.ui.base.filter.expression.FilterExpression
-import taack.ui.base.filter.expression.Operator
+import taack.ui.dsl.UiFilterSpecifier
+import taack.ui.dsl.filter.UiFilterVisitorImpl
+import taack.ui.dsl.filter.expression.FilterExpression
+import taack.ui.dsl.filter.expression.Operator
 import taack.ui.dump.RawHtmlFilterDump
 import taack.utils.DateFormat
 

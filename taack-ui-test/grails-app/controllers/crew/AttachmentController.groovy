@@ -17,11 +17,10 @@ import attachment.DocumentAccess
 import attachment.Term
 import taack.domain.*
 import taack.render.TaackUiService
-import taack.ui.base.*
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.IconStyle
-import taack.ui.base.common.Style
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
+import taack.ui.dsl.common.Style
 import taack.ui.dump.markdown.Markdown
 
 @GrailsCompileStatic
@@ -38,8 +37,8 @@ class AttachmentController {
     @Value('${intranet.root}')
     String rootPath
 
-    static private UiMenuSpecifier buildMenu(String q = null) {
-        UiMenuSpecifier m = new UiMenuSpecifier()
+    static private taack.ui.dsl.UiMenuSpecifier buildMenu(String q = null) {
+        taack.ui.dsl.UiMenuSpecifier m = new taack.ui.dsl.UiMenuSpecifier()
 
         m.ui {
             menu AttachmentController.&index as MC
@@ -56,7 +55,7 @@ class AttachmentController {
     }
 
     def index() {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             inline(attachmentUiService.buildAttachmentsBlock())
         }, buildMenu())
     }
@@ -84,7 +83,7 @@ class AttachmentController {
 
     def showAttachment(Attachment attachment) {
         if (params.boolean('isAjax'))
-            taackUiService.show(new UiBlockSpecifier().ui {
+            taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
                 modal {
                     ajaxBlock 'showAttachment', {
                         inline attachmentUiService.buildShowAttachmentBlock(attachment)
@@ -92,7 +91,7 @@ class AttachmentController {
                 }
             })
         else {
-            taackUiService.show(new UiBlockSpecifier().ui {
+            taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
                 ajaxBlock 'showAttachment', {
                     inline attachmentUiService.buildShowAttachmentBlock(attachment)
                 }
@@ -112,7 +111,7 @@ class AttachmentController {
 
 
     def uploadAttachment() {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 form AttachmentUiService.buildAttachmentForm(new Attachment()), BlockSpec.Width.MAX
             }
@@ -121,7 +120,7 @@ class AttachmentController {
 
     def editAttachmentDescriptor(DocumentAccess attachmentDescriptor) {
         attachmentDescriptor ?= new DocumentAccess()
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 form AttachmentUiService.buildDocumentAccessForm(attachmentDescriptor), BlockSpec.Width.MAX
             }
@@ -142,7 +141,7 @@ class AttachmentController {
         if (!ad.id)
             ad.save(flush: true)
         taackSaveService.displayBlockOrRenderErrors(ad,
-                new UiBlockSpecifier().ui {
+                new taack.ui.dsl.UiBlockSpecifier().ui {
                     closeModal(ad.id, ad.toString())
                 }
         )
@@ -154,7 +153,7 @@ class AttachmentController {
         dc.save(flush: true)
         taackSaveService.displayBlockOrRenderErrors(
                 dc,
-                new UiBlockSpecifier().ui {
+                new taack.ui.dsl.UiBlockSpecifier().ui {
                     closeModal(dc.id, dc.toString())
                 }
         )
@@ -162,7 +161,7 @@ class AttachmentController {
 
 
     def updateAttachment(Attachment attachment) {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 form AttachmentUiService.buildAttachmentForm(attachment), BlockSpec.Width.MAX
             }
@@ -177,9 +176,9 @@ class AttachmentController {
 
     def showLinkedData(Attachment attachment) {
         def objs = taackMetaModelService.listObjectsPointingTo(attachment)
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
-                table new UiTableSpecifier().ui({
+                table new taack.ui.dsl.UiTableSpecifier().ui({
                     for (def classNameField : objs.keySet()) {
                         row {
                             rowColumn 3, {
@@ -205,7 +204,7 @@ class AttachmentController {
 
     def model(String modelName) {
         String graph = taackMetaModelService.modelGraph(modelName ? Class.forName(modelName) : null)
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 ajaxBlock 'model$modelName', {
                     custom taackMetaModelService.svg(graph)
@@ -230,7 +229,7 @@ class AttachmentController {
         User u = new User()
 
         List<Term> parentTerms = Term.findAllByActiveAndTermGroupConfigAndParentIsNull(true, termGroup)
-        UiTableSpecifier ts = new UiTableSpecifier()
+        taack.ui.dsl.UiTableSpecifier ts = new taack.ui.dsl.UiTableSpecifier()
 
         ts.ui {
             header {
@@ -262,9 +261,9 @@ class AttachmentController {
                 }
             }
         }
-        taackUiService.show new UiBlockSpecifier().ui {
+        taackUiService.show new taack.ui.dsl.UiBlockSpecifier().ui {
             table ts, BlockSpec.Width.THIRD
-            show new UiShowSpecifier().ui(new Object(), {
+            show new taack.ui.dsl.UiShowSpecifier().ui(new Object(), {
                 field Markdown.getContentHtml('# Click on a tag ..')
             }), BlockSpec.Width.TWO_THIRD
         }, buildMenu()
@@ -275,7 +274,7 @@ class AttachmentController {
         DocumentAccess ad = new DocumentAccess()
         User u = new User()
         def attachments = Attachment.executeQuery('from Attachment a where a.active = true and ?0 in elements(a.tags)', term) as List<Attachment>
-        def ts = new UiTableSpecifier().ui {
+        def ts = new taack.ui.dsl.UiTableSpecifier().ui {
             header {
                 column {
                     label 'Preview'
@@ -324,7 +323,7 @@ class AttachmentController {
                 }
             }
         }
-        taackUiService.show new UiBlockSpecifier().ui {
+        taackUiService.show new taack.ui.dsl.UiBlockSpecifier().ui {
             table ts, BlockSpec.Width.TWO_THIRD
         }
     }
@@ -332,10 +331,10 @@ class AttachmentController {
     def selectDocumentAccess() {
         TaackDocument td = taackUiService.ajaxBind(TaackDocument)
         DocumentAccess documentAccess = td.documentAccess ?: new DocumentAccess()
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 ajaxBlock 'selectDocumentAccessTable', {
-                    table new UiTableSpecifier().ui({
+                    table new taack.ui.dsl.UiTableSpecifier().ui({
                         header {
                             label documentAccess.isInternal_
                             label documentAccess.isRestrictedToMyManagers_
@@ -372,7 +371,7 @@ class AttachmentController {
         TaackDocument td = taackUiService.ajaxBind(TaackDocument)
         DocumentCategory documentCategory = td.documentCategory ?: new DocumentCategory()
 
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 form AttachmentUiService.buildDocumentDescriptorForm(documentCategory)
             }
@@ -383,7 +382,7 @@ class AttachmentController {
         List<Term> parentTerms = Term.findAllByActiveAndParentIsNull(true)
         Term t = new Term()
 
-        UiTableSpecifier ts = new UiTableSpecifier().ui {
+        taack.ui.dsl.UiTableSpecifier ts = new taack.ui.dsl.UiTableSpecifier().ui {
             header {
                 label t.name_
                 label t.termGroupConfig_
@@ -414,7 +413,7 @@ class AttachmentController {
                 }
             }
         }
-        taackUiService.show new UiBlockSpecifier().ui {
+        taackUiService.show new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 table ts, BlockSpec.Width.MAX
             }
@@ -426,9 +425,9 @@ class AttachmentController {
     }
 
     def listTerm() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
-        UiFilterSpecifier f = attachmentUiService.buildTermFilter()
-        UiTableSpecifier t = attachmentUiService.buildTermTable f
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
+        taack.ui.dsl.UiFilterSpecifier f = attachmentUiService.buildTermFilter()
+        taack.ui.dsl.UiTableSpecifier t = attachmentUiService.buildTermTable f
         b.ui {
             tableFilter f, t, BlockSpec.Width.MAX, {
                 menuIcon ActionIcon.CREATE, AttachmentController.&editTerm as MC
@@ -440,7 +439,7 @@ class AttachmentController {
     @Secured(['ROLE_ADMIN', 'ROLE_TERM_ADMIN'])
     def editTerm(Term term) {
         term = term ?: new Term()
-        UiBlockSpecifier b = new UiBlockSpecifier().ui {
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 form attachmentUiService.buildTermForm(term), BlockSpec.Width.MAX
             }
@@ -463,9 +462,9 @@ class AttachmentController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_TERM_ADMIN'])
     def selectTermM2O() {
-        UiFilterSpecifier f = attachmentUiService.buildTermFilter()
-        UiTableSpecifier t = attachmentUiService.buildTermTable f, true
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiFilterSpecifier f = attachmentUiService.buildTermFilter()
+        taack.ui.dsl.UiTableSpecifier t = attachmentUiService.buildTermTable f, true
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         b.ui {
             modal {
                 tableFilter f, t, BlockSpec.Width.MAX
@@ -476,7 +475,7 @@ class AttachmentController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_TERM_ADMIN'])
     def selectTermM2OCloseModal(Term term) {
-        UiBlockSpecifier block = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier block = new taack.ui.dsl.UiBlockSpecifier()
         block.ui {
             closeModal term.id, "${term}"
         }

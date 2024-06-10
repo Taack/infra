@@ -18,16 +18,16 @@ import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
 import taack.render.IFormInputOverrider
 import taack.render.TaackUiOverriderService
-import taack.ui.base.UiFilterSpecifier
-import taack.ui.base.UiFormSpecifier
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.IconStyle
-import taack.ui.base.filter.expression.FilterExpression
-import taack.ui.base.filter.expression.Operator
-import taack.ui.base.form.FormSpec
+import taack.ui.dsl.UiFilterSpecifier
+import taack.ui.dsl.UiFormSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
+import taack.ui.dsl.filter.expression.FilterExpression
+import taack.ui.dsl.filter.expression.Operator
+import taack.ui.dsl.form.FormSpec
 
 import javax.annotation.PostConstruct
 

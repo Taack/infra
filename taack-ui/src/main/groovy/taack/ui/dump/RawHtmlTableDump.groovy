@@ -4,9 +4,9 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.helper.Utils
 import taack.ui.dump.common.CommonRawHtmlTableDump
 
 @CompileStatic

@@ -3,8 +3,8 @@ package taack.ui.dump
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.common.Style
-import taack.ui.base.table.UiTableVisitorImpl
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.table.UiTableVisitorImpl
 
 @CompileStatic
 final class RawCsvTableDump extends UiTableVisitorImpl {

@@ -2,15 +2,15 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.base.UiChartSpecifier
-import taack.ui.base.UiDiagramSpecifier
-import taack.ui.base.UiFilterSpecifier
-import taack.ui.base.UiFormSpecifier
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.block.IUiBlockVisitor
-import taack.ui.base.common.Style
+import taack.ui.dsl.UiChartSpecifier
+import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.UiFilterSpecifier
+import taack.ui.dsl.UiFormSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.block.IUiBlockVisitor
+import taack.ui.dsl.common.Style
 
 @CompileStatic
 class RawHtmlBlockDump extends RawHtmlMenuDump implements IUiBlockVisitor {

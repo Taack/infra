@@ -19,11 +19,17 @@ import org.springframework.core.io.Resource
 import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.UiFilterSpecifier
+import taack.ui.dsl.UiFormSpecifier
+import taack.ui.dsl.UiMenuSpecifier
+import taack.ui.dsl.UiPrintableSpecifier
+import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.html.theme.ThemeSelector
-import taack.ui.base.*
-import taack.ui.base.block.BlockSpec
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.*
 import taack.ui.dump.mail.RawHtmlMailDump
 import taack.ui.dump.pdf.RawHtmlPrintableDump
@@ -35,10 +41,10 @@ import javax.annotation.PostConstruct
  * <p>
  * <ul>
  * <li>A full web page is rendered when calling
- * {@link TaackUiService#show(UiBlockSpecifier, UiMenuSpecifier)}
+ * {@link TaackUiService#show(taack.ui.dsl.UiBlockSpecifier, taack.ui.dsl.UiMenuSpecifier)}
  *
  * <li>An ajax render is returned to the browser if calling
- * {@link TaackUiService#show(UiBlockSpecifier)}
+ * {@link TaackUiService#show(taack.ui.dsl.UiBlockSpecifier)}
  * </ul>
  * <pre>{@code
  *  taackUiSimpleService.show(new UiBlockSpecifier() {

@@ -6,10 +6,10 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.helper.Utils
-import taack.ui.base.menu.IUiMenuVisitor
-import taack.ui.base.menu.MenuSpec
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.helper.Utils
+import taack.ui.dsl.menu.IUiMenuVisitor
+import taack.ui.dsl.menu.MenuSpec
 
 // TODO: Construct menu using IHTMLElement
 

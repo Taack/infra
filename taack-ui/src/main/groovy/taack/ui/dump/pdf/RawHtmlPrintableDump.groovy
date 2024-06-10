@@ -1,10 +1,10 @@
 package taack.ui.dump.pdf
 
 import groovy.transform.CompileStatic
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.printable.IUiPrintableVisitor
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.printable.IUiPrintableVisitor
 import taack.ui.dump.Parameter
 
 @CompileStatic

@@ -15,11 +15,10 @@ import taack.domain.TaackFilterService
 import taack.domain.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.TaackUiConfiguration
-import taack.ui.base.*
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.IconStyle
-import taack.ui.base.form.FormSpec
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
+import taack.ui.dsl.form.FormSpec
 import taack.ui.dump.markdown.Markdown
 
 import javax.annotation.PostConstruct
@@ -59,8 +58,8 @@ class CmsController implements WebAttributes {
         TaackSaveService.filePaths.put(controllerName, f)
     }
 
-    static private UiMenuSpecifier buildMenu(String q = null) {
-        UiMenuSpecifier m = new UiMenuSpecifier()
+    static private taack.ui.dsl.UiMenuSpecifier buildMenu(String q = null) {
+        taack.ui.dsl.UiMenuSpecifier m = new taack.ui.dsl.UiMenuSpecifier()
         m.ui {
             label "CMS"
             menu this.&pages as MC
@@ -116,8 +115,8 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private static UiFormSpecifier buildCmsPageForm(final CmsPage cmsPage) {
-        UiFormSpecifier f = new UiFormSpecifier()
+    private static taack.ui.dsl.UiFormSpecifier buildCmsPageForm(final CmsPage cmsPage) {
+        taack.ui.dsl.UiFormSpecifier f = new taack.ui.dsl.UiFormSpecifier()
 
         f.ui cmsPage, {
             section "Page Information", FormSpec.Width.FULL_WIDTH, {
@@ -166,8 +165,8 @@ class CmsController implements WebAttributes {
         f
     }
 
-    private static UiFormSpecifier buildCmsSlideshowForm(CmsPage cmsPage) {
-        UiFormSpecifier f = new UiFormSpecifier()
+    private static taack.ui.dsl.UiFormSpecifier buildCmsSlideshowForm(CmsPage cmsPage) {
+        taack.ui.dsl.UiFormSpecifier f = new taack.ui.dsl.UiFormSpecifier()
 
         cmsPage = cmsPage ?: new CmsPage(pageType: CmsPageType.SLIDESHOW)
 
@@ -203,8 +202,8 @@ class CmsController implements WebAttributes {
         f
     }
 
-    private static UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
-        new UiFormSpecifier().ui cmsInsert, {
+    private static taack.ui.dsl.UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
+        new taack.ui.dsl.UiFormSpecifier().ui cmsInsert, {
             section "Position", FormSpec.Width.DOUBLE_WIDTH, {
                 field cmsInsert.x_
                 field cmsInsert.y_
@@ -229,8 +228,8 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private static UiFormSpecifier buildCmsImageForm(final CmsImage cmsImage) {
-        UiFormSpecifier f = new UiFormSpecifier()
+    private static taack.ui.dsl.UiFormSpecifier buildCmsImageForm(final CmsImage cmsImage) {
+        taack.ui.dsl.UiFormSpecifier f = new taack.ui.dsl.UiFormSpecifier()
         f.ui cmsImage, {
             if (cmsImage.cmsPage) hiddenField cmsImage.cmsPage_
             section "File Upload", FormSpec.Width.FULL_WIDTH, {
@@ -245,8 +244,8 @@ class CmsController implements WebAttributes {
         f
     }
 
-    private static UiFormSpecifier buildCmsVideoForm(final CmsVideoFile cmsVideo) {
-        new UiFormSpecifier().ui cmsVideo, {
+    private static taack.ui.dsl.UiFormSpecifier buildCmsVideoForm(final CmsVideoFile cmsVideo) {
+        new taack.ui.dsl.UiFormSpecifier().ui cmsVideo, {
             hiddenField cmsVideo.cmsPage_
             section "File Upload", FormSpec.Width.DOUBLE_WIDTH, {
                 field cmsVideo.filePath_
@@ -268,8 +267,8 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private static UiFormSpecifier buildCmsPdfForm(final CmsPdfFile pdfFile) {
-        new UiFormSpecifier().ui pdfFile, {
+    private static taack.ui.dsl.UiFormSpecifier buildCmsPdfForm(final CmsPdfFile pdfFile) {
+        new taack.ui.dsl.UiFormSpecifier().ui pdfFile, {
             hiddenField pdfFile.cmsPage_
             section "File Upload", FormSpec.Width.FULL_WIDTH, {
                 field pdfFile.filePath_
@@ -283,10 +282,10 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private UiTableSpecifier buildBlockTable() {
+    private taack.ui.dsl.UiTableSpecifier buildBlockTable() {
         CmsBlock cb = new CmsBlock()
 
-        new UiTableSpecifier().ui {
+        new taack.ui.dsl.UiTableSpecifier().ui {
             header {
                 sortableFieldHeader cb.position_
                 sortableFieldHeader cb.subsidiary_
@@ -336,7 +335,7 @@ class CmsController implements WebAttributes {
     }
 
     def images() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         b.ui {
             ajaxBlock "imagesBlockAction", {
                 tableFilter CmsUiService.buildCmsImageFilter(), cmsUiService.buildCmsImageTable(), BlockSpec.Width.MAX, {
@@ -348,7 +347,7 @@ class CmsController implements WebAttributes {
     }
 
     def pdfs() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         b.ui {
             ajaxBlock "pdfsBlock", {
                 table cmsUiService.buildCmsPdfTable(), BlockSpec.Width.MAX
@@ -358,7 +357,7 @@ class CmsController implements WebAttributes {
     }
 
     def videos() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         b.ui {
             ajaxBlock "videosBlock", {
                 table cmsUiService.buildCmsVideoTable(), BlockSpec.Width.MAX
@@ -371,7 +370,7 @@ class CmsController implements WebAttributes {
         def ci = new CmsInsert()
         def cp = new CmsPage()
         def cia = new CmsImage()
-        def f = new UiFilterSpecifier().ui CmsInsert, {
+        def f = new taack.ui.dsl.UiFilterSpecifier().ui CmsInsert, {
             section "Content", {
                 filterField ci.cmsPage_, cp.name_
                 filterField ci.imageApplication_, cia.originalName_
@@ -380,7 +379,7 @@ class CmsController implements WebAttributes {
                 filterField ci.rangeId_
             }
         }
-        def b = new UiBlockSpecifier()
+        def b = new taack.ui.dsl.UiBlockSpecifier()
         b.ui {
             ajaxBlock "videosBlock", {
                 tableFilter f, cmsUiService.buildCmsInsertTable(), BlockSpec.Width.MAX, {
@@ -394,7 +393,7 @@ class CmsController implements WebAttributes {
     def slideshows() {
         def ss = new CmsPage()
         def u = new User()
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             tableFilter(cmsUiService.buildCmsSlideshowFilter(), cmsUiService.buildCmsSlideshowTable(), BlockSpec.Width.MAX, {
                 menu this.&editSlideshow as MC
             })
@@ -402,7 +401,7 @@ class CmsController implements WebAttributes {
     }
 
     def editSlideshow(CmsPage slideshow) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         Boolean createNew = slideshow == null
         if (!slideshow) slideshow = new CmsPage(pageType: CmsPageType.SLIDESHOW)
@@ -437,7 +436,7 @@ class CmsController implements WebAttributes {
     }
 
     def cmsInsertForm(CmsInsert cmsInsert) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         if (!cmsInsert) cmsInsert = new CmsInsert()
         b.ui {
             modal {
@@ -451,7 +450,7 @@ class CmsController implements WebAttributes {
     }
 
     def editCmsImage(CmsImage cmsImage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         boolean removeModal = false
         if (!cmsImage)
             if (params.containsKey('cmsPageId'))
@@ -480,7 +479,7 @@ class CmsController implements WebAttributes {
     }
 
     def editCmsVideo(CmsVideoFile videoFile) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         if (!videoFile) videoFile = new CmsVideoFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
         b.ui {
             modal {
@@ -493,7 +492,7 @@ class CmsController implements WebAttributes {
     }
 
     def editCmsPdf(CmsPdfFile pdfFile) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         if (!pdfFile) pdfFile = new CmsPdfFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
         b.ui {
             modal {
@@ -514,13 +513,13 @@ class CmsController implements WebAttributes {
                 i.save(flush: true)
                 def page = CmsPage.read(params.long('cmsPage.id'))
                 taackUiService.cleanForm()
-                taackSaveService.displayBlockOrRenderErrors(i, new UiBlockSpecifier().ui {
+                taackSaveService.displayBlockOrRenderErrors(i, new taack.ui.dsl.UiBlockSpecifier().ui {
                     closeModalAndUpdateBlock buildImagesTab(page)
                 })
             } else {
                 def i = taackSaveService.save(CmsImage)
                 i.save(flush: true)
-                taackSaveService.displayBlockOrRenderErrors(i, new UiBlockSpecifier().ui {
+                taackSaveService.displayBlockOrRenderErrors(i, new taack.ui.dsl.UiBlockSpecifier().ui {
                     closeModal i.id, i.toString()
                 })
             }
@@ -535,7 +534,7 @@ class CmsController implements WebAttributes {
             videoFile.save(flush: true)
             def page = CmsPage.read(params.long("cmsPage.id"))
             taackUiService.cleanForm()
-            taackSaveService.displayBlockOrRenderErrors(videoFile, new UiBlockSpecifier().ui {
+            taackSaveService.displayBlockOrRenderErrors(videoFile, new taack.ui.dsl.UiBlockSpecifier().ui {
                 closeModalAndUpdateBlock buildVideosTab(page)
             })
         }
@@ -549,14 +548,14 @@ class CmsController implements WebAttributes {
             pdfFile.save(flush: true)
             def page = CmsPage.read(params.long("cmsPage.id"))
             taackUiService.cleanForm()
-            taackSaveService.displayBlockOrRenderErrors(pdfFile, new UiBlockSpecifier().ui {
+            taackSaveService.displayBlockOrRenderErrors(pdfFile, new taack.ui.dsl.UiBlockSpecifier().ui {
                 closeModalAndUpdateBlock buildPdfsTab(page)
             })
         }
     }
 
     def previewBody(String previewLanguage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         String html = """<div class="markdown-body">
                             ${cmsHtmlGeneratorService.translate(params["bodyContent"][previewLanguage] as String, previewLanguage)}
                     </div>
@@ -618,7 +617,7 @@ class CmsController implements WebAttributes {
 
         def html = cmsUiService.bodySlideshow(slideshow, SupportedLanguage.fromIso2(params.previewLanguage as String))
 
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         b.ui {
             modal {
                 ajaxBlock "renderedBody", {
@@ -630,7 +629,7 @@ class CmsController implements WebAttributes {
     }
 
     def previewImage() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         String html = params.long("mainImage") ? """<div class="markdown-body">
                         <img src="/cms/mediaPreview/${params.long("mainImage")}"
                     </div>""" : """No Preview"""
@@ -646,7 +645,7 @@ class CmsController implements WebAttributes {
 
     def previewVideo() {
         CmsVideoFile videoFile = CmsVideoFile.read params.long("mainVideo")
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         String html = videoFile?.preview?.id ? """<div class="markdown-body">
                         <img src="/cms/mediaPreview/${videoFile?.preview?.id}"
                     </div>""" : """ No Preview"""
@@ -661,7 +660,7 @@ class CmsController implements WebAttributes {
     }
 
     def selectPageImage() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def filter = CmsUiService.buildCmsImageFilter(null, ImageType.PAGE_PREVIEW)
         b.ui {
             modal {
@@ -676,7 +675,7 @@ class CmsController implements WebAttributes {
     }
 
     def selectPageImageCloseModal(CmsImage cmsImage) {
-        taackUiService.show new UiBlockSpecifier().ui {
+        taackUiService.show new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModal cmsImage.id, cmsImage.toString()
         }
     }
@@ -720,9 +719,9 @@ class CmsController implements WebAttributes {
     }
 
     def index() {
-        UiBlockSpecifier b = new UiBlockSpecifier().ui {
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier().ui {
             ajaxBlock "indexHelp", {
-                show new UiShowSpecifier().ui {
+                show new taack.ui.dsl.UiShowSpecifier().ui {
                     inlineHtml Markdown.getContentHtml("""\
                         # Markdown
                         
@@ -834,7 +833,7 @@ class CmsController implements WebAttributes {
     }
 
     def pages() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         b.ui {
             ajaxBlock "cmsPageList", {
@@ -847,7 +846,7 @@ class CmsController implements WebAttributes {
     }
 
     def editPage(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         Boolean createNew = cmsPage == null
         if (!cmsPage) cmsPage = new CmsPage()
@@ -883,10 +882,10 @@ class CmsController implements WebAttributes {
         def cu = springSecurityService.currentUser as User
         def cmsSub = CmsSubsidiary.values().find { it.getSubsidiary() == cu.subsidiary }
         block ?= new CmsBlock(subsidiary: cmsSub)
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 ajaxBlock "editBlock", {
-                    form new UiFormSpecifier().ui(block, {
+                    form new taack.ui.dsl.UiFormSpecifier().ui(block, {
                         section('Block Position') {
                             field block.position_
                             field block.subsidiary_
@@ -903,7 +902,7 @@ class CmsController implements WebAttributes {
     }
 
     def selectM2oMenu() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def s = params['subsidiary'] as CmsSubsidiary
         b.ui {
             modal {
@@ -917,7 +916,7 @@ class CmsController implements WebAttributes {
 
     def selectM2oPage() {
         def p = taackUiService.ajaxBind(CmsPage)
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def filter = CmsUiService.buildCmsPageFilter(p)
 
         b.ui {
@@ -932,7 +931,7 @@ class CmsController implements WebAttributes {
 
     @Transactional
     def refreshCmsPageCmsImages(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         cmsPage.bodyContent.each {
             def m = it.value =~ /\$\{IMG#([0-9]*)/
@@ -950,7 +949,7 @@ class CmsController implements WebAttributes {
 
     @Transactional
     def refreshCmsPageCmsVideos(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         cmsPage.bodyContent.each {
             def m = it.value =~ /\$\{VID(_LINK)?#([0-9]*)/
@@ -969,7 +968,7 @@ class CmsController implements WebAttributes {
 
     @Transactional
     def refreshCmsPageCmsPdfs(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         cmsPage.bodyContent.each {
             def m = it.value =~ /\$\{PDF#([0-9]*)/
@@ -986,7 +985,7 @@ class CmsController implements WebAttributes {
     }
 
     def selectM2mCmsImage(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def filter = cmsPage ? CmsUiService.buildCmsImageFilter(cmsPage) : CmsUiService.buildCmsImageFilter(null, params['imageType'] as ImageType)
 
         b.ui {
@@ -1000,7 +999,7 @@ class CmsController implements WebAttributes {
     }
 
     def selectM2mCmsVideo(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def filter = CmsUiService.buildCmsVideoFilter(cmsPage)
 
         b.ui {
@@ -1014,7 +1013,7 @@ class CmsController implements WebAttributes {
     }
 
     def selectM2mCmsPdf(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def filter = CmsUiService.buildCmsPdfFilter(cmsPage)
 
         b.ui {
@@ -1030,7 +1029,7 @@ class CmsController implements WebAttributes {
     def selectM2mCmsSlideshow() {
         def cs = taackUiService.ajaxBind(CmsConfSite)
         CmsSubsidiary cmsSubsidiary = cs.subsidiary
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
         def cmsPage = new CmsPage(subsidiary: cmsSubsidiary, pageType: CmsPageType.SLIDESHOW)
         def filter = CmsUiService.buildCmsSlideshowFilter(cmsPage)
         b.ui {
@@ -1048,7 +1047,7 @@ class CmsController implements WebAttributes {
     def addCmsImageToPage() {
         CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
         cmsPage.addToBodyImages(CmsImage.get(params.getLong("cmsImageId")))
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModalAndUpdateBlock buildImagesTab(cmsPage)
         })
     }
@@ -1058,7 +1057,7 @@ class CmsController implements WebAttributes {
     def addCmsPdfToPage() {
         CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
         cmsPage.addToBodyPdfs(CmsPdfFile.get(params.getLong("cmsPdfId")))
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModalAndUpdateBlock buildPdfsTab(cmsPage)
         })
     }
@@ -1068,7 +1067,7 @@ class CmsController implements WebAttributes {
     def addCmsVideoToPage() {
         CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
         cmsPage.addToBodyVideos(CmsVideoFile.get(params.getLong("cmsVideoId")))
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModalAndUpdateBlock buildVideosTab(cmsPage)
         })
     }
@@ -1078,7 +1077,7 @@ class CmsController implements WebAttributes {
     def removeCmsImageFromPage() {
         CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
         cmsPage.removeFromBodyImages(CmsImage.read(params.getLong("cmsImageId")))
-        taackUiService.show(new UiBlockSpecifier().ui(buildImagesTab(cmsPage)))
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui(buildImagesTab(cmsPage)))
     }
 
     @Transactional
@@ -1086,7 +1085,7 @@ class CmsController implements WebAttributes {
     def removeCmsPdfFromPage() {
         CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
         cmsPage.removeFromBodyPdfs(CmsPdfFile.read(params.getLong("cmsPdfId")))
-        taackUiService.show(new UiBlockSpecifier().ui(buildPdfsTab(cmsPage)))
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui(buildPdfsTab(cmsPage)))
     }
 
     @Transactional
@@ -1094,11 +1093,11 @@ class CmsController implements WebAttributes {
     def removeCmsVideoFromPage() {
         CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
         cmsPage.removeFromBodyVideos(CmsVideoFile.read(params.getLong("cmsVideoId")))
-        taackUiService.show(new UiBlockSpecifier().ui(buildVideosTab(cmsPage)))
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui(buildVideosTab(cmsPage)))
     }
 
-    private static UiTableSpecifier buildCmsMenuEntryTable(CmsSubsidiary subsidiary = null, Long theId = null) {
-        UiTableSpecifier t = new UiTableSpecifier()
+    private static taack.ui.dsl.UiTableSpecifier buildCmsMenuEntryTable(CmsSubsidiary subsidiary = null, Long theId = null) {
+        taack.ui.dsl.UiTableSpecifier t = new taack.ui.dsl.UiTableSpecifier()
         final CmsMenuEntry me = new CmsMenuEntry()
 
         t.ui {
@@ -1156,25 +1155,25 @@ class CmsController implements WebAttributes {
     }
 
     def selectM2mCmsVideoCloseModal(CmsVideoFile videoFile) {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModal(videoFile.id, videoFile.toString())
         })
     }
 
     def selectM2mCmsPdfCloseModal(CmsPdfFile pdfFile) {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModal(pdfFile.id, pdfFile.toString())
         })
     }
 
     def selectM2oMenuCloseModal(CmsMenuEntry menuEntry) {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModal(menuEntry.id, menuEntry.toString())
         })
     }
 
     def selectM2oPageCloseModal(CmsPage page) {
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             closeModal(page.id, page.toString())
         })
     }
@@ -1184,10 +1183,10 @@ class CmsController implements WebAttributes {
         if (params.containsKey('parentMenu')) p = CmsMenuEntry.read(params.long('parentMenu'))
         String title = menuEntry ? "Edit Menu Entry" : "Create Menu Entry"
         menuEntry ?= new CmsMenuEntry(parent: p, subsidiary: p?.subsidiary)
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 ajaxBlock "editMenu", {
-                    form new UiFormSpecifier().ui(menuEntry, {
+                    form new taack.ui.dsl.UiFormSpecifier().ui(menuEntry, {
                         if (p || menuEntry.id) {
                             hiddenField menuEntry.parent_
                             hiddenField menuEntry.subsidiary_
@@ -1217,7 +1216,7 @@ class CmsController implements WebAttributes {
     }
 
     def menuEntries() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
+        taack.ui.dsl.UiBlockSpecifier b = new taack.ui.dsl.UiBlockSpecifier()
 
         b.ui {
             ajaxBlock "menuEntries", {
@@ -1230,7 +1229,7 @@ class CmsController implements WebAttributes {
     }
 
     def blocks() {
-        taackUiService.show(new UiBlockSpecifier().ui({
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui({
             ajaxBlock 'blocks', {
                 table(buildBlockTable(), BlockSpec.Width.MAX) {
                     menu this.&editBlock as MC
@@ -1245,9 +1244,9 @@ class CmsController implements WebAttributes {
 
     def confSites() {
         def cs = new CmsConfSite()
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             ajaxBlock 'confSites', {
-                table(new UiTableSpecifier().ui({
+                table(new taack.ui.dsl.UiTableSpecifier().ui({
                     header {
                         sortableFieldHeader cs.subsidiary_
                         sortableFieldHeader cs.cmsSiteType_
@@ -1271,10 +1270,10 @@ class CmsController implements WebAttributes {
 
     def editCmsConfSite(CmsConfSite confSite) {
         confSite ?= new CmsConfSite()
-        taackUiService.show(new UiBlockSpecifier().ui {
+        taackUiService.show(new taack.ui.dsl.UiBlockSpecifier().ui {
             modal {
                 ajaxBlock 'editCmsConfSite', {
-                    form new UiFormSpecifier().ui(confSite, {
+                    form new taack.ui.dsl.UiFormSpecifier().ui(confSite, {
                         field confSite.subsidiary_
                         field confSite.cmsSiteType_
                         ajaxField confSite.mainSlideShow_, this.&selectM2mCmsSlideshow as MC, confSite.subsidiary_

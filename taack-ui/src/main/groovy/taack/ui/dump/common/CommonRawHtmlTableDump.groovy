@@ -3,9 +3,9 @@ package taack.ui.dump.common
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dump.html.table.ITableTheme
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.table.IUiTableVisitor
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.html.table.BootstrapTable
 

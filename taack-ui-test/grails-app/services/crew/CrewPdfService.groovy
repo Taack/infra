@@ -8,11 +8,11 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.web.api.WebAttributes
 import taack.domain.TaackAttachmentService
 import taack.render.TaackUiService
-import taack.ui.base.UiPrintableSpecifier
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.common.Style
+import taack.ui.dsl.UiPrintableSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.Style
 
 @GrailsCompileStatic
 class CrewPdfService implements WebAttributes {

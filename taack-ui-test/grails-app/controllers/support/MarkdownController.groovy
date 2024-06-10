@@ -8,8 +8,8 @@ import org.codehaus.groovy.runtime.MethodClosure
 import attachment.Attachment
 import taack.domain.TaackSaveService
 import taack.render.TaackUiService
-import taack.ui.base.UiBlockSpecifier
-import taack.ui.base.block.BlockSpec
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.markdown.Markdown
 
 @GrailsCompileStatic

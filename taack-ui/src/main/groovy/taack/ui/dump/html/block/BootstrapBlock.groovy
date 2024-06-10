@@ -1,8 +1,8 @@
 package taack.ui.dump.html.block
 
 import groovy.transform.CompileStatic
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.form.FormSpec
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.form.FormSpec
 import taack.ui.dump.html.base.HTMLDiv
 import taack.ui.dump.html.base.IHTMLElement
 import taack.ui.dump.html.base.TaackTag

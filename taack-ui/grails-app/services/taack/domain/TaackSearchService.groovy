@@ -22,11 +22,11 @@ import taack.solr.SolrIndexerVisitor
 import taack.solr.SolrSearcherVisitor
 import taack.solr.SolrSpecifier
 import taack.ui.TaackUiConfiguration
-import taack.ui.base.UiBlockSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.IconStyle
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
 
 import javax.annotation.PostConstruct
 

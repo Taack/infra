@@ -1,12 +1,12 @@
 package taack.ui.dump.mail
 
 import groovy.transform.CompileStatic
-import taack.ui.base.UiChartSpecifier
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.block.UiBlockVisitor
-import taack.ui.base.common.Style
+import taack.ui.dsl.UiChartSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.block.UiBlockVisitor
+import taack.ui.dsl.common.Style
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawHtmlChartDump
 

@@ -13,8 +13,8 @@ import taack.ui.dump.html.base.IHTMLElement
 import taack.ui.dump.html.base.InputType
 import taack.ui.dump.html.base.TaackTag
 import taack.ui.dump.html.theme.ThemeSelector
-import taack.ui.base.form.FormSpec
-import taack.ui.base.form.IUiFormVisitor
+import taack.ui.dsl.form.FormSpec
+import taack.ui.dsl.form.IUiFormVisitor
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.IFormTheme
 

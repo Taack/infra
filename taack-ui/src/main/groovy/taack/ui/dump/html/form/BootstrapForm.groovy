@@ -3,7 +3,7 @@ package taack.ui.dump.html.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
-import taack.ui.base.form.FormSpec
+import taack.ui.dsl.form.FormSpec
 import taack.ui.dump.html.base.ButtonStyle
 import taack.ui.dump.html.base.HTMLButton
 import taack.ui.dump.html.base.HTMLDiv
