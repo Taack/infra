@@ -41,12 +41,15 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private int tabIds = 0
     private FieldInfo[] lockedFields
 
-    IFormTheme formThemed
+    final IFormTheme formThemed
     IHTMLElement topElement
 
     RawHtmlFormDump(final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
         this.parameter = parameter
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize)
+
     }
 
     static String inputEscape(final String val) {
@@ -70,22 +73,20 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.lockedFields = lockedFields
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
-        ThemeSelector ts = parameter.uiThemeService.themeSelector
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
+        formThemed.builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
                 new HTMLInput(InputType.HIDDEN, id, 'id'),
                 new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
                 new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
-        ).build() as IFormTheme
+        )
         topElement = formThemed
     }
 
     @Override
     void visitFormEnd() {
         topElement = closeTags(TaackTag.SECTION)
-
         topElement = formThemed.formActionBlock(topElement)
         formActions.each {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
@@ -312,5 +313,4 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             )
         }
     }
-
 }

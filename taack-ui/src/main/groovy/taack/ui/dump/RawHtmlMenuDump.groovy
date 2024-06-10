@@ -37,7 +37,7 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
         } else {
             out << """
              <li class="nav-item">
-                <a class="nav-link" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">${i18n}</a>
+                <a class="nav-link" href="#">${i18n}</a>
             </li>
             """
 
@@ -200,7 +200,7 @@ class RawHtmlMenuDump implements IUiMenuVisitor {
             } else {
                 out << """\
                     <li>
-                        <a class='dropdown-item' href='${parameter.urlMapped(controller, action, parameter.params, false)}'>
+                        <a class='dropdown-item' href='${parameter.urlMapped(controller, action, parameter.params as Map, false)}'>
                             ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
                             ${option.value}
                         </a>
