@@ -3,7 +3,9 @@ package taack.ui.dump.html.block
 import groovy.transform.CompileStatic
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.form.FormSpec
+import taack.ui.dump.html.element.HTMLButton
 import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLNav
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.layout.BootstrapLayout
@@ -26,9 +28,28 @@ final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
         new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build()
     }
 
+    static IHTMLElement blockHeader(IHTMLElement topElement) {
+        topElement.addChildren(
+                new HTMLNav().builder.addClasses('navbar', 'navbar-expand-md').setTaackTag(TaackTag.MENU_BLOCK).addChildren(
+                        new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
+                                new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
+                                        .addClasses('navbar-toggler', 'navbar-dark')
+                                        .putAttribute('data-bs-toggle', 'collapse')
+                                        .putAttribute('data-bs-target', '#navbarSupportedContent')
+                                        .putAttribute('aria-controls', 'navbarSupportedContent')
+                                        .putAttribute('aria-expanded', 'false')
+                                        .putAttribute('aria-label', 'Toggle navigation')
+                                        .build(),
+                                new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent').build()
+                        ).build()
+                ).build()
+        )
+        topElement.children.first().children.first().children.last()
+    }
+
     @Override
-    IHTMLElement blockAjax(IHTMLElement topElement, String blockId) {
-        return null
+    IHTMLElement blockAjax(String blockId) {
+        return new HTMLAjaxBlock(blockId)
     }
 
     @Override

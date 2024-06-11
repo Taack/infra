@@ -36,11 +36,11 @@ final class MenuSpec {
 
     void label(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure = null) {
         if (closure) {
-            menuVisitor.visitLabel(i18n, true)
+            menuVisitor.visitMenuLabel(i18n, true)
             closure.delegate = subMenuSpec
             closure.call()
-            menuVisitor.visitLabelEnd()
-        } else menuVisitor.visitLabel(i18n, false)
+            menuVisitor.visitMenuLabelEnd()
+        } else menuVisitor.visitMenuLabel(i18n, false)
     }
 
     void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {
@@ -74,9 +74,9 @@ final class MenuSpec {
 
     void section(final String i18n, final MenuPosition position = MenuPosition.TOP_LEFT,
                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
-        menuVisitor.visitSection(i18n, position)
+        menuVisitor.visitMenuSection(i18n, position)
         closure.delegate = subMenuSpec
         closure.call()
-        menuVisitor.visitSectionEnd()
+        menuVisitor.visitMenuSectionEnd()
     }
 }

@@ -9,9 +9,9 @@ import taack.ui.dump.html.element.IHTMLElement
 
 interface IUiMenuVisitor extends IHTMLElement {
 
-    void visitLabel(String i18n, boolean hasClosure)
+    void visitMenuLabel(String i18n, boolean hasClosure)
 
-    void visitLabelEnd()
+    void visitMenuLabelEnd()
 
     void visitMenuStart(MenuSpec.MenuMode menuMode)
 
@@ -21,9 +21,9 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitSubMenu(final String controller, final String action, final Map<String, ? extends Object> params)
 
-    void visitSection(final String i18n, final MenuSpec.MenuPosition position)
+    void visitMenuSection(final String i18n, final MenuSpec.MenuPosition position)
 
-    void visitSectionEnd()
+    void visitMenuSectionEnd()
 
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ? extends Object> params, final boolean isModal)
 

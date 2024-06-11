@@ -10,7 +10,7 @@ trait IBlockTheme implements IHTMLElement {
 
     abstract IHTMLElement block(String blockId)
 
-    abstract IHTMLElement blockAjax(IHTMLElement topElement, String blockId)
+    abstract IHTMLElement blockAjax(String blockId)
 
     abstract IHTMLElement innerBlock(IHTMLElement topElement, String i18n, String blockId, BlockSpec.Width width)
 

@@ -9,6 +9,8 @@ enum TaackTag {
     BLOCK,
     MENU,
     MENU_OPTION,
+    MENU_COL,
+    MENU_BLOCK,
     INNER_BLOCK,
     AJAX_BLOCK,
     FORM,

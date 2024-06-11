@@ -10,12 +10,12 @@ import taack.ui.dsl.common.ActionIcon
 class UiMenuVisitor implements IUiMenuVisitor {
 
     @Override
-    void visitLabel(String i18n, boolean hasClosure) {
+    void visitMenuLabel(String i18n, boolean hasClosure) {
 
     }
 
     @Override
-    void visitLabelEnd() {
+    void visitMenuLabelEnd() {
 
     }
 
@@ -40,12 +40,12 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
-    void visitSection(String i18n, MenuSpec.MenuPosition position) {
+    void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
 
     }
 
     @Override
-    void visitSectionEnd() {
+    void visitMenuSectionEnd() {
 
     }
 

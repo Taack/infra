@@ -140,7 +140,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     static String visitMenu(final UiMenuSpecifier menuSpecifier) {
         ByteArrayOutputStream menuStream = new ByteArrayOutputStream()
 
-        RawHtmlMenuDump htmlBlock = new RawHtmlMenuDump(menuStream, "0", new Parameter(false, LocaleContextHolder.locale, staticMs))
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(menuStream, new Parameter(false, LocaleContextHolder.locale, staticMs))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
             menuStream.toString()
