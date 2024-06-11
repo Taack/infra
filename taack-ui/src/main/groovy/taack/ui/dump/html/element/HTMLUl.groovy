@@ -5,6 +5,6 @@ import groovy.transform.CompileStatic
 @CompileStatic
 final class HTMLUl implements IHTMLElement {
     HTMLUl() {
-        tag = 'Ul'
+        tag = 'ul'
     }
 }

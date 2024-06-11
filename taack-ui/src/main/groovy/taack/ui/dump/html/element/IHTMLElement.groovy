@@ -8,6 +8,7 @@ import taack.ui.dump.html.style.IStyleDescriptor
 enum TaackTag {
     BLOCK,
     MENU,
+    MENU_SPLIT,
     MENU_OPTION,
     MENU_COL,
     MENU_BLOCK,

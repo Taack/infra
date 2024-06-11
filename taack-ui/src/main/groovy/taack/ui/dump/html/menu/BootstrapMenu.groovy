@@ -35,39 +35,52 @@ final class BootstrapMenu implements IHTMLElement {
         this.themeSize = themeSize
     }
 
-    static IHTMLElement menuStart(IHTMLElement topElement) {
-        new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').setTaackTag(TaackTag.MENU).build()
+
+    IHTMLElement menuStart(IHTMLElement topElement = null) {
+        topElement ?= this
+        topElement.addChildren(
+                new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').setTaackTag(TaackTag.MENU).build()
+        )
+        return topElement.children.last()
     }
 
     static IHTMLElement splitMenuStart(IHTMLElement topElement) {
         topElement.addChildren(
-                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').setTaackTag(TaackTag.MENU).build()
+                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').setTaackTag(TaackTag.MENU_SPLIT).build()
         )
-        topElement.children.first()
+        topElement.children.last()
     }
 
     static IHTMLElement label(IHTMLElement topElement, String i18n, boolean hasClosure) {
-        if (hasClosure)
-            topElement.builder.addChildren(
+        if (hasClosure) {
+            HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build()
+            topElement.addChildren(
                     new HTMLLi().builder.addClasses('nav-item', 'dropdown').setTaackTag(TaackTag.LABEL).addChildren(
                             new HTMLAnchor(false, '#').builder
-                                    .addClasses('nav-item', 'dropdown-toggle')
+                                    .addClasses('nav-link', 'dropdown-toggle')
                                     .putAttribute('role', 'button')
                                     .putAttribute('data-bs-toggle', 'dropdown')
                                     .putAttribute('aria-expanded', 'false')
                                     .addChildren(
                                             new HTMLTxtContent(i18n)
-                                    ).build()
+                                    ).build(),
+                            ul
                     ).build()
-            ).build().children.first()
-        else
-            topElement.builder.addChildren(
+            )
+            println "i18n $i18n, $hasClosure"
+            println topElement.children.first().children.last()
+            println topElement.children.last().children.last().output
+            return ul
+        } else {
+            topElement.addChildren(
                     new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                            new HTMLAnchor(false, '#').builder.addClasses('nav-item').addChildren(
+                            new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
                                     new HTMLTxtContent(i18n)
                             ).build()
                     ).build()
-            ).build()
+            )
+            return topElement
+        }
     }
 
     static IHTMLElement menu(IHTMLElement topElement, String i18n, String url) {
@@ -80,18 +93,17 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     static IHTMLElement section(IHTMLElement topElement, String i18n) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
                         new HTMLSpan().builder.addClasses('navbar-text').addChildren(new HTMLTxtContent('<b>' + i18n + '</b>')).build()
                 ).build()
-        )
-        topElement
+        ).build()
     }
 
     static IHTMLElement menuIcon(IHTMLElement topElement, String iconHtml, String url, boolean isAjax) {
         topElement.addChildren(
                 new HTMLLi().builder.addClasses().addChildren(
-                        new HTMLAnchor(isAjax, url).builder.addClasses('navbar-link').addChildren(new HTMLTxtContent(iconHtml)).build()
+                        new HTMLAnchor(isAjax, url).builder.addClasses('nav-link').addChildren(new HTMLTxtContent(iconHtml)).build()
                 ).build()
         )
         topElement
@@ -110,33 +122,43 @@ final class BootstrapMenu implements IHTMLElement {
 
     static IHTMLElement menuOption(IHTMLElement topElement, String img, String value, String url) {
         topElement.addChildren(
-                new HTMLAnchor(false, url).builder.addClasses('nav-link').addChildren(
-                        new HTMLTxtContent(img),
-                        new HTMLTxtContent(value)
+                new HTMLLi().builder.addChildren(
+                        new HTMLAnchor(false, url).builder.addClasses('dropdown-item').addChildren(
+                                new HTMLTxtContent(img),
+                                new HTMLTxtContent(value)
+                        ).build()
                 ).build()
         )
         topElement
     }
 
     static IHTMLElement menuOptionSection(IHTMLElement topElement, String img, String value) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
                         new HTMLTxtContent(img),
                         new HTMLTxtContent(value)
                 ).build()
-        )
-        topElement
+        ).build()
     }
 
     static IHTMLElement menuOptions(IHTMLElement topElement, String img, String value) {
-        topElement.addChildren(
-                new HTMLLi().builder.addClasses('nav-item', 'dropdown').setTaackTag(TaackTag.MENU_OPTION).addChildren(
-                        new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
-                                new HTMLTxtContent(img),
-                                new HTMLTxtContent(value)
+        topElement.builder.addChildren(
+                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').setTaackTag(TaackTag.MENU_OPTION).addChildren(
+                        new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                                new HTMLAnchor(false, '#').builder
+                                        .addClasses('nav-link', 'dropdown-toggle')
+                                        .putAttribute('role', 'button')
+                                        .putAttribute('data-bs-toggle', 'dropdown')
+                                        .putAttribute('aria-haspopup', 'true')
+                                        .putAttribute('aria-expanded', 'false')
+                                        .addChildren(
+                                                new HTMLTxtContent(img),
+                                                new HTMLTxtContent(value)
+                                        ).build(),
+                                new HTMLUl().builder.addClasses('dropdown-menu').build()
                         ).build()
-                ).build()
+                ).build(),
         )
-        topElement.children.first()
+        topElement.children.last().children.first().children.last()
     }
 }

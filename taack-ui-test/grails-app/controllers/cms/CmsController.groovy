@@ -73,7 +73,6 @@ class CmsController implements WebAttributes {
             menu this.&pdfs as MC
             menu this.&videos as MC
             menu this.&blocks as MC
-//            menu this.&inserts as MC
             menu this.&slideshows as MC
             label "Admin", {
                 subMenu this.&confSites as MC
@@ -367,30 +366,6 @@ class CmsController implements WebAttributes {
         b.ui {
             ajaxBlock "videosBlock", {
                 table cmsUiService.buildCmsVideoTable(), BlockSpec.Width.MAX
-            }
-        }
-        taackUiService.show(b, buildMenu())
-    }
-
-    def inserts() {
-        def ci = new CmsInsert()
-        def cp = new CmsPage()
-        def cia = new CmsImage()
-        def f = new UiFilterSpecifier().ui CmsInsert, {
-            section "Content", {
-                filterField ci.cmsPage_, cp.name_
-                filterField ci.imageApplication_, cia.originalName_
-                filterField ci.itemId_
-                filterField ci.subFamilyId_
-                filterField ci.rangeId_
-            }
-        }
-        def b = new UiBlockSpecifier()
-        b.ui {
-            ajaxBlock "videosBlock", {
-                tableFilter f, cmsUiService.buildCmsInsertTable(), BlockSpec.Width.MAX, {
-                    menu this.&cmsInsertForm as MC
-                }
             }
         }
         taackUiService.show(b, buildMenu())

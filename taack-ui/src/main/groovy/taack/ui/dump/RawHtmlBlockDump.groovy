@@ -43,7 +43,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     private int tabOccurrencePrevious = 0
     private int tabIds = 0
 
-    final BootstrapBlock bootstrapBlock
+    final BootstrapBlock block
     final BootstrapMenu menu
     final Parameter parameter
 
@@ -57,21 +57,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (parameter.params.boolean('refresh'))
             isModalRefresh = true
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        bootstrapBlock = new BootstrapBlock(ts.themeMode, ts.themeSize)
+        block = new BootstrapBlock(ts.themeMode, ts.themeSize)
+        menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
     }
 
     private IHTMLElement closeTags(TaackTag tag) {
         IHTMLElement top = topElement
-        while (top && top.taackTag != tag) {
+        while (top && top.taackTag != tag && top.parent) {
             top = top.parent
         }
-        (top?.taackTag == tag ? top?.parent : top) ?: bootstrapBlock
+        top.parent ?: top
+//        (top?.taackTag == tag ? top?.parent : top) ?: block
     }
 
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            topElement = bootstrapBlock.block("${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
+            topElement = block.block("${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
         }
     }
 
@@ -80,44 +82,29 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (!parameter.isAjaxRendering || isModal) {
             topElement = closeTags(TaackTag.BLOCK)
         }
+        out << block.output
     }
 
     @Override
     void visitBlockHeader() {
-        topElement = bootstrapBlock.blockHeader(topElement)
-//        out << """
-//            <nav class="navbar navbar-expand-md" >
-//                <div id="dropdownNav" class="container-fluid">
-//                    <button id="dLabel" class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse"
-//                            data-bs-target="#navbarSupportedContent"
-//                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
-//                            data-bs-toggle="dropdownNav">
-//                        <span class="navbar-toggler-icon"></span>
-//                    </button>
-//                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-//        """
+        topElement = block.blockHeader(topElement)
     }
 
     @Override
     void visitBlockHeaderEnd() {
-//        out << """
-//                    </div>
-//                </div>
-//            </nav>
-//        """
         topElement = closeTags(TaackTag.MENU_BLOCK)
     }
 
     @Override
     void visitCol(final BlockSpec.Width width) {
 //        out << """<div class="${width.bootstrapCss} align-items-start">"""
-        topElement = bootstrapBlock.col(topElement)
+        topElement = block.col(topElement)
     }
 
     @Override
     void visitInnerColBlockEnd() {
 //        out << "</div>"
-        topElement = closeTags(TaackTag.MENU_COL)
+        topElement = closeTags(TaackTag.COL)
 
     }
 
@@ -131,7 +118,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             ajaxBlockId = id
         }
 //        if (isModalRefresh) out << "__ajaxBlockStart__$id:"
-        if (isModalRefresh) topElement = bootstrapBlock.blockAjax(id)
+        if (isModalRefresh) topElement = block.blockAjax(id)
     }
 
     @Override
@@ -149,7 +136,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitFormEnd(UiFormSpecifier formSpecifier) {
         visitCloseTitle()
-        formSpecifier.visitForm(new RawHtmlFormDump(out, parameter))
+        formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
         visitInnerColBlockEnd()
     }
 
@@ -206,7 +193,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
         visitInnerColBlockEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
     }
@@ -240,7 +227,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitDiagramFilter(final UiFilterSpecifier filterSpecifier, final BlockSpec.Width width) {
         visitCol(width)
         visitCloseTitle()
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
         visitInnerColBlockEnd()
     }
 
@@ -267,7 +254,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTab(final String i18n) {
         currentTabNames << i18n
 //        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0 ? "Inner" : ""}">"""
-        topElement = bootstrapBlock.tab(topElement, ++tabOccurrence)
+        topElement = block.tab(topElement, ++tabOccurrence)
     }
 
     @Override
@@ -314,7 +301,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         tabOccurrencePrevious = 0
         out << "</section></div>"
 
-        topElement = bootstrapBlock.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
+        topElement = block.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
 
     }
 
@@ -344,17 +331,19 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitRow() {
-        out << """<div class="row align-items-start">"""
+//        out << """<div class="row align-items-start">"""
+        topElement = block.row(topElement)
     }
 
     @Override
     void visitRowEnd() {
-        out << "</div>"
+//        out << "</div>"
+        topElement = closeTags(TaackTag.ROW)
     }
 
     @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
-        topElement = menu.label(this, i18n, hasClosure)
+        topElement = menu.label(topElement, i18n, hasClosure)
     }
 
     @Override
@@ -365,15 +354,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
         topElement = menu.menuStart(topElement)
+
     }
 
     @Override
     void visitMenuStartEnd() {
         topElement = closeTags(TaackTag.MENU)
+        out << menu.output
     }
 
     private void splitMenuStart() {
-        topElement = closeTags(TaackTag.MENU)
+        topElement = menu
         topElement = menu.splitMenuStart(topElement)
     }
 
@@ -391,7 +382,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
-        menu.menu(topElement, i18n, parameter.urlMapped(controller, action, params))
+        topElement = menu.menu(topElement, i18n, parameter.urlMapped(controller, action, params))
     }
 
     @Override
@@ -408,7 +399,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
         i18n ?= parameter.trField(controller, action)
         splitMenuStart()
-        menu.menuIcon(topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        topElement = menu.menuIcon(topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
     }
 
     @Override
@@ -427,7 +418,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
         splitMenuStart()
-        menu.menuSearch(topElement, q?.replace('"', "&quot;"), parameter.urlMapped(Utils.getControllerName(action), action.method))
+        topElement = menu.menuSearch(menu, q?.replace('"', "&quot;"), parameter.urlMapped(Utils.getControllerName(action), action.method))
     }
 
     @Override
@@ -437,19 +428,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
-//        String current = """\
-//            <a class="nav-link dropdown-toggle" id="navbar${enumOptions.paramKey.capitalize()}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-//                ${currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''}
-//                ${selectedOptionValue}
-//            </a>
-//        """.stripIndent()
-
-//        out << """\
-//        <li class="nav-item dropdown">
-//            $current
-//            <ul class="dropdown-menu" aria-labelledby="navbar${enumOptions.paramKey.capitalize()}">
-//        """.stripIndent()
-
         String img = currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
 
         topElement = menu.menuOptions(topElement, img, selectedOptionValue)
@@ -466,33 +444,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             parameter.params.put(enumOptions.paramKey, option.key)
             if (option.section) {
                 img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
-//                out << """\
-//                    <li>
-//                        <a class="dropdown-item" style="color: #887700">
-//                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
-//                            <b>${option.value}</b>
-//                        </a>
-//                    </li>
-//                """.stripIndent()
                 menu.menuOptionSection(topElement, img, option.value)
             } else {
-//                out << """\
-//                    <li>
-//                        <a class='dropdown-item' href='${parameter.urlMapped(controller, action, parameter.params as Map, false)}'>
-//                            ${parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")}
-//                            ${option.value}
-//                        </a>
-//                    </li>
-//                """.stripIndent()
                 String url = parameter.urlMapped(controller, action, parameter.params as Map, false)
                 menu.menuOption(topElement, img, option.value, url)
             }
         }
-//        out << """\
-//            </ul>
-//        </li>
-//        """.stripIndent()
-        closeTags(TaackTag.MENU_OPTION)
+        topElement = closeTags(TaackTag.MENU_OPTION)
 
     }
 

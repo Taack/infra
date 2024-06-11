@@ -21,15 +21,14 @@ import taack.ui.dump.html.theme.ThemeSelector
 @CompileStatic
 final class RawHtmlFilterDump implements IUiFilterVisitor {
 
-    final private ByteArrayOutputStream out
     final private Parameter parameter
     final private List<Triple<String, ButtonStyle, String>> filterActions = []
 
     IFormTheme formThemed
     IHTMLElement topElement
 
-    RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        this.out = out
+    RawHtmlFilterDump(final IHTMLElement topElement, final Parameter parameter) {
+        this.topElement = topElement
         this.parameter = parameter
         filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
         filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
@@ -88,7 +87,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
         topElement = closeTags(TaackTag.FILTER)
-        out << formThemed.output
     }
 
     @Override

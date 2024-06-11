@@ -45,8 +45,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     final IFormTheme formThemed
     IHTMLElement topElement
 
-    RawHtmlFormDump(final ByteArrayOutputStream out, final Parameter parameter) {
+    RawHtmlFormDump(IHTMLElement topElement, final Parameter parameter) {
         this.out = out
+        this.topElement = topElement
         this.parameter = parameter
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         formThemed = new BootstrapForm(ts.themeMode, ts.themeSize)
@@ -75,12 +76,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        formThemed.builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
-                new HTMLInput(InputType.HIDDEN, id, 'id'),
-                new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
-                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
-                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
-                new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
+        topElement.builder.addChildren(
+                formThemed.builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
+                        new HTMLInput(InputType.HIDDEN, id, 'id'),
+                        new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
+                        new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
+                        new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
+                        new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
+                ).build()
         )
         topElement = formThemed
     }

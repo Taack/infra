@@ -40,7 +40,9 @@ final class MenuSpec {
             closure.delegate = subMenuSpec
             closure.call()
             menuVisitor.visitMenuLabelEnd()
-        } else menuVisitor.visitMenuLabel(i18n, false)
+        } else {
+            menuVisitor.visitMenuLabel(i18n, false)
+        }
     }
 
     void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {
