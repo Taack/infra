@@ -36,10 +36,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     static IHTMLElement menuStart(IHTMLElement topElement) {
-        topElement.addChildren(
-                new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').setTaackTag(TaackTag.MENU).build()
-        )
-        topElement.children.first()
+        new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').setTaackTag(TaackTag.MENU).build()
     }
 
     static IHTMLElement splitMenuStart(IHTMLElement topElement) {
