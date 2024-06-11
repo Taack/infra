@@ -68,7 +68,7 @@ final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
     }
 
     @Override
-    IHTMLElement blockTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width) {
+    IHTMLElement blockTabs(IHTMLElement topElement, int tabIds, List<String> names, BlockSpec.Width width) {
         return null
     }
 

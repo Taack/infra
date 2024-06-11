@@ -1,13 +1,13 @@
 package taack.ui.dump.html.layout
 
 import groovy.transform.CompileStatic
-import taack.ui.dsl.form.FormSpec
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.html.element.*
 
 @CompileStatic
 class BootstrapLayout {
 
-    static IHTMLElement tabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width) {
+    static IHTMLElement tabs(IHTMLElement topElement, int tabIds, List<String> names, BlockSpec.Width width) {
         HTMLInput[] radioList = new HTMLInput[names.size()]
         HTMLLi[] liList = new HTMLLi[names.size()]
         names.eachWithIndex { it, occ ->
@@ -23,7 +23,7 @@ class BootstrapLayout {
         topElement.builder.addChildren(
                 new HTMLDiv().builder
                         .setTaackTag(TaackTag.TABS)
-                        .addClasses('pc-tab', width.sectionCss)
+                        .addClasses('pc-tab', width.bootstrapCss)
                         .addChildren(radioList)
                         .addChildren(
                                 new HTMLNav().builder.addChildren(

@@ -125,7 +125,7 @@ class CmsController implements WebAttributes {
         UiFormSpecifier f = new UiFormSpecifier()
 
         f.ui cmsPage, {
-            section "Page Information", FormSpec.Width.FULL_WIDTH, {
+            section "Page Information", BlockSpec.Width.MAX, {
                 row {
                     col {
                         field cmsPage.name_
@@ -156,7 +156,7 @@ class CmsController implements WebAttributes {
             }
 
             if (cmsPage.subsidiary)
-                tabs FormSpec.Width.FULL_WIDTH, {
+                tabs BlockSpec.Width.MAX, {
                     for (SupportedLanguage language : cmsPage.subsidiary.languages) {
                         tabLabel "${language.label}", {
                             fieldFromMap cmsPage.title_, language.toString().toLowerCase()
@@ -178,7 +178,7 @@ class CmsController implements WebAttributes {
 
         f.ui cmsPage, {
             hiddenField(cmsPage.pageType_)
-            section "Slideshow Information", FormSpec.Width.FULL_WIDTH, {
+            section "Slideshow Information", BlockSpec.Width.MAX, {
                 row {
                     col {
                         field cmsPage.name_
@@ -195,7 +195,7 @@ class CmsController implements WebAttributes {
                 }
             }
             if (cmsPage.subsidiary)
-                tabs FormSpec.Width.FULL_WIDTH, {
+                tabs BlockSpec.Width.MAX, {
                     for (SupportedLanguage language : cmsPage.subsidiary.languages) {
                         tabLabel "${language.label}", {
                             fieldFromMap cmsPage.bodyContent_, language.toString().toLowerCase()
@@ -210,19 +210,19 @@ class CmsController implements WebAttributes {
 
     private static UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
         new UiFormSpecifier().ui cmsInsert, {
-            section "Position", FormSpec.Width.DOUBLE_WIDTH, {
+            section "Position", BlockSpec.Width.HALF, {
                 field cmsInsert.x_
                 field cmsInsert.y_
                 field cmsInsert.width_
             }
 
-            section "Object", FormSpec.Width.DOUBLE_WIDTH, {
+            section "Object", BlockSpec.Width.HALF, {
                 field cmsInsert.itemId_
                 field cmsInsert.subFamilyId_
                 field cmsInsert.rangeId_
             }
 
-            tabs FormSpec.Width.FULL_WIDTH, {
+            tabs BlockSpec.Width.MAX, {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     tabLabel "Text ${language.label}", {
                         fieldFromMap "Title ${language.toString().toLowerCase()}", cmsInsert.title_, language.toString().toLowerCase()
@@ -238,7 +238,7 @@ class CmsController implements WebAttributes {
         UiFormSpecifier f = new UiFormSpecifier()
         f.ui cmsImage, {
             if (cmsImage.cmsPage) hiddenField cmsImage.cmsPage_
-            section "File Upload", FormSpec.Width.FULL_WIDTH, {
+            section "File Upload", BlockSpec.Width.MAX, {
                 field cmsImage.filePath_
                 field cmsImage.imageType_
                 for (SupportedLanguage language : SupportedLanguage.values()) {
@@ -253,18 +253,18 @@ class CmsController implements WebAttributes {
     private static UiFormSpecifier buildCmsVideoForm(final CmsVideoFile cmsVideo) {
         new UiFormSpecifier().ui cmsVideo, {
             hiddenField cmsVideo.cmsPage_
-            section "File Upload", FormSpec.Width.DOUBLE_WIDTH, {
+            section "File Upload", BlockSpec.Width.HALF, {
                 field cmsVideo.filePath_
             }
-            section "Video Preview", FormSpec.Width.DOUBLE_WIDTH, {
+            section "Video Preview", BlockSpec.Width.HALF, {
                 ajaxField cmsVideo.preview_, CmsController.&selectM2mCmsImage as MC, ['imageType': ImageType.MEDIA_POSTER.toString()]
             }
-            section "Alt Text", FormSpec.Width.DOUBLE_WIDTH, {
+            section "Alt Text", BlockSpec.Width.HALF, {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "ALT Text ${language.label}", cmsVideo.altText_, language.toString().toLowerCase()
                 }
             }
-            section "Youtube id", FormSpec.Width.DOUBLE_WIDTH, {
+            section "Youtube id", BlockSpec.Width.HALF, {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "id for ${language.label}", cmsVideo.youtubeI18n_, language.toString().toLowerCase()
                 }
@@ -276,7 +276,7 @@ class CmsController implements WebAttributes {
     private static UiFormSpecifier buildCmsPdfForm(final CmsPdfFile pdfFile) {
         new UiFormSpecifier().ui pdfFile, {
             hiddenField pdfFile.cmsPage_
-            section "File Upload", FormSpec.Width.FULL_WIDTH, {
+            section "File Upload", BlockSpec.Width.MAX, {
                 field pdfFile.filePath_
             }
             section "Alt Text", {
@@ -1197,7 +1197,7 @@ class CmsController implements WebAttributes {
                             hiddenField menuEntry.parent_
                             hiddenField menuEntry.subsidiary_
                         }
-                        section "Menu Entry", FormSpec.Width.DOUBLE_WIDTH, {
+                        section "Menu Entry", BlockSpec.Width.HALF, {
                             field menuEntry.code_
                             field menuEntry.suffixLink_
                             field menuEntry.position_
@@ -1209,7 +1209,7 @@ class CmsController implements WebAttributes {
                             ajaxField menuEntry.page_, this.&selectM2oPage as MC, menuEntry.subsidiary_
 
                         }
-                        section "Menu Entry Translation", FormSpec.Width.DOUBLE_WIDTH, {
+                        section "Menu Entry Translation", BlockSpec.Width.HALF, {
                             for (def l in SupportedLanguage.values()) {
                                 fieldFromMap "Title ${l.label}", menuEntry.title_, l.toString().toLowerCase()
                             }

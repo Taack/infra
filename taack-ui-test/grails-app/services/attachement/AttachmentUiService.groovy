@@ -234,7 +234,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildDocumentAccessForm(DocumentAccess docAccess, MC returnMethod = AttachmentController.&saveDocAccess as MC, Map other = null) {
         new UiFormSpecifier().ui docAccess, {
-            section "Security", FormSpec.Width.FULL_WIDTH, {
+            section "Security", BlockSpec.Width.MAX, {
                 row {
                     col {
                         field docAccess.isInternal_
@@ -256,7 +256,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildDocumentDescriptorForm(DocumentCategory docCat, MC returnMethod = AttachmentController.&saveDocDesc as MC, Map other = null) {
         new UiFormSpecifier().ui docCat, {
-            section "Category", FormSpec.Width.DOUBLE_WIDTH, {
+            section "Category", BlockSpec.Width.HALF, {
                 field docCat.category_
                 ajaxField docCat.tags_, AttachmentController.&selectTagsM2M as MC
             }
@@ -266,7 +266,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildAttachmentForm(Attachment attachment, MC returnMethod = AttachmentController.&saveAttachment as MC, Map other = null) {
         new UiFormSpecifier().ui attachment, {
-            section "File Info", FormSpec.Width.DOUBLE_WIDTH, {
+            section "File Info", BlockSpec.Width.HALF, {
                 field attachment.filePath_
                 ajaxField attachment.documentCategory_, AttachmentController.&selectDocumentCategory as MC, attachment.documentCategory?.id
                 ajaxField attachment.documentAccess_, AttachmentController.&selectDocumentAccess as MC, attachment.documentAccess_
@@ -280,7 +280,7 @@ final class AttachmentUiService implements WebAttributes {
             field term.name_
             field term.termGroupConfig_
             ajaxField term.parent_, AttachmentController.&selectTermM2O as MC
-            tabs FormSpec.Width.FULL_WIDTH, {
+            tabs BlockSpec.Width.MAX, {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     tabLabel "Translation ${language.label}", {
                         fieldFromMap "Translation ${language.toString().toLowerCase()}", term.translations_, language.toString().toLowerCase()

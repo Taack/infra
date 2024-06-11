@@ -3,6 +3,7 @@ package taack.ui.dsl.form
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.form.IFormTheme
@@ -88,12 +89,12 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormSection(String i18n, FormSpec.Width width) {
+    void visitFormSection(String i18n, BlockSpec.Width width) {
 
     }
 
     @Override
-    void visitFormTabs(List<String> names, FormSpec.Width width) {
+    void visitFormTabs(List<String> names, BlockSpec.Width width) {
 
     }
 

@@ -7,6 +7,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
 import taack.ui.dump.html.element.IHTMLElement
@@ -98,8 +99,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormSection(String i18n, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        topElement = formThemed.section(topElement, i18n, width.sectionCss.split(' '))
+    void visitFormSection(String i18n, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
+        topElement = formThemed.section(topElement, i18n, width.bootstrapCss.split(' '))
     }
 
     @Override
@@ -213,7 +214,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
+    void visitFormTabs(List<String> names, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
         topElement = BootstrapLayout.tabs(topElement, tabIds, names, width)
         tabIds++
     }

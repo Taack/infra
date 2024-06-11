@@ -190,7 +190,7 @@ class CrewController implements WebAttributes {
 
         taack.ui.dsl.UiFormSpecifier f = new taack.ui.dsl.UiFormSpecifier()
         f.ui user, {
-            section "User", FormSpec.Width.ONE_THIRD, {
+            section "User", BlockSpec.Width.THIRD, {
                 field user.username_
                 field user.firstName_
                 field user.lastName_
@@ -198,12 +198,12 @@ class CrewController implements WebAttributes {
                 ajaxField user.mainPicture_, this.&selectUserMainPicture as MC
                 field user.password_
             }
-            section "Coords", FormSpec.Width.ONE_THIRD, {
+            section "Coords", BlockSpec.Width.THIRD, {
                 field user.businessUnit_
                 field user.mail_
                 field user.subsidiary_
             }
-            section "Status", FormSpec.Width.ONE_THIRD, {
+            section "Status", BlockSpec.Width.THIRD, {
                 field user.enabled_
                 field user.accountExpired_
                 field user.accountLocked_

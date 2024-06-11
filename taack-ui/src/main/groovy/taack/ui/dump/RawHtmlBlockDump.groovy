@@ -20,6 +20,8 @@ import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.menu.MenuSpec
 import taack.ui.dump.html.block.BootstrapBlock
 import taack.ui.dump.html.block.HTMLAjaxCloseModal
+import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLTxtContent
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.menu.BootstrapMenu
@@ -175,9 +177,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitHtmlBlock(String html, Style style) {
-        out << """
-            <div class="${style?.cssClassesString ?: ''}">${html}</div>
-        """
+        topElement.addChildren(
+                new HTMLDiv().builder.addClasses(style?.cssClassesString).addChildren(
+                        new HTMLTxtContent(html)
+                ).build()
+        )
+//        out << """
+//            <div class="${style?.cssClassesString ?: ''}">${html}</div>
+//        """
     }
 
     @Override
@@ -259,12 +266,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockTab(final String i18n) {
         currentTabNames << i18n
-        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0 ? "Inner" : ""}">"""
+//        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0 ? "Inner" : ""}">"""
+        topElement = bootstrapBlock.tab(topElement, ++tabOccurrence)
     }
 
     @Override
     void visitBlockTabEnd() {
-        out << '</div>'
+//        out << '</div>'
+        topElement = closeTags(TaackTag.TAB)
     }
 
     private List<String> currentTabNames
@@ -304,6 +313,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         tabOccurrence = tabOccurrencePrevious
         tabOccurrencePrevious = 0
         out << "</section></div>"
+
+        topElement = bootstrapBlock.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
+
     }
 
     @Override

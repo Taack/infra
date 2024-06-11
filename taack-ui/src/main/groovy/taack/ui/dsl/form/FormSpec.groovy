@@ -3,6 +3,7 @@ package taack.ui.dsl.form
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.html.element.ButtonStyle
 
@@ -23,20 +24,6 @@ final class FormSpec extends FormSectionSpec {
     /**
      * Form sections relative Width
      */
-    enum Width {
-        DEFAULT_WIDTH("col"),
-        DOUBLE_WIDTH("col-6"),
-        ONE_THIRD("col-4"),
-        TWO_THIRD("col-3"),
-        FULL_WIDTH("col-12")
-
-        Width(final String sectionCss) {
-            this.sectionCss = sectionCss
-        }
-
-        final String sectionCss
-    }
-
 
     FormSpec(IUiFormVisitor formVisitor) {
         super(formVisitor)
@@ -48,7 +35,7 @@ final class FormSpec extends FormSectionSpec {
      * @param width relative total width
      * @param closure list of {@link FormTabSpec#tabLabel(java.lang.String, groovy.lang.Closure)}
      */
-    void tabs(Width width = Width.DEFAULT_WIDTH, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
+    void tabs(BlockSpec.Width width = BlockSpec.Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
         List<String> tabNames = []
 
         UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {

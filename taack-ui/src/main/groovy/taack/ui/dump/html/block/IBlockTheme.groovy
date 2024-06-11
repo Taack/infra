@@ -18,7 +18,7 @@ trait IBlockTheme implements IHTMLElement {
 
     abstract IHTMLElement innerModal(IHTMLElement topElement, String blockId)
 
-    abstract IHTMLElement blockTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width)
+    abstract IHTMLElement blockTabs(IHTMLElement topElement, int tabIds, List<String> names, BlockSpec.Width width)
 
     abstract IHTMLElement blockTab(IHTMLElement topElement, int occ)
 
