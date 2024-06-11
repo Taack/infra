@@ -92,6 +92,10 @@ grails {
     }
 }
 
+bootJar {
+    enabled = true
+}
+
 application {
     mainClass.set("taack.ui.test.Application")
 }
