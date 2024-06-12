@@ -48,8 +48,10 @@ final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
     }
 
     @Override
-    IHTMLElement blockAjax(String blockId) {
-        return new HTMLAjaxBlock(blockId)
+    IHTMLElement blockAjax(IHTMLElement topElement, String blockId) {
+        IHTMLElement e = new HTMLAjaxBlock(blockId).builder.setTaackTag(TaackTag.AJAX_BLOCK).build()
+        if (topElement) topElement.addChildren(e)
+        topElement ?: e
     }
 
     @Override

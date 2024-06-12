@@ -1,7 +1,6 @@
 package taack.ui.base.leaf
 
 import kotlinx.browser.window
-import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
@@ -29,10 +28,11 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
         }
     }
 
-    private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value
-
+    private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value ?: a.attributes.getNamedItem("href")?.value
+    private val hasHref = a.hasAttribute("href")
     init {
-        trace("BaseAjaxAction::init $action")
+        trace("BaseAjaxAction::init $action $hasHref")
+
         a.onclick = { e -> onclickBaseAjaxAction(e) }
     }
 
@@ -62,7 +62,7 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
                 if (text.contains(Regex(".{0,4}<html"))) {
                     trace("AUO response identified like full page ...")
                     window.document.write(text)
-                    window.history.pushState("", "Intranet ", action)
+                    window.history.pushState("", "", action)
                 } else {
                     processAjaxLink(text, parent)
                 }

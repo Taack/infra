@@ -132,7 +132,7 @@ final class BlockSpec {
         closure.delegate = this
         closure.call()
         counter ++
-        if (displayElement()) blockVisitor.visitInnerColBlockEnd()
+        if (displayElement()) blockVisitor.visitColEnd()
     }
 
     /**

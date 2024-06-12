@@ -106,7 +106,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerColBlockEnd() {
+    void visitColEnd() {
 //        out << "</div>"
         topElement = closeTags(TaackTag.COL)
 
@@ -122,7 +122,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             ajaxBlockId = id
         }
 //        if (isModalRefresh) out << "__ajaxBlockStart__$id:"
-        if (isModalRefresh) topElement = block.blockAjax(id)
+        if (isModalRefresh) topElement = block.blockAjax(topElement, id)
     }
 
     @Override
@@ -139,7 +139,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitFormEnd(UiFormSpecifier formSpecifier) {
         visitCloseTitle()
         formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -152,7 +152,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(out, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -187,7 +187,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(2048)
         tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(out, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -198,7 +198,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
     }
 
@@ -206,7 +206,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
         visitRowEnd()
     }
 
@@ -220,8 +220,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
-        visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
+        visitColEnd()
+        visitColEnd()
     }
 
     @Override
@@ -234,7 +234,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCol(width)
         visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -242,8 +242,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, width), UiDiagramSpecifier.DiagramBase.SVG)
-        visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
+        visitColEnd()
+        visitColEnd()
     }
 
     @Override
@@ -294,8 +294,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCol(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
-        visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
+        visitColEnd()
+        visitColEnd()
     }
 
     @Override

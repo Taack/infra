@@ -6,12 +6,7 @@ import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
-import taack.ui.dsl.UiChartSpecifier
-import taack.ui.dsl.UiDiagramSpecifier
-import taack.ui.dsl.UiFilterSpecifier
-import taack.ui.dsl.UiFormSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 import taack.ui.dsl.common.ActionIcon
@@ -23,7 +18,6 @@ import taack.ui.dump.html.block.HTMLAjaxCloseLastModal
 import taack.ui.dump.html.block.HTMLAjaxCloseModal
 import taack.ui.dump.html.block.HTMLFieldInfo
 import taack.ui.dump.html.element.HTMLDiv
-import taack.ui.dump.html.element.HTMLSection
 import taack.ui.dump.html.element.HTMLTxtContent
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
@@ -48,7 +42,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     final BootstrapMenu menu
     final Parameter parameter
 
-    IHTMLElement topElement
+    private IHTMLElement _topElement
+
+    IHTMLElement getTopElement() {
+        _topElement ?= new HTMLEmpty()
+        _topElement
+    }
+
+    IHTMLElement setTopElement(IHTMLElement topElement) {
+        _topElement = topElement
+    }
 
     RawHtmlBlockDump(final Parameter parameter, final String modalId = null) {
         if (modalId) isModal = true
@@ -100,7 +103,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerColBlockEnd() {
+    void visitColEnd() {
         topElement = closeTags(TaackTag.COL)
     }
 
@@ -114,12 +117,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             ajaxBlockId = id
         }
 //        if (isModalRefresh) out << "__ajaxBlockStart__$id:"
-        if (isModalRefresh) topElement = block.blockAjax(id)
+        if (isModalRefresh) topElement = block.blockAjax(topElement, id)
     }
 
     @Override
     void visitAjaxBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
+        if (isModalRefresh) topElement = closeTags(TaackTag.AJAX_BLOCK)
     }
 
     @Override
@@ -131,7 +135,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitFormEnd(UiFormSpecifier formSpecifier) {
         visitCloseTitle()
         formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -144,7 +148,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -178,7 +182,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
         tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(topElement, id, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -189,14 +193,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
     }
 
     @Override
     void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
         tableSpecifier.visitTable(new RawHtmlTableDump(topElement, id, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
         visitRowEnd()
     }
 
@@ -210,8 +214,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
-        visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
+        visitColEnd()
+        visitColEnd()
     }
 
     @Override
@@ -224,7 +228,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCol(width)
         visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
-        visitInnerColBlockEnd()
+        visitColEnd()
     }
 
     @Override
@@ -232,8 +236,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, width), UiDiagramSpecifier.DiagramBase.SVG)
-        visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
+        visitColEnd()
+        visitColEnd()
     }
 
     @Override
@@ -284,8 +288,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitCol(width)
         visitCloseTitle()
         visitHtmlBlock(html, style)
-        visitInnerColBlockEnd()
-        visitInnerColBlockEnd()
+        visitColEnd()
+        visitColEnd()
     }
 
     @Override
@@ -422,7 +426,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             }
         }
         topElement = closeTags(TaackTag.MENU_OPTION)
-
     }
 
 }

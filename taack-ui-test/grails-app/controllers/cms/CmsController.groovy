@@ -84,36 +84,30 @@ class CmsController implements WebAttributes {
 
     private Closure<BlockSpec> buildImagesTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            ajaxBlock "imagesTab", {
-                table cmsUiService.buildCmsImageTable(cmsPage), BlockSpec.Width.MAX, {
-                    menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
-                    menu this.&selectM2mCmsImage as MC, cmsPage.id
-                    menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
-                }
+            table cmsUiService.buildCmsImageTable(cmsPage), BlockSpec.Width.MAX, {
+                menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
+                menu this.&selectM2mCmsImage as MC, cmsPage.id
+                menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
             }
         }
     }
 
     private Closure<BlockSpec> buildVideosTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            ajaxBlock "videosTab", {
-                table cmsUiService.buildCmsVideoTable(cmsPage), BlockSpec.Width.MAX, {
-                    menu this.&refreshCmsPageCmsVideos as MC, cmsPage.id
-                    menu this.&selectM2mCmsVideo as MC, cmsPage.id
-                    menu this.&editCmsVideo as MC, [cmsPageId: cmsPage.id]
-                }
+            table cmsUiService.buildCmsVideoTable(cmsPage), BlockSpec.Width.MAX, {
+                menu this.&refreshCmsPageCmsVideos as MC, cmsPage.id
+                menu this.&selectM2mCmsVideo as MC, cmsPage.id
+                menu this.&editCmsVideo as MC, [cmsPageId: cmsPage.id]
             }
         }
     }
 
     private Closure<BlockSpec> buildPdfsTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            ajaxBlock "pdfsTab", {
-                table cmsUiService.buildCmsPdfTable(cmsPage), BlockSpec.Width.MAX, {
-                    menu this.&refreshCmsPageCmsPdfs as MC, [id: cmsPage.id]
-                    menu this.&selectM2mCmsPdf as MC, [id: cmsPage.id]
-                    menu this.&editCmsPdf as MC, [cmsPageId: cmsPage.id]
-                }
+            table cmsUiService.buildCmsPdfTable(cmsPage), BlockSpec.Width.MAX, {
+                menu this.&refreshCmsPageCmsPdfs as MC, [id: cmsPage.id]
+                menu this.&selectM2mCmsPdf as MC, [id: cmsPage.id]
+                menu this.&editCmsPdf as MC, [cmsPageId: cmsPage.id]
             }
         }
     }
@@ -813,34 +807,28 @@ class CmsController implements WebAttributes {
 
     def pages() {
         UiBlockSpecifier b = new UiBlockSpecifier().ui {
-            ajaxBlock "cmsPageList", {
-                tableFilter CmsUiService.buildCmsPageFilter(), cmsUiService.buildCmsPageTable(), BlockSpec.Width.MAX, {
-                    menu this.&editPage as MC
-                }
+            tableFilter CmsUiService.buildCmsPageFilter(), cmsUiService.buildCmsPageTable(), BlockSpec.Width.MAX, {
+                menu this.&editPage as MC
             }
         }
         taackUiService.show(b, buildMenu())
     }
 
     def editPage(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
-
         Boolean createNew = cmsPage == null
         if (!cmsPage) cmsPage = new CmsPage()
 
-        b.ui {
-            if (createNew)
+        if (createNew)
+            taackUiService.show new UiBlockSpecifier().ui {
                 modal {
-//                    ajaxBlock "createNew", {
-                        form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
-//                    }
+                    form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
                 }
-            else {
+            }
+        else
+            taackUiService.show new UiBlockSpecifier().ui {
                 row {
                     col BlockSpec.Width.HALF, {
-//                    ajaxBlock "cmsPageForm", {
                         form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
-//                    }
                     }
                     col {
                         tabs {
@@ -850,9 +838,7 @@ class CmsController implements WebAttributes {
                         }
                     }
                 }
-            }
-        }
-        taackUiService.show(b, buildMenu())
+            }, buildMenu()
     }
 
     @Secured(["ROLE_ADMIN", "ROLE_CMS_DIRECTOR", "ROLE_CMS_MANAGER"])

@@ -48,9 +48,6 @@ final class BootstrapMenu implements IHTMLElement {
                             ul
                     ).build()
             )
-            println "i18n $i18n, $hasClosure"
-            println topElement.children.first().children.last()
-            println topElement.children.last().children.last().output
             return ul
         } else {
             topElement.addChildren(
@@ -67,7 +64,7 @@ final class BootstrapMenu implements IHTMLElement {
     static IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String url) {
         topElement.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                        new HTMLAnchor(false, url).builder.addClasses('nav-link').addChildren(new HTMLTxtContent(i18n)).build()
+                        new HTMLAnchor(false, url).builder.addClasses('nav-link', 'taackMenu').addChildren(new HTMLTxtContent(i18n)).build()
                 ).build()
         )
         topElement

@@ -9,6 +9,7 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AjaxBlockInputTab
+import taack.ui.base.leaf.AnchorHref
 
 class Block(val parent: Modal?, val d: HTMLDivElement) :
     BaseElement {
@@ -32,6 +33,8 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         if (tmpBlockId != null && tmpBlockId != "") {
             blockId = tmpBlockId
             ActionLink.getActionLink(this)
+            AnchorHref.getAnchorHref(this)
+
         } else {
             blockId = "modal${modalNumber++}"
         }

@@ -21,15 +21,13 @@ class ThemeController {
         ThemeSelector themeSelector = ThemeSelector.fromSession(session)
         taackUiService.show(new UiBlockSpecifier().ui({
             modal {
-                ajaxBlock 'mandatoryAjaxBlock', {
-                    form new UiFormSpecifier().ui(themeSelector, {
-                        section TaackUiService.tr('theme.choice.label'), {
-                            field themeSelector.themeMode_
-                            field themeSelector.themeSize_
-                        }
-                        formAction(this.&changeTheme as MC)
-                    })
-                }
+                form new UiFormSpecifier().ui(themeSelector, {
+                    section TaackUiService.tr('theme.choice.label'), {
+                        field themeSelector.themeMode_
+                        field themeSelector.themeSize_
+                    }
+                    formAction(this.&changeTheme as MC)
+                })
             }
         }))
     }

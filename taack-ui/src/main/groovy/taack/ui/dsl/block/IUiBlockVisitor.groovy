@@ -28,7 +28,7 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitCol(BlockSpec.Width width)
 
-    void visitInnerColBlockEnd()
+    void visitColEnd()
 
     void visitModal()
 

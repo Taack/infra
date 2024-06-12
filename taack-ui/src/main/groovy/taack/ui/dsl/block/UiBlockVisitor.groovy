@@ -49,7 +49,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitInnerColBlockEnd() {
+    void visitColEnd() {
 
     }
 

@@ -141,8 +141,7 @@ class CrewController implements WebAttributes {
         UiFilterSpecifier f = CrewUiService.buildUserTableFilter cu
         UiTableSpecifier t = crewUiService.buildUserTable f
 
-        UiBlockSpecifier b = new UiBlockSpecifier()
-        b.ui {
+        UiBlockSpecifier b = new UiBlockSpecifier().ui {
             tableFilter f, t, BlockSpec.Width.MAX, {
                 menuIcon ActionIcon.CREATE, CrewController.&editUser as MC
             }

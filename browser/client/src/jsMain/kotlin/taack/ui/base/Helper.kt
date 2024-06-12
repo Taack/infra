@@ -145,13 +145,13 @@ class Helper {
                 }
                 text.startsWith(abs) -> {
                     mapAjaxText(text).map {
-                        val target = block.ajaxBlockElements?.get(it.key)
+                        val target = block.ajaxBlockElements.get(it.key)
                         target!!.d.innerHTML = it.value
                         target.refresh()
                     }
                 }
                 else -> {
-                    trace("Helper::redirect")
+                    trace("Helper::open modal")
                     if (process != null) {
                         processingStack.add(process)
                     }
