@@ -45,7 +45,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     private IHTMLElement _topElement
 
     IHTMLElement getTopElement() {
-        _topElement ?= new HTMLEmpty()
+//        _topElement ?= new HTMLEmpty()
         _topElement
     }
 
@@ -62,6 +62,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         block = new BootstrapBlock(ts.themeMode, ts.themeSize)
         menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
+        topElement = new HTMLEmpty()
     }
 
     private IHTMLElement closeTags(TaackTag tag) {

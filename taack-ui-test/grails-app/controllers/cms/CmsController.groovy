@@ -113,9 +113,7 @@ class CmsController implements WebAttributes {
     }
 
     private static UiFormSpecifier buildCmsPageForm(final CmsPage cmsPage) {
-        UiFormSpecifier f = new UiFormSpecifier()
-
-        f.ui cmsPage, {
+        new UiFormSpecifier().ui cmsPage, {
             section "Page Information", BlockSpec.Width.MAX, {
                 row {
                     col {
@@ -159,15 +157,12 @@ class CmsController implements WebAttributes {
                 }
             formAction this.&saveCmsPage as MC, null, [:]
         }
-        f
     }
 
     private static UiFormSpecifier buildCmsSlideshowForm(CmsPage cmsPage) {
-        UiFormSpecifier f = new UiFormSpecifier()
-
         cmsPage = cmsPage ?: new CmsPage(pageType: CmsPageType.SLIDESHOW)
 
-        f.ui cmsPage, {
+        new UiFormSpecifier().ui cmsPage, {
             hiddenField(cmsPage.pageType_)
             section "Slideshow Information", BlockSpec.Width.MAX, {
                 row {
@@ -196,7 +191,6 @@ class CmsController implements WebAttributes {
                 }
             formAction this.&saveCmsSlideshow as MC, null, [:]
         }
-        f
     }
 
     private static UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
