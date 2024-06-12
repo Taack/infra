@@ -31,7 +31,6 @@ import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.*
-import taack.ui.dump.mail.RawHtmlMailDump
 import taack.ui.dump.pdf.RawHtmlPrintableDump
 
 import javax.annotation.PostConstruct
@@ -123,12 +122,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return String that contains the HTML snippet
      */
     String visit(final UiBlockSpecifier blockSpecifier, final boolean isAjaxRendering = false) {
-
-        ByteArrayOutputStream blockStream = new ByteArrayOutputStream()
-        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(blockStream, new Parameter(isAjaxRendering, LocaleContextHolder.locale, messageSource))
-
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(isAjaxRendering, LocaleContextHolder.locale, messageSource))
         blockSpecifier.visitBlock(htmlBlock)
-        blockStream.toString()
+        htmlBlock.topElement.output
     }
 
     /**
@@ -138,12 +134,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return String the contains the HTML snippet
      */
     static String visitMenu(final UiMenuSpecifier menuSpecifier) {
-        ByteArrayOutputStream menuStream = new ByteArrayOutputStream()
-
-        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(menuStream, new Parameter(false, LocaleContextHolder.locale, staticMs))
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(false, LocaleContextHolder.locale, staticMs))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
-            menuStream.toString()
+            htmlBlock.menu.output
         } else ""
     }
 
@@ -487,12 +481,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content
      */
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        ByteArrayOutputStream blockStream = new ByteArrayOutputStream(8_000)
-        RawHtmlMailDump htmlPdf = new RawHtmlMailDump(blockStream, new Parameter(false, locale ?: LocaleContextHolder.locale, messageSource), "intranet.citel.fr")
+        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(false, locale ?: LocaleContextHolder.locale, messageSource), "intranet.citel.fr")
         blockSpecifier.visitBlock(htmlPdf)
 
         String html = g.render template: "/taackUi/block-mail", model: [
-                block: blockStream.toString(),
+                block: htmlPdf.topElement.output,
                 root : taackUiPluginConfiguration.root
         ]
         html

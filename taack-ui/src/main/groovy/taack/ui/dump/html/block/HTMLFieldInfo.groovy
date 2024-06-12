@@ -8,7 +8,7 @@ final class HTMLFieldInfo implements IHTMLElement {
 
     final String value
 
-    HTMLFieldInfo(String id) {
+    HTMLFieldInfo(String id, String value) {
         this.id = id
         this.value = value
     }

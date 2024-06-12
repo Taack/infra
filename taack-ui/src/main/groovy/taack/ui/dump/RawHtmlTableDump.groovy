@@ -8,15 +8,8 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.common.CommonRawHtmlTableDump
-import taack.ui.dump.html.element.HTMLAnchor
-import taack.ui.dump.html.element.HTMLDiv
-import taack.ui.dump.html.element.HTMLForm
-import taack.ui.dump.html.element.HTMLInput
-import taack.ui.dump.html.element.HTMLSpan
-import taack.ui.dump.html.element.HTMLTxtContent
-import taack.ui.dump.html.element.IHTMLElement
-import taack.ui.dump.html.element.InputType
-import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.element.*
+import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayInlineBlock
 import taack.ui.dump.html.table.HTMLTd
 import taack.ui.dump.html.table.HTMLTr
@@ -65,24 +58,20 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
-        fieldHeader()
         topElement.addChildren(
-                new HTMLSpan().builder.addClasses('sortColumn').putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
+                new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
                         new HTMLTxtContent("<a>${i18n}</a>")
                 ).build()
         )
-        fieldFooter()
     }
 
     @Override
     void visitFieldHeader(final String i18n) {
-        fieldHeader()
         topElement.addChildren(
                 new HTMLSpan().builder.setStyle(new DisplayInlineBlock()).addChildren(
                         new HTMLTxtContent("${i18n}")
                 ).build()
         )
-        fieldFooter()
     }
 
     @Override
@@ -108,10 +97,8 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowField(final String value, final Style style) {
-        fieldHeader()
         displayCell(value, style, null, firstInCol, isInCol)
         firstInCol = false
-        fieldFooter()
     }
 
     @Override
@@ -173,7 +160,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
                 .addClasses('taackRowGroupFooter', "taackRowGroupFooter-$level")
                 .addChildren(
                         new HTMLTd(colCount).builder.addChildren(
-                                        new HTMLTxtContent(content)
+                                new HTMLTxtContent(content)
                         ).build()
                 ).build()
         )

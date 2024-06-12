@@ -6,9 +6,9 @@ import taack.ui.dump.html.element.IHTMLElement
 @CompileStatic
 final class HTMLAjaxCloseLastModal implements IHTMLElement {
 
-    final String value
+    String value
 
-    HTMLAjaxCloseLastModal(String id) {
+    HTMLAjaxCloseLastModal(String id, String value) {
         this.id = id
         this.value = value
     }

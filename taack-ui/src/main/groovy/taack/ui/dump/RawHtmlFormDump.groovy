@@ -97,7 +97,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         }
 
         topElement = closeTags(TaackTag.FORM)
-        out << formThemed.output
         tabIds = 0
     }
 

@@ -18,7 +18,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     private boolean firstInCol = false
 
     RawHtmlTableDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        super(out, parameter)
+        super(null, parameter)
     }
 
     @Override
@@ -62,6 +62,9 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
         out << " ${i18n} <br>"
         fieldFooter()
     }
+
+    void fieldHeader() {}
+    void fieldFooter() {}
 
     @Override
     void visitFieldHeader(FieldInfo[] fields) {

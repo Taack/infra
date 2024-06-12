@@ -69,24 +69,11 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
         if (!cell || cell.empty) return new HTMLTxtContent('')
-        return new HTMLDiv().builder.addClasses(style.cssClassesString).addChildren(
+        return new HTMLDiv().builder.addClasses(style?.cssClassesString).addChildren(
                 new HTMLAnchor(false, url).builder.addChildren(
                         new HTMLTxtContent(cell)
                 ).build()
         ).build()
-    }
-
-    void fieldHeader() {
-        if (!isInCol) {
-            colCount++
-        }
-    }
-
-    void fieldFooter() {
-        if (!isInCol)
-            topElement.addChildren(
-                new HTMLTd()
-            )
     }
 
     @Override
@@ -99,6 +86,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         colCount++
         isInCol = true
         HTMLTh th = new HTMLTh(colSpan, rowSpan)
+        th.setTaackTag(TaackTag.TABLE_COL)
         topElement.addChildren(th)
         topElement = th
     }
@@ -108,7 +96,9 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         isInHeader = true
         HTMLTr tr = new HTMLTr()
         topElement.addChildren(
-                new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).build(), tr
+                new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).addChildren(
+                        tr
+                ).build()
         )
         topElement = tr
     }
@@ -183,14 +173,12 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     void visitRowAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, final Boolean isAjax) {
         i18n ?= parameter.trField(controller, action)
 
-        fieldHeader()
         params ?= [:]
         topElement.addChildren(
                 new HTMLDiv().builder.addChildren(
                         new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params))
                 ).build()
         )
-        fieldFooter()
     }
 
     @Override

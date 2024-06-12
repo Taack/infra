@@ -1,4 +1,4 @@
-package taack.ui.dump
+package taack.ui.dump.mail
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
@@ -18,6 +18,11 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.menu.MenuSpec
+import taack.ui.dump.Parameter
+import taack.ui.dump.RawHtmlChartDump
+import taack.ui.dump.RawHtmlDiagramDump
+import taack.ui.dump.RawHtmlFilterDump
+import taack.ui.dump.RawHtmlFormDump
 import taack.ui.dump.html.block.BootstrapBlock
 import taack.ui.dump.html.block.HTMLAjaxCloseLastModal
 import taack.ui.dump.html.block.HTMLAjaxCloseModal
@@ -50,7 +55,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     IHTMLElement topElement
 
-    RawHtmlBlockDump(final Parameter parameter, final String modalId = null) {
+    RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter, final String modalId = null) {
         if (modalId) isModal = true
         this.parameter = parameter
         this.modalId = modalId
@@ -146,7 +151,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitShowEnd(final UiShowSpecifier uiShowSpecifier) {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
+        if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(out, parameter))
         visitInnerColBlockEnd()
     }
 
@@ -180,7 +185,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
-        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(topElement, id, parameter))
+        ByteArrayOutputStream out = new ByteArrayOutputStream(2048)
+        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(out, parameter))
         visitInnerColBlockEnd()
     }
 
@@ -198,7 +204,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
-        tableSpecifier.visitTable(new RawHtmlTableDump(topElement, id, parameter))
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
+        tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
         visitInnerColBlockEnd()
         visitRowEnd()
     }
@@ -256,11 +263,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockTab(final String i18n) {
         currentTabNames << i18n
+//        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0 ? "Inner" : ""}">"""
         topElement = block.tab(topElement, ++tabOccurrence)
     }
 
     @Override
     void visitBlockTabEnd() {
+//        out << '</div>'
         topElement = closeTags(TaackTag.TAB)
     }
 
@@ -269,11 +278,37 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTabs(final BlockSpec.Width width) {
+//        outBkup = out
+////        out = new ByteArrayOutputStream()
+//        blockTabWidth = width
+//        currentTabNames = []
     }
 
     @Override
     void visitBlockTabsEnd() {
-
+//        outBkup << """<div class="pc-tab ${blockTabWidth.bootstrapCss} taackContainer">"""
+//        currentTabNames.eachWithIndex { it, occ ->
+//            outBkup << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-${tabIds}" type="radio" class="taackBlockInputTab inputTab${occ + 1}${false ? "Inner" : ""}" name="pct-${tabIds}" />"""
+//        }
+//        outBkup << "<nav><ul>"
+//        currentTabNames.eachWithIndex { it, occ ->
+//            outBkup << """
+//                <li class="tab${occ + 1}">
+//                    <label for="tab${occ + 1}-${tabIds}">${it}</label>
+//                </li>
+//            """
+//        }
+//        outBkup << "</ul></nav>"
+//        outBkup << "<section>"
+//        tabIds++
+//        if (tabOccurrence != 0) tabOccurrencePrevious = tabOccurrence
+//        tabOccurrence = 0
+//        out.writeTo(outBkup)
+////        out = outBkup
+//
+//        tabOccurrence = tabOccurrencePrevious
+//        tabOccurrencePrevious = 0
+//        out << "</section></div>"
 
         topElement = block.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
 
@@ -305,11 +340,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitRow() {
+//        out << """<div class="row align-items-start">"""
         topElement = block.row(topElement)
     }
 
     @Override
     void visitRowEnd() {
+//        out << "</div>"
         topElement = closeTags(TaackTag.ROW)
     }
 

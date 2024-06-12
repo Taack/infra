@@ -45,6 +45,10 @@ trait IHTMLElement {
     }
 
     void addChildren(IHTMLElement... elements) {
+        for (IHTMLElement e in elements) {
+            e.parent = this
+        }
+
         if (elements) children += elements
     }
 
@@ -122,10 +126,7 @@ trait IHTMLElement {
         }
 
         HTMLElementBuilder<T> addChildren(IHTMLElement... elements) {
-            for (IHTMLElement e in elements) {
-                e.parent = this.element
-            }
-            element.children += elements
+            this.element.addChildren(elements)
             this
         }
 

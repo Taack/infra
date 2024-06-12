@@ -27,6 +27,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     IFormTheme formThemed
     IHTMLElement topElement
 
+
     RawHtmlFilterDump(final IHTMLElement topElement, final Parameter parameter) {
         this.topElement = topElement
         this.parameter = parameter
@@ -48,6 +49,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
+        println "Coucou"
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
@@ -64,11 +66,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         HTMLInput[] addedInputs = additionalParams?.collect {
             new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
         } as HTMLInput[]
-
+        topElement.addChildren(formThemed)
         if (addedInputs)
             formThemed.addChildren(addedInputs)
-
-        topElement = formThemed
     }
 
     @Override
@@ -86,7 +86,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         filterActions.each {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
-        topElement = closeTags(TaackTag.FILTER)
     }
 
     @Override

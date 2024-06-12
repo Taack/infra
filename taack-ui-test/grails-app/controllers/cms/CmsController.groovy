@@ -814,9 +814,7 @@ class CmsController implements WebAttributes {
     }
 
     def pages() {
-        UiBlockSpecifier b = new UiBlockSpecifier()
-
-        b.ui {
+        UiBlockSpecifier b = new UiBlockSpecifier().ui {
             ajaxBlock "cmsPageList", {
                 tableFilter CmsUiService.buildCmsPageFilter(), cmsUiService.buildCmsPageTable(), BlockSpec.Width.MAX, {
                     menu this.&editPage as MC

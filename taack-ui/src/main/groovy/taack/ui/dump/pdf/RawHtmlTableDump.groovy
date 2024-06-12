@@ -14,9 +14,9 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     private Object[] latestGroups = null
     int level = 0
     private boolean firstInCol = false
-
+    final ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
     RawHtmlTableDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        super(out, parameter)
+        super(null, parameter)
     }
 
     @Override
@@ -41,6 +41,9 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
         rowStyle = null
         out << "</tr>\n"
     }
+
+    void fieldHeader() {}
+    void fieldFooter() {}
 
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
