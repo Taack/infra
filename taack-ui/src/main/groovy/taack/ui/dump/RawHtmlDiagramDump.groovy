@@ -1,10 +1,10 @@
 package taack.ui.dump
 
 import groovy.transform.CompileStatic
-import taack.ui.base.UiDiagramSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.diagram.DiagramTypeSpec
-import taack.ui.base.diagram.IUiDiagramVisitor
+import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.diagram.DiagramTypeSpec
+import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.diagram.render.IDiagramRender
 import taack.ui.diagram.render.PngDiagramRender
 import taack.ui.diagram.render.SvgDiagramRender

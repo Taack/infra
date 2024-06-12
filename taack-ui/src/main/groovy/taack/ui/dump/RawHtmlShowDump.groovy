@@ -5,10 +5,10 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ast.type.WidgetKind
 import taack.ui.IEnumOption
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
-import taack.ui.base.show.IUiShowVisitor
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.helper.Utils
+import taack.ui.dsl.show.IUiShowVisitor
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type

@@ -19,11 +19,17 @@ import org.springframework.core.io.Resource
 import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.UiFilterSpecifier
+import taack.ui.dsl.UiFormSpecifier
+import taack.ui.dsl.UiMenuSpecifier
+import taack.ui.dsl.UiPrintableSpecifier
+import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.html.theme.ThemeSelector
-import taack.ui.base.*
-import taack.ui.base.block.BlockSpec
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.*
 import taack.ui.dump.mail.RawHtmlMailDump
 import taack.ui.dump.pdf.RawHtmlPrintableDump
@@ -35,10 +41,10 @@ import javax.annotation.PostConstruct
  * <p>
  * <ul>
  * <li>A full web page is rendered when calling
- * {@link TaackUiService#show(UiBlockSpecifier, UiMenuSpecifier)}
+ * {@link TaackUiService#show(taack.ui.dsl.UiBlockSpecifier, taack.ui.dsl.UiMenuSpecifier)}
  *
  * <li>An ajax render is returned to the browser if calling
- * {@link TaackUiService#show(UiBlockSpecifier)}
+ * {@link TaackUiService#show(taack.ui.dsl.UiBlockSpecifier)}
  * </ul>
  * <pre>{@code
  *  taackUiSimpleService.show(new UiBlockSpecifier() {
@@ -134,7 +140,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     static String visitMenu(final UiMenuSpecifier menuSpecifier) {
         ByteArrayOutputStream menuStream = new ByteArrayOutputStream()
 
-        RawHtmlMenuDump htmlBlock = new RawHtmlMenuDump(menuStream, "0", new Parameter(false, LocaleContextHolder.locale, staticMs))
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(menuStream, new Parameter(false, LocaleContextHolder.locale, staticMs))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
             menuStream.toString()
@@ -169,9 +175,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null) {
-        Map recordState = decodeCookie(params['recordState'] as String) as Map<String, Map>
-        if (recordState && !recordState.empty) params['recordStateDecoded'] = recordState
-        if (params.boolean("isAjax")) {
+        if (params.boolean("isAjax") && !menu) {
             render visit(block, true)
         } else {
             ThemeSelector themeSelector = themeService.themeSelector
@@ -361,7 +365,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         String fileName = fileNamePrefix + "-${dateFileName}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
-        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=\"${fileName}${isHtml ? ".html" : ""}\"")
+        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}${isHtml ? ".html" : ""}")
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
         try {

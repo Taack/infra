@@ -12,7 +12,6 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Table
-import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 import kotlin.math.max
 import kotlin.math.min
@@ -40,25 +39,11 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
     private val count: Number = d.attributes["taackCount"]!!.value.toLong()
     private val currentPage = (offset.toDouble() / max.toDouble()).toInt()
     private val numberOfPage = (count.toDouble() / max.toDouble()).toInt()
-    private val state: RecordState = RecordState()
     private val ul = document.createElement("ul") as HTMLUListElement
-    /*
-        <nav aria-label="...">
-            <ul class="pagination pagination-sm">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1">1</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-            </ul>
-        </nav> 
-    *
-    */
-    
+
     init {
         trace("TablePaginate1 max: $max, offset: $offset, count: $count")
         trace("TablePaginate2 currentPage: $currentPage, numberOfPage: $numberOfPage")
-        trace("TablePaginate3 state: $state")
 
         val nav = document.createElement("nav") as HTMLElement
         ul.addClass("pagination")
@@ -173,9 +158,6 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
         fd.set("offset", offset)
         fd.append("refresh", "true")
         fd.append("filterTableId", parent.parent.blockId)
-        state.addClientStateAjaxBlock()
-        state.addServerState(fd)
-//        RecordState.storeState()
         val b = f.querySelector("button#filter") as HTMLButtonElement?
         window.fetch(b?.formAction ?: f.action, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {

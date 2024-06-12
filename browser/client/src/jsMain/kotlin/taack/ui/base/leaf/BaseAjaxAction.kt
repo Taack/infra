@@ -2,6 +2,7 @@ package taack.ui.base.leaf
 
 import kotlinx.browser.window
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.url.URL
@@ -14,9 +15,8 @@ import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.record.RecordState
 
-open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement) : LeafElement {
+open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : LeafElement {
 
     companion object {
         fun createUrl(action: String, additionalParams: Map<String, String>? = null): URL {
@@ -25,7 +25,6 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLAnchorElement)
             additionalParams?.forEach {
                 url.searchParams.set(it.key, it.value)
             }
-            if (!url.searchParams.has("recordState") && RecordState.serverState.isNotEmpty()) url.searchParams.set("recordState", RecordState.dumpServerState())
             return url
         }
     }

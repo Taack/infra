@@ -2,8 +2,8 @@ package taack.ui.dump.vt100
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.base.common.Style
-import taack.ui.base.table.UiTableVisitorImpl
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.table.UiTableVisitorImpl
 import taack.ui.dump.vt100.DisplayManager as DM
 
 @CompileStatic

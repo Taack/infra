@@ -3,32 +3,15 @@ package taack.ui.dump.html.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
-import taack.ui.base.form.FormSpec
-import taack.ui.dump.html.base.ButtonStyle
-import taack.ui.dump.html.base.HTMLButton
-import taack.ui.dump.html.base.HTMLDiv
-import taack.ui.dump.html.base.HTMLFieldset
-import taack.ui.dump.html.base.HTMLImg
-import taack.ui.dump.html.base.HTMLInput
-import taack.ui.dump.html.base.HTMLLabel
-import taack.ui.dump.html.base.HTMLLegend
-import taack.ui.dump.html.base.HTMLLi
-import taack.ui.dump.html.base.HTMLNav
-import taack.ui.dump.html.base.HTMLSection
-import taack.ui.dump.html.base.HTMLSelect
-import taack.ui.dump.html.base.HTMLSpan
-import taack.ui.dump.html.base.HTMLTxtContent
-import taack.ui.dump.html.base.HTMLUl
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.InputType
-import taack.ui.dump.html.base.TaackTag
+import taack.ui.dump.html.element.*
+import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.script.DeleteSiblingInputContent
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
-final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
+final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout implements IFormTheme<T> {
 
     final ThemeMode themeMode
     final ThemeSize themeSize
@@ -56,7 +39,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
         IHTMLElement ret = topElement
         if (floating) {
             ret = new HTMLDiv().builder.addClasses('form-floating', 'mb-1').build() as IHTMLElement
-            topElement.addChildren(ret)
+            topElement.builder.addChildren(ret)
         }
         ret
     }
@@ -73,7 +56,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
             case ThemeSize.LG:
                 'form-control form-control-lg'
                 break
-            case ThemeSize.NONE:
+            case ThemeSize.NORMAL:
                 'form-control form-control'
                 break
         }
@@ -93,15 +76,15 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
                     new HTMLImg(imgSrc).builder.putAttribute('style', 'max-height: 112px; max-width: 112px;').build()
             )
         }
-        topElement.addChildren(span.build())
-        topElement.addChildren(formLabelInput(qualifiedName, trI18n))
-        topElement.addChildren(divError(qualifiedName))
+        topElement.builder.addChildren(span.build())
+        topElement.builder.addChildren(formLabelInput(qualifiedName, trI18n))
+        topElement.builder.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement section(IHTMLElement topElement, String trI18n, String... classes) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
                         .addChildren(
                                 new HTMLFieldset().builder.addChildren(
@@ -224,7 +207,7 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.TEXTAREA, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
+        HTMLTextarea input = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLTextarea
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -266,56 +249,14 @@ final class BootstrapForm<T extends GormEntity<T>> implements IFormTheme<T> {
     }
 
     @Override
-    IHTMLElement formTabs(IHTMLElement topElement, int tabIds, List<String> names, FormSpec.Width width) {
-        HTMLInput[] radioList = new HTMLInput[names.size()]
-        HTMLLi[] liList = new HTMLLi[names.size()]
-        names.eachWithIndex { it, occ ->
-            radioList[occ] = HTMLInput.inputRadio(occ, "pct-${tabIds}", occ == 0).builder.setId("tab${occ + 1}-f${tabIds}").addClasses("inputTab${occ + 1}").build() as HTMLInput
-            liList[occ] = new HTMLLi().builder.addClasses("tab${occ + 1}").addChildren(
-                    new HTMLLabel("tab${occ + 1}-f${tabIds}").builder.addChildren(
-                            new HTMLTxtContent(it)
-                    ).build()
-            ).build() as HTMLLi
-        }
-
-        topElement.addChildren(
-                new HTMLDiv().builder
-                        .setTaackTag(TaackTag.TABS)
-                        .addClasses('pc-tab', width.sectionCss)
-                        .addChildren(radioList)
-                        .addChildren(
-                                new HTMLNav().builder.addChildren(
-                                        new HTMLUl().builder.addChildren(liList).build()
-                                ).build())
-                        .addChildren(new HTMLSection())
-                        .build()
-        )
-        topElement.children.last().children.last()
-    }
-
-    @Override
-    IHTMLElement formTab(IHTMLElement topElement, int occ) {
-        topElement.addChildren(
-                new HTMLDiv().builder.setTaackTag(TaackTag.TAB).addClasses('tab' + occ).build()
-        )
-        topElement.children.last()
-    }
-
-    @Override
-    IHTMLElement formCol(IHTMLElement topElement) {
-        topElement.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.COL).build())
-        topElement.children.last()
-    }
-
-    @Override
     IHTMLElement formActionBlock(IHTMLElement topElement) {
-        topElement.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap').build())
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('d-flex', 'flex-nowrap', 'justify-content-end').build())
         topElement.children.last()
     }
 
     @Override
     IHTMLElement addFormAction(IHTMLElement topElement, String url, String i18n, ButtonStyle style) {
-        topElement.addChildren(
+        topElement.builder.addChildren(
                 new HTMLButton(url, i18n, style)
         )
         topElement

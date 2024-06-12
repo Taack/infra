@@ -23,8 +23,8 @@ final class ThemeSelector implements Validateable {
     }
 
     static ThemeSelector fromSession(HttpSession session) {
-        ThemeMode themeMode =( session[SESSION_THEME_MODE] ?: ThemeMode.LIGHT) as ThemeMode
-        ThemeSize themeSize = (session[SESSION_THEME_SIZE] ?: ThemeSize.NONE)  as ThemeSize
+        ThemeMode themeMode = (session[SESSION_THEME_MODE] ?: ThemeMode.NORMAL) as ThemeMode
+        ThemeSize themeSize = (session[SESSION_THEME_SIZE] ?: ThemeSize.NORMAL)  as ThemeSize
         new ThemeSelector(themeMode, themeSize)
 
     }

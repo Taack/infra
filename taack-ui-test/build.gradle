@@ -1,0 +1,118 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.grails.org/grails/core/" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
+        classpath "org.grails.plugins:hibernate5:${grailsHibernate5}"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipeline}"
+    }
+}
+
+plugins {
+    id "groovy"
+    id "org.grails.grails-web"
+    id "org.grails.grails-gsp"
+    id 'com.bertramlabs.asset-pipeline'
+    id "org.grails.grails-plugin"
+    id "application"
+}
+
+group = "taack.ui.test"
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.grails.org/grails/core/" }
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+dependencies {
+    if (Os.isFamily(Os.FAMILY_MAC)) {
+        runtimeOnly 'net.java.dev.jna:jna:5.14.0'
+        implementation 'io.methvin:directory-watcher:0.18.0'
+    }
+    developmentOnly('org.springframework.boot:spring-boot-devtools')
+    console 'org.grails:grails-console'
+    implementation 'org.grails.plugins:gsp'
+    profile 'org.grails.profiles:web'
+
+    compileOnly("io.micronaut:micronaut-inject-groovy")
+    implementation("org.grails:grails-core")
+    implementation("org.grails:grails-logging")
+    implementation("org.grails:grails-plugin-databinding")
+    implementation("org.grails:grails-plugin-i18n")
+    implementation("org.grails:grails-plugin-interceptors")
+    implementation("org.grails.plugins:async")
+    implementation("org.grails:grails-plugin-rest")
+    implementation("org.grails:grails-plugin-services")
+    implementation("org.grails:grails-plugin-url-mappings")
+    implementation("org.grails:grails-web-boot")
+    implementation("org.grails.plugins:gsp")
+    implementation("org.grails.plugins:hibernate5")
+    implementation("org.hibernate:hibernate-core:5.6.14.Final")
+    implementation "org.grails.plugins:events"
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-logging")
+    implementation("org.springframework.boot:spring-boot-starter-tomcat")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("javax.xml.bind:jaxb-api:2.3.1")
+    runtimeOnly("org.apache.tomcat:tomcat-jdbc")
+    runtimeOnly("org.glassfish.web:el-impl:2.2.1-b05")
+    runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
+
+    implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
+
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'org.asciidoctor:asciidoctorj:2.5.7'
+    implementation 'org.asciidoctor:asciidoctorj-pdf:2.3.4'
+    implementation 'org.asciidoctor:asciidoctorj-diagram:2.2.4'
+    implementation 'org.asciidoctor:asciidoctorj-revealjs:5.0.0.rc1'
+
+}
+
+grails {
+    // should use gradle -Dgrails.run.active=true bootRun
+    exploded = true
+    plugins {
+        implementation project(':taack-ui')
+    }
+}
+
+bootJar {
+    enabled = true
+}
+
+application {
+    mainClass.set("taack.ui.test.Application")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+assets {
+    minifyJs = true
+    minifyCss = true
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    systemProperty "geb.env", System.getProperty('geb.env')
+    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
+    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
+    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
+}

@@ -7,14 +7,16 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
-import taack.ui.dump.html.base.ButtonStyle
-import taack.ui.dump.html.base.HTMLInput
-import taack.ui.dump.html.base.IHTMLElement
-import taack.ui.dump.html.base.InputType
-import taack.ui.dump.html.base.TaackTag
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dump.html.element.ButtonStyle
+import taack.ui.dump.html.element.HTMLInput
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.InputType
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.theme.ThemeSelector
-import taack.ui.base.form.FormSpec
-import taack.ui.base.form.IUiFormVisitor
+import taack.ui.dsl.form.FormSpec
+import taack.ui.dsl.form.IUiFormVisitor
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.IFormTheme
 
@@ -40,26 +42,21 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private int tabIds = 0
     private FieldInfo[] lockedFields
 
-    IFormTheme formThemed
+    final IFormTheme formThemed
     IHTMLElement topElement
 
-    RawHtmlFormDump(final ByteArrayOutputStream out, final Parameter parameter) {
+    RawHtmlFormDump(IHTMLElement topElement, final Parameter parameter) {
         this.out = out
+        this.topElement = topElement
         this.parameter = parameter
+        ThemeSelector ts = parameter.uiThemeService.themeSelector
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize)
+
     }
 
     static String inputEscape(final String val) {
         val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
     }
-
-//    private void closeTags(TaackTag tag) {
-//        IHTMLElement top = topElement
-//        while (top && top.taackTag != tag) {
-//            top = top.parent
-//        }
-//        topElement = top?.taackTag == tag ? top?.parent : top
-//        if (!topElement) topElement = formThemed
-//    }
 
     private boolean isDisabled(FieldInfo field) {
         if (lockedFields == null) {
@@ -78,22 +75,22 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.lockedFields = lockedFields
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
-        ThemeSelector ts = parameter.uiThemeService.themeSelector
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize).builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
-                new HTMLInput(InputType.HIDDEN, id, 'id'),
-                new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
-                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
-                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
-                new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
-        ).build() as IFormTheme
+        topElement.builder.addChildren(
+                formThemed.builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
+                        new HTMLInput(InputType.HIDDEN, id, 'id'),
+                        new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
+                        new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
+                        new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
+                        new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
+                ).build()
+        )
         topElement = formThemed
     }
 
     @Override
     void visitFormEnd() {
         topElement = closeTags(TaackTag.SECTION)
-
         topElement = formThemed.formActionBlock(topElement)
         formActions.each {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
@@ -105,8 +102,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormSection(String i18n, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        topElement = formThemed.section(topElement, i18n, width.sectionCss.split(' '))
+    void visitFormSection(String i18n, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
+        topElement = formThemed.section(topElement, i18n, width.bootstrapCss.split(' '))
     }
 
     @Override
@@ -187,8 +184,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 topElement = formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
             }
         }
-        //inputOverride(qualifiedName, trI18n, field)
-
     }
 
     @Override
@@ -206,8 +201,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             GormEntity v = (field?.value) as GormEntity
             formThemed.ajaxField(topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         }
-
-        //inputOverride(qualifiedName, trI18n, field)
     }
 
     private static String fieldInfoParams(FieldInfo[] fieldInfos) {
@@ -224,8 +217,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormTabs(List<String> names, FormSpec.Width width = FormSpec.Width.DEFAULT_WIDTH) {
-        topElement = formThemed.formTabs(topElement, tabIds, names, width)
+    void visitFormTabs(List<String> names, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
+        topElement = BootstrapLayout.tabs(topElement, tabIds, names, width)
         tabIds++
     }
 
@@ -236,7 +229,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTab(String name) {
-        topElement = formThemed.formTab(topElement, ++tabOccurrence)
+        topElement = BootstrapLayout.tab(topElement, ++tabOccurrence)
     }
 
     @Override
@@ -250,6 +243,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         formActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${controller}/${action}" as String)
     }
 
+    @Override
+    void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
+        topElement = formThemed.formActionBlock topElement
+        i18n ?= parameter.trField(controller, action)
+        formThemed.addFormAction(topElement, "/${controller}/${action}", i18n, style)
+        topElement = topElement.parent
+    }
 
     @Override
     void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry) {
@@ -274,12 +274,22 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitCol() {
-        topElement = formThemed.formCol(topElement)
+        topElement = BootstrapLayout.col(topElement)
     }
 
     @Override
     void visitColEnd() {
         topElement = closeTags(TaackTag.COL)
+    }
+
+    @Override
+    void visitRow() {
+        topElement = BootstrapLayout.row(topElement)
+    }
+
+    @Override
+    void visitRowEnd() {
+        topElement = closeTags(TaackTag.ROW)
     }
 
     @Override
@@ -307,5 +317,4 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             )
         }
     }
-
 }

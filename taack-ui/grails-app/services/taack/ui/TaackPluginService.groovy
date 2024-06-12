@@ -17,7 +17,6 @@ final class TaackPluginService {
 
     @PostConstruct
     void init() {
-        println "AUO TaackPluginService PostConstruct"
         AbstractGrailsPluginManager pm = grailsApplication.mainContext.getBean('pluginManager') as AbstractGrailsPluginManager
         List<TaackPlugin> tp = []
         pm.allPlugins.each { GrailsPlugin grailsPlugin ->

@@ -10,45 +10,29 @@
         <meta name="color-scheme" content="dark">
         <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
     </g:if>
-    <g:else>
+    <g:elseif test="${themeMode == ThemeMode.LIGHT}">
         <meta name="color-scheme" content="light">
         <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
-    </g:else>
+    </g:elseif>
 
     <title>${conf.defaultTitle}</title>
-%{--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"--}%
-%{--          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">--}%
-
     <asset:stylesheet href="application-taack-bootstrap.css"/>
     <style>
     .navbar-nav > li > .dropdown-menu {
         background-color: ${conf.bgColor};
     }
 
-    .navbar-nav a.nav-link {
+    body>nav .navbar-nav a.nav-link {
         color: ${conf.fgColor};
     }
 
-    <g:if test="${!conf.outlineContainer}">
-    .taackContainer {
-        outline: none;
-    }
-    </g:if>
-
-    .navbar-toggler .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='${URLEncoder.encode(conf.fgColor, "UTF-8")}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
-    }
-
-    %{--.navbar-toggler.navbar-toggler {--}%
-    %{--    border-color: ${c.fgColor};--}%
-    %{--}--}%
     </style>
 
     <link rel="icon" type="image/png" href="/assets/favicon.png"/>
     <g:layoutHead/>
 </head>
 
-<body class="${themeMode == ThemeMode.DARK ? 'night' : 'day'}" data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
+<body data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
 
 <nav class="navbar navbar-expand-md" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
     <div id="dropdownNav" class="container-fluid">
@@ -115,8 +99,5 @@
 <g:else>
     <asset:javascript src="application-taack.js"/>
 </g:else>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-        crossorigin="anonymous"></script>
 </body>
 </html>

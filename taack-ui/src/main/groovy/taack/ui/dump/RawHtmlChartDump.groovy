@@ -1,9 +1,9 @@
 package taack.ui.dump
 
 import groovy.transform.CompileStatic
-import taack.ui.base.chart.ChartDatasetSpec
-import taack.ui.base.chart.ChartSpec
-import taack.ui.base.chart.IUiChartVisitor
+import taack.ui.dsl.chart.ChartDatasetSpec
+import taack.ui.dsl.chart.ChartSpec
+import taack.ui.dsl.chart.IUiChartVisitor
 
 @CompileStatic
 class RawHtmlChartDump implements IUiChartVisitor {

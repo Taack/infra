@@ -4,7 +4,7 @@ package taack.render
 import grails.compiler.GrailsCompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
-import taack.ui.base.UiBlockSpecifier
+import taack.ui.dsl.UiBlockSpecifier
 
 /**
  * Service managing progressbar. The action must return immediately after having initialised the progressbar.

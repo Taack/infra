@@ -6,8 +6,8 @@ import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackUiService
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
-import taack.ui.base.UiBlockSpecifier
-import taack.ui.base.UiFormSpecifier
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dump.html.theme.ThemeSize
 
 // TODO: Develop the UI

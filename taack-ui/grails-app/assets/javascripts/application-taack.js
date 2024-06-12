@@ -1,5 +1,3 @@
-//= require reveal.js/dist/reveal.js
-//= require reveal.js/plugin/highlight/highlight.js
-//= require reveal.js/plugin/zoom/zoom.js
+//= require bootstrap.bundle
 //= require client
 //= require_self

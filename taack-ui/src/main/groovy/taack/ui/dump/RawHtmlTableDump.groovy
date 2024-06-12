@@ -4,10 +4,22 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.helper.Utils
 import taack.ui.dump.common.CommonRawHtmlTableDump
+import taack.ui.dump.html.element.HTMLAnchor
+import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLForm
+import taack.ui.dump.html.element.HTMLInput
+import taack.ui.dump.html.element.HTMLSpan
+import taack.ui.dump.html.element.HTMLTxtContent
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.InputType
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.style.DisplayInlineBlock
+import taack.ui.dump.html.table.HTMLTd
+import taack.ui.dump.html.table.HTMLTr
 
 @CompileStatic
 final class RawHtmlTableDump extends CommonRawHtmlTableDump {
@@ -18,33 +30,35 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     private Object[] latestGroups = null
 
-    RawHtmlTableDump(final String id, final ByteArrayOutputStream out, final Parameter parameter) {
-        super(out, parameter)
+    RawHtmlTableDump(final IHTMLElement topElement, final String id, final Parameter parameter) {
+        super(topElement, parameter)
         this.blockId = id ?: '' + parameter.modalId
         currentFormId++
     }
 
     @Override
     void visitTable() {
-        out << """
-                <div style='overflow: auto;'><table class='${tableTheme.getTableClasses()} taackTable' taackTableId='${blockId}'>
-               """
+        topElement = themableTable.table(topElement, blockId)
     }
 
     @Override
     void visitTableWithoutFilter() {
-        out << """
-                <form style="display: none;" id="formId${currentFormId}" action="/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" name="${currentFormId}_Filter" class="pure-form pure-form-aligned filter" taackFilterId="${blockId}">
-                    <input type="hidden" name="sort" value="${parameter.applicationTagLib.params['sort'] ?: ''}">
-                    <input type="hidden" name="order" value="${parameter.applicationTagLib.params['order'] ?: ''}">
-                    <input type="hidden" name="grouping" value="${parameter.applicationTagLib.params['grouping'] ?: ''}">
-                    <input type="hidden" name="offset" value="${parameter.offset ?: '0'}">
-                    <input type="hidden" name="max" value="${parameter.max ?: '20'}">
-                    ${parameter.beanId ? '<input type="hidden" name="id" value=' + parameter.beanId + '>' : ''}
-                </form>
-            """
-
-        out << "<div class='table-div' style='overflow: auto;'><table class='pure-table taackTable' taackTableId='${blockId}'>\n"
+        IHTMLElement table = themableTable.table(topElement, blockId)
+        topElement.addChildren(
+                new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).addChildren(
+                        new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+                                new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
+                                new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
+                                new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
+                                new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
+                                new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
+                                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
+                                new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
+                        ).build(),
+                        table
+                ).build()
+        )
+        topElement = table
     }
 
 
@@ -52,38 +66,40 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
         fieldHeader()
-        out << """
-            <span class="sortable sortColumn taackSortableColumn " property="${RawHtmlFilterDump.getQualifiedName(fields)}" formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
-        """
+        topElement.addChildren(
+                new HTMLSpan().builder.addClasses('sortColumn').putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
+                        new HTMLTxtContent("<a>${i18n}</a>")
+                ).build()
+        )
         fieldFooter()
     }
 
     @Override
     void visitFieldHeader(final String i18n) {
         fieldHeader()
-        out << " ${i18n} <br>"
+        topElement.addChildren(
+                new HTMLSpan().builder.setStyle(new DisplayInlineBlock()).addChildren(
+                        new HTMLTxtContent("${i18n}")
+                ).build()
+        )
         fieldFooter()
     }
 
     @Override
     void visitFieldHeader(FieldInfo[] fields) {
-        fieldHeader()
-        out << parameter.trField(fields) + ' <br>'
-        fieldFooter()
+        visitFieldHeader parameter.trField(fields)
     }
 
     @Override
     void visitRowColumnEnd() {
         firstInCol = false
         isInCol = false
-        out << "</td>"
     }
 
     @Override
     void visitRowField(final FieldInfo fieldInfo, final String format, final Style style) {
         visitRowField(dataFormat(fieldInfo.value, format), style)
     }
-
 
     @Override
     void visitRowField(final GetMethodReturn fieldInfo, final String format, final Style style) {
@@ -93,7 +109,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitRowField(final String value, final Style style) {
         fieldHeader()
-        out << displayCell(value, style, null, firstInCol, isInCol)
+        displayCell(value, style, null, firstInCol, isInCol)
         firstInCol = false
         fieldFooter()
     }
@@ -106,7 +122,13 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitPaginate(Number max, Number count) {
         if (max != 0)
-            out << """<div class="taackTablePaginate" taackMax="$max" taackOffset="${parameter.params.long('offset')?:0}" taackCount="$count"></div>"""
+            topElement.addChildren(new HTMLDiv().builder
+                    .addClasses('taackTablePaginate')
+                    .putAttribute('taackMax', max?.toString())
+                    .putAttribute('taackOffset', parameter.params.long('offset')?.toString())
+                    .putAttribute('taackCount', count?.toString())
+                    .build()
+            )
     }
 
     @Override
@@ -119,30 +141,41 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
         i18n ?= parameter.trField(fields)
 
         String name = RawHtmlFilterDump.getQualifiedName(fields)
-        out << """
-            <span class="sortable sortColumn taackGroupableColumn" property="${name}" formid="${name}_Filter"><a  style="display: inline;">${i18n}</a><input type="checkbox"/></span><br>
-        """
+
+        topElement.addChildren(
+                new HTMLSpan().builder.addClasses('sortColumn', 'taackGroupableColumn')
+                        .putAttribute('groupField', name).addChildren(
+                        new HTMLTxtContent("""<a style="display: inline;">${i18n}</a><input type="checkbox"/>""")
+                ).build()
+        )
     }
 
     @Override
     void visitRowGroupHeader(String groups, MethodClosure show, long id) {
 
         stripped = 0
-        if (!show) {
-            out << """
-                <tr class="taackRowGroupHeader taackRowGroupHeader-$level"><td colspan="${colCount}"><em>$groups</em></td></tr>
-            """
-        } else {
-            out << """
-                <tr class="taackRowGroupHeader taackRowGroupHeader-$level"><td colspan="${colCount}"><a href="${parameter.urlMapped(Utils.getControllerName(show), show.method, id)}"><em>$groups</em></a></td></tr>
-            """
-        }
+
+        topElement.addChildren(new HTMLTr().builder
+                .addClasses('taackRowGroupHeader', "taackRowGroupHeader-$level")
+                .addChildren(
+                        new HTMLTd(colCount).builder.addChildren(
+                                new HTMLAnchor(false, parameter.urlMapped(Utils.getControllerName(show), show.method, id)).builder.addChildren(
+                                        new HTMLTxtContent("<em>$groups</em>")
+                                ).build()
+                        ).build()
+                ).build()
+        )
     }
 
     @Override
     void visitRowGroupFooter(String content) {
-        out << """
-            <tr class="taackRowGroupFooter taackRowGroupFooter-$level"><td colspan="${colCount}">$content</td></tr>
-        """
+        topElement.addChildren(new HTMLTr().builder
+                .addClasses('taackRowGroupFooter', "taackRowGroupFooter-$level")
+                .addChildren(
+                        new HTMLTd(colCount).builder.addChildren(
+                                        new HTMLTxtContent(content)
+                        ).build()
+                ).build()
+        )
     }
 }

@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
-import taack.ui.base.UiFilterSpecifier
+import taack.ui.dsl.UiFilterSpecifier
 /**
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.

@@ -6,7 +6,6 @@ import org.w3c.dom.events.Event
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
-import taack.ui.base.leaf.TableRowLink
 
 class TableRow(val parent: Table, val r: HTMLTableRowElement) :
         BaseElement {
@@ -20,7 +19,6 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
         }
     }
 
-    private val rowLink: List<TableRowLink>
     private val rowGroup: Int? = r.attributes.getNamedItem("taackTableRowGroup")?.value?.toInt()
     private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
     private var isExpended: Boolean = false
@@ -46,7 +44,6 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
 
     init {
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")
-        rowLink = TableRowLink.getSiblingTableRowLink(this)
         innerButt.type = "button"
         if (rowGroup != null) {
             val firstCell = r.firstElementChild!! as HTMLTableCellElement

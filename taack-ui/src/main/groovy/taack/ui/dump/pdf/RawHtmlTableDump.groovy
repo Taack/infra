@@ -1,12 +1,10 @@
 package taack.ui.dump.pdf
 
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
 import taack.ui.dump.Parameter
 import taack.ui.dump.common.CommonRawHtmlTableDump
 
@@ -24,13 +22,13 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTable() {
         out << """
-                <div style='overflow: auto;'><table class='pure-table taackTable'>
+                <div style='overflow: auto;'><table class='taackTable pure-table'>
                """
     }
 
     @Override
     void visitTableWithoutFilter() {
-        out << "<div class='table-div' style='overflow: auto;'><table class='pure-table taackTable'>\n"
+        out << "<div class='table-div' style='overflow: auto;'><table class='taackTable pure-table'>\n"
     }
 
     @Override
@@ -49,7 +47,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
         i18n ?= parameter.trField(fields)
         fieldHeader()
         out << """
-            <span class="sortable sortColumn taackSortableColumn " formid="${fields.first().fieldConstraint.field.declaringClass.simpleName}_Filter"><a>${i18n}</a></span>
+            <span class="sortable sortColumn "><a>${i18n}</a></span>
         """
         fieldFooter()
     }

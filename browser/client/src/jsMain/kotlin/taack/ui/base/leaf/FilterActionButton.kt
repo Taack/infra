@@ -10,7 +10,6 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
-import taack.ui.base.record.RecordState
 import kotlin.js.Promise
 
 class FilterActionButton(private val parent: Filter, private val b: HTMLButtonElement?) : LeafElement {
@@ -23,8 +22,6 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
             }
         }
     }
-
-    private val state: RecordState = RecordState()
 
     init {
         trace("FilterActionButton::init ${b?.id}")
@@ -44,9 +41,8 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
         fd.append("isAjax", "true")
         fd.append("refresh", "true")
         fd.append("filterTableId", parent.filterId)
+        fd.append("ajaxBlockId", parent.parent.blockId)
         fd.set("offset", "0")
-        state.addClientStateAjaxBlock()
-        state.addServerState(fd)
         window.fetch(b?.formAction ?: pf.action, RequestInit(method = "POST", body = fd)).then {
             if (it.ok) {
                 it.text()
@@ -59,19 +55,21 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                 trace("FilterActionButton::onclick __redirect__ ${it.substring("__redirect__".length)}")
                 window.location.href = it.substring("__redirect__".length)
             } else if (it.startsWith("__reload__")) {
-                trace("FilterActionButton::onclick __reload__ ${RecordState.serverState.isNotEmpty()}, RecordState.serverState=${RecordState.serverState}")
-                window.location.href = (Block.href ?: "") + if (RecordState.serverState.isNotEmpty()) "?recordState=${RecordState.dumpServerState()}" else ""
+                trace("FilterActionButton::onclick __reload__")
+                window.location.href = (Block.href ?: "")
             } else if (it.startsWith("__ajaxBlockStart__")) {
                 trace("FilterActionButton::onclick __ajaxBlockStart__")
                 Helper.mapAjaxText(it).map { me ->
                     val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
-                    target!!.d.innerHTML = me.value
-                    target.refresh()
+                    if (target != null) {
+                        target.updateContent(me.value)
+                    } else {
+                        trace("FilterActionButton::onclick no target ${me.key}")
+                    }
                 }
             } else {
                 trace("FilterActionButton::onclick other content")
-                parent.parent.d.innerHTML = it
-                parent.parent.refresh()
+                parent.parent.parent.updateContent(it)
             }
         }.then {
             b?.disabled = false

@@ -10,7 +10,7 @@ final class EnumOption implements IEnumOption {
     final String asset
     final Boolean section
 
-    EnumOption(String key, String value, String asset, Boolean isSection) {
+    EnumOption(String key, String value, String asset = null, Boolean isSection = false) {
         this.key = key?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
         this.value = value
         this.asset = asset
@@ -52,23 +52,22 @@ final class EnumOptions implements IEnumOptions {
     }
 
     EnumOptions(Class<? extends Enum> options, String paramKey, Enum... currents) {
-        String[] values = options.invokeMethod('values', null) as String[]
+        Enum[] values = options.invokeMethod('values', null) as Enum[]
         this.options = new EnumOption[values.size()]
 
         for (int i = 0; i < values.size(); i++) {
-            final String v = values[i]
-            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
-            this.options[i] = new EnumOption(v, name, null, false)
+            final Enum v = values[i]
+            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v.toString()
+            this.options[i] = new EnumOption(v.toString(), name, null, false)
         }
-
         if (currents && currents.size() > 0) {
             this.currents = new EnumOption[currents.size()]
 
             for (int i = 0; i < currents.size(); i++) {
-                final String v = currents[i]
+                final Enum v = currents[i]
                 if (v) {
                     final String name = v?.hasProperty(ST_NAME) ? values[i]?.getAt(ST_NAME) : v
-                    this.currents[i] = new EnumOption(v, name, null, false)
+                    this.currents[i] = new EnumOption(v.toString(), name, null, false)
                 }
             }
         }

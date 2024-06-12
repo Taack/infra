@@ -1,7 +1,7 @@
 package taack.ui.diagram.render
 
 import groovy.transform.CompileStatic
-import taack.ui.base.common.Style
+import taack.ui.dsl.common.Style
 
 import java.awt.Color
 import java.awt.Font

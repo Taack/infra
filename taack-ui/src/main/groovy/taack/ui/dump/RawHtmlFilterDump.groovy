@@ -1,15 +1,19 @@
 package taack.ui.dump
 
-import grails.util.Pair
+
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.EnumOptions
 import taack.ui.IEnumOption
-import taack.ui.base.filter.IUiFilterVisitor
-import taack.ui.base.filter.expression.FilterExpression
-import taack.ui.dump.html.base.*
+import taack.ui.dsl.filter.IUiFilterVisitor
+import taack.ui.dsl.filter.expression.FilterExpression
+import taack.ui.dump.html.element.ButtonStyle
+import taack.ui.dump.html.element.HTMLInput
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.InputType
+import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.IFormTheme
 import taack.ui.dump.html.theme.ThemeSelector
@@ -17,15 +21,14 @@ import taack.ui.dump.html.theme.ThemeSelector
 @CompileStatic
 final class RawHtmlFilterDump implements IUiFilterVisitor {
 
-    final private ByteArrayOutputStream out
     final private Parameter parameter
     final private List<Triple<String, ButtonStyle, String>> filterActions = []
 
     IFormTheme formThemed
     IHTMLElement topElement
 
-    RawHtmlFilterDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        this.out = out
+    RawHtmlFilterDump(final IHTMLElement topElement, final Parameter parameter) {
+        this.topElement = topElement
         this.parameter = parameter
         filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
         filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
@@ -84,7 +87,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
         topElement = closeTags(TaackTag.FILTER)
-        out << formThemed.output
     }
 
     @Override

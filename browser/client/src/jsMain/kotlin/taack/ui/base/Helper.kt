@@ -57,6 +57,7 @@ class Helper {
         }
 
         fun mapAjaxText(text: String): Map<String, String> {
+//            console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
             console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
             val abs = "__ajaxBlockStart__"
@@ -90,7 +91,7 @@ class Helper {
             val block = base.getParentBlock()
             when {
                 text.contains(rel) -> {
-                    window.location.href = (Block.href ?: "")// + "?recordState=${RecordState.dumpServerState()}"
+                    window.location.href = (Block.href ?: "")
                 }
                 text.startsWith(m) -> {
                     val pos = text.indexOf(':', m.length)
@@ -150,12 +151,12 @@ class Helper {
                     }
                 }
                 else -> {
-                    trace("Helper::opening Modal")
+                    trace("Helper::redirect")
                     if (process != null) {
                         processingStack.add(process)
                     }
                     block.modal.open(text)
-                    val s = block.modal.innerModal.getElementsByTagName("script").asList()
+                    val s = block.modal.dModalBody.getElementsByTagName("script").asList()
                     trace("Executing $s")
                 }
             }

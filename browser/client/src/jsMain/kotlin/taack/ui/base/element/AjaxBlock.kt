@@ -1,15 +1,17 @@
 package taack.ui.base.element
 
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.await
 import kotlinx.coroutines.launch
-import org.w3c.dom.*
+import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.Node
+import org.w3c.dom.asList
+import org.w3c.dom.get
 import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
-import taack.ui.base.record.RecordState
+import taack.ui.base.leaf.ActionLink
 import kotlin.js.Promise
 
 class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
@@ -17,65 +19,30 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     companion object {
         fun getSiblingAjaxBlock(p: Block): List<AjaxBlock> {
             val divElements: List<Node>?
-            divElements = p.d.querySelectorAll("div.taackAjaxBlock").asList()
+            divElements = p.d.querySelectorAll("div[ajaxBlockId]").asList()
+//            return (divElements + p.d).map {
             return divElements.map {
                 AjaxBlock(p, it as HTMLDivElement)
             }
         }
     }
-
-    val blockId = parent.blockId
-    var filters: Map<String, Filter>
-    var tables: Map<String, Table>
-    var forms: List<Form>
-    var shows: List<Show>
+    val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")?.value ?:  d.attributes.getNamedItem("blockId")?.value
+    val blockId = ajaxBlockId ?: parent.blockId
+    var filters: Map<String, Filter> = mutableMapOf()
+    var tables: Map<String, Table> = mutableMapOf()
+    var forms: List<Form> = mutableListOf()
+    var shows: List<Show> = mutableListOf()
     var progressId: String = ""
     private val innerScripts = d.getElementsByTagName("script")
 
     init {
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
-        filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
-        tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
-        forms = Form.getSiblingForm(this)
-        shows = Show.getSiblingShow(this)
-        Helper.trace("innerScripts ${innerScripts.length}")
-        //Ugly as Hell
-        for (i in 0 until innerScripts.length) {
-            val s = innerScripts.get(i) as HTMLScriptElement
-            if (s.type == "module") {
-                console.log("AUO detecting a module")
-                document.body!!.appendChild(s)
+        refresh()
 
-//                val code: Any = s.innerHTML
-//                js("const dataUri = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code);const module = await import(dataUri);console.log(module);const myHello = module.default;myHello();")
-            } else {
-                if (!s.hasAttribute("postExecute")) continue
-
-                if (s.hasAttribute("src")) {
-                    console.log("AUO Eval src: ${(innerScripts.get(i)!! as HTMLScriptElement).src}")
-                    val script = document.createElement("script") as HTMLScriptElement
-                    script.src = (innerScripts.get(i)!! as HTMLScriptElement).src
-                    document.head?.appendChild(script)
-
-                } else {
-                    console.log("AUO Eval: ${innerScripts.get(i)!!.innerHTML}")
-                    eval("(function() {" + innerScripts.get(i)!!.innerHTML + "})()")
-//                    document.body?.appendChild(innerScripts.get(i)!!)
-                }
-            }
-        }
-
-        RecordState.setCurrentBlockId(blockId)
         if (blockId.startsWith("drawProgress:")) {
             poolDrawProgress(blockId)
         }
-        val clientState = RecordState.getPreviousClientState()?.get(blockId)
-        Helper.trace("clientState = $clientState")
-        if (clientState != null) {
-            window.scrollTo(clientState[0]?.toDouble() ?: 0.0, clientState[1]?.toDouble() ?: 0.0)
-            RecordState.clearClientState(blockId)
-        }
-
+        parent.ajaxBlockElements.put(blockId, this)
 
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }
@@ -115,12 +82,20 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
         tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
         forms = Form.getSiblingForm(this)
+        shows = Show.getSiblingShow(this)
         for (i in 0 until innerScripts.length) {
             eval(innerScripts.get(i)!!.innerHTML);
         }
-        parent.refresh()
+        ActionLink.getActionLink(this)
         Helper.traceDeIndent("AjaxBlock::refresh --- blockId: $blockId")
     }
+
+    fun updateContent(newContent: String) {
+        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
+        d.innerHTML = newContent
+        refresh()
+    }
+
 
     override fun getParentBlock(): Block {
         return parent

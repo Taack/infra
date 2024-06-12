@@ -3,9 +3,9 @@ package taack.ui.dump.mail
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.show.IUiShowVisitor
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.show.IUiShowVisitor
 import taack.ui.dump.Parameter
 
 @CompileStatic

@@ -7,10 +7,6 @@
     color: #212529;
 }
 
-.pure-table-odd td, .pure-table-odd th {
-    background-color: var(--bs-gray-200);
-}
-
 .taackColorBlue {
     color-scheme: dark;
     color: #000099;
