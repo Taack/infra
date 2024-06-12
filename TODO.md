@@ -36,6 +36,7 @@
   - ~~clean up form / table / filter DSLs~~
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
+- Reduce CSS and JS
 - Fix table grouping / trees with pagination
 - Improve form layout, add row in DSL
 - More coherent button style in forms
@@ -53,6 +54,7 @@
 
 # 0.5.x
 
+- SVG theme, use id
 - Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Ajax scrollable tables
 - PDF / Docx / pptx / HTML from Asciidoc

@@ -2,12 +2,22 @@ package taack.ui.dump.common
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.ui.dump.html.table.ITableTheme
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.Parameter
-import taack.ui.dump.html.table.BootstrapTable
+import taack.ui.dump.html.element.HTMLAnchor
+import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLTxtContent
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.style.DisplayNone
+import taack.ui.dump.html.table.HTMLTHead
+import taack.ui.dump.html.table.HTMLTBody
+import taack.ui.dump.html.table.HTMLTd
+import taack.ui.dump.html.table.HTMLTh
+import taack.ui.dump.html.table.HTMLTr
+import taack.ui.dump.html.table.ThemableTable
 
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -15,9 +25,8 @@ import java.text.SimpleDateFormat
 @CompileStatic
 abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
-    final ByteArrayOutputStream out
     final Parameter parameter
-    final ITableTheme tableTheme
+    final ThemableTable themableTable
 
     private int indent = -1
     int colCount = 0
@@ -28,10 +37,20 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     int level = 0
     boolean firstInCol = false
 
-    CommonRawHtmlTableDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        this.out = out
+    IHTMLElement topElement
+
+    CommonRawHtmlTableDump(final IHTMLElement topElement, final Parameter parameter) {
+        this.topElement = topElement
         this.parameter = parameter
-        this.tableTheme = new BootstrapTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
+        this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
+    }
+
+    IHTMLElement closeTags(TaackTag tag) {
+        IHTMLElement top = topElement
+        while (top && top.taackTag != tag && top.parent) {
+            top = top.parent
+        }
+        top.parent ?: top
     }
 
     static final <T> String dataFormat(T value, String format) {
@@ -48,91 +67,90 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         }
     }
 
-    static final String displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
-        if (style) {
-            if (!cell || cell.empty) return ""
-            return """
-                <div class="${style.cssClassesString ?: ''}" style="${style.cssStyleString ?: ''}">
-                    ${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell ?: ''}"}
-                </div>
-            """
-        } else {
-            String ret = "${cell && !cell.empty ? "${url ? "<a class='link' href='${url}'>${cell ?: ''}</a>" : "${cell}"}" : ''}"
-            ret = ret.empty ? '' : (((!firstInCol && isInCol) ? '<br>' : '') + ret)
-            return ret
-        }
+    static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
+        if (!cell || cell.empty) return new HTMLTxtContent('')
+        return new HTMLDiv().builder.addClasses(style.cssClassesString).addChildren(
+                new HTMLAnchor(false, url).builder.addChildren(
+                        new HTMLTxtContent(cell)
+                ).build()
+        ).build()
     }
 
     void fieldHeader() {
         if (!isInCol) {
             colCount++
-            out << (isInHeader ? "<th>" : "<td>")
         }
     }
 
     void fieldFooter() {
-        if (!isInCol) out << (isInHeader ? "</th>" : "</td>")
+        if (!isInCol)
+            topElement.addChildren(
+                new HTMLTd()
+            )
     }
 
     @Override
     void visitTableEnd() {
-        out << "</tbody>"
-        out << "</table></div></div>\n"
+        topElement = closeTags(TaackTag.TABLE)
     }
 
     @Override
     void visitColumn(Integer colSpan, Integer rowSpan) {
         colCount++
         isInCol = true
-        if (colSpan) {
-            out << """<th colspan="${colSpan}" ${rowSpan ? "rowSpan='${rowSpan}'" : ""} ${rowStyle ? "style='${rowStyle.cssStyleString}' " : ""}>"""
-        } else {
-            out << "<th>"
-        }
+        HTMLTh th = new HTMLTh(colSpan, rowSpan)
+        topElement.addChildren(th)
+        topElement = th
     }
 
     @Override
     void visitHeader() {
         isInHeader = true
-        out << "\n<thead>"
-        out << "\n<tr>"
+        HTMLTr tr = new HTMLTr()
+        topElement.addChildren(
+                new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).build(), tr
+        )
+        topElement = tr
     }
 
     @Override
     void visitHeaderEnd() {
         isInHeader = false
-        out << "</tr>\n"
-        out << "</thead>\n"
-        out << "<tbody>\n"
+        topElement = closeTags(TaackTag.TABLE_HEAD)
+        HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
+        topElement.addChildren(tb)
+        topElement = tb
     }
 
     @Override
     void visitColumnEnd() {
         isInCol = false
-        out << "</th>"
+        topElement = closeTags(TaackTag.TABLE_COL)
     }
 
     @Override
     void visitRow(Style style, boolean hasChildren) {
         rowStyle = style
         stripped++
-        out << """
-            <tr class="taackTableRow" ${indent > -1 ? "${indent > 0 ? "style='display: none'" : ""}; taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
-        """
+        HTMLTr tr = new HTMLTr()
+        if (indent > 0) {
+            tr.styleDescriptor = new DisplayNone()
+            tr.taackTag = TaackTag.TABLE_ROW
+            tr.attributes.put('taackTableRowGroup', indent.toString())
+            tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
+        }
+        topElement.addChildren(tr)
+        topElement = tr
     }
 
     void visitRowRO(Style style, boolean hasChildren) {
-        rowStyle = style
-        stripped++
-        out << """
-            <tr class="taackTableRow" ${indent > -1 ? "taackTableRowGroup=$indent taackTableRowGroupHasChildren='${hasChildren}'" : ""}>
-        """
+        visitRow style, hasChildren
     }
 
     @Override
     void visitRowEnd() {
         rowStyle = null
-        out << "</tr>\n"
+        topElement = closeTags(TaackTag.TABLE_ROW)
     }
 
     @Override
@@ -152,9 +170,13 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitRowGroupHeader(String label) {
         stripped = 0
-        out << """
-                <tr class="taackRowGroupHeader taackRowGroupHeader-$level"><td colspan="${colCount}"><em>$label</em></td></tr>
-            """
+        topElement.addChildren(
+                new HTMLTr(colCount).builder.addClasses('taackRowGroupHeader', "taackRowGroupHeader-$level").addChildren(
+                        new HTMLTd(colCount).builder.addChildren(
+                                new HTMLTxtContent("<em>$label</em>")
+                        ).build()
+                ).build()
+        )
     }
 
     @Override
@@ -163,34 +185,21 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
         fieldHeader()
         params ?= [:]
-        if (isAjax) {
-            out << """
-                 <div class='icon'>
-                    <a class='taackAjaxRowLink' ajaxAction='${parameter.urlMapped(controller, action, id, params)}'>
-                        ${actionIcon.getHtml(i18n)}
-                    </a>
-                 </div>
-            """
-        } else {
-            out << """
-                 <div class='icon'>
-                    <a class='link' href="${parameter.urlMapped(controller, action, id, params)}">
-                        ${actionIcon.getHtml(i18n)}
-                    </a>
-                 </div>
-            """
-        }
+        topElement.addChildren(
+                new HTMLDiv().builder.addChildren(
+                        new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params))
+                ).build()
+        )
         fieldFooter()
     }
 
     @Override
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
         isInCol = true
-        if (colSpan) {
-            out << """<td colspan="${colSpan}" ${rowSpan ? "rowSpan='${rowSpan}'" : ""} ${style ? "style='${style.cssStyleString}'" : (rowStyle ? "style='${rowStyle.cssStyleString}'" : "")}>"""
-        } else {
-            out << """<td ${style ? "style='${style.cssStyleString}'" : (rowStyle ? "style='${rowStyle.cssStyleString}'" : "")}>"""
-        }
+        HTMLTd td = new HTMLTd(colSpan, rowSpan)
+        topElement.addChildren(td)
+        topElement = td
+
         firstInCol = true
     }
 

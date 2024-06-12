@@ -30,7 +30,6 @@ import taack.ui.dump.html.theme.ThemeSelector
 @CompileStatic
 final class RawHtmlBlockDump implements IUiBlockVisitor {
     private String id
-    final ByteArrayOutputStream out
     final String modalId
 
 
@@ -53,7 +52,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (modalId) isModal = true
         this.parameter = parameter
         this.modalId = modalId
-        this.out = out
         if (parameter.params.boolean('refresh'))
             isModalRefresh = true
         ThemeSelector ts = parameter.uiThemeService.themeSelector
@@ -82,7 +80,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (!parameter.isAjaxRendering || isModal) {
             topElement = closeTags(TaackTag.BLOCK)
         }
-        out << block.output
     }
 
     @Override
@@ -124,8 +121,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitAjaxBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
-        if (isModalRefresh) out << topElement.output
-        //else out << "</div>"
     }
 
     @Override
@@ -182,7 +177,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
-        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(id, out, parameter))
+        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(topElement, id, parameter))
         visitInnerColBlockEnd()
     }
 
@@ -200,7 +195,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
-        tableSpecifier.visitTable(new RawHtmlTableDump(id, out, parameter))
+        tableSpecifier.visitTable(new RawHtmlTableDump(topElement, id, parameter))
         visitInnerColBlockEnd()
         visitRowEnd()
     }
