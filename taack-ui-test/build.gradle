@@ -104,6 +104,11 @@ java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
 
+assets {
+    minifyJs = true
+    minifyCss = true
+}
+
 tasks.withType(Test) {
     useJUnitPlatform()
     systemProperty "geb.env", System.getProperty('geb.env')
