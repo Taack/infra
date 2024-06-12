@@ -37,6 +37,8 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
         implementation "org.grails.plugins:gsp"
         profile "org.grails.profiles:web-plugin"
         runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
+        assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipeline}"
+        assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipeline}"
     }
 
     if (rootProject.name == 'infraFalse') {
@@ -110,21 +112,22 @@ if (rootProject.name != 'infra') {
     assets {
         minifyJs = true
         minifyCss = true
-        configOptions = [
-                commonJs: false,
-                babel   : [
-                        enabled       : false,
-                        processJsFiles: false
-                ]
-        ] //useful for custom config on extension libraries
+        configOptions = [:]
 
-        excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
+        minifyOptions = [
+                languageMode: 'ES_NEXT_IN',
+                targetLanguage: 'ES_NEXT_IN', //Can go from ES6 to ES5 for those bleeding edgers
+                optimizationLevel: 'SIMPLE',
+                angularPass: false // Can use @ngInject annotation for Angular Apps
+        ]
+
+        //excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
 
         //for plugin packaging
         packagePlugin = true //set to true if this is a library
 
         //developmentRuntime can be turned off
-        developmentRuntime = false
+        developmentRuntime = true
 
         //if you want to customize the jar task this task runs on you can specify a jarTaskName
         jarTaskName = null

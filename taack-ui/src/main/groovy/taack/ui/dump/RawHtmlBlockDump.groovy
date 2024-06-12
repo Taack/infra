@@ -442,8 +442,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         for (i; i < im;) {
             IEnumOption option = options[i++]
             parameter.params.put(enumOptions.paramKey, option.key)
+            img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
             if (option.section) {
-                img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
                 menu.menuOptionSection(topElement, img, option.value)
             } else {
                 String url = parameter.urlMapped(controller, action, parameter.params as Map, false)

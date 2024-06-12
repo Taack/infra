@@ -7,7 +7,11 @@
 * You're free to add application-wide styles to this file and they'll appear at the top of the
 * compiled file, but it's generally better to create a new file per style scope.
 *
-*= require taack-theme-bootstrap
+*= require bootstrap
 *= require taack
 *= require_self
 */
+
+.navbar-nav a.nav-link.show {
+    color: #ffc747;
+}

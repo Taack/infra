@@ -53,7 +53,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     static IHTMLElement label(IHTMLElement topElement, String i18n, boolean hasClosure) {
         if (hasClosure) {
-            HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build()
+            HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build() as HTMLUl
             topElement.addChildren(
                     new HTMLLi().builder.addClasses('nav-item', 'dropdown').setTaackTag(TaackTag.LABEL).addChildren(
                             new HTMLAnchor(false, '#').builder
@@ -122,8 +122,8 @@ final class BootstrapMenu implements IHTMLElement {
 
     static IHTMLElement menuOption(IHTMLElement topElement, String img, String value, String url) {
         topElement.addChildren(
-                new HTMLLi().builder.addChildren(
-                        new HTMLAnchor(false, url).builder.addClasses('dropdown-item').addChildren(
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                        new HTMLAnchor(false, url).builder.addClasses('nav-link').addChildren(
                                 new HTMLTxtContent(img),
                                 new HTMLTxtContent(value)
                         ).build()
