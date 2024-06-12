@@ -20,9 +20,6 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     final String blockId
     private static Integer currentFormId = 0
 
-
-    private Object[] latestGroups = null
-
     RawHtmlTableDump(final IHTMLElement topElement, final String id, final Parameter parameter) {
         super(topElement, parameter)
         this.blockId = id ?: '' + parameter.modalId
@@ -81,7 +78,6 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowColumnEnd() {
-        firstInCol = false
         isInCol = false
     }
 
@@ -97,8 +93,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowField(final String value, final Style style) {
-        displayCell(value, style, null, firstInCol, isInCol)
-        firstInCol = false
+        topElement.addChildren(displayCell(value, style, null, firstInCol, isInCol))
     }
 
     @Override

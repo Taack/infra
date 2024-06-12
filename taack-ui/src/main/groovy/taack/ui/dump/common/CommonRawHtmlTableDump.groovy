@@ -6,18 +6,9 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.Parameter
-import taack.ui.dump.html.element.HTMLAnchor
-import taack.ui.dump.html.element.HTMLDiv
-import taack.ui.dump.html.element.HTMLTxtContent
-import taack.ui.dump.html.element.IHTMLElement
-import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.element.*
 import taack.ui.dump.html.style.DisplayNone
-import taack.ui.dump.html.table.HTMLTHead
-import taack.ui.dump.html.table.HTMLTBody
-import taack.ui.dump.html.table.HTMLTd
-import taack.ui.dump.html.table.HTMLTh
-import taack.ui.dump.html.table.HTMLTr
-import taack.ui.dump.html.table.ThemableTable
+import taack.ui.dump.html.table.*
 
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -68,11 +59,9 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
-        if (!cell || cell.empty) return new HTMLTxtContent('')
-        return new HTMLDiv().builder.addClasses(style?.cssClassesString).addChildren(
-                new HTMLAnchor(false, url).builder.addChildren(
-                        new HTMLTxtContent(cell)
-                ).build()
+        if (!url) return new HTMLTxtContent(cell)
+        return new HTMLAnchor(true, url).builder.addChildren(
+                new HTMLTxtContent(cell)
         ).build()
     }
 
@@ -85,10 +74,17 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     void visitColumn(Integer colSpan, Integer rowSpan) {
         colCount++
         isInCol = true
-        HTMLTh th = new HTMLTh(colSpan, rowSpan)
-        th.setTaackTag(TaackTag.TABLE_COL)
-        topElement.addChildren(th)
-        topElement = th
+        if (isInHeader) {
+            HTMLTh th = new HTMLTh(colSpan, rowSpan)
+            th.setTaackTag(TaackTag.TABLE_COL)
+            topElement.addChildren(th)
+            topElement = th
+        } else {
+            HTMLTd th = new HTMLTd(colSpan, rowSpan)
+            th.setTaackTag(TaackTag.TABLE_COL)
+            topElement.addChildren(th)
+            topElement = th
+        }
     }
 
     @Override
@@ -123,9 +119,9 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         rowStyle = style
         stripped++
         HTMLTr tr = new HTMLTr()
+        tr.taackTag = TaackTag.TABLE_ROW
         if (indent > 0) {
             tr.styleDescriptor = new DisplayNone()
-            tr.taackTag = TaackTag.TABLE_ROW
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
         }
@@ -176,7 +172,9 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         params ?= [:]
         topElement.addChildren(
                 new HTMLDiv().builder.addChildren(
-                        new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params))
+                        new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
+                                new HTMLTxtContent(actionIcon.getHtml(i18n))
+                        ).build()
                 ).build()
         )
     }
