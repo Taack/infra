@@ -16,7 +16,6 @@ import taack.domain.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.UiShowSpecifier
@@ -24,7 +23,6 @@ import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
-import taack.ui.dsl.form.FormSpec
 import taack.ui.dump.markdown.Markdown
 
 import javax.annotation.PostConstruct
@@ -395,7 +393,7 @@ class CmsController implements WebAttributes {
                     }
                 }
             else {
-                innerBlock BlockSpec.Width.HALF, {
+                col BlockSpec.Width.HALF, {
                     ajaxBlock "cmsSlideshowForm", {
                         form buildCmsSlideshowForm(slideshow), BlockSpec.Width.MAX
                     }
@@ -839,16 +837,17 @@ class CmsController implements WebAttributes {
                 }
             else {
                 row {
-                    innerBlock BlockSpec.Width.HALF, {
+                    col BlockSpec.Width.HALF, {
 //                    ajaxBlock "cmsPageForm", {
                         form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
 //                    }
                     }
-
-                    tabs BlockSpec.Width.HALF, {
-                        tab "Images", buildImagesTab(cmsPage)
-                        tab "Pdfs", buildPdfsTab(cmsPage)
-                        tab "Videos", buildVideosTab(cmsPage)
+                    col {
+                        tabs {
+                            tab "Images", buildImagesTab(cmsPage)
+                            tab "Pdfs", buildPdfsTab(cmsPage)
+                            tab "Videos", buildVideosTab(cmsPage)
+                        }
                     }
                 }
             }

@@ -127,7 +127,7 @@ final class BlockSpec {
      * @param width
      * @param closure
      */
-    void innerBlock(final Width width, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+    void col(final Width width = Width.HALF, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         if (displayElement()) blockVisitor.visitCol(width)
         closure.delegate = this
         closure.call()

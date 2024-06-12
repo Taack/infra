@@ -163,7 +163,7 @@ final class TaackSearchService implements WebAttributes {
         Map<String, Map<String, List<String>>> highlighting = queryResponse.highlighting
         def response = queryResponse.response
         new UiBlockSpecifier().ui {
-            innerBlock BlockSpec.Width.THIRD, {
+            col BlockSpec.Width.THIRD, {
                 ajaxBlock "range", {
                     table new UiTableSpecifier().ui {
                         header {
@@ -205,7 +205,7 @@ final class TaackSearchService implements WebAttributes {
                     }
                 }
             }
-            innerBlock BlockSpec.Width.TWO_THIRD, {
+            col BlockSpec.Width.TWO_THIRD, {
                 ajaxBlock "results", {
                     table new UiTableSpecifier().ui {
                         header {

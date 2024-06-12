@@ -23,9 +23,11 @@ import taack.ui.dump.html.block.HTMLAjaxCloseLastModal
 import taack.ui.dump.html.block.HTMLAjaxCloseModal
 import taack.ui.dump.html.block.HTMLFieldInfo
 import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLSection
 import taack.ui.dump.html.element.HTMLTxtContent
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.menu.BootstrapMenu
 import taack.ui.dump.html.theme.ThemeSelector
 
@@ -36,13 +38,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
 
     private String ajaxBlockId = null
-    final private Long blockId = System.currentTimeMillis()
     boolean isModal = false
     boolean isModalRefresh = false
 
+    final private Random random = new Random(System.currentTimeMillis())
     private int tabOccurrence = 0
-    private int tabOccurrencePrevious = 0
-    private int tabIds = 0
 
     final BootstrapBlock block
     final BootstrapMenu menu
@@ -96,15 +96,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitCol(final BlockSpec.Width width) {
-//        out << """<div class="${width.bootstrapCss} align-items-start">"""
-        topElement = block.col(topElement)
+        topElement = block.col(topElement, width)
     }
 
     @Override
     void visitInnerColBlockEnd() {
-//        out << "</div>"
         topElement = closeTags(TaackTag.COL)
-
     }
 
     @Override
@@ -264,19 +261,22 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         topElement = closeTags(TaackTag.TAB)
     }
 
-    private List<String> currentTabNames
+    private List<String> currentTabNames = []
+    private IHTMLElement oldParent = null
     private BlockSpec.Width blockTabWidth
 
     @Override
     void visitBlockTabs(final BlockSpec.Width width) {
+        oldParent = topElement
+        topElement = new HTMLEmpty()
     }
 
     @Override
     void visitBlockTabsEnd() {
-
-
-        topElement = block.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
-
+        IHTMLElement tabsContent = topElement
+        topElement = block.tabs(oldParent, random.nextInt(), currentTabNames, blockTabWidth)
+        topElement.addChildren(tabsContent)
+        topElement = closeTags(TaackTag.TABS)
     }
 
     @Override
@@ -353,7 +353,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
-        topElement = menu.menu(topElement, i18n, parameter.urlMapped(controller, action, params))
+        topElement = menu.menu(topElement, i18n, parameter.isAjaxRendering, parameter.urlMapped(controller, action, params))
     }
 
     @Override

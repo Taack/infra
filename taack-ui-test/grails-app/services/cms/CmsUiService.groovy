@@ -180,7 +180,7 @@ class CmsUiService implements WebAttributes {
                     .setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_)
                     .build()) { CmsPage cp ->
                 rowColumn {
-                    rowField previewMedia(cp.mainImage?.id)
+                    rowField this.previewMedia(cp.mainImage?.id)
                 }
                 rowColumn {
                     rowField cp.dateCreated_

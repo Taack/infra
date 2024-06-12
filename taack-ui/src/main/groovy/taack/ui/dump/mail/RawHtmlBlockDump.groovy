@@ -280,38 +280,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTabs(final BlockSpec.Width width) {
 //        outBkup = out
 ////        out = new ByteArrayOutputStream()
-//        blockTabWidth = width
-//        currentTabNames = []
+        blockTabWidth = width
+        currentTabNames = []
     }
 
     @Override
     void visitBlockTabsEnd() {
-//        outBkup << """<div class="pc-tab ${blockTabWidth.bootstrapCss} taackContainer">"""
-//        currentTabNames.eachWithIndex { it, occ ->
-//            outBkup << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-${tabIds}" type="radio" class="taackBlockInputTab inputTab${occ + 1}${false ? "Inner" : ""}" name="pct-${tabIds}" />"""
-//        }
-//        outBkup << "<nav><ul>"
-//        currentTabNames.eachWithIndex { it, occ ->
-//            outBkup << """
-//                <li class="tab${occ + 1}">
-//                    <label for="tab${occ + 1}-${tabIds}">${it}</label>
-//                </li>
-//            """
-//        }
-//        outBkup << "</ul></nav>"
-//        outBkup << "<section>"
-//        tabIds++
-//        if (tabOccurrence != 0) tabOccurrencePrevious = tabOccurrence
-//        tabOccurrence = 0
-//        out.writeTo(outBkup)
-////        out = outBkup
-//
-//        tabOccurrence = tabOccurrencePrevious
-//        tabOccurrencePrevious = 0
-//        out << "</section></div>"
-
         topElement = block.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
-
     }
 
     @Override
@@ -390,7 +365,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
-        topElement = menu.menu(topElement, i18n, parameter.urlMapped(controller, action, params))
+        topElement = menu.menu(topElement, i18n, parameter.isAjaxRendering, parameter.urlMapped(controller, action, params))
     }
 
     @Override

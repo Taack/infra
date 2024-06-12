@@ -37,6 +37,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     final private Parameter parameter
 
     private Object aObject
+    final private Random random = new Random(0)
 
     private int tabOccurrence = 0
     private int tabIds = 0
@@ -217,7 +218,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabs(List<String> names, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
-        topElement = BootstrapLayout.tabs(topElement, tabIds, names, width)
+        topElement = BootstrapLayout.tabs(topElement, random.nextInt(), names, width)
         tabIds++
     }
 
