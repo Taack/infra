@@ -51,7 +51,7 @@ class BootstrapLayout {
     }
 
     static IHTMLElement row(IHTMLElement topElement) {
-        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.ROW).addClasses('d-flex', 'flex-row').build())
+        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.ROW).addClasses('row', 'g-2').build())
         topElement.children.last()
     }
 

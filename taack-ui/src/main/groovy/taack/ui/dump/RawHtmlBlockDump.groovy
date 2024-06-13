@@ -164,15 +164,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitTableFilter(final String id,
                           final UiFilterSpecifier filterSpecifier,
                           final UiTableSpecifier tableSpecifier) {
-
-        visitRow()
         visitCol(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
         tableSpecifier.visitTable(new RawHtmlTableDump(topElement, id, parameter))
         visitColEnd()
-        visitRowEnd()
     }
 
     @Override

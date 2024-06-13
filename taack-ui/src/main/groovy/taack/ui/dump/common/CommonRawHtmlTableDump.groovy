@@ -91,6 +91,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     void visitHeader() {
         isInHeader = true
         HTMLTr tr = new HTMLTr()
+        tr.addClasses('align-middle')
         topElement.addChildren(
                 new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).addChildren(
                         tr

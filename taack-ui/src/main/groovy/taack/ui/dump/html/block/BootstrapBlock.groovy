@@ -25,7 +25,7 @@ final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
 
     @Override
     IHTMLElement block(String blockId) {
-        new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build()
+        new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build()
     }
 
     static IHTMLElement blockHeader(IHTMLElement topElement) {

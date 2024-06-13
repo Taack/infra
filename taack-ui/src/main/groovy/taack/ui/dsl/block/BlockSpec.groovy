@@ -267,7 +267,9 @@ final class BlockSpec {
             id = aId
             blockVisitor.visitAjaxBlock(id)
             processMenuBlock(closure)
+            blockVisitor.visitRow()
             blockVisitor.visitTableFilter(id, filterSpecifier, tableSpecifier)
+            blockVisitor.visitRowEnd()
             blockVisitor.visitAjaxBlockEnd()
         }
     }
