@@ -172,7 +172,7 @@ final class AttachmentUiService implements WebAttributes {
             if (iFrame) {
                 custom iFrame
             }
-            show buildShowAttachment(attachment, iFrame == null), BlockSpec.Width.MAX, {
+            show buildShowAttachment(attachment, iFrame == null), {
                 menuIcon ActionIcon.EDIT, AttachmentController.&updateAttachment as MC, attachment.id
                 menuIcon ActionIcon.DOWNLOAD, AttachmentController.&downloadAttachment as MC, attachment.id
                 if (attachmentSecurityService.canDownloadFile(attachment) && converterExtensions) {
@@ -234,7 +234,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildDocumentAccessForm(DocumentAccess docAccess, MC returnMethod = AttachmentController.&saveDocAccess as MC, Map other = null) {
         new UiFormSpecifier().ui docAccess, {
-            section "Security", BlockSpec.Width.MAX, {
+            section "Security", {
                 row {
                     col {
                         field docAccess.isInternal_
@@ -256,7 +256,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildDocumentDescriptorForm(DocumentCategory docCat, MC returnMethod = AttachmentController.&saveDocDesc as MC, Map other = null) {
         new UiFormSpecifier().ui docCat, {
-            section "Category", BlockSpec.Width.HALF, {
+            section "Category", {
                 field docCat.category_
                 ajaxField docCat.tags_, AttachmentController.&selectTagsM2M as MC
             }
@@ -266,7 +266,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildAttachmentForm(Attachment attachment, MC returnMethod = AttachmentController.&saveAttachment as MC, Map other = null) {
         new UiFormSpecifier().ui attachment, {
-            section "File Info", BlockSpec.Width.HALF, {
+            section "File Info", {
                 field attachment.filePath_
                 ajaxField attachment.documentCategory_, AttachmentController.&selectDocumentCategory as MC, attachment.documentCategory?.id
                 ajaxField attachment.documentAccess_, AttachmentController.&selectDocumentAccess as MC, attachment.documentAccess_

@@ -102,8 +102,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormSection(String i18n, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
-        topElement = formThemed.section(topElement, i18n, width.bootstrapCss.split(' '))
+    void visitFormSection(String i18n) {
+        topElement = formThemed.section(topElement, i18n)
     }
 
     @Override

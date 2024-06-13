@@ -1,12 +1,9 @@
 package taack.ui.dsl.form
 
-
 import groovy.transform.CompileStatic
-import taack.ui.dsl.block.BlockSpec
 
 @CompileStatic
 class FormSectionSpec extends FormAjaxFieldSpec {
-
 
     FormSectionSpec(IUiFormVisitor formVisitor) {
         super(formVisitor)
@@ -19,9 +16,8 @@ class FormSectionSpec extends FormAjaxFieldSpec {
      * @param width its relative width
      * @param closure Description of the content of this section
      */
-    void section(String sectionName, BlockSpec.Width width = BlockSpec.Width.QUARTER,
-                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormRowSpec) Closure closure) {
-        formVisitor.visitFormSection(sectionName, width)
+    void section(String sectionName, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormRowSpec) Closure closure) {
+        formVisitor.visitFormSection(sectionName)
         closure.delegate = new FormRowSpec(formVisitor)
         closure.call()
         formVisitor.visitFormSectionEnd()

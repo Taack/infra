@@ -24,6 +24,11 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
+    void visitFormSection(String i18n) {
+
+    }
+
+    @Override
     void visitFormSectionEnd() {
 
     }
@@ -85,11 +90,6 @@ class UiFormVisitorImpl implements IUiFormVisitor {
 
     @Override
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
-
-    }
-
-    @Override
-    void visitFormSection(String i18n, BlockSpec.Width width) {
 
     }
 

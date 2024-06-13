@@ -46,7 +46,7 @@ class MarkdownController {
     def uploadAttachment() {
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
-                    form AttachmentUiService.buildAttachmentForm(new Attachment(), MarkdownController.&saveAttachment as MethodClosure, [directUpload: params['directUpload'] == "true"]), BlockSpec.Width.MAX
+                    form AttachmentUiService.buildAttachmentForm(new Attachment(), MarkdownController.&saveAttachment as MethodClosure, [directUpload: params['directUpload'] == "true"])
             }
         })
     }

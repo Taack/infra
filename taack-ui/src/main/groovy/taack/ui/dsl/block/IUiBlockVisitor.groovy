@@ -34,33 +34,23 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitModalEnd()
 
-    void visitCloseTitle()
-
     void visitAjaxBlock(String id)
 
     void visitAjaxBlockEnd()
 
     void visitForm(UiFormSpecifier formSpecifier)
 
-    void visitFormEnd(UiFormSpecifier formSpecifier)
-
-    void visitShow()
+    void visitShow(UiShowSpecifier uiShowSpecifier)
 
     void visitTable(String id, UiTableSpecifier tableSpecifier)
 
-    void visitTableEnd(UiTableSpecifier tableSpecifier)
-
     void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier)
 
-    void visitChart()
+    void visitChart(UiChartSpecifier chartSpecifier)
 
-    void visitChartEnd(UiChartSpecifier chartSpecifier)
+    void visitDiagram(UiDiagramSpecifier diagramSpecifier)
 
-    void visitDiagram()
-
-    void visitDiagramFilter(UiFilterSpecifier filterSpecifier)
-
-    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier)
+    void visitDiagramFilter(UiDiagramSpecifier diagramSpecifier, UiFilterSpecifier filterSpecifier)
 
     void visitCloseModal(String id, String value, FieldInfo[] fields)
 
@@ -73,8 +63,6 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitBlockTabsEnd()
 
     void visitCustom(String html, Style style)
-
-    void visitShowEnd(UiShowSpecifier uiShowSpecifier)
 
     void visitCloseModalAndUpdateBlock()
 

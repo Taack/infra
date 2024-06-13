@@ -176,7 +176,7 @@ class CrewController implements WebAttributes {
     def showUser(User u) {
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
-                show crewUiService.buildUserShow(u), BlockSpec.Width.MAX
+                show crewUiService.buildUserShow(u)
             }
         })
     }
@@ -184,7 +184,7 @@ class CrewController implements WebAttributes {
     def showUserFromSearch() {
         User u = User.read(params.long('id'))
         taackUiService.show(new UiBlockSpecifier().ui {
-            show crewUiService.buildUserShow(u), BlockSpec.Width.MAX
+            show crewUiService.buildUserShow(u)
         }, buildMenu())
     }
 
@@ -193,7 +193,7 @@ class CrewController implements WebAttributes {
 
         UiFormSpecifier f = new UiFormSpecifier()
         f.ui user, {
-            section "User", BlockSpec.Width.THIRD, {
+            section "User", {
                 field user.username_
                 field user.firstName_
                 field user.lastName_
@@ -201,12 +201,12 @@ class CrewController implements WebAttributes {
                 ajaxField user.mainPicture_, this.&selectUserMainPicture as MC
                 field user.password_
             }
-            section "Coords", BlockSpec.Width.THIRD, {
+            section "Coords", {
                 field user.businessUnit_
                 field user.mail_
                 field user.subsidiary_
             }
-            section "Status", BlockSpec.Width.THIRD, {
+            section "Status", {
                 field user.enabled_
                 field user.accountExpired_
                 field user.accountLocked_
@@ -217,7 +217,7 @@ class CrewController implements WebAttributes {
 
         taackUiService.show new UiBlockSpecifier().ui {
             modal {
-                form f, BlockSpec.Width.MAX
+                form f
             }
         }
     }
@@ -340,7 +340,7 @@ class CrewController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
             modal {
-                form f, BlockSpec.Width.MAX
+                form f
             }
         }
         taackUiService.show(b, buildMenu())

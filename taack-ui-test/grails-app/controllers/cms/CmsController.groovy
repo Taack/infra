@@ -195,13 +195,13 @@ class CmsController implements WebAttributes {
 
     private static UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
         new UiFormSpecifier().ui cmsInsert, {
-            section "Position", BlockSpec.Width.HALF, {
+            section "Position", {
                 field cmsInsert.x_
                 field cmsInsert.y_
                 field cmsInsert.width_
             }
 
-            section "Object", BlockSpec.Width.HALF, {
+            section "Object", {
                 field cmsInsert.itemId_
                 field cmsInsert.subFamilyId_
                 field cmsInsert.rangeId_
@@ -238,18 +238,18 @@ class CmsController implements WebAttributes {
     private static UiFormSpecifier buildCmsVideoForm(final CmsVideoFile cmsVideo) {
         new UiFormSpecifier().ui cmsVideo, {
             hiddenField cmsVideo.cmsPage_
-            section "File Upload", BlockSpec.Width.HALF, {
+            section "File Upload", {
                 field cmsVideo.filePath_
             }
-            section "Video Preview", BlockSpec.Width.HALF, {
+            section "Video Preview", {
                 ajaxField cmsVideo.preview_, CmsController.&selectM2mCmsImage as MC, ['imageType': ImageType.MEDIA_POSTER.toString()]
             }
-            section "Alt Text", BlockSpec.Width.HALF, {
+            section "Alt Text", {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "ALT Text ${language.label}", cmsVideo.altText_, language.toString().toLowerCase()
                 }
             }
-            section "Youtube id", BlockSpec.Width.HALF, {
+            section "Youtube id", {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "id for ${language.label}", cmsVideo.youtubeI18n_, language.toString().toLowerCase()
                 }
@@ -377,19 +377,20 @@ class CmsController implements WebAttributes {
             if (createNew)
                 modal {
                     ajaxBlock "createNew", {
-                        form buildCmsSlideshowForm(slideshow), BlockSpec.Width.MAX
+                        form buildCmsSlideshowForm(slideshow)
                     }
                 }
             else {
-                col BlockSpec.Width.HALF, {
+                col {
                     ajaxBlock "cmsSlideshowForm", {
-                        form buildCmsSlideshowForm(slideshow), BlockSpec.Width.MAX
+                        form buildCmsSlideshowForm(slideshow)
                     }
                 }
-
-                tabs BlockSpec.Width.HALF, {
-                    tab "Images", buildImagesTab(slideshow)
-                    tab "Videos", buildVideosTab(slideshow)
+                col {
+                    tabs {
+                        tab "Images", buildImagesTab(slideshow)
+                        tab "Videos", buildVideosTab(slideshow)
+                    }
                 }
             }
         }
@@ -408,7 +409,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "imagesForm", {
-                    form buildCmsInsertForm(cmsInsert), BlockSpec.Width.MAX
+                    form buildCmsInsertForm(cmsInsert)
                 }
             }
         }
@@ -431,14 +432,14 @@ class CmsController implements WebAttributes {
                 closeModalAndUpdateBlock {
                     modal {
                         ajaxBlock "imagesForm", {
-                            form buildCmsImageForm(cmsImage), BlockSpec.Width.MAX
+                            form buildCmsImageForm(cmsImage)
                         }
                     }
                 }
             else
                 modal {
                     ajaxBlock "imagesForm", {
-                        form buildCmsImageForm(cmsImage), BlockSpec.Width.MAX
+                        form buildCmsImageForm(cmsImage)
                     }
                 }
         }
@@ -451,7 +452,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "videoForm", {
-                    form buildCmsVideoForm(videoFile), BlockSpec.Width.MAX
+                    form buildCmsVideoForm(videoFile)
                 }
             }
         }
@@ -464,7 +465,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "pdfsForm", {
-                    form buildCmsPdfForm(pdfFile), BlockSpec.Width.MAX
+                    form buildCmsPdfForm(pdfFile)
                 }
             }
         }
@@ -793,7 +794,7 @@ class CmsController implements WebAttributes {
                         *Adrien Guichard*
 
                         """.stripIndent()), "markdown-body"
-                }, BlockSpec.Width.MAX
+                }
             }
         }
         taackUiService.show(b, buildMenu())
@@ -815,14 +816,14 @@ class CmsController implements WebAttributes {
         if (createNew)
             taackUiService.show new UiBlockSpecifier().ui {
                 modal {
-                    form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
+                    form buildCmsPageForm(cmsPage)
                 }
             }
         else
             taackUiService.show new UiBlockSpecifier().ui {
                 row {
-                    col BlockSpec.Width.HALF, {
-                        form buildCmsPageForm(cmsPage), BlockSpec.Width.MAX
+                    col {
+                        form buildCmsPageForm(cmsPage)
                     }
                     col {
                         tabs {
@@ -1149,7 +1150,7 @@ class CmsController implements WebAttributes {
                             hiddenField menuEntry.parent_
                             hiddenField menuEntry.subsidiary_
                         }
-                        section "Menu Entry", BlockSpec.Width.HALF, {
+                        section "Menu Entry", {
                             field menuEntry.code_
                             field menuEntry.suffixLink_
                             field menuEntry.position_
@@ -1161,7 +1162,7 @@ class CmsController implements WebAttributes {
                             ajaxField menuEntry.page_, this.&selectM2oPage as MC, menuEntry.subsidiary_
 
                         }
-                        section "Menu Entry Translation", BlockSpec.Width.HALF, {
+                        section "Menu Entry Translation", {
                             for (def l in SupportedLanguage.values()) {
                                 fieldFromMap "Title ${l.label}", menuEntry.title_, l.toString().toLowerCase()
                             }

@@ -9,6 +9,7 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.common.CommonRawHtmlTableDump
 import taack.ui.dump.html.element.*
+import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayInlineBlock
 import taack.ui.dump.html.table.HTMLTd
@@ -34,19 +35,17 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTableWithoutFilter() {
         IHTMLElement table = themableTable.table(topElement, blockId)
-        topElement.addChildren(
-                new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).addChildren(
-                        new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
-                                new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
-                                new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
-                                new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
-                                new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
-                                new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
-                                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
-                                new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-                        ).build(),
-                        table
-                ).build()
+        new HTMLEmpty().addChildren(
+                new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+                        new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
+                        new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
+                        new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
+                        new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
+                        new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
+                        new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
+                        new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
+                ).build(),
+                table
         )
         topElement = table
     }

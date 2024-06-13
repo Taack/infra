@@ -99,7 +99,7 @@ final class BlockSpec {
      * @param width width of the tabulation block
      * @param closure description of the tabulations
      */
-    void tabs(final Width width = Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+    void tabs(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         blockVisitor.visitBlockTabs()
         closure.delegate = this
         closure.call()
@@ -205,15 +205,14 @@ final class BlockSpec {
      * @param width
      * @param closure list of action in the header to add. See {@link MenuSpec}
      */
-    void form(final UiFormSpecifier formSpecifier, final Width width = Width.MAX,
+    void form(final UiFormSpecifier formSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId  = ajaxBlockId
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitForm(null)
             processMenuBlock(closure)
-            blockVisitor.visitFormEnd(formSpecifier)
+            blockVisitor.visitForm(formSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
@@ -227,15 +226,14 @@ final class BlockSpec {
      * @param width
      * @param closure list of action in the header to add. See {@link MenuSpec}
      */
-    void show(final UiShowSpecifier showSpecifier, final Width width,
+    void show(final UiShowSpecifier showSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId  = ajaxBlockId
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitShow()
             processMenuBlock(closure)
-            blockVisitor.visitShowEnd(showSpecifier)
+            blockVisitor.visitShow(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
@@ -246,9 +244,8 @@ final class BlockSpec {
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitTable(id, tableSpecifier)
             processMenuBlock(closure)
-            blockVisitor.visitTableEnd(tableSpecifier)
+            blockVisitor.visitTable(id, tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
@@ -284,31 +281,28 @@ final class BlockSpec {
      * @param width the with of the chart in the block
      * @param closure actions to add in the header of the chart
      */
-    void chart(final UiChartSpecifier chartSpecifier, final Width width = Width.MAX,
+    void chart(final UiChartSpecifier chartSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId  = ajaxBlockId
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitChart()
             processMenuBlock(closure)
-            blockVisitor.visitChartEnd(chartSpecifier)
+            blockVisitor.visitChart(chartSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
 
-    void diagram(final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
+    void diagram(final UiDiagramSpecifier diagramSpecifier) {
         if (displayElement()) {
-            blockVisitor.visitDiagram()
-            blockVisitor.visitDiagramEnd(diagramSpecifier)
+            blockVisitor.visitDiagram(diagramSpecifier)
         }
     }
 
     void diagramFilter(final UiFilterSpecifier filterSpecifier,
-                       final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
+                       final UiDiagramSpecifier diagramSpecifier) {
         if (displayElement()) {
-            blockVisitor.visitDiagramFilter(filterSpecifier)
-            blockVisitor.visitDiagramEnd(diagramSpecifier)
+            blockVisitor.visitDiagramFilter(diagramSpecifier, filterSpecifier)
         }
     }
 
@@ -321,7 +315,7 @@ final class BlockSpec {
      * @param width width inside the block
      * @param closure actions to display in the header
      */
-    void custom(final String html, final Style style = null, final Width width = Width.MAX,
+    void custom(final String html, final Style style = null,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId  = ajaxBlockId
         if (displayElement(aId)) {

@@ -15,7 +15,7 @@ interface IUiFormVisitor extends IBaseFormVisitor {
 
     void visitFormEnd()
 
-    void visitFormSection(final String i18n, BlockSpec.Width width)
+    void visitFormSection(final String i18n)
 
     void visitFormSectionEnd()
 

@@ -270,7 +270,7 @@ class AttachmentController {
             table ts
             show new UiShowSpecifier().ui(new Object(), {
                 field Markdown.getContentHtml('# Click on a tag ..')
-            }), BlockSpec.Width.HALF
+            })
         }, buildMenu()
     }
 

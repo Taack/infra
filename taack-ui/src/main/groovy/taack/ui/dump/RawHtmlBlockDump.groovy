@@ -109,10 +109,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCloseTitle() {
-    }
-
-    @Override
     void visitAjaxBlock(final String id) {
         if (!parameter.isAjaxRendering || isModal) {
             ajaxBlockId = id
@@ -132,20 +128,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
     }
 
-    @Override
-    void visitFormEnd(UiFormSpecifier formSpecifier) {
-        visitCloseTitle()
-        visitColEnd()
-    }
 
     @Override
-    void visitShow() {
-//        visitCol(width)
-    }
-
-    @Override
-    void visitShowEnd(final UiShowSpecifier uiShowSpecifier) {
-        visitCloseTitle()
+    void visitShow(final UiShowSpecifier uiShowSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
         visitColEnd()
@@ -168,20 +153,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                         new HTMLTxtContent(html)
                 ).build()
         )
-//        out << """
-//            <div class="${style?.cssClassesString ?: ''}">${html}</div>
-//        """
     }
 
     @Override
     void visitTable(String id, final UiTableSpecifier tableSpecifier) {
         tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(topElement, id, parameter))
-    }
-
-    @Override
-    void visitTableEnd(UiTableSpecifier tableSpecifier) {
-
-        visitColEnd()
     }
 
     @Override
@@ -200,44 +176,24 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitChart() {
-//        visitCol(width)
-    }
-
-    @Override
-    void visitChartEnd(final UiChartSpecifier chartSpecifier) {
-        visitCloseTitle()
+    void visitChart(final UiChartSpecifier chartSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
-        visitColEnd()
-        visitColEnd()
     }
 
     @Override
-    void visitDiagram() {
-//        visitCol(width)
-    }
-
-    @Override
-    void visitDiagramFilter(final UiFilterSpecifier filterSpecifier) {
-//        visitCol(width)
-        visitCloseTitle()
+    void visitDiagramFilter(final UiDiagramSpecifier diagramSpecifier, final UiFilterSpecifier filterSpecifier) {
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
-        visitColEnd()
     }
 
     @Override
-    void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier) {
-        visitCloseTitle()
+    void visitDiagram(final UiDiagramSpecifier diagramSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, BlockSpec.Width.MAX), UiDiagramSpecifier.DiagramBase.SVG)
-        visitColEnd()
-        visitColEnd()
     }
 
     @Override
     void visitCloseModal(final String id, final String value, FieldInfo[] fields = null) {
-
         topElement.addChildren(new HTMLAjaxCloseLastModal(id, value))
         for (FieldInfo fi : fields) {
             if (fi.value) {

@@ -64,11 +64,6 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCloseTitle() {
-
-    }
-
-    @Override
     void visitAjaxBlock(String id) {
 
     }
@@ -84,12 +79,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitFormEnd(UiFormSpecifier formSpecifier) {
-
-    }
-
-    @Override
-    void visitShow() {
+    void visitShow(UiShowSpecifier uiShowSpecifier) {
 
     }
 
@@ -99,37 +89,22 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTableEnd(UiTableSpecifier tableSpecifier) {
-
-    }
-
-    @Override
     void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier) {
 
     }
 
     @Override
-    void visitChart() {
+    void visitChart(UiChartSpecifier chartSpecifier) {
 
     }
 
     @Override
-    void visitChartEnd(UiChartSpecifier chartSpecifier) {
+    void visitDiagram(UiDiagramSpecifier diagramSpecifier) {
 
     }
 
     @Override
-    void visitDiagram() {
-
-    }
-
-    @Override
-    void visitDiagramFilter(UiFilterSpecifier filterSpecifier) {
-
-    }
-
-    @Override
-    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier) {
+    void visitDiagramFilter(UiDiagramSpecifier diagramSpecifier, UiFilterSpecifier filterSpecifier) {
 
     }
 
@@ -160,11 +135,6 @@ class UiBlockVisitor implements IUiBlockVisitor {
 
     @Override
     void visitCustom(String html, Style style) {
-
-    }
-
-    @Override
-    void visitShowEnd(UiShowSpecifier uiShowSpecifier) {
 
     }
 
