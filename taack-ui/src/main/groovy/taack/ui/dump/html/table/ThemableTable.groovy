@@ -21,7 +21,7 @@ final class ThemableTable {
         HTMLTable htmlTable = new HTMLTable()
         htmlTable.setTaackTag(TaackTag.TABLE)
         htmlTable.classes = ['table', 'table-striped', 'table-hover', 'table-bordered']
-        htmlTable.allAttributes.put('taackTableId', blockId)
+        htmlTable.attributes.put('taackTableId', blockId)
         topElement.addChildren(
                 htmlTable
         )
