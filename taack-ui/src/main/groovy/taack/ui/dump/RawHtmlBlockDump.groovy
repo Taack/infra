@@ -54,13 +54,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         block = new BootstrapBlock(ts.themeMode, ts.themeSize)
         menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
         topElement = new HTMLEmpty()
+        topElement.setTaackTag(TaackTag.BLOCK)
     }
 
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            topElement.setTaackTag(TaackTag.BLOCK)
-            topElement = block.block("${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
+            topElement = block.block(topElement, "${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
         }
     }
 
@@ -84,6 +84,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitCol(final BlockSpec.Width width) {
+        topElement.setTaackTag(TaackTag.COL)
         topElement = block.col(topElement, width)
     }
 
@@ -237,6 +238,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitRow() {
+        topElement.setTaackTag(TaackTag.ROW)
         topElement = block.row(topElement)
     }
 

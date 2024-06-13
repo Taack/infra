@@ -46,12 +46,12 @@ class BootstrapLayout {
 
     static IHTMLElement col(IHTMLElement topElement, Width width = null) {
         String widthClass = width?.bootstrapCss ?: 'flex-fill'
-        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.COL).addClasses(widthClass).build())
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses(widthClass).build())
         topElement.children.last()
     }
 
     static IHTMLElement row(IHTMLElement topElement) {
-        topElement.builder.addChildren(new HTMLDiv().builder.setTaackTag(TaackTag.ROW).addClasses('row', 'g-2').build())
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('row', 'g-2').build())
         topElement.children.last()
     }
 

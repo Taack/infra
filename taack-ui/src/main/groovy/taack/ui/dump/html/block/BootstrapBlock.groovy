@@ -13,7 +13,7 @@ import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
-final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
+final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
 
     final ThemeMode themeMode
     final ThemeSize themeSize
@@ -23,59 +23,37 @@ final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
         this.themeSize = themeSize
     }
 
-    @Override
-    IHTMLElement block(String blockId) {
-        new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').putAttribute('blockId', blockId).build()
+    static IHTMLElement block(IHTMLElement topElement, String blockId) {
+        topElement.addChildren(
+                new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').putAttribute('blockId', blockId).build()
+        )
+        topElement.children.first()
     }
 
     static IHTMLElement blockHeader(IHTMLElement topElement) {
+        HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
+                new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
+                        .addClasses('navbar-toggler', 'navbar-dark')
+                        .putAttribute('data-bs-toggle', 'collapse')
+                        .putAttribute('data-bs-target', '#navbarSupportedContent')
+                        .putAttribute('aria-controls', 'navbarSupportedContent')
+                        .putAttribute('aria-expanded', 'false')
+                        .putAttribute('aria-label', 'Toggle navigation')
+                        .build(),
+                new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent').build()
+        ).build() as HTMLDiv
+
         topElement.addChildren(
                 new HTMLNav().builder.addClasses('navbar', 'navbar-expand-md').addChildren(
-                        new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
-                                new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
-                                        .addClasses('navbar-toggler', 'navbar-dark')
-                                        .putAttribute('data-bs-toggle', 'collapse')
-                                        .putAttribute('data-bs-target', '#navbarSupportedContent')
-                                        .putAttribute('aria-controls', 'navbarSupportedContent')
-                                        .putAttribute('aria-expanded', 'false')
-                                        .putAttribute('aria-label', 'Toggle navigation')
-                                        .build(),
-                                new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent').build()
-                        ).build()
+                        div
                 ).build()
         )
-        topElement.children.first().children.first().children.last()
+        div
     }
 
-    @Override
-    IHTMLElement blockAjax(IHTMLElement topElement, String blockId) {
+    static IHTMLElement blockAjax(IHTMLElement topElement, String blockId) {
         IHTMLElement e = new HTMLAjaxBlock(blockId).builder.setTaackTag(TaackTag.AJAX_BLOCK).build()
         if (topElement) topElement.addChildren(e)
         topElement ?: e
-    }
-
-    @Override
-    IHTMLElement innerBlock(IHTMLElement topElement, String i18n, String blockId, BlockSpec.Width width) {
-        return null
-    }
-
-    @Override
-    IHTMLElement annoBlock(IHTMLElement topElement, BlockSpec.Width width) {
-        return null
-    }
-
-    @Override
-    IHTMLElement innerModal(IHTMLElement topElement, String blockId) {
-        return null
-    }
-
-    @Override
-    IHTMLElement blockTabs(IHTMLElement topElement, int tabIds, List<String> names, BlockSpec.Width width) {
-        return null
-    }
-
-    @Override
-    IHTMLElement blockTab(IHTMLElement topElement, int occ) {
-        return null
     }
 }

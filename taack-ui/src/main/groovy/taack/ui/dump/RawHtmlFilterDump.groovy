@@ -52,8 +52,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true)
+        topElement.setTaackTag(TaackTag.FILTER)
         topElement.addChildren(
-                formThemed.builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+                formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
                         new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                         new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                         new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),

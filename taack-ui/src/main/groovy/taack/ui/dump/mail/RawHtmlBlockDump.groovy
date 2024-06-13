@@ -69,7 +69,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
-            topElement = block.block("${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
+            topElement = block.block(topElement, "${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
         }
     }
 
