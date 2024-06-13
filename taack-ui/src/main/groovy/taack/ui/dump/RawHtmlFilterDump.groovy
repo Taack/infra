@@ -69,7 +69,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         HTMLInput[] addedInputs = additionalParams?.collect {
             new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
         } as HTMLInput[]
-        topElement.addChildren(formThemed)
         if (addedInputs)
             formThemed.addChildren(addedInputs)
         topElement = formThemed
