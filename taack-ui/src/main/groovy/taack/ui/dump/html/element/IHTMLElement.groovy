@@ -4,6 +4,9 @@ import groovy.transform.CompileStatic
 import taack.ui.dump.html.script.IJavascriptDescriptor
 import taack.ui.dump.html.style.IStyleDescriptor
 
+import javax.management.BadAttributeValueExpException
+import java.util.concurrent.ExecutionException
+
 @CompileStatic
 enum TaackTag {
     BLOCK,
@@ -50,6 +53,19 @@ trait IHTMLElement {
         }
 
         if (elements) children += elements
+    }
+
+    IHTMLElement toParentTaackTag(TaackTag... taackTags) {
+        IHTMLElement ret = this
+        List<IHTMLElement> ltt = []
+        while (ret && !taackTags.contains(ret.taackTag)) {
+            ret = ret.parent
+            ltt << ret
+        }
+        if (!ret) {
+            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.tag + ':' + this.taackTag + ':' + this.attributes} has no parent ${taackTags}, tags = ${ltt*.tag}, ltt = ${ltt*.taackTag}")
+        }
+        ret
     }
 
     String indent() {

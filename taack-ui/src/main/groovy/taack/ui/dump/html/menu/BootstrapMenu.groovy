@@ -20,7 +20,7 @@ final class BootstrapMenu implements IHTMLElement {
     IHTMLElement menuStart(IHTMLElement topElement = null) {
         topElement.addChildren(
                 this.builder.addChildren(
-                        new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').setTaackTag(TaackTag.MENU).build()
+                        new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').build()
                 ).build()
         )
         return this.children.first()
@@ -28,7 +28,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     static IHTMLElement splitMenuStart(IHTMLElement topElement) {
         topElement.addChildren(
-                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').setTaackTag(TaackTag.MENU_SPLIT).build()
+                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').build()
         )
         topElement.children.last()
     }

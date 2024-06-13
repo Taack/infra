@@ -91,13 +91,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormEnd() {
-        topElement = closeTags(TaackTag.SECTION)
         topElement = formThemed.formActionBlock(topElement)
         formActions.each {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
 
-        topElement = closeTags(TaackTag.FORM)
+        topElement = topElement.toParentTaackTag(TaackTag.FORM)
         tabIds = 0
     }
 
@@ -108,7 +107,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormSectionEnd() {
-        topElement = closeTags(TaackTag.SECTION)
+        topElement = topElement.toParentTaackTag(TaackTag.SECTION)
     }
 
     @Override
@@ -224,7 +223,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabsEnd() {
-        topElement = closeTags(TaackTag.TABS)
+        topElement = topElement.toParentTaackTag(TaackTag.TABS)
     }
 
     @Override
@@ -234,7 +233,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabEnd() {
-        topElement = closeTags(TaackTag.TAB)
+        topElement = topElement.toParentTaackTag(TaackTag.TAB)
     }
 
     @Override
@@ -279,7 +278,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitColEnd() {
-        topElement = closeTags(TaackTag.COL)
+        topElement = topElement.toParentTaackTag(TaackTag.COL)
     }
 
     @Override
@@ -289,7 +288,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitRowEnd() {
-        topElement = closeTags(TaackTag.ROW)
+        topElement = topElement.toParentTaackTag(TaackTag.ROW)
     }
 
     @Override

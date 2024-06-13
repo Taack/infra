@@ -84,15 +84,15 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement section(IHTMLElement topElement, String trI18n, String... classes) {
-        topElement.builder.addChildren(
+        HTMLFieldset fs = new HTMLFieldset().builder.addChildren(
+                new HTMLLegend().builder.addChildren(new HTMLTxtContent(trI18n)).build()
+        ).build() as HTMLFieldset
+
+        topElement.addChildren(
                 new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
-                        .addChildren(
-                                new HTMLFieldset().builder.addChildren(
-                                        new HTMLLegend().builder.addChildren(new HTMLTxtContent(trI18n)).build()
-                                ).build()
-                        ).build()
+                        .addChildren(fs).build()
         )
-        topElement.children.last().children.last()
+        fs
     }
 
     @Override

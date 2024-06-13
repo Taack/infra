@@ -36,14 +36,6 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
     }
 
-    IHTMLElement closeTags(TaackTag tag) {
-        IHTMLElement top = topElement
-        while (top && top.taackTag != tag && top.parent) {
-            top = top.parent
-        }
-        top.parent ?: top
-    }
-
     static final <T> String dataFormat(T value, String format) {
         if (!format) return value?.toString()
         switch (value.class) {
@@ -67,7 +59,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableEnd() {
-        topElement = closeTags(TaackTag.TABLE)
+        topElement = topElement.toParentTaackTag(TaackTag.TABLE)
     }
 
     @Override
@@ -103,7 +95,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitHeaderEnd() {
         isInHeader = false
-        topElement = closeTags(TaackTag.TABLE_HEAD)
+        topElement = topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
         HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
         topElement.addChildren(tb)
         topElement = tb
@@ -112,7 +104,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitColumnEnd() {
         isInCol = false
-        topElement = closeTags(TaackTag.TABLE_COL)
+        topElement = topElement.toParentTaackTag(TaackTag.TABLE_COL)
     }
 
     @Override
@@ -137,7 +129,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitRowEnd() {
         rowStyle = null
-        topElement = closeTags(TaackTag.TABLE_ROW)
+        topElement = topElement.toParentTaackTag(TaackTag.TABLE_ROW)
     }
 
     @Override

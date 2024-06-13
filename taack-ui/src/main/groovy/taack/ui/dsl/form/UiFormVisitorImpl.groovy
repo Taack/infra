@@ -113,13 +113,4 @@ class UiFormVisitorImpl implements IUiFormVisitor {
 
     }
 
-    @Override
-    IFormTheme getFormThemed() {
-        return null
-    }
-
-    @Override
-    IHTMLElement getTopElement() {
-        return null
-    }
 }

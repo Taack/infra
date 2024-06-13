@@ -135,7 +135,6 @@ class CrewController implements WebAttributes {
     }
 
     def index() {
-
         User cu = authenticatedUser as User
 
         UiFilterSpecifier f = CrewUiService.buildUserTableFilter cu

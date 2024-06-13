@@ -61,13 +61,4 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
 
     }
 
-    @Override
-    IFormTheme getFormThemed() {
-        return null
-    }
-
-    @Override
-    IHTMLElement getTopElement() {
-        return null
-    }
 }

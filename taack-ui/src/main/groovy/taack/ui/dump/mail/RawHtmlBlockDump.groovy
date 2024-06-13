@@ -66,15 +66,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
     }
 
-    private IHTMLElement closeTags(TaackTag tag) {
-        IHTMLElement top = topElement
-        while (top && top.taackTag != tag && top.parent) {
-            top = top.parent
-        }
-        top.parent ?: top
-//        (top?.taackTag == tag ? top?.parent : top) ?: block
-    }
-
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
@@ -85,7 +76,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) {
-            topElement = closeTags(TaackTag.BLOCK)
+            topElement = topElement.toParentTaackTag(TaackTag.BLOCK)
         }
     }
 
@@ -96,19 +87,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockHeaderEnd() {
-        topElement = closeTags(TaackTag.MENU_BLOCK)
+        topElement = topElement.toParentTaackTag(TaackTag.MENU_BLOCK)
     }
 
     @Override
     void visitCol(final BlockSpec.Width width) {
-//        out << """<div class="${width.bootstrapCss} align-items-start">"""
         topElement = block.col(topElement)
     }
 
     @Override
     void visitColEnd() {
-//        out << "</div>"
-        topElement = closeTags(TaackTag.COL)
+        topElement = topElement.toParentTaackTag(TaackTag.COL)
 
     }
 
@@ -201,14 +190,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockTab(final String i18n) {
         currentTabNames << i18n
-//        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0 ? "Inner" : ""}">"""
         topElement = block.tab(topElement, ++tabOccurrence)
     }
 
     @Override
     void visitBlockTabEnd() {
-//        out << '</div>'
-        topElement = closeTags(TaackTag.TAB)
+        topElement = topElement.toParentTaackTag(TaackTag.TAB)
     }
 
     @Override
@@ -252,7 +239,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitRowEnd() {
 //        out << "</div>"
-        topElement = closeTags(TaackTag.ROW)
+        topElement = topElement.toParentTaackTag(TaackTag.ROW)
     }
 
     @Override
@@ -262,7 +249,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuLabelEnd() {
-        topElement = closeTags(TaackTag.LABEL)
+        topElement = topElement.toParentTaackTag(TaackTag.LABEL)
     }
 
     @Override
@@ -273,7 +260,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuStartEnd() {
-        topElement = closeTags(TaackTag.MENU)
+        topElement = topElement.toParentTaackTag(TaackTag.MENU)
     }
 
     private void splitMenuStart() {

@@ -9,7 +9,7 @@ import taack.ui.dump.html.element.ButtonStyle
 import java.text.NumberFormat
 
 @CompileStatic
-interface IUiFormVisitor extends IBaseFormVisitor {
+interface IUiFormVisitor {
 
     void visitForm(Object aObject, FieldInfo[] lockedFields)
 

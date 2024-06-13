@@ -51,16 +51,19 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true).builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
-                new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
-                new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
-                new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
-                new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
-                new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId'),
-                new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand'),
-                new HTMLInput(InputType.HIDDEN, aClass.name, 'className'),
-                new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-        ).build() as IFormTheme
+        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true)
+        topElement.addChildren(
+                formThemed.builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+                        new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
+                        new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
+                        new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
+                        new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
+                        new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId'),
+                        new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand'),
+                        new HTMLInput(InputType.HIDDEN, aClass.name, 'className'),
+                        new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
+                ).build()
+        )
 
         HTMLInput[] addedInputs = additionalParams?.collect {
             new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
@@ -68,6 +71,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         topElement.addChildren(formThemed)
         if (addedInputs)
             formThemed.addChildren(addedInputs)
+        topElement = formThemed
     }
 
     @Override
@@ -80,11 +84,10 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitFilterEnd() {
         topElement = formThemed.formActionBlock(topElement)
-//        addFormAction(topElement, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}", 'Filter', ButtonStyle.SUCCESS)
-//        formThemed.addFormAction(topElement, null, 'Reset', ButtonStyle.SECONDARY)
         filterActions.each {
             formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
         }
+        topElement = topElement.toParentTaackTag(TaackTag.FILTER)
     }
 
     @Override
@@ -94,7 +97,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitSectionEnd() {
-        topElement = closeTags(TaackTag.SECTION)
+        topElement = topElement.toParentTaackTag(TaackTag.SECTION)
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {

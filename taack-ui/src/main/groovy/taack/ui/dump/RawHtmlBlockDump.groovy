@@ -42,16 +42,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     final BootstrapMenu menu
     final Parameter parameter
 
-    private IHTMLElement _topElement
-
-    IHTMLElement getTopElement() {
-//        _topElement ?= new HTMLEmpty()
-        _topElement
-    }
-
-    IHTMLElement setTopElement(IHTMLElement topElement) {
-        _topElement = topElement
-    }
+    private IHTMLElement topElement
 
     RawHtmlBlockDump(final Parameter parameter, final String modalId = null) {
         if (modalId) isModal = true
@@ -65,18 +56,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         topElement = new HTMLEmpty()
     }
 
-    private IHTMLElement closeTags(TaackTag tag) {
-        IHTMLElement top = topElement
-        while (top && top.taackTag != tag && top.parent) {
-            top = top.parent
-        }
-        top.parent ?: top
-//        (top?.taackTag == tag ? top?.parent : top) ?: block
-    }
-
     @Override
     void visitBlock() {
         if (!parameter.isAjaxRendering || isModal) {
+            topElement.setTaackTag(TaackTag.BLOCK)
             topElement = block.block("${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
         }
     }
@@ -84,18 +67,19 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) {
-            topElement = closeTags(TaackTag.BLOCK)
+            topElement = topElement.toParentTaackTag(TaackTag.BLOCK, TaackTag.MENU_BLOCK)
         }
     }
 
     @Override
     void visitBlockHeader() {
+        topElement.setTaackTag(TaackTag.MENU_BLOCK)
         topElement = block.blockHeader(topElement)
     }
 
     @Override
     void visitBlockHeaderEnd() {
-        topElement = closeTags(TaackTag.MENU_BLOCK)
+        topElement = topElement.toParentTaackTag(TaackTag.MENU_BLOCK)
     }
 
     @Override
@@ -105,7 +89,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitColEnd() {
-        topElement = closeTags(TaackTag.COL)
+        topElement = topElement.toParentTaackTag(TaackTag.COL)
     }
 
     @Override
@@ -120,7 +104,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitAjaxBlockEnd() {
         if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
-        if (isModalRefresh) topElement = closeTags(TaackTag.AJAX_BLOCK)
+        if (isModalRefresh) topElement = topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
     }
 
     @Override
@@ -210,7 +194,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTabEnd() {
-        topElement = closeTags(TaackTag.TAB)
+        topElement = topElement.toParentTaackTag(TaackTag.TAB)
     }
 
     private List<String> currentTabNames = []
@@ -228,7 +212,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         IHTMLElement tabsContent = topElement
         topElement = block.tabs(oldParent, random.nextInt(), currentTabNames, blockTabWidth)
         topElement.addChildren(tabsContent)
-        topElement = closeTags(TaackTag.TABS)
+        topElement = topElement.toParentTaackTag(TaackTag.TABS)
     }
 
     @Override
@@ -258,7 +242,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitRowEnd() {
-        topElement = closeTags(TaackTag.ROW)
+        topElement = topElement.toParentTaackTag(TaackTag.ROW)
     }
 
     @Override
@@ -268,22 +252,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuLabelEnd() {
-        topElement = closeTags(TaackTag.LABEL)
+        topElement = topElement.toParentTaackTag(TaackTag.LABEL)
     }
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
+        topElement.setTaackTag(TaackTag.MENU)
         topElement = menu.menuStart(topElement)
-
     }
 
     @Override
     void visitMenuStartEnd() {
-        topElement = closeTags(TaackTag.MENU)
+        topElement = topElement.toParentTaackTag(TaackTag.MENU, TaackTag.MENU_SPLIT)
     }
 
     private void splitMenuStart() {
         topElement = menu
+        topElement.setTaackTag(TaackTag.MENU_SPLIT)
         topElement = menu.splitMenuStart(topElement)
     }
 
@@ -369,7 +354,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                 menu.menuOption(topElement, img, option.value, url)
             }
         }
-        topElement = closeTags(TaackTag.MENU_OPTION)
+        topElement = topElement.toParentTaackTag(TaackTag.MENU_OPTION)
     }
 
 }

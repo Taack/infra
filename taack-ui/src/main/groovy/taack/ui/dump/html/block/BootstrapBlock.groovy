@@ -25,12 +25,12 @@ final class BootstrapBlock extends BootstrapLayout implements IBlockTheme {
 
     @Override
     IHTMLElement block(String blockId) {
-        new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').setTaackTag(TaackTag.BLOCK).putAttribute('blockId', blockId).build()
+        new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').putAttribute('blockId', blockId).build()
     }
 
     static IHTMLElement blockHeader(IHTMLElement topElement) {
         topElement.addChildren(
-                new HTMLNav().builder.addClasses('navbar', 'navbar-expand-md').setTaackTag(TaackTag.MENU_BLOCK).addChildren(
+                new HTMLNav().builder.addClasses('navbar', 'navbar-expand-md').addChildren(
                         new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
                                 new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
                                         .addClasses('navbar-toggler', 'navbar-dark')
