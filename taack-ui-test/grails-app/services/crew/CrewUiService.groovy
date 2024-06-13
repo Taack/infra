@@ -46,11 +46,11 @@ class CrewUiService implements WebAttributes {
                 filterField u.subsidiary_
                 filterField u.businessUnit_
                 filterField u.enabled_
-//                filterFieldExpressionBool tr('user.myTeam.label'), user ? false : true, new FilterExpression(cu.allManagedUsers*.id, Operator.IN, u.selfObject_)
+                filterFieldExpressionBool tr('user.myTeam.label'), user ? false : true, new FilterExpression(cu.allManagedUsers*.id, Operator.IN, u.selfObject_)
             }
             section tr('default.role.label'), {
                 UserRole ur = new UserRole(role: new Role())
-//                filterFieldInverse tr('default.role.label'), UserRole, ur.user_, ur.role_, ur.role.authority_
+                filterFieldInverse tr('default.role.label'), UserRole, ur.user_, ur.role_, ur.role.authority_
             }
         }
     }

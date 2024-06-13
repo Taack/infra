@@ -5,5 +5,11 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 enum ThemeMode {
-    NORMAL, DARK, LIGHT
+    NORMAL('auto'), DARK('dark'), LIGHT('light')
+
+    ThemeMode(String name) {
+        this.name = name
+    }
+
+    final String name
 }

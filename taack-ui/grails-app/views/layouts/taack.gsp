@@ -1,7 +1,7 @@
 <%@ page import="taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
-<html lang="${lang}">
+<html lang="${lang}" data-bs-theme="${themeMode.name}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
@@ -32,7 +32,7 @@
     <g:layoutHead/>
 </head>
 
-<body data-bs-theme="${themeMode == ThemeMode.DARK ? 'dark' : 'light'}">
+<body>
 
 <nav class="navbar navbar-expand-md" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
     <div id="dropdownNav" class="container-fluid">
@@ -99,5 +99,19 @@
 <g:else>
     <asset:javascript src="application-taack.js"/>
 </g:else>
+<script>
+    function updateTheme() {
+        const colorMode = window.matchMedia("(prefers-color-scheme: dark)").matches ?
+            "dark" :
+            "light";
+        document.querySelector("html").setAttribute("data-bs-theme", colorMode);
+    }
+
+    // Set theme on load
+    updateTheme()
+
+    // Update theme when the preferred scheme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme)
+</script>
 </body>
 </html>
