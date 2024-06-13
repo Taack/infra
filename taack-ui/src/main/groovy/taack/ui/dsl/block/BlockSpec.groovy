@@ -100,7 +100,7 @@ final class BlockSpec {
      * @param closure description of the tabulations
      */
     void tabs(final Width width = Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        blockVisitor.visitBlockTabs(width)
+        blockVisitor.visitBlockTabs()
         closure.delegate = this
         closure.call()
         counter ++
@@ -211,7 +211,7 @@ final class BlockSpec {
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitForm(width)
+            blockVisitor.visitForm(null)
             processMenuBlock(closure)
             blockVisitor.visitFormEnd(formSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -233,20 +233,20 @@ final class BlockSpec {
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitShow(width)
+            blockVisitor.visitShow()
             processMenuBlock(closure)
             blockVisitor.visitShowEnd(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
 
-    void table(final UiTableSpecifier tableSpecifier, final Width width = Width.MAX,
+    void table(final UiTableSpecifier tableSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId  = ajaxBlockId
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitTable(id, width)
+            blockVisitor.visitTable(id, tableSpecifier)
             processMenuBlock(closure)
             blockVisitor.visitTableEnd(tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -264,15 +264,13 @@ final class BlockSpec {
      */
     void tableFilter(final UiFilterSpecifier filterSpecifier,
                      final UiTableSpecifier tableSpecifier,
-                     final Width width,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId  = ajaxBlockId
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitTableFilter(id, filterSpecifier, width)
             processMenuBlock(closure)
-            blockVisitor.visitTableFilterEnd(tableSpecifier)
+            blockVisitor.visitTableFilter(id, filterSpecifier, tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }
@@ -292,7 +290,7 @@ final class BlockSpec {
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitChart(width)
+            blockVisitor.visitChart()
             processMenuBlock(closure)
             blockVisitor.visitChartEnd(chartSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -301,16 +299,16 @@ final class BlockSpec {
 
     void diagram(final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
         if (displayElement()) {
-            blockVisitor.visitDiagram(width)
-            blockVisitor.visitDiagramEnd(diagramSpecifier, width)
+            blockVisitor.visitDiagram()
+            blockVisitor.visitDiagramEnd(diagramSpecifier)
         }
     }
 
     void diagramFilter(final UiFilterSpecifier filterSpecifier,
                        final UiDiagramSpecifier diagramSpecifier, final Width width = Width.MAX) {
         if (displayElement()) {
-            blockVisitor.visitDiagramFilter(filterSpecifier, width)
-            blockVisitor.visitDiagramEnd(diagramSpecifier, Width.THREE_QUARTER)
+            blockVisitor.visitDiagramFilter(filterSpecifier)
+            blockVisitor.visitDiagramEnd(diagramSpecifier)
         }
     }
 
@@ -329,7 +327,7 @@ final class BlockSpec {
         if (displayElement(aId)) {
             id = aId
             blockVisitor.visitAjaxBlock(id)
-            blockVisitor.visitCustom(html, style, width)
+            blockVisitor.visitCustom(html, style)
             counter ++
             blockVisitor.visitAjaxBlockEnd()
         }

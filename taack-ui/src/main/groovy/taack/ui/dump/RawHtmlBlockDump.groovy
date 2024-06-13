@@ -128,20 +128,19 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitForm(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitForm(UiFormSpecifier formSpecifier) {
+        formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
     }
 
     @Override
     void visitFormEnd(UiFormSpecifier formSpecifier) {
         visitCloseTitle()
-        formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
         visitColEnd()
     }
 
     @Override
-    void visitShow(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitShow() {
+//        visitCol(width)
     }
 
     @Override
@@ -175,39 +174,34 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTable(final String id, final BlockSpec.Width width) {
-        this.id = id
-        visitCol(width)
+    void visitTable(String id, final UiTableSpecifier tableSpecifier) {
+        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(topElement, id, parameter))
     }
 
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
-        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(topElement, id, parameter))
+
         visitColEnd()
     }
 
     @Override
     void visitTableFilter(final String id,
                           final UiFilterSpecifier filterSpecifier,
-                          final BlockSpec.Width width) {
+                          final UiTableSpecifier tableSpecifier) {
 
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
-    }
-
-    @Override
-    void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
         tableSpecifier.visitTable(new RawHtmlTableDump(topElement, id, parameter))
         visitColEnd()
         visitRowEnd()
     }
 
     @Override
-    void visitChart(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitChart() {
+//        visitCol(width)
     }
 
     @Override
@@ -220,23 +214,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitDiagram(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitDiagram() {
+//        visitCol(width)
     }
 
     @Override
-    void visitDiagramFilter(final UiFilterSpecifier filterSpecifier, final BlockSpec.Width width) {
-        visitCol(width)
+    void visitDiagramFilter(final UiFilterSpecifier filterSpecifier) {
+//        visitCol(width)
         visitCloseTitle()
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
         visitColEnd()
     }
 
     @Override
-    void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier, final BlockSpec.Width width = BlockSpec.Width.MAX) {
+    void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier) {
         visitCloseTitle()
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, width), UiDiagramSpecifier.DiagramBase.SVG)
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, BlockSpec.Width.MAX), UiDiagramSpecifier.DiagramBase.SVG)
         visitColEnd()
         visitColEnd()
     }
@@ -271,7 +265,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     private BlockSpec.Width blockTabWidth
 
     @Override
-    void visitBlockTabs(final BlockSpec.Width width) {
+    void visitBlockTabs() {
         oldParent = topElement
         topElement = new HTMLEmpty()
     }
@@ -285,12 +279,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCustom(final String html, Style style, final BlockSpec.Width width) {
-        visitCol(width)
-        visitCloseTitle()
+    void visitCustom(final String html, Style style) {
         visitHtmlBlock(html, style)
-        visitColEnd()
-        visitColEnd()
     }
 
     @Override

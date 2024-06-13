@@ -40,29 +40,27 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitAjaxBlockEnd()
 
-    void visitForm(BlockSpec.Width width)
+    void visitForm(UiFormSpecifier formSpecifier)
 
     void visitFormEnd(UiFormSpecifier formSpecifier)
 
-    void visitShow(BlockSpec.Width width)
+    void visitShow()
 
-    void visitTable(String id, BlockSpec.Width width)
+    void visitTable(String id, UiTableSpecifier tableSpecifier)
 
     void visitTableEnd(UiTableSpecifier tableSpecifier)
 
-    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, BlockSpec.Width width)
+    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier)
 
-    void visitTableFilterEnd(UiTableSpecifier tableSpecifier)
-
-    void visitChart(BlockSpec.Width width)
+    void visitChart()
 
     void visitChartEnd(UiChartSpecifier chartSpecifier)
 
-    void visitDiagram(BlockSpec.Width width)
+    void visitDiagram()
 
-    void visitDiagramFilter(UiFilterSpecifier filterSpecifier, BlockSpec.Width width)
+    void visitDiagramFilter(UiFilterSpecifier filterSpecifier)
 
-    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier, BlockSpec.Width width)
+    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier)
 
     void visitCloseModal(String id, String value, FieldInfo[] fields)
 
@@ -70,11 +68,11 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitBlockTabEnd()
 
-    void visitBlockTabs(BlockSpec.Width width)
+    void visitBlockTabs()
 
     void visitBlockTabsEnd()
 
-    void visitCustom(String html, Style style, BlockSpec.Width width)
+    void visitCustom(String html, Style style)
 
     void visitShowEnd(UiShowSpecifier uiShowSpecifier)
 

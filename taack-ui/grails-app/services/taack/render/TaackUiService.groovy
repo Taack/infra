@@ -188,23 +188,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     /**
-     * Shortcut method that call the {@link #show(UiBlockSpecifier)} underneath.
-     * <p>Allow to render a form directly.
-     *
-     * @param formSpecifier form descriptor
-     * @param i18n title of the form
-     * @param menu
-     * @return
-     */
-    final def show(UiFormSpecifier formSpecifier, UiMenuSpecifier menu = null) {
-        show(new UiBlockSpecifier().ui {
-            ajaxBlock actionName, {
-                form(formSpecifier)
-            }
-        }, menu)
-    }
-
-    /**
      * Build a modal from a form and shows it.
      *
      * @param formSpecifier form descriptor
@@ -216,46 +199,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             modal {
                 ajaxBlock actionName, {
                     form(formSpecifier)
-                }
-            }
-        })
-    }
-
-    /**
-     * Shortcut method that call the {@link #show(UiBlockSpecifier)} underneath.
-     * <p>Allow to render a table and its filter directly.
-     *
-     * @param tableSpecifier table descriptor
-     * @param i18nTable label of the table
-     * @param filterSpecifier filter descriptor
-     * @param i18nTableFilter label of the filter
-     * @param menuSpecifier page menu if not ajax rendering
-     * @return
-     */
-    final def show(UiTableSpecifier tableSpecifier, String i18nTable, UiFilterSpecifier filterSpecifier = null, String i18nTableFilter = null, UiMenuSpecifier menuSpecifier) {
-        show(new UiBlockSpecifier().ui {
-            ajaxBlock actionName, {
-                if (filterSpecifier) tableFilter(filterSpecifier, tableSpecifier, BlockSpec.Width.MAX)
-                else table tableSpecifier
-            }
-        }, menuSpecifier)
-    }
-
-    /**
-     * Build a modal from a table and a filter and shows it.
-     *
-     * @param tableSpecifier table descriptor
-     * @param i18nTable
-     * @param filterSpecifier filter descriptor
-     * @param i18nTableFilter
-     * @return
-     */
-    final def showModal(UiTableSpecifier tableSpecifier, String i18nTable = null, UiFilterSpecifier filterSpecifier = null, String i18nTableFilter = null) {
-        show(new UiBlockSpecifier().ui {
-            modal {
-                ajaxBlock actionName, {
-                    if (filterSpecifier) tableFilter(filterSpecifier, tableSpecifier, BlockSpec.Width.MAX)
-                    else table(tableSpecifier, BlockSpec.Width.MAX)
                 }
             }
         })

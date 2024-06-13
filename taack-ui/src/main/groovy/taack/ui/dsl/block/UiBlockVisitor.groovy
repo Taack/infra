@@ -79,7 +79,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitForm(BlockSpec.Width width) {
+    void visitForm(UiFormSpecifier formSpecifier) {
 
     }
 
@@ -89,12 +89,12 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitShow(BlockSpec.Width width) {
+    void visitShow() {
 
     }
 
     @Override
-    void visitTable(String id, BlockSpec.Width width) {
+    void visitTable(String id, UiTableSpecifier tableSpecifier) {
 
     }
 
@@ -104,17 +104,12 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, BlockSpec.Width width) {
+    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier) {
 
     }
 
     @Override
-    void visitTableFilterEnd(UiTableSpecifier tableSpecifier) {
-
-    }
-
-    @Override
-    void visitChart(BlockSpec.Width width) {
+    void visitChart() {
 
     }
 
@@ -124,17 +119,17 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitDiagram(BlockSpec.Width width) {
+    void visitDiagram() {
 
     }
 
     @Override
-    void visitDiagramFilter(UiFilterSpecifier filterSpecifier, BlockSpec.Width width) {
+    void visitDiagramFilter(UiFilterSpecifier filterSpecifier) {
 
     }
 
     @Override
-    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier, BlockSpec.Width width) {
+    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier) {
 
     }
 
@@ -154,7 +149,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitBlockTabs(BlockSpec.Width width) {
+    void visitBlockTabs() {
 
     }
 
@@ -164,7 +159,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCustom(String html, Style style, BlockSpec.Width width) {
+    void visitCustom(String html, Style style) {
 
     }
 

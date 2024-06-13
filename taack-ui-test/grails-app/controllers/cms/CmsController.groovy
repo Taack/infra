@@ -84,7 +84,7 @@ class CmsController implements WebAttributes {
 
     private Closure<BlockSpec> buildImagesTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            table cmsUiService.buildCmsImageTable(cmsPage), BlockSpec.Width.MAX, {
+            table cmsUiService.buildCmsImageTable(cmsPage), {
                 menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
                 menu this.&selectM2mCmsImage as MC, cmsPage.id
                 menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
@@ -94,7 +94,7 @@ class CmsController implements WebAttributes {
 
     private Closure<BlockSpec> buildVideosTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            table cmsUiService.buildCmsVideoTable(cmsPage), BlockSpec.Width.MAX, {
+            table cmsUiService.buildCmsVideoTable(cmsPage), {
                 menu this.&refreshCmsPageCmsVideos as MC, cmsPage.id
                 menu this.&selectM2mCmsVideo as MC, cmsPage.id
                 menu this.&editCmsVideo as MC, [cmsPageId: cmsPage.id]
@@ -104,7 +104,7 @@ class CmsController implements WebAttributes {
 
     private Closure<BlockSpec> buildPdfsTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            table cmsUiService.buildCmsPdfTable(cmsPage), BlockSpec.Width.MAX, {
+            table cmsUiService.buildCmsPdfTable(cmsPage), {
                 menu this.&refreshCmsPageCmsPdfs as MC, [id: cmsPage.id]
                 menu this.&selectM2mCmsPdf as MC, [id: cmsPage.id]
                 menu this.&editCmsPdf as MC, [cmsPageId: cmsPage.id]
@@ -114,7 +114,7 @@ class CmsController implements WebAttributes {
 
     private static UiFormSpecifier buildCmsPageForm(final CmsPage cmsPage) {
         new UiFormSpecifier().ui cmsPage, {
-            section "Page Information", BlockSpec.Width.MAX, {
+            section "Page Information", {
                 row {
                     col {
                         field cmsPage.name_
@@ -164,7 +164,7 @@ class CmsController implements WebAttributes {
 
         new UiFormSpecifier().ui cmsPage, {
             hiddenField(cmsPage.pageType_)
-            section "Slideshow Information", BlockSpec.Width.MAX, {
+            section "Slideshow Information", {
                 row {
                     col {
                         field cmsPage.name_
@@ -223,7 +223,7 @@ class CmsController implements WebAttributes {
         UiFormSpecifier f = new UiFormSpecifier()
         f.ui cmsImage, {
             if (cmsImage.cmsPage) hiddenField cmsImage.cmsPage_
-            section "File Upload", BlockSpec.Width.MAX, {
+            section "File Upload", {
                 field cmsImage.filePath_
                 field cmsImage.imageType_
                 for (SupportedLanguage language : SupportedLanguage.values()) {
@@ -261,7 +261,7 @@ class CmsController implements WebAttributes {
     private static UiFormSpecifier buildCmsPdfForm(final CmsPdfFile pdfFile) {
         new UiFormSpecifier().ui pdfFile, {
             hiddenField pdfFile.cmsPage_
-            section "File Upload", BlockSpec.Width.MAX, {
+            section "File Upload", {
                 field pdfFile.filePath_
             }
             section "Alt Text", {
@@ -329,7 +329,7 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
             ajaxBlock "imagesBlockAction", {
-                tableFilter CmsUiService.buildCmsImageFilter(), cmsUiService.buildCmsImageTable(), BlockSpec.Width.MAX, {
+                tableFilter CmsUiService.buildCmsImageFilter(), cmsUiService.buildCmsImageTable(), {
                     menu this.&editCmsImage as MC
                 }
             }
@@ -341,7 +341,7 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
             ajaxBlock "pdfsBlock", {
-                table cmsUiService.buildCmsPdfTable(), BlockSpec.Width.MAX
+                table cmsUiService.buildCmsPdfTable()
             }
         }
         taackUiService.show(b, buildMenu())
@@ -351,7 +351,7 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
             ajaxBlock "videosBlock", {
-                table cmsUiService.buildCmsVideoTable(), BlockSpec.Width.MAX
+                table cmsUiService.buildCmsVideoTable()
             }
         }
         taackUiService.show(b, buildMenu())
@@ -361,7 +361,7 @@ class CmsController implements WebAttributes {
         def ss = new CmsPage()
         def u = new User()
         taackUiService.show(new UiBlockSpecifier().ui {
-            tableFilter(cmsUiService.buildCmsSlideshowFilter(), cmsUiService.buildCmsSlideshowTable(), BlockSpec.Width.MAX, {
+            tableFilter(cmsUiService.buildCmsSlideshowFilter(), cmsUiService.buildCmsSlideshowTable(), {
                 menu this.&editSlideshow as MC
             })
         }, buildMenu())
@@ -632,7 +632,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "selectPageImage", {
-                    tableFilter filter, cmsUiService.buildCmsImageTable(null, CmsUiService.CmsTableMode.MANY_2_MANY, filter), BlockSpec.Width.MAX, {
+                    tableFilter filter, cmsUiService.buildCmsImageTable(null, CmsUiService.CmsTableMode.MANY_2_MANY, filter), {
                         menu this.&editCmsImage as MC
                     }
                 }
@@ -801,7 +801,7 @@ class CmsController implements WebAttributes {
 
     def pages() {
         UiBlockSpecifier b = new UiBlockSpecifier().ui {
-            tableFilter CmsUiService.buildCmsPageFilter(), cmsUiService.buildCmsPageTable(), BlockSpec.Width.MAX, {
+            tableFilter CmsUiService.buildCmsPageFilter(), cmsUiService.buildCmsPageTable(), {
                 menu this.&editPage as MC
             }
         }
@@ -865,7 +865,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "menuEntries", {
-                    table buildCmsMenuEntryTable(s, params.long('theId')), BlockSpec.Width.MAX
+                    table buildCmsMenuEntryTable(s, params.long('theId'))
                 }
             }
         }
@@ -880,7 +880,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "selectM2oPage", {
-                    tableFilter filter, cmsUiService.buildCmsPageTable(filter), BlockSpec.Width.MAX
+                    tableFilter filter, cmsUiService.buildCmsPageTable(filter)
                 }
             }
         }
@@ -949,7 +949,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "selectM2mCmsImageBlock", {
-                    tableFilter filter, cmsUiService.buildCmsImageTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter), BlockSpec.Width.MAX
+                    tableFilter filter, cmsUiService.buildCmsImageTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
                 }
             }
         }
@@ -963,7 +963,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "selectM2mCmsVideoBlock", {
-                    tableFilter filter, cmsUiService.buildCmsVideoTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter), BlockSpec.Width.MAX
+                    tableFilter filter, cmsUiService.buildCmsVideoTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
                 }
             }
         }
@@ -977,7 +977,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "selectM2mCmsPdfBlock", {
-                    tableFilter filter, cmsUiService.buildCmsPdfTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter), BlockSpec.Width.MAX
+                    tableFilter filter, cmsUiService.buildCmsPdfTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
                 }
             }
         }
@@ -993,7 +993,7 @@ class CmsController implements WebAttributes {
         b.ui {
             modal {
                 ajaxBlock "selectM2mCmsSlideshow", {
-                    tableFilter filter, cmsUiService.buildCmsSlideshowTable(filter), BlockSpec.Width.MAX
+                    tableFilter filter, cmsUiService.buildCmsSlideshowTable(filter)
                 }
             }
         }
@@ -1178,7 +1178,7 @@ class CmsController implements WebAttributes {
 
         b.ui {
             ajaxBlock "menuEntries", {
-                table buildCmsMenuEntryTable(), BlockSpec.Width.MAX, {
+                table buildCmsMenuEntryTable(), {
                     menu this.&editMenu as MC
                 }
             }
@@ -1189,7 +1189,7 @@ class CmsController implements WebAttributes {
     def blocks() {
         taackUiService.show(new UiBlockSpecifier().ui({
             ajaxBlock 'blocks', {
-                table(buildBlockTable(), BlockSpec.Width.MAX) {
+                table(buildBlockTable()) {
                     menu this.&editBlock as MC
                 }
             }
@@ -1219,7 +1219,7 @@ class CmsController implements WebAttributes {
                         if (o.mainSlideShow) rowField o.mainSlideShow.name + "(${o.mainSlideShow.id})"
                         else rowField 'Default slideshow'
                     }
-                }), BlockSpec.Width.MAX, {
+                }), {
                     menu this.&editCmsConfSite as MC
                 })
             }

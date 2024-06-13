@@ -34,12 +34,15 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     }
 
     @Override
-    void visitTable(UiTableSpecifier tableSpecifier, final BlockSpec.Width width) {
-        visitInnerBlock(width)
-        tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
-        visitInnerBlockEnd()
+    void visitTable(UiTableSpecifier uiTableSpecifier, BlockSpec.Width width) {
+
     }
 
+//    @Override
+//    void visitTable(UiTableSpecifier tableSpecifier) {
+//        tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
+//    }
+//
     @Override
     void visitCustom(final String html, final BlockSpec.Width width) {
         visitInnerBlock(width)

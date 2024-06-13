@@ -131,8 +131,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitForm(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitForm(UiFormSpecifier formSpecifier) {
+
     }
 
     @Override
@@ -143,8 +143,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitShow(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitShow() {
+
+    }
+
+    @Override
+    void visitTable(String id, UiTableSpecifier tableSpecifier) {
+
     }
 
     @Override
@@ -177,11 +182,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 //        """
     }
 
-    @Override
-    void visitTable(final String id, final BlockSpec.Width width) {
-        this.id = id
-        visitCol(width)
-    }
+//    @Override
+//    void visitTable(final String id, final BlockSpec.Width width) {
+//        this.id = id
+//        visitCol(width)
+//    }
 
     @Override
     void visitTableEnd(UiTableSpecifier tableSpecifier) {
@@ -191,28 +196,22 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitTableFilter(final String id,
-                          final UiFilterSpecifier filterSpecifier,
-                          final BlockSpec.Width width) {
-
+    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier) {
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
         filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
-    }
-
-    @Override
-    void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
         visitColEnd()
         visitRowEnd()
+
     }
 
     @Override
-    void visitChart(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitChart() {
+
     }
 
     @Override
@@ -225,39 +224,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitDiagram(final BlockSpec.Width width) {
-        visitCol(width)
+    void visitDiagram() {
+
     }
 
     @Override
-    void visitDiagramFilter(final UiFilterSpecifier filterSpecifier, final BlockSpec.Width width) {
-        visitCol(width)
-        visitCloseTitle()
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
-        visitColEnd()
+    void visitDiagramFilter(UiFilterSpecifier filterSpecifier) {
+
     }
 
     @Override
-    void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier, final BlockSpec.Width width = BlockSpec.Width.MAX) {
-        visitCloseTitle()
-        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, width), UiDiagramSpecifier.DiagramBase.SVG)
-        visitColEnd()
-        visitColEnd()
+    void visitDiagramEnd(UiDiagramSpecifier diagramSpecifier) {
+
     }
 
     @Override
-    void visitCloseModal(final String id, final String value, FieldInfo[] fields = null) {
+    void visitCloseModal(String id, String value, FieldInfo[] fields) {
 
-        topElement.addChildren(new HTMLAjaxCloseLastModal(id, value))
-        for (FieldInfo fi : fields) {
-            if (fi.value) {
-                if (parameter.nf && fi.value instanceof Number)
-                    topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
-                else
-                    topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
-            }
-        }
     }
 
     @Override
@@ -273,16 +256,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         topElement = closeTags(TaackTag.TAB)
     }
 
+    @Override
+    void visitBlockTabs() {
+
+    }
     private List<String> currentTabNames
     private BlockSpec.Width blockTabWidth
-
-    @Override
-    void visitBlockTabs(final BlockSpec.Width width) {
-//        outBkup = out
-////        out = new ByteArrayOutputStream()
-        blockTabWidth = width
-        currentTabNames = []
-    }
 
     @Override
     void visitBlockTabsEnd() {
@@ -290,12 +269,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCustom(final String html, Style style, final BlockSpec.Width width) {
-        visitCol(width)
-        visitCloseTitle()
-        visitHtmlBlock(html, style)
-        visitColEnd()
-        visitColEnd()
+    void visitCustom(String html, Style style) {
+
     }
 
     @Override
@@ -379,23 +354,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
-        i18n ?= parameter.trField(controller, action)
-        splitMenuStart()
-        topElement = menu.menuIcon(topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal) {
+
     }
 
     @Override
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
-        String valueSelected = params[paramName]
-        IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
-        String controller = params['controller'] as String
-        String action = params['action'] as String
-        visitLabeledSubMenu(enumSelected.value, controller, action, params)
-        for (def eo in enumOptions.getOptions()) {
-            params.put(paramName, eo.key)
-            visitLabeledSubMenu(eo.value, controller, action, params)
-        }
+
     }
 
     @Override
@@ -406,35 +371,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuOptions(IEnumOptions enumOptions) {
-        splitMenuStart()
-        String selectedOptionKey = parameter.params[enumOptions.paramKey]
-
-        IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
-        String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
-        String img = currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
-
-        topElement = menu.menuOptions(topElement, img, selectedOptionValue)
-
-        String controller = parameter.params['controller'] as String
-        String action = parameter.params['action'] as String
-
-        final IEnumOption[] options = enumOptions.options
-        final int im = options.size()
-
-        int i = 0
-        for (i; i < im;) {
-            IEnumOption option = options[i++]
-            parameter.params.put(enumOptions.paramKey, option.key)
-            img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
-            if (option.section) {
-                menu.menuOptionSection(topElement, img, option.value)
-            } else {
-                String url = parameter.urlMapped(controller, action, parameter.params as Map, false)
-                menu.menuOption(topElement, img, option.value, url)
-            }
-        }
-        topElement = closeTags(TaackTag.MENU_OPTION)
 
     }
-
 }

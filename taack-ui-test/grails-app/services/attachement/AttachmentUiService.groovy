@@ -158,7 +158,7 @@ final class AttachmentUiService implements WebAttributes {
             }
         }
         BlockSpec.buildBlockSpec {
-            tableFilter f, t, BlockSpec.Width.MAX, {
+            tableFilter f, t, {
                 if (uploadAttachment)
                     menuIcon ActionIcon.CREATE, uploadAttachment, selectParams
             }
