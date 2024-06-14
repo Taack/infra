@@ -684,13 +684,13 @@
    * Constants
    */
 
-  const NAME$4 = 'button';
-  const DATA_KEY$3 = 'bs.button';
-  const EVENT_KEY$3 = `.${DATA_KEY$3}`;
-  const DATA_API_KEY$2 = '.data-api';
-  const CLASS_NAME_ACTIVE = 'active';
-  const SELECTOR_DATA_TOGGLE$2 = '[data-bs-toggle="button"]';
-  const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$3}${DATA_API_KEY$2}`;
+  const NAME$6 = 'button';
+  const DATA_KEY$5 = 'bs.button';
+  const EVENT_KEY$5 = `.${DATA_KEY$5}`;
+  const DATA_API_KEY$3 = '.data-api';
+  const CLASS_NAME_ACTIVE$1 = 'active';
+  const SELECTOR_DATA_TOGGLE$4 = '[data-bs-toggle="button"]';
+  const EVENT_CLICK_DATA_API$4 = `click${EVENT_KEY$5}${DATA_API_KEY$3}`;
 
   /**
    * Class definition
@@ -699,13 +699,13 @@
   class Button extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$4;
+      return NAME$6;
     }
 
     // Public
     toggle() {
       // Toggle class and sync the `aria-pressed` attribute with the return value of the `.toggle()` method
-      this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE));
+      this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE$1));
     }
 
     // Static
@@ -723,9 +723,9 @@
    * Data API implementation
    */
 
-  EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$2, event => {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$4, SELECTOR_DATA_TOGGLE$4, event => {
     event.preventDefault();
-    const button = event.target.closest(SELECTOR_DATA_TOGGLE$2);
+    const button = event.target.closest(SELECTOR_DATA_TOGGLE$4);
     const data = Button.getOrCreateInstance(button);
     data.toggle();
   });
@@ -735,6 +735,329 @@
    */
 
   defineJQueryPlugin(Button);
+
+  /**
+   * --------------------------------------------------------------------------
+   * Bootstrap dom/selector-engine.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+  const getSelector = element => {
+    let selector = element.getAttribute('data-bs-target');
+    if (!selector || selector === '#') {
+      let hrefAttribute = element.getAttribute('href');
+
+      // The only valid content that could double as a selector are IDs or classes,
+      // so everything starting with `#` or `.`. If a "real" URL is used as the selector,
+      // `document.querySelector` will rightfully complain it is invalid.
+      // See https://github.com/twbs/bootstrap/issues/32273
+      if (!hrefAttribute || !hrefAttribute.includes('#') && !hrefAttribute.startsWith('.')) {
+        return null;
+      }
+
+      // Just in case some CMS puts out a full URL with the anchor appended
+      if (hrefAttribute.includes('#') && !hrefAttribute.startsWith('#')) {
+        hrefAttribute = `#${hrefAttribute.split('#')[1]}`;
+      }
+      selector = hrefAttribute && hrefAttribute !== '#' ? hrefAttribute.trim() : null;
+    }
+    return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null;
+  };
+  const SelectorEngine = {
+    find(selector, element = document.documentElement) {
+      return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
+    },
+    findOne(selector, element = document.documentElement) {
+      return Element.prototype.querySelector.call(element, selector);
+    },
+    children(element, selector) {
+      return [].concat(...element.children).filter(child => child.matches(selector));
+    },
+    parents(element, selector) {
+      const parents = [];
+      let ancestor = element.parentNode.closest(selector);
+      while (ancestor) {
+        parents.push(ancestor);
+        ancestor = ancestor.parentNode.closest(selector);
+      }
+      return parents;
+    },
+    prev(element, selector) {
+      let previous = element.previousElementSibling;
+      while (previous) {
+        if (previous.matches(selector)) {
+          return [previous];
+        }
+        previous = previous.previousElementSibling;
+      }
+      return [];
+    },
+    // TODO: this is now unused; remove later along with prev()
+    next(element, selector) {
+      let next = element.nextElementSibling;
+      while (next) {
+        if (next.matches(selector)) {
+          return [next];
+        }
+        next = next.nextElementSibling;
+      }
+      return [];
+    },
+    focusableChildren(element) {
+      const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
+      return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
+    },
+    getSelectorFromElement(element) {
+      const selector = getSelector(element);
+      if (selector) {
+        return SelectorEngine.findOne(selector) ? selector : null;
+      }
+      return null;
+    },
+    getElementFromSelector(element) {
+      const selector = getSelector(element);
+      return selector ? SelectorEngine.findOne(selector) : null;
+    },
+    getMultipleElementsFromSelector(element) {
+      const selector = getSelector(element);
+      return selector ? SelectorEngine.find(selector) : [];
+    }
+  };
+
+  /**
+   * --------------------------------------------------------------------------
+   * Bootstrap collapse.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$5 = 'collapse';
+  const DATA_KEY$4 = 'bs.collapse';
+  const EVENT_KEY$4 = `.${DATA_KEY$4}`;
+  const DATA_API_KEY$2 = '.data-api';
+  const EVENT_SHOW$3 = `show${EVENT_KEY$4}`;
+  const EVENT_SHOWN$3 = `shown${EVENT_KEY$4}`;
+  const EVENT_HIDE$3 = `hide${EVENT_KEY$4}`;
+  const EVENT_HIDDEN$3 = `hidden${EVENT_KEY$4}`;
+  const EVENT_CLICK_DATA_API$3 = `click${EVENT_KEY$4}${DATA_API_KEY$2}`;
+  const CLASS_NAME_SHOW$4 = 'show';
+  const CLASS_NAME_COLLAPSE = 'collapse';
+  const CLASS_NAME_COLLAPSING = 'collapsing';
+  const CLASS_NAME_COLLAPSED = 'collapsed';
+  const CLASS_NAME_DEEPER_CHILDREN = `:scope .${CLASS_NAME_COLLAPSE} .${CLASS_NAME_COLLAPSE}`;
+  const CLASS_NAME_HORIZONTAL = 'collapse-horizontal';
+  const WIDTH = 'width';
+  const HEIGHT = 'height';
+  const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing';
+  const SELECTOR_DATA_TOGGLE$3 = '[data-bs-toggle="collapse"]';
+  const Default$4 = {
+    parent: null,
+    toggle: true
+  };
+  const DefaultType$4 = {
+    parent: '(null|element)',
+    toggle: 'boolean'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class Collapse extends BaseComponent {
+    constructor(element, config) {
+      super(element, config);
+      this._isTransitioning = false;
+      this._triggerArray = [];
+      const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE$3);
+      for (const elem of toggleList) {
+        const selector = SelectorEngine.getSelectorFromElement(elem);
+        const filterElement = SelectorEngine.find(selector).filter(foundElement => foundElement === this._element);
+        if (selector !== null && filterElement.length) {
+          this._triggerArray.push(elem);
+        }
+      }
+      this._initializeChildren();
+      if (!this._config.parent) {
+        this._addAriaAndCollapsedClass(this._triggerArray, this._isShown());
+      }
+      if (this._config.toggle) {
+        this.toggle();
+      }
+    }
+
+    // Getters
+    static get Default() {
+      return Default$4;
+    }
+    static get DefaultType() {
+      return DefaultType$4;
+    }
+    static get NAME() {
+      return NAME$5;
+    }
+
+    // Public
+    toggle() {
+      if (this._isShown()) {
+        this.hide();
+      } else {
+        this.show();
+      }
+    }
+    show() {
+      if (this._isTransitioning || this._isShown()) {
+        return;
+      }
+      let activeChildren = [];
+
+      // find active children
+      if (this._config.parent) {
+        activeChildren = this._getFirstLevelChildren(SELECTOR_ACTIVES).filter(element => element !== this._element).map(element => Collapse.getOrCreateInstance(element, {
+          toggle: false
+        }));
+      }
+      if (activeChildren.length && activeChildren[0]._isTransitioning) {
+        return;
+      }
+      const startEvent = EventHandler.trigger(this._element, EVENT_SHOW$3);
+      if (startEvent.defaultPrevented) {
+        return;
+      }
+      for (const activeInstance of activeChildren) {
+        activeInstance.hide();
+      }
+      const dimension = this._getDimension();
+      this._element.classList.remove(CLASS_NAME_COLLAPSE);
+      this._element.classList.add(CLASS_NAME_COLLAPSING);
+      this._element.style[dimension] = 0;
+      this._addAriaAndCollapsedClass(this._triggerArray, true);
+      this._isTransitioning = true;
+      const complete = () => {
+        this._isTransitioning = false;
+        this._element.classList.remove(CLASS_NAME_COLLAPSING);
+        this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$4);
+        this._element.style[dimension] = '';
+        EventHandler.trigger(this._element, EVENT_SHOWN$3);
+      };
+      const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1);
+      const scrollSize = `scroll${capitalizedDimension}`;
+      this._queueCallback(complete, this._element, true);
+      this._element.style[dimension] = `${this._element[scrollSize]}px`;
+    }
+    hide() {
+      if (this._isTransitioning || !this._isShown()) {
+        return;
+      }
+      const startEvent = EventHandler.trigger(this._element, EVENT_HIDE$3);
+      if (startEvent.defaultPrevented) {
+        return;
+      }
+      const dimension = this._getDimension();
+      this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`;
+      reflow(this._element);
+      this._element.classList.add(CLASS_NAME_COLLAPSING);
+      this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$4);
+      for (const trigger of this._triggerArray) {
+        const element = SelectorEngine.getElementFromSelector(trigger);
+        if (element && !this._isShown(element)) {
+          this._addAriaAndCollapsedClass([trigger], false);
+        }
+      }
+      this._isTransitioning = true;
+      const complete = () => {
+        this._isTransitioning = false;
+        this._element.classList.remove(CLASS_NAME_COLLAPSING);
+        this._element.classList.add(CLASS_NAME_COLLAPSE);
+        EventHandler.trigger(this._element, EVENT_HIDDEN$3);
+      };
+      this._element.style[dimension] = '';
+      this._queueCallback(complete, this._element, true);
+    }
+    _isShown(element = this._element) {
+      return element.classList.contains(CLASS_NAME_SHOW$4);
+    }
+
+    // Private
+    _configAfterMerge(config) {
+      config.toggle = Boolean(config.toggle); // Coerce string values
+      config.parent = getElement(config.parent);
+      return config;
+    }
+    _getDimension() {
+      return this._element.classList.contains(CLASS_NAME_HORIZONTAL) ? WIDTH : HEIGHT;
+    }
+    _initializeChildren() {
+      if (!this._config.parent) {
+        return;
+      }
+      const children = this._getFirstLevelChildren(SELECTOR_DATA_TOGGLE$3);
+      for (const element of children) {
+        const selected = SelectorEngine.getElementFromSelector(element);
+        if (selected) {
+          this._addAriaAndCollapsedClass([element], this._isShown(selected));
+        }
+      }
+    }
+    _getFirstLevelChildren(selector) {
+      const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent);
+      // remove children if greater depth
+      return SelectorEngine.find(selector, this._config.parent).filter(element => !children.includes(element));
+    }
+    _addAriaAndCollapsedClass(triggerArray, isOpen) {
+      if (!triggerArray.length) {
+        return;
+      }
+      for (const element of triggerArray) {
+        element.classList.toggle(CLASS_NAME_COLLAPSED, !isOpen);
+        element.setAttribute('aria-expanded', isOpen);
+      }
+    }
+
+    // Static
+    static jQueryInterface(config) {
+      const _config = {};
+      if (typeof config === 'string' && /show|hide/.test(config)) {
+        _config.toggle = false;
+      }
+      return this.each(function () {
+        const data = Collapse.getOrCreateInstance(this, _config);
+        if (typeof config === 'string') {
+          if (typeof data[config] === 'undefined') {
+            throw new TypeError(`No method named "${config}"`);
+          }
+          data[config]();
+        }
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(document, EVENT_CLICK_DATA_API$3, SELECTOR_DATA_TOGGLE$3, function (event) {
+    // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
+    if (event.target.tagName === 'A' || event.delegateTarget && event.delegateTarget.tagName === 'A') {
+      event.preventDefault();
+    }
+    for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
+      Collapse.getOrCreateInstance(element, {
+        toggle: false
+      }).toggle();
+    }
+  });
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Collapse);
 
   var top = 'top';
   var bottom = 'bottom';
@@ -2577,95 +2900,6 @@
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap dom/selector-engine.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  const getSelector = element => {
-    let selector = element.getAttribute('data-bs-target');
-    if (!selector || selector === '#') {
-      let hrefAttribute = element.getAttribute('href');
-
-      // The only valid content that could double as a selector are IDs or classes,
-      // so everything starting with `#` or `.`. If a "real" URL is used as the selector,
-      // `document.querySelector` will rightfully complain it is invalid.
-      // See https://github.com/twbs/bootstrap/issues/32273
-      if (!hrefAttribute || !hrefAttribute.includes('#') && !hrefAttribute.startsWith('.')) {
-        return null;
-      }
-
-      // Just in case some CMS puts out a full URL with the anchor appended
-      if (hrefAttribute.includes('#') && !hrefAttribute.startsWith('#')) {
-        hrefAttribute = `#${hrefAttribute.split('#')[1]}`;
-      }
-      selector = hrefAttribute && hrefAttribute !== '#' ? hrefAttribute.trim() : null;
-    }
-    return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null;
-  };
-  const SelectorEngine = {
-    find(selector, element = document.documentElement) {
-      return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
-    },
-    findOne(selector, element = document.documentElement) {
-      return Element.prototype.querySelector.call(element, selector);
-    },
-    children(element, selector) {
-      return [].concat(...element.children).filter(child => child.matches(selector));
-    },
-    parents(element, selector) {
-      const parents = [];
-      let ancestor = element.parentNode.closest(selector);
-      while (ancestor) {
-        parents.push(ancestor);
-        ancestor = ancestor.parentNode.closest(selector);
-      }
-      return parents;
-    },
-    prev(element, selector) {
-      let previous = element.previousElementSibling;
-      while (previous) {
-        if (previous.matches(selector)) {
-          return [previous];
-        }
-        previous = previous.previousElementSibling;
-      }
-      return [];
-    },
-    // TODO: this is now unused; remove later along with prev()
-    next(element, selector) {
-      let next = element.nextElementSibling;
-      while (next) {
-        if (next.matches(selector)) {
-          return [next];
-        }
-        next = next.nextElementSibling;
-      }
-      return [];
-    },
-    focusableChildren(element) {
-      const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
-      return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
-    },
-    getSelectorFromElement(element) {
-      const selector = getSelector(element);
-      if (selector) {
-        return SelectorEngine.findOne(selector) ? selector : null;
-      }
-      return null;
-    },
-    getElementFromSelector(element) {
-      const selector = getSelector(element);
-      return selector ? SelectorEngine.findOne(selector) : null;
-    },
-    getMultipleElementsFromSelector(element) {
-      const selector = getSelector(element);
-      return selector ? SelectorEngine.find(selector) : [];
-    }
-  };
-
-  /**
-   * --------------------------------------------------------------------------
    * Bootstrap dropdown.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
@@ -2676,31 +2910,31 @@
    * Constants
    */
 
-  const NAME$3 = 'dropdown';
-  const DATA_KEY$2 = 'bs.dropdown';
-  const EVENT_KEY$2 = `.${DATA_KEY$2}`;
+  const NAME$4 = 'dropdown';
+  const DATA_KEY$3 = 'bs.dropdown';
+  const EVENT_KEY$3 = `.${DATA_KEY$3}`;
   const DATA_API_KEY$1 = '.data-api';
   const ESCAPE_KEY$1 = 'Escape';
   const TAB_KEY$1 = 'Tab';
-  const ARROW_UP_KEY = 'ArrowUp';
-  const ARROW_DOWN_KEY = 'ArrowDown';
+  const ARROW_UP_KEY$1 = 'ArrowUp';
+  const ARROW_DOWN_KEY$1 = 'ArrowDown';
   const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
 
-  const EVENT_HIDE$1 = `hide${EVENT_KEY$2}`;
-  const EVENT_HIDDEN$1 = `hidden${EVENT_KEY$2}`;
-  const EVENT_SHOW$1 = `show${EVENT_KEY$2}`;
-  const EVENT_SHOWN$1 = `shown${EVENT_KEY$2}`;
-  const EVENT_CLICK_DATA_API$1 = `click${EVENT_KEY$2}${DATA_API_KEY$1}`;
-  const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY$2}${DATA_API_KEY$1}`;
-  const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY$2}${DATA_API_KEY$1}`;
-  const CLASS_NAME_SHOW$2 = 'show';
+  const EVENT_HIDE$2 = `hide${EVENT_KEY$3}`;
+  const EVENT_HIDDEN$2 = `hidden${EVENT_KEY$3}`;
+  const EVENT_SHOW$2 = `show${EVENT_KEY$3}`;
+  const EVENT_SHOWN$2 = `shown${EVENT_KEY$3}`;
+  const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$3}${DATA_API_KEY$1}`;
+  const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY$3}${DATA_API_KEY$1}`;
+  const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY$3}${DATA_API_KEY$1}`;
+  const CLASS_NAME_SHOW$3 = 'show';
   const CLASS_NAME_DROPUP = 'dropup';
   const CLASS_NAME_DROPEND = 'dropend';
   const CLASS_NAME_DROPSTART = 'dropstart';
   const CLASS_NAME_DROPUP_CENTER = 'dropup-center';
   const CLASS_NAME_DROPDOWN_CENTER = 'dropdown-center';
-  const SELECTOR_DATA_TOGGLE$1 = '[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)';
-  const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$1}.${CLASS_NAME_SHOW$2}`;
+  const SELECTOR_DATA_TOGGLE$2 = '[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$2}.${CLASS_NAME_SHOW$3}`;
   const SELECTOR_MENU = '.dropdown-menu';
   const SELECTOR_NAVBAR = '.navbar';
   const SELECTOR_NAVBAR_NAV = '.navbar-nav';
@@ -2752,7 +2986,7 @@
       return DefaultType$3;
     }
     static get NAME() {
-      return NAME$3;
+      return NAME$4;
     }
 
     // Public
@@ -2766,7 +3000,7 @@
       const relatedTarget = {
         relatedTarget: this._element
       };
-      const showEvent = EventHandler.trigger(this._element, EVENT_SHOW$1, relatedTarget);
+      const showEvent = EventHandler.trigger(this._element, EVENT_SHOW$2, relatedTarget);
       if (showEvent.defaultPrevented) {
         return;
       }
@@ -2783,9 +3017,9 @@
       }
       this._element.focus();
       this._element.setAttribute('aria-expanded', true);
-      this._menu.classList.add(CLASS_NAME_SHOW$2);
-      this._element.classList.add(CLASS_NAME_SHOW$2);
-      EventHandler.trigger(this._element, EVENT_SHOWN$1, relatedTarget);
+      this._menu.classList.add(CLASS_NAME_SHOW$3);
+      this._element.classList.add(CLASS_NAME_SHOW$3);
+      EventHandler.trigger(this._element, EVENT_SHOWN$2, relatedTarget);
     }
     hide() {
       if (isDisabled(this._element) || !this._isShown()) {
@@ -2811,7 +3045,7 @@
 
     // Private
     _completeHide(relatedTarget) {
-      const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE$1, relatedTarget);
+      const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE$2, relatedTarget);
       if (hideEvent.defaultPrevented) {
         return;
       }
@@ -2826,17 +3060,17 @@
       if (this._popper) {
         this._popper.destroy();
       }
-      this._menu.classList.remove(CLASS_NAME_SHOW$2);
-      this._element.classList.remove(CLASS_NAME_SHOW$2);
+      this._menu.classList.remove(CLASS_NAME_SHOW$3);
+      this._element.classList.remove(CLASS_NAME_SHOW$3);
       this._element.setAttribute('aria-expanded', 'false');
       Manipulator.removeDataAttribute(this._menu, 'popper');
-      EventHandler.trigger(this._element, EVENT_HIDDEN$1, relatedTarget);
+      EventHandler.trigger(this._element, EVENT_HIDDEN$2, relatedTarget);
     }
     _getConfig(config) {
       config = super._getConfig(config);
       if (typeof config.reference === 'object' && !isElement$1(config.reference) && typeof config.reference.getBoundingClientRect !== 'function') {
         // Popper virtual elements require a getBoundingClientRect method
-        throw new TypeError(`${NAME$3.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
+        throw new TypeError(`${NAME$4.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
       }
       return config;
     }
@@ -2856,7 +3090,7 @@
       this._popper = createPopper(referenceElement, this._menu, popperConfig);
     }
     _isShown() {
-      return this._menu.classList.contains(CLASS_NAME_SHOW$2);
+      return this._menu.classList.contains(CLASS_NAME_SHOW$3);
     }
     _getPlacement() {
       const parentDropdown = this._parent;
@@ -2935,7 +3169,7 @@
 
       // if target isn't included in items (e.g. when expanding the dropdown)
       // allow cycling to get the last item in case key equals ARROW_UP_KEY
-      getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus();
+      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$1, !items.includes(target)).focus();
     }
 
     // Static
@@ -2986,7 +3220,7 @@
 
       const isInput = /input|textarea/i.test(event.target.tagName);
       const isEscapeEvent = event.key === ESCAPE_KEY$1;
-      const isUpOrDownEvent = [ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key);
+      const isUpOrDownEvent = [ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event.key);
       if (!isUpOrDownEvent && !isEscapeEvent) {
         return;
       }
@@ -2996,7 +3230,7 @@
       event.preventDefault();
 
       // TODO: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
-      const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$1) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$1)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$1)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$1, event.delegateTarget.parentNode);
+      const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$2) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$2)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$2)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$2, event.delegateTarget.parentNode);
       const instance = Dropdown.getOrCreateInstance(getToggleButton);
       if (isUpOrDownEvent) {
         event.stopPropagation();
@@ -3017,11 +3251,11 @@
    * Data API implementation
    */
 
-  EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE$1, Dropdown.dataApiKeydownHandler);
+  EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE$2, Dropdown.dataApiKeydownHandler);
   EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_MENU, Dropdown.dataApiKeydownHandler);
-  EventHandler.on(document, EVENT_CLICK_DATA_API$1, Dropdown.clearMenus);
+  EventHandler.on(document, EVENT_CLICK_DATA_API$2, Dropdown.clearMenus);
   EventHandler.on(document, EVENT_KEYUP_DATA_API, Dropdown.clearMenus);
-  EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_DATA_TOGGLE$1, function (event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$2, function (event) {
     event.preventDefault();
     Dropdown.getOrCreateInstance(this).toggle();
   });
@@ -3044,10 +3278,10 @@
    * Constants
    */
 
-  const NAME$2 = 'backdrop';
-  const CLASS_NAME_FADE$1 = 'fade';
-  const CLASS_NAME_SHOW$1 = 'show';
-  const EVENT_MOUSEDOWN = `mousedown.bs.${NAME$2}`;
+  const NAME$3 = 'backdrop';
+  const CLASS_NAME_FADE$2 = 'fade';
+  const CLASS_NAME_SHOW$2 = 'show';
+  const EVENT_MOUSEDOWN = `mousedown.bs.${NAME$3}`;
   const Default$2 = {
     className: 'modal-backdrop',
     clickCallback: null,
@@ -3084,7 +3318,7 @@
       return DefaultType$2;
     }
     static get NAME() {
-      return NAME$2;
+      return NAME$3;
     }
 
     // Public
@@ -3098,7 +3332,7 @@
       if (this._config.isAnimated) {
         reflow(element);
       }
-      element.classList.add(CLASS_NAME_SHOW$1);
+      element.classList.add(CLASS_NAME_SHOW$2);
       this._emulateAnimation(() => {
         execute(callback);
       });
@@ -3108,7 +3342,7 @@
         execute(callback);
         return;
       }
-      this._getElement().classList.remove(CLASS_NAME_SHOW$1);
+      this._getElement().classList.remove(CLASS_NAME_SHOW$2);
       this._emulateAnimation(() => {
         this.dispose();
         execute(callback);
@@ -3129,7 +3363,7 @@
         const backdrop = document.createElement('div');
         backdrop.className = this._config.className;
         if (this._config.isAnimated) {
-          backdrop.classList.add(CLASS_NAME_FADE$1);
+          backdrop.classList.add(CLASS_NAME_FADE$2);
         }
         this._element = backdrop;
       }
@@ -3193,11 +3427,11 @@
    * Constants
    */
 
-  const NAME$1 = 'focustrap';
-  const DATA_KEY$1 = 'bs.focustrap';
-  const EVENT_KEY$1 = `.${DATA_KEY$1}`;
-  const EVENT_FOCUSIN = `focusin${EVENT_KEY$1}`;
-  const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$1}`;
+  const NAME$2 = 'focustrap';
+  const DATA_KEY$2 = 'bs.focustrap';
+  const EVENT_KEY$2 = `.${DATA_KEY$2}`;
+  const EVENT_FOCUSIN = `focusin${EVENT_KEY$2}`;
+  const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$2}`;
   const TAB_KEY = 'Tab';
   const TAB_NAV_FORWARD = 'forward';
   const TAB_NAV_BACKWARD = 'backward';
@@ -3230,7 +3464,7 @@
       return DefaultType$1;
     }
     static get NAME() {
-      return NAME$1;
+      return NAME$2;
     }
 
     // Public
@@ -3241,7 +3475,7 @@
       if (this._config.autofocus) {
         this._config.trapElement.focus();
       }
-      EventHandler.off(document, EVENT_KEY$1); // guard against infinite focus loop
+      EventHandler.off(document, EVENT_KEY$2); // guard against infinite focus loop
       EventHandler.on(document, EVENT_FOCUSIN, event => this._handleFocusin(event));
       EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event));
       this._isActive = true;
@@ -3251,7 +3485,7 @@
         return;
       }
       this._isActive = false;
-      EventHandler.off(document, EVENT_KEY$1);
+      EventHandler.off(document, EVENT_KEY$2);
     }
 
     // Private
@@ -3389,29 +3623,29 @@
    * Constants
    */
 
-  const NAME = 'modal';
-  const DATA_KEY = 'bs.modal';
-  const EVENT_KEY = `.${DATA_KEY}`;
+  const NAME$1 = 'modal';
+  const DATA_KEY$1 = 'bs.modal';
+  const EVENT_KEY$1 = `.${DATA_KEY$1}`;
   const DATA_API_KEY = '.data-api';
   const ESCAPE_KEY = 'Escape';
-  const EVENT_HIDE = `hide${EVENT_KEY}`;
-  const EVENT_HIDE_PREVENTED = `hidePrevented${EVENT_KEY}`;
-  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
-  const EVENT_SHOW = `show${EVENT_KEY}`;
-  const EVENT_SHOWN = `shown${EVENT_KEY}`;
-  const EVENT_RESIZE = `resize${EVENT_KEY}`;
-  const EVENT_CLICK_DISMISS = `click.dismiss${EVENT_KEY}`;
-  const EVENT_MOUSEDOWN_DISMISS = `mousedown.dismiss${EVENT_KEY}`;
-  const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
+  const EVENT_HIDE$1 = `hide${EVENT_KEY$1}`;
+  const EVENT_HIDE_PREVENTED = `hidePrevented${EVENT_KEY$1}`;
+  const EVENT_HIDDEN$1 = `hidden${EVENT_KEY$1}`;
+  const EVENT_SHOW$1 = `show${EVENT_KEY$1}`;
+  const EVENT_SHOWN$1 = `shown${EVENT_KEY$1}`;
+  const EVENT_RESIZE = `resize${EVENT_KEY$1}`;
+  const EVENT_CLICK_DISMISS = `click.dismiss${EVENT_KEY$1}`;
+  const EVENT_MOUSEDOWN_DISMISS = `mousedown.dismiss${EVENT_KEY$1}`;
+  const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY$1}`;
+  const EVENT_CLICK_DATA_API$1 = `click${EVENT_KEY$1}${DATA_API_KEY}`;
   const CLASS_NAME_OPEN = 'modal-open';
-  const CLASS_NAME_FADE = 'fade';
-  const CLASS_NAME_SHOW = 'show';
+  const CLASS_NAME_FADE$1 = 'fade';
+  const CLASS_NAME_SHOW$1 = 'show';
   const CLASS_NAME_STATIC = 'modal-static';
   const OPEN_SELECTOR = '.modal.show';
   const SELECTOR_DIALOG = '.modal-dialog';
   const SELECTOR_MODAL_BODY = '.modal-body';
-  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="modal"]';
+  const SELECTOR_DATA_TOGGLE$1 = '[data-bs-toggle="modal"]';
   const Default = {
     backdrop: true,
     focus: true,
@@ -3447,7 +3681,7 @@
       return DefaultType;
     }
     static get NAME() {
-      return NAME;
+      return NAME$1;
     }
 
     // Public
@@ -3458,7 +3692,7 @@
       if (this._isShown || this._isTransitioning) {
         return;
       }
-      const showEvent = EventHandler.trigger(this._element, EVENT_SHOW, {
+      const showEvent = EventHandler.trigger(this._element, EVENT_SHOW$1, {
         relatedTarget
       });
       if (showEvent.defaultPrevented) {
@@ -3475,19 +3709,19 @@
       if (!this._isShown || this._isTransitioning) {
         return;
       }
-      const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE);
+      const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE$1);
       if (hideEvent.defaultPrevented) {
         return;
       }
       this._isShown = false;
       this._isTransitioning = true;
       this._focustrap.deactivate();
-      this._element.classList.remove(CLASS_NAME_SHOW);
+      this._element.classList.remove(CLASS_NAME_SHOW$1);
       this._queueCallback(() => this._hideModal(), this._element, this._isAnimated());
     }
     dispose() {
-      EventHandler.off(window, EVENT_KEY);
-      EventHandler.off(this._dialog, EVENT_KEY);
+      EventHandler.off(window, EVENT_KEY$1);
+      EventHandler.off(this._dialog, EVENT_KEY$1);
       this._backdrop.dispose();
       this._focustrap.deactivate();
       super.dispose();
@@ -3524,13 +3758,13 @@
         modalBody.scrollTop = 0;
       }
       reflow(this._element);
-      this._element.classList.add(CLASS_NAME_SHOW);
+      this._element.classList.add(CLASS_NAME_SHOW$1);
       const transitionComplete = () => {
         if (this._config.focus) {
           this._focustrap.activate();
         }
         this._isTransitioning = false;
-        EventHandler.trigger(this._element, EVENT_SHOWN, {
+        EventHandler.trigger(this._element, EVENT_SHOWN$1, {
           relatedTarget
         });
       };
@@ -3578,11 +3812,11 @@
         document.body.classList.remove(CLASS_NAME_OPEN);
         this._resetAdjustments();
         this._scrollBar.reset();
-        EventHandler.trigger(this._element, EVENT_HIDDEN);
+        EventHandler.trigger(this._element, EVENT_HIDDEN$1);
       });
     }
     _isAnimated() {
-      return this._element.classList.contains(CLASS_NAME_FADE);
+      return this._element.classList.contains(CLASS_NAME_FADE$1);
     }
     _triggerBackdropTransition() {
       const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED);
@@ -3649,17 +3883,17 @@
    * Data API implementation
    */
 
-  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$1, SELECTOR_DATA_TOGGLE$1, function (event) {
     const target = SelectorEngine.getElementFromSelector(this);
     if (['A', 'AREA'].includes(this.tagName)) {
       event.preventDefault();
     }
-    EventHandler.one(target, EVENT_SHOW, showEvent => {
+    EventHandler.one(target, EVENT_SHOW$1, showEvent => {
       if (showEvent.defaultPrevented) {
         // only register focus restorer if modal will actually get shown
         return;
       }
-      EventHandler.one(target, EVENT_HIDDEN, () => {
+      EventHandler.one(target, EVENT_HIDDEN$1, () => {
         if (isVisible(this)) {
           this.focus();
         }
@@ -3684,15 +3918,281 @@
 
   /**
    * --------------------------------------------------------------------------
+   * Bootstrap tab.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME = 'tab';
+  const DATA_KEY = 'bs.tab';
+  const EVENT_KEY = `.${DATA_KEY}`;
+  const EVENT_HIDE = `hide${EVENT_KEY}`;
+  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
+  const EVENT_SHOW = `show${EVENT_KEY}`;
+  const EVENT_SHOWN = `shown${EVENT_KEY}`;
+  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`;
+  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
+  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`;
+  const ARROW_LEFT_KEY = 'ArrowLeft';
+  const ARROW_RIGHT_KEY = 'ArrowRight';
+  const ARROW_UP_KEY = 'ArrowUp';
+  const ARROW_DOWN_KEY = 'ArrowDown';
+  const HOME_KEY = 'Home';
+  const END_KEY = 'End';
+  const CLASS_NAME_ACTIVE = 'active';
+  const CLASS_NAME_FADE = 'fade';
+  const CLASS_NAME_SHOW = 'show';
+  const CLASS_DROPDOWN = 'dropdown';
+  const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
+  const SELECTOR_DROPDOWN_MENU = '.dropdown-menu';
+  const NOT_SELECTOR_DROPDOWN_TOGGLE = `:not(${SELECTOR_DROPDOWN_TOGGLE})`;
+  const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
+  const SELECTOR_OUTER = '.nav-item, .list-group-item';
+  const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;
+  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]'; // TODO: could only be `tab` in v6
+  const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
+  const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-bs-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="list"]`;
+
+  /**
+   * Class definition
+   */
+
+  class Tab extends BaseComponent {
+    constructor(element) {
+      super(element);
+      this._parent = this._element.closest(SELECTOR_TAB_PANEL);
+      if (!this._parent) {
+        return;
+        // TODO: should throw exception in v6
+        // throw new TypeError(`${element.outerHTML} has not a valid parent ${SELECTOR_INNER_ELEM}`)
+      }
+
+      // Set up initial aria attributes
+      this._setInitialAttributes(this._parent, this._getChildren());
+      EventHandler.on(this._element, EVENT_KEYDOWN, event => this._keydown(event));
+    }
+
+    // Getters
+    static get NAME() {
+      return NAME;
+    }
+
+    // Public
+    show() {
+      // Shows this elem and deactivate the active sibling if exists
+      const innerElem = this._element;
+      if (this._elemIsActive(innerElem)) {
+        return;
+      }
+
+      // Search for active tab on same parent to deactivate it
+      const active = this._getActiveElem();
+      const hideEvent = active ? EventHandler.trigger(active, EVENT_HIDE, {
+        relatedTarget: innerElem
+      }) : null;
+      const showEvent = EventHandler.trigger(innerElem, EVENT_SHOW, {
+        relatedTarget: active
+      });
+      if (showEvent.defaultPrevented || hideEvent && hideEvent.defaultPrevented) {
+        return;
+      }
+      this._deactivate(active, innerElem);
+      this._activate(innerElem, active);
+    }
+
+    // Private
+    _activate(element, relatedElem) {
+      if (!element) {
+        return;
+      }
+      element.classList.add(CLASS_NAME_ACTIVE);
+      this._activate(SelectorEngine.getElementFromSelector(element)); // Search and activate/show the proper section
+
+      const complete = () => {
+        if (element.getAttribute('role') !== 'tab') {
+          element.classList.add(CLASS_NAME_SHOW);
+          return;
+        }
+        element.removeAttribute('tabindex');
+        element.setAttribute('aria-selected', true);
+        this._toggleDropDown(element, true);
+        EventHandler.trigger(element, EVENT_SHOWN, {
+          relatedTarget: relatedElem
+        });
+      };
+      this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE));
+    }
+    _deactivate(element, relatedElem) {
+      if (!element) {
+        return;
+      }
+      element.classList.remove(CLASS_NAME_ACTIVE);
+      element.blur();
+      this._deactivate(SelectorEngine.getElementFromSelector(element)); // Search and deactivate the shown section too
+
+      const complete = () => {
+        if (element.getAttribute('role') !== 'tab') {
+          element.classList.remove(CLASS_NAME_SHOW);
+          return;
+        }
+        element.setAttribute('aria-selected', false);
+        element.setAttribute('tabindex', '-1');
+        this._toggleDropDown(element, false);
+        EventHandler.trigger(element, EVENT_HIDDEN, {
+          relatedTarget: relatedElem
+        });
+      };
+      this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE));
+    }
+    _keydown(event) {
+      if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key)) {
+        return;
+      }
+      event.stopPropagation(); // stopPropagation/preventDefault both added to support up/down keys without scrolling the page
+      event.preventDefault();
+      const children = this._getChildren().filter(element => !isDisabled(element));
+      let nextActiveElement;
+      if ([HOME_KEY, END_KEY].includes(event.key)) {
+        nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1];
+      } else {
+        const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key);
+        nextActiveElement = getNextActiveElement(children, event.target, isNext, true);
+      }
+      if (nextActiveElement) {
+        nextActiveElement.focus({
+          preventScroll: true
+        });
+        Tab.getOrCreateInstance(nextActiveElement).show();
+      }
+    }
+    _getChildren() {
+      // collection of inner elements
+      return SelectorEngine.find(SELECTOR_INNER_ELEM, this._parent);
+    }
+    _getActiveElem() {
+      return this._getChildren().find(child => this._elemIsActive(child)) || null;
+    }
+    _setInitialAttributes(parent, children) {
+      this._setAttributeIfNotExists(parent, 'role', 'tablist');
+      for (const child of children) {
+        this._setInitialAttributesOnChild(child);
+      }
+    }
+    _setInitialAttributesOnChild(child) {
+      child = this._getInnerElement(child);
+      const isActive = this._elemIsActive(child);
+      const outerElem = this._getOuterElement(child);
+      child.setAttribute('aria-selected', isActive);
+      if (outerElem !== child) {
+        this._setAttributeIfNotExists(outerElem, 'role', 'presentation');
+      }
+      if (!isActive) {
+        child.setAttribute('tabindex', '-1');
+      }
+      this._setAttributeIfNotExists(child, 'role', 'tab');
+
+      // set attributes to the related panel too
+      this._setInitialAttributesOnTargetPanel(child);
+    }
+    _setInitialAttributesOnTargetPanel(child) {
+      const target = SelectorEngine.getElementFromSelector(child);
+      if (!target) {
+        return;
+      }
+      this._setAttributeIfNotExists(target, 'role', 'tabpanel');
+      if (child.id) {
+        this._setAttributeIfNotExists(target, 'aria-labelledby', `${child.id}`);
+      }
+    }
+    _toggleDropDown(element, open) {
+      const outerElem = this._getOuterElement(element);
+      if (!outerElem.classList.contains(CLASS_DROPDOWN)) {
+        return;
+      }
+      const toggle = (selector, className) => {
+        const element = SelectorEngine.findOne(selector, outerElem);
+        if (element) {
+          element.classList.toggle(className, open);
+        }
+      };
+      toggle(SELECTOR_DROPDOWN_TOGGLE, CLASS_NAME_ACTIVE);
+      toggle(SELECTOR_DROPDOWN_MENU, CLASS_NAME_SHOW);
+      outerElem.setAttribute('aria-expanded', open);
+    }
+    _setAttributeIfNotExists(element, attribute, value) {
+      if (!element.hasAttribute(attribute)) {
+        element.setAttribute(attribute, value);
+      }
+    }
+    _elemIsActive(elem) {
+      return elem.classList.contains(CLASS_NAME_ACTIVE);
+    }
+
+    // Try to get the inner element (usually the .nav-link)
+    _getInnerElement(elem) {
+      return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine.findOne(SELECTOR_INNER_ELEM, elem);
+    }
+
+    // Try to get the outer element (usually the .nav-item)
+    _getOuterElement(elem) {
+      return elem.closest(SELECTOR_OUTER) || elem;
+    }
+
+    // Static
+    static jQueryInterface(config) {
+      return this.each(function () {
+        const data = Tab.getOrCreateInstance(this);
+        if (typeof config !== 'string') {
+          return;
+        }
+        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config]();
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
+    if (['A', 'AREA'].includes(this.tagName)) {
+      event.preventDefault();
+    }
+    if (isDisabled(this)) {
+      return;
+    }
+    Tab.getOrCreateInstance(this).show();
+  });
+
+  /**
+   * Initialize on focus
+   */
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE_ACTIVE)) {
+      Tab.getOrCreateInstance(element);
+    }
+  });
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Tab);
+
+  /**
+   * --------------------------------------------------------------------------
    * Bootstrap index.umd.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
 
-  //import Offcanvas from './src/offcanvas.js'
-  // import Popover from './src/popover.js'
-  //import ScrollSpy from './src/scrollspy.js'
-  //import Tab from './src/tab.js'
   //import Toast from './src/toast.js'
   //import Tooltip from './src/tooltip.js'
 
@@ -3700,13 +4200,13 @@
     // Alert,
     Button,
     // Carousel,
-    // Collapse,
+    Collapse,
     Dropdown,
-    Modal
+    Modal,
     // Offcanvas,
     // Popover,
     // ScrollSpy,
-    // Tab,
+    Tab
     // Toast,
     // Tooltip
   };
