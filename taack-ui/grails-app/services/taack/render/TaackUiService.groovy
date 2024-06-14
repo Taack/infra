@@ -169,7 +169,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null) {
-        if (params.boolean("isAjax") && !menu) {
+        if (params.boolean("isAjax")) {
             render visit(block, true)
         } else {
             ThemeSelector themeSelector = themeService.themeSelector

@@ -156,7 +156,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier) {
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement,id,  parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)

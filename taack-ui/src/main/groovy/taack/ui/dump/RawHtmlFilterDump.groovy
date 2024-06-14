@@ -23,16 +23,19 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     final private Parameter parameter
     final private List<Triple<String, ButtonStyle, String>> filterActions = []
+    final String blockId
 
     IFormTheme formThemed
     IHTMLElement topElement
 
 
-    RawHtmlFilterDump(final IHTMLElement topElement, final Parameter parameter) {
+    RawHtmlFilterDump(final IHTMLElement topElement, final String id, final Parameter parameter) {
         this.topElement = topElement
         this.parameter = parameter
         filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
         filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
+        this.blockId = id ?: '' + parameter.modalId
+
     }
 
     static String getQualifiedName(final FieldInfo fieldInfo) {
@@ -54,7 +57,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true)
         topElement.setTaackTag(TaackTag.FILTER)
         topElement.addChildren(
-                formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+                formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
                         new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                         new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                         new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),

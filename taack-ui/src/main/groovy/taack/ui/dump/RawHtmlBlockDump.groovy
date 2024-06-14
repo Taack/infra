@@ -98,8 +98,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (!parameter.isAjaxRendering || isModal) {
             ajaxBlockId = id
         }
-//        if (isModalRefresh) out << "__ajaxBlockStart__$id:"
-        if (isModalRefresh) topElement = block.blockAjax(topElement, id)
+        if (isModalRefresh) {
+            topElement.setTaackTag(TaackTag.AJAX_BLOCK)
+            topElement = block.blockAjax(topElement, id)
+        }
     }
 
     @Override
@@ -118,7 +120,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitShow(final UiShowSpecifier uiShowSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
-        visitColEnd()
     }
 
     @Override
@@ -150,7 +151,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                           final UiFilterSpecifier filterSpecifier,
                           final UiTableSpecifier tableSpecifier) {
         visitCol(BlockSpec.Width.QUARTER)
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, id, parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
         tableSpecifier.visitTable(new RawHtmlTableDump(topElement, id, parameter))
@@ -165,7 +166,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitDiagramFilter(final UiDiagramSpecifier diagramSpecifier, final UiFilterSpecifier filterSpecifier) {
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement, id, parameter))
     }
 
     @Override
@@ -190,6 +191,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitBlockTab(final String i18n) {
         currentTabNames << i18n
+        topElement.setTaackTag(TaackTag.TAB)
         topElement = block.tab(topElement, ++tabOccurrence)
     }
 

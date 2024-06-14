@@ -39,7 +39,7 @@ class BootstrapLayout {
 
     static IHTMLElement tab(IHTMLElement topElement, int occ) {
         topElement.builder.addChildren(
-                new HTMLDiv().builder.setTaackTag(TaackTag.TAB).addClasses('tab' + occ).build()
+                new HTMLDiv().builder.addClasses('tab' + occ).build()
         )
         topElement.children.last()
     }

@@ -68,6 +68,22 @@ trait IHTMLElement {
         ret
     }
 
+    List<IHTMLElement> getParents() {
+        IHTMLElement ret = this
+        List<IHTMLElement> ltt = []
+        while (ret.parent) {
+            ret = ret.parent
+            ltt << ret
+        }
+        ltt
+    }
+
+    @Override
+    String toString() {
+        List<IHTMLElement> p = parents
+        """IHTMLElement ${this.tag + ':' + this.taackTag + ':' + this.attributes}, ${p*.tag}, ${p*.taackTag}"""
+    }
+
     String indent() {
         String ret = "    "
         IHTMLElement p = this

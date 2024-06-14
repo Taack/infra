@@ -14,6 +14,7 @@ import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.InputType
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.layout.BootstrapLayout
+import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dsl.form.FormSpec
 import taack.ui.dsl.form.IUiFormVisitor
@@ -228,6 +229,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTab(String name) {
+        topElement.setTaackTag(TaackTag.TAB)
         topElement = BootstrapLayout.tab(topElement, ++tabOccurrence)
     }
 
@@ -273,6 +275,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitCol() {
+        topElement.setTaackTag(TaackTag.COL)
         topElement = BootstrapLayout.col(topElement)
     }
 
@@ -283,6 +286,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitRow() {
+        topElement.setTaackTag(TaackTag.ROW)
         topElement = BootstrapLayout.row(topElement)
     }
 

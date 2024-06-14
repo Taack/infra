@@ -102,7 +102,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitPaginate(Number max, Number count) {
-        if (max != 0)
+        if (count > max) {
             topElement.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
                     .putAttribute('taackMax', max?.toString())
@@ -110,6 +110,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
                     .putAttribute('taackCount', count?.toString())
                     .build()
             )
+        }
     }
 
     @Override

@@ -7,6 +7,8 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.html.element.*
+import taack.ui.dump.html.style.DisplayBlock
+import taack.ui.dump.html.style.DisplayInlineBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
 
@@ -51,7 +53,9 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
-        if (!url) return new HTMLTxtContent(cell)
+        if (!url) return new HTMLSpan().builder
+                .setStyle(new DisplayBlock())
+                .addChildren(new HTMLTxtContent(cell)).build()
         return new HTMLAnchor(true, url).builder.addChildren(
                 new HTMLTxtContent(cell)
         ).build()
