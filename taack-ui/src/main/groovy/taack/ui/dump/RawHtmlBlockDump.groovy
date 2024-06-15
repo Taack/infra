@@ -118,7 +118,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitAjaxBlock(final String id) {
-        enterBlock('visitAjaxBlock ' + id)
+        enterBlock('visitAjaxBlock id: ' + id)
         if (!parameter.isAjaxRendering || isModal) {
             ajaxBlockId = id
         }
@@ -130,7 +130,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitAjaxBlockEnd() {
-        exitBlock('visitAjaxBlockEnd ' + ajaxBlockId)
+        exitBlock('visitAjaxBlockEnd ajaxBlockId: ' + ajaxBlockId)
         if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
         if (isModalRefresh) topElement = topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
     }
