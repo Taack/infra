@@ -86,7 +86,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockEnd() {
         exitBlock('visitBlockEnd')
         if (!parameter.isAjaxRendering || isModal) {
-            topElement = topElement.toParentTaackTag(TaackTag.BLOCK, TaackTag.MENU_BLOCK)
+            topElement = topElement.toParentTaackTag(TaackTag.BLOCK)
         }
     }
 
@@ -299,8 +299,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
-        if (hasClosure) enterBlock('visitMenuLabel')
-        else stayBlock('visitMenuLabel')
+        if (hasClosure) enterBlock('visitMenuLabel ' + i18n)
+        else stayBlock('visitMenuLabel ' + i18n)
         topElement.setTaackTag(TaackTag.LABEL)
         topElement = menu.label(topElement, i18n, hasClosure)
     }
@@ -361,13 +361,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
-        stayBlock('visitLabeledSubMenu')
+        stayBlock('visitLabeledSubMenu ' + i18n)
         topElement = menu.menu(topElement, i18n, parameter.isAjaxRendering, parameter.urlMapped(controller, action, params))
     }
 
     @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
-        enterBlock('visitMenuSection')
+        enterBlock('visitMenuSection ' + i18n)
         menu.section(topElement, i18n)
     }
 
@@ -379,8 +379,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
-        stayBlock('visitSubMenuIcon')
         i18n ?= parameter.trField(controller, action)
+        stayBlock('visitSubMenuIcon ' + i18n)
         if (!topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
             splitMenu()
         }
