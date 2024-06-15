@@ -80,8 +80,10 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
 
     fun refresh() {
         Helper.traceIndent("AjaxBlock::refresh +++ blockId: $blockId")
-        filters = Filter.getSiblingFilterBlock(this).map { it.filterId to it }.toMap()
-        tables = Table.getSiblingTable(this).map { it.tableId to it }.toMap()
+        filters = Filter.getSiblingFilterBlock(this).map { it.filterId + blockId to it }.toMap()
+        println("filters: $filters")
+        println("filters: ${filters.keys}")
+        tables = Table.getSiblingTable(this).map { it.tableId + blockId to it }.toMap()
         forms = Form.getSiblingForm(this)
         shows = Show.getSiblingShow(this)
         for (i in 0 until innerScripts.length) {

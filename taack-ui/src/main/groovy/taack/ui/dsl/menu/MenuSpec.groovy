@@ -30,10 +30,6 @@ final class MenuSpec {
         TOP_LEFT, BOTTOM_RIGHT
     }
 
-    void menuStart(final MenuMode menuMode) {
-        menuVisitor.visitMenuStart(menuMode)
-    }
-
     void label(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure = null) {
         if (closure) {
             menuVisitor.visitMenuLabel(i18n, true)

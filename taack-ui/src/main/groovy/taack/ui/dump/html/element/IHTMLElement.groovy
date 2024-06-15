@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException
 enum TaackTag {
     BLOCK,
     MENU,
+    MODAL,
     MENU_SPLIT,
     MENU_OPTION,
     MENU_COL,
@@ -56,6 +57,7 @@ trait IHTMLElement {
     }
 
     IHTMLElement toParentTaackTag(TaackTag... taackTags) {
+        if (taackTags.contains(taackTag)) return this
         IHTMLElement ret = this
         List<IHTMLElement> ltt = []
         while (ret && !taackTags.contains(ret.taackTag)) {
@@ -66,6 +68,15 @@ trait IHTMLElement {
             throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.tag + ':' + this.taackTag + ':' + this.attributes} has no parent ${taackTags}, tags = ${ltt*.tag}, ltt = ${ltt*.taackTag}")
         }
         ret
+    }
+
+    boolean testParentTaackTag(TaackTag... taackTags) {
+        if (taackTags.contains(taackTag)) return true
+        IHTMLElement ret = this
+        while (ret && !taackTags.contains(ret.taackTag)) {
+            ret = ret.parent
+        }
+        taackTags.contains ret?.taackTag
     }
 
     List<IHTMLElement> getParents() {

@@ -18,12 +18,14 @@ final class BootstrapMenu implements IHTMLElement {
 
 
     IHTMLElement menuStart(IHTMLElement topElement = null) {
+        IHTMLElement bootstrapMenu = this//new BootstrapMenu(themeMode, themeSize)
+        children = []
         topElement.addChildren(
-                this.builder.addChildren(
+                bootstrapMenu.builder.addChildren(
                         new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').build()
                 ).build()
         )
-        return this.children.first()
+        return bootstrapMenu.children.first()
     }
 
     static IHTMLElement splitMenuStart(IHTMLElement topElement) {
@@ -37,7 +39,7 @@ final class BootstrapMenu implements IHTMLElement {
         if (hasClosure) {
             HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build() as HTMLUl
             topElement.addChildren(
-                    new HTMLLi().builder.addClasses('nav-item', 'dropdown').setTaackTag(TaackTag.LABEL).addChildren(
+                    new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
                             new HTMLAnchor(false, '#').builder
                                     .addClasses('nav-link', 'dropdown-toggle')
                                     .putAttribute('role', 'button')
@@ -122,7 +124,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     static IHTMLElement menuOptions(IHTMLElement topElement, String img, String value) {
         topElement.builder.addChildren(
-                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').setTaackTag(TaackTag.MENU_OPTION).addChildren(
+                new HTMLUl().builder.addClasses('navbar-nav', 'flex-row', 'ml-md-auto').addChildren(
                         new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
                                 new HTMLAnchor(false, '#').builder
                                         .addClasses('nav-link', 'dropdown-toggle')

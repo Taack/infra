@@ -234,7 +234,7 @@ class CrewController implements WebAttributes {
             modal {
                 table crewUiService.buildRoleTable(user)
             }
-        }, buildMenu())
+        })
     }
 
     @Secured("ROLE_ADMIN")

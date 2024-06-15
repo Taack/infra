@@ -88,11 +88,14 @@ class Helper {
             val fi = ":__FieldInfo__:"
             val fie = ":__FieldInfoEnd__"
             val rel = "__reload__"
+            val openModal = "__openModal__:"
+            val refreshModal = "__refreshModal__:"
             val block = base.getParentBlock()
             when {
                 text.contains(rel) -> {
                     window.location.href = (Block.href ?: "")
                 }
+
                 text.startsWith(m) -> {
                     val pos = text.indexOf(':', m.length)
                     if (text[m.length] != ':' || text.subSequence(text.length - fie.length, text.length) == fie) {
@@ -100,7 +103,8 @@ class Helper {
                         if (processingStack.isNotEmpty()) {
                             trace("Helper::process")
                             val id = text.substring(m.length, pos)
-                            val value = if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
+                            val value =
+                                if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
                             var otherField = emptyMap<String, String>()
                             while (posField != -1) {
                                 val endFieldNameIndex = text.indexOf(':', posField + fi.length)
@@ -126,12 +130,14 @@ class Helper {
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
                 }
+
                 text.startsWith(m2) -> {
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
                     if (text.substring(29).startsWith(abs)) {
                         mapAjaxText(text.substring(29)).map {
-                            val target = block.ajaxBlockElements?.get(it.key) ?: block.parent!!.parent.ajaxBlockElements!![it.key]
+                            val target = block.ajaxBlockElements?.get(it.key)
+                                ?: block.parent!!.parent.ajaxBlockElements!![it.key]
                             target!!.d.innerHTML = it.value
                             target.refresh()
                         }
@@ -143,6 +149,7 @@ class Helper {
                         window.location.href = Block.href ?: ""
                     }
                 }
+
                 text.startsWith(abs) -> {
                     mapAjaxText(text).map {
                         val target = block.ajaxBlockElements.get(it.key)
@@ -150,14 +157,28 @@ class Helper {
                         target.refresh()
                     }
                 }
-                else -> {
-                    trace("Helper::open modal")
+                text.startsWith(openModal) -> {
+                    trace("Helper::opening modal ...")
                     if (process != null) {
                         processingStack.add(process)
                     }
                     block.modal.open(text)
                     val s = block.modal.dModalBody.getElementsByTagName("script").asList()
                     trace("Executing $s")
+                }
+                text.startsWith(refreshModal) -> {
+                    trace("Helper::refresh modal")
+                    if (process != null) {
+                        processingStack.add(process)
+                    }
+                    block.modal.dModalBody.innerHTML = text
+                    val s = block.modal.dModalBody.getElementsByTagName("script").asList()
+                    trace("Executing $s")
+
+                }
+                else -> {
+                    trace("Helper::update current block")
+                    base.getParentBlock().updateContent(text)
                 }
             }
         }

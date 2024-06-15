@@ -35,8 +35,8 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitTableWithoutFilter() {
         IHTMLElement table = themableTable.table(topElement, blockId)
-        new HTMLEmpty().addChildren(
-                new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.setTaackTag(TaackTag.FILTER).addClasses('filter', 'rounded-3').putAttribute('taackFilterId', parameter.modalId?.toString()).addChildren(
+        new HTMLEmpty().builder.setTaackTag(TaackTag.FILTER).addChildren(
+                new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
                         new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                         new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                         new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
@@ -64,7 +64,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitFieldHeader(final String i18n) {
         topElement.addChildren(
-                new HTMLSpan().builder.setStyle(new DisplayInlineBlock()).addChildren(
+                new HTMLSpan().builder.setStyle(new DisplayBlock()).addChildren(
                         new HTMLTxtContent("${i18n}")
                 ).build()
         )
