@@ -19,7 +19,6 @@ final class ThemableTable {
 
     static IHTMLElement table(IHTMLElement topElement, String blockId) {
         HTMLTable htmlTable = new HTMLTable()
-        htmlTable.setTaackTag(TaackTag.TABLE)
         htmlTable.classes = ['table', 'table-striped', 'table-hover', 'table-bordered']
         htmlTable.attributes.put('taackTableId', blockId)
         topElement.addChildren(

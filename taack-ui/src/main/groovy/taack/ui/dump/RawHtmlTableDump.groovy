@@ -7,6 +7,7 @@ import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.common.CommonRawHtmlTableDump
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.HTMLEmpty
@@ -19,23 +20,23 @@ import taack.ui.dump.html.table.HTMLTr
 final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     final String blockId
-    private static Integer currentFormId = 0
 
-    RawHtmlTableDump(final IHTMLElement topElement, final String id, final Parameter parameter) {
-        super(topElement, parameter)
+    RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
+        super(blockLog, parameter)
         this.blockId = id ?: '' + parameter.modalId
-        currentFormId++
     }
 
     @Override
     void visitTable() {
-        topElement = themableTable.table(topElement, blockId)
+        blockLog.topElement.setTaackTag(TaackTag.TABLE)
+        blockLog.topElement = themableTable.table(blockLog.topElement, blockId)
     }
 
     @Override
     void visitTableWithoutFilter() {
-        IHTMLElement table = themableTable.table(topElement, blockId)
-        new HTMLEmpty().builder.setTaackTag(TaackTag.FILTER).addChildren(
+        IHTMLElement table = themableTable.table(blockLog.topElement, blockId)
+        blockLog.topElement.setTaackTag(TaackTag.TABLE)
+        blockLog.topElement.addChildren(
                 new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
                         new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                         new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
@@ -47,14 +48,13 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
                 ).build(),
                 table
         )
-        topElement = table
     }
 
 
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
-        topElement.addChildren(
+        blockLog.topElement.addChildren(
                 new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
                         new HTMLTxtContent("<a>${i18n}</a>")
                 ).build()
@@ -63,7 +63,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitFieldHeader(final String i18n) {
-        topElement.addChildren(
+        blockLog.topElement.addChildren(
                 new HTMLSpan().builder.setStyle(new DisplayBlock()).addChildren(
                         new HTMLTxtContent("${i18n}")
                 ).build()
@@ -92,7 +92,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowField(final String value, final Style style) {
-        topElement.addChildren(displayCell(value, style, null, firstInCol, isInCol))
+        blockLog.topElement.addChildren(displayCell(value, style, null, firstInCol, isInCol))
     }
 
     @Override
@@ -103,7 +103,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitPaginate(Number max, Number count) {
         if (count > max) {
-            topElement.addChildren(new HTMLDiv().builder
+            blockLog.topElement.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
                     .putAttribute('taackMax', max?.toString())
                     .putAttribute('taackOffset', parameter.params.long('offset')?.toString())
@@ -124,7 +124,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
         String name = RawHtmlFilterDump.getQualifiedName(fields)
 
-        topElement.addChildren(
+        blockLog.topElement.addChildren(
                 new HTMLSpan().builder.addClasses('sortColumn', 'taackGroupableColumn')
                         .putAttribute('groupField', name).addChildren(
                         new HTMLTxtContent("""<a style="display: inline;">${i18n}</a><input type="checkbox"/>""")
@@ -137,7 +137,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
         stripped = 0
 
-        topElement.addChildren(new HTMLTr().builder
+        blockLog.topElement.addChildren(new HTMLTr().builder
                 .addClasses('taackRowGroupHeader', "taackRowGroupHeader-$level")
                 .addChildren(
                         new HTMLTd(colCount).builder.addChildren(
@@ -151,7 +151,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowGroupFooter(String content) {
-        topElement.addChildren(new HTMLTr().builder
+        blockLog.topElement.addChildren(new HTMLTr().builder
                 .addClasses('taackRowGroupFooter', "taackRowGroupFooter-$level")
                 .addChildren(
                         new HTMLTd(colCount).builder.addChildren(

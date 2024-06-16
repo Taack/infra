@@ -30,10 +30,10 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     int level = 0
     boolean firstInCol = false
 
-    IHTMLElement topElement
+    protected final BlockLog blockLog
 
-    CommonRawHtmlTableDump(final IHTMLElement topElement, final Parameter parameter) {
-        this.topElement = topElement
+    CommonRawHtmlTableDump(final BlockLog blockLog, final Parameter parameter) {
+        this.blockLog = blockLog
         this.parameter = parameter
         this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
     }
@@ -63,7 +63,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.TABLE)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
     }
 
     @Override
@@ -73,13 +73,13 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         if (isInHeader) {
             HTMLTh th = new HTMLTh(colSpan, rowSpan)
             th.setTaackTag(TaackTag.TABLE_COL)
-            topElement.addChildren(th)
-            topElement = th
+            blockLog.topElement.addChildren(th)
+            blockLog.topElement = th
         } else {
             HTMLTd th = new HTMLTd(colSpan, rowSpan)
             th.setTaackTag(TaackTag.TABLE_COL)
-            topElement.addChildren(th)
-            topElement = th
+            blockLog.topElement.addChildren(th)
+            blockLog.topElement = th
         }
     }
 
@@ -88,27 +88,27 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         isInHeader = true
         HTMLTr tr = new HTMLTr()
         tr.addClasses('align-middle')
-        topElement.addChildren(
+        blockLog.topElement.addChildren(
                 new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).addChildren(
                         tr
                 ).build()
         )
-        topElement = tr
+        blockLog.topElement = tr
     }
 
     @Override
     void visitHeaderEnd() {
         isInHeader = false
-        topElement = topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
         HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
-        topElement.addChildren(tb)
-        topElement = tb
+        blockLog.topElement.addChildren(tb)
+        blockLog.topElement = tb
     }
 
     @Override
     void visitColumnEnd() {
         isInCol = false
-        topElement = topElement.toParentTaackTag(TaackTag.TABLE_COL)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL)
     }
 
     @Override
@@ -122,8 +122,8 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
         }
-        topElement.addChildren(tr)
-        topElement = tr
+        blockLog.topElement.addChildren(tr)
+        blockLog.topElement = tr
     }
 
     void visitRowRO(Style style, boolean hasChildren) {
@@ -133,7 +133,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitRowEnd() {
         rowStyle = null
-        topElement = topElement.toParentTaackTag(TaackTag.TABLE_ROW)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_ROW)
     }
 
     @Override
@@ -153,7 +153,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitRowGroupHeader(String label) {
         stripped = 0
-        topElement.addChildren(
+        blockLog.topElement.addChildren(
                 new HTMLTr(colCount).builder.addClasses('taackRowGroupHeader', "taackRowGroupHeader-$level").addChildren(
                         new HTMLTd(colCount).builder.addChildren(
                                 new HTMLTxtContent("<em>$label</em>")
@@ -167,7 +167,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         i18n ?= parameter.trField(controller, action)
 
         params ?= [:]
-        topElement.addChildren(
+        blockLog.topElement.addChildren(
                 new HTMLDiv().builder.addChildren(
                         new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
                                 new HTMLTxtContent(actionIcon.getHtml(i18n))
@@ -180,8 +180,8 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
         isInCol = true
         HTMLTd td = new HTMLTd(colSpan, rowSpan)
-        topElement.addChildren(td)
-        topElement = td
+        blockLog.topElement.addChildren(td)
+        blockLog.topElement = td
 
         firstInCol = true
     }

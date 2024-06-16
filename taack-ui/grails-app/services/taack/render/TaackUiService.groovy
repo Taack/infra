@@ -124,7 +124,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     String visit(final UiBlockSpecifier blockSpecifier, final boolean isAjaxRendering = false) {
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(isAjaxRendering, LocaleContextHolder.locale, messageSource))
         blockSpecifier.visitBlock(htmlBlock)
-        htmlBlock.topElement.output
+        htmlBlock.output
     }
 
     /**
@@ -429,7 +429,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         blockSpecifier.visitBlock(htmlPdf)
 
         String html = g.render template: "/taackUi/block-mail", model: [
-                block: htmlPdf.topElement.output,
+                block: htmlPdf.output,
                 root : taackUiPluginConfiguration.root
         ]
         html
