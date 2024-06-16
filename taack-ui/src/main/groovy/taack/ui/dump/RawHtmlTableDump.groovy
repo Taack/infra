@@ -28,12 +28,14 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitTable() {
+        blockLog.enterBlock('visitTable')
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
         blockLog.topElement = themableTable.table(blockLog.topElement, blockId)
     }
 
     @Override
     void visitTableWithoutFilter() {
+        blockLog.enterBlock('visitTableWithoutFilter')
         IHTMLElement table = themableTable.table(blockLog.topElement, blockId)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
         blockLog.topElement.addChildren(
@@ -77,6 +79,7 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowColumnEnd() {
+        blockLog.exitBlock('visitRowColumnEnd')
         isInCol = false
     }
 

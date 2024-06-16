@@ -63,11 +63,13 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableEnd() {
+        blockLog.exitBlock('visitTableEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
     }
 
     @Override
     void visitColumn(Integer colSpan, Integer rowSpan) {
+        blockLog.enterBlock('visitColumn')
         colCount++
         isInCol = true
         if (isInHeader) {
@@ -85,6 +87,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitHeader() {
+        blockLog.enterBlock('visitHeader')
         isInHeader = true
         HTMLTr tr = new HTMLTr()
         tr.addClasses('align-middle')
@@ -98,6 +101,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitHeaderEnd() {
+        blockLog.exitBlock('visitHeaderEnd')
         isInHeader = false
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
         HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
@@ -107,12 +111,14 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitColumnEnd() {
+        blockLog.exitBlock('visitColumnEnd')
         isInCol = false
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL)
     }
 
     @Override
     void visitRow(Style style, boolean hasChildren) {
+        blockLog.enterBlock('visitRow')
         rowStyle = style
         stripped++
         HTMLTr tr = new HTMLTr()
@@ -132,17 +138,20 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowEnd() {
+        blockLog.exitBlock('visitRowEnd')
         rowStyle = null
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_ROW)
     }
 
     @Override
     void visitRowIndent() {
+        blockLog.enterBlock('visitRowIndent')
         indent++
     }
 
     @Override
     void visitRowIndentEnd() {
+        blockLog.exitBlock('visitRowIndentEnd')
         indent--
     }
 
@@ -178,6 +187,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
+        blockLog.enterBlock('visitRowColumn')
         isInCol = true
         HTMLTd td = new HTMLTd(colSpan, rowSpan)
         blockLog.topElement.addChildren(td)
