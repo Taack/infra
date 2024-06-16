@@ -50,6 +50,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         ThemeSelector ts = parameter.uiThemeService.themeSelector
         block = new BootstrapBlock(ts.themeMode, ts.themeSize)
         menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
+        blockLog = new BlockLog()
         blockLog.topElement = new HTMLEmpty()
         blockLog.topElement.setTaackTag(TaackTag.BLOCK)
     }
@@ -426,4 +427,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.exitBlock('visitMenuOptions')
     }
 
+    @Override
+    String getOutput() {
+        blockLog.topElement.output
+    }
 }
