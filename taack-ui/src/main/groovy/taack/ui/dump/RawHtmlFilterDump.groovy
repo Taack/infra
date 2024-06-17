@@ -33,7 +33,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         this.blockLog = blockLog
         this.parameter = parameter
         filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
-        filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
+//        filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
         this.blockId = id ?: '' + parameter.modalId
 
     }

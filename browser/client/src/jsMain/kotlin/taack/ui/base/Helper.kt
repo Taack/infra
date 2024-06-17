@@ -57,7 +57,7 @@ class Helper {
         }
 
         fun mapAjaxText(text: String): Map<String, String> {
-//            console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
+//            console.log("Mapping Ajax Content ... ${text}")
             console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
             val abs = "__ajaxBlockStart__"

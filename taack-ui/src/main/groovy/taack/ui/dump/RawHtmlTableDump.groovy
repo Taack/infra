@@ -48,8 +48,8 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
                         new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
                 ).build(),
-                table
         )
+        blockLog.topElement = table
     }
 
 
