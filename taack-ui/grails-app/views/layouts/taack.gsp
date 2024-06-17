@@ -1,7 +1,7 @@
-<%@ page import="taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
-<html lang="${lang}" data-bs-theme="${themeMode.name}">
+<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto" :"data-bs-theme=${themeMode.name}"}>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">

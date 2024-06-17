@@ -17,9 +17,23 @@ final class ThemableTable {
         this.themeSize = themeSize
     }
 
-    static IHTMLElement table(IHTMLElement topElement, String blockId) {
+    String getTableSized() {
+        switch (themeSize) {
+            case ThemeSize.NORMAL:
+                'table'
+                break
+            case ThemeSize.LG:
+                'table table-xl'
+                break
+            case ThemeSize.SM:
+                'table table-sm'
+                break
+        }
+    }
+
+    IHTMLElement table(IHTMLElement topElement, String blockId) {
         HTMLTable htmlTable = new HTMLTable()
-        htmlTable.classes = ['table', 'table-striped', 'table-hover', 'table-bordered']
+        htmlTable.classes = [tableSized, 'table-striped', 'table-hover', 'table-bordered']
         htmlTable.attributes.put('taackTableId', blockId)
         topElement.addChildren(
                 htmlTable

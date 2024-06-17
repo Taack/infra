@@ -59,7 +59,21 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
                 'form-control form-control-lg'
                 break
             case ThemeSize.NORMAL:
-                'form-control form-control'
+                'form-control'
+                break
+        }
+    }
+
+    private String getFormSelect() {
+        switch (themeSize) {
+            case ThemeSize.SM:
+                'form-select form-select-sm'
+                break
+            case ThemeSize.LG:
+                'form-select form-select-lg'
+                break
+            case ThemeSize.NORMAL:
+                'form-select'
                 break
         }
     }
@@ -132,7 +146,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.addClasses('form-select').build() as HTMLSelect
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.addClasses(formSelect).build() as HTMLSelect
         el.addChildren(s)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))

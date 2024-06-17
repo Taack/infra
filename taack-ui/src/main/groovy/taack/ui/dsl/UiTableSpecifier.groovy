@@ -11,7 +11,6 @@ import taack.ui.dsl.table.IUiTableVisitor
  * {@link taack.ui.dsl.block.BlockSpec#table(UiTableSpecifier)}
  *
  * <p>A table along with a filter is created with:
- * {@link taack.ui.dsl.block.BlockSpec#tableFilter(java.lang.String, UiFilterSpecifier, java.lang.String, UiTableSpecifier)}
  */
 @CompileStatic
 final class UiTableSpecifier {
