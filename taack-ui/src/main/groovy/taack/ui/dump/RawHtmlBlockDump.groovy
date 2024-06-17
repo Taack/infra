@@ -245,9 +245,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitModal() {
         blockLog.enterBlock('visitModal ' + modalId)
         isModal = true
+        HTMLAjaxModal modal = new HTMLAjaxModal(isModalRefresh)
+        blockLog.topElement.addChildren(modal)
         blockLog.topElement.setTaackTag(TaackTag.MODAL)
-        blockLog.topElement.addChildren(new HTMLAjaxModal(isModalRefresh))
-        blockLog.topElement = blockLog.topElement.children.last()
+        blockLog.topElement = modal
     }
 
     @Override

@@ -2,11 +2,17 @@ package taack.ui.base
 
 import kotlinx.browser.window
 import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.asList
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.url.URL
+import org.w3c.fetch.RequestInit
 import org.w3c.files.Blob
+import org.w3c.xhr.FormData
 import taack.ui.base.element.Block
+import taack.ui.base.element.Filter
+import taack.ui.base.element.Form
+import kotlin.js.Promise
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
 
@@ -23,6 +29,7 @@ class Helper {
         private const val FIELD_INFO_END = ":__FieldInfoEnd__"
         private const val RELOAD = "__reload__"
         private const val REDIRECT = "__redirect__"
+        private const val ERROR_START = "__ErrorKeyStart__"
 
         fun trace(level: Int, message: String) {
             var s = ""
@@ -66,6 +73,42 @@ class Helper {
             return m
         }
 
+        fun filterForm(
+            filter: Filter,
+            offset: Int? = null,
+            sort: String? = null,
+            order: String? = null,
+            b: HTMLButtonElement? = null
+        ) {
+            b?.disabled = true
+            val innerText = b?.innerText
+            b?.innerText = "Submitting ..."
+            val f = filter.f
+            val fd = FormData(f)
+            fd.set("isAjax", "true")
+            fd.set("refresh", "true")
+            fd.set("filterTableId", filter.filterId)
+            fd.set("ajaxBlockId", filter.parent.blockId)
+            if (offset != null) fd.set("offset", offset.toString())
+            if (sort != null) fd.set("sort", sort)
+            if (order != null) fd.set("order", order)
+            else fd.delete("order")
+
+            window.fetch(b?.formAction ?: f.action, RequestInit(method = "POST", body = fd)).then {
+                if (it.ok) {
+                    it.text()
+                } else {
+                    trace(it.statusText)
+                    Promise.reject(Throwable())
+                }
+            }.then {
+                processAjaxLink(it, filter)
+            }.then {
+                b?.disabled = false
+                if (innerText != null) b?.innerText = innerText
+            }
+        }
+
         fun mapAjaxBlock(text: String): Map<String, String> {
             console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
@@ -97,7 +140,11 @@ class Helper {
 
                 text.startsWith(CLOSE_LAST_MODAL) -> {
                     val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
-                    if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(text.length - FIELD_INFO_END.length, text.length) == FIELD_INFO_END) {
+                    if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
+                            text.length - FIELD_INFO_END.length,
+                            text.length
+                        ) == FIELD_INFO_END
+                    ) {
                         var posField = text.indexOf(FIELD_INFO)
                         if (processingStack.isNotEmpty()) {
                             trace("Helper::process")
@@ -117,7 +164,9 @@ class Helper {
                             f(id, value, otherField)
                         }
                     } else {
-                        if (text.length > CLOSE_LAST_MODAL.length + 1 && text.substring(CLOSE_LAST_MODAL.length + 1).startsWith(BLOCK_START)) {
+                        if (text.length > CLOSE_LAST_MODAL.length + 1 && text.substring(CLOSE_LAST_MODAL.length + 1)
+                                .startsWith(BLOCK_START)
+                        ) {
                             mapAjaxBlock(text.substring(CLOSE_LAST_MODAL.length + 1)).map {
                                 val target = block.parent?.parent?.ajaxBlockElements?.get(it.key)
                                 target!!.d.innerHTML = it.value
@@ -156,6 +205,7 @@ class Helper {
                         target.refresh()
                     }
                 }
+
                 text.startsWith(OPEN_MODAL) -> {
                     trace("Helper::opening modal ...")
                     if (process != null) {
@@ -165,8 +215,9 @@ class Helper {
                     val s = block.modal.dModalBody.getElementsByTagName("script").asList()
                     trace("Executing $s")
                 }
+
                 text.startsWith(REFRESH_MODAL) -> {
-                    trace("Helper::refresh modal")
+                    trace("Helper::refresh modal $text")
                     if (process != null) {
                         processingStack.add(process)
                     }
@@ -175,14 +226,36 @@ class Helper {
                     trace("Executing $s")
 
                 }
+
                 text.startsWith(REDIRECT) -> {
                     trace("Helper::redirect ${text.substring("__redirect__".length)}")
                     window.location.href = text.substring("__redirect__".length)
                 }
+
+                text.startsWith(ERROR_START) -> {
+                    var hasErrors = false
+                    (base as Form).cleanUpErrors()
+                    val map = mapAjaxErrors(text).map { me ->
+                        hasErrors = true
+                        val d = (base as Form).errorPlaceHolders[me.key]?.d
+                        if (d != null) {
+                            d.innerHTML = me.value
+                            d.style.display = "block"
+                        }
+                    }
+                    if (!hasErrors) {
+                        trace("FormActionButton::hasNoErrors")
+                    } else {
+                        trace("FormActionButton::hasErrors $map")
+                    }
+
+                }
+
                 else -> {
                     trace("Helper::update current block")
                     base.getParentBlock().updateContent(text)
                 }
+
             }
         }
 

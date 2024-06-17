@@ -1,6 +1,5 @@
 package taack.ui.dump
 
-
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
@@ -12,12 +11,10 @@ import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
-import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.InputType
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.IFormTheme
-import taack.ui.dump.html.theme.ThemeSelector
 
 @CompileStatic
 final class RawHtmlFilterDump implements IUiFilterVisitor {
@@ -33,7 +30,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         this.blockLog = blockLog
         this.parameter = parameter
         filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
-//        filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
         this.blockId = id ?: '' + parameter.modalId
 
     }
@@ -53,8 +49,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
-        ThemeSelector ts = parameter.uiThemeService.themeSelector
         formThemed = new BootstrapForm(blockLog, false, true)
+        formThemed.attributes.put('action', parameter.urlMapped())
         blockLog.topElement.setTaackTag(TaackTag.FILTER)
         blockLog.topElement.addChildren(
                 formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(

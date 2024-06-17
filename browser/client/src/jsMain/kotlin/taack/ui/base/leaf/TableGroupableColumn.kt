@@ -80,26 +80,7 @@ class TableGroupableColumn(private val parent: Table, private val s: HTMLSpanEle
     private fun onClick(e: MouseEvent) {
         e.preventDefault()
         trace("TableGroupableColumn::onClick")
-        val f = parent.filter.f
-        val fd = FormData(f)
-        fd.set("sort", property)
         val dir = if (direction == null || direction == "") "desc" else if (direction == "desc") "asc" else null
-        if (dir != null) fd.set("order", dir)
-        else fd.delete("order")
-        fd.append("isAjax", "true")
-        window.fetch("", RequestInit(method = "POST", body = fd)).then {
-            if (it.ok) {
-                it.text()
-            } else {
-                trace(it.statusText)
-                Promise.reject(Throwable())
-            }
-        }.then {
-            Helper.mapAjaxBlock(it).map { me ->
-                parent.parent.d.innerHTML = me.value
-            }
-        }.then {
-            AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
-        }
+        Helper.filterForm(parent.filter, null, property, dir)
     }
 }

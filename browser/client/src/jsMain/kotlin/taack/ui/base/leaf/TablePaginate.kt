@@ -1,18 +1,13 @@
 package taack.ui.base.leaf
 
 import kotlinx.browser.document
-import kotlinx.browser.window
 import kotlinx.dom.addClass
 import org.w3c.dom.*
 import org.w3c.dom.events.MouseEvent
-import org.w3c.fetch.RequestInit
-import org.w3c.xhr.FormData
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Table
-import kotlin.js.Promise
 import kotlin.math.max
 import kotlin.math.min
 
@@ -150,29 +145,7 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
 
     private fun onClick(e: MouseEvent, a: HTMLAnchorElement) {
         e.preventDefault()
-        trace("SortableColumn::onClick")
-        val f = parent.filter.f
-        val fd = FormData(f)
-        fd.append("isAjax", "true")
-        val offset = (a.attributes["taackPageOffset"]!!.value.toDouble() * max.toDouble()).toLong().toString()
-        fd.set("offset", offset)
-        fd.append("refresh", "true")
-        fd.append("filterTableId", parent.parent.blockId)
-        val b = f.querySelector("button#filter") as HTMLButtonElement?
-        window.fetch(b?.formAction ?: f.action, RequestInit(method = "POST", body = fd)).then {
-            if (it.ok) {
-                it.text()
-            } else {
-                trace(it.statusText)
-                Promise.reject(Throwable())
-            }
-        }.then {
-            Helper.mapAjaxBlock(it).map { me ->
-                val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
-                target!!.d.innerHTML = me.value
-            }
-        }.then {
-            AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
-        }
+        val offset = (a.attributes["taackPageOffset"]!!.value.toDouble() * max.toDouble()).toInt()
+        Helper.filterForm(parent.filter, offset, null)
     }
 }

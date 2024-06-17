@@ -173,4 +173,7 @@ final class Parameter implements WebAttributes {
         applicationTagLib.createLink(controller: controller, action: action, params: p, id: id)
     }
 
+    final String urlMapped() {
+        urlMapped(controllerName, actionName)
+    }
 }

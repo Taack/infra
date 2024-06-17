@@ -6,10 +6,8 @@ import org.w3c.dom.events.Event
 import org.w3c.fetch.RequestInit
 import org.w3c.xhr.FormData
 import taack.ui.base.Helper
-import taack.ui.base.Helper.Companion.mapAjaxErrors
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.element.Block
 import taack.ui.base.element.Form
 import kotlin.js.Promise
 
@@ -57,83 +55,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 Promise.reject(Throwable())
             }
         }.then {
-            if (it.startsWith("__redirect__")) {
-                window.location.href = it.substring("__redirect__".length)
-            } else if (it.startsWith("__reload__")) {
-                window.location.href = (Block.href ?: "")
-            } else if (it.startsWith("__ajaxBlockStart__")) {
-                trace("__ajaxBlockStart__ ${parent.parent.parent.ajaxBlockElements}")
-                Helper.mapAjaxBlock(it).map { me ->
-                    val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
-                    target!!.d.innerHTML = me.value
-                    target.refresh()
-                }
-            } else if (it.startsWith("__closeLastModal__:")) {
-                val m = "__closeLastModal__:"
-                val fi = ":__FieldInfo__:"
-                val fie = ":__FieldInfoEnd__"
-                val text = it
-                val pos = text.indexOf(':', m.length)
-                var posField = text.indexOf(fi)
-                if (Helper.processingStack.isNotEmpty()) {
-                    trace("Helper::process")
-                    val id = text.substring(m.length, pos)
-                    val value = if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
-                    var otherField = emptyMap<String, String>()
-                    while (posField != -1) {
-                        val endFieldNameIndex = text.indexOf(':', posField + fi.length)
-                        val fieldName = text.substring(posField + fi.length, endFieldNameIndex)
-                        val endFieldValueIndex = text.indexOf(fie, endFieldNameIndex)
-                        val fieldValue = text.substring(endFieldNameIndex + 1, endFieldValueIndex)
-                        otherField = otherField.plus(Pair(fieldName, fieldValue))
-                        posField = text.indexOf(fi, endFieldValueIndex)
-                    }
-                    if (id.isNotEmpty() && value.isNotEmpty()) {
-                        val fct = Helper.processingStack.last()
-                        fct(id, value, otherField)
-                    } else {
-                        for (field in otherField) {
-                            val taOrI = parent.f.querySelector("#${field.key}")
-                            if (taOrI is HTMLInputElement) taOrI.value = field.value
-                            else if (taOrI is HTMLTextAreaElement) taOrI.value = field.value
-                        }
-                    }
-                }
-                trace("FormAction::closing Modal ...")
-                if (parent.parent.parent.parent != null) parent.parent.parent.parent.close()
-                else parent.parent.parent.modal.close()
-
-            } else if (it.startsWith("__closeLastModalAndUpdateBlock__:")) {
-                if (parent.parent.parent.parent != null) parent.parent.parent.parent.close()
-                else parent.parent.parent.modal.close()
-                val m = Helper.mapAjaxBlock(it.substring(29))
-                m.map { me ->
-                    val target = parent.parent.parent.parent?.parent?.ajaxBlockElements?.get(me.key)
-                    target!!.d.innerHTML = me.value
-                    target.refresh()
-                }
-            } else if (it.startsWith("__ErrorKeyStart__")) {
-                var hasErrors = false
-                parent.cleanUpErrors()
-                val map = mapAjaxErrors(it).map { me ->
-                    hasErrors = true
-                    val d = parent.errorPlaceHolders[me.key]?.d
-                    if (d != null) {
-                        d.innerHTML = me.value
-                        d.style.display = "block"
-                    }
-                }
-                if (!hasErrors) {
-                    trace("FormActionButton::hasNoErrors")
-                } else {
-                    trace("FormActionButton::hasErrors $map")
-                }
-            } else {
-                trace("FormActionButton::opening Modal")
-                Helper.processAjaxLink(it, parent.parent.parent, ::modalReturnSelect)
-                parent.parent.parent.modal.open(it)
-//                Block.getSiblingBlockElement(parent.parent.parent.modal)
-            }
+            Helper.processAjaxLink(it, parent)
         }.then {
             b.disabled = false
             b.innerText = innerText
