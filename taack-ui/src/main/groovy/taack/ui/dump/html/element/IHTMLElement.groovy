@@ -112,7 +112,7 @@ trait IHTMLElement {
         if (taackTag)
             res += ['taackTag': taackTag.toString()]
         if (classes)
-            res += ['class': classes.join(' ')]
+            res += ['class': classes.grep { it != null} .join(' ')]
         if (onClick)
             res += ['onclick': onClick.output]
         if (styleDescriptor)

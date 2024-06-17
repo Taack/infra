@@ -16,11 +16,20 @@ enum ButtonStyle {
 
 @CompileStatic
 final class HTMLButton implements IHTMLElement {
-    HTMLButton(String url, String i18n, ButtonStyle style = ButtonStyle.SUCCESS) {
+
+    HTMLButton(String i18n) {
+        this(null, i18n)
+        attributes.put('type', 'button')
+    }
+
+    HTMLButton(String url, String i18n, ButtonStyle style = null) {
         tag = 'button'
-        if (url) attributes.put('formaction', url)
+        if (url) {
+            attributes.put('formaction', url)
+            addClasses('btn', 'w-75', 'mb-1')
+        }
 
         addChildren(new HTMLTxtContent(i18n))
-        addClasses('btn', 'w-75', 'mb-1', style.classString)
+        if (style) addClasses(style.classString)
     }
 }

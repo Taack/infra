@@ -32,7 +32,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean isModal = false
     boolean isModalRefresh = false
 
-    final private Random random = new Random(System.currentTimeMillis())
     private int tabOccurrence = 0
 
     final BootstrapBlock block
@@ -207,7 +206,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.enterBlock('visitBlockTab')
         currentTabNames << i18n
         blockLog.topElement.setTaackTag(TaackTag.TAB)
-        blockLog.topElement = block.tab(blockLog.topElement, ++tabOccurrence)
+        blockLog.topElement = block.tab(blockLog.topElement, tabOccurrence++)
     }
 
     @Override
@@ -218,12 +217,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     private List<String> currentTabNames = []
     private IHTMLElement oldParent = null
-    private BlockSpec.Width blockTabWidth
 
     @Override
     void visitBlockTabs() {
         blockLog.enterBlock('visitBlockTabs')
         oldParent = blockLog.topElement
+        oldParent.setTaackTag(TaackTag.TABS)
         blockLog.topElement = new HTMLEmpty()
     }
 
@@ -231,7 +230,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTabsEnd() {
         blockLog.exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
-        blockLog.topElement = block.tabs(oldParent, random.nextInt(), currentTabNames, blockTabWidth)
+        blockLog.topElement = block.tabs(oldParent, currentTabNames)
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }

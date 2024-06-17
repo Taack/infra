@@ -47,8 +47,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean isModalRefresh = false
 
     private int tabOccurrence = 0
-    private int tabOccurrencePrevious = 0
-    private int tabIds = 0
 
     final BootstrapBlock block
     final BootstrapMenu menu
@@ -204,11 +202,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     }
     private List<String> currentTabNames
-    private BlockSpec.Width blockTabWidth
 
     @Override
     void visitBlockTabsEnd() {
-        topElement = block.tabs(topElement, tabIds, currentTabNames, blockTabWidth)
+        topElement = block.tabs(topElement, currentTabNames)
     }
 
     @Override
