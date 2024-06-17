@@ -36,10 +36,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     private int tabOccurrence = 0
 
     final BootstrapBlock block
-    final BootstrapMenu menu
     final Parameter parameter
 
-    private BlockLog blockLog
+    private final BlockLog blockLog
 
     RawHtmlBlockDump(final Parameter parameter, final String modalId = null) {
         if (modalId) isModal = true
@@ -47,10 +46,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         this.modalId = modalId
         if (parameter.params.boolean('refresh'))
             isModalRefresh = true
-        ThemeSelector ts = parameter.uiThemeService.themeSelector
-        block = new BootstrapBlock(ts.themeMode, ts.themeSize)
-        menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
-        blockLog = new BlockLog()
+        blockLog = new BlockLog(parameter.uiThemeService.themeSelector)
+        block = new BootstrapBlock(blockLog)
+//        menu = new BootstrapMenu(blockLog)
         blockLog.topElement = new HTMLEmpty()
         blockLog.topElement.setTaackTag(TaackTag.BLOCK)
     }
@@ -119,7 +117,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitForm(UiFormSpecifier formSpecifier) {
         blockLog.stayBlock('visitForm')
-        formSpecifier.visitForm(new RawHtmlFormDump(blockLog.topElement, parameter))
+        formSpecifier.visitForm(new RawHtmlFormDump(blockLog, parameter))
     }
 
 
@@ -163,7 +161,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                           final UiTableSpecifier tableSpecifier) {
         blockLog.stayBlock('visitTableFilter ' + id)
         visitCol(BlockSpec.Width.QUARTER)
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog.topElement, id, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog, id, parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
         tableSpecifier.visitTable(new RawHtmlTableDump(blockLog, id, parameter))
@@ -180,7 +178,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitDiagramFilter(final UiDiagramSpecifier diagramSpecifier, final UiFilterSpecifier filterSpecifier) {
         blockLog.stayBlock('visitDiagramFilter')
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog.topElement, id, parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog, id, parameter))
     }
 
     @Override
@@ -278,11 +276,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ROW)
     }
 
+    BootstrapMenu menu
+
     @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
         if (hasClosure) blockLog.enterBlock('visitMenuLabel ' + i18n)
         else blockLog.stayBlock('visitMenuLabel ' + i18n)
         blockLog.topElement.setTaackTag(TaackTag.LABEL)
+
         blockLog.topElement = menu.label(blockLog.topElement, i18n, hasClosure)
     }
 
@@ -296,6 +297,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitMenuStart(MenuSpec.MenuMode menuMode) {
         blockLog.enterBlock('visitMenuStart')
         blockLog.topElement.setTaackTag(TaackTag.MENU)
+        menu = new BootstrapMenu(blockLog)
         blockLog.topElement = menu.menuStart(blockLog.topElement)
     }
 

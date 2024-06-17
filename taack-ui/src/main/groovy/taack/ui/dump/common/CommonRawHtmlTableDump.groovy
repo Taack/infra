@@ -8,7 +8,6 @@ import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.style.DisplayBlock
-import taack.ui.dump.html.style.DisplayInlineBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
 

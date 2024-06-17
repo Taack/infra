@@ -3,6 +3,7 @@ package taack.ui.dump.html.block
 import groovy.transform.CompileStatic
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.form.FormSpec
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.HTMLButton
 import taack.ui.dump.html.element.HTMLDiv
 import taack.ui.dump.html.element.HTMLNav
@@ -15,12 +16,9 @@ import taack.ui.dump.html.theme.ThemeSize
 @CompileStatic
 final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
 
-    final ThemeMode themeMode
-    final ThemeSize themeSize
 
-    BootstrapBlock(ThemeMode themeMode, ThemeSize themeSize) {
-        this.themeMode = themeMode
-        this.themeSize = themeSize
+    BootstrapBlock(BlockLog blockLog) {
+        super(blockLog)
     }
 
     static IHTMLElement block(IHTMLElement topElement, String blockId) {

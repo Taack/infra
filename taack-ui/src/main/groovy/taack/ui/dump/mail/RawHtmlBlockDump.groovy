@@ -23,6 +23,7 @@ import taack.ui.dump.RawHtmlChartDump
 import taack.ui.dump.RawHtmlDiagramDump
 import taack.ui.dump.RawHtmlFilterDump
 import taack.ui.dump.RawHtmlFormDump
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.BootstrapBlock
 import taack.ui.dump.html.block.HTMLAjaxCloseLastModal
 import taack.ui.dump.html.block.HTMLAjaxCloseModal
@@ -62,8 +63,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (parameter.params.boolean('refresh'))
             isModalRefresh = true
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        block = new BootstrapBlock(ts.themeMode, ts.themeSize)
-        menu = new BootstrapMenu(ts.themeMode, ts.themeSize)
+        block = new BootstrapBlock(new BlockLog(ts))
+        menu = new BootstrapMenu(new BlockLog(ts))
     }
 
     @Override
@@ -118,7 +119,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitForm(UiFormSpecifier formSpecifier) {
-        formSpecifier.visitForm(new RawHtmlFormDump(topElement, parameter))
+        formSpecifier.visitForm(new RawHtmlFormDump(new BlockLog(null), parameter))
     }
 
     @Override
@@ -156,7 +157,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier) {
         visitRow()
         visitCol(BlockSpec.Width.QUARTER)
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(topElement,id,  parameter))
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(new BlockLog(null),id,  parameter))
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)

@@ -1,6 +1,7 @@
 package taack.ui.dump.html.menu
 
 import groovy.transform.CompileStatic
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
@@ -8,12 +9,10 @@ import taack.ui.dump.html.theme.ThemeSize
 @CompileStatic
 final class BootstrapMenu implements IHTMLElement {
 
-    final ThemeMode themeMode
-    final ThemeSize themeSize
+    final BlockLog blockLog
 
-    BootstrapMenu(ThemeMode themeMode, ThemeSize themeSize) {
-        this.themeMode = themeMode
-        this.themeSize = themeSize
+    BootstrapMenu(BlockLog blockLog) {
+        this.blockLog = blockLog
     }
 
 

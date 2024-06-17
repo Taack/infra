@@ -3,6 +3,7 @@ package taack.ui.dump.html.form
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.script.DeleteSiblingInputContent
@@ -18,9 +19,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     final boolean floating
     final boolean noLabel
 
-    BootstrapForm(ThemeMode themeMode, ThemeSize themeSize, boolean floating = true, boolean noLabel = false) {
-        this.themeMode = themeMode
-        this.themeSize = themeSize
+    BootstrapForm(final BlockLog blockLog, boolean floating = true, boolean noLabel = false) {
+        super(blockLog)
+        this.themeMode = blockLog.ts.themeMode
+        this.themeSize = blockLog.ts.themeSize
         this.floating = floating
         this.noLabel = noLabel
         if (floating) addClasses 'form-floating', 'mb-1'

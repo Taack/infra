@@ -8,6 +8,7 @@ import taack.ast.type.WidgetKind
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
 import taack.ui.dump.html.element.IHTMLElement
@@ -33,8 +34,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private final static String ST_LIST = 'list'
     final private List<Triple<String, ButtonStyle, String>> formActions = []
 
-
-    final private ByteArrayOutputStream out
     final private Parameter parameter
 
     private Object aObject
@@ -45,14 +44,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private FieldInfo[] lockedFields
 
     final IFormTheme formThemed
-    IHTMLElement topElement
+    final BlockLog blockLog
 
-    RawHtmlFormDump(IHTMLElement topElement, final Parameter parameter) {
-        this.out = out
-        this.topElement = topElement
+    RawHtmlFormDump(final BlockLog blockLog, final Parameter parameter) {
+        this.blockLog = blockLog
         this.parameter = parameter
-        ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize)
+        formThemed = new BootstrapForm(blockLog)
 
     }
 
@@ -78,7 +75,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
-        topElement.builder.addChildren(
+         blockLog.topElement.builder.addChildren(
                 formThemed.builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
                         new HTMLInput(InputType.HIDDEN, id, 'id'),
                         new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
@@ -87,28 +84,28 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                         new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
                 ).build()
         )
-        topElement = formThemed
+         blockLog.topElement = formThemed
     }
 
     @Override
     void visitFormEnd() {
-        topElement = formThemed.formActionBlock(topElement)
+         blockLog.topElement = formThemed.formActionBlock( blockLog.topElement)
         formActions.each {
-            formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
+            formThemed.addFormAction( blockLog.topElement, it.cValue, it.aValue, it.bValue)
         }
 
-        topElement = topElement.toParentTaackTag(TaackTag.FORM)
+         blockLog.topElement =  blockLog.topElement.toParentTaackTag(TaackTag.FORM)
         tabIds = 0
     }
 
     @Override
     void visitFormSection(String i18n) {
-        topElement = formThemed.section(topElement, i18n)
+         blockLog.topElement = formThemed.section( blockLog.topElement, i18n)
     }
 
     @Override
     void visitFormSectionEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.SECTION)
+         blockLog.topElement =  blockLog.topElement.toParentTaackTag(TaackTag.SECTION)
     }
 
     @Override
@@ -133,12 +130,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
-            topElement = formThemed.booleanInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as boolean)
+             blockLog.topElement = formThemed.booleanInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as boolean)
         } else if (eos) {
-            topElement = formThemed.selects(topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
+             blockLog.topElement = formThemed.selects( blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                topElement = formThemed.selects(topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+                 blockLog.topElement = formThemed.selects( blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
@@ -147,20 +144,20 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
                         Enum[] values = actualClass.invokeMethod(ST_VALUES, null) as Enum[]
-                        topElement = formThemed.selects(topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+                         blockLog.topElement = formThemed.selects( blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
                     } else {
                         String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
-                        topElement = formThemed.selects(topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
+                         blockLog.topElement = formThemed.selects( blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
                     }
                 }
             }
         } else if (isDate) {
-            topElement = formThemed.dateInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date)
+             blockLog.topElement = formThemed.dateInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                topElement = formThemed.textareaInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
+                 blockLog.topElement = formThemed.textareaInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                topElement = formThemed.fileInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
+                 blockLog.topElement = formThemed.fileInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
                 result.append """\
                 <div id="${qualifiedName}-editor">
@@ -181,7 +178,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 if (numberFormat && field.value instanceof Number) {
                     valueString = numberFormat.format(field.value)
                 }
-                topElement = formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
+                 blockLog.topElement = formThemed.normalInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
             }
         }
     }
@@ -196,10 +193,10 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
         if (isListOrSet)
-            formThemed.ajaxField(topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
+            formThemed.ajaxField( blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         else {
             GormEntity v = (field?.value) as GormEntity
-            formThemed.ajaxField(topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
+            formThemed.ajaxField( blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
         }
     }
 
@@ -213,29 +210,29 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
         final String fieldInfoParams = fieldInfoParams(fieldInfos)
-        formThemed.ajaxField(topElement, trI18n, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoParams, isFieldDisabled)
+        formThemed.ajaxField( blockLog.topElement, trI18n, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoParams, isFieldDisabled)
     }
 
     @Override
     void visitFormTabs(List<String> names, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
-        topElement = BootstrapLayout.tabs(topElement, random.nextInt(), names, width)
+         blockLog.topElement = BootstrapLayout.tabs( blockLog.topElement, random.nextInt(), names, width)
         tabIds++
     }
 
     @Override
     void visitFormTabsEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.TABS)
+         blockLog.topElement =  blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }
 
     @Override
     void visitFormTab(String name) {
-        topElement.setTaackTag(TaackTag.TAB)
-        topElement = BootstrapLayout.tab(topElement, ++tabOccurrence)
+         blockLog.topElement.setTaackTag(TaackTag.TAB)
+         blockLog.topElement = BootstrapLayout.tab( blockLog.topElement, ++tabOccurrence)
     }
 
     @Override
     void visitFormTabEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.TAB)
+         blockLog.topElement =  blockLog.topElement.toParentTaackTag(TaackTag.TAB)
     }
 
     @Override
@@ -246,10 +243,10 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
-        topElement = formThemed.formActionBlock topElement
+         blockLog.topElement = formThemed.formActionBlock  blockLog.topElement
         i18n ?= parameter.trField(controller, action)
-        formThemed.addFormAction(topElement, "/${controller}/${action}", i18n, style)
-        topElement = topElement.parent
+        formThemed.addFormAction( blockLog.topElement, "/${controller}/${action}", i18n, style)
+         blockLog.topElement =  blockLog.topElement.parent
     }
 
     @Override
@@ -261,38 +258,38 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
         if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-            formThemed.textareaInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+            formThemed.textareaInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-            formThemed.fileInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+            formThemed.fileInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
-                formThemed.passwdInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+                formThemed.passwdInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             } else {
-                formThemed.normalInput(topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+                formThemed.normalInput( blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             }
         }
     }
 
     @Override
     void visitCol() {
-        topElement.setTaackTag(TaackTag.COL)
-        topElement = BootstrapLayout.col(topElement)
+         blockLog.topElement.setTaackTag(TaackTag.COL)
+         blockLog.topElement = BootstrapLayout.col( blockLog.topElement)
     }
 
     @Override
     void visitColEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.COL)
+         blockLog.topElement =  blockLog.topElement.toParentTaackTag(TaackTag.COL)
     }
 
     @Override
     void visitRow() {
-        topElement.setTaackTag(TaackTag.ROW)
-        topElement = BootstrapLayout.row(topElement)
+         blockLog.topElement.setTaackTag(TaackTag.ROW)
+         blockLog.topElement = BootstrapLayout.row( blockLog.topElement)
     }
 
     @Override
     void visitRowEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.ROW)
+         blockLog.topElement =  blockLog.topElement.toParentTaackTag(TaackTag.ROW)
     }
 
     @Override

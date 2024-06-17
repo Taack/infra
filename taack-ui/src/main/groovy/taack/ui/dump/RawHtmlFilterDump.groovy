@@ -9,6 +9,7 @@ import taack.ui.EnumOptions
 import taack.ui.IEnumOption
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.filter.expression.FilterExpression
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
 import taack.ui.dump.html.element.IHTMLElement
@@ -26,11 +27,10 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     final String blockId
 
     IFormTheme formThemed
-    IHTMLElement topElement
+    final BlockLog blockLog
 
-
-    RawHtmlFilterDump(final IHTMLElement topElement, final String id, final Parameter parameter) {
-        this.topElement = topElement
+    RawHtmlFilterDump(final BlockLog blockLog, final String id, final Parameter parameter) {
+        this.blockLog = blockLog
         this.parameter = parameter
         filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
         filterActions.add new Triple<String, ButtonStyle, String>('Reset', ButtonStyle.SECONDARY, null)
@@ -54,9 +54,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         parameter.aClassSimpleName = aClass.simpleName
         ThemeSelector ts = parameter.uiThemeService.themeSelector
-        formThemed = new BootstrapForm(ts.themeMode, ts.themeSize, false, true)
-        topElement.setTaackTag(TaackTag.FILTER)
-        topElement.addChildren(
+        formThemed = new BootstrapForm(blockLog, false, true)
+        blockLog.topElement.setTaackTag(TaackTag.FILTER)
+        blockLog.topElement.addChildren(
                 formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
                         new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
                         new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
@@ -74,7 +74,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         } as HTMLInput[]
         if (addedInputs)
             formThemed.addChildren(addedInputs)
-        topElement = formThemed
+        blockLog.topElement = formThemed
     }
 
     @Override
@@ -86,21 +86,21 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterEnd() {
-        topElement = formThemed.formActionBlock(topElement)
+        blockLog.topElement = formThemed.formActionBlock(blockLog.topElement)
         filterActions.each {
-            formThemed.addFormAction(topElement, it.cValue, it.aValue, it.bValue)
+            formThemed.addFormAction(blockLog.topElement, it.cValue, it.aValue, it.bValue)
         }
-        topElement = topElement.toParentTaackTag(TaackTag.FILTER)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.FILTER)
     }
 
     @Override
     void visitSection(final String i18n) {
-        topElement = formThemed.section(topElement, i18n)
+        blockLog.topElement = formThemed.section(blockLog.topElement, i18n)
     }
 
     @Override
     void visitSectionEnd() {
-        topElement = topElement.toParentTaackTag(TaackTag.SECTION)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION)
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
@@ -108,16 +108,16 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
         final String qualifiedId = qualifiedName + "-" + parameter.modalId
         if (enumOptions) {
-            topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), true, false, true)
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), true, false, true)
         } else if (isEnum) {
             final Class type = fieldInfo.fieldConstraint.field.type
-            topElement = formThemed.selects(topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value), true, false, true)
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value), true, false, true)
         } else if (isBoolean) {
             Boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ?
                     ((parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '1') ? true : (parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '0') ? false : null) : fieldInfo.value
-            topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, true, isChecked)
+            blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, i18n, false, true, isChecked)
         } else {
-            topElement = formThemed.normalInput(topElement, qualifiedName, i18n, false, true, value)
+            blockLog.topElement = formThemed.normalInput(blockLog.topElement, qualifiedName, i18n, false, true, value)
         }
     }
 
@@ -142,8 +142,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
-        topElement = formThemed.booleanInput(topElement, qualifiedName, i18n, false, false, isChecked)
-        topElement.addChildren(new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default"))
+        blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, i18n, false, false, isChecked)
+        blockLog.topElement.addChildren(new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default"))
     }
 
     @Override

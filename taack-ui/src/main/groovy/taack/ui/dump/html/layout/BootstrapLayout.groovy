@@ -3,10 +3,17 @@ package taack.ui.dump.html.layout
 import groovy.transform.CompileStatic
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.BlockSpec.Width
+import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 
 @CompileStatic
 class BootstrapLayout {
+
+    final BlockLog blockLog
+
+    BootstrapLayout(final BlockLog blockLog) {
+        this.blockLog = blockLog
+    }
 
     static IHTMLElement tabs(IHTMLElement topElement, int tabIds, List<String> names, BlockSpec.Width width) {
         tabIds = Math.abs(tabIds)
