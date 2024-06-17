@@ -167,7 +167,7 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
                 Promise.reject(Throwable())
             }
         }.then {
-            Helper.mapAjaxText(it).map { me ->
+            Helper.mapAjaxBlock(it).map { me ->
                 val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
                 target!!.d.innerHTML = me.value
             }

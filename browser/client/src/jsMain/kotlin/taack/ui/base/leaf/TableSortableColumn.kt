@@ -62,7 +62,7 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
                 Promise.reject(Throwable())
             }
         }.then {
-            Helper.mapAjaxText(it).map { me ->
+            Helper.mapAjaxBlock(it).map { me ->
                 parent.parent.updateContent(me.value)
             }
 //        }.then {

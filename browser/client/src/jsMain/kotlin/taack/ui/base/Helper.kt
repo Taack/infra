@@ -12,7 +12,17 @@ typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> U
 
 class Helper {
     companion object {
-        var level = 0
+        private var level = 0
+        private const val BLOCK_START = "__ajaxBlockStart__"
+        private const val BLOCK_END = "__ajaxBlockEnd__"
+        private const val OPEN_MODAL = "__openModal__:"
+        private const val REFRESH_MODAL = "__refreshModal__:"
+        private const val CLOSE_LAST_MODAL = "__closeLastModal__:"
+        private const val CLOSE_LAST_MODAL_AND_UPDATE_BLOCK = "__closeLastModalAndUpdateBlock__:"
+        private const val FIELD_INFO = ":__FieldInfo__:"
+        private const val FIELD_INFO_END = ":__FieldInfoEnd__"
+        private const val RELOAD = "__reload__"
+        private const val REDIRECT = "__redirect__"
 
         fun trace(level: Int, message: String) {
             var s = ""
@@ -56,21 +66,18 @@ class Helper {
             return m
         }
 
-        fun mapAjaxText(text: String): Map<String, String> {
-//            console.log("Mapping Ajax Content ... ${text}")
+        fun mapAjaxBlock(text: String): Map<String, String> {
             console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
-            val abs = "__ajaxBlockStart__"
-            val abe = "__ajaxBlockEnd__"
-            if (text.startsWith(abs)) {
-                var pos1 = abs.length
+            if (text.startsWith(BLOCK_START)) {
+                var pos1 = BLOCK_START.length
                 var pos2 = text.indexOf(':')
                 do {
                     val abId = text.substring(pos1, pos2)
-                    pos1 = text.indexOf(abe, pos2)
+                    pos1 = text.indexOf(BLOCK_END, pos2)
                     val content = text.substring(pos2 + 1, pos1)
-                    pos1 += abe.length
-                    pos1 += abs.length
+                    pos1 += BLOCK_END.length
+                    pos1 += BLOCK_START.length
                     pos2 = text.indexOf(':', pos1)
 
                     m[abId] = content
@@ -82,44 +89,36 @@ class Helper {
         val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
 
         fun processAjaxLink(text: String, base: BaseElement, process: CloseModalPostProcessing? = null) {
-            val abs = "__ajaxBlockStart__"
-            val m = "__closeLastModal__:"
-            val m2 = "__closeLastModalAndUpdateBlock__:"
-            val fi = ":__FieldInfo__:"
-            val fie = ":__FieldInfoEnd__"
-            val rel = "__reload__"
-            val openModal = "__openModal__:"
-            val refreshModal = "__refreshModal__:"
             val block = base.getParentBlock()
             when {
-                text.contains(rel) -> {
+                text.contains(RELOAD) -> {
                     window.location.href = (Block.href ?: "")
                 }
 
-                text.startsWith(m) -> {
-                    val pos = text.indexOf(':', m.length)
-                    if (text[m.length] != ':' || text.subSequence(text.length - fie.length, text.length) == fie) {
-                        var posField = text.indexOf(fi)
+                text.startsWith(CLOSE_LAST_MODAL) -> {
+                    val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
+                    if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(text.length - FIELD_INFO_END.length, text.length) == FIELD_INFO_END) {
+                        var posField = text.indexOf(FIELD_INFO)
                         if (processingStack.isNotEmpty()) {
                             trace("Helper::process")
-                            val id = text.substring(m.length, pos)
+                            val id = text.substring(CLOSE_LAST_MODAL.length, pos)
                             val value =
                                 if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
                             var otherField = emptyMap<String, String>()
                             while (posField != -1) {
-                                val endFieldNameIndex = text.indexOf(':', posField + fi.length)
-                                val fieldName = text.substring(posField + fi.length, endFieldNameIndex)
-                                val endFieldValueIndex = text.indexOf(fie, endFieldNameIndex)
+                                val endFieldNameIndex = text.indexOf(':', posField + FIELD_INFO.length)
+                                val fieldName = text.substring(posField + FIELD_INFO.length, endFieldNameIndex)
+                                val endFieldValueIndex = text.indexOf(FIELD_INFO_END, endFieldNameIndex)
                                 val fieldValue = text.substring(endFieldNameIndex + 1, endFieldValueIndex)
                                 otherField = otherField.plus(Pair(fieldName, fieldValue))
-                                posField = text.indexOf(fi, endFieldValueIndex)
+                                posField = text.indexOf(FIELD_INFO, endFieldValueIndex)
                             }
                             val f = processingStack.last()
                             f(id, value, otherField)
                         }
                     } else {
-                        if (text.length > m.length + 1 && text.substring(m.length + 1).startsWith(abs)) {
-                            mapAjaxText(text.substring(m.length + 1)).map {
+                        if (text.length > CLOSE_LAST_MODAL.length + 1 && text.substring(CLOSE_LAST_MODAL.length + 1).startsWith(BLOCK_START)) {
+                            mapAjaxBlock(text.substring(CLOSE_LAST_MODAL.length + 1)).map {
                                 val target = block.parent?.parent?.ajaxBlockElements?.get(it.key)
                                 target!!.d.innerHTML = it.value
                                 target.refresh()
@@ -131,11 +130,11 @@ class Helper {
                     else block.modal.close()
                 }
 
-                text.startsWith(m2) -> {
+                text.startsWith(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK) -> {
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
-                    if (text.substring(29).startsWith(abs)) {
-                        mapAjaxText(text.substring(29)).map {
+                    if (text.substring(29).startsWith(BLOCK_START)) {
+                        mapAjaxBlock(text.substring(29)).map {
                             val target = block.ajaxBlockElements?.get(it.key)
                                 ?: block.parent!!.parent.ajaxBlockElements!![it.key]
                             target!!.d.innerHTML = it.value
@@ -145,28 +144,28 @@ class Helper {
                         if (block.parent != null) block.parent.open(text.substring(29))
                         else block.modal.open(text.substring(29))
 
-                    } else if (text.substring(29) == rel) {
+                    } else if (text.substring(29) == RELOAD) {
                         window.location.href = Block.href ?: ""
                     }
                 }
 
-                text.startsWith(abs) -> {
-                    mapAjaxText(text).map {
+                text.startsWith(BLOCK_START) -> {
+                    mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements.get(it.key)
                         target!!.d.innerHTML = it.value
                         target.refresh()
                     }
                 }
-                text.startsWith(openModal) -> {
+                text.startsWith(OPEN_MODAL) -> {
                     trace("Helper::opening modal ...")
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    block.modal.open(text.substring(openModal.length))
+                    block.modal.open(text.substring(OPEN_MODAL.length))
                     val s = block.modal.dModalBody.getElementsByTagName("script").asList()
                     trace("Executing $s")
                 }
-                text.startsWith(refreshModal) -> {
+                text.startsWith(REFRESH_MODAL) -> {
                     trace("Helper::refresh modal")
                     if (process != null) {
                         processingStack.add(process)
@@ -175,6 +174,10 @@ class Helper {
                     val s = block.modal.dModalBody.getElementsByTagName("script").asList()
                     trace("Executing $s")
 
+                }
+                text.startsWith(REDIRECT) -> {
+                    trace("Helper::redirect ${text.substring("__redirect__".length)}")
+                    window.location.href = text.substring("__redirect__".length)
                 }
                 else -> {
                     trace("Helper::update current block")

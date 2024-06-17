@@ -51,6 +51,7 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                 Promise.reject(Throwable())
             }
         }.then {
+//            Helper.processAjaxLink(it, parent)
             if (it.startsWith("__redirect__")) {
                 trace("FilterActionButton::onclick __redirect__ ${it.substring("__redirect__".length)}")
                 window.location.href = it.substring("__redirect__".length)
@@ -59,7 +60,7 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
                 window.location.href = (Block.href ?: "")
             } else if (it.startsWith("__ajaxBlockStart__")) {
                 trace("FilterActionButton::onclick __ajaxBlockStart__")
-                Helper.mapAjaxText(it).map { me ->
+                Helper.mapAjaxBlock(it).map { me ->
                     val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
                     if (target != null) {
                         target.updateContent(me.value)

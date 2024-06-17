@@ -63,7 +63,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 window.location.href = (Block.href ?: "")
             } else if (it.startsWith("__ajaxBlockStart__")) {
                 trace("__ajaxBlockStart__ ${parent.parent.parent.ajaxBlockElements}")
-                Helper.mapAjaxText(it).map { me ->
+                Helper.mapAjaxBlock(it).map { me ->
                     val target = parent.parent.parent.ajaxBlockElements?.get(me.key)
                     target!!.d.innerHTML = me.value
                     target.refresh()
@@ -106,7 +106,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
             } else if (it.startsWith("__closeLastModalAndUpdateBlock__:")) {
                 if (parent.parent.parent.parent != null) parent.parent.parent.parent.close()
                 else parent.parent.parent.modal.close()
-                val m = Helper.mapAjaxText(it.substring(29))
+                val m = Helper.mapAjaxBlock(it.substring(29))
                 m.map { me ->
                     val target = parent.parent.parent.parent?.parent?.ajaxBlockElements?.get(me.key)
                     target!!.d.innerHTML = me.value

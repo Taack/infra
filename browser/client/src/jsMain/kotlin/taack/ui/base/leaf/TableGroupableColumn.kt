@@ -68,7 +68,7 @@ class TableGroupableColumn(private val parent: Table, private val s: HTMLSpanEle
                 Promise.reject(Throwable())
             }
         }.then {
-            Helper.mapAjaxText(it).map { me ->
+            Helper.mapAjaxBlock(it).map { me ->
                 parent.parent.d.innerHTML = me.value
             }
         }.then {
@@ -95,7 +95,7 @@ class TableGroupableColumn(private val parent: Table, private val s: HTMLSpanEle
                 Promise.reject(Throwable())
             }
         }.then {
-            Helper.mapAjaxText(it).map { me ->
+            Helper.mapAjaxBlock(it).map { me ->
                 parent.parent.d.innerHTML = me.value
             }
         }.then {
