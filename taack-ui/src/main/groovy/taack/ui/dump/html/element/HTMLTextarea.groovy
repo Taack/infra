@@ -1,5 +1,6 @@
 package taack.ui.dump.html.element
 
+
 import groovy.transform.CompileStatic
 import taack.ui.dump.html.style.Height240
 
@@ -9,6 +10,11 @@ final class HTMLTextarea implements IHTMLElement {
 
     HTMLTextarea(Object value, String name, String placeHolder = null, boolean disabled = false, boolean readonly = false) {
         tag = 'textarea'
+        if (value) {
+            addChildren(
+                    new HTMLTxtContent(value.toString())
+            )
+        }
         attributes.put('value', value?.toString())
         attributes.put('rows', '6')
         styleDescriptor = new Height240()
