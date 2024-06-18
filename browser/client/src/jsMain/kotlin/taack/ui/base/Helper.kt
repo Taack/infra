@@ -201,7 +201,7 @@ class Helper {
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements.get(it.key)
-                        target!!.d.innerHTML = it.value
+                        target!!.d.innerHTML = it.value.substring(BLOCK_START.length + 2 + it.key.length + 3)
                         target.refresh()
                     }
                 }
