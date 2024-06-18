@@ -25,7 +25,7 @@ import taack.ui.dump.html.theme.ThemeSelector
 
 @CompileStatic
 final class RawHtmlBlockDump implements IUiBlockVisitor {
-    private String id
+    private String currentAjaxBlockId = null
     final String modalId
 
     boolean isModal = false
@@ -52,19 +52,27 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
+    boolean doDisplay(String id = null) {
+        // if many blocks in the same response, only redraw current block
+        // further the first block must be in ajaxMode until current block ends
+        if (!id && (!parameter.isAjaxRendering || isModal)) {
+            return true
+        }
+        if (parameter.isAjaxRendering && currentAjaxBlockId == null)
+            currentAjaxBlockId = id
+        return !parameter.isAjaxRendering || currentAjaxBlockId == parameter.ajaxBlockId
+    }
+
+    @Override
     void visitBlock() {
         blockLog.enterBlock('visitBlock')
-        if (!parameter.isAjaxRendering || isModal) {
-            blockLog.topElement = block.block(blockLog.topElement, "${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
-        }
+        blockLog.topElement = block.block(blockLog.topElement, "${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
     }
 
     @Override
     void visitBlockEnd() {
         blockLog.exitBlock('visitBlockEnd')
-        if (!parameter.isAjaxRendering || isModal) {
-            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.BLOCK)
-        }
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.BLOCK)
     }
 
     @Override
@@ -95,14 +103,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitAjaxBlock(final String id) {
-        blockLog.enterBlock('visitAjaxBlock id: ' + id + "parameter.isAjaxRendering: " + parameter.isAjaxRendering)
+        blockLog.enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering)
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
-        blockLog.topElement = block.blockAjax(blockLog.topElement, id, parameter.isAjaxRendering)
+        // if many blocks in the same response, only redraw current block
+        // further the first block must be in ajaxMode until current block ends
+        blockLog.topElement = block.blockAjax(blockLog.topElement, id, parameter.isAjaxRendering && id == currentAjaxBlockId)
     }
 
     @Override
     void visitAjaxBlockEnd() {
         blockLog.exitBlock('visitAjaxBlockEnd')
+        currentAjaxBlockId = null
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
     }
 

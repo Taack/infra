@@ -14,6 +14,11 @@ import taack.ui.dsl.menu.MenuSpec
 class UiBlockVisitor implements IUiBlockVisitor {
 
     @Override
+    boolean doDisplay(String id) {
+        return false
+    }
+
+    @Override
     void visitBlock() {
 
     }

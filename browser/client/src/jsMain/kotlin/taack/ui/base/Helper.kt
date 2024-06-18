@@ -133,6 +133,7 @@ class Helper {
 
         fun processAjaxLink(text: String, base: BaseElement, process: CloseModalPostProcessing? = null) {
             val block = base.getParentBlock()
+            println(text)
             when {
                 text.contains(RELOAD) -> {
                     window.location.href = (Block.href ?: "")
@@ -201,7 +202,15 @@ class Helper {
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements.get(it.key)
-                        target!!.d.innerHTML = it.value.substring(BLOCK_START.length + 2 + it.key.length + 3)
+                        var pos1 = 0
+                        if (it.value.startsWith(BLOCK_START))
+                            pos1 += it.value.indexOf(':') + 1
+                        var pos2 = it.value.length - pos1
+                        if (it.value.endsWith(BLOCK_END))
+                            pos2 -= BLOCK_END.length
+                        println("pos1: $pos1, pos2: $pos2")
+                        println(it.value.substring(pos1, pos2))
+                        target!!.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
                         target.refresh()
                     }
                 }

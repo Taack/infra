@@ -84,12 +84,10 @@ class CmsController implements WebAttributes {
 
     private Closure<BlockSpec> buildImagesTab(CmsPage cmsPage) {
         BlockSpec.buildBlockSpec {
-            ajaxBlock "buildImagesTab", {
-                table cmsUiService.buildCmsImageTable(cmsPage), {
-                    menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
-                    menu this.&selectM2mCmsImage as MC, cmsPage.id
-                    menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
-                }
+            table cmsUiService.buildCmsImageTable(cmsPage), {
+                menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
+                menu this.&selectM2mCmsImage as MC, cmsPage.id
+                menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
             }
         }
     }

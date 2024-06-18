@@ -27,7 +27,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
             }
         }
     }
-    val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")?.value ?:  d.attributes.getNamedItem("blockId")?.value
+    val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")!!.value
     val blockId = ajaxBlockId ?: parent.blockId
     var filters: Map<String, Filter> = mutableMapOf()
     var tables: Map<String, Table> = mutableMapOf()

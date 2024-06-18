@@ -46,10 +46,12 @@ final class UiBlockSpecifier {
      */
     void visitBlock(final IUiBlockVisitor blockVisitor) {
         if (blockVisitor && closure) {
-            blockVisitor.visitBlock()
+            println "AUOAUOAUOAUO +++ ${blockVisitor.doDisplay(null)}"
+            if (blockVisitor.doDisplay(null)) blockVisitor.visitBlock()
             closure.delegate = new BlockSpec(blockVisitor)
             closure.call()
-            blockVisitor.visitBlockEnd()
+            if (blockVisitor.doDisplay(null)) blockVisitor.visitBlockEnd()
+            println "AUOAUOAUOAUO --- ${blockVisitor.doDisplay(null)}"
         }
     }
 }
