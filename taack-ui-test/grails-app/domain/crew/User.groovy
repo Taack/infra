@@ -77,6 +77,11 @@ class User implements Serializable {
         ret
     }
 
+    @Override
+    String toString() {
+        return "$username[$id]"
+    }
+
     List<User> getAllManagers() {
         final List<User> res = []
         User cursor = this

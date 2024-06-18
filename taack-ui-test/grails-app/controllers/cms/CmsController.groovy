@@ -418,7 +418,6 @@ class CmsController implements WebAttributes {
     }
 
     def editCmsImage(CmsImage cmsImage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
         boolean removeModal = false
         if (!cmsImage)
             if (params.containsKey('cmsPageId'))
@@ -427,7 +426,8 @@ class CmsController implements WebAttributes {
                 removeModal = true
                 cmsImage = new CmsImage(imageType: ImageType.PAGE_PREVIEW)
             }
-        b.ui {
+
+        UiBlockSpecifier b = new UiBlockSpecifier().ui {
             if (removeModal)
                 closeModalAndUpdateBlock {
                     modal {
@@ -443,7 +443,7 @@ class CmsController implements WebAttributes {
                     }
                 }
         }
-        taackUiService.show(b, buildMenu())
+        taackUiService.show(b)
     }
 
     def editCmsVideo(CmsVideoFile videoFile) {
@@ -944,17 +944,15 @@ class CmsController implements WebAttributes {
     }
 
     def selectM2mCmsImage(CmsPage cmsPage) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
         def filter = cmsPage ? CmsUiService.buildCmsImageFilter(cmsPage) : CmsUiService.buildCmsImageFilter(null, params['imageType'] as ImageType)
 
-        b.ui {
+        taackUiService.show new UiBlockSpecifier().ui {
             modal {
                 ajaxBlock "selectM2mCmsImageBlock", {
                     tableFilter filter, cmsUiService.buildCmsImageTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
                 }
             }
         }
-        taackUiService.show(b, buildMenu())
     }
 
     def selectM2mCmsVideo(CmsPage cmsPage) {
