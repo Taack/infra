@@ -224,7 +224,10 @@ class CrewController implements WebAttributes {
     @Secured("ROLE_ADMIN")
     @Transactional
     def saveUser() {
-        if (params.password) params.password = springSecurityService.encodePassword(params.password as String)
+        User u = User.get(params.long('id'))
+        if ((u && u.password != params.password) || !u) {
+            params.password = springSecurityService.encodePassword(params.password as String)
+        }
         taackSaveService.saveThenReloadOrRenderErrors(User)
     }
 
@@ -342,7 +345,7 @@ class CrewController implements WebAttributes {
                 form f
             }
         }
-        taackUiService.show(b, buildMenu())
+        taackUiService.show(b)
     }
 
     @Secured(["ROLE_ADMIN", "ROLE_SWITCH_USER"])
