@@ -34,6 +34,7 @@ final class Parameter implements WebAttributes {
     final Long additionalId
     final Long beanId
     final Boolean isAjaxRendering
+    final String ajaxBlockId
     final String fieldName
     final Long modalId = System.currentTimeMillis()
     final NumberFormat nf
@@ -46,7 +47,7 @@ final class Parameter implements WebAttributes {
 
     String aClassSimpleName
 
-    Parameter(final Boolean isAjaxRendering = false, final Locale lcl = null, MessageSource messageSource = null) {
+    Parameter(final Locale lcl = null, MessageSource messageSource = null) {
         this.messageSource = messageSource
         this.sort = params.get(P_SORT) ?: null
         this.order = params.get(P_ORDER) ?: null
@@ -56,7 +57,8 @@ final class Parameter implements WebAttributes {
         this.beanId = params.long(P_ID) ?: null
         this.brand = params.get(P_BRAND) ?: null
         this.fieldName = params.get(P_FIELD_NAME) ?: null
-        this.isAjaxRendering = isAjaxRendering
+        this.ajaxBlockId = params.get('ajaxBlockId') ?: null
+        this.isAjaxRendering = params.boolean('isAjax') == true
         this.lcl = lcl
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null

@@ -49,8 +49,8 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
         div
     }
 
-    static IHTMLElement blockAjax(IHTMLElement topElement, String blockId) {
-        IHTMLElement e = new HTMLAjaxBlock(blockId).builder.build()
+    static IHTMLElement blockAjax(IHTMLElement topElement, String blockId, boolean isAjax) {
+        IHTMLElement e = isAjax ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).build()
         topElement.addChildren(e)
         e
     }

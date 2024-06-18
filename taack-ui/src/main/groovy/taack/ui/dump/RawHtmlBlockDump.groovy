@@ -28,7 +28,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     private String id
     final String modalId
 
-    private String ajaxBlockId = null
     boolean isModal = false
     boolean isModalRefresh = false
 
@@ -96,21 +95,15 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitAjaxBlock(final String id) {
-        blockLog.enterBlock('visitAjaxBlock id: ' + id)
-        if (!parameter.isAjaxRendering || isModal) {
-            ajaxBlockId = id
-        }
-        if (isModalRefresh) {
-            blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
-            blockLog.topElement = block.blockAjax(blockLog.topElement, id)
-        }
+        blockLog.enterBlock('visitAjaxBlock id: ' + id + "parameter.isAjaxRendering: " + parameter.isAjaxRendering)
+        blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
+        blockLog.topElement = block.blockAjax(blockLog.topElement, id, parameter.isAjaxRendering)
     }
 
     @Override
     void visitAjaxBlockEnd() {
-        blockLog.exitBlock('visitAjaxBlockEnd ajaxBlockId: ' + ajaxBlockId)
-        if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
-        if (isModalRefresh) blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
+        blockLog.exitBlock('visitAjaxBlockEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
     }
 
     @Override
@@ -171,7 +164,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitChart(final UiChartSpecifier chartSpecifier) {
         blockLog.stayBlock('visitChart')
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
+        chartSpecifier.visitChart(new RawHtmlChartDump(out, "ajaxBlockId"))
     }
 
     @Override
@@ -184,7 +177,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitDiagram(final UiDiagramSpecifier diagramSpecifier) {
         blockLog.stayBlock('visitDiagram')
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, BlockSpec.Width.MAX), UiDiagramSpecifier.DiagramBase.SVG)
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, "ajaxBlockId", BlockSpec.Width.MAX), UiDiagramSpecifier.DiagramBase.SVG)
     }
 
     @Override

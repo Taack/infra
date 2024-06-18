@@ -106,7 +106,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             ajaxBlockId = id
         }
 //        if (isModalRefresh) out << "__ajaxBlockStart__$id:"
-        if (isModalRefresh) topElement = block.blockAjax(topElement, id)
+        if (isModalRefresh) topElement = block.blockAjax(topElement, id, false)
     }
 
     @Override
