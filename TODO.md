@@ -36,12 +36,12 @@
   - ~~clean up form / table / filter DSLs~~
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
-- Reduce CSS and JS
+- ~~Reduce CSS and JS~~
 - Fix table grouping / trees with pagination
-- Improve form layout, add row in DSL
-- More coherent button style in forms
-- More restrictive DSL
-- Simplify i18n, default action with naming convention starting with save, select, preview ... should be auto-translated
+- ~~Improve form layout, add row in DSL~~
+- ~~More coherent button style in forms~~
+- ~~More restrictive DSL~~
+- ~~Simplify i18n, default action with naming convention starting with save, select, preview ... should be auto-translated~~
 - ~~Bump CSS, improve theming~~
 - ~~improve block caption~~
 - ~~Bootstrap~~
@@ -49,13 +49,15 @@
 - ~~Improve Table / Filter~~
   - ~~add top level `condition` (`if`, branch on 2 closures)~~
     - ~~Test, debug, offline capabilities~~
-- Add title to modal / menu / size
+- ~~Add title to modal / menu / size~~
 - For GormEntity, propose a default M2O or M2M in forms (field) / shows
-- remove Width from form ... layout managed from elsewhere.. 
+- ~~remove Width from form ... layout managed from elsewhere..~~ 
 - remove object param from visitShow
-- add col and row
-- remove close title
-- remove visit*End when possible
+- ~~add col and row~~
+- ~~remove close title~~
+- ~~remove visit*End when possible~~
+- add refresh current block (see refresh in cms/editPage)
+- use different translations for create or edit, if ID is present
 
 # 0.5.x
 
