@@ -9,7 +9,7 @@ final class HTMLTxtContent implements IHTMLElement {
 
     HTMLTxtContent(String content) {
         tag = null
-        this.content = content
+        this.content = content ?: ''
     }
 
     @Override

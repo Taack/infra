@@ -38,6 +38,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final <T> String dataFormat(T value, String format) {
+        if (!value) return ''
         switch (value.class) {
             case BigDecimal:
                 DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
@@ -46,7 +47,7 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
                 SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy/MM/dd")
                 return sdf.format(value)
             default:
-                return value?.toString()
+                return value.toString()
         }
     }
 
