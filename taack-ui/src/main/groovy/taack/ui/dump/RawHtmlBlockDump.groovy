@@ -55,12 +55,15 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean doDisplay(String id = null) {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        if (!id && (!parameter.isAjaxRendering || isModal)) {
+        blockLog.stayBlock("doDisplay id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
+        if (!id && (!parameter.isAjaxRendering && !isModal)) {
             return true
-        }
+        } else if (!id) return false
         if (parameter.isAjaxRendering && currentAjaxBlockId == null)
             currentAjaxBlockId = id
-        return !parameter.isAjaxRendering || currentAjaxBlockId == parameter.ajaxBlockId
+
+        blockLog.stayBlock("doDisplay currentAjaxBlockId: $currentAjaxBlockId, ajaxBlockId: ${parameter.ajaxBlockId}")
+        return !parameter.isAjaxRendering || currentAjaxBlockId == id //parameter.ajaxBlockId
     }
 
     @Override
@@ -247,7 +250,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitModal() {
-        blockLog.enterBlock('visitModal ' + modalId)
+        blockLog.enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isModalRefresh)
         isModal = true
         HTMLAjaxModal modal = new HTMLAjaxModal(isModalRefresh)
         blockLog.topElement.addChildren(modal)
