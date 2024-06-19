@@ -431,16 +431,12 @@ class CmsController implements WebAttributes {
             if (removeModal)
                 closeModalAndUpdateBlock {
                     modal {
-                        ajaxBlock "imagesForm", {
-                            form buildCmsImageForm(cmsImage)
-                        }
+                        form buildCmsImageForm(cmsImage)
                     }
                 }
             else
                 modal {
-                    ajaxBlock "imagesForm", {
-                        form buildCmsImageForm(cmsImage)
-                    }
+                    form buildCmsImageForm(cmsImage)
                 }
         }
         taackUiService.show(b)
@@ -948,9 +944,7 @@ class CmsController implements WebAttributes {
 
         taackUiService.show new UiBlockSpecifier().ui {
             modal {
-                ajaxBlock "selectM2mCmsImageBlock", {
-                    tableFilter filter, cmsUiService.buildCmsImageTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
-                }
+                tableFilter filter, cmsUiService.buildCmsImageTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
             }
         }
     }
