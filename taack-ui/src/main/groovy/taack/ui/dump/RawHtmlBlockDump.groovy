@@ -60,7 +60,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             return true
         } else if (!id) return false
         if (parameter.isAjaxRendering && currentAjaxBlockId == null)
-            currentAjaxBlockId = id
+            currentAjaxBlockId = parameter.ajaxBlockId
 
         blockLog.stayBlock("doDisplay currentAjaxBlockId: $currentAjaxBlockId, ajaxBlockId: ${parameter.ajaxBlockId}")
         return !parameter.isAjaxRendering || currentAjaxBlockId == id //parameter.ajaxBlockId
