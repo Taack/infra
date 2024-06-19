@@ -56,7 +56,7 @@ class CrewPdfService implements WebAttributes {
                         count++
                         boolean muHasChildren = !mu.managedUsers.isEmpty()
                         rowTree muHasChildren, {
-                            rowColumn(1, 1, new Style("firstCellInGroup-${level}", cssStyle[level])) {
+                            rowColumn {
                                 rowField attachmentUiService.preview(mu.mainPicture?.id, TaackAttachmentService.PreviewFormat.DEFAULT_PDF)
                             }
                             rowColumn {

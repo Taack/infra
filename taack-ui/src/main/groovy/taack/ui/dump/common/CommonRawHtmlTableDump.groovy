@@ -8,7 +8,6 @@ import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.style.DisplayBlock
-import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
 
 import java.text.DecimalFormat
@@ -123,12 +122,13 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         HTMLTr tr = new HTMLTr()
         tr.taackTag = TaackTag.TABLE_ROW
         if (indent > 0) {
-            tr.styleDescriptor = new DisplayNone()
+            //tr.styleDescriptor = new DisplayNone()
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
         }
         blockLog.topElement.addChildren(tr)
         blockLog.topElement = tr
+        firstInCol = true
     }
 
     void visitRowRO(Style style, boolean hasChildren) {
@@ -189,10 +189,10 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
         blockLog.enterBlock('visitRowColumn')
         isInCol = true
         HTMLTd td = new HTMLTd(colSpan, rowSpan)
+        if (firstInCol) td.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
+        firstInCol = false
         blockLog.topElement.addChildren(td)
         blockLog.topElement = td
-
-        firstInCol = true
     }
 
     @Override

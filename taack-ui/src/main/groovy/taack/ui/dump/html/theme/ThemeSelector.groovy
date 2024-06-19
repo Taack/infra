@@ -17,7 +17,7 @@ final class ThemeSelector implements Validateable {
     ThemeMode themeMode
     ThemeSize themeSize
 
-    private ThemeSelector(ThemeMode themeMode, ThemeSize themeSize) {
+    ThemeSelector(ThemeMode themeMode, ThemeSize themeSize) {
         this.themeMode = themeMode
         this.themeSize = themeSize
     }

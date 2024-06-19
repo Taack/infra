@@ -406,11 +406,11 @@ class CrewController implements WebAttributes {
         taackSaveService.saveThenRedirectOrRenderErrors(Role, this.&listRoles as MC)
     }
 
-    def downloadBinPdf(Boolean isPdf) {
-        taackUiService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', isPdf != true)
+    def downloadBinPdf() {
+        taackUiService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', true)
     }
 
-    def downloadBinPdf2(Boolean isPdf) {
+    def downloadBinPdf2() {
         taackUiService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', false)
     }
 }

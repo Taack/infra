@@ -1,11 +1,18 @@
 package taack.ui.dump.pdf
 
 import groovy.transform.CompileStatic
+import org.grails.buffer.StreamByteBuffer
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.printable.IUiPrintableVisitor
 import taack.ui.dump.Parameter
+import taack.ui.dump.RawHtmlTableDump
+import taack.ui.dump.common.BlockLog
+import taack.ui.dump.html.layout.HTMLEmpty
+import taack.ui.dump.html.theme.ThemeMode
+import taack.ui.dump.html.theme.ThemeSelector
+import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
 class RawHtmlPrintableDump implements IUiPrintableVisitor {
@@ -20,8 +27,11 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     String headerHeight = null
 
     private int tabOccurrence = 0
+    final private BlockLog blockLog
 
-    RawHtmlPrintableDump(final ByteArrayOutputStream out, Parameter parameter) {
+    RawHtmlPrintableDump(ByteArrayOutputStream out, Parameter parameter) {
+        this.blockLog = new BlockLog(new ThemeSelector(ThemeMode.LIGHT, ThemeSize.NORMAL))
+        this.blockLog.topElement = new HTMLEmpty()
         this.out = out
         this.parameter = parameter
     }
@@ -35,6 +45,10 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitTable(UiTableSpecifier uiTableSpecifier, BlockSpec.Width width) {
+        visitInnerBlock(width)
+        uiTableSpecifier.visitTable(new RawHtmlTableDump(blockLog, "pdf", parameter))
+        out << blockLog.topElement.output
+        visitInnerBlockEnd()
 
     }
 
