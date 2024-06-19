@@ -19,7 +19,7 @@ import taack.ui.dump.html.element.ButtonStyle
  * browser.
  */
 @CompileStatic
-final class FormSpec extends FormSectionSpec {
+final class FormSpec extends FormRowSpec {
 
     /**
      * Form sections relative Width
@@ -65,6 +65,4 @@ final class FormSpec extends FormSectionSpec {
     void formAction(final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
         if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
     }
-
-
 }

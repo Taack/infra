@@ -34,6 +34,7 @@ final class Parameter implements WebAttributes {
     final Long additionalId
     final Long beanId
     final Boolean isAjaxRendering
+    final Boolean isRefresh
     final String ajaxBlockId
     final String fieldName
     final Long modalId = System.currentTimeMillis()
@@ -59,6 +60,7 @@ final class Parameter implements WebAttributes {
         this.fieldName = params.get(P_FIELD_NAME) ?: null
         this.ajaxBlockId = params.get('ajaxBlockId') ?: null
         this.isAjaxRendering = params.boolean('isAjax') == true
+        this.isRefresh = params.boolean('refresh') == true
         this.lcl = lcl
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null

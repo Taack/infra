@@ -26,6 +26,7 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
+import taack.ui.dump.html.layout.BootstrapLayout
 
 @GrailsCompileStatic
 @Secured(['isAuthenticated()'])
@@ -190,26 +191,33 @@ class CrewController implements WebAttributes {
     def editUser(User user) {
         user ?= new User(params)
 
-        UiFormSpecifier f = new UiFormSpecifier()
-        f.ui user, {
-            section "User", {
-                field user.username_
-                field user.firstName_
-                field user.lastName_
-                ajaxField user.manager_, this.&selectUserM2O as MC
-                ajaxField user.mainPicture_, this.&selectUserMainPicture as MC
-                field user.password_
-            }
-            section "Coords", {
-                field user.businessUnit_
-                field user.mail_
-                field user.subsidiary_
-            }
-            section "Status", {
-                field user.enabled_
-                field user.accountExpired_
-                field user.accountLocked_
-                field user.passwordExpired_
+        UiFormSpecifier f = new UiFormSpecifier().ui user, {
+            row {
+                col {
+                    section "User", {
+                        field user.username_
+                        field user.firstName_
+                        field user.lastName_
+                        ajaxField user.manager_, this.&selectUserM2O as MC
+                        ajaxField user.mainPicture_, this.&selectUserMainPicture as MC
+                        field user.password_
+                    }
+                }
+                col {
+                    section "Coords", {
+                        field user.businessUnit_
+                        field user.mail_
+                        field user.subsidiary_
+                    }
+                }
+                col {
+                    section "Status", {
+                        field user.enabled_
+                        field user.accountExpired_
+                        field user.accountLocked_
+                        field user.passwordExpired_
+                    }
+                }
             }
             formAction this.&saveUser as MC, user.id
         }

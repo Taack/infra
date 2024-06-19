@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.block.BlockSpec.Width
 import taack.ui.dump.html.element.ButtonStyle
 
 import java.text.NumberFormat
@@ -35,7 +36,7 @@ interface IUiFormVisitor {
 
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style)
 
-    void visitCol()
+    void visitCol(Width width)
 
     void visitColEnd()
 

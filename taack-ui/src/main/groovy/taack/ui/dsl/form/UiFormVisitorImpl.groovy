@@ -44,11 +44,6 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitCol() {
-
-    }
-
-    @Override
     void visitColEnd() {
 
     }
@@ -90,6 +85,11 @@ class UiFormVisitorImpl implements IUiFormVisitor {
 
     @Override
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
+
+    }
+
+    @Override
+    void visitCol(BlockSpec.Width width) {
 
     }
 

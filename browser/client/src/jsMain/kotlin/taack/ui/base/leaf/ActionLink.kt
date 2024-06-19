@@ -20,7 +20,7 @@ class ActionLink(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a
         fun getActionLink(p: Block): List<ActionLink> {
             val elements: List<Node>?
             elements = document.querySelectorAll("body>nav a[ajaxaction]").asList()
-            return elements.map {
+            return (elements + p.d.querySelectorAll("div[blockId]>nav a[ajaxaction]").asList()).map {
                 ActionLink(p, it as HTMLAnchorElement)
             }
         }

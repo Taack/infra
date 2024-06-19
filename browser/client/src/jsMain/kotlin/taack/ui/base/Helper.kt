@@ -123,7 +123,7 @@ class Helper {
                     pos1 += BLOCK_START.length
                     pos2 = text.indexOf(':', pos1)
 
-                    m[abId] = content
+                    m[abId] = content.substring(pos1, pos2)
                 } while (pos2 != -1)
             }
             return m

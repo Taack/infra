@@ -8,6 +8,7 @@ import taack.ast.type.WidgetKind
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.block.BlockSpec.Width
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
@@ -76,8 +77,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.aObject = aObject
         parameter.aClassSimpleName = aObject.class.simpleName
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
+        blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(
-                formThemed.builder.addClasses('row', 'taackForm').setTaackTag(TaackTag.FORM).addChildren(
+                formThemed.builder.addClasses('row', 'taackForm').addChildren(
                         new HTMLInput(InputType.HIDDEN, id, 'id'),
                         new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
@@ -273,9 +275,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitCol() {
+    void visitCol(Width width) {
         blockLog.topElement.setTaackTag(TaackTag.COL)
-        blockLog.topElement = layout.col(blockLog.topElement)
+        blockLog.topElement = layout.col(blockLog.topElement, width)
     }
 
     @Override
