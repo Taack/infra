@@ -428,7 +428,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content
      */
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource), "intranet.citel.fr")
+        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource))
         blockSpecifier.visitBlock(htmlPdf)
 
         String html = g.render template: "/taackUi/block-mail", model: [
