@@ -41,4 +41,9 @@ class ThemeController {
 
         taackUiService.ajaxReload()
     }
+
+    def autoTheme(String themeModeAuto) {
+        session[ThemeSelector.SESSION_THEME_AUTO] = themeModeAuto
+        render 'themeModeAuto ' + themeModeAuto
+    }
 }

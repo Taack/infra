@@ -12,13 +12,16 @@ import javax.servlet.http.HttpSession
 final class ThemeSelector implements Validateable {
 
     final static String SESSION_THEME_MODE = 'themeMode'
+    final static String SESSION_THEME_AUTO = 'themeAuto'
     final static String SESSION_THEME_SIZE = 'themeSize'
 
     ThemeMode themeMode
+    ThemeMode themeAuto
     ThemeSize themeSize
 
     ThemeSelector(ThemeMode themeMode, ThemeSize themeSize) {
         this.themeMode = themeMode
+        themeAuto = themeMode
         this.themeSize = themeSize
     }
 

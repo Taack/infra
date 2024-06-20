@@ -174,12 +174,14 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             render visit(block, true)
         } else {
             ThemeSelector themeSelector = themeService.themeSelector
-            ThemeSize tableThemeSize = themeSelector.themeSize
-            ThemeMode tableThemeMode = themeSelector.themeMode
+            ThemeSize themeSize = themeSelector.themeSize
+            ThemeMode themeMode = themeSelector.themeMode
+            ThemeMode themeAuto = themeSelector.themeMode
 
             return new ModelAndView("/taackUi/block", [
-                    themeSize   : tableThemeSize,
-                    themeMode   : tableThemeMode,
+                    themeSize   : themeSize,
+                    themeMode   : themeMode,
+                    themeAuto   : themeAuto,
                     block       : visit(block),
                     menu        : visitMenu(menu),
                     conf        : taackUiPluginConfiguration,
