@@ -38,8 +38,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     private final BlockLog blockLog
 
-    RawHtmlBlockDump(final Parameter parameter, final String modalId = null) {
-        if (modalId) isModal = true
+    RawHtmlBlockDump(final Parameter parameter) {
         this.parameter = parameter
         this.modalId = modalId
         if (parameter.params.boolean('refresh'))
@@ -55,15 +54,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean doDisplay(String id = null) {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        blockLog.stayBlock("doDisplay id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
+        blockLog.stayBlock("doDisplay1 id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
         if (!id && (!parameter.isAjaxRendering && !isModal)) {
             return true
-        } else if (!id) return false
+        } else if (!id) return isModal
         if (parameter.isAjaxRendering && currentAjaxBlockId == null)
             currentAjaxBlockId = parameter.ajaxBlockId
 
-        blockLog.stayBlock("doDisplay currentAjaxBlockId: $currentAjaxBlockId, ajaxBlockId: ${parameter.ajaxBlockId}")
-        return !parameter.isAjaxRendering || currentAjaxBlockId == id //parameter.ajaxBlockId
+        boolean ret = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal)
+        blockLog.stayBlock("doDisplay2 currentAjaxBlockId: $currentAjaxBlockId, ajaxBlockId: ${parameter.ajaxBlockId}, ret = $ret")
+        return ret
     }
 
     @Override
