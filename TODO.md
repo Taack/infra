@@ -58,9 +58,12 @@
 - ~~remove visit*End when possible~~
 - add refresh current block (see refresh in cms/editPage)
 - use different translations for create or edit, if ID is present
+- Use bootstrap progress
+- Choose bootstrap from jDeliver or custom
 
 # 0.5.x
 
+- Add toast and websockets events
 - SVG theme, use id
 - Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Ajax scrollable tables
