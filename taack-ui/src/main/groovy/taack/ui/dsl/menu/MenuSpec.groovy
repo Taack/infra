@@ -13,10 +13,12 @@ import taack.ui.dsl.helper.Utils
 final class MenuSpec {
     final IUiMenuVisitor menuVisitor
     final SubMenuSpec subMenuSpec
+    final String ajaxBlockd
 
     TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
 
-    MenuSpec(final IUiMenuVisitor menuVisitor) {
+    MenuSpec(final String ajaxBlockd = null, final IUiMenuVisitor menuVisitor) {
+        this.ajaxBlockd = ajaxBlockd
         this.menuVisitor = menuVisitor
         this.subMenuSpec = new SubMenuSpec(menuVisitor)
     }

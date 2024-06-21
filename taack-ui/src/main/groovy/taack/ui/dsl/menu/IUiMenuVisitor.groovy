@@ -13,7 +13,7 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitMenuLabelEnd()
 
-    void visitMenuStart(MenuSpec.MenuMode menuMode)
+    void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId)
 
     void visitMenuStartEnd()
 

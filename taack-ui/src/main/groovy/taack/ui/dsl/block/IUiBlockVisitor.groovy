@@ -14,7 +14,7 @@ import taack.ui.dsl.menu.IUiMenuVisitor
 @CompileStatic
 interface IUiBlockVisitor extends IUiMenuVisitor {
 
-    boolean doDisplay(String id)
+    boolean doRenderElement(String id)
 
     void visitBlock()
 

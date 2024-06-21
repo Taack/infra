@@ -66,7 +66,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    boolean doDisplay(String id) {
+    boolean doRenderElement(String id) {
         return false
     }
 
@@ -256,7 +256,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitMenuStart(MenuSpec.MenuMode menuMode) {
+    void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
         topElement = menu.menuStart(topElement)
 
     }

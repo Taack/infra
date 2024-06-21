@@ -36,6 +36,7 @@ final class Parameter implements WebAttributes {
     final Boolean isAjaxRendering
     final Boolean isRefresh
     final String ajaxBlockId
+    final String targetAjaxBlockId
     final String fieldName
     final Long modalId = System.currentTimeMillis()
     final NumberFormat nf
@@ -59,6 +60,7 @@ final class Parameter implements WebAttributes {
         this.brand = params.get(P_BRAND) ?: null
         this.fieldName = params.get(P_FIELD_NAME) ?: null
         this.ajaxBlockId = params.get('ajaxBlockId') ?: null
+        this.targetAjaxBlockId = params.get('targetAjaxBlockId') ?: null
         this.isAjaxRendering = params.boolean('isAjax') == true
         this.isRefresh = params.boolean('refresh') == true
         this.lcl = lcl

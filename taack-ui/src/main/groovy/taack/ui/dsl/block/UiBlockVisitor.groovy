@@ -14,7 +14,7 @@ import taack.ui.dsl.menu.MenuSpec
 class UiBlockVisitor implements IUiBlockVisitor {
 
     @Override
-    boolean doDisplay(String id) {
+    boolean doRenderElement(String id) {
         return false
     }
 
@@ -174,7 +174,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitMenuStart(MenuSpec.MenuMode menuMode) {
+    void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
 
     }
 

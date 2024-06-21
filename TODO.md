@@ -56,13 +56,15 @@
 - ~~add col and row~~
 - ~~remove close title~~
 - ~~remove visit*End when possible~~
-- add refresh current block (see refresh in cms/editPage)
-- use different translations for create or edit, if ID is present
+- ~~add refresh current block (see refresh in cms/editPage)~~
+- use different translations for `create` or `edit`, if ID is present
 - Use bootstrap progress
 - Choose bootstrap from jDeliver or custom
+- Add **horizontal scrollbar on tables** when needed
 
 # 0.5.x
 
+- Vertical / Horizontal menu switch
 - Add toast and websockets events
 - SVG theme, use id
 - Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)

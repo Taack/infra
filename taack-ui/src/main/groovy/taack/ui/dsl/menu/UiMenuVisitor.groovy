@@ -20,7 +20,7 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuStart(MenuSpec.MenuMode menuMode) {
+    void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
 
     }
 

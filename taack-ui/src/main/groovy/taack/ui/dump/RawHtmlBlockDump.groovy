@@ -27,6 +27,7 @@ import taack.ui.dump.html.theme.ThemeSelector
 final class RawHtmlBlockDump implements IUiBlockVisitor {
     private String currentAjaxBlockId = null
     final String modalId
+    String futurCurrentAjaxBlockId
 
     boolean isModal = false
     boolean isModalRefresh = false
@@ -51,7 +52,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    boolean doDisplay(String id = null) {
+    boolean doRenderElement(String id = null) {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
         blockLog.stayBlock("doDisplay1 id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
@@ -61,9 +62,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (parameter.isAjaxRendering && currentAjaxBlockId == null)
             currentAjaxBlockId = parameter.ajaxBlockId
 
-        boolean ret = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal)
-        blockLog.stayBlock("doDisplay2 currentAjaxBlockId: $currentAjaxBlockId, ajaxBlockId: ${parameter.ajaxBlockId}, ret = $ret")
-        return ret
+        if (parameter.targetAjaxBlockId) currentAjaxBlockId = parameter.targetAjaxBlockId
+
+        boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal) || parameter.targetAjaxBlockId
+        blockLog.stayBlock("doDisplay2 currentAjaxBlockId: $currentAjaxBlockId, targetAjaxBlockId: ${parameter.targetAjaxBlockId}, ajaxBlockId: ${parameter.ajaxBlockId}, doRender = $doRender")
+        return doRender
     }
 
     @Override
@@ -105,12 +108,18 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitAjaxBlock(final String id) {
-        blockLog.enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering)
+    void visitAjaxBlock(String id) {
+        blockLog.enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering + " parameter.ajaxBlockId: " + parameter.ajaxBlockId)
+        if (!id) id = parameter.ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        blockLog.topElement = block.blockAjax(blockLog.topElement, id, parameter.isRefresh && parameter.isAjaxRendering && id == currentAjaxBlockId)
+        boolean doAjaxRendering = parameter.isRefresh && parameter.isAjaxRendering && id == currentAjaxBlockId
+        if (!doAjaxRendering && parameter.targetAjaxBlockId) {
+            id = parameter.targetAjaxBlockId
+            doAjaxRendering = true
+        }
+        blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering)
     }
 
     @Override
@@ -301,8 +310,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitMenuStart(MenuSpec.MenuMode menuMode) {
-        blockLog.enterBlock('visitMenuStart')
+    void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
+        blockLog.enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
+        futurCurrentAjaxBlockId = ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.MENU)
         menu = new BootstrapMenu(blockLog)
         blockLog.topElement = menu.menuStart(blockLog.topElement)
@@ -352,6 +362,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
         blockLog.stayBlock('visitLabeledSubMenu ' + i18n)
+        if (futurCurrentAjaxBlockId) {
+            params ?= [:]
+            params.put('targetAjaxBlockId', futurCurrentAjaxBlockId)
+        }
         blockLog.topElement = menu.menu(blockLog.topElement, i18n, parameter.isAjaxRendering, parameter.urlMapped(controller, action, params))
     }
 

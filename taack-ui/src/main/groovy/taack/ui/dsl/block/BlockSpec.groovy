@@ -94,11 +94,11 @@ final class BlockSpec {
      * @param closure description of the tabulations
      */
     void tabs(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitBlockTabs()
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabs()
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitBlockTabsEnd()
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabsEnd()
     }
 
     /**
@@ -107,11 +107,11 @@ final class BlockSpec {
      * @param closure content of the tabulation.
      */
     void tab(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitBlockTab(i18n)
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTab(i18n)
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitBlockTabEnd()
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabEnd()
     }
 
     /**
@@ -121,11 +121,11 @@ final class BlockSpec {
      * @param closure
      */
     void col(final Width width = Width.HALF, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitCol(width)
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitCol(width)
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitColEnd()
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitColEnd()
     }
 
     /**
@@ -135,11 +135,11 @@ final class BlockSpec {
      * @param closure
      */
     void row(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitRow()
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitRow()
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doDisplay(null)) blockVisitor.visitRowEnd()
+        if (blockVisitor.doRenderElement(null)) blockVisitor.visitRowEnd()
     }
 
     /**
@@ -151,9 +151,8 @@ final class BlockSpec {
      * @param visitAjax set to false to process block like non ajax block
      * @param closure description of the user interface
      */
-    void ajaxBlock(final String id, Boolean visitAjax = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        println "AUOAUOA ajaxBlock $id ${blockVisitor.doDisplay(id)}"
-        if (blockVisitor.doDisplay(id)) {
+    void ajaxBlock(final String id = null, Boolean visitAjax = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        if (!id || blockVisitor.doRenderElement(id)) {
             if (visitAjax) blockVisitor.visitAjaxBlock(id)
             closure.delegate = this
             closure.call()
@@ -176,11 +175,11 @@ final class BlockSpec {
         blockVisitor.visitModalEnd()
     }
 
-    private void processMenuBlock(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure) {
-        if (blockVisitor.doDisplay(null)) {
+    private void processMenuBlock(String ajaxBlockId, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure) {
+        if (blockVisitor.doRenderElement(null)) {
             if (closure) {
                 blockVisitor.visitBlockHeader()
-                blockVisitor.visitMenuStart(null)
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL, ajaxBlockId)
                 closure.delegate = new MenuSpec(blockVisitor) //menuSpec
                 closure.call()
                 counter++
@@ -201,8 +200,8 @@ final class BlockSpec {
     void form(final UiFormSpecifier formSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('form')
-        processMenuBlock(closure)
-        if (blockVisitor.doDisplay(aId)) {
+        processMenuBlock(aId, closure)
+        if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitForm(formSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -221,8 +220,8 @@ final class BlockSpec {
     void show(final UiShowSpecifier showSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('show')
-        processMenuBlock(closure)
-        if (blockVisitor.doDisplay(aId)) {
+        processMenuBlock(aId, closure)
+        if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitShow(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -232,8 +231,8 @@ final class BlockSpec {
     void table(final UiTableSpecifier tableSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('table')
-        processMenuBlock(closure)
-        if (blockVisitor.doDisplay(aId)) {
+        processMenuBlock(aId, closure)
+        if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitTable(aId, tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -253,8 +252,8 @@ final class BlockSpec {
                      final UiTableSpecifier tableSpecifier,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('tableFilter')
-        processMenuBlock(closure)
-        if (blockVisitor.doDisplay(aId)) {
+        processMenuBlock(aId, closure)
+        if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitRow()
             blockVisitor.visitTableFilter(aId, filterSpecifier, tableSpecifier)
@@ -275,8 +274,8 @@ final class BlockSpec {
     void chart(final UiChartSpecifier chartSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
-        processMenuBlock(closure)
-        if (blockVisitor.doDisplay(aId)) {
+        processMenuBlock(aId, closure)
+        if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitChart(chartSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -304,7 +303,7 @@ final class BlockSpec {
     void custom(final String html, final Style style = null,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('custom')
-        if (blockVisitor.doDisplay(aId)) {
+        if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitCustom(html, style)
             counter++

@@ -15,7 +15,7 @@ final class UiMenuSpecifier {
 
     void visitMenu(final IUiMenuVisitor menuVisitor) {
         if (menuVisitor && closure) {
-            menuVisitor.visitMenuStart(null)
+            menuVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL, null)
             closure.delegate = new MenuSpec(menuVisitor)
             closure.call()
             menuVisitor.visitMenuStartEnd()
