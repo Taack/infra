@@ -50,7 +50,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
     }
 
     static IHTMLElement blockAjax(IHTMLElement topElement, String blockId, boolean isAjax) {
-        IHTMLElement e = isAjax ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).build()
+        IHTMLElement e = isAjax ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).addClasses('overflow-x-auto').build()
         topElement.addChildren(e)
         e
     }
