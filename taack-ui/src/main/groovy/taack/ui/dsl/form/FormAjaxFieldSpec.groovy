@@ -6,6 +6,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOptions
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.html.element.ButtonStyle
 
@@ -17,6 +18,29 @@ class FormAjaxFieldSpec extends FormVisitable {
 
     FormAjaxFieldSpec(final IUiFormVisitor formVisitor) {
         super(formVisitor)
+    }
+    /**
+     * {@link #tabs(groovy.lang.Closure)} container.
+     *
+     * @param width relative total width
+     * @param closure list of {@link FormTabSpec#tabLabel(java.lang.String, groovy.lang.Closure)}
+     */
+    void tabs(BlockSpec.Width width = BlockSpec.Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
+        List<String> tabNames = []
+
+        UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {
+            @Override
+            void visitFormTab(String i18n) {
+                tabNames << i18n
+            }
+        }
+        closure.delegate = new FormTabSpec(tabNameVisitor)
+        closure.call()
+
+        formVisitor.visitFormTabs(tabNames, width)
+        closure.delegate = new FormTabSpec(formVisitor)
+        closure.call()
+        formVisitor.visitFormTabsEnd()
     }
 
     /**

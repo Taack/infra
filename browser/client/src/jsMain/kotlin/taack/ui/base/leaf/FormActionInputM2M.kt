@@ -17,7 +17,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
     companion object {
         fun getSiblingFormActionInputM2M(f: Form): List<FormActionInputM2M> {
             val elements: List<Node>?
-            elements = f.f.querySelectorAll("input.taackAjaxFormM2M").asList()
+            elements = f.f.querySelectorAll("input[taackAjaxFormM2MAction]").asList()
             return elements.map {
                 FormActionInputM2M(f, it as HTMLInputElement)
             }
@@ -76,12 +76,17 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
         trace("FormActionInputM2M::modalReturnSelect $key $value")
-        val span = i.parentElement as HTMLSpanElement
+        val span = i.parentElement!!
+        trace("AUO1 $span")
         if (span.hasClass("M2MToDuplicate")) {
-            val span2 = span.cloneNode(true) as HTMLSpanElement
-            FormActionInputM2M(parent, span2.querySelector("input.taackAjaxFormM2M") as HTMLInputElement)
+            trace("AUO111")
+            val span2 = span.cloneNode(true) as HTMLElement
+            trace("AUO112 $span2")
+            FormActionInputM2M(parent, span2.querySelector("input[taackAjaxFormM2MAction]") as HTMLInputElement)
+            trace("AUO113")
             span.parentElement!!.appendChild(span2)
         }
+        trace("AUO2 $span")
         span.removeClass("M2MToDuplicate")
         span.addClass("M2MParent")
         i.value = value

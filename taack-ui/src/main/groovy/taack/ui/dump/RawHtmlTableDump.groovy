@@ -56,20 +56,27 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
     @Override
     void visitSortableFieldHeader(String i18n, FieldInfo[] fields) {
         i18n ?= parameter.trField(fields)
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
         blockLog.topElement.addChildren(
                 new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
                         new HTMLTxtContent("<a>${i18n}</a>")
                 ).build()
         )
+        if (addColumn) visitColumnEnd()
+
     }
 
     @Override
     void visitFieldHeader(final String i18n) {
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
         blockLog.topElement.addChildren(
                 new HTMLSpan().builder.setStyle(new DisplayBlock()).addChildren(
                         new HTMLTxtContent("${i18n}")
                 ).build()
         )
+        if (addColumn) visitColumnEnd()
     }
 
     @Override
@@ -95,12 +102,18 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
 
     @Override
     void visitRowField(final String value, final Style style) {
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
         blockLog.topElement.addChildren(displayCell(value, style, null, firstInCol, isInCol))
+        if (addColumn) visitColumnEnd()
     }
 
     @Override
     void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
         visitRowAction(i18n, actionIcon, 'progress', 'echoSelect', id, [label: label], isAjax)
+        if (addColumn) visitColumnEnd()
     }
 
     @Override

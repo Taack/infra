@@ -50,7 +50,7 @@
   - ~~add top level `condition` (`if`, branch on 2 closures)~~
     - ~~Test, debug, offline capabilities~~
 - ~~Add title to modal / menu / size~~
-- For GormEntity, propose a default M2O or M2M in forms (field) / shows
+- ~~For GormEntity, propose a default M2O or M2M in forms (field) / shows~~
 - ~~remove Width from form ... layout managed from elsewhere..~~ 
 - remove object param from visitShow
 - ~~add col and row~~
@@ -60,7 +60,7 @@
 - use different translations for `create` or `edit`, if ID is present
 - Use bootstrap progress
 - Choose bootstrap from jDeliver or custom
-- Add **horizontal scrollbar on tables** when needed
+- ~~Add **horizontal scrollbar on tables** when needed~~
 
 # 0.5.x
 

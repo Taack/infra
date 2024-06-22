@@ -29,29 +29,6 @@ final class FormSpec extends FormRowSpec {
         super(formVisitor)
     }
 
-    /**
-     * {@link #tabs(groovy.lang.Closure)} container.
-     *
-     * @param width relative total width
-     * @param closure list of {@link FormTabSpec#tabLabel(java.lang.String, groovy.lang.Closure)}
-     */
-    void tabs(BlockSpec.Width width = BlockSpec.Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
-        List<String> tabNames = []
-
-        UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {
-            @Override
-            void visitFormTab(String i18n) {
-                tabNames << i18n
-            }
-        }
-        closure.delegate = new FormTabSpec(tabNameVisitor)
-        closure.call()
-
-        formVisitor.visitFormTabs(tabNames, width)
-        closure.delegate = new FormTabSpec(formVisitor)
-        closure.call()
-        formVisitor.visitFormTabsEnd()
-    }
 
     /**
      * form action. The form is POSTed to the target action.

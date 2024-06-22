@@ -154,8 +154,13 @@ class AttachmentController {
 
     @Transactional
     def saveDocDesc() {
-        DocumentCategory dc = taackSaveService.save(DocumentCategory, null, false)
-        dc.save(flush: true)
+        DocumentCategory dc = taackSaveService.save(DocumentCategory, null, true)
+        dc.save(flush: true, failOnError: true)
+        if (dc.hasErrors()) {
+            log.error "${dc.errors}"
+        } else {
+            log.info "DocumentCategory $dc"
+        }
         taackSaveService.displayBlockOrRenderErrors(
                 dc,
                 new UiBlockSpecifier().ui {
