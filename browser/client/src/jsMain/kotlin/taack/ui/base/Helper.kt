@@ -161,7 +161,7 @@ class Helper {
                                 otherField = otherField.plus(Pair(fieldName, fieldValue))
                                 posField = text.indexOf(FIELD_INFO, endFieldValueIndex)
                             }
-                            val f = processingStack.last()
+                            val f = processingStack.removeLast()
                             f(id, value, otherField)
                         }
                     } else {

@@ -1,28 +1,19 @@
 package crew
 
-import attachment.DocumentCategory
-import attachment.TaackDocument
-import crew.config.SupportedLanguage
-import attachment.config.TermGroupConfig
 import attachement.AttachmentSearchService
 import attachement.AttachmentUiService
+import attachment.*
+import attachment.config.TermGroupConfig
+import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
-import attachment.Attachment
-import attachment.DocumentAccess
-import attachment.Term
 import taack.domain.*
 import taack.render.TaackUiService
-import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiFilterSpecifier
-import taack.ui.dsl.UiMenuSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.UiTableSpecifier
-import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.*
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
@@ -378,9 +369,7 @@ class AttachmentController {
     }
 
     def selectDocumentCategory() {
-        TaackDocument td = taackUiService.ajaxBind(TaackDocument)
-        DocumentCategory documentCategory = td.documentCategory ?: new DocumentCategory()
-
+        DocumentCategory documentCategory = taackUiService.ajaxBind(DocumentCategory)
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
                 form AttachmentUiService.buildDocumentDescriptorForm(documentCategory)

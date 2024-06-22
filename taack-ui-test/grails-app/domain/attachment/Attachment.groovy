@@ -29,7 +29,7 @@ class Attachment extends TaackDocument implements IDomainHistory<Attachment> {
         documentAccess nullable: true
         contentTypeEnum nullable: true
         contentTypeCategoryEnum nullable: true
-        filePath widget: "filePath"
+        filePath widget: "filePath", nullable: true
         lastUpdated nullable: true
         nextVersion nullable: true
         active validator: { boolean val, Attachment obj ->

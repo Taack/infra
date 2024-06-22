@@ -12,13 +12,9 @@ import taack.ui.dsl.block.BlockSpec.Width
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
-import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.InputType
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.layout.BootstrapLayout
-import taack.ui.dump.html.layout.HTMLEmpty
-import taack.ui.dump.html.theme.ThemeSelector
-import taack.ui.dsl.form.FormSpec
 import taack.ui.dsl.form.IUiFormVisitor
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.IFormTheme
@@ -192,19 +188,18 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
         final boolean isListOrSet = Collection.isAssignableFrom(field.fieldConstraint.field.type)
         final String qualifiedName = field.fieldName
-        final String fieldInfoParams = fieldInfoParams(fieldInfos)
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
         if (isListOrSet)
-            formThemed.ajaxField(blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
+            formThemed.ajaxField(blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
         else {
             GormEntity v = (field?.value) as GormEntity
-            formThemed.ajaxField(blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoParams, isFieldDisabled, isNullable)
+            formThemed.ajaxField(blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
         }
     }
 
-    private static String fieldInfoParams(FieldInfo[] fieldInfos) {
-        fieldInfos ? "taackFieldInfoParams=\"${fieldInfos.collect { it.value?.hasProperty(ST_ID) ? "${it.fieldName}.id" : it.fieldName }.join(',')}\"" : ""
+    private static List<String> fieldInfoCollect(FieldInfo[] fieldInfos) {
+        fieldInfos.collect { it.fieldConstraint.field.type.getDeclaredField('id') ? "${it.fieldName}.id" : it.fieldName } as List<String>
     }
 
     @Override
@@ -212,12 +207,11 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String trI18n = i18n ?: parameter.trField(field)
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
-        final String fieldInfoParams = fieldInfoParams(fieldInfos)
-        formThemed.ajaxField(blockLog.topElement, trI18n, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoParams, isFieldDisabled)
+        formThemed.ajaxField(blockLog.topElement, trI18n, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled)
     }
 
     @Override
-    void visitFormTabs(List<String> names, BlockSpec.Width width = BlockSpec.Width.QUARTER) {
+    void visitFormTabs(List<String> names, Width width = Width.QUARTER) {
         blockLog.topElement.setTaackTag(TaackTag.TABS)
         blockLog.topElement = layout.tabs(blockLog.topElement, names)
         tabIds++
