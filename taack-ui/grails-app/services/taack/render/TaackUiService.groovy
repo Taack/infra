@@ -75,6 +75,12 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     @Value('${client.js.path}')
     String clientJsPath
 
+    @Value('${bootstrap.js.path}')
+    String bootstrapJsPath
+
+    @Value('${bootstrap.css.path}')
+    String bootstrapCssPath
+
 
     @Autowired
     ResourceLocator assetResourceLocator
@@ -186,6 +192,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     menu        : visitMenu(menu),
                     conf        : taackUiPluginConfiguration,
                     clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
+                    bootstrapJsPath: bootstrapJsPath?.length() > 0 ? bootstrapJsPath : null,
+                    bootstrapCssPath: bootstrapCssPath?.length() > 0 ? bootstrapCssPath : null,
             ])
         }
     }

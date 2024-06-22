@@ -16,7 +16,14 @@
     </g:elseif>
 
     <title>${conf.defaultTitle}</title>
-    <asset:stylesheet href="application-taack-bootstrap.css"/>
+    <g:if test="${bootstrapCssPath != null}">
+        <script src="${bootstrapCssPath}"></script>
+        <asset:javascript src="application-taack-nobootstrap.css"/>
+    </g:if>
+    <g:else>
+        <asset:stylesheet href="application-taack-bootstrap.css"/>
+    </g:else>
+
     <style>
     .navbar-nav > li > .dropdown-menu {
         background-color: ${conf.bgColor};
@@ -84,7 +91,6 @@
                             <a class="nav-link" href="/login">Login</a>
                         </li>
                     </sec:ifNotLoggedIn>
-
                 </g:if>
             </ul>
         </div>
@@ -95,6 +101,13 @@
 <g:if test="${clientJsPath != null}">
     <script src="${clientJsPath}"></script>
     <asset:javascript src="application-taack-debug.js"/>
+</g:if>
+<g:else>
+    <asset:javascript src="application-taack.js"/>
+</g:else>
+<g:if test="${bootstrapJsPath != null}">
+    <script src="${bootstrapJsPath}"></script>
+    <asset:javascript src="application-taack-nobootstrap.js"/>
 </g:if>
 <g:else>
     <asset:javascript src="application-taack.js"/>

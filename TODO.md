@@ -59,7 +59,7 @@
 - ~~add refresh current block (see refresh in cms/editPage)~~
 - use different translations for `create` or `edit`, if ID is present
 - Use bootstrap progress
-- Choose bootstrap from jDeliver or custom
+- ~~Choose bootstrap from jDeliver or custom~~
 - ~~Add **horizontal scrollbar on tables** when needed~~
 
 # 0.5.x
