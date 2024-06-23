@@ -16,20 +16,15 @@
     </g:elseif>
 
     <title>${conf.defaultTitle}</title>
-    <g:if test="${bootstrapCssPath != null}">
-        <script src="${bootstrapCssPath}"></script>
-        <asset:javascript src="application-taack-nobootstrap.css"/>
-    </g:if>
-    <g:else>
-        <asset:stylesheet href="application-taack-bootstrap.css"/>
-    </g:else>
+    ${raw(bootstrapCssTag)}
+    <asset:javascript src="application-taack-nobootstrap.css"/>
 
     <style>
     .navbar-nav > li > .dropdown-menu {
         background-color: ${conf.bgColor};
     }
 
-    body>nav .navbar-nav a.nav-link {
+    body > nav .navbar-nav a.nav-link {
         color: ${conf.fgColor};
     }
 
@@ -75,7 +70,8 @@
 
                                 <ul class="dropdown-menu" aria-labelledby="navbarUser">
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link ajaxLink taackAjaxLink" ajaxaction="/theme?isAjax=true"><g:message code="theme.label"/></a>
+                                        <a class="nav-link ajaxLink taackAjaxLink"
+                                           ajaxaction="/theme?isAjax=true"><g:message code="theme.label"/></a>
                                     </li>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link" href="/logout"><g:message code="logout.label"/></a>
@@ -98,16 +94,10 @@
 </nav>
 
 <g:layoutBody/>
+${raw(bootstrapJsTag)}
 <g:if test="${clientJsPath != null}">
     <script src="${clientJsPath}"></script>
     <asset:javascript src="application-taack-debug.js"/>
-</g:if>
-<g:else>
-    <asset:javascript src="application-taack.js"/>
-</g:else>
-<g:if test="${bootstrapJsPath != null}">
-    <script src="${bootstrapJsPath}"></script>
-    <asset:javascript src="application-taack-nobootstrap.js"/>
 </g:if>
 <g:else>
     <asset:javascript src="application-taack.js"/>

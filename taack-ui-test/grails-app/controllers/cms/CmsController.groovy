@@ -1,6 +1,7 @@
 package cms
 
 import cms.config.CmsSubsidiary
+import crew.CrewUiService
 import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
@@ -13,20 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackFilterService
 import taack.domain.TaackSaveService
+import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
-import taack.ui.TaackUiConfiguration
-import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiFormSpecifier
-import taack.ui.dsl.UiMenuSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dump.markdown.Markdown
 
 import javax.annotation.PostConstruct
-
+import static grails.async.Promises.task
 /*
 * TODO: Menu grouped by default
 * TODO: Menu add submenu and menu
@@ -46,9 +43,7 @@ class CmsController implements WebAttributes {
     TaackFilterService taackFilterService
     CmsSearchService cmsSearchService
     SpringSecurityService springSecurityService
-
-    @Autowired
-    TaackUiConfiguration taackUiConfiguration
+    TaackUiProgressBarService taackUiProgressBarService
 
     @Value('${intranet.root}')
     String rootPath
@@ -75,6 +70,7 @@ class CmsController implements WebAttributes {
             label "Admin", {
                 subMenu this.&confSites as MC
                 subMenu this.&menuEntries as MC
+                subMenu this.&testProgressBar as MC
             }
             menuSearch CmsController.&search as MC, q
             menuOptions(SupportedLanguage.fromContext())
@@ -656,7 +652,7 @@ class CmsController implements WebAttributes {
         response.setHeader("Content-disposition", "filename=\"${URLEncoder.encode(cmsImage?.fileName ?: 'noPreview.webp', 'UTF-8')}\"")
         if (!cmsImage) response.setHeader("Cache-Control", "max-age=604800")
         if (!cmsImage?.filePath) {
-            response.outputStream << new File("${taackUiConfiguration.resources}/noPreview.webp").bytes
+            response.outputStream << new File("noPreview.webp").bytes
         } else {
             String fp = localPath(cmsImage.filePath)
             if (fp) {
@@ -1242,4 +1238,33 @@ class CmsController implements WebAttributes {
     def saveCmsConfSite() {
         taackSaveService.saveThenReloadOrRenderErrors(CmsConfSite)
     }
+
+    def testProgressBar() {
+        String pId = taackUiProgressBarService.progressStart(CrewUiService.messageBlock("""Test Ended in 10 seconds .."""), 100)
+        task {
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progress(pId, 10)
+            sleep(1_000)
+            taackUiProgressBarService.progressEnded(pId)
+        }
+    }
+
 }

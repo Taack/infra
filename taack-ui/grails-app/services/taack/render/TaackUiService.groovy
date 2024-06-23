@@ -75,11 +75,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     @Value('${client.js.path}')
     String clientJsPath
 
-    @Value('${bootstrap.js.path}')
-    String bootstrapJsPath
+    @Value('${bootstrap.js.tag}')
+    String bootstrapJsTag
 
-    @Value('${bootstrap.css.path}')
-    String bootstrapCssPath
+    @Value('${bootstrap.css.tag}')
+    String bootstrapCssTag
 
 
     @Autowired
@@ -192,8 +192,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     menu        : visitMenu(menu),
                     conf        : taackUiPluginConfiguration,
                     clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
-                    bootstrapJsPath: bootstrapJsPath?.length() > 0 ? bootstrapJsPath : null,
-                    bootstrapCssPath: bootstrapCssPath?.length() > 0 ? bootstrapCssPath : null,
+                    bootstrapJsTag: bootstrapJsTag,
+                    bootstrapCssTag: bootstrapCssTag
             ])
         }
     }
