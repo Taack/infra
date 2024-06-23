@@ -138,7 +138,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
                     ).build(),
             )
 
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -146,7 +146,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.addClasses(formSelect).build() as HTMLSelect
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
         el.addChildren(s)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
@@ -159,7 +159,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLSelect s = new HTMLSelect(choices, false, false, disable)
         HTMLDiv d = new HTMLDiv()
         if (!disable) {
-            d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.addClasses('deleteIconM2M').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).build())
+            d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.setId(qualifiedName).addClasses('deleteIconM2M').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).build())
         }
         d.addChildren(s)
         el.addChildren(s)
@@ -204,7 +204,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
 
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName, null, disabled).builder.addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), null, null, disabled, true).builder.setId(qualifiedName).putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
@@ -217,7 +217,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.DATE, value?.toString(), qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.DATE, value?.toString(), qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -228,7 +228,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLTextarea input = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLTextarea
+        HTMLTextarea input = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses(formControl).setId(qualifiedName).build() as HTMLTextarea
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -239,7 +239,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -250,7 +250,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
@@ -261,7 +261,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))

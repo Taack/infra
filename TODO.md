@@ -52,7 +52,6 @@
 - ~~Add title to modal / menu / size~~
 - ~~For GormEntity, propose a default M2O or M2M in forms (field) / shows~~
 - ~~remove Width from form ... layout managed from elsewhere..~~ 
-- remove object param from visitShow
 - ~~add col and row~~
 - ~~remove close title~~
 - ~~remove visit*End when possible~~

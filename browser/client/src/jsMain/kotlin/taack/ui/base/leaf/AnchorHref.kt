@@ -1,6 +1,5 @@
 package taack.ui.base.leaf
 
-import kotlinx.browser.document
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.Node
 import org.w3c.dom.asList
