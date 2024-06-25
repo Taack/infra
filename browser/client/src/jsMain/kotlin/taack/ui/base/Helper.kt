@@ -138,7 +138,6 @@ class Helper {
                 text.contains(RELOAD) -> {
                     window.location.href = (Block.href ?: "")
                 }
-
                 text.startsWith(CLOSE_LAST_MODAL) -> {
                     val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
                     if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
@@ -201,7 +200,6 @@ class Helper {
 //                        window.location.href = Block.href ?: ""
 //                    }
                 }
-
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements.get(it.key)
@@ -236,12 +234,11 @@ class Helper {
                     block.modal.dModalBody.innerHTML = text
                     val s = block.modal.dModalBody.getElementsByTagName("script").asList()
                     trace("Executing $s")
-
                 }
 
                 text.startsWith(REDIRECT) -> {
-                    trace("Helper::redirect ${text.substring("__redirect__".length)}")
-                    window.location.href = text.substring("__redirect__".length)
+                    trace("Helper::redirect ${text.substring(REDIRECT.length)}")
+                    window.location.href = text.substring(REDIRECT.length)
                 }
 
                 text.startsWith(ERROR_START) -> {
@@ -249,7 +246,7 @@ class Helper {
                     (base as Form).cleanUpErrors()
                     val map = mapAjaxErrors(text).map { me ->
                         hasErrors = true
-                        val d = (base as Form).errorPlaceHolders[me.key]?.d
+                        val d = base.errorPlaceHolders[me.key]?.d
                         if (d != null) {
                             d.innerHTML = me.value
                             d.style.display = "block"

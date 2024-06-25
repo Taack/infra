@@ -1,19 +1,13 @@
 package taack.ui.base.element
 
-import kotlinx.browser.window
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
-import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 import org.w3c.dom.asList
 import org.w3c.dom.get
-import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
-import kotlin.js.Promise
 
 class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     BaseElement {
@@ -111,7 +105,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         for (i in 0 until innerScripts.length) {
             eval(innerScripts.get(i)!!.innerHTML);
         }
-        ActionLink.getActionLink(this)
+        ActionLink.getActionLinks(this)
         AnchorHref.getAnchorHref(this)
         Helper.traceDeIndent("AjaxBlock::refresh --- ")
     }

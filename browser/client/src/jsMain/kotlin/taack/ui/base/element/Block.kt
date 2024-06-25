@@ -32,7 +32,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         traceIndent("Block::init +++ ${d.id}, ${tmpBlockId}.")
         if (tmpBlockId != null && tmpBlockId != "") {
             blockId = tmpBlockId
-            ActionLink.getActionLink(this)
+            ActionLink.getActionLinks(this)
             AnchorHref.getAnchorHref(this)
 
         } else {

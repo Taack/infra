@@ -75,7 +75,8 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
         }
 
         if (!action.isNullOrEmpty()) {
-            xhr.open("GET", createUrl(!isHref, action).toString())
+//            xhr.open("GET", createUrl(!isHref, action).toString())
+            xhr.open("GET", createUrl(true, action).toString())
             xhr.send()
         }
     }
