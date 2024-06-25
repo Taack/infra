@@ -49,7 +49,7 @@ class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectE
             }
         }
         // TODO: change to Post (see FilterActionButton.kt)
-        val url = BaseAjaxAction.createUrl(action, additionalParams)
+        val url = BaseAjaxAction.createUrl(true, action, additionalParams)
         window.fetch(url.toString(),
             RequestInit(method = "GET")
         ).then {

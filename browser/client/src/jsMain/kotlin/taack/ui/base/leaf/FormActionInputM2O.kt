@@ -46,7 +46,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
                     additionalParams["ajaxParams.$it"] = v.value
             }
         }
-        val url = BaseAjaxAction.createUrl(action, additionalParams)
+        val url = BaseAjaxAction.createUrl(true, action, additionalParams)
         // TODO: change to Post (see FilterActionButton.kt)
         window.fetch(
             url.toString(),

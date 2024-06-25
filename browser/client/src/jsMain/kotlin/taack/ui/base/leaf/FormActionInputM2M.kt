@@ -60,7 +60,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         }
 
 //        val params = i.attributes.getNamedItem("taackAjaxFormM2MParams")?.value
-        val url = BaseAjaxAction.createUrl(action, additionalParams)
+        val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
         window.fetch(url.toString(), RequestInit(method = "GET")).then {
             if (it.ok) {

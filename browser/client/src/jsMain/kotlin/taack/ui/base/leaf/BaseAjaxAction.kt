@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.events.Event
@@ -18,9 +19,9 @@ import taack.ui.base.LeafElement
 open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : LeafElement {
 
     companion object {
-        fun createUrl(action: String, additionalParams: Map<String, String>? = null): URL {
+        fun createUrl(isAjax: Boolean, action: String, additionalParams: Map<String, String>? = null): URL {
             val url = URL(action, "${window.location.protocol}//${window.location.host}")
-            url.searchParams.set("isAjax", "true")
+            if (isAjax) url.searchParams.set("isAjax", "true")
             additionalParams?.forEach {
                 url.searchParams.set(it.key, it.value)
             }
@@ -29,9 +30,9 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
     }
 
     private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value ?: a.attributes.getNamedItem("href")?.value
-    private val hasHref = a.hasAttribute("href")
+    private val isHref = a.hasAttribute("href")
     init {
-        trace("BaseAjaxAction::init $action $hasHref")
+        trace("BaseAjaxAction::init $action $isHref")
 
         a.onclick = { e -> onclickBaseAjaxAction(e) }
     }
@@ -60,17 +61,21 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
             } else {
                 val text = xhr.responseText
                 if (text.contains(Regex(".{0,4}<html"))) {
-                    trace("AUO response identified like full page ...")
+                    trace("Full webpage ...|$action|${document.title}|${document.domain}|${document.documentURI}")
+                    val url = URL(document.URL)
+                    window.history.pushState("", document.title, url.href)
+                    window.document.clear()
                     window.document.write(text)
-                    window.history.pushState("", "", action)
+                    window.document.close()
                 } else {
                     trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
                     processAjaxLink(text, parent)
                 }
             }
         }
-        if (action != null) {
-            xhr.open("GET", createUrl(action).toString())
+
+        if (!action.isNullOrEmpty()) {
+            xhr.open("GET", createUrl(!isHref, action).toString())
             xhr.send()
         }
     }
