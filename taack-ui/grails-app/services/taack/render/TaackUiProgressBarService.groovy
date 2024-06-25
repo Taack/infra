@@ -24,7 +24,7 @@ import taack.ui.dsl.UiBlockSpecifier
  *      }
  *      taackUiProgressBarService.progressEnded(pId)
  *  }
- * }</pre>
+ *}</pre>
 
  */
 @GrailsCompileStatic
@@ -39,12 +39,10 @@ class TaackUiProgressBarService {
     static UiBlockSpecifier buildProgressBlock(String ret, int max, int value) {
         new UiBlockSpecifier().ui {
             modal {
-                ajaxBlock "drawProgress:$ret", {
-                    custom """
+                custom """\
                         <label for="progress">Job progress:</label>
                         <progress id="progress" max="$max" value="$value"> 0 / $max </progress>
                     """.stripIndent()
-                }
             }
         }
     }

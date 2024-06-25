@@ -1,6 +1,7 @@
 package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.dsl.UiChartSpecifier
 import taack.ui.dsl.UiDiagramSpecifier
@@ -303,6 +304,7 @@ final class BlockSpec {
     void custom(final String html, final Style style = null,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('custom')
+        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitCustom(html, style)
@@ -356,5 +358,13 @@ final class BlockSpec {
         closure.call()
         counter++
         blockVisitor.visitCloseModalAndUpdateBlockEnd()
+    }
+
+    void poll(int millis, MethodClosure polledMethod, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        blockVisitor.visitPoll(millis, polledMethod)
+        closure.delegate = this
+        closure.call()
+        counter++
+        blockVisitor.visitPollEnd()
     }
 }

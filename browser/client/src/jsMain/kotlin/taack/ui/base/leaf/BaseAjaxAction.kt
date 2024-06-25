@@ -64,6 +64,7 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
                     window.document.write(text)
                     window.history.pushState("", "", action)
                 } else {
+                    trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
                     processAjaxLink(text, parent)
                 }
             }

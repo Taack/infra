@@ -21,7 +21,6 @@ import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.menu.BootstrapMenu
-import taack.ui.dump.html.theme.ThemeSelector
 
 @CompileStatic
 final class RawHtmlBlockDump implements IUiBlockVisitor {
@@ -30,7 +29,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     String futurCurrentAjaxBlockId
 
     boolean isModal = false
-    boolean isModalRefresh = false
+    boolean isRefreshing = false
+    int poll = 0
 
     private int tabOccurrence = 0
 
@@ -43,7 +43,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         this.parameter = parameter
         this.modalId = modalId
         if (parameter.params.boolean('refresh'))
-            isModalRefresh = true
+            isRefreshing = true
         blockLog = new BlockLog(parameter.uiThemeService.themeSelector)
         block = new BootstrapBlock(blockLog)
 //        menu = new BootstrapMenu(blockLog)
@@ -165,6 +165,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
+    void visitPoll(int millis, MethodClosure polledAction) {
+        blockLog.enterBlock('visitPoll ' + millis + ' ms ' + polledAction.toString())
+        poll = millis
+        HTMLAjaxPoll poll = new HTMLAjaxPoll(millis, parameter.urlMapped(polledAction))
+        blockLog.topElement.addChildren(poll)
+        blockLog.topElement.setTaackTag(TaackTag.POLL)
+
+    }
+
+    @Override
+    void visitPollEnd() {
+        blockLog.enterBlock('visitPollEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
+        poll = 0
+    }
+
+    @Override
     void visitTable(String id, final UiTableSpecifier tableSpecifier) {
         blockLog.stayBlock('visitTable ' + id)
         tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(blockLog, id, parameter))
@@ -259,9 +276,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitModal() {
-        blockLog.enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isModalRefresh)
+        blockLog.enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isRefreshing)
         isModal = true
-        HTMLAjaxModal modal = new HTMLAjaxModal(isModalRefresh)
+        HTMLAjaxModal modal = new HTMLAjaxModal(isRefreshing)
         blockLog.topElement.addChildren(modal)
         blockLog.topElement.setTaackTag(TaackTag.MODAL)
         blockLog.topElement = modal

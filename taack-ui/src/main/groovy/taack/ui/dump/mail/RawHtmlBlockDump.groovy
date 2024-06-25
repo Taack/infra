@@ -151,6 +151,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
+    void visitPoll(int millis, MethodClosure polledMethod) {
+
+    }
+
+    @Override
+    void visitPollEnd() {
+
+    }
+
+    @Override
     void visitTable(String id, UiTableSpecifier tableSpecifier) {
         ByteArrayOutputStream out = new ByteArrayOutputStream(2048)
         tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(out, parameter))

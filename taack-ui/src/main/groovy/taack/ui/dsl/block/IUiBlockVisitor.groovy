@@ -1,6 +1,7 @@
 package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.dsl.UiChartSpecifier
 import taack.ui.dsl.UiDiagramSpecifier
@@ -71,6 +72,10 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitCloseModalAndUpdateBlockEnd()
 
     void visitHtmlBlock(String html, Style style)
+
+    void visitPoll(int millis, MethodClosure polledMethod)
+
+    void visitPollEnd()
 
     Map getParameterMap()
 }

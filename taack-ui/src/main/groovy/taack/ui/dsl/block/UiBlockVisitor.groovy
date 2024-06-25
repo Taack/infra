@@ -159,6 +159,16 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitPoll(int millis, MethodClosure polledMethod) {
+
+    }
+
+    @Override
+    void visitPollEnd() {
+
+    }
+
+    @Override
     Map getParameterMap() {
         return null
     }

@@ -1242,7 +1242,7 @@ class CmsController implements WebAttributes {
     def testProgressBar() {
         String pId = taackUiProgressBarService.progressStart(CrewUiService.messageBlock("""Test Ended in 10 seconds .."""), 100)
         task {
-            sleep(1_000)
+            it.sleep(1_000)
             taackUiProgressBarService.progress(pId, 10)
             sleep(1_000)
             taackUiProgressBarService.progress(pId, 10)
@@ -1265,6 +1265,7 @@ class CmsController implements WebAttributes {
             sleep(1_000)
             taackUiProgressBarService.progressEnded(pId)
         }
+        println "test action ends"
     }
 
 }

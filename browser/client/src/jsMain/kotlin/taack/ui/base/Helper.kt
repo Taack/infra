@@ -181,22 +181,25 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK) -> {
+                    trace("Helper::CLOSE_LAST_MODAL_AND_UPDATE_BLOCK ${block.modal.mId}")
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
-                    if (text.substring(29).startsWith(BLOCK_START)) {
-                        mapAjaxBlock(text.substring(29)).map {
-                            val target = block.ajaxBlockElements?.get(it.key)
-                                ?: block.parent!!.parent.ajaxBlockElements!![it.key]
-                            target!!.d.innerHTML = it.value
-                            target.refresh()
-                        }
-                    } else if (text[29] == '<') {
-                        if (block.parent != null) block.parent.open(text.substring(29))
-                        else block.modal.open(text.substring(29))
-
-                    } else if (text.substring(29) == RELOAD) {
-                        window.location.href = Block.href ?: ""
-                    }
+                    val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
+                    processAjaxLink(innerText, base, process)
+//                    if (innerText.startsWith(BLOCK_START)) {
+//                        mapAjaxBlock(innerText.substring(29)).map {
+//                            val target = block.ajaxBlockElements?.get(it.key)
+//                                ?: block.parent!!.parent.ajaxBlockElements!![it.key]
+//                            target!!.d.innerHTML = it.value
+//                            target.refresh()
+//                        }
+//                    } else if (text[29] == '<') {
+//                        if (block.parent != null) block.parent.open(text.substring(29))
+//                        else block.modal.open(text.substring(29))
+//
+//                    } else if (text.substring(29) == RELOAD) {
+//                        window.location.href = Block.href ?: ""
+//                    }
                 }
 
                 text.startsWith(BLOCK_START) -> {

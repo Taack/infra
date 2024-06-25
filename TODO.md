@@ -57,7 +57,7 @@
 - ~~remove visit*End when possible~~
 - ~~add refresh current block (see refresh in cms/editPage)~~
 - use different translations for `create` or `edit`, if ID is present
-- Use bootstrap progress
+- Use bootstrap progress, convert it to poll block
 - ~~Choose bootstrap from jDeliver or custom~~
 - ~~Add **horizontal scrollbar on tables** when needed~~
 

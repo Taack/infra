@@ -3,12 +3,14 @@ package taack.ui.dump
 import grails.util.Pair
 import grails.web.api.WebAttributes
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiOverriderService
 import taack.render.ThemeService
+import taack.ui.dsl.helper.Utils
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -157,6 +159,10 @@ final class Parameter implements WebAttributes {
         }
 
         return keys.join(',')
+    }
+
+    final String urlMapped(MethodClosure action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+        urlMapped(Utils.getControllerName(action), action.method, params, isAjax)
     }
 
     final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {

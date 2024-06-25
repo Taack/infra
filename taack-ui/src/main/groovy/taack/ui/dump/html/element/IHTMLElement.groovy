@@ -4,9 +4,6 @@ import groovy.transform.CompileStatic
 import taack.ui.dump.html.script.IJavascriptDescriptor
 import taack.ui.dump.html.style.IStyleDescriptor
 
-import javax.management.BadAttributeValueExpException
-import java.util.concurrent.ExecutionException
-
 @CompileStatic
 enum TaackTag {
     BLOCK,
@@ -17,6 +14,7 @@ enum TaackTag {
     MENU_COL,
     MENU_BLOCK,
     INNER_BLOCK,
+    POLL,
     TABLE,
     TABLE_COL,
     TABLE_ROW,

@@ -34,10 +34,12 @@ class ProgressController {
     TaackUiService taackUiService
 
     def drawProgress(String id) {
+        println "${new Date()} AUOAUOAUOAOUOAUAUU $id"
         if (id && taackUiProgressBarService.progressMax(id)) {
             int max = taackUiProgressBarService.progressMax(id)
             int value = taackUiProgressBarService.progress(id)
             boolean ended = taackUiProgressBarService.progressHasEnded(id)
+            println "${new Date()} AUOAUOAUOAOUOAUAUU max: $max, value: $value, ended: $ended"
             if (!ended) {
                 response.outputStream << taackUiService.visit(new UiBlockSpecifier().ui {
                     closeModalAndUpdateBlock(TaackUiProgressBarService.buildProgressBlock(id, max, value).closure)
@@ -50,6 +52,7 @@ class ProgressController {
                 })
             }
         } else {
+            println "${new Date()} AUOAUOAUOAOUOAUAUU return true"
             return true
         }
     }
