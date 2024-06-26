@@ -37,7 +37,7 @@
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
 - ~~Reduce CSS and JS~~
-- Fix table grouping / trees with pagination
+- Fix table grouping / trees with pagination, rework grouping to be trees (do an iterateOnGroup) 
 - ~~Improve form layout, add row in DSL~~
 - ~~More coherent button style in forms~~
 - ~~More restrictive DSL~~
@@ -57,12 +57,14 @@
 - ~~remove visit*End when possible~~
 - ~~add refresh current block (see refresh in cms/editPage)~~
 - use different translations for `create` or `edit`, if ID is present
-- Use bootstrap progress, convert it to poll block
+- ~~Use bootstrap progress~~
 - ~~Choose bootstrap from jDeliver or custom~~
 - ~~Add **horizontal scrollbar on tables** when needed~~
 
 # 0.5.x
 
+- Improve/fix mail rendering using bootstrap
+- Improve PDF rendering using bootstrap
 - Vertical / Horizontal menu switch
 - Add toast and websockets events
 - SVG theme, use id
