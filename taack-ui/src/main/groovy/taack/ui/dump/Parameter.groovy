@@ -36,6 +36,7 @@ final class Parameter implements WebAttributes {
     final Long additionalId
     final Long beanId
     final Boolean isAjaxRendering
+    // this is a refresh of ajaxBlocks (i.e. do not reopen a modal, refresh the content)
     final Boolean isRefresh
     final String ajaxBlockId
     final String targetAjaxBlockId

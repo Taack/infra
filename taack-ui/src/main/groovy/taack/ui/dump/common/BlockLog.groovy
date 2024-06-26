@@ -6,7 +6,7 @@ import taack.ui.dump.html.theme.ThemeSelector
 final class BlockLog {
     private final String indent = '   '
     private int occ = 0
-    final static boolean debug = false
+    final static boolean debug = true
     IHTMLElement topElement
     final ThemeSelector ts
 

@@ -4,14 +4,8 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
-import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
-import taack.ui.dsl.UiChartSpecifier
-import taack.ui.dsl.UiDiagramSpecifier
-import taack.ui.dsl.UiFilterSpecifier
-import taack.ui.dsl.UiFormSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 import taack.ui.dsl.common.ActionIcon
@@ -20,14 +14,11 @@ import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.menu.MenuSpec
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawHtmlChartDump
-import taack.ui.dump.RawHtmlDiagramDump
 import taack.ui.dump.RawHtmlFilterDump
 import taack.ui.dump.RawHtmlFormDump
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.BootstrapBlock
-import taack.ui.dump.html.block.HTMLAjaxCloseLastModal
 import taack.ui.dump.html.block.HTMLAjaxCloseModal
-import taack.ui.dump.html.block.HTMLFieldInfo
 import taack.ui.dump.html.element.HTMLDiv
 import taack.ui.dump.html.element.HTMLTxtContent
 import taack.ui.dump.html.element.IHTMLElement
@@ -236,6 +227,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitModalEnd() {
         isModal = false
+    }
+
+    @Override
+    void setExplicitAjaxBlockId(String id) {
+
     }
 
     @Override

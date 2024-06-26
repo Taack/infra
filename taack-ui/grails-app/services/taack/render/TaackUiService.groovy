@@ -128,6 +128,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return String that contains the HTML snippet
      */
     String visit(final UiBlockSpecifier blockSpecifier, final boolean isAjaxRendering = false) {
+        if (!blockSpecifier) return ''
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource))
         blockSpecifier.visitBlock(htmlBlock)
         htmlBlock.output

@@ -27,6 +27,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     private String currentAjaxBlockId = null
     final String modalId
     String futurCurrentAjaxBlockId
+    String theCurrentExplicitAjaxBlockId
 
     boolean isModal = false
     boolean isRefreshing = false
@@ -51,12 +52,25 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement.setTaackTag(TaackTag.BLOCK)
     }
 
+    /**
+     * Check if a block DSL element has to be rendered. If a page contains multiple block, and user click on
+     * a table to sort, only the table will be rendered when processing the DSL.
+     *
+     * * If the page is not ajax, everything is rendered
+     * * else
+     * * * If no explicit ajaxBlock, only current or target ajaxBlock is rendered
+     * * * If explicit ajaxBlocks are specified (via {@link #setExplicitAjaxBlockId(String id) setAjaxBlockId}),
+     *     only then will be rendered if in ajax mode (parameter.isAjaxRendering == true)
+     *
+     * @param id
+     * @return
+     */
     @Override
     boolean doRenderElement(String id = null) {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
         blockLog.stayBlock("doDisplay1 id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
-        if (!id && (!parameter.isAjaxRendering && !isModal)) {
+        if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
             return true
         } else if (!id) return isModal
         if (parameter.isAjaxRendering && currentAjaxBlockId == null)
@@ -107,6 +121,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.COL)
     }
 
+    /**
+     * 2 modes of rendering:
+     * * either we transmit to the browser which blocks that should be updated
+     * * either we transmit a div, placeholder for the subsequent updates
+     *
+     * @param id
+     */
     @Override
     void visitAjaxBlock(String id) {
         blockLog.enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering + " parameter.ajaxBlockId: " + parameter.ajaxBlockId)
@@ -114,7 +135,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        boolean doAjaxRendering = parameter.isRefresh && parameter.isAjaxRendering && id == currentAjaxBlockId
+        boolean doAjaxRendering = parameter.isRefresh && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
         if (!doAjaxRendering && parameter.targetAjaxBlockId) {
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true
@@ -289,6 +310,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.exitBlock('visitModalEnd')
         isModal = false
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
+    }
+
+    /**
+     * Set explicit ajaxBlockId to for ajax mode and for render.
+     * (See {@link #visitAjaxBlock}
+     *
+     * @param id
+     */
+    @Override
+    void setExplicitAjaxBlockId(String id) {
+        theCurrentExplicitAjaxBlockId = id
     }
 
     @Override

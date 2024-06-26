@@ -32,7 +32,6 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
     init {
         traceIndent("Table::init +++ tableId: $tableId")
         val f = parent.filters[tableId + parent.blockId]
-        println("parent.filters[$tableId] ${parent.filters[tableId]}")
         filter = f!!
         tableSortableColumns = TableSortableColumn.getSiblingSortableColumn(this)
         tableGroupableColumns = TableGroupableColumn.getSiblingGroupableColumn(this)

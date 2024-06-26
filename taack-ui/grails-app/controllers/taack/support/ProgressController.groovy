@@ -5,6 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.block.UiBlockVisitor
 
 /**
  * Support Controller for progressbar.
@@ -12,7 +13,9 @@ import taack.ui.dsl.UiBlockSpecifier
  * <p>Here is how to add a progress bar to a long duration job:
  *
  * <pre>{@code
- *  String pId = taackUiProgressBarService.progressStart(CrewUiService.messageBlock("Done .."), rowCount)
+ *          String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
+ *                            custom("""<p>Test ended</p>""")
+ *          }, 100)
  *  def task = task {
  *      customerRows.eachWithIndex { String[] row, int i ->
  *          importCustomer(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17])
@@ -34,25 +37,18 @@ class ProgressController {
     TaackUiService taackUiService
 
     def drawProgress(String id) {
-        println "${new Date()} AUOAUOAUOAOUOAUAUU $id"
         if (id && taackUiProgressBarService.progressMax(id)) {
             int max = taackUiProgressBarService.progressMax(id)
             int value = taackUiProgressBarService.progress(id)
             boolean ended = taackUiProgressBarService.progressHasEnded(id)
-            println "${new Date()} AUOAUOAUOAOUOAUAUU max: $max, value: $value, ended: $ended"
             if (!ended) {
-                response.outputStream << taackUiService.visit(new UiBlockSpecifier().ui {
-                    closeModalAndUpdateBlock(TaackUiProgressBarService.buildProgressBlock(id, max, value).closure)
-                }, true)
-                response.outputStream.flush()
-                response.outputStream.close()
+                response.outputStream << taackUiService.visit(TaackUiProgressBarService.buildProgressBlock(id, max, value), true)
             } else {
-                taackUiService.show(new UiBlockSpecifier().ui {
-                    closeModalAndUpdateBlock(taackUiProgressBarService.progressEnds(id).closure)
-                })
+                response.outputStream << taackUiService.visit(taackUiProgressBarService.buildEndBlock(id), true)
             }
+            response.outputStream.flush()
+            response.outputStream.close()
         } else {
-            println "${new Date()} AUOAUOAUOAOUOAUAUU return true"
             return true
         }
     }

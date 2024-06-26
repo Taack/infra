@@ -5,6 +5,7 @@ import grails.compiler.GrailsCompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
 import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.block.BlockSpec
 
 /**
  * Service managing progressbar. The action must return immediately after having initialised the progressbar.
@@ -31,7 +32,7 @@ import taack.ui.dsl.UiBlockSpecifier
 class TaackUiProgressBarService {
     private Map<String, Integer> progressRegister = [:]
     private Map<String, Integer> progressRegisterMax = [:]
-    private Map<String, UiBlockSpecifier> endsRegister = [:]
+    private Map<String, Closure<BlockSpec>> endsRegister = [:]
     private Set<String> endedProgress = []
 
     TaackUiService taackUiService
@@ -39,12 +40,27 @@ class TaackUiProgressBarService {
     static UiBlockSpecifier buildProgressBlock(String ret, int max, int value) {
         new UiBlockSpecifier().ui {
             modal {
-                custom """\
+                ajaxBlock "drawProgress=$ret", {
+                    custom """\
                         <label for="progress">Job progress:</label>
                         <progress id="progress" max="$max" value="$value"> 0 / $max </progress>
                     """.stripIndent()
+                }
             }
         }
+    }
+
+    UiBlockSpecifier buildEndBlock(String ret) {
+        Closure<BlockSpec> b = progressEnds(ret)
+        if (b) {
+            new UiBlockSpecifier().ui {
+                modal {
+                    ajaxBlock "drawProgress=$ret", {
+                        inline b
+                    }
+                }
+            }
+        } else null
     }
 
     /**
@@ -54,7 +70,7 @@ class TaackUiProgressBarService {
      * @param max Number of task steps
      * @return The ID of the progressbar
      */
-    String progressStart(UiBlockSpecifier ends, Integer max) {
+    String progressStart(Closure<BlockSpec> ends, Integer max) {
         String ret = (ends.toString() + System.currentTimeMillis()).sha256()
         progressRegister.put(ret, 0)
         progressRegisterMax.put(ret, max)
@@ -91,7 +107,7 @@ class TaackUiProgressBarService {
         return progressRegister[id]
     }
 
-    UiBlockSpecifier progressEnds(String id) {
+    Closure<BlockSpec> progressEnds(String id) {
         def c = endsRegister[id]
         progressClean(id)
         return c

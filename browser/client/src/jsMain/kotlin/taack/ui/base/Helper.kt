@@ -133,7 +133,6 @@ class Helper {
 
         fun processAjaxLink(text: String, base: BaseElement, process: CloseModalPostProcessing? = null) {
             val block = base.getParentBlock()
-            println(text)
             when {
                 text.contains(RELOAD) -> {
                     window.location.href = (Block.href ?: "")
@@ -209,8 +208,6 @@ class Helper {
                         var pos2 = it.value.length - pos1
                         if (it.value.endsWith(BLOCK_END))
                             pos2 -= BLOCK_END.length
-                        println("pos1: $pos1, pos2: $pos2")
-                        println(it.value.substring(pos1, pos2))
                         target!!.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
                         target.refresh()
                     }
@@ -257,12 +254,12 @@ class Helper {
                     } else {
                         trace("FormActionButton::hasErrors $map")
                     }
-
                 }
 
                 else -> {
                     trace("Helper::update current block")
-                    base.getParentBlock().updateContent(text)
+                    if (text.isNotEmpty())
+                        base.getParentBlock().updateContent(text)
                 }
 
             }

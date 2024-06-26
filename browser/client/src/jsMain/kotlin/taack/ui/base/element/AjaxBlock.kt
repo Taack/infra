@@ -1,13 +1,19 @@
 package taack.ui.base.element
 
+import kotlinx.browser.window
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.await
+import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 import org.w3c.dom.asList
 import org.w3c.dom.get
+import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
+import kotlin.js.Promise
 
 class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     BaseElement {
@@ -27,6 +33,8 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     var tables: Map<String, Table> = mutableMapOf()
     var forms: List<Form> = mutableListOf()
     var shows: List<Show> = mutableListOf()
+    var progressId: String = ""
+
     private val innerScripts = d.getElementsByTagName("script")
 
     init {
@@ -38,66 +46,41 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }
 
-//    private suspend fun onPoll() {
-//        Helper.trace("AjaxBlock::onPoll")
-//
-//        window.fetch("/progress/drawProgress/$progressId?isAjax=true", RequestInit(method = "GET")).then {
-//            if (it.ok) {
-//                Helper.trace("AjaxBlock::it.ok")
-//                it.text()
-//            } else {
-//                Helper.trace("AjaxBlock::it.ok N//    private suspend fun onPoll() {
-//        Helper.trace("AjaxBlock::onPoll")
-//
-//        window.fetch("/progress/drawProgress/$progressId?isAjax=true", RequestInit(method = "GET")).then {
-//            if (it.ok) {
-//                Helper.trace("AjaxBlock::it.ok")
-//                it.text()
-//            } else {
-//                Helper.trace("AjaxBlock::it.ok NOK")
-//                Helper.trace(it.statusText)
-//                Promise.reject(Throwable())
-//            }
-//        }.then {
-//            Helper.processAjaxLink(it, parent)
-//        }.await()
-//
-//        // window.setTimeout(handler = {}, timeout = 1000)
-//    }
-//
-//    private fun poolDrawProgress(blockId: String) {
-//        progressId = blockId.substring(13)
-//        Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
-//        window.setTimeout(handler = {
-//            GlobalScope.launch {
-//                onPoll()
-//            }
-//        }, timeout = 800)
-//        Helper.traceDeIndent("poolDrawProgress::start ---")
-//    }
-//                Helper.trace(it.statusText)
-//                Promise.reject(Throwable())
-//            }
-//        }.then {
-//            Helper.processAjaxLink(it, parent)
-//        }.await()
-//
-//        // window.setTimeout(handler = {}, timeout = 1000)
-//    }
-//
-//    private fun poolDrawProgress(blockId: String) {
-//        progressId = blockId.substring(13)
-//        Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
-//        window.setTimeout(handler = {
-//            GlobalScope.launch {
-//                onPoll()
-//            }
-//        }, timeout = 800)
-//        Helper.traceDeIndent("poolDrawProgress::start ---")
-//    }
+    private suspend fun onPoll() {
+        Helper.trace("AjaxBlock::onPoll")
+
+        window.fetch("/progress/drawProgress/$progressId?isAjax=true&refresh=true", RequestInit(method = "GET")).then {
+            if (it.ok) {
+                Helper.trace("AjaxBlock::it.ok")
+                it.text()
+            } else {
+                Helper.trace("AjaxBlock::it.ok NOK")
+                Helper.trace(it.statusText)
+                Promise.reject(Throwable())
+            }
+        }.then {
+            Helper.processAjaxLink(it, parent)
+        }.await()
+
+        // window.setTimeout(handler = {}, timeout = 1000)
+    }
+
+    private fun poolDrawProgress(blockId: String) {
+        progressId = blockId.substring(13)
+        Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
+        window.setTimeout(handler = {
+            GlobalScope.launch {
+                onPoll()
+            }
+        }, timeout = 1500)
+        Helper.traceDeIndent("poolDrawProgress::start ---")
+    }
 
     fun refresh() {
         Helper.traceIndent("AjaxBlock::refresh +++ blockId: $blockId")
+        if (blockId.startsWith("drawProgress=")) {
+            poolDrawProgress(blockId)
+        }
         filters = Filter.getSiblingFilterBlock(this).map { it.filterId + blockId to it }.toMap()
         tables = Table.getSiblingTable(this).map { it.tableId + blockId to it }.toMap()
         forms = Form.getSiblingForm(this)
