@@ -47,28 +47,6 @@ final class TableSpec {
     }
 
     /**
-     * Display a row that has the width of the table and contains group as label.
-     *
-     * @param label Label to display
-     */
-    void rowGroupHeader(String label) {
-        tableVisitor.visitRowGroupHeader(label)
-    }
-
-    void rowGroupHeader(String label, MethodClosure show, long id) {
-        tableVisitor.visitRowGroupHeader(label, show, id)
-    }
-
-    /**
-     * Display a row that has the width of the table.
-     *
-     * @param content
-     */
-    void rowGroupFooter(final String content) {
-        tableVisitor.visitRowGroupFooter(content)
-    }
-
-    /**
      * Row container
      *
      * @param currentObject Mandatory if table is selectable

@@ -7,23 +7,181 @@ import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
+import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
-import taack.ui.dump.common.CommonRawHtmlTableDump
 import taack.ui.dump.html.element.*
-import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.style.DisplayBlock
-import taack.ui.dump.html.style.DisplayInlineBlock
-import taack.ui.dump.html.table.HTMLTd
-import taack.ui.dump.html.table.HTMLTr
+import taack.ui.dump.html.table.*
+
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 
 @CompileStatic
-final class RawHtmlTableDump extends CommonRawHtmlTableDump {
+final class RawHtmlTableDump implements IUiTableVisitor {
 
     final String blockId
+    final Parameter parameter
+    final ThemableTable themableTable
+
+    private int indent = -1
+    int colCount = 0
+    boolean isInCol = false
+    Style rowStyle = null
+    int stripped = 0
+    boolean isInHeader = false
+    int level = 0
+    boolean firstInCol = false
+
+    protected final BlockLog blockLog
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
-        super(blockLog, parameter)
+        this.blockLog = blockLog
+        this.parameter = parameter
+        this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
         this.blockId = id ?: '' + parameter.modalId
+    }
+
+    static final <T> String dataFormat(T value, String format) {
+        if (!value) return ''
+        switch (value.class) {
+            case BigDecimal:
+                DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
+                return df.format(value)
+            case Date:
+                SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy/MM/dd")
+                return sdf.format(value)
+            default:
+                return value.toString()
+        }
+    }
+
+    static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
+        if (!url) return new HTMLSpan().builder
+                .setStyle(new DisplayBlock())
+                .addChildren(new HTMLTxtContent(cell)).build()
+        return new HTMLAnchor(true, url).builder.addChildren(
+                new HTMLTxtContent(cell)
+        ).build()
+    }
+
+    @Override
+    void visitTableEnd() {
+        blockLog.exitBlock('visitTableEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
+    }
+
+    @Override
+    void visitColumn(Integer colSpan, Integer rowSpan) {
+        blockLog.enterBlock('visitColumn')
+        colCount++
+        isInCol = true
+        if (isInHeader) {
+            HTMLTh th = new HTMLTh(colSpan, rowSpan)
+            th.setTaackTag(TaackTag.TABLE_COL)
+            blockLog.topElement.addChildren(th)
+            blockLog.topElement = th
+        } else {
+            HTMLTd th = new HTMLTd(colSpan, rowSpan)
+            th.setTaackTag(TaackTag.TABLE_COL)
+            blockLog.topElement.addChildren(th)
+            blockLog.topElement = th
+        }
+    }
+
+    @Override
+    void visitHeader() {
+        blockLog.enterBlock('visitHeader')
+        isInHeader = true
+        HTMLTr tr = new HTMLTr()
+        tr.addClasses('align-middle')
+        blockLog.topElement.addChildren(
+                new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).addChildren(
+                        tr
+                ).build()
+        )
+        blockLog.topElement = tr
+    }
+
+    @Override
+    void visitHeaderEnd() {
+        blockLog.exitBlock('visitHeaderEnd')
+        isInHeader = false
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
+        HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
+        blockLog.topElement.addChildren(tb)
+        blockLog.topElement = tb
+    }
+
+    @Override
+    void visitColumnEnd() {
+        blockLog.exitBlock('visitColumnEnd')
+        isInCol = false
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL)
+    }
+
+    @Override
+    void visitRow(Style style, boolean hasChildren) {
+        blockLog.enterBlock('visitRow')
+        rowStyle = style
+        stripped++
+        HTMLTr tr = new HTMLTr()
+        tr.taackTag = TaackTag.TABLE_ROW
+        if (indent > 0) {
+            //tr.styleDescriptor = new DisplayNone()
+            tr.attributes.put('taackTableRowGroup', indent.toString())
+            tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
+        }
+        blockLog.topElement.addChildren(tr)
+        blockLog.topElement = tr
+        firstInCol = true
+    }
+
+    void visitRowRO(Style style, boolean hasChildren) {
+        visitRow style, hasChildren
+    }
+
+    @Override
+    void visitRowEnd() {
+        blockLog.exitBlock('visitRowEnd')
+        rowStyle = null
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_ROW)
+    }
+
+    @Override
+    void visitRowIndent() {
+        blockLog.enterBlock('visitRowIndent')
+        indent++
+    }
+
+    @Override
+    void visitRowIndentEnd() {
+        blockLog.exitBlock('visitRowIndentEnd')
+        indent--
+    }
+
+    @Override
+    void visitRowAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
+
+        params ?= [:]
+        blockLog.topElement.addChildren(
+                new HTMLDiv().builder.addChildren(
+                        new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
+                                new HTMLTxtContent(actionIcon.getHtml(i18n))
+                        ).build()
+                ).build()
+        )
+    }
+
+    @Override
+    void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
+        blockLog.enterBlock('visitRowColumn')
+        isInCol = true
+        HTMLTd td = new HTMLTd(colSpan, rowSpan)
+        if (firstInCol) td.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
+        firstInCol = false
+        blockLog.topElement.addChildren(td)
+        blockLog.topElement = td
     }
 
     @Override
@@ -127,53 +285,5 @@ final class RawHtmlTableDump extends CommonRawHtmlTableDump {
                     .build()
             )
         }
-    }
-
-    @Override
-    void visitGroupFieldHeader(FieldInfo[] fields) {
-        visitGroupFieldHeader(parameter.trField(fields), fields)
-    }
-
-    @Override
-    void visitGroupFieldHeader(String i18n, FieldInfo[] fields) {
-        i18n ?= parameter.trField(fields)
-
-        String name = RawHtmlFilterDump.getQualifiedName(fields)
-
-        blockLog.topElement.addChildren(
-                new HTMLSpan().builder.addClasses('sortColumn', 'taackGroupableColumn')
-                        .putAttribute('groupField', name).addChildren(
-                        new HTMLTxtContent("""<a style="display: inline;">${i18n}</a><input type="checkbox"/>""")
-                ).build()
-        )
-    }
-
-    @Override
-    void visitRowGroupHeader(String groups, MethodClosure show, long id) {
-
-        stripped = 0
-
-        blockLog.topElement.addChildren(new HTMLTr().builder
-                .addClasses('taackRowGroupHeader', "taackRowGroupHeader-$level")
-                .addChildren(
-                        new HTMLTd(colCount).builder.addChildren(
-                                new HTMLAnchor(false, parameter.urlMapped(Utils.getControllerName(show), show.method, id)).builder.addChildren(
-                                        new HTMLTxtContent("<em>$groups</em>")
-                                ).build()
-                        ).build()
-                ).build()
-        )
-    }
-
-    @Override
-    void visitRowGroupFooter(String content) {
-        blockLog.topElement.addChildren(new HTMLTr().builder
-                .addClasses('taackRowGroupFooter', "taackRowGroupFooter-$level")
-                .addChildren(
-                        new HTMLTd(colCount).builder.addChildren(
-                                new HTMLTxtContent(content)
-                        ).build()
-                ).build()
-        )
     }
 }

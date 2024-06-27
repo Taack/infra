@@ -172,7 +172,11 @@ final class TaackSearchService implements WebAttributes {
                         }
                         for (def r in ranges) {
                             if (i18nMap[r.name]) {
-                                rowGroupHeader i18nMap[r.name]
+                                row {
+                                    rowColumn(2) {
+                                        rowField(i18nMap[r.name] ?: 'Type')
+                                    }
+                                }
                                 for (def c in r.counts) {
                                     String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
                                     row {
@@ -192,7 +196,11 @@ final class TaackSearchService implements WebAttributes {
                             label "Action"
                         }
                         for (def f in facets) {
-                            rowGroupHeader i18nMap[f.name] ?: 'Type'
+                            row {
+                                rowColumn(2) {
+                                    rowField(i18nMap[f.name] ?: 'Type')
+                                }
+                            }
                             for (def v in f.values) {
                                 String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                 row {
@@ -220,7 +228,12 @@ final class TaackSearchService implements WebAttributes {
                             if (solrSpecifier) {
                                 def id = Long.parseLong(docId.substring(iSep + 1))
                                 String label = solrSpecifier.label.call(id)
-                                rowGroupHeader label, solrSpecifier.show, id
+                                row {
+                                    rowColumn(2) {
+                                        rowAction(ActionIcon.FILTER, solrSpecifier.show, id)
+                                        rowField label
+                                    }
+                                }
                                 for (def hli in hl) {
                                     row {
                                         rowField i18nMap[hli.key]

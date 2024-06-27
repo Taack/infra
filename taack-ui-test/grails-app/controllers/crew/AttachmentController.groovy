@@ -256,7 +256,9 @@ class AttachmentController {
             if (parentTerms) {
                 for (Term t in parentTerms) {
                     if (t) {
-                        rowGroupHeader "${t}"
+                        row {
+                            rowField "${t}"
+                        }
                         rec(t)
                     }
                 }

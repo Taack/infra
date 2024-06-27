@@ -1106,7 +1106,11 @@ class CmsController implements WebAttributes {
             else subsidiaries.addAll CmsSubsidiary.values().toList()
 
             for (def g : subsidiaries) {
-                rowGroupHeader(g.toString() + " " + g.languages*.label.join(', '))
+                row {
+                    rowColumn(2) {
+                        rowField g.toString() + " " + g.languages*.label.join(', ')
+                    }
+                }
                 rec(CmsMenuEntry.findAllBySubsidiaryAndParentIsNull(g), g, 0)
             }
         }

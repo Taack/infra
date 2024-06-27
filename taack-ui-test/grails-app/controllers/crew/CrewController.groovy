@@ -63,10 +63,10 @@ class CrewController implements WebAttributes {
             header {
                 column {
                     label u.username_
-                    groupFieldHeader u.businessUnit_
+                    sortableFieldHeader u.businessUnit_
                 }
                 column {
-                    groupFieldHeader u.subsidiary_
+                    sortableFieldHeader u.subsidiary_
                     label u.manager_
                 }
                 column {
@@ -109,11 +109,19 @@ class CrewController implements WebAttributes {
                 User filterUser = new User(enabled: true)
                 for (def g : groups) {
                     int oldCount = count
-                    rowGroupHeader g as String
+                    row {
+                        rowColumn(4) {
+                            rowField g as String
+                        }
+                    }
                     rec(taackFilterService.getBuilder(User).build().listInGroup(g, new UiFilterSpecifier().sec(User, {
                         filterFieldExpressionBool new FilterExpression(true, Operator.EQ, filterUser.enabled_)
                     })).aValue, 0)
-                    rowGroupFooter "Count: ${count - oldCount}"
+                    row {
+                        rowColumn(4) {
+                            rowField "Count: ${count - oldCount}"
+                        }
+                    }
                 }
             } else {
                 rec(User.findAllByManagerIsNullAndEnabled(true), 0)

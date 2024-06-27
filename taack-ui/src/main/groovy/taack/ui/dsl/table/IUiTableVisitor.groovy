@@ -50,16 +50,6 @@ interface IUiTableVisitor {
     void visitRowIndent()
 
     void visitRowIndentEnd()
-
-    void visitGroupFieldHeader(FieldInfo[] fields)
-
-    void visitGroupFieldHeader(String i18n, FieldInfo[] fields)
-
-    void visitRowGroupHeader(String label)
-
-    void visitRowGroupHeader(String groups, MethodClosure show, long id)
-
-    void visitRowGroupFooter(String content)
-
+    
     void visitPaginate(Number max, Number count)
 }

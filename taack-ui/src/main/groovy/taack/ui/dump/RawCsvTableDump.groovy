@@ -3,11 +3,12 @@ package taack.ui.dump
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
-import taack.ui.dsl.table.UiTableVisitorImpl
+import taack.ui.dsl.table.IUiTableVisitor
 
 @CompileStatic
-final class RawCsvTableDump extends UiTableVisitorImpl {
+final class RawCsvTableDump implements IUiTableVisitor {
     final private ByteArrayOutputStream out
 
     final static char sep = '|'
@@ -23,8 +24,43 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
     }
 
     @Override
+    void visitTable() {
+
+    }
+
+    @Override
+    void visitTableWithoutFilter() {
+
+    }
+
+    @Override
+    void visitTableEnd() {
+
+    }
+
+    @Override
+    void visitHeader() {
+
+    }
+
+    @Override
     void visitHeaderEnd() {
         out << "\n"
+    }
+
+    @Override
+    void visitColumn(Integer colSpan, Integer rowSpan) {
+
+    }
+
+    @Override
+    void visitColumnEnd() {
+
+    }
+
+    @Override
+    void visitRow(Style style, boolean hasChildren) {
+
     }
 
     @Override
@@ -35,6 +71,21 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
     @Override
     void visitFieldHeader(final String i18n) {
         out << "\"${i18n.replace(sep, (char) ':')}\"${sep}"
+    }
+
+    @Override
+    void visitFieldHeader(FieldInfo[] fields) {
+
+    }
+
+    @Override
+    void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
+
+    }
+
+    @Override
+    void visitRowColumnEnd() {
+
     }
 
     @Override
@@ -56,5 +107,28 @@ final class RawCsvTableDump extends UiTableVisitorImpl {
         out << surroundCell(value)
     }
 
+    @Override
+    void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
 
+    }
+
+    @Override
+    void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
+
+    }
+
+    @Override
+    void visitRowIndent() {
+
+    }
+
+    @Override
+    void visitRowIndentEnd() {
+
+    }
+
+    @Override
+    void visitPaginate(Number max, Number count) {
+
+    }
 }

@@ -2,12 +2,14 @@ package taack.ui.dump.vt100
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
+import taack.ast.type.GetMethodReturn
+import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
-import taack.ui.dsl.table.UiTableVisitorImpl
+import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.vt100.DisplayManager as DM
 
 @CompileStatic
-final class RenderingTable extends UiTableVisitorImpl {
+final class RenderingTable implements IUiTableVisitor {
     private final DM dm
 
     final char colSep = '│'
@@ -53,8 +55,43 @@ final class RenderingTable extends UiTableVisitorImpl {
     }
 
     @Override
+    void visitColumn(Integer colSpan, Integer rowSpan) {
+
+    }
+
+    @Override
+    void visitColumnEnd() {
+
+    }
+
+    @Override
     void visitFieldHeader(String i18n) {
         headers.add i18n
+    }
+
+    @Override
+    void visitFieldHeader(FieldInfo[] fields) {
+
+    }
+
+    @Override
+    void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
+
+    }
+
+    @Override
+    void visitRowColumnEnd() {
+
+    }
+
+    @Override
+    void visitRowField(FieldInfo fieldInfo, String format, Style style) {
+
+    }
+
+    @Override
+    void visitRowField(GetMethodReturn fieldInfo, String format, Style style) {
+
     }
 
     @Override
@@ -70,6 +107,11 @@ final class RenderingTable extends UiTableVisitorImpl {
         currentLineSize = 0
     }
 
+    @Override
+    void visitRowEnd() {
+
+    }
+
     private void drawCell(String value, boolean padLeft = true) {
         dm.addFocusableCell(value, colWidth, padLeft)
         currentLineSize++
@@ -81,6 +123,41 @@ final class RenderingTable extends UiTableVisitorImpl {
     @Override
     void visitRowField(String value, Style style) {
         drawCell(value.toString())
+    }
+
+    @Override
+    void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+
+    }
+
+    @Override
+    void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
+
+    }
+
+    @Override
+    void visitRowIndent() {
+
+    }
+
+    @Override
+    void visitRowIndentEnd() {
+
+    }
+
+    @Override
+    void visitPaginate(Number max, Number count) {
+
+    }
+
+    @Override
+    void visitTable() {
+
+    }
+
+    @Override
+    void visitTableWithoutFilter() {
+
     }
 
     @Override

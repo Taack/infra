@@ -110,7 +110,7 @@ class Helper {
         }
 
         fun mapAjaxBlock(text: String): Map<String, String> {
-            console.log("Mapping Ajax Content ... ${text.substring(0, 10)}")
+            trace("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
             if (text.startsWith(BLOCK_START)) {
                 var pos1 = BLOCK_START.length

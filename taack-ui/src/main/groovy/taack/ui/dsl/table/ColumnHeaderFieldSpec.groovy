@@ -45,26 +45,6 @@ class ColumnHeaderFieldSpec {
     }
 
     /**
-     * Add a checkbox, if clicked, the table will group lines.
-     *
-     * @param i18n Label of the column field
-     * @param field Target field (has to be a direct field of the object)
-     */
-    void groupFieldHeader(final String i18n, final FieldInfo... fields) {
-        tableVisitor.visitGroupFieldHeader(fields)
-    }
-
-    /**
-     * Add a checkbox, if clicked, the table will group lines.
-     *
-     * @param i18n Label of the column field
-     * @param field Target field (has to be a direct field of the object)
-     */
-    void groupFieldHeader(final FieldInfo... fields) {
-        tableVisitor.visitGroupFieldHeader(fields)
-    }
-
-    /**
      *
      * @param i18n
      * @param fields
