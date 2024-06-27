@@ -30,7 +30,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     final private BlockLog blockLog
 
     RawHtmlPrintableDump(ByteArrayOutputStream out, Parameter parameter) {
-        this.blockLog = new BlockLog(new ThemeSelector(ThemeMode.LIGHT, ThemeSize.NORMAL))
+        this.blockLog = new BlockLog(new ThemeSelector(ThemeMode.LIGHT, ThemeMode.LIGHT, ThemeSize.NORMAL))
         this.blockLog.topElement = new HTMLEmpty()
         this.out = out
         this.parameter = parameter

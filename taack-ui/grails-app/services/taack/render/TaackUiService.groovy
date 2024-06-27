@@ -183,7 +183,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             ThemeSelector themeSelector = themeService.themeSelector
             ThemeSize themeSize = themeSelector.themeSize
             ThemeMode themeMode = themeSelector.themeMode
-            ThemeMode themeAuto = themeSelector.themeMode
+            ThemeMode themeAuto = themeSelector.themeAuto
 
             return new ModelAndView("/taackUi/block", [
                     themeSize   : themeSize,

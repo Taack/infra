@@ -11,5 +11,9 @@ enum ThemeMode {
         this.name = name
     }
 
+    static ThemeMode fromName(String name) {
+        if (name == 'dark') DARK
+        else LIGHT
+    }
     final String name
 }

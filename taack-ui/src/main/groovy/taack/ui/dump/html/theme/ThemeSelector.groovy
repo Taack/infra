@@ -19,16 +19,17 @@ final class ThemeSelector implements Validateable {
     ThemeMode themeAuto
     ThemeSize themeSize
 
-    ThemeSelector(ThemeMode themeMode, ThemeSize themeSize) {
+    ThemeSelector(ThemeMode themeMode, ThemeMode themeAuto, ThemeSize themeSize) {
         this.themeMode = themeMode
-        themeAuto = themeMode
+        this.themeAuto = themeAuto
         this.themeSize = themeSize
     }
 
     static ThemeSelector fromSession(HttpSession session) {
         ThemeMode themeMode = (session[SESSION_THEME_MODE] ?: ThemeMode.NORMAL) as ThemeMode
+        ThemeMode themeAuto = ThemeMode.fromName(session[SESSION_THEME_AUTO] as String)
         ThemeSize themeSize = (session[SESSION_THEME_SIZE] ?: ThemeSize.NORMAL)  as ThemeSize
-        new ThemeSelector(themeMode, themeSize)
+        new ThemeSelector(themeMode, themeAuto, themeSize)
 
     }
 

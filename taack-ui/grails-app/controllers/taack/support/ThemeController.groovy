@@ -4,6 +4,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackUiService
+import taack.render.ThemeService
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dsl.UiBlockSpecifier
@@ -16,6 +17,7 @@ import taack.ui.dump.html.theme.ThemeSize
 class ThemeController {
 
     TaackUiService taackUiService
+    ThemeService themeService
 
     def index() {
         ThemeSelector themeSelector = ThemeSelector.fromSession(session)
@@ -44,6 +46,13 @@ class ThemeController {
 
     def autoTheme(String themeModeAuto) {
         session[ThemeSelector.SESSION_THEME_AUTO] = themeModeAuto
-        render 'themeModeAuto ' + themeModeAuto
+
+        ThemeSelector themeSelector = themeService.themeSelector
+        ThemeSize themeSize = themeSelector.themeSize
+        ThemeMode themeMode = themeSelector.themeMode
+        ThemeMode themeAuto = themeSelector.themeAuto
+
+        log.warn("Changing color mode ($themeModeAuto): ${themeAuto}, ${themeMode}, ${themeSize}")
+        render 'themeModeAuto '
     }
 }
