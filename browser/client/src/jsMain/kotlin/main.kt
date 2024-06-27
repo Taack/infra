@@ -4,4 +4,5 @@ import taack.ui.base.element.Block
 fun main() {
     Block.href = window.location.href
     Block.getSiblingBlock(null)
+    window.addEventListener("popstate", { window.location.reload() })
 }

@@ -19,13 +19,15 @@ import taack.ui.base.LeafElement
 open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : LeafElement {
 
     companion object {
-        fun createUrl(isAjax: Boolean, action: String, additionalParams: Map<String, String>? = null): URL {
-            val url = URL(action, "${window.location.protocol}//${window.location.host}")
-            if (isAjax) url.searchParams.set("isAjax", "true")
-            additionalParams?.forEach {
-                url.searchParams.set(it.key, it.value)
-            }
-            return url
+        fun createUrl(isAjax: Boolean, action: String?, additionalParams: Map<String, String>? = null): URL {
+            if (action != null) {
+                val url = URL(action, "${window.location.protocol}//${window.location.host}")
+                if (isAjax) url.searchParams.set("isAjax", "true")
+                additionalParams?.forEach {
+                    url.searchParams.set(it.key, it.value)
+                }
+                return url
+            } else return URL("${window.location.protocol}//${window.location.host}")
         }
     }
 
@@ -39,12 +41,14 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
 
     private fun onclickBaseAjaxAction(e: MouseEvent) {
         e.preventDefault()
+        val targetUrl = createUrl(true, action).toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
         val xhr = XMLHttpRequest()
         if (action?.contains("downloadBin") == true) {
             trace("Binary Action ... $action")
             xhr.responseType = XMLHttpRequestResponseType.BLOB
         }
+
         xhr.onloadend = { ev: Event ->
             ev.preventDefault()
             trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}'")
@@ -62,8 +66,9 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
                 val text = xhr.responseText
                 if (text.contains(Regex(".{0,4}<html"))) {
                     trace("Full webpage ...|$action|${document.title}|${document.domain}|${document.documentURI}")
-                    val url = URL(document.URL)
-                    window.history.pushState("", document.title, url.href)
+                    window.history.pushState("{}", window.document.title, targetUrl)
+                    trace("Setting location.href: $targetUrl")
+                    window.location.href = targetUrl
                     window.document.clear()
                     window.document.write(text)
                     window.document.close()
@@ -76,7 +81,7 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
 
         if (!action.isNullOrEmpty()) {
 //            xhr.open("GET", createUrl(!isHref, action).toString())
-            xhr.open("GET", createUrl(true, action).toString())
+            xhr.open("GET", targetUrl)
             xhr.send()
         }
     }
