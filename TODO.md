@@ -56,7 +56,7 @@
 - ~~remove close title~~
 - ~~remove visit*End when possible~~
 - ~~add refresh current block (see refresh in cms/editPage)~~
-- use different translations for `create` or `edit`, if ID is present
+- ~~use different translations for `create` or `edit`, if ID is present~~
 - ~~Use bootstrap progress~~
 - ~~Choose bootstrap from jDeliver or custom~~
 - ~~Add **horizontal scrollbar on tables** when needed~~

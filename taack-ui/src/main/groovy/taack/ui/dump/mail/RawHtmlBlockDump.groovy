@@ -279,14 +279,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenu(String controller, String action, Map<String, ?> params) {
-        String i18n = parameter.trField(controller, action)
+        String i18n = parameter.trField(controller, action, params.containsKey('id'))
         visitLabeledSubMenu(i18n, controller, action, params)
     }
 
 
     @Override
     void visitSubMenu(String controller, String action, Map<String, ?> params) {
-        String i18n = parameter.trField(controller, action)
+        String i18n = parameter.trField(controller, action, params.containsKey('id'))
         visitLabeledSubMenu(i18n, controller, action, params)
     }
 

@@ -118,8 +118,9 @@ final class Parameter implements WebAttributes {
 
     }
 
-    String trField(final String controller, final String action) {
+    String trField(final String controller, final String action, final boolean hasId) {
         String key = controller.uncapitalize() + '.' + action + '.label'
+
         if (!testI18n) {
             String rv = tr(key)
             if (rv) return rv
@@ -127,7 +128,11 @@ final class Parameter implements WebAttributes {
             if (rv) return rv
             Pair p = actionTrParams(action)
             String trClass = tr('default' + '.' + p.bValue + '.label')
-            rv = tr('default' + '.' + p.aValue + '.label', null, trClass ?: p.bValue)
+            if (p.aValue == 'edit' && !hasId) {
+                rv = tr('default' + '.' + 'create' + '.label', null, trClass ?: p.bValue)
+            } else {
+                rv = tr('default' + '.' + p.aValue + '.label', null, trClass ?: p.bValue)
+            }
             if (rv) return rv
         }
         return key

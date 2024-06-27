@@ -171,8 +171,8 @@ abstract class CommonRawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, final Boolean isAjax) {
-        i18n ?= parameter.trField(controller, action)
+    void visitRowAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
 
         params ?= [:]
         blockLog.topElement.addChildren(

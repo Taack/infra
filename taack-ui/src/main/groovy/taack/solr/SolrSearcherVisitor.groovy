@@ -14,7 +14,7 @@ class SolrSearcherVisitor implements ISolrIndexerVisitor {
     @Override
     void index(SolrFieldType fieldType, String fieldPrefix, Object value, boolean faceted = true, float boost) {
         final String key = fieldPrefix + fieldType.suffix
-        i18nMap.put(key, parameter.trField('solr', fieldPrefix) + "[${fieldType.label}]")
+        i18nMap.put(key, parameter.trField('solr', fieldPrefix, false) + "[${fieldType.label}]")
         if (fieldType == SolrFieldType.DATE) return
         if (faceted) {
             facets.add key

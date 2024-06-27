@@ -397,7 +397,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitMenu(String controller, String action, Map<String, ?> params) {
         blockLog.stayBlock('visitMenu')
-        String i18n = parameter.trField(controller, action)
+        String i18n = parameter.trField(controller, action, params?.containsKey('id'))
         visitLabeledSubMenu(i18n, controller, action, params)
     }
 
@@ -405,7 +405,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitSubMenu(String controller, String action, Map<String, ?> params) {
         blockLog.stayBlock('visitSubMenu')
-        String i18n = parameter.trField(controller, action)
+        String i18n = parameter.trField(controller, action, params?.containsKey('id'))
         visitLabeledSubMenu(i18n, controller, action, params)
     }
 
@@ -432,7 +432,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
-        i18n ?= parameter.trField(controller, action)
+        i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
         blockLog.stayBlock('visitSubMenuIcon ' + i18n)
         if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
             splitMenu()
