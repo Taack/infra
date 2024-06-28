@@ -23,7 +23,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
 
     static IHTMLElement block(IHTMLElement topElement, String blockId) {
         topElement.addChildren(
-                new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').putAttribute('blockId', blockId).build()
+                new HTMLDiv().builder.addClasses('taackBlock', 'container-fluid', 'border').putAttribute('blockId', blockId).addClasses('overflow-y-auto').build()
         )
         topElement.children.first()
     }
@@ -50,7 +50,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
     }
 
     static IHTMLElement blockAjax(IHTMLElement topElement, String blockId, boolean isAjax) {
-        IHTMLElement e = isAjax ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).addClasses('overflow-x-auto').build()
+        IHTMLElement e = isAjax ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).build()
         topElement.addChildren(e)
         e
     }

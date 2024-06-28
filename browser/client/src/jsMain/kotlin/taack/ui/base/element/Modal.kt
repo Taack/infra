@@ -33,7 +33,7 @@ class Modal(val parent: Block) : BaseElement {
         dModalDialog.addClass("modal-dialog", "modal-xl", "modal-dialog-scrollable")
         dModalContent = document.createElement("div") as HTMLDivElement
         dModalBody = document.createElement("div") as HTMLDivElement
-        dModalBody.addClass("modal-body")
+        dModalBody.addClass("modal-body", "overflow-y-auto")
 //        val innerModal = document.createElement("div") as HTMLDivElement
         dModalContent.classList.add("modal-content")
         dModalContent.classList.add("taackModal")
