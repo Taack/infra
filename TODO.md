@@ -37,7 +37,7 @@
 - ~~Hook to register form field (view, update, remove, secure)~~
 - ~~Improve restore state~~
 - ~~Reduce CSS and JS~~
-- Fix table grouping / trees with pagination, rework grouping to be trees (do an iterateOnGroup) 
+- ~~rework grouping to be trees~~
 - ~~Improve form layout, add row in DSL~~
 - ~~More coherent button style in forms~~
 - ~~More restrictive DSL~~

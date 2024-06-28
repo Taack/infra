@@ -55,8 +55,6 @@ class CrewController implements WebAttributes {
 
     private UiTableSpecifier buildUserTableHierarchy(final User u) {
 
-        def groups = taackFilterService.getBuilder(User).build().listGroup()
-
         boolean hasActions = crewSecurityService.admin
 
         new UiTableSpecifier().ui {
@@ -105,27 +103,7 @@ class CrewController implements WebAttributes {
                 })
             }
 
-            if (groups) {
-                User filterUser = new User(enabled: true)
-                for (def g : groups) {
-                    int oldCount = count
-                    row {
-                        rowColumn(4) {
-                            rowField g as String
-                        }
-                    }
-                    rec(taackFilterService.getBuilder(User).build().listInGroup(g, new UiFilterSpecifier().sec(User, {
-                        filterFieldExpressionBool new FilterExpression(true, Operator.EQ, filterUser.enabled_)
-                    })).aValue, 0)
-                    row {
-                        rowColumn(4) {
-                            rowField "Count: ${count - oldCount}"
-                        }
-                    }
-                }
-            } else {
-                rec(User.findAllByManagerIsNullAndEnabled(true), 0)
-            }
+            rec(User.findAllByManagerIsNullAndEnabled(true), 0)
         }
     }
 

@@ -11,7 +11,7 @@
 *= require github-markdown
 *= require grids-responsive-min
 *= require wysiwyg
-*= require taack
+*= require taack.css
 *= require custom.css
 *= require_self
 */

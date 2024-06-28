@@ -129,7 +129,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      */
     String visit(final UiBlockSpecifier blockSpecifier, final boolean isAjaxRendering = false) {
         if (!blockSpecifier) return ''
-        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource))
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB))
         blockSpecifier.visitBlock(htmlBlock)
         htmlBlock.output
     }
@@ -141,7 +141,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return String the contains the HTML snippet
      */
     static String visitMenu(final UiMenuSpecifier menuSpecifier) {
-        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs))
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
             htmlBlock.menu.output
@@ -260,7 +260,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      */
     final String streamPdf(final UiPrintableSpecifier printableSpecifier, final OutputStream outputStream = null, Locale locale = null) {
         ByteArrayOutputStream blockStream = new ByteArrayOutputStream(8_000)
-        RawHtmlPrintableDump htmlPdf = new RawHtmlPrintableDump(blockStream, new Parameter(locale ?: LocaleContextHolder.locale, messageSource))
+        RawHtmlPrintableDump htmlPdf = new RawHtmlPrintableDump(blockStream, new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.PDF))
         printableSpecifier.visitPrintableBlock(htmlPdf)
         final StringBuffer css = new StringBuffer()
         final listCss = [
@@ -445,7 +445,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content
      */
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource))
+        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
         blockSpecifier.visitBlock(htmlPdf)
 
         String html = g.render template: "/taackUi/block-mail", model: [

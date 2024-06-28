@@ -12,7 +12,7 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     companion object {
         fun getSiblingRows(p: Table): List<TableRow> {
             val elements: List<Node>?
-            elements = p.t.querySelectorAll("tr.taackTableRow").asList()
+            elements = p.t.querySelectorAll("tr[taacktag]").asList()
             return elements.map {
                 TableRow(p, it as HTMLTableRowElement)
             }

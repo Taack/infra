@@ -1,16 +1,15 @@
 package taack.ui.dump
 
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
-import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.style.DisplayBlock
+import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
 
 import java.text.DecimalFormat
@@ -126,10 +125,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         stripped++
         HTMLTr tr = new HTMLTr()
         tr.taackTag = TaackTag.TABLE_ROW
-        if (indent > 0) {
+        if (indent >= 0) {
             //tr.styleDescriptor = new DisplayNone()
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
+        }
+        if (indent > 0 && parameter.target == Parameter.RenderingTarget.WEB) {
+            tr.setStyleDescriptor(new DisplayNone())
         }
         blockLog.topElement.addChildren(tr)
         blockLog.topElement = tr

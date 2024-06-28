@@ -9,7 +9,7 @@ class SolrSearcherVisitor implements ISolrIndexerVisitor {
     final List<String> facets = []
     final Map<String, String> i18nMap = [:]
     final List<String> boostFields = []
-    final Parameter parameter = new Parameter()
+    final Parameter parameter = new Parameter(Parameter.RenderingTarget.WEB)
 
     @Override
     void index(SolrFieldType fieldType, String fieldPrefix, Object value, boolean faceted = true, float boost) {

@@ -17,7 +17,7 @@
 
     <title>${conf.defaultTitle}</title>
     ${raw(bootstrapCssTag)}
-    <asset:javascript src="application-taack-nobootstrap.css"/>
+    <asset:stylesheet href="application-taack.css"/>
 
     <style>
     .navbar-nav > li > .dropdown-menu {

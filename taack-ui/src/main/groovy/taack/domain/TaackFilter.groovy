@@ -549,52 +549,52 @@ final class TaackFilter<T extends GormEntity<T>> {
         return new Pair<List<T>, Long>(res, executeQueryUniqueResult(Long, namedParams, count) as Long)
     }
 
-    /**
-     * When a group header is present in the table, list the distinct values for the selected group
-     * (without applying the filter)
-     *
-     * @return list of distinct value
-     */
-    List listGroup() {
-        if (theParams['grouping']) {
-            final String simpleClassName = cClass.name.substring(cClass.name.lastIndexOf('.') + 1)
-
-            final def groupList = (theParams['grouping'] as String).tokenize(' ')
-            final def columnsName = groupList.join(', sc.')
-            final def whereClause = groupList.join(' is not null and sc.')
-            final String query = """
-                select sc.${columnsName} from ${simpleClassName} sc
-                where sc.${whereClause} is not null
-                group by sc.${columnsName}
-                order by sc.${columnsName}
-            """
-
-            return executeQuery(query, [:])
-        } else return null
-    }
-
-    /**
-     * List objects in the given group
-     *
-     * @param aClass class displayed in the table
-     * @param f filter to apply while retrieving the list
-     * @param t object instance of type aClass that add filter criteria
-     * @return pair that contains list of objects and the number of objects reached by the query
-     */
-    final Pair<List<T>, Long> listInGroup(def group, final UiFilterSpecifier f = null, final T t = null) {
-        if (theParams['grouping']) {
-            if (group.class.isArray()) {
-                final def groupList = (theParams['grouping'] as String).tokenize(' ')
-                groupList.eachWithIndex { it, i ->
-                    theParams.put(it.trim(), (group as List)[i])
-                }
-                return list(cClass, 20, f, t)
-            } else {
-                theParams.put((theParams['grouping'] as String).trim(), group)
-                return list(cClass, 20, f, t)
-            }
-        } else return null
-    }
+//    /**
+//     * When a group header is present in the table, list the distinct values for the selected group
+//     * (without applying the filter)
+//     *
+//     * @return list of distinct value
+//     */
+//    List listGroup() {
+//        if (theParams['grouping']) {
+//            final String simpleClassName = cClass.name.substring(cClass.name.lastIndexOf('.') + 1)
+//
+//            final def groupList = (theParams['grouping'] as String).tokenize(' ')
+//            final def columnsName = groupList.join(', sc.')
+//            final def whereClause = groupList.join(' is not null and sc.')
+//            final String query = """
+//                select sc.${columnsName} from ${simpleClassName} sc
+//                where sc.${whereClause} is not null
+//                group by sc.${columnsName}
+//                order by sc.${columnsName}
+//            """
+//
+//            return executeQuery(query, [:])
+//        } else return null
+//    }
+//
+//    /**
+//     * List objects in the given group
+//     *
+//     * @param aClass class displayed in the table
+//     * @param f filter to apply while retrieving the list
+//     * @param t object instance of type aClass that add filter criteria
+//     * @return pair that contains list of objects and the number of objects reached by the query
+//     */
+//    final Pair<List<T>, Long> listInGroup(def group, final UiFilterSpecifier f = null, final T t = null) {
+//        if (theParams['grouping']) {
+//            if (group.class.isArray()) {
+//                final def groupList = (theParams['grouping'] as String).tokenize(' ')
+//                groupList.eachWithIndex { it, i ->
+//                    theParams.put(it.trim(), (group as List)[i])
+//                }
+//                return list(cClass, 20, f, t)
+//            } else {
+//                theParams.put((theParams['grouping'] as String).trim(), group)
+//                return list(cClass, 20, f, t)
+//            }
+//        } else return null
+//    }
 
     static enum Order {
         ASC, DESC, NONE

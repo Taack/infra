@@ -11,6 +11,7 @@ import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiOverriderService
 import taack.render.ThemeService
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.vt100.RenderingTable
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -18,6 +19,10 @@ import java.text.NumberFormat
 
 @CompileStatic
 final class Parameter implements WebAttributes {
+
+    enum RenderingTarget {
+        WEB, MAIL, PDF
+    }
 
     final static String P_ID = 'id'
     final static String P_SORT = 'sort'
@@ -28,6 +33,7 @@ final class Parameter implements WebAttributes {
     final static String P_ADDITIONAL_ID = 'additionalId'
     final static String P_FIELD_NAME = 'fieldName'
 
+    final RenderingTarget target
     final String sort
     final String order
     final Integer offset
@@ -52,8 +58,9 @@ final class Parameter implements WebAttributes {
 
     String aClassSimpleName
 
-    Parameter(final Locale lcl = null, MessageSource messageSource = null) {
+    Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target) {
         this.messageSource = messageSource
+        this.target = target
         this.sort = params.get(P_SORT) ?: null
         this.order = params.get(P_ORDER) ?: null
         this.max = params.int(P_MAX) ?: 20
