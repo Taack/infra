@@ -136,7 +136,7 @@ class SectionSpec {
      * @param html
      * @param additionalCSSClass
      */
-    void inlineHtml(final String html, final String additionalCSSClass) {
+    void inlineHtml(final String html, final String additionalCSSClass = null) {
         showVisitor.visitShowInlineHtml(html, additionalCSSClass)
     }
 

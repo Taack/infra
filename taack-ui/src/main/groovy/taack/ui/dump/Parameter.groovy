@@ -174,11 +174,11 @@ final class Parameter implements WebAttributes {
         return keys.join(',')
     }
 
-    final String urlMapped(MethodClosure action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+    static final String urlMapped(MethodClosure action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         urlMapped(Utils.getControllerName(action), action.method, params, isAjax)
     }
 
-    final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+    static final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         def p = params
         if (isAjax) {
             p = new HashMap<String, Object>()
@@ -188,7 +188,7 @@ final class Parameter implements WebAttributes {
         applicationTagLib.createLink(controller: controller, action: action, params: p)
     }
 
-    final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+    static final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         def p = params
         if (isAjax) {
             p = new HashMap<String, Object>()
