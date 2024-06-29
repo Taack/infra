@@ -1,11 +1,14 @@
 package crew
 
+import attachment.DocumentAccess
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import org.codehaus.groovy.runtime.MethodClosure as MC
-import attachment.DocumentAccess
+import taack.app.TaackApp
+import taack.app.TaackAppRegisterService
 import taack.render.TaackUiEnablerService
+import taack.ui.test.Application
 
 import javax.annotation.PostConstruct
 
@@ -28,6 +31,7 @@ class CrewSecurityService {
                 this.&securityClosure,
                 CrewController.&editUser as MC,
                 CrewController.&saveUser as MC)
+        TaackAppRegisterService.register(new TaackApp(CrewController.&index as MC, new String(Application.getResourceAsStream("/crew/crew.svg").readAllBytes())))
     }
 
     User authenticatedRolesUser() {

@@ -1,11 +1,14 @@
 package attachement
 
 import crew.AttachmentController
+import crew.CrewController
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.SpringSecurityService
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import attachment.Attachment
 import crew.User
+import taack.app.TaackApp
+import taack.app.TaackAppRegisterService
 import taack.render.TaackUiEnablerService
 
 import javax.annotation.PostConstruct
@@ -29,6 +32,8 @@ class AttachmentSecurityService {
                 this.&securityClosure,
                 AttachmentController.&downloadAttachment as MC,
                 AttachmentController.&extensionForAttachment as MC)
+        TaackAppRegisterService.register(new TaackApp(AttachmentController.&index as MC, new String(AttachmentSecurityService.getResourceAsStream("/att/att.svg").readAllBytes())))
+
     }
 
     boolean canDownloadFile(Attachment attachment) {

@@ -1,6 +1,6 @@
 package cms
 
-
+import crew.CrewController
 import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
@@ -8,6 +8,8 @@ import grails.web.api.WebAttributes
 import org.asciidoctor.*
 import org.asciidoctor.ast.Document
 import org.codehaus.groovy.runtime.MethodClosure as MC
+import taack.app.TaackApp
+import taack.app.TaackAppRegisterService
 import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
 import taack.ui.dsl.UiFilterSpecifier
@@ -23,6 +25,8 @@ import javax.annotation.PostConstruct
 @GrailsCompileStatic
 class CmsUiService implements WebAttributes {
 
+    static lazyInit = false
+
     CmsHtmlGeneratorService cmsHtmlGeneratorService
     enum CmsTableMode {
         NONE,
@@ -34,6 +38,8 @@ class CmsUiService implements WebAttributes {
     @PostConstruct
     void init() {
         INSTANCE = this
+        TaackAppRegisterService.register(new TaackApp(CmsController.&index as MC, new String(CmsUiService.getResourceAsStream("/cms/cms.svg").readAllBytes())))
+
         // TODO: Pfffff
         //     asciidoctor = Asciidoctor.Factory.create()
         //     asciidoctor.requireLibrary("asciidoctor-diagram", "asciidoctor-revealjs")

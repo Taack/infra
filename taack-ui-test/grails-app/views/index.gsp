@@ -1,3 +1,4 @@
+<%@ page import="taack.ui.dsl.helper.Utils; taack.app.TaackAppRegisterService" %>
 <!doctype html>
 <html>
 <head>
@@ -18,6 +19,16 @@
             </p>
 
             <div id="controllers" role="navigation">
+                <h2>Available Apps:</h2>
+                <div class="controller">
+                    <g:each var="a" in="${TaackAppRegisterService.apps }">
+                            <g:link controller="${Utils.getControllerName(a.entryPoint)}" action="${a.entryPoint.method}">
+                                <div class="taack-app" style="width: 220px; padding: 35px; text-align: center;display: inline-grid;">${raw(a.svg)}<div>${a.label}: ${a.desc}</div></div>
+
+                            </g:link>
+                    </g:each>
+                </div>
+
                 <h2>Available Controllers:</h2>
                 <ul>
                     <g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">

@@ -63,11 +63,9 @@
 
 # 0.5.1
 
-- Replace ROLEs def by enums with label, optional desc (i18n), BusinessUnit
-  - create missing roles
-  - roles into conf (register them at startup time in security service)
-- TaackPluginConfiguration, replace mainController by methodClosure
-- TaackApps must not be a grails plugin 
+- ~~TaackPluginConfiguration, replace mainController by methodClosure~~
+- ~~TaackApps must not be a grails plugin~~
+- Port intranet apps
 
 # 0.5.x
 
