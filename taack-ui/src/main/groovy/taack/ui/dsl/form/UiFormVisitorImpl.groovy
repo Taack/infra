@@ -84,6 +84,11 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
+    void visitFormAction(String i18n, String url, ButtonStyle style) {
+
+    }
+
+    @Override
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
 
     }

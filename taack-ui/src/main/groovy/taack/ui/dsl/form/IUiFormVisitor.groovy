@@ -34,6 +34,8 @@ interface IUiFormVisitor {
 
     void visitFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style)
 
+    void visitFormAction(String i18n, String url, ButtonStyle style)
+
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style)
 
     void visitCol(Width width)

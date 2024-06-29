@@ -29,7 +29,6 @@ final class FormSpec extends FormRowSpec {
         super(formVisitor)
     }
 
-
     /**
      * form action. The form is POSTed to the target action.
      *
@@ -41,5 +40,9 @@ final class FormSpec extends FormRowSpec {
      */
     void formAction(final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
         if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
+    }
+
+    void formAction(String i18n, String url, ButtonStyle style = ButtonStyle.SUCCESS) {
+        formVisitor.visitFormAction(i18n, url, style)
     }
 }
