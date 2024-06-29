@@ -14,6 +14,7 @@
  */
 package taack.ui.test
 
+import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.config.Config
@@ -49,12 +50,12 @@ class LoginController extends grails.plugin.springsecurity.LoginController imple
 
 		String postUrl = request.contextPath + conf.apf["filterProcessesUrl"]
 
-		LoginFormData formData = new LoginFormData()
+		User user = new User()
 
-		UiFormSpecifier f = new UiFormSpecifier().ui(formData) {
+		UiFormSpecifier f = new UiFormSpecifier().ui(user) {
 			section 'Credentials', {
-				field formData.username_
-				field formData.password_
+				field user.username_
+				field user.password_
 			}
 			formAction('Login', postUrl)
 		}
@@ -62,11 +63,6 @@ class LoginController extends grails.plugin.springsecurity.LoginController imple
 		taackUiService.show(new UiBlockSpecifier().ui {
 			form f
 		}, buildMenu())
-//		render view: 'crewAuth', model: [postUrl: postUrl,
-//		                             rememberMeParameter: conf.rememberMe["parameter"],
-//		                             usernameParameter: conf.apf["usernameParameter"],
-//		                             passwordParameter: conf.apf["passwordParameter"],
-//		                             gspLayout: conf.gsp["layoutAuth"]]
 	}
 
 	@Override
