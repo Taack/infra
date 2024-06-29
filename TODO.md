@@ -61,6 +61,14 @@
 - ~~Choose bootstrap from jDeliver or custom~~
 - ~~Add **horizontal scrollbar on tables** when needed~~
 
+# 0.5.1
+
+- Replace ROLEs def by enums with label, optional desc (i18n), BusinessUnit
+  - create missing roles
+  - roles into conf (register them at startup time in security service)
+- TaackPluginConfiguration, replace mainController by methodClosure
+- TaackApps must not be a grails plugin 
+
 # 0.5.x
 
 - Improve/fix mail rendering using bootstrap
