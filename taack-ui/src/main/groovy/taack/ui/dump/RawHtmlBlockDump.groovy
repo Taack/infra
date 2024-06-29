@@ -162,6 +162,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.stayBlock('visitShow')
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
+        blockLog.topElement.addChildren(new HTMLOutput(out))
     }
 
     @Override
@@ -226,6 +227,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.stayBlock('visitChart')
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         chartSpecifier.visitChart(new RawHtmlChartDump(out, "ajaxBlockId"))
+        blockLog.topElement.addChildren(new HTMLOutput(out))
     }
 
     @Override
@@ -239,6 +241,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.stayBlock('visitDiagram')
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, "ajaxBlockId", BlockSpec.Width.MAX), UiDiagramSpecifier.DiagramBase.SVG)
+        blockLog.topElement.addChildren(new HTMLOutput(out))
     }
 
     @Override

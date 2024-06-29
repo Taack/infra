@@ -17,7 +17,7 @@ final class TaackApp implements Comparable {
     }
 
     String getLabel() {
-        TaackUiService.tr("${Utils.getControllerName(entryPoint)}.label" as String)
+        TaackUiService.tr("${Utils.getControllerName(entryPoint)}.app" as String)
     }
 
     String getDesc() {
