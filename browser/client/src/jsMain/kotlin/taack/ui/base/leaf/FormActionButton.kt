@@ -10,6 +10,7 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
 import kotlin.js.Promise
+import kotlin.math.min
 
 class FormActionButton(private val parent: Form, private val b: HTMLButtonElement) : LeafElement {
     companion object {
@@ -55,7 +56,15 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 Promise.reject(Throwable())
             }
         }.then {
-            Helper.processAjaxLink(it, parent)
+            val t = it
+            if (t.substring(0, min(20, t.length)).contains("<!DOCTYPE html>", false)) {
+                window.location.href = b.formAction
+                window.document.clear()
+                window.document.write(t)
+                window.document.close()
+            } else {
+                Helper.processAjaxLink(it, parent)
+            }
         }.then {
             b.disabled = false
             b.innerText = innerText

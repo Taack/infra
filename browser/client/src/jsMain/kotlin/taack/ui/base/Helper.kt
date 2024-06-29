@@ -137,6 +137,7 @@ class Helper {
                 text.contains(RELOAD) -> {
                     window.location.href = (Block.href ?: "")
                 }
+
                 text.startsWith(CLOSE_LAST_MODAL) -> {
                     val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
                     if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
@@ -199,6 +200,7 @@ class Helper {
 //                        window.location.href = Block.href ?: ""
 //                    }
                 }
+
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements.get(it.key)
@@ -257,9 +259,10 @@ class Helper {
                 }
 
                 else -> {
-                    trace("Helper::update current block")
-                    if (text.isNotEmpty())
+                    if (text.isNotEmpty()) {
+                        trace("Helper::update current block")
                         base.getParentBlock().updateContent(text)
+                    }
                 }
 
             }

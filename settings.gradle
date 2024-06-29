@@ -12,5 +12,5 @@ rootProject.name = 'infra'
 include 'taack-jdbc-common'
 include 'taack-ui'
 include 'taack-ui-test'
-//include 'browser:client'
+include 'browser:client'
 
