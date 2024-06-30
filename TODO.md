@@ -65,7 +65,9 @@
 
 - ~~TaackPluginConfiguration, replace mainController by methodClosure~~
 - ~~TaackApps must not be a grails plugin~~
-- Port intranet apps
+- ~~Port intranet apps~~
+- PoC new Charts DSL
+
 
 # 0.5.x
 
@@ -77,7 +79,6 @@
 - Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Ajax scrollable tables
 - PDF / Docx / pptx / HTML from Asciidoc
-- PoC new Charts DSL
 - PoC inline DSL JS (IJavascriptDescriptor.groovy)
 - PoC inline DSL CSS (with params)
 - Asciidoc online editor (paragraph only)

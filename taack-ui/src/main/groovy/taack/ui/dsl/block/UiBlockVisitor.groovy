@@ -104,11 +104,6 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitChart(UiChartSpecifier chartSpecifier) {
-
-    }
-
-    @Override
     void visitDiagram(UiDiagramSpecifier diagramSpecifier) {
 
     }

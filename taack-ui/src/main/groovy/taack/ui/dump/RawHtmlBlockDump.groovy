@@ -222,13 +222,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitColEnd()
     }
 
-    @Override
-    void visitChart(final UiChartSpecifier chartSpecifier) {
-        blockLog.stayBlock('visitChart')
-        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        chartSpecifier.visitChart(new RawHtmlChartDump(out, "ajaxBlockId"))
-        blockLog.topElement.addChildren(new HTMLOutput(out))
-    }
+//    @Override
+//    void visitChart(final UiChartSpecifier chartSpecifier) {
+//        blockLog.stayBlock('visitChart')
+//        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
+//        chartSpecifier.visitChart(new RawHtmlChartDump(out, "ajaxBlockId"))
+//        blockLog.topElement.addChildren(new HTMLOutput(out))
+//    }
 
     @Override
     void visitDiagramFilter(final UiDiagramSpecifier diagramSpecifier, final UiFilterSpecifier filterSpecifier) {

@@ -2,7 +2,6 @@ package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.dsl.UiChartSpecifier
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
@@ -268,24 +267,19 @@ final class BlockSpec {
     /**
      * Add a chart to the block
      *
-     * @param i18n label of the chart
-     * @param chartSpecifier description of the Chart. See {@link taack.ui.dsl.UiChartSpecifier}
-     * @param width the with of the chart in the block
-     * @param closure actions to add in the header of the chart
+     * @param diagramSpecifier description of the Chart. See {@link UiDiagramSpecifier}
+     * @param closure menu
      */
-    void chart(final UiChartSpecifier chartSpecifier,
-               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+    void diagram(final UiDiagramSpecifier diagramSpecifier,
+                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
         processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
-            blockVisitor.visitChart(chartSpecifier)
+            blockVisitor.visitDiagram(diagramSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
-    }
 
-    void diagram(final UiDiagramSpecifier diagramSpecifier) {
-        blockVisitor.visitDiagram(diagramSpecifier)
     }
 
     void diagramFilter(final UiFilterSpecifier filterSpecifier,
@@ -296,10 +290,8 @@ final class BlockSpec {
     /**
      * Add custom HTML code in a block
      *
-     * @param i18n label of the block part
      * @param html code
      * @param style the template style to use
-     * @param width width inside the block
      * @param closure actions to display in the header
      */
     void custom(final String html, final Style style = null,

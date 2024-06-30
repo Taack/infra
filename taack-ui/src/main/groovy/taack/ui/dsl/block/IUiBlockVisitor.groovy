@@ -3,7 +3,6 @@ package taack.ui.dsl.block
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
-import taack.ui.dsl.UiChartSpecifier
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
@@ -50,8 +49,6 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitTable(String id, UiTableSpecifier tableSpecifier)
 
     void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier)
-
-    void visitChart(UiChartSpecifier chartSpecifier)
 
     void visitDiagram(UiDiagramSpecifier diagramSpecifier)
 

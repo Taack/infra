@@ -27,21 +27,21 @@ final class DiagramTypeSpec {
     }
 
     void bar(List<String> xLabels, boolean isStacked = true,
-             @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
+             @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation(xLabels, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitBarDiagram(isStacked)
     }
 
-    void line(List<String> xLabels, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
+    void line(List<String> xLabels, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation(xLabels, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitLineDiagram()
     }
 
-    void pie(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
+    void pie(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation([], radio)
         closure.delegate = diagramDatasetSpec
         closure.call()

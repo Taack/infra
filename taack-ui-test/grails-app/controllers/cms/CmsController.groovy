@@ -20,6 +20,8 @@ import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
+import taack.ui.dsl.diagram.DiagramTypeSpec
+import taack.ui.dsl.diagram.UiDiagramVisitor
 import taack.ui.dump.markdown.Markdown
 
 import javax.annotation.PostConstruct
@@ -1255,7 +1257,29 @@ class CmsController implements WebAttributes {
 
     def testProgressBar() {
         String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
-            custom("""<p>Test ended</p>""")
+            row {
+                custom("""<p>Test ended</p>""")
+            }
+            row {
+                col {
+                    diagram(new UiDiagramSpecifier().ui {
+                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                        }, DiagramTypeSpec.HeightWidthRadio.ONE)
+                    })
+                }
+                col {
+                    diagram(new UiDiagramSpecifier().ui {
+                        bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
+                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                        }, DiagramTypeSpec.HeightWidthRadio.ONE)
+                    })
+                }
+            }
         }, 100)
         task {
             it.sleep(1_000)
