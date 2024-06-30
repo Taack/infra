@@ -15,7 +15,7 @@ class SvgDiagramRender implements IDiagramRender {
     private final BigDecimal svgHeight
     private final isViewBox
     private final FontMetrics fm
-
+    private final BigDecimal fontSize = 50
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private String fillStyle = "black"
@@ -24,7 +24,7 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
-        this.fm = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, 13))
+        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize.intValue()))
     }
 
     @Override
@@ -79,7 +79,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderLabel(String label) { // FONT_SIZE = 13.0
         outStr.append("""
-              <text x="${trX}" y="${trY + 13.0 - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${13.0}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="${trX}" y="${trY + fontSize - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${fontSize}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -87,7 +87,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         outStr.append("""
-              <text x="$trX" y="${trY + 13.0 - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${13.0 * 0.8}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="$trX" y="${trY + fontSize - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${fontSize * 0.8}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -95,7 +95,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
-              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + 13.0 - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${13.0}px; font-family: 'sans serif'">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" text-rendering="optimizeLegibility" style="fill: black;font-size: ${fontSize}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -183,8 +183,7 @@ class SvgDiagramRender implements IDiagramRender {
                     length, 0.0,
                     length / 2.0, length
             )
-        }
-        else {
+        } else {
             renderPoly(
                     0.0, 0.0,
                     length, length / 2.0,

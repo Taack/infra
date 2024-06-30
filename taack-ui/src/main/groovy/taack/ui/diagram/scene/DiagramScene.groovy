@@ -9,14 +9,14 @@ import java.util.List
 @CompileStatic
 abstract class DiagramScene {
     final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
-    final protected BigDecimal LEGEND_RECT_HEIGHT = 13.0 // should be same as font size
+    final protected BigDecimal FONT_SIZE = 50.0 // should be same as the value of fontSize from render
+    final protected BigDecimal LEGEND_RECT_HEIGHT = FONT_SIZE // should be same as font size
     final protected BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
     final protected BigDecimal LEGEND_MARGIN = 10.0
     final protected BigDecimal DIAGRAM_MARGIN_LEFT = 60.0
     final protected BigDecimal DIAGRAM_MARGIN_RIGHT = 20.0
     final protected BigDecimal DIAGRAM_MARGIN_TOP = 20.0
     final protected BigDecimal DIAGRAM_MARGIN_BOTTOM = 60.0
-    final protected BigDecimal FONT_SIZE = 13.0 // should be same as the value of fontSize from render
 
     protected BigDecimal width
     protected BigDecimal height
