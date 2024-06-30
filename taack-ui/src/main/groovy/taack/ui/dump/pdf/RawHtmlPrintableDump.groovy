@@ -1,12 +1,13 @@
 package taack.ui.dump.pdf
 
 import groovy.transform.CompileStatic
-import org.grails.buffer.StreamByteBuffer
+import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.printable.IUiPrintableVisitor
 import taack.ui.dump.Parameter
+import taack.ui.dump.RawHtmlDiagramDump
 import taack.ui.dump.RawHtmlTableDump
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.layout.HTMLEmpty
@@ -53,11 +54,17 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     }
 
-//    @Override
-//    void visitTable(UiTableSpecifier tableSpecifier) {
-//        tableSpecifier.visitTable(new RawHtmlTableDump(out, parameter))
-//    }
-//
+    @Override
+    void visitDiagram(UiDiagramSpecifier uiDiagramSpecifier, BlockSpec.Width width) {
+        visitInnerBlock(width)
+        ByteArrayOutputStream outb = new ByteArrayOutputStream(4096)
+        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb, "ajaxBlockId", width), UiDiagramSpecifier.DiagramBase.PNG)
+        this.out << """<img src='data:image/png;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
+//        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb, "ajaxBlockId", width), UiDiagramSpecifier.DiagramBase.SVG)
+//        this.out << """<img src='data:image/svg+xml;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
+        visitInnerBlockEnd()
+    }
+
     @Override
     void visitCustom(final String html, final BlockSpec.Width width) {
         visitInnerBlock(width)

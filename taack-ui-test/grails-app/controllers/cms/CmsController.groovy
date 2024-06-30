@@ -3,6 +3,7 @@ package cms
 import cms.config.CmsSubsidiary
 import crew.CrewUiService
 import crew.User
+import crew.config.Subsidiary
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
@@ -20,12 +21,14 @@ import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
+import taack.ui.dsl.common.Style
 import taack.ui.dsl.diagram.DiagramTypeSpec
 import taack.ui.dsl.diagram.UiDiagramVisitor
 import taack.ui.dump.markdown.Markdown
 
 import javax.annotation.PostConstruct
 import static grails.async.Promises.task
+
 /*
 * TODO: Menu grouped by default
 * TODO: Menu add submenu and menu
@@ -1255,29 +1258,39 @@ class CmsController implements WebAttributes {
         taackSaveService.saveThenReloadOrRenderErrors(CmsConfSite)
     }
 
+    private static UiDiagramSpecifier d1() {
+        new UiDiagramSpecifier().ui {
+            bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+            }, DiagramTypeSpec.HeightWidthRadio.ONE)
+        }
+    }
+
+    private static UiDiagramSpecifier d2() {
+        new UiDiagramSpecifier().ui {
+            bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
+                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+            }, DiagramTypeSpec.HeightWidthRadio.ONE)
+        }
+    }
+
     def testProgressBar() {
         String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
             row {
-                custom("""<p>Test ended</p>""")
+                custom("""<p>Test ended</p>""", null) {
+                    menuIcon(ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC)
+                }
             }
             row {
                 col {
-                    diagram(new UiDiagramSpecifier().ui {
-                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
-                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                        }, DiagramTypeSpec.HeightWidthRadio.ONE)
-                    })
+                    diagram(d1())
                 }
                 col {
-                    diagram(new UiDiagramSpecifier().ui {
-                        bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
-                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                        }, DiagramTypeSpec.HeightWidthRadio.ONE)
-                    })
+                    diagram(d2())
                 }
             }
         }, 100)
@@ -1306,6 +1319,53 @@ class CmsController implements WebAttributes {
             taackUiProgressBarService.progressEnded(pId)
         }
         println "test action ends"
+    }
+
+    def downloadBinPdf2() {
+        User cu = springSecurityService.currentUser as User
+
+        def pdf = new UiPrintableSpecifier().ui {
+            printableHeaderLeft('8.5cm') {
+                show new UiShowSpecifier().ui {
+                    field null, "Printed for", Style.BOLD
+                    field null, """${cu.firstName} ${cu.lastName}"""
+                }, BlockSpec.Width.THIRD
+                show new UiShowSpecifier().ui {
+                    field """\
+                        <div style="height: 2cm; text-align: center;align-content: center; width: 100%;margin-left: 1cm;">
+                            ${this.taackUiService.dumpAsset("logo-taack-web.svg")}
+                        </div>
+                    """.stripIndent()
+                }, BlockSpec.Width.THIRD
+                show new UiShowSpecifier().ui {
+                    field null, """${new Date()}""", Style.ALIGN_RIGHT
+                }, BlockSpec.Width.THIRD
+
+            }
+            printableBody {
+                diagram(d1(), BlockSpec.Width.QUARTER)
+                show(new UiShowSpecifier().ui {
+                    inlineHtml("<br>", "")
+                }, BlockSpec.Width.MAX)
+                diagram(d2(), BlockSpec.Width.QUARTER)
+            }
+            // TODO: Improve that, we want to code like this
+            /*
+            printableBody {
+                diagram(d1(), BlockSpec.Width.HALF)
+                diagram(d2(), BlockSpec.Width.HALF)
+            }
+            */
+
+            printableFooter {
+                show new UiShowSpecifier().ui {
+                    field "<b>Taackly</b> Powered"
+                }, BlockSpec.Width.MAX
+            }
+
+        }
+
+        taackUiService.downloadPdf(pdf, 'testChart', false)
     }
 
 }

@@ -1,5 +1,6 @@
 package taack.ui.dsl.printable
 
+import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
@@ -17,6 +18,8 @@ interface IUiPrintableVisitor {
     void visitShow(UiShowSpecifier uiShowSpecifier, BlockSpec.Width width)
 
     void visitTable(UiTableSpecifier uiTableSpecifier, BlockSpec.Width width)
+
+    void visitDiagram(UiDiagramSpecifier uiDiagramSpecifier, BlockSpec.Width width)
 
     void visitCustom(String html, BlockSpec.Width width)
 

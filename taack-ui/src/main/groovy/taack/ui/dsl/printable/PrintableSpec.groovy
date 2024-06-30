@@ -1,6 +1,7 @@
 package taack.ui.dsl.printable
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
@@ -63,6 +64,11 @@ class PrintableSpec {
     void table(final UiTableSpecifier tableSpecifier, final BlockSpec.Width width,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         printableVisitor.visitTable(tableSpecifier, width)
+    }
+
+    void diagram(final UiDiagramSpecifier diagramSpecifier, final BlockSpec.Width width,
+                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+        printableVisitor.visitDiagram(diagramSpecifier, width)
     }
 
     void custom(final String html, final BlockSpec.Width width,
