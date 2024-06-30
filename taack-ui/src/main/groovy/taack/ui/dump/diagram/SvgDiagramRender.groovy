@@ -1,4 +1,4 @@
-package taack.ui.diagram.render
+package taack.ui.dump.diagram
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.common.Style

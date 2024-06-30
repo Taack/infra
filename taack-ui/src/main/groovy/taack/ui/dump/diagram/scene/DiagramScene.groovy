@@ -1,7 +1,7 @@
-package taack.ui.diagram.scene
+package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
-import taack.ui.diagram.render.IDiagramRender
+import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.*
 import java.util.List
@@ -10,7 +10,7 @@ import java.util.List
 abstract class DiagramScene {
     final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
     final protected BigDecimal FONT_SIZE = 50.0 // should be same as the value of fontSize from render
-    final protected BigDecimal LEGEND_RECT_HEIGHT = FONT_SIZE // should be same as font size
+    final protected BigDecimal LEGEND_RECT_HEIGHT = 20.0 // should be same as font size
     final protected BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
     final protected BigDecimal LEGEND_MARGIN = 10.0
     final protected BigDecimal DIAGRAM_MARGIN_LEFT = 60.0

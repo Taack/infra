@@ -15,6 +15,7 @@ final class UiDiagramSpecifier {
 
     enum DiagramBase {
         SVG,
+        SVG_CSS21,
         PNG
     }
     void visitDiagram(final IUiDiagramVisitor diagramVisitor, final DiagramBase diagramBase) {

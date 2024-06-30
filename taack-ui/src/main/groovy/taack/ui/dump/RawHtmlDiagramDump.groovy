@@ -5,12 +5,13 @@ import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.diagram.DiagramTypeSpec
 import taack.ui.dsl.diagram.IUiDiagramVisitor
-import taack.ui.diagram.render.IDiagramRender
-import taack.ui.diagram.render.PngDiagramRender
-import taack.ui.diagram.render.SvgDiagramRender
-import taack.ui.diagram.scene.BarDiagramScene
-import taack.ui.diagram.scene.LineDiagramScene
-import taack.ui.diagram.scene.PieDiagramScene
+import taack.ui.dump.diagram.IDiagramRender
+import taack.ui.dump.diagram.PngDiagramRender
+import taack.ui.dump.diagram.SvgDiagramRender
+import taack.ui.dump.diagram.scene.BarDiagramScene
+import taack.ui.dump.diagram.scene.LineDiagramScene
+import taack.ui.dump.diagram.scene.PieDiagramScene
+import taack.ui.dump.pdf.SvgDiagramRenderPdf
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
@@ -38,6 +39,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitDiagramEnd() {
         if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
             out << (this.render as SvgDiagramRender).getRendered()
+        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_CSS21) {
+            out << (this.render as SvgDiagramRenderPdf).getRendered()
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
             (this.render as PngDiagramRender).writeImage(out)
         }
@@ -58,6 +61,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         }
         if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
             this.render = new SvgDiagramRender(width, width * radio.radio, true)
+        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_CSS21) {
+            this.render = new SvgDiagramRenderPdf(width, width * radio.radio)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
             this.render = new PngDiagramRender(width, width * radio.radio)
         }

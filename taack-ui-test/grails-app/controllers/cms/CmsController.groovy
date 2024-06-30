@@ -1342,20 +1342,20 @@ class CmsController implements WebAttributes {
                 }, BlockSpec.Width.THIRD
 
             }
-            printableBody {
-                diagram(d1(), BlockSpec.Width.QUARTER)
-                show(new UiShowSpecifier().ui {
-                    inlineHtml("<br>", "")
-                }, BlockSpec.Width.MAX)
-                diagram(d2(), BlockSpec.Width.QUARTER)
-            }
+//            printableBody {
+//                diagram(d1(), BlockSpec.Width.QUARTER)
+//                show(new UiShowSpecifier().ui {
+//                    inlineHtml("<br>", "")
+//                }, BlockSpec.Width.MAX)
+//                diagram(d2(), BlockSpec.Width.QUARTER)
+//            }
             // TODO: Improve that, we want to code like this
-            /*
+
             printableBody {
                 diagram(d1(), BlockSpec.Width.HALF)
                 diagram(d2(), BlockSpec.Width.HALF)
             }
-            */
+
 
             printableFooter {
                 show new UiShowSpecifier().ui {

@@ -1,4 +1,4 @@
-package taack.ui.diagram.render
+package taack.ui.dump.diagram
 
 import taack.ui.dsl.common.Style
 
