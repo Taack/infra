@@ -130,11 +130,11 @@ final class Parameter implements WebAttributes {
 
         if (!testI18n) {
             String rv = tr(key)
-            if (rv) return rv
-            rv = tr 'default' + '.' + action + '.label'
+            if (rv && rv != key) return rv
+            rv = tr 'default.' + action + '.label'
             if (rv) return rv
             Pair p = actionTrParams(action)
-            String trClass = tr('default' + '.' + p.bValue + '.label')
+            String trClass = tr('default.' + p.bValue?.uncapitalize() + '.label')
             if (p.aValue == 'edit' && !hasId) {
                 rv = tr('default' + '.' + 'create' + '.label', null, trClass ?: p.bValue)
             } else {
