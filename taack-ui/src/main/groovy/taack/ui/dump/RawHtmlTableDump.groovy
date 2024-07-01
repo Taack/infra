@@ -282,7 +282,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             blockLog.topElement.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
                     .putAttribute('taackMax', max?.toString())
-                    .putAttribute('taackOffset', parameter.params.long('offset')?.toString())
+                    .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: "0")
                     .putAttribute('taackCount', count?.toString())
                     .build()
             )

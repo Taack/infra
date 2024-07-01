@@ -14,7 +14,7 @@ import kotlin.math.min
 class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : LeafElement {
     companion object {
         fun getSiblingTablePaginate(p: Table): TablePaginate? {
-            val d = p.t.parentElement!!.querySelector("div.taackTablePaginate")
+            val d = p.t.parentElement!!.querySelector("div[taackmax]")
             if (d != null) {
                 try {
                     return TablePaginate(p, d as HTMLDivElement)
@@ -30,7 +30,7 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
     }
 
     private val max: Number = d.attributes["taackMax"]!!.value.toLong()
-    private val offset: Number = d.attributes["taackOffset"]!!.value.toLong()
+    private val offset: Number = d.attributes["taackOffset"]?.value!!.toLong()
     private val count: Number = d.attributes["taackCount"]!!.value.toLong()
     private val currentPage = (offset.toDouble() / max.toDouble()).toInt()
     private val numberOfPage = (count.toDouble() / max.toDouble()).toInt()

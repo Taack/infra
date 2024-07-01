@@ -39,7 +39,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
             blockId = "modal${modalNumber++}"
         }
         tabs = AjaxBlockInputTab.getSiblingBlockInputTab(this)
-        val abe = AjaxBlock.getSiblingAjaxBlock(this)
+        AjaxBlock.getSiblingAjaxBlock(this)
         modal = Modal.buildModal(this)
 
 //        AjaxBlock(this, d)
@@ -56,9 +56,10 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
 
     fun updateContent(newContent: String) {
         Helper.trace("Block::updateContent ...")
-        if (d.children[0] != null)
+        if (d.children[0] != null) {
             d.children[0]!!.innerHTML = newContent
-        else
+            AjaxBlock.getSiblingAjaxBlock(this)
+        } else
             Helper.trace("Block::updateContent no DIV ...")
     }
 }
