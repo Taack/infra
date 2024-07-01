@@ -67,10 +67,7 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
 }
 
 dependencies {
-    implementation 'org.jsoup:jsoup:1.15.3'
-    implementation "com.openhtmltopdf:openhtmltopdf-core:${openhtmlVersion}"
-    implementation "com.openhtmltopdf:openhtmltopdf-pdfbox:${openhtmlVersion}"
-    implementation "com.openhtmltopdf:openhtmltopdf-svg-support:${openhtmlVersion}"
+    implementation 'com.itextpdf:html2pdf:5.0.4'
 
     implementation "org.grails:grails-plugin-controllers"
 

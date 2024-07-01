@@ -287,8 +287,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 headerHeight: htmlPdf.headerHeight
         ]
 
-        if (outputStream)
-            taackPdfConverterFromHtmlService.generatePdfFromHtml(outputStream, html)
+        if (outputStream) {
+            taackPdfConverterFromHtmlService.generatePdfFromHtmlIText(outputStream, html)
+        }
         html
     }
 
