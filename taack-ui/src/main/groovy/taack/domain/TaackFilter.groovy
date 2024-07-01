@@ -512,6 +512,13 @@ final class TaackFilter<T extends GormEntity<T>> {
         if (filterSpecifier) {
             filterSpecifier.visitFilter(new UiFilterVisitorImpl() {
                 @Override
+                void visitFilterFieldExpressionBool(FilterExpression... filterExpression) {
+                    filterExpression.each {
+                        occ = visitFilterFieldExpressionBool(it, occ, where, namedParams)
+                    }
+                }
+
+                @Override
                 void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
                     String qualifiedName = filterExpressions*.qualifiedName.join('_')
                     boolean applyFilter = (theParams[qualifiedName] || theParams[qualifiedName + 'Default']) ? (theParams[qualifiedName] == '1' || (defaultValue && !theParams[qualifiedName + 'Default'])) : defaultValue
