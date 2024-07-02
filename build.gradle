@@ -19,7 +19,7 @@ buildscript {
     }
 }
 
-ext.releaseVersion = '0.5.1'
+ext.releaseVersion = '0.5.2-SNAPSHOT'
 ext.isReleaseVersion = { -> !releaseVersion.endsWith('SNAPSHOT') }
 
 version releaseVersion
