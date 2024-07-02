@@ -66,7 +66,7 @@
 - ~~TaackPluginConfiguration, replace mainController by methodClosure~~
 - ~~TaackApps must not be a grails plugin~~
 - ~~Port intranet apps~~
-- PoC new Charts DSL
+- ~~PoC new Charts DSL~~
 
 
 # 0.5.x
