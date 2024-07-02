@@ -12,7 +12,20 @@ final class SubMenuSpec {
         this.menuVisitor = menuVisitor
     }
 
-    void subMenu(final MethodClosure action, final Map<String, ? extends Object> params = null) {
-        menuVisitor.visitSubMenu(Utils.getControllerName(action), action.method, params)
+    void subMenu(String i18n, final MethodClosure action, final Map<String, ? extends Object> params = null) {
+        menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
     }
+
+    void subMenu(final MethodClosure action, final Map<String, ? extends Object> params = null) {
+        menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method, params)
+    }
+
+    void section(final String i18n, final MenuSpec.MenuPosition position = MenuSpec.MenuPosition.TOP_LEFT,
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
+        menuVisitor.visitMenuSection(i18n, position)
+        closure.delegate = this
+        closure.call()
+        menuVisitor.visitMenuSectionEnd()
+    }
+
 }

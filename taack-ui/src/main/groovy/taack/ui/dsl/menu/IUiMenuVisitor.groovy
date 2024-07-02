@@ -21,6 +21,8 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitSubMenu(final String controller, final String action, final Map<String, ? extends Object> params)
 
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params)
+
     void visitMenuSection(final String i18n, final MenuSpec.MenuPosition position)
 
     void visitMenuSectionEnd()

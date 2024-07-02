@@ -400,19 +400,19 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitMenu(String controller, String action, Map<String, ?> params) {
         blockLog.stayBlock('visitMenu')
-        String i18n = parameter.trField(controller, action, params?.containsKey('id'))
-        visitLabeledSubMenu(i18n, controller, action, params)
+        visitLabeledSubMenu(null, controller, action, params)
     }
 
 
     @Override
     void visitSubMenu(String controller, String action, Map<String, ?> params) {
         blockLog.stayBlock('visitSubMenu')
-        String i18n = parameter.trField(controller, action, params?.containsKey('id'))
-        visitLabeledSubMenu(i18n, controller, action, params)
+        visitLabeledSubMenu(null, controller, action, params)
     }
 
-    private void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+        i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
+
         blockLog.stayBlock('visitLabeledSubMenu ' + i18n)
         if (futurCurrentAjaxBlockId) {
             params ?= [:]

@@ -40,6 +40,11 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+
+    }
+
+    @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
 
     }

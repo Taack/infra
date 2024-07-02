@@ -43,13 +43,13 @@ final class MenuSpec {
         }
     }
 
-    void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitMenu(Utils.getControllerName(action), action.method.toString(), params)
+    void menu(String i18n = null, final MethodClosure action, Map<String, ? extends Object> params = null) {
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
     }
 
-    void menu(final MethodClosure action, Long id) {
+    void menu(String i18n = null, final MethodClosure action, Long id) {
         Map params = [id: id]
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenu(Utils.getControllerName(action), action.method.toString(), params)
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
     }
 
     void menuIcon(final ActionIcon icon, final MethodClosure action, Long id = null) {
@@ -72,11 +72,4 @@ final class MenuSpec {
         menuVisitor.visitMenuOptions(options)
     }
 
-    void section(final String i18n, final MenuPosition position = MenuPosition.TOP_LEFT,
-                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
-        menuVisitor.visitMenuSection(i18n, position)
-        closure.delegate = subMenuSpec
-        closure.call()
-        menuVisitor.visitMenuSectionEnd()
-    }
 }
