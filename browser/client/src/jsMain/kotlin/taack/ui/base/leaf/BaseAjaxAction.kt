@@ -31,17 +31,20 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
         }
     }
 
-    private val action: String? = a.attributes.getNamedItem("ajaxAction")?.value ?: a.attributes.getNamedItem("href")?.value
+    private val action: String? =
+        a.attributes.getNamedItem("ajaxAction")?.value ?: a.attributes.getNamedItem("href")?.value
     private val isHref = a.hasAttribute("href")
+
     init {
         trace("BaseAjaxAction::init $action $isHref")
-
-        a.onclick = { e -> onclickBaseAjaxAction(e) }
+        if (!(action != null && action.contains("#")))
+            a.onclick = { e -> onclickBaseAjaxAction(e) }
+        else trace("BaseAjaxAction::init no onClick added")
     }
 
     private fun onclickBaseAjaxAction(e: MouseEvent) {
         e.preventDefault()
-        val targetUrl = createUrl(true, action).toString()
+        val targetUrl = createUrl(!isHref, action).toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
         val xhr = XMLHttpRequest()
         if (action?.contains("downloadBin") == true) {
