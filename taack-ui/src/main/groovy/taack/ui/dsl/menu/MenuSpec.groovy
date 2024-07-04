@@ -43,8 +43,12 @@ final class MenuSpec {
         }
     }
 
-    void menu(String i18n = null, final MethodClosure action, Map<String, ? extends Object> params = null) {
+    void menu(String i18n, final MethodClosure action, Map<String, ? extends Object> params = null) {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
+    }
+
+    void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method.toString(), params)
     }
 
     void menu(String i18n = null, final MethodClosure action, Long id) {
