@@ -5,6 +5,8 @@ fun main() {
     if (!window.location.href.contains("login")) {
         Block.href = window.location.href
         Block.getSiblingBlock(null)
-        window.addEventListener("popstate", { window.location.reload() })
+        window.addEventListener("popstate", {
+            if (window.location.hash.isEmpty()) window.location.reload()
+        })
     }
 }
