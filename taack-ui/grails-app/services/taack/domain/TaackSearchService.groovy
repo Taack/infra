@@ -163,81 +163,83 @@ final class TaackSearchService implements WebAttributes {
         Map<String, Map<String, List<String>>> highlighting = queryResponse.highlighting
         def response = queryResponse.response
         new UiBlockSpecifier().ui {
-            col BlockSpec.Width.THIRD, {
-                ajaxBlock "range", {
-                    table new UiTableSpecifier().ui {
-                        header {
-                            label "Value"
-                            label "Action"
-                        }
-                        for (def r in ranges) {
-                            if (i18nMap[r.name]) {
-                                row {
-                                    rowColumn(2) {
-                                        rowField(i18nMap[r.name] ?: 'Type')
+            row {
+                col BlockSpec.Width.THIRD, {
+                    ajaxBlock "range", {
+                        table new UiTableSpecifier().ui {
+                            header {
+                                label "Value"
+                                label "Action"
+                            }
+                            for (def r in ranges) {
+                                if (i18nMap[r.name]) {
+                                    row {
+                                        rowColumn(2) {
+                                            rowField(i18nMap[r.name] ?: 'Type')
+                                        }
+                                    }
+                                    for (def c in r.counts) {
+                                        String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
+                                        row {
+                                            rowField c.value + "(${c.count})"
+                                            if (rangesClicked.contains(currentRange)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
+                                            else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
+                                        }
                                     }
                                 }
-                                for (def c in r.counts) {
-                                    String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
+                            }
+                        }
+                    }
+                    ajaxBlock "faceting", {
+                        table new UiTableSpecifier().ui {
+                            header {
+                                label "Value"
+                                label "Action"
+                            }
+                            for (def f in facets) {
+                                row {
+                                    rowColumn(2) {
+                                        rowField(i18nMap[f.name] ?: 'Type')
+                                    }
+                                }
+                                for (def v in f.values) {
+                                    String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                     row {
-                                        rowField c.value + "(${c.count})"
-                                        if (rangesClicked.contains(currentRange)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
-                                        else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
+                                        rowField v.name + "(${v.count})"
+                                        if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
+                                        else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
                                     }
                                 }
                             }
                         }
                     }
                 }
-                ajaxBlock "faceting", {
-                    table new UiTableSpecifier().ui {
-                        header {
-                            label "Value"
-                            label "Action"
-                        }
-                        for (def f in facets) {
-                            row {
-                                rowColumn(2) {
-                                    rowField(i18nMap[f.name] ?: 'Type')
-                                }
+                col BlockSpec.Width.TWO_THIRD, {
+                    ajaxBlock "results", {
+                        table new UiTableSpecifier().ui {
+                            header {
+                                label "Field"
+                                label "Value"
                             }
-                            for (def v in f.values) {
-                                String currentFacet = "${f.name ?: "type_s"};${v.name}"
-                                row {
-                                    rowField v.name + "(${v.count})"
-                                    if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
-                                    else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            col BlockSpec.Width.TWO_THIRD, {
-                ajaxBlock "results", {
-                    table new UiTableSpecifier().ui {
-                        header {
-                            label "Field"
-                            label "Value"
-                        }
-                        for (def resp in response["response"]) {
-                            def docId = resp['id'] as String
-                            def hl = highlighting[docId]
-                            def iSep = docId.lastIndexOf('-')
-                            def solrSpecifier = mapSolrSpecifier[classMap[docId.substring(0, iSep)]]?.bValue
-                            if (solrSpecifier) {
-                                def id = Long.parseLong(docId.substring(iSep + 1))
-                                String label = solrSpecifier.label.call(id)
-                                row {
-                                    rowColumn(2) {
-                                        rowAction(ActionIcon.FILTER, solrSpecifier.show, id)
-                                        rowField label
-                                    }
-                                }
-                                for (def hli in hl) {
+                            for (def resp in response["response"]) {
+                                def docId = resp['id'] as String
+                                def hl = highlighting[docId]
+                                def iSep = docId.lastIndexOf('-')
+                                def solrSpecifier = mapSolrSpecifier[classMap[docId.substring(0, iSep)]]?.bValue
+                                if (solrSpecifier) {
+                                    def id = Long.parseLong(docId.substring(iSep + 1))
+                                    String label = solrSpecifier.label.call(id)
                                     row {
-                                        rowField i18nMap[hli.key]
-                                        rowField hli.value.join(', ')
+                                        rowColumn(2) {
+                                            rowAction(ActionIcon.FILTER, solrSpecifier.show, id)
+                                            rowField label
+                                        }
+                                    }
+                                    for (def hli in hl) {
+                                        row {
+                                            rowField i18nMap[hli.key]
+                                            rowField hli.value.join(', ')
+                                        }
                                     }
                                 }
                             }
