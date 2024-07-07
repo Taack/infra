@@ -11,6 +11,7 @@ class TaackUiConfiguration {
     int logoWidth
     int logoHeight
 
+    boolean fixedTop
     boolean hasMenuLogin
     boolean outlineContainer
     String bgColor
