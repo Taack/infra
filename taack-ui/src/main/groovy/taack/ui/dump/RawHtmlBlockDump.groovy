@@ -240,7 +240,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitDiagram(final UiDiagramSpecifier diagramSpecifier) {
         blockLog.stayBlock('visitDiagram')
         ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, "ajaxBlockId", BlockSpec.Width.MAX), UiDiagramSpecifier.DiagramBase.SVG)
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out), UiDiagramSpecifier.DiagramBase.SVG)
         blockLog.topElement.addChildren(new HTMLOutput(out))
     }
 

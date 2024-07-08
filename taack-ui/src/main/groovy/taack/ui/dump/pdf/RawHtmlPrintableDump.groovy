@@ -58,9 +58,9 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     void visitDiagram(UiDiagramSpecifier uiDiagramSpecifier, BlockSpec.Width width) {
         visitInnerBlock(width)
         ByteArrayOutputStream outb = new ByteArrayOutputStream(4096)
-//        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb, "ajaxBlockId", width), UiDiagramSpecifier.DiagramBase.PNG)
+//        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.PNG)
 //        this.out << """<img src='data:image/png;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
-        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb, "ajaxBlockId", width), UiDiagramSpecifier.DiagramBase.SVG_CSS21)
+        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.SVG_CSS21)
         this.out << """<img src='data:image/svg+xml;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
         visitInnerBlockEnd()
     }

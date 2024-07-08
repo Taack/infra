@@ -15,16 +15,18 @@ class SvgDiagramRender implements IDiagramRender {
     private final BigDecimal svgHeight
     private final isViewBox
     private final FontMetrics fm
-    private final BigDecimal fontSize = 50
+    private final Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private String fillStyle = "black"
 
     SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false) {
+        // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params "width/height" will be used to do ZOOM
+        // if isViewBox == false, the diagramWidth/diagramHeight will be fixed to params "width/height"
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
-        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize.intValue()))
+        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
     }
 
     @Override
@@ -222,6 +224,11 @@ class SvgDiagramRender implements IDiagramRender {
           """.stripIndent()
             )
         }
+    }
+
+    @Override
+    BigDecimal getFontSize() {
+        return fontSize
     }
 
     @Override
