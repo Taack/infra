@@ -75,8 +75,9 @@ class CmsController implements WebAttributes {
             label "Admin", {
                 subMenu this.&confSites as MC
                 subMenu this.&menuEntries as MC
-                subMenu this.&testProgressBar as MC
             }
+            menuIcon ActionIcon.CHART, this.&testProgressBar as MC
+
             menuSearch CmsController.&search as MC, q
             menuOptions(SupportedLanguage.fromContext())
         }
