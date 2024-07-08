@@ -18,46 +18,9 @@
     <meta charset="utf-8">
 
     <title></title>
-</head>
 <style>
-
-${css}
-
-div#header {
-    /*display: inline-block;*/
-    border: 1px black solid;
-    /*margin-left: -1cm;*/
-    text-align: center;
-    position: running(header-top-center);
-}
-
-div#header-left {
-    /*margin-left: -1cm;*/
-    /*display: inline-block;*/
-    /*border: 1px red solid;*/
-    text-align: left;
-    position: running(header-top-left);
-}
-
-div#header-right {
-    /*display: inline-block;*/
-    border: 1px blue solid;
-    /*margin-left: -1cm;*/
-    text-align: right;
-    position: running(header-top-right);
-}
-
-div#footer {
-    display: block;
-    text-align: center;
-    font-size: 3mm;
-    position: running(footer);
-}
-
-body {
-    width: 190mm;
-    /*height: 297mm;*/
-}
+    
+${raw(css)}
 
 @page {
     /*-fs-page-orientation: portrait;*/
@@ -73,6 +36,7 @@ body {
     }
 
     margin-top: ${headerHeight?:"5cm"};
+
     @bottom-center {
         /*font-style: italic;*/
         /*font-family: "DINPro-LightItalic";*/
@@ -80,208 +44,34 @@ body {
     }
     @bottom-right {
         font-size: 3mm;
-        content: counter(page) " / " counter(pages)
+        content: "Page " counter(page) " of " counter(pages);
     }
 }
-
-div.pure-u-1 {
-    /*border: 1px red solid;*/
-
-    page-break-before: avoid;
-    page-break-inside: auto;
-    page-break-after: avoid;
+svg {
+    width: 3cm;
 }
 
-table {
-    -fs-table-paginate: paginate;
-    width: 18.4cm;
-    page-break-before: avoid;
-    page-break-inside: auto;
-    page-break-after: auto;
-    /*margin-left: 1mm;*/
-    margin-top: 6mm;
-    border-collapse: collapse;
-    font-size: 3mm;
-
+.pure-u-1-3 {
+    width: 60mm;
+    display: inline-block;
+    vertical-align: top;
 }
 
-.columnSmall {
-    width: 12mm;
+th, td {
+    border-bottom: 1px solid #d5d5d5;
 }
 
-.terms {
-    page-break-inside: auto;
-    font-size: 2.5mm;
-    line-height: 3mm;
+th {
+    background: #f8f9ff;
 }
 
-.separator td {
-    border-bottom: 0.3mm solid black;
+td {
+    border-right: 1px solid #f5f5f5;
 }
-
-tr, td {
-    page-break-before: auto;
-    page-break-inside: avoid;
-    page-break-after: auto;
-}
-
-tbody {
-    page-break-before: auto;
-    page-break-inside: auto;
-    page-break-after: auto;
-}
-
-thead {
-    page-break-before: auto;
-    page-break-inside: auto;
-    page-break-after: auto;
-    display: table-header-group;
-}
-
-tfoot {
-    display: table-footer-group;
-}
-
-li {
-    list-style-type: none;
-}
-
-.markdown-body ul{
-    list-style: none;
-    padding-left: 20px;
-}
-
-.markdown-body li:before{ content:"•"; font-size:10pt; }
-
-.markdown-body li li:before{ content:"•"; font-size:10pt; }
-
-ol {
-    /*padding-inline-start: 0;*/
-    padding-left: 0;
-}
-
-body {
-    font-size: small;
-}
-
-@font-face {
-    font-family: NotoSansSC;
-    font-style: normal;
-    font-weight: normal;
-    src: url("file://${root}/pdf/fonts/NotoSansSC-Regular.ttf");
-    /*-fs-font-subset: complete-font;*/
-}
-
-@font-face {
-    font-family: Roboto;
-    font-style: normal;
-    font-weight: normal;
-    src: url("file://${root}/pdf/fonts/Roboto-Medium.ttf");
-    /*-fs-font-subset: complete-font;*/
-}
-
-%{--@font-face {--}%
-%{--    font-family: Manrope;--}%
-%{--    font-style: italic;--}%
-%{--    font-weight: 400;--}%
-%{--    src: url("file://${root}/pdf/fonts/LiberationSans-Italic.ttf");--}%
-%{--    -fs-font-subset: complete-font;--}%
-%{--}--}%
-
-%{--@font-face {--}%
-%{--    font-family: Manrope;--}%
-%{--    font-style: normal;--}%
-%{--    font-weight: bold;--}%
-%{--    src: url("file://${root}/pdf/fonts/Manrope-Bold.ttf");--}%
-%{--    /*-fs-font-subset: complete-font;*/--}%
-%{--}--}%
-
-@font-face {
-    font-family: NotoSansSC;
-    font-style: normal;
-    font-weight: bold;
-    src: url("file://${root}/pdf/fonts/NotoSansSC-Regular.ttf");
-    /*-fs-font-subset: complete-font;*/
-}
-
-@font-face {
-    font-family: Roboto;
-    font-style: normal;
-    font-weight: bold;
-    src: url("file://${root}/pdf/fonts/Roboto-Bold.ttf");
-    /*-fs-font-subset: complete-font;*/
-}
-
-%{--@font-face {--}%
-%{--    font-family: Inter;--}%
-%{--    font-style: normal;--}%
-%{--    font-weight: bold;--}%
-%{--    src: url("file://${root}/pdf/fonts/Inter-Bold.ttf");--}%
-%{--    /*-fs-font-subset: complete-font;*/--}%
-%{--}--}%
-
-%{--@font-face {--}%
-%{--    font-family: Manrope;--}%
-%{--    font-style: italic;--}%
-%{--    font-weight: bold;--}%
-%{--    src: url("file://${root}/pdf/fonts/LiberationSans-BoldItalic.ttf");--}%
-%{--    -fs-font-subset: complete-font;--}%
-%{--}--}%
-
-html {
-    font-family: NotoSansSC, Roboto, sans-serif;
-}
-
-.pure-g {
-    font-family: NotoSansSC, Roboto, sans-serif;
-}
-
-.pure-g [class *= 'pure-u'] {
-    font-family: NotoSansSC, Roboto, sans-serif;
-}
-
-table.general-condition {
-    font-size: smaller;
-    page-break-inside: avoid;
-}
-
-span.property-value p {
-    margin: 0.3cm;
-}
-ul.property-list, ul.taackSection {
-    padding: 0;
-}
-
-ul.taackSection {
-    padding-top: 0.5cm;
-}
-
-ul.taackSection>li {
-    padding-left: 0.5cm;
-}
-
-span.property-value li {
-    margin-top:0.1cm;
-    list-style-type: disc;
-}
-
-li.fieldcontain {
-    page-break-inside: avoid;
-}
-
-.taackMarkdown li {
-    all: revert;
-}
-
-.taackMarkdown ol {
-    all: revert;
-}
-
-
-
 </style>
+</head>
 
-<body>
+<body style="font-family: 'Noto Sans', sans, sans-serif;">
 ${raw(block)}
 </body>
 </html>
