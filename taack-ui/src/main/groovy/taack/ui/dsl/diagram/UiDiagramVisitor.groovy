@@ -16,7 +16,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramPreparation(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio) {
+    void visitDiagramPreparation(List<String> xLabels, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio radio) {
 
     }
 

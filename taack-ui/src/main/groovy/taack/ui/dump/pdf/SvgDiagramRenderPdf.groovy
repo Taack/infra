@@ -12,18 +12,16 @@ class SvgDiagramRenderPdf implements IDiagramRender {
     private StringBuilder outStr = new StringBuilder()
     private final BigDecimal svgWidth
     private final BigDecimal svgHeight
-    private final isViewBox
     private final FontMetrics fm
-    private final BigDecimal fontSize = 10
+    private final Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private String fillStyle = "black"
 
-    SvgDiagramRenderPdf(BigDecimal width, BigDecimal height, boolean isViewBox = false) {
-        this.svgWidth = width * 720 / 1800
-        this.svgHeight = height * 640 / 1800
-        this.isViewBox = isViewBox
-        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize.intValue()))
+    SvgDiagramRenderPdf(BigDecimal width, BigDecimal height) {
+        this.svgWidth = width
+        this.svgHeight = height
+        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
     }
 
     @Override
@@ -224,6 +222,11 @@ class SvgDiagramRenderPdf implements IDiagramRender {
     }
 
     @Override
+    BigDecimal getFontSize() {
+        return fontSize
+    }
+
+    @Override
     BigDecimal getDiagramWidth() {
         return svgWidth
     }
@@ -241,7 +244,7 @@ class SvgDiagramRenderPdf implements IDiagramRender {
     String getRendered() {
         return """<?xml version="1.0" encoding="utf-8"?>
             <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${svgWidth}px" height="${svgHeight}px">
             """.stripIndent() + outStr.toString() + "</svg>"
     }
 }

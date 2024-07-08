@@ -9,8 +9,6 @@ import java.util.List
 @CompileStatic
 abstract class DiagramScene {
     final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
-    final protected BigDecimal FONT_SIZE = 50.0 // should be same as the value of fontSize from render
-    final protected BigDecimal LEGEND_RECT_HEIGHT = 20.0 // should be same as font size
     final protected BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
     final protected BigDecimal LEGEND_MARGIN = 10.0
     final protected BigDecimal DIAGRAM_MARGIN_LEFT = 60.0
@@ -18,6 +16,7 @@ abstract class DiagramScene {
     final protected BigDecimal DIAGRAM_MARGIN_TOP = 20.0
     final protected BigDecimal DIAGRAM_MARGIN_BOTTOM = 60.0
 
+    protected BigDecimal fontSize
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
@@ -65,7 +64,7 @@ abstract class DiagramScene {
             totalLength += length + LEGEND_MARGIN
         }
 
-        diagramMarginTop += (LEGEND_MARGIN + LEGEND_RECT_HEIGHT) * line
+        diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
 
         BigDecimal startY = LEGEND_MARGIN
         Integer legendIndex = 0
@@ -78,12 +77,12 @@ abstract class DiagramScene {
                 Color rectColor = LegendColor.colorFrom(legendIndex)
                 if (legendFullColor) {
                     render.fillStyle(rectColor)
-                    render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.DiagramStyle.fill)
+                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
                 } else {
                     render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
-                    render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.DiagramStyle.fill)
+                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
                     render.fillStyle(rectColor)
-                    render.renderRect(LEGEND_RECT_WIDTH, LEGEND_RECT_HEIGHT, IDiagramRender.DiagramStyle.stroke)
+                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.stroke)
                 }
 
                 // text
@@ -93,7 +92,7 @@ abstract class DiagramScene {
                 startX += keyEntry.value + LEGEND_MARGIN
                 legendIndex++
             }
-            startY += LEGEND_RECT_HEIGHT + LEGEND_MARGIN
+            startY += fontSize + LEGEND_MARGIN
         }
     }
 }

@@ -46,6 +46,8 @@ interface IDiagramRender {
 
     void renderSector(BigDecimal r, BigDecimal angle1, BigDecimal angle2, DiagramStyle diagramStyle)
 
+    BigDecimal getFontSize()
+
     BigDecimal getDiagramWidth()
 
     BigDecimal getDiagramHeight()

@@ -20,6 +20,7 @@ class BarDiagramScene extends DiagramScene {
     final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
 
     BarDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey, boolean isStacked) {
+        this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
@@ -70,7 +71,7 @@ class BarDiagramScene extends DiagramScene {
 
             // y axis label
             String yLabel = "${gapY < 1 ? (endLabelY - gapY * i).round(1) : (endLabelY - gapY * i).toInteger()}"
-            render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - FONT_SIZE / 2)
+            render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
             render.renderLabel(yLabel)
         }
     }
@@ -154,7 +155,7 @@ class BarDiagramScene extends DiagramScene {
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 if (yData > startLabelY) {
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
-                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - FONT_SIZE / 2 : barY - barHeight - FONT_SIZE - 2.0)
+                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
                     render.renderLabel(yDataLabel)
                 }
 

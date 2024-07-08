@@ -7,9 +7,9 @@ import taack.ui.dsl.UiDiagramSpecifier
 interface IUiDiagramVisitor {
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase)
 
-    void visitDiagramEnd()
+    void visitDiagramPreparation(List<String> xLabels, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio radio)
 
-    void visitDiagramPreparation(List<String> xLabels, DiagramTypeSpec.HeightWidthRadio radio)
+    void dataset(String key, List<BigDecimal> data)
 
     void visitBarDiagram(boolean isStacked)
 
@@ -17,5 +17,5 @@ interface IUiDiagramVisitor {
 
     void visitPieDiagram()
 
-    void dataset(String key, List<BigDecimal> data)
+    void visitDiagramEnd()
 }
