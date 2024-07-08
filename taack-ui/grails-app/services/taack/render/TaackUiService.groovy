@@ -264,8 +264,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         printableSpecifier.visitPrintableBlock(htmlPdf)
         final StringBuffer css = new StringBuffer()
         final listCss = [
-                'pure-min.css',
-                //'bootstrap.css',
+
                 'taack.css',
                 'taack-pdf.css',
                 'custom-pdf.css'
@@ -284,7 +283,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 block       : blockStream.toString(),
                 css         : css.toString(),
                 root        : taackUiPluginConfiguration.root,
-                headerHeight: htmlPdf.headerHeight
+                headerHeight: htmlPdf.headerHeight,
+                bootstrapJsTag: bootstrapJsTag,
+                bootstrapCssTag: bootstrapCssTag
         ]
 
         if (outputStream) {
@@ -339,7 +340,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final def downloadDiagram(final UiDiagramSpecifier diagramSpecifier, final String fileName, final UiDiagramSpecifier.DiagramBase diagramBase) {
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         ByteArrayOutputStream stream = new ByteArrayOutputStream()
-        RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream, "0", BlockSpec.Width.MAX)
+        RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream)
         diagramSpecifier.visitDiagram(diagramDump, diagramBase)
         boolean isSvg = diagramBase == UiDiagramSpecifier.DiagramBase.SVG
         webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")

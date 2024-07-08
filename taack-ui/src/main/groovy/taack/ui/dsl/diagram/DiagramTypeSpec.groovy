@@ -27,22 +27,25 @@ final class DiagramTypeSpec {
     }
 
     void bar(List<String> xLabels, boolean isStacked = true,
-             @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation(xLabels, radio)
+             @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+             BigDecimal widthInPx = null, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation(xLabels, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitBarDiagram(isStacked)
     }
 
-    void line(List<String> xLabels, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation(xLabels, radio)
+    void line(List<String> xLabels, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+              BigDecimal widthInPx = null, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation(xLabels, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitLineDiagram()
     }
 
-    void pie(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation([], radio)
+    void pie(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+             BigDecimal widthInPx = null, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation([], widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitPieDiagram()

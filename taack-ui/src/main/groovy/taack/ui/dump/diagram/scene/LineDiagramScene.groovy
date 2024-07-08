@@ -20,6 +20,7 @@ class LineDiagramScene extends DiagramScene {
     final private BigDecimal MIN_GAP_WIDTH = 5.0 // hide dataLabel/dataCircle/backgroundVerticalLine when gap too narrow (it means huge number of labels)
 
     LineDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey) {
+        this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
@@ -55,7 +56,7 @@ class LineDiagramScene extends DiagramScene {
 
             // y axis label
             String yLabel = "${gapY < 1 ? (endLabelY - gapY * i).round(1) : (endLabelY - gapY * i).toInteger()}"
-            render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - FONT_SIZE / 2)
+            render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
             render.renderLabel(yLabel)
         }
     }
@@ -119,7 +120,7 @@ class LineDiagramScene extends DiagramScene {
                 // data label
                 if (yData > startLabelY && !hideInfo) {
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
-                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - CIRCLE_RADIUS - FONT_SIZE - 2.0)
+                    render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - CIRCLE_RADIUS - fontSize - 2.0)
                     render.renderLabel(yDataLabel)
                 }
             }

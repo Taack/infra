@@ -1265,7 +1265,7 @@ class CmsController implements WebAttributes {
                 dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
                 dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
                 dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-            }, DiagramTypeSpec.HeightWidthRadio.ONE)
+            }, 360.0, DiagramTypeSpec.HeightWidthRadio.ONE)
         }
     }
 
@@ -1275,7 +1275,7 @@ class CmsController implements WebAttributes {
                 dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
                 dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
                 dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-            }, DiagramTypeSpec.HeightWidthRadio.ONE)
+            }, 360.0, DiagramTypeSpec.HeightWidthRadio.ONE)
         }
     }
 
@@ -1369,4 +1369,112 @@ class CmsController implements WebAttributes {
         taackUiService.downloadPdf(pdf, 'testChart', false)
     }
 
+    def testDiagramHtml() {
+        taackUiService.show(new UiBlockSpecifier().ui({
+            ajaxBlock 'blocks', {
+                row {
+                    // widthInPx was set -> Font size is always same, no matter how large/small the diagramWidth is
+                    diagram new UiDiagramSpecifier().ui {
+                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                        }, 600.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    }
+                    diagram new UiDiagramSpecifier().ui {
+                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                        }, 1800.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    }
+
+                    // widthInPx was not set / was set to null -> the diagram width is auto-fit to 100% of section width (by doing ZOOM)
+                    // We see that everything (including font size) is zoomed
+                    // zoomRate = sectionWidth / 960.0 (960px is the default width value which is saved in RawHtmlDiagramDump.visitDiagramPreparation())
+                    diagram new UiDiagramSpecifier().ui {
+                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                        }, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    }
+
+                    // line and pie
+                    col {
+                        diagram new UiDiagramSpecifier().ui {
+                            line(["T1", "T2", "T3", "T4"] as List<String>, {
+                                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                            }, 600.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                        }
+                    }
+                    col {
+                        diagram new UiDiagramSpecifier().ui({
+                            pie({
+                                dataset("Truc1", 1.0)
+                                dataset("Truc2", 2.0)
+                                dataset("Truc3", 2.0)
+                            }, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE)
+                        })
+                    }
+                }
+            }
+        }), buildMenu())
+    }
+
+    def testDiagramPdf() {
+        def pdf = new UiPrintableSpecifier().ui {
+            printableBody {
+                // BlockSpec.Width is used to manage layout:
+                // HALF + HALF -> 1 line
+                // HALF + TWO_THIRD -> 2 lines
+                // ...
+                diagram(new UiDiagramSpecifier().ui {
+                    bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
+                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                    }, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF)
+                }, BlockSpec.Width.HALF)
+
+                diagram(new UiDiagramSpecifier().ui {
+                    bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
+                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                    }, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF)
+                }, BlockSpec.Width.HALF)
+
+                diagram(new UiDiagramSpecifier().ui {
+                    bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
+                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                    }, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    // no auto-fit in PDF
+                    // width will be set to default value (720px) if null
+                }, BlockSpec.Width.HALF)
+
+
+                diagram new UiDiagramSpecifier().ui {
+                    line(["T1", "T2", "T3", "T4"] as List<String>, {
+                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+                    }, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                }, BlockSpec.Width.MAX
+
+                diagram new UiDiagramSpecifier().ui({
+                    pie({
+                        dataset("Truc1", 1.0)
+                        dataset("Truc2", 2.0)
+                        dataset("Truc3", 2.0)
+                    }, DiagramTypeSpec.HeightWidthRadio.ONE)
+                }), BlockSpec.Width.MAX
+            }
+        }
+        taackUiService.downloadPdf(pdf, 'testChart', false)
+    }
 }

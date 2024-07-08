@@ -17,9 +17,8 @@ class PngDiagramRender implements IDiagramRender {
     final Graphics2D ig2
     private final BigDecimal pngWidth
     private final BigDecimal pngHeight
-    Font currentFont = new Font(Font.SANS_SERIF, Font.PLAIN, 13)
     private final FontMetrics fm
-
+    private final Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private Color fillStyle = Color.BLACK
@@ -30,8 +29,9 @@ class PngDiagramRender implements IDiagramRender {
         bi = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(fillStyle)
-        ig2.setFont(currentFont)
-        fm = ig2.getFontMetrics(currentFont)
+        Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
+        ig2.setFont(f)
+        fm = ig2.getFontMetrics(f)
     }
 
     @Override
@@ -86,16 +86,16 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderLabel(String label) {
         ig2.setPaint(Color.BLACK)
-        ig2.drawString(label, trX.toInteger(), (trY + 13.0 - 2.0).toInteger())
+        ig2.drawString(label, trX.toInteger(), (trY + fontSize - 2.0).toInteger())
         ig2.setPaint(fillStyle)
     }
 
     @Override
     void renderSmallLabel(String label) {
         ig2.setPaint(Color.BLACK)
-        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10))
-        ig2.drawString(label, trX.toInteger(), (trY + 13.0 - 2.0).toInteger())
-        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 13))
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * 0.8).intValue()))
+        ig2.drawString(label, trX.toInteger(), (trY + fontSize - 2.0).toInteger())
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
         ig2.setPaint(fillStyle)
     }
 
@@ -204,6 +204,11 @@ class PngDiagramRender implements IDiagramRender {
         } else {
             ig2.draw(sector)
         }
+    }
+
+    @Override
+    BigDecimal getFontSize() {
+        return fontSize
     }
 
     @Override
