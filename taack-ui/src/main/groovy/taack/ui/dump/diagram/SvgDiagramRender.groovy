@@ -133,7 +133,7 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderPoly(BigDecimal... coords) {
+    void renderPoly(List<BigDecimal> coords) {
         def it = coords.iterator()
         def sb = new StringBuilder()
         sb.append(" ${trX},${trY}")
@@ -145,7 +145,11 @@ class SvgDiagramRender implements IDiagramRender {
                 <polygon points="$sb" style="fill:${fillStyle}" />
         """.stripIndent()
         )
+    }
 
+    @Override
+    void renderPoly(BigDecimal... coords) {
+        renderPoly(coords.collect() as List<BigDecimal>)
     }
 
     @Override

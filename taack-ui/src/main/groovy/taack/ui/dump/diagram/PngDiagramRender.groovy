@@ -10,6 +10,7 @@ import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
+import java.util.List
 
 @CompileStatic
 class PngDiagramRender implements IDiagramRender {
@@ -130,14 +131,20 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderPoly(BigDecimal... coords) {
+    void renderPoly(List<BigDecimal> coords) {
         def p = new Polygon()
         def it = coords.iterator()
+        p.addPoint(trX.toInteger(), trY.toInteger())
         ig2.setPaint(fillStyle)
         while (it.hasNext()) {
             p.addPoint((it.next() + trX).toInteger(), (it.next() + trY).toInteger())
         }
         ig2.fill(p)
+    }
+
+    @Override
+    void renderPoly(BigDecimal... coords) {
+        renderPoly(coords.collect() as List<BigDecimal>)
     }
 
     @Override

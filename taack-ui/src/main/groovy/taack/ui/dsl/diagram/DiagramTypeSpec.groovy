@@ -43,6 +43,15 @@ final class DiagramTypeSpec {
         diagramVisitor.visitLineDiagram()
     }
 
+    void area(List<String> xLabels, boolean isStacked = true,
+              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+              BigDecimal widthInPx = null, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation(xLabels, widthInPx, radio)
+        closure.delegate = diagramDatasetSpec
+        closure.call()
+        diagramVisitor.visitAreaDiagram(isStacked)
+    }
+
     void pie(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
              BigDecimal widthInPx = null, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation([], widthInPx, radio)

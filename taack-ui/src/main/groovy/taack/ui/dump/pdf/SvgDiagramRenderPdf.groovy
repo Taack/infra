@@ -6,6 +6,7 @@ import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.*
 import java.awt.image.BufferedImage
+import java.util.List
 
 @CompileStatic
 class SvgDiagramRenderPdf implements IDiagramRender {
@@ -128,8 +129,8 @@ class SvgDiagramRenderPdf implements IDiagramRender {
     }
 
     @Override
-    void renderPoly(BigDecimal... coords) {
-        def it = coords.iterator()
+    void renderPoly(List<BigDecimal> coords) {
+        Iterator<BigDecimal> it = coords.iterator()
         def sb = new StringBuilder()
         sb.append(" ${trX},${trY}")
         while (it.hasNext()) {
@@ -140,7 +141,11 @@ class SvgDiagramRenderPdf implements IDiagramRender {
                 <polygon points="$sb" style="fill:${fillStyle}" />
         """.stripIndent()
         )
+    }
 
+    @Override
+    void renderPoly(BigDecimal... coords) {
+        renderPoly(coords.collect() as List<BigDecimal>)
     }
 
     @Override

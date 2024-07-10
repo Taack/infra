@@ -2,12 +2,12 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
-import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.diagram.DiagramTypeSpec
 import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.diagram.IDiagramRender
 import taack.ui.dump.diagram.PngDiagramRender
 import taack.ui.dump.diagram.SvgDiagramRender
+import taack.ui.dump.diagram.scene.AreaDiagramScene
 import taack.ui.dump.diagram.scene.BarDiagramScene
 import taack.ui.dump.diagram.scene.LineDiagramScene
 import taack.ui.dump.diagram.scene.PieDiagramScene
@@ -70,6 +70,12 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitLineDiagram() {
         LineDiagramScene scene = new LineDiagramScene(render, xLabels, yDataPerKey)
+        scene.draw()
+    }
+
+    @Override
+    void visitAreaDiagram(boolean isStacked) {
+        AreaDiagramScene scene = new AreaDiagramScene(render, xLabels, yDataPerKey, isStacked)
         scene.draw()
     }
 

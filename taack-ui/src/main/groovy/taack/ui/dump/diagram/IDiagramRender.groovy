@@ -40,6 +40,8 @@ interface IDiagramRender {
 
     void renderPoly(BigDecimal... coords)
 
+    void renderPoly(List<BigDecimal> coords)
+
     void renderArrow(BigDecimal... coords)
 
     void renderTriangle(BigDecimal length, boolean isDown)
