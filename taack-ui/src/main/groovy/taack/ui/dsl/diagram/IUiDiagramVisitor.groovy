@@ -15,7 +15,7 @@ interface IUiDiagramVisitor {
 
     void visitLineDiagram()
 
-    void visitPieDiagram()
+    void visitPieDiagram(boolean hasSlice)
 
     void visitDiagramEnd()
 }
