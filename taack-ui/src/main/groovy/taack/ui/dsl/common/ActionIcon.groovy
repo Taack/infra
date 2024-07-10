@@ -53,6 +53,7 @@ class ActionIcon {
     final static ActionIcon MAIL = new ActionIcon("/assets/taack/icons/actions/mail.svg")
     final static ActionIcon HELP = new ActionIcon("/assets/taack/icons/actions/help.svg")
     final static ActionIcon GRAPH = new ActionIcon("/assets/taack/icons/actions/graph-model.svg")
+    final static ActionIcon CHART = new ActionIcon("/assets/taack/icons/actions/chart.svg")
     final static ActionIcon GANTT = new ActionIcon("/assets/taack/icons/actions/gantt.svg")
     final static ActionIcon TIMING = new ActionIcon("/assets/taack/icons/actions/timing.svg")
     final static ActionIcon START = new ActionIcon("/assets/taack/icons/actions/start.svg")
