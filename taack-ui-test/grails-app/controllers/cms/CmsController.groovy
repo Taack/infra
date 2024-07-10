@@ -1378,6 +1378,15 @@ class CmsController implements WebAttributes {
             }, widthInPx, heightWidthRadio) // widthInPx to define the diagram width, heightWidthRadio to define the diagram height
         }
     }
+    private static UiDiagramSpecifier areaDiagram(boolean isStacked, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+        new UiDiagramSpecifier().ui {
+            area(["T1", "T2", "T3", "T4"] as List<String>, isStacked, {
+                dataset 'Truc1', [1.0, 1.0, 1.0, 2.0]
+                dataset 'Truc2', [2.0, 2.0, 1.0, 0.0]
+                dataset 'Truc3', [3.0, 3.0, 1.0, 3.0]
+            }, widthInPx, heightWidthRadio)
+        }
+    }
     private static UiDiagramSpecifier pieDiagram(boolean hasSlice, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
         new UiDiagramSpecifier().ui({
             pie(hasSlice, {
@@ -1418,6 +1427,10 @@ class CmsController implements WebAttributes {
                     col BlockSpec.Width.QUARTER, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
                     col BlockSpec.Width.MAX, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
 
+                    // ------- Area diagram -------
+                    col BlockSpec.Width.MAX, { diagram areaDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
+                    col BlockSpec.Width.MAX, { diagram areaDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
+
                     // ------- Pie diagram -------
                     // No slice: all information is shown
                     col { diagram pieDiagram(false, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
@@ -1436,6 +1449,9 @@ class CmsController implements WebAttributes {
                 diagram(barDiagram(false, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
                 diagram(barDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
                 diagram(barDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+
+                diagram(areaDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+                diagram(areaDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
 
                 diagram pieDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX // some info was exceeding diagram height, in this case we can put the HeightWidthRadio to ONE to allow more diagram height
                 diagram pieDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX
