@@ -1369,56 +1369,61 @@ class CmsController implements WebAttributes {
         taackUiService.downloadPdf(pdf, 'testChart', false)
     }
 
+    private static UiDiagramSpecifier barDiagram(boolean isStacked, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+        new UiDiagramSpecifier().ui {
+            bar(["T1", "T2", "T3", "T4"] as List<String>, isStacked, {
+                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
+                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
+                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
+            }, widthInPx, heightWidthRadio) // widthInPx to define the diagram width, heightWidthRadio to define the diagram height
+        }
+    }
+    private static UiDiagramSpecifier pieDiagram(boolean hasSlice, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+        new UiDiagramSpecifier().ui({
+            pie(hasSlice, {
+                dataset("cli", 1.47)
+                dataset("client", 0.28)
+                dataset("client1", 0.1)
+                dataset("client2", 1.45)
+                dataset("client3", 0.05)
+                dataset("client31", 0.05)
+                dataset("client32", 0.05)
+                dataset("c33", 0.05)
+                dataset("client311", 0.05)
+                dataset("client312", 0.05)
+                dataset("client313", 0.05)
+                dataset("client4", 0.8)
+                dataset("client5", 2.1)
+                dataset("client55", 0.1)
+                dataset("client555", 0.2)
+                dataset("client5555", 0.3)
+                dataset("client55555", 0.3)
+                dataset("admin", 1.6)
+                dataset("test1", 0.05)
+            }, widthInPx, heightWidthRadio)
+        })
+    }
     def testDiagramHtml() {
         taackUiService.show(new UiBlockSpecifier().ui({
             ajaxBlock 'blocks', {
                 row {
-                    // widthInPx was set -> Font size is always same, no matter how large/small the diagramWidth is
-                    diagram new UiDiagramSpecifier().ui {
-                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
-                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                        }, 600.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                    }
-                    diagram new UiDiagramSpecifier().ui {
-                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
-                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                        }, 1800.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                    }
+                    // ------- Bar diagram -------
+                    // widthInPx was set (Font size is always same, no matter how large/small the diagramWidth is)
+                    diagram barDiagram(false, 600.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    diagram barDiagram(false, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
 
                     // widthInPx was not set / was set to null -> the diagram width is auto-fit to 100% of section width (by doing ZOOM)
                     // We see that everything (including font size) is zoomed
                     // zoomRate = sectionWidth / 960.0 (960px is the default width value which is saved in RawHtmlDiagramDump.visitDiagramPreparation())
-                    diagram new UiDiagramSpecifier().ui {
-                        bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
-                            dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                            dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                            dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                        }, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                    }
+                    col BlockSpec.Width.QUARTER, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
+                    col BlockSpec.Width.MAX, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
 
-                    // line and pie
-                    col {
-                        diagram new UiDiagramSpecifier().ui {
-                            line(["T1", "T2", "T3", "T4"] as List<String>, {
-                                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                            }, 600.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                        }
-                    }
-                    col {
-                        diagram new UiDiagramSpecifier().ui({
-                            pie({
-                                dataset("Truc1", 1.0)
-                                dataset("Truc2", 2.0)
-                                dataset("Truc3", 2.0)
-                            }, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE)
-                        })
-                    }
+                    // ------- Pie diagram -------
+                    // No slice: all information is shown
+                    col { diagram pieDiagram(false, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
+
+                    // has slice: make the first dataset as slice, and a part of information is hidden
+                    col { diagram pieDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
                 }
             }
         }), buildMenu())
@@ -1427,52 +1432,13 @@ class CmsController implements WebAttributes {
     def testDiagramPdf() {
         def pdf = new UiPrintableSpecifier().ui {
             printableBody {
-                // BlockSpec.Width is used to manage layout:
-                // HALF + HALF -> 1 line
-                // HALF + TWO_THIRD -> 2 lines
-                // ...
-                diagram(new UiDiagramSpecifier().ui {
-                    bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
-                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                    }, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF)
-                }, BlockSpec.Width.HALF)
+                // width will be set to default value (720px) if null. (No auto-fit width in PDF)
+                diagram(barDiagram(false, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+                diagram(barDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+                diagram(barDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
 
-                diagram(new UiDiagramSpecifier().ui {
-                    bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
-                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                    }, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF)
-                }, BlockSpec.Width.HALF)
-
-                diagram(new UiDiagramSpecifier().ui {
-                    bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
-                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                    }, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                    // no auto-fit in PDF
-                    // width will be set to default value (720px) if null
-                }, BlockSpec.Width.HALF)
-
-
-                diagram new UiDiagramSpecifier().ui {
-                    line(["T1", "T2", "T3", "T4"] as List<String>, {
-                        dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                        dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                        dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-                    }, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                }, BlockSpec.Width.MAX
-
-                diagram new UiDiagramSpecifier().ui({
-                    pie({
-                        dataset("Truc1", 1.0)
-                        dataset("Truc2", 2.0)
-                        dataset("Truc3", 2.0)
-                    }, DiagramTypeSpec.HeightWidthRadio.ONE)
-                }), BlockSpec.Width.MAX
+                diagram pieDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX // some info was exceeding diagram height, in this case we can put the HeightWidthRadio to ONE to allow more diagram height
+                diagram pieDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX
             }
         }
         taackUiService.downloadPdf(pdf, 'testChart', false)

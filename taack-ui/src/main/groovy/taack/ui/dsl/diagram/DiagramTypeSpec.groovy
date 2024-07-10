@@ -52,11 +52,11 @@ final class DiagramTypeSpec {
         diagramVisitor.visitAreaDiagram(isStacked)
     }
 
-    void pie(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+    void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
              BigDecimal widthInPx = null, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation([], widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
-        diagramVisitor.visitPieDiagram()
+        diagramVisitor.visitPieDiagram(hasSlice)
     }
 }

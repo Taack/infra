@@ -80,8 +80,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitPieDiagram() {
-        PieDiagramScene scene = new PieDiagramScene(render, yDataPerKey)
+    void visitPieDiagram(boolean hasSlice) {
+        PieDiagramScene scene = new PieDiagramScene(render, yDataPerKey, hasSlice)
         scene.draw()
     }
 

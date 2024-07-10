@@ -17,7 +17,7 @@ interface IUiDiagramVisitor {
 
     void visitAreaDiagram(boolean isStacked)
 
-    void visitPieDiagram()
+    void visitPieDiagram(boolean hasSlice)
 
     void visitDiagramEnd()
 }

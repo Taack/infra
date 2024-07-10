@@ -36,7 +36,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitPieDiagram() {
+    void visitPieDiagram(boolean hasSlice) {
 
     }
 
