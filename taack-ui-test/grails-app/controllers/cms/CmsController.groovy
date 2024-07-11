@@ -1259,26 +1259,6 @@ class CmsController implements WebAttributes {
         taackSaveService.saveThenReloadOrRenderErrors(CmsConfSite)
     }
 
-    private static UiDiagramSpecifier d1() {
-        new UiDiagramSpecifier().ui {
-            bar(["T1", "T2", "T3", "T4"] as List<String>, false, {
-                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-            }, 360.0, DiagramTypeSpec.HeightWidthRadio.ONE)
-        }
-    }
-
-    private static UiDiagramSpecifier d2() {
-        new UiDiagramSpecifier().ui {
-            bar(["T1", "T2", "T3", "T4"] as List<String>, true, {
-                dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
-                dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
-                dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-            }, 360.0, DiagramTypeSpec.HeightWidthRadio.ONE)
-        }
-    }
-
     def testProgressBar() {
         String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
             row {
@@ -1288,10 +1268,10 @@ class CmsController implements WebAttributes {
             }
             row {
                 col {
-                    diagram(d1())
+                    barDiagram(false, 360.0, DiagramTypeSpec.HeightWidthRadio.ONE)
                 }
                 col {
-                    diagram(d2())
+                    barDiagram(true, 300.0, DiagramTypeSpec.HeightWidthRadio.ONE)
                 }
             }
         }, 100)
@@ -1343,20 +1323,18 @@ class CmsController implements WebAttributes {
                 }, BlockSpec.Width.THIRD
 
             }
-//            printableBody {
-//                diagram(d1(), BlockSpec.Width.QUARTER)
-//                show(new UiShowSpecifier().ui {
-//                    inlineHtml("<br>", "")
-//                }, BlockSpec.Width.MAX)
-//                diagram(d2(), BlockSpec.Width.QUARTER)
-//            }
-            // TODO: Improve that, we want to code like this
 
             printableBody {
-                diagram(d1(), BlockSpec.Width.HALF)
-                diagram(d2(), BlockSpec.Width.HALF)
-            }
+                // width will be set to default value (720px) if null. (No auto-fit width in PDF)
+                diagram(barDiagram(false, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+                diagram(barDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+                diagram(barDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
 
+                diagram(areaDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+
+                diagram pieDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.ONE), BlockSpec.Width.MAX
+                diagram pieDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX
+            }
 
             printableFooter {
                 show new UiShowSpecifier().ui {
@@ -1428,35 +1406,15 @@ class CmsController implements WebAttributes {
                     col BlockSpec.Width.MAX, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
 
                     // ------- Area diagram -------
-                    col BlockSpec.Width.MAX, { diagram areaDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
-                    col BlockSpec.Width.MAX, { diagram areaDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
+                    diagram areaDiagram(true, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
 
                     // ------- Pie diagram -------
                     // No slice: all information is shown
                     col { diagram pieDiagram(false, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
-
                     // has slice: make the first dataset as slice, and a part of information is hidden
                     col { diagram pieDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
                 }
             }
         }), buildMenu())
-    }
-
-    def testDiagramPdf() {
-        def pdf = new UiPrintableSpecifier().ui {
-            printableBody {
-                // width will be set to default value (720px) if null. (No auto-fit width in PDF)
-                diagram(barDiagram(false, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-                diagram(barDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-                diagram(barDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-
-                diagram(areaDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-                diagram(areaDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-
-                diagram pieDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX // some info was exceeding diagram height, in this case we can put the HeightWidthRadio to ONE to allow more diagram height
-                diagram pieDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX
-            }
-        }
-        taackUiService.downloadPdf(pdf, 'testChart', false)
     }
 }
