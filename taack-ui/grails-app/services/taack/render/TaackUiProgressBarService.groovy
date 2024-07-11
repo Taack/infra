@@ -113,6 +113,10 @@ class TaackUiProgressBarService {
         return c
     }
 
+    void progressEndedClosure(String id, Closure<BlockSpec> c) {
+        endsRegister[id] = c
+    }
+
     boolean progressHasEnded(String id) {
         endedProgress.contains(id)
     }
