@@ -301,7 +301,6 @@ final class BlockSpec {
         if (blockVisitor.doRenderElement(aId)) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitCustom(html, style)
-            counter++
             blockVisitor.visitAjaxBlockEnd()
         }
     }

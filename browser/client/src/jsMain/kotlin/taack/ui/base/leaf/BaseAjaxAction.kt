@@ -15,6 +15,7 @@ import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
+import kotlin.math.min
 
 open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : LeafElement {
 
@@ -67,7 +68,7 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
                 }
             } else {
                 val text = xhr.responseText
-                if (text.contains(Regex(".{0,4}<html"))) {
+                if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
                     trace("Full webpage ...|$action|${document.title}|${document.domain}|${document.documentURI}")
                     window.history.pushState("{}", window.document.title, targetUrl)
                     trace("Setting location.href: $targetUrl")
