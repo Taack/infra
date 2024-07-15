@@ -186,17 +186,44 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             ThemeMode themeAuto = themeSelector.themeAuto
 
             return new ModelAndView("/taackUi/block", [
-                    themeSize   : themeSize,
-                    themeMode   : themeMode,
-                    themeAuto   : themeAuto,
-                    block       : visit(block),
-                    menu        : visitMenu(menu),
-                    conf        : taackUiPluginConfiguration,
-                    clientJsPath: clientJsPath?.length() > 0 ? clientJsPath : null,
-                    bootstrapJsTag: bootstrapJsTag,
+                    themeSize      : themeSize,
+                    themeMode      : themeMode,
+                    themeAuto      : themeAuto,
+                    block          : visit(block),
+                    menu           : visitMenu(menu),
+                    conf           : taackUiPluginConfiguration,
+                    clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+                    bootstrapJsTag : bootstrapJsTag,
                     bootstrapCssTag: bootstrapCssTag
             ])
         }
+    }
+
+    /**
+     * Render the block to the browser. Either the page is updated with the block content, either the
+     * full page is rendered if 'isAjax' params is true.
+     *
+     * @param html inline to render
+     * @param menu menu descriptor
+     * @return
+     */
+    final def show(String html, UiMenuSpecifier menu = null) {
+        ThemeSelector themeSelector = themeService.themeSelector
+        ThemeSize themeSize = themeSelector.themeSize
+        ThemeMode themeMode = themeSelector.themeMode
+        ThemeMode themeAuto = themeSelector.themeAuto
+
+        return new ModelAndView("/taackUi/block", [
+                themeSize      : themeSize,
+                themeMode      : themeMode,
+                themeAuto      : themeAuto,
+                block          : html,
+                menu           : visitMenu(menu),
+                conf           : taackUiPluginConfiguration,
+                clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+                bootstrapJsTag : bootstrapJsTag,
+                bootstrapCssTag: bootstrapCssTag
+        ])
     }
 
     /**
@@ -280,11 +307,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         }
 
         String html = g.render template: "/taackUi/block-pdf", model: [
-                block       : blockStream.toString(),
-                css         : css.toString(),
-                root        : taackUiPluginConfiguration.root,
-                headerHeight: htmlPdf.headerHeight,
-                bootstrapJsTag: bootstrapJsTag,
+                block          : blockStream.toString(),
+                css            : css.toString(),
+                root           : taackUiPluginConfiguration.root,
+                headerHeight   : htmlPdf.headerHeight,
+                bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
         ]
 
