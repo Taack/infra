@@ -7,8 +7,9 @@ import java.awt.Color
 
 @CompileStatic
 class BarDiagramScene extends DiagramScene {
-    final private List<String> xLabels
     final private boolean isStacked
+    final private Set<String> xLabelList
+    final private Map<String, List<BigDecimal>> yDataListPerKey
 
     private BigDecimal startLabelY
     private BigDecimal gapY
@@ -19,31 +20,40 @@ class BarDiagramScene extends DiagramScene {
     final private BigDecimal AXIS_LABEL_MARGIN = 10.0
     final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
 
-    BarDiagramScene(IDiagramRender render, List<String> xLabels, Map<String, List<BigDecimal>> yDataPerKey, boolean isStacked) {
+    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked) {
         this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
-        this.yDataPerKey = yDataPerKey
-        this.xLabels = xLabels
         this.isStacked = isStacked
+        this.dataPerKey = dataPerKey
+
+        Set<String> keys = dataPerKey.keySet()
+        this.xLabelList = (keys.isEmpty() ? [] : dataPerKey[keys.first()].keySet().collect { it.toString() }) as Set<String>
+
+        Map<String, List<BigDecimal>> yDataListPerKey = [:]
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys[i]
+            yDataListPerKey.put(key, dataPerKey[key].values() as List<BigDecimal>)
+        }
+        this.yDataListPerKey = yDataListPerKey
     }
 
     void drawHorizontalBackground() {
-        Set<String> keys = yDataPerKey.keySet()
+        Set<String> keys = yDataListPerKey.keySet()
         Set<BigDecimal> values
         if (isStacked) {
             values = []
-            for (int i = 0; i < xLabels.size(); i++) {
+            for (int i = 0; i < xLabelList.size(); i++) {
                 BigDecimal value = 0.0
                 for (int j = 0; j < keys.size(); j++) {
-                    value += yDataPerKey[keys[j]][i]
+                    value += yDataListPerKey[keys[j]][i]
                 }
                 values.add(value)
             }
             values = values.sort() as Set<BigDecimal>
         } else {
-            values = yDataPerKey.values().flatten().sort() as Set<BigDecimal>
+            values = yDataListPerKey.values().flatten().sort() as Set<BigDecimal>
         }
         startLabelY = values.first() >= 0 ? 0.0 : Math.floor(values.first().toDouble()).toBigDecimal()
         BigDecimal totalGapY = values.last() - startLabelY
@@ -77,8 +87,8 @@ class BarDiagramScene extends DiagramScene {
     }
 
     void drawVerticalBackgroundAndDataBar() {
-        Set<String> keys = yDataPerKey.keySet()
-        int gapNumberX = xLabels.size()
+        Set<String> keys = yDataListPerKey.keySet()
+        int gapNumberX = xLabelList.size()
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / gapNumberX
         int barNumber = isStacked ? 1 : keys.size()
@@ -101,7 +111,7 @@ class BarDiagramScene extends DiagramScene {
             gapHorizontalPadding = (gapWidth - barWidth * barNumber - barMargin * (barNumber - 1)) / 2
         }
 
-        int showLabelEveryX = (render.measureText(xLabels.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
+        int showLabelEveryX = (render.measureText(xLabelList.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
         for (int i = 0; i < gapNumberX / showGapEveryX; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
@@ -111,7 +121,7 @@ class BarDiagramScene extends DiagramScene {
             render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
 
             // x axis label
-            String xLabel = xLabels[i * showGapEveryX]
+            String xLabel = xLabelList[i * showGapEveryX]
             if (showLabelEveryX >= 1) {
                 if (i % showLabelEveryX == 0) {
                     render.translateTo(startX + gapWidth * 0.5 - render.measureText(xLabel), height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
@@ -126,7 +136,7 @@ class BarDiagramScene extends DiagramScene {
             BigDecimal barX = startX + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
-                BigDecimal yData = yDataPerKey[keys[j]][i * showGapEveryX]
+                BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 if (yData > startLabelY) {
                     render.translateTo(barX, barY - barHeight)
@@ -151,7 +161,7 @@ class BarDiagramScene extends DiagramScene {
             BigDecimal barX = startX + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
-                BigDecimal yData = yDataPerKey[keys[j]][i * showGapEveryX]
+                BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 if (yData > startLabelY) {
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
@@ -169,7 +179,7 @@ class BarDiagramScene extends DiagramScene {
     }
 
     void draw() {
-        if (xLabels.isEmpty() || yDataPerKey.keySet().isEmpty()) {
+        if (xLabelList.isEmpty() || yDataListPerKey.isEmpty()) {
             return
         }
         drawLegend()

@@ -26,27 +26,35 @@ final class DiagramTypeSpec {
         final BigDecimal radio
     }
 
-    void bar(List<String> xLabels, boolean isStacked = true,
+    void bar(Set<Object> xDataList, boolean isStacked = true,
              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
              BigDecimal widthInPx = null, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation(xLabels, widthInPx, radio)
+        diagramVisitor.visitDiagramPreparation(xDataList, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitBarDiagram(isStacked)
     }
 
-    void line(List<String> xLabels, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+    void line(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
               BigDecimal widthInPx = null, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation(xLabels, widthInPx, radio)
+        diagramVisitor.visitDiagramPreparation(xDataList, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitLineDiagram()
     }
 
-    void area(List<String> xLabels, boolean isStacked = true,
+    void line(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+              BigDecimal widthInPx = null, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation([] as Set<Object>, widthInPx, radio)
+        closure.delegate = diagramDatasetSpec
+        closure.call()
+        diagramVisitor.visitLineDiagram()
+    }
+
+    void area(Set<Object> xDataList, boolean isStacked = true,
               @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
               BigDecimal widthInPx = null, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation(xLabels, widthInPx, radio)
+        diagramVisitor.visitDiagramPreparation(xDataList, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitAreaDiagram(isStacked)
@@ -54,7 +62,7 @@ final class DiagramTypeSpec {
 
     void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
              BigDecimal widthInPx = null, HeightWidthRadio radio) {
-        diagramVisitor.visitDiagramPreparation([], widthInPx, radio)
+        diagramVisitor.visitDiagramPreparation(["pieData"] as Set<Object>, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitPieDiagram(hasSlice)

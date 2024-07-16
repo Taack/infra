@@ -20,7 +20,7 @@ abstract class DiagramScene {
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
-    protected Map<String, List<BigDecimal>> yDataPerKey
+    protected Map<String, Map<Object, BigDecimal>> dataPerKey
     protected BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP
     protected boolean legendFullColor = false
 
@@ -48,7 +48,7 @@ abstract class DiagramScene {
         Integer line = 1
         BigDecimal totalLength = 0.0
         Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
-        yDataPerKey.keySet().each { String key ->
+        dataPerKey.keySet().each { String key ->
             BigDecimal length = LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
             if (totalLength + length > width) {
                 line++

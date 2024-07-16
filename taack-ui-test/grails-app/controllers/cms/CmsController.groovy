@@ -1349,7 +1349,7 @@ class CmsController implements WebAttributes {
 
     private static UiDiagramSpecifier barDiagram(boolean isStacked, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
         new UiDiagramSpecifier().ui {
-            bar(["T1", "T2", "T3", "T4"] as List<String>, isStacked, {
+            bar(["T1", "T2", "T3", "T4"] as Set<Object>, isStacked, {
                 dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
                 dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
                 dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
@@ -1358,7 +1358,7 @@ class CmsController implements WebAttributes {
     }
     private static UiDiagramSpecifier areaDiagram(boolean isStacked, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
         new UiDiagramSpecifier().ui {
-            area(["T1", "T2", "T3", "T4"] as List<String>, isStacked, {
+            area(["T1", "T2", "T3", "T4"] as Set<Object>, isStacked, {
                 dataset 'Truc1', [1.0, 1.0, 1.0, 2.0]
                 dataset 'Truc2', [2.0, 2.0, 1.0, 0.0]
                 dataset 'Truc3', [3.0, 3.0, 1.0, 3.0]
@@ -1404,6 +1404,34 @@ class CmsController implements WebAttributes {
                     // zoomRate = sectionWidth / 960.0 (960px is the default width value which is saved in RawHtmlDiagramDump.visitDiagramPreparation())
                     col BlockSpec.Width.QUARTER, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
                     col BlockSpec.Width.MAX, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
+
+                    // ------- Line diagram -------
+                    // discrete (X axis contains at least 1 non-Number value)
+                    diagram new UiDiagramSpecifier().ui({
+                        Set<Object> xLabels = ["day1", "day2", "day3", "day4", "day5", "day6"]
+                        line xLabels, {
+                            dataset("client", [10.0, 20.1, 30.0])
+                            dataset("admin", [5.0, 7.0])
+                            dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
+                    })
+                    // continuous (X axis is all of Number type)
+                    diagram new UiDiagramSpecifier().ui({
+                        Set<Object> xNumbers = [1, 3, 4.4, 5, 7.8, 8] // first way to set X axis
+                        line xNumbers, {
+                            dataset("client", [10.0, 20.1, 30.0])
+                            dataset("admin", [5.0, 7.0])
+                            dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
+                    })
+                    diagram new UiDiagramSpecifier().ui({
+                        line({
+                            // second way to set X axis
+                            dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
+                            dataset("admin", [3: 5.0, 6.9: 7.5])
+                            dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    })
 
                     // ------- Area diagram -------
                     diagram areaDiagram(true, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
