@@ -35,6 +35,22 @@ final class DiagramTypeSpec {
         diagramVisitor.visitBarDiagram(isStacked)
     }
 
+    void scatter(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+              BigDecimal widthInPx = null, HeightWidthRadio radio, String... pointImageHref) {
+        diagramVisitor.visitDiagramPreparation(xDataList, widthInPx, radio)
+        closure.delegate = diagramDatasetSpec
+        closure.call()
+        diagramVisitor.visitScatterDiagram(pointImageHref)
+    }
+
+    void scatter(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+              BigDecimal widthInPx = null, HeightWidthRadio radio, String... pointImageHref) {
+        diagramVisitor.visitDiagramPreparation([] as Set<Object>, widthInPx, radio)
+        closure.delegate = diagramDatasetSpec
+        closure.call()
+        diagramVisitor.visitScatterDiagram(pointImageHref)
+    }
+
     void line(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
               BigDecimal widthInPx = null, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation(xDataList, widthInPx, radio)

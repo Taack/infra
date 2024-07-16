@@ -15,6 +15,8 @@ interface IUiDiagramVisitor {
 
     void visitBarDiagram(boolean isStacked)
 
+    void visitScatterDiagram(String... pointImageHref)
+
     void visitLineDiagram()
 
     void visitAreaDiagram(boolean isStacked)

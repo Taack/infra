@@ -1433,6 +1433,25 @@ class CmsController implements WebAttributes {
                         }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
                     })
 
+                    // ------- Scatter diagram -------
+                    // discrete
+                    diagram new UiDiagramSpecifier().ui({
+                        Set<Object> xLabels = ["day1", "day2", "day3", "day4", "day5", "day6"]
+                        scatter xLabels, {
+                            dataset("client", [10.0, 20.1, 30.0])
+                            dataset("admin", [5.0, 7.0])
+                            dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
+                    })
+                    // continuous
+                    diagram new UiDiagramSpecifier().ui({
+                        scatter({
+                            dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
+                            dataset("admin", [3: 5.0, 6.9: 7.5])
+                            dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD, "/assets/skin/house.png", "/assets/skin/exclamation.png", "/assets/taack/intranet.png")
+                    })
+
                     // ------- Area diagram -------
                     diagram areaDiagram(true, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
 

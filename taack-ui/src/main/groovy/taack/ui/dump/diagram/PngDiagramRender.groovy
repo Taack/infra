@@ -214,6 +214,11 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderImage(String filepath, BigDecimal width, BigDecimal height) {
+
+    }
+
+    @Override
     BigDecimal getFontSize() {
         return fontSize
     }

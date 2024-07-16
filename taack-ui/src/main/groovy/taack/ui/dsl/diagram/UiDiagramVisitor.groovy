@@ -26,6 +26,11 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
+    void visitScatterDiagram(String... pointImageHref) {
+
+    }
+
+    @Override
     void visitLineDiagram() {
 
     }

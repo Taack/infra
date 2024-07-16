@@ -227,6 +227,14 @@ class SvgDiagramRenderPdf implements IDiagramRender {
     }
 
     @Override
+    void renderImage(String filepath, BigDecimal width, BigDecimal height) {
+        outStr.append("""
+                <image x="${trX}" y="${trY}" href="${filepath}" width="${width}" height="${height}" />
+        """.stripIndent()
+        )
+    }
+
+    @Override
     BigDecimal getFontSize() {
         return fontSize
     }

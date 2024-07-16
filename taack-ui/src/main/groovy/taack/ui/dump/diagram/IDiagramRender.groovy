@@ -48,6 +48,8 @@ interface IDiagramRender {
 
     void renderSector(BigDecimal r, BigDecimal angle1, BigDecimal angle2, DiagramStyle diagramStyle)
 
+    void renderImage(String filepath, BigDecimal width, BigDecimal height)
+
     BigDecimal getFontSize()
 
     BigDecimal getDiagramWidth()
