@@ -21,7 +21,7 @@ class TaackANTLRErrorListener implements ANTLRErrorListener {
     void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) throws TaackJdbcError {
         println "TaackANTLRErrorListener:reportAmbiguity $recognizer $dfa $startIndex $stopIndex $exact $ambigAlts $configs"
 //        errors << new AntlrError(errorStep: 'reportAmbiguity', errorMessage: "line: ${line}, at position: $charPositionInLine, $msg")
-        throw new TaackJdbcError('reportAmbiguity', "$recognizer $dfa $startIndex $stopIndex $exact $ambigAlts $configs")
+//        throw new TaackJdbcError('reportAmbiguity', "$recognizer $dfa $startIndex $stopIndex $exact $ambigAlts $configs")
     }
 
     @Override
@@ -33,6 +33,6 @@ class TaackANTLRErrorListener implements ANTLRErrorListener {
     @Override
     void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) throws TaackJdbcError {
         println "TaackANTLRErrorListener:reportContextSensitivity $recognizer $dfa $startIndex $stopIndex $prediction $configs"
-        throw new TaackJdbcError('reportContextSensitivity', "$recognizer $dfa $startIndex $stopIndex $prediction $configs")
+//        throw new TaackJdbcError('reportContextSensitivity', "$recognizer $dfa $startIndex $stopIndex $prediction $configs")
     }
 }
