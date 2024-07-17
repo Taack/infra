@@ -89,7 +89,7 @@ tql
 selectStar
 selectExpression
 groupByExpression
-selectFuntionExpression
+selectFunctionExpression
 fromExpression
 idTableWithAlias
 idTable

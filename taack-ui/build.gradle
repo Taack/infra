@@ -92,9 +92,9 @@ dependencies {
     implementation "org.apache.sshd:sshd-cli:${minaSshd}"
 
     if (rootProject.name != 'infra' && rootProject.name != 'taack-ui-test') {
-        implementation project(':infra:taack-jdbc-common')
+        api project(':infra:taack-jdbc-common')
     } else {
-        implementation project(':taack-jdbc-common')
+        api project(':taack-jdbc-common')
     }
 }
 

@@ -1,6 +1,6 @@
 grammar TQL;
 
-//@header{package taack.jdbc.common.tql;}
+@header{package taack.jdbc.common.tql.gen;}
 
 tql : SELECT (selectStar | selectExpression)
     FROM fromExpression
@@ -9,11 +9,11 @@ tql : SELECT (selectStar | selectExpression)
 
 selectStar: '*';
 
-selectExpression: ( idTableStar | selectFuntionExpression | columnExpression ) (',' ( selectFuntionExpression | columnExpression | idTableStar ))*;
+selectExpression: ( idTableStar | selectFunctionExpression | columnExpression ) (',' ( selectFunctionExpression | columnExpression | idTableStar ))*;
 
-groupByExpression: ( selectFuntionExpression | columnExpression) (',' ( selectFuntionExpression | columnExpression ))*;
+groupByExpression: ( selectFunctionExpression | columnExpression) (',' ( selectFunctionExpression | columnExpression ))*;
 
-selectFuntionExpression: selFunc LPAREN ( idColumn | additionalExpression | '*') RPAREN;
+selectFunctionExpression: selFunc LPAREN ( idColumn | additionalExpression | '*') RPAREN;
 
 fromExpression: ( idTableWithAlias | idTable ) (',' ( idTableWithAlias | idTable ) )*;
 

@@ -92,15 +92,15 @@ public class TQLDump extends TQLBaseListener {
     }
 
     @Override
-    public void enterSelectFuntionExpression(TQLParser.SelectFuntionExpressionContext ctx) {
-        indentPrint("enterSelectFuntionExpression " + ctx);
-        super.enterSelectFuntionExpression(ctx);
+    public void enterSelectFunctionExpression(TQLParser.SelectFunctionExpressionContext ctx) {
+        indentPrint("enterSelectFunctionExpression " + ctx);
+        super.enterSelectFunctionExpression(ctx);
     }
 
     @Override
-    public void exitSelectFuntionExpression(TQLParser.SelectFuntionExpressionContext ctx) {
-        deIndentedPrint("exitSelectFuntionExpression " + ctx);
-        super.exitSelectFuntionExpression(ctx);
+    public void exitSelectFunctionExpression(TQLParser.SelectFunctionExpressionContext ctx) {
+        deIndentedPrint("exitSelectFunctionExpression " + ctx);
+        super.exitSelectFunctionExpression(ctx);
     }
 
     @Override

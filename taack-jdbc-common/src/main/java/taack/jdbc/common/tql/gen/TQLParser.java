@@ -1,13 +1,17 @@
-package taack.jdbc.common.tql.gen;// Generated from TQL.g4 by ANTLR 4.10.1
+// Generated from TQL.g4 by ANTLR 4.13.1
+package taack.jdbc.common.tql.gen;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class TQLParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.10.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -21,7 +25,7 @@ public class TQLParser extends Parser {
 		POW=35, PI=36, LPAREN=37, RPAREN=38, SCIENTIFIC_NUMBER=39, WS=40;
 	public static final int
 		RULE_tql = 0, RULE_selectStar = 1, RULE_selectExpression = 2, RULE_groupByExpression = 3, 
-		RULE_selectFuntionExpression = 4, RULE_fromExpression = 5, RULE_idTableWithAlias = 6, 
+		RULE_selectFunctionExpression = 4, RULE_fromExpression = 5, RULE_idTableWithAlias = 6, 
 		RULE_idTable = 7, RULE_selFunc = 8, RULE_columnExpression = 9, RULE_idColumn = 10, 
 		RULE_aliasColumn = 11, RULE_aliasTable = 12, RULE_idTableStar = 13, RULE_whereClause = 14, 
 		RULE_whereExpression = 15, RULE_whereExpressionElement = 16, RULE_junctionOp = 17, 
@@ -29,7 +33,7 @@ public class TQLParser extends Parser {
 		RULE_signedAtom = 21, RULE_atom = 22, RULE_scientific = 23, RULE_relOp = 24;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"tql", "selectStar", "selectExpression", "groupByExpression", "selectFuntionExpression", 
+			"tql", "selectStar", "selectExpression", "groupByExpression", "selectFunctionExpression", 
 			"fromExpression", "idTableWithAlias", "idTable", "selFunc", "columnExpression", 
 			"idColumn", "aliasColumn", "aliasTable", "idTableStar", "whereClause", 
 			"whereExpression", "whereExpressionElement", "junctionOp", "additionalExpression", 
@@ -110,6 +114,7 @@ public class TQLParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class TqlContext extends ParserRuleContext {
 		public TerminalNode SELECT() { return getToken(TQLParser.SELECT, 0); }
 		public TerminalNode FROM() { return getToken(TQLParser.FROM, 0); }
@@ -136,11 +141,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_tql; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterTql(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterTql(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitTql(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitTql(this);
 		}
 	}
 
@@ -227,6 +232,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class SelectStarContext extends ParserRuleContext {
 		public TerminalNode TIMES() { return getToken(TQLParser.TIMES, 0); }
 		public SelectStarContext(ParserRuleContext parent, int invokingState) {
@@ -235,11 +241,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_selectStar; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterSelectStar(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterSelectStar(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitSelectStar(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitSelectStar(this);
 		}
 	}
 
@@ -264,6 +270,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class SelectExpressionContext extends ParserRuleContext {
 		public List<IdTableStarContext> idTableStar() {
 			return getRuleContexts(IdTableStarContext.class);
@@ -271,11 +278,11 @@ public class TQLParser extends Parser {
 		public IdTableStarContext idTableStar(int i) {
 			return getRuleContext(IdTableStarContext.class,i);
 		}
-		public List<SelectFuntionExpressionContext> selectFuntionExpression() {
-			return getRuleContexts(SelectFuntionExpressionContext.class);
+		public List<SelectFunctionExpressionContext> selectFunctionExpression() {
+			return getRuleContexts(SelectFunctionExpressionContext.class);
 		}
-		public SelectFuntionExpressionContext selectFuntionExpression(int i) {
-			return getRuleContext(SelectFuntionExpressionContext.class,i);
+		public SelectFunctionExpressionContext selectFunctionExpression(int i) {
+			return getRuleContext(SelectFunctionExpressionContext.class,i);
 		}
 		public List<ColumnExpressionContext> columnExpression() {
 			return getRuleContexts(ColumnExpressionContext.class);
@@ -289,11 +296,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_selectExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterSelectExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterSelectExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitSelectExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitSelectExpression(this);
 		}
 	}
 
@@ -319,7 +326,7 @@ public class TQLParser extends Parser {
 			case ELEMENTS:
 				{
 				setState(70);
-				selectFuntionExpression();
+				selectFunctionExpression();
 				}
 				break;
 			case BOOLEAN_LITTERAL:
@@ -356,7 +363,7 @@ public class TQLParser extends Parser {
 				case ELEMENTS:
 					{
 					setState(75);
-					selectFuntionExpression();
+					selectFunctionExpression();
 					}
 					break;
 				case BOOLEAN_LITTERAL:
@@ -401,12 +408,13 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class GroupByExpressionContext extends ParserRuleContext {
-		public List<SelectFuntionExpressionContext> selectFuntionExpression() {
-			return getRuleContexts(SelectFuntionExpressionContext.class);
+		public List<SelectFunctionExpressionContext> selectFunctionExpression() {
+			return getRuleContexts(SelectFunctionExpressionContext.class);
 		}
-		public SelectFuntionExpressionContext selectFuntionExpression(int i) {
-			return getRuleContext(SelectFuntionExpressionContext.class,i);
+		public SelectFunctionExpressionContext selectFunctionExpression(int i) {
+			return getRuleContext(SelectFunctionExpressionContext.class,i);
 		}
 		public List<ColumnExpressionContext> columnExpression() {
 			return getRuleContexts(ColumnExpressionContext.class);
@@ -420,11 +428,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_groupByExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterGroupByExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterGroupByExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitGroupByExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitGroupByExpression(this);
 		}
 	}
 
@@ -444,7 +452,7 @@ public class TQLParser extends Parser {
 			case ELEMENTS:
 				{
 				setState(85);
-				selectFuntionExpression();
+				selectFunctionExpression();
 				}
 				break;
 			case BOOLEAN_LITTERAL:
@@ -481,7 +489,7 @@ public class TQLParser extends Parser {
 				case ELEMENTS:
 					{
 					setState(90);
-					selectFuntionExpression();
+					selectFunctionExpression();
 					}
 					break;
 				case BOOLEAN_LITTERAL:
@@ -520,7 +528,8 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
-	public static class SelectFuntionExpressionContext extends ParserRuleContext {
+	@SuppressWarnings("CheckReturnValue")
+	public static class SelectFunctionExpressionContext extends ParserRuleContext {
 		public SelFuncContext selFunc() {
 			return getRuleContext(SelFuncContext.class,0);
 		}
@@ -533,23 +542,23 @@ public class TQLParser extends Parser {
 			return getRuleContext(AdditionalExpressionContext.class,0);
 		}
 		public TerminalNode TIMES() { return getToken(TQLParser.TIMES, 0); }
-		public SelectFuntionExpressionContext(ParserRuleContext parent, int invokingState) {
+		public SelectFunctionExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_selectFuntionExpression; }
+		@Override public int getRuleIndex() { return RULE_selectFunctionExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterSelectFuntionExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterSelectFunctionExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitSelectFuntionExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitSelectFunctionExpression(this);
 		}
 	}
 
-	public final SelectFuntionExpressionContext selectFuntionExpression() throws RecognitionException {
-		SelectFuntionExpressionContext _localctx = new SelectFuntionExpressionContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_selectFuntionExpression);
+	public final SelectFunctionExpressionContext selectFunctionExpression() throws RecognitionException {
+		SelectFunctionExpressionContext _localctx = new SelectFunctionExpressionContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_selectFunctionExpression);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -594,6 +603,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class FromExpressionContext extends ParserRuleContext {
 		public List<IdTableWithAliasContext> idTableWithAlias() {
 			return getRuleContexts(IdTableWithAliasContext.class);
@@ -613,11 +623,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_fromExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterFromExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterFromExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitFromExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitFromExpression(this);
 		}
 	}
 
@@ -687,6 +697,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class IdTableWithAliasContext extends ParserRuleContext {
 		public IdTableContext idTable() {
 			return getRuleContext(IdTableContext.class,0);
@@ -701,11 +712,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_idTableWithAlias; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterIdTableWithAlias(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterIdTableWithAlias(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitIdTableWithAlias(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitIdTableWithAlias(this);
 		}
 	}
 
@@ -750,6 +761,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class IdTableContext extends ParserRuleContext {
 		public TerminalNode TABLE_NAME() { return getToken(TQLParser.TABLE_NAME, 0); }
 		public IdTableContext(ParserRuleContext parent, int invokingState) {
@@ -758,11 +770,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_idTable; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterIdTable(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterIdTable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitIdTable(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitIdTable(this);
 		}
 	}
 
@@ -787,6 +799,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class SelFuncContext extends ParserRuleContext {
 		public TerminalNode COUNT() { return getToken(TQLParser.COUNT, 0); }
 		public TerminalNode DISTINCT() { return getToken(TQLParser.DISTINCT, 0); }
@@ -798,11 +811,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_selFunc; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterSelFunc(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterSelFunc(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitSelFunc(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitSelFunc(this);
 		}
 	}
 
@@ -815,7 +828,7 @@ public class TQLParser extends Parser {
 			{
 			setState(133);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << COUNT) | (1L << SUM) | (1L << DISTINCT) | (1L << ELEMENTS))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 1966080L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -836,6 +849,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class ColumnExpressionContext extends ParserRuleContext {
 		public IdColumnContext idColumn() {
 			return getRuleContext(IdColumnContext.class,0);
@@ -853,11 +867,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_columnExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterColumnExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterColumnExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitColumnExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitColumnExpression(this);
 		}
 	}
 
@@ -909,6 +923,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class IdColumnContext extends ParserRuleContext {
 		public TerminalNode COLUMN_NAME_POINTED() { return getToken(TQLParser.COLUMN_NAME_POINTED, 0); }
 		public TerminalNode COLUMN_NAME_FRAGMANT() { return getToken(TQLParser.COLUMN_NAME_FRAGMANT, 0); }
@@ -918,11 +933,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_idColumn; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterIdColumn(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterIdColumn(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitIdColumn(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitIdColumn(this);
 		}
 	}
 
@@ -956,6 +971,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class AliasColumnContext extends ParserRuleContext {
 		public TerminalNode COLUMN_NAME_FRAGMANT() { return getToken(TQLParser.COLUMN_NAME_FRAGMANT, 0); }
 		public AliasColumnContext(ParserRuleContext parent, int invokingState) {
@@ -964,11 +980,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_aliasColumn; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterAliasColumn(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterAliasColumn(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitAliasColumn(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitAliasColumn(this);
 		}
 	}
 
@@ -993,6 +1009,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class AliasTableContext extends ParserRuleContext {
 		public TerminalNode COLUMN_NAME_FRAGMANT() { return getToken(TQLParser.COLUMN_NAME_FRAGMANT, 0); }
 		public AliasTableContext(ParserRuleContext parent, int invokingState) {
@@ -1001,11 +1018,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_aliasTable; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterAliasTable(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterAliasTable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitAliasTable(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitAliasTable(this);
 		}
 	}
 
@@ -1030,6 +1047,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class IdTableStarContext extends ParserRuleContext {
 		public TerminalNode TABLE_STAR() { return getToken(TQLParser.TABLE_STAR, 0); }
 		public IdTableStarContext(ParserRuleContext parent, int invokingState) {
@@ -1038,11 +1056,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_idTableStar; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterIdTableStar(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterIdTableStar(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitIdTableStar(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitIdTableStar(this);
 		}
 	}
 
@@ -1067,6 +1085,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class WhereClauseContext extends ParserRuleContext {
 		public WhereExpressionElementContext whereExpressionElement() {
 			return getRuleContext(WhereExpressionElementContext.class,0);
@@ -1083,11 +1102,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_whereClause; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterWhereClause(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterWhereClause(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitWhereClause(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitWhereClause(this);
 		}
 	}
 
@@ -1103,7 +1122,7 @@ public class TQLParser extends Parser {
 			setState(155);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,16,_ctx);
-			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
@@ -1129,6 +1148,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class WhereExpressionContext extends ParserRuleContext {
 		public JunctionOpContext junctionOp() {
 			return getRuleContext(JunctionOpContext.class,0);
@@ -1145,11 +1165,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_whereExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterWhereExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterWhereExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitWhereExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitWhereExpression(this);
 		}
 	}
 
@@ -1205,6 +1225,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class WhereExpressionElementContext extends ParserRuleContext {
 		public IdColumnContext idColumn() {
 			return getRuleContext(IdColumnContext.class,0);
@@ -1227,11 +1248,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_whereExpressionElement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterWhereExpressionElement(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterWhereExpressionElement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitWhereExpressionElement(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitWhereExpressionElement(this);
 		}
 	}
 
@@ -1325,6 +1346,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class JunctionOpContext extends ParserRuleContext {
 		public TerminalNode AND() { return getToken(TQLParser.AND, 0); }
 		public TerminalNode OR() { return getToken(TQLParser.OR, 0); }
@@ -1334,11 +1356,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_junctionOp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterJunctionOp(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterJunctionOp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitJunctionOp(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitJunctionOp(this);
 		}
 	}
 
@@ -1372,6 +1394,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class AdditionalExpressionContext extends ParserRuleContext {
 		public List<MultiplyingExpressionContext> multiplyingExpression() {
 			return getRuleContexts(MultiplyingExpressionContext.class);
@@ -1393,11 +1416,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_additionalExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterAdditionalExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterAdditionalExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitAdditionalExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitAdditionalExpression(this);
 		}
 	}
 
@@ -1414,7 +1437,7 @@ public class TQLParser extends Parser {
 			setState(194);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
-			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
@@ -1450,6 +1473,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class MultiplyingExpressionContext extends ParserRuleContext {
 		public List<PowExpressionContext> powExpression() {
 			return getRuleContexts(PowExpressionContext.class);
@@ -1471,11 +1495,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_multiplyingExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterMultiplyingExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterMultiplyingExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitMultiplyingExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitMultiplyingExpression(this);
 		}
 	}
 
@@ -1492,7 +1516,7 @@ public class TQLParser extends Parser {
 			setState(202);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,21,_ctx);
-			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
@@ -1528,6 +1552,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class PowExpressionContext extends ParserRuleContext {
 		public List<SignedAtomContext> signedAtom() {
 			return getRuleContexts(SignedAtomContext.class);
@@ -1545,11 +1570,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_powExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterPowExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterPowExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitPowExpression(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitPowExpression(this);
 		}
 	}
 
@@ -1565,7 +1590,7 @@ public class TQLParser extends Parser {
 			setState(210);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,22,_ctx);
-			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
@@ -1593,6 +1618,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class SignedAtomContext extends ParserRuleContext {
 		public TerminalNode PLUS() { return getToken(TQLParser.PLUS, 0); }
 		public SignedAtomContext signedAtom() {
@@ -1611,11 +1637,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_signedAtom; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterSignedAtom(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterSignedAtom(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitSignedAtom(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitSignedAtom(this);
 		}
 	}
 
@@ -1671,6 +1697,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class AtomContext extends ParserRuleContext {
 		public ScientificContext scientific() {
 			return getRuleContext(ScientificContext.class,0);
@@ -1692,11 +1719,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_atom; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterAtom(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterAtom(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitAtom(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitAtom(this);
 		}
 	}
 
@@ -1771,6 +1798,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class ScientificContext extends ParserRuleContext {
 		public TerminalNode SCIENTIFIC_NUMBER() { return getToken(TQLParser.SCIENTIFIC_NUMBER, 0); }
 		public ScientificContext(ParserRuleContext parent, int invokingState) {
@@ -1779,11 +1807,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_scientific; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterScientific(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterScientific(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitScientific(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitScientific(this);
 		}
 	}
 
@@ -1808,6 +1836,7 @@ public class TQLParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
 	public static class RelOpContext extends ParserRuleContext {
 		public TerminalNode EQ() { return getToken(TQLParser.EQ, 0); }
 		public TerminalNode GT() { return getToken(TQLParser.GT, 0); }
@@ -1820,11 +1849,11 @@ public class TQLParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_relOp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).enterRelOp(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).enterRelOp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof TQLListener) ((TQLListener)listener).exitRelOp(this);
+			if ( listener instanceof TQLListener ) ((TQLListener)listener).exitRelOp(this);
 		}
 	}
 
@@ -1837,7 +1866,7 @@ public class TQLParser extends Parser {
 			{
 			setState(235);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 33285996544L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {

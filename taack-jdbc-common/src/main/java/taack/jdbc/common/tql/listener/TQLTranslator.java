@@ -226,13 +226,13 @@ public final class TQLTranslator extends TQLBaseListener {
     }
 
     @Override
-    public void enterSelectFuntionExpression(TQLParser.SelectFuntionExpressionContext ctx) {
-        super.enterSelectFuntionExpression(ctx);
+    public void enterSelectFunctionExpression(TQLParser.SelectFunctionExpressionContext ctx) {
+        super.enterSelectFunctionExpression(ctx);
     }
 
     @Override
-    public void exitSelectFuntionExpression(TQLParser.SelectFuntionExpressionContext ctx) {
-        super.exitSelectFuntionExpression(ctx);
+    public void exitSelectFunctionExpression(TQLParser.SelectFunctionExpressionContext ctx) {
+        super.exitSelectFunctionExpression(ctx);
     }
 
     @Override

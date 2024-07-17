@@ -18,20 +18,21 @@ class TaackANTLRErrorListener implements ANTLRErrorListener {
     }
 
     @Override
-    void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+    void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) throws TaackJdbcError {
         println "TaackANTLRErrorListener:reportAmbiguity $recognizer $dfa $startIndex $stopIndex $exact $ambigAlts $configs"
 //        errors << new AntlrError(errorStep: 'reportAmbiguity', errorMessage: "line: ${line}, at position: $charPositionInLine, $msg")
+        throw new TaackJdbcError('reportAmbiguity', "$recognizer $dfa $startIndex $stopIndex $exact $ambigAlts $configs")
     }
 
     @Override
-    void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
-        println "TaackANTLRErrorListener:reportAmbiguity $recognizer $dfa $startIndex $stopIndex $conflictingAlts $configs"
-
+    void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) throws TaackJdbcError {
+        println "TaackANTLRErrorListener:reportAttemptingFullContext $recognizer $dfa $startIndex $stopIndex $conflictingAlts $configs"
+//        throw new TaackJdbcError('reportAttemptingFullContext', "$recognizer $dfa $startIndex $stopIndex $conflictingAlts $configs")
     }
 
     @Override
-    void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
-        println "TaackANTLRErrorListener:reportAmbiguity $recognizer $dfa $startIndex $stopIndex $prediction $configs"
-
+    void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) throws TaackJdbcError {
+        println "TaackANTLRErrorListener:reportContextSensitivity $recognizer $dfa $startIndex $stopIndex $prediction $configs"
+        throw new TaackJdbcError('reportContextSensitivity', "$recognizer $dfa $startIndex $stopIndex $prediction $configs")
     }
 }

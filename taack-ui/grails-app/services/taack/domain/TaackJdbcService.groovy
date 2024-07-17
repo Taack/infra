@@ -136,7 +136,7 @@ final class TaackJdbcService {
         out.toString()
     }
 
-    private static final TQLTranslator translatorFromTql(String tql) {
+    static final TQLTranslator translatorFromTql(String tql) throws TaackJdbcError {
         def lexer = new TQLLexer(CharStreams.fromString(tql))
         def errors = new TaackANTLRErrorListener()
         lexer.removeErrorListener(ConsoleErrorListener.INSTANCE)
@@ -345,7 +345,7 @@ final class TaackJdbcService {
     }
 
 
-    private final Pair<List<Object[]>, Long> listFromTranslator(TQLTranslator translator, Integer max, int offset) {
+    final Pair<List<Object[]>, Long> listFromTranslator(TQLTranslator translator, Integer max, int offset) {
         def simpleName = translator.tables.first()
         Class<? extends GormEntity> aClass = gormClassesMap[simpleName]
         TaackFilter tf = taackFilterService.getBuilder(aClass).build()
