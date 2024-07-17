@@ -215,7 +215,13 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderImage(String filepath, BigDecimal width, BigDecimal height) {
-
+        File image = new File(filepath)
+        if (image.exists()) {
+            ig2.drawImage(ImageIO.read(image), trX.toInteger(), trY.toInteger(), width.toInteger(), height.toInteger(), null)
+        } else {
+            translateTo(trX + width / 2, trY + height / 2)
+            renderCircle(width / 2)
+        }
     }
 
     @Override

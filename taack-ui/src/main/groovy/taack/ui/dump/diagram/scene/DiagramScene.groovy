@@ -8,6 +8,7 @@ import java.util.List
 
 @CompileStatic
 abstract class DiagramScene {
+    final protected BigDecimal LEGEND_IMAGE_WIDTH = 20.0
     final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
     final protected BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
     final protected BigDecimal LEGEND_MARGIN = 10.0
@@ -44,12 +45,12 @@ abstract class DiagramScene {
         }
     }
 
-    void drawLegend() {
+    void drawLegend(List<String> pointImageHref = []) {
         Integer line = 1
         BigDecimal totalLength = 0.0
         Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
-        dataPerKey.keySet().each { String key ->
-            BigDecimal length = LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
+        dataPerKey.keySet().eachWithIndex { String key, int i ->
+            BigDecimal length = (i < pointImageHref.size() ? LEGEND_IMAGE_WIDTH : LEGEND_RECT_WIDTH) + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
             if (totalLength + length > width) {
                 line++
                 totalLength = 0.0
@@ -72,22 +73,29 @@ abstract class DiagramScene {
             Map<String, BigDecimal> keyMap = it.value
             BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
             keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
-                // rect
-                render.translateTo(startX, startY)
+                // image or rect, with text
                 Color rectColor = LegendColor.colorFrom(legendIndex)
-                if (legendFullColor) {
-                    render.fillStyle(rectColor)
-                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
-                } else {
-                    render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
-                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
-                    render.fillStyle(rectColor)
-                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.stroke)
-                }
+                render.fillStyle(rectColor)
+                if (legendIndex < pointImageHref.size()) {
+                    render.translateTo(startX, startY - (LEGEND_IMAGE_WIDTH - fontSize))
+                    render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
 
-                // text
-                render.translateTo(startX + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
-                render.renderLabel(keyEntry.key)
+                    render.translateTo(startX + LEGEND_IMAGE_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
+                    render.renderLabel(keyEntry.key)
+                } else {
+                    render.translateTo(startX, startY)
+                    if (legendFullColor) {
+                        render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
+                    } else {
+                        render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.stroke)
+                        render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
+                        render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
+                    }
+
+                    // text
+                    render.translateTo(startX + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
+                    render.renderLabel(keyEntry.key)
+                }
 
                 startX += keyEntry.value + LEGEND_MARGIN
                 legendIndex++

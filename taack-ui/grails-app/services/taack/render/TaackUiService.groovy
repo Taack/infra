@@ -369,7 +369,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ByteArrayOutputStream stream = new ByteArrayOutputStream()
         RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream)
         diagramSpecifier.visitDiagram(diagramDump, diagramBase)
-        boolean isSvg = diagramBase == UiDiagramSpecifier.DiagramBase.SVG
+        boolean isSvg = diagramBase != UiDiagramSpecifier.DiagramBase.PNG
         webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")
         webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}.${isSvg ? "svg" : "png"}")
         stream.writeTo(webUtils.currentResponse.outputStream)
