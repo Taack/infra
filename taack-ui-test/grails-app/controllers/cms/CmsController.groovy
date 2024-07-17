@@ -1450,6 +1450,9 @@ class CmsController implements WebAttributes {
                             dataset("admin", [3: 5.0, 6.9: 7.5])
                             dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
                         }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD, "/assets/skin/house.png", "/assets/skin/exclamation.png", "/assets/taack/intranet.png")
+                        // todo:
+                        // the pointImageHref doesn't work in PDF (So in PDF we will replace it by default image)
+                        // because in PDF the href will locate from client side... So instead of a href, we should give an url that refers to our online server assets ?
                     })
 
                     // ------- Area diagram -------

@@ -28,7 +28,7 @@ class ScatterDiagramScene extends DiagramScene {
         this.height = render.getDiagramHeight()
         this.render = render
         this.dataPerKey = dataPerKey
-        this.dataPointRadius = 10
+        this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
         this.pointImageHref = pointImageHref.toList()
 
         this.xLabelList = []
@@ -129,15 +129,15 @@ class ScatterDiagramScene extends DiagramScene {
                     Number y = pointList[x]
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * totalWidth
+                    Color circleColor = LegendColor.colorFrom(i)
+                    render.fillStyle(circleColor)
 
                     // data point
                     if (i < pointImageHref.size()) {
                         render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                         render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
                     } else {
-                        Color circleColor = LegendColor.colorFrom(i)
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(circleColor)
                         render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
                         render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
                         render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
@@ -204,7 +204,7 @@ class ScatterDiagramScene extends DiagramScene {
         if (xLabelList.isEmpty()) {
             return
         }
-        drawLegend()
+        drawLegend(pointImageHref)
         drawHorizontalBackground()
         drawVerticalBackground()
         drawDataPoint()

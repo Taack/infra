@@ -228,10 +228,16 @@ class SvgDiagramRenderPdf implements IDiagramRender {
 
     @Override
     void renderImage(String filepath, BigDecimal width, BigDecimal height) {
-        outStr.append("""
+        File image = new File(filepath)
+        if (image.exists()) {
+            outStr.append("""
                 <image x="${trX}" y="${trY}" href="${filepath}" width="${width}" height="${height}" />
-        """.stripIndent()
-        )
+            """.stripIndent()
+            )
+        } else {
+            translateTo(trX + width / 2, trY + height / 2)
+            renderCircle(width / 2)
+        }
     }
 
     @Override
