@@ -108,16 +108,6 @@ public interface TQLListener extends ParseTreeListener {
 	 */
 	void exitColumnExpression(TQLParser.ColumnExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TQLParser#idColumn}.
-	 * @param ctx the parse tree
-	 */
-	void enterIdColumn(TQLParser.IdColumnContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TQLParser#idColumn}.
-	 * @param ctx the parse tree
-	 */
-	void exitIdColumn(TQLParser.IdColumnContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link TQLParser#aliasColumn}.
 	 * @param ctx the parse tree
 	 */
@@ -147,6 +137,16 @@ public interface TQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIdTableStar(TQLParser.IdTableStarContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TQLParser#idColumn}.
+	 * @param ctx the parse tree
+	 */
+	void enterIdColumn(TQLParser.IdColumnContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TQLParser#idColumn}.
+	 * @param ctx the parse tree
+	 */
+	void exitIdColumn(TQLParser.IdColumnContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TQLParser#whereClause}.
 	 * @param ctx the parse tree

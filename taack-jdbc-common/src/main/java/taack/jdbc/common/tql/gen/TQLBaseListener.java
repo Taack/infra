@@ -137,18 +137,6 @@ public class TQLBaseListener implements TQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIdColumn(TQLParser.IdColumnContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitIdColumn(TQLParser.IdColumnContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterAliasColumn(TQLParser.AliasColumnContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -180,6 +168,18 @@ public class TQLBaseListener implements TQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitIdTableStar(TQLParser.IdTableStarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIdColumn(TQLParser.IdColumnContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIdColumn(TQLParser.IdColumnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

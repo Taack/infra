@@ -5,7 +5,7 @@ grammar TQL;
 tql : SELECT (selectStar | selectExpression)
     FROM fromExpression
     (WHERE whereClause)?
-    (GROUP_BY groupByExpression)? ';';
+    (GROUP_BY groupByExpression)? ';' EOF;
 
 selectStar: '*';
 
@@ -23,10 +23,10 @@ selFunc: COUNT | DISTINCT | ELEMENTS | SUM;
 
 //alias: COLUMN_FRAGMANT;
 columnExpression: (idColumn | additionalExpression) ( AS aliasColumn)?;
-idColumn:  COLUMN_NAME_POINTED | COLUMN_NAME_FRAGMANT;
 aliasColumn: COLUMN_NAME_FRAGMANT;
 aliasTable: COLUMN_NAME_FRAGMANT;
 idTableStar: TABLE_STAR;
+idColumn:  COLUMN_NAME_POINTED;
 
 IN_ELEMENTS: 'in elements';
 SELECT: 'select' | 'SELECT';
@@ -37,14 +37,14 @@ AND: 'AND' | 'and';
 OR : 'OR' | 'or';
 AS: 'AS' | 'as';
 BOOLEAN_LITTERAL: 'true' | 'false';
-TABLE_STAR: COLUMN_NAME_FRAGMANT '.*';
 COUNT: 'COUNT' | 'count';
 SUM: 'SUM' | 'sum';
 DISTINCT: 'DISTINCT' | 'distinct';
 ELEMENTS: 'ELEMENTS' | 'elements';
 TABLE_NAME: UPPER_CHARS ALL_ASCII*;
-COLUMN_NAME_POINTED: COLUMN_NAME_FRAGMANT ('.' COLUMN_NAME_FRAGMANT)+;
+TABLE_STAR: COLUMN_NAME_FRAGMANT '.*';
 COLUMN_NAME_FRAGMANT : LOWER_CHARS ALL_ASCII* ;
+COLUMN_NAME_POINTED: COLUMN_NAME_FRAGMANT ('.' COLUMN_NAME_FRAGMANT)*;
 
 fragment LOWER_CHARS : ('a' .. 'z');
 fragment UPPER_CHARS : ('A' .. 'Z');

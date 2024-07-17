@@ -24,7 +24,7 @@ class TaackJdbcController {
         }
         byte[] b
         try {
-            b = taackJdbcService.getBufFromTql(req, maxRow, offset)
+            b = taackJdbcService.getBufFromTql(req, maxRow ?: 2, offset ?: 0)
         } catch(e) {
             log.error("Bad SQL: $req , ${e.message}")
             e.printStackTrace()
