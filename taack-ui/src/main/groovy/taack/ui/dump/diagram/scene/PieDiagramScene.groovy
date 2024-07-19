@@ -10,6 +10,7 @@ class PieDiagramScene extends DiagramScene {
     final private Map<String, BigDecimal> pieDataPerKey
     final private BigDecimal slicePositionRate
 
+    final private BigDecimal SLICE_DISTANCE_FROM_CENTER = 0.3 // define how far the slice should be: 0.3 * radius
     final private BigDecimal OUTSIDE_LABEL_MARGIN = 2.0
 
     PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice) {
@@ -18,7 +19,7 @@ class PieDiagramScene extends DiagramScene {
         this.height = render.getDiagramHeight()
         this.render = render
         this.legendFullColor = true
-        this.slicePositionRate = hasSlice ? 0.3 : 0.0 // define how far the slice should be: radius * 0.3
+        this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
 
         Map<String, BigDecimal> pieDataPerKey = [:]
         Set<String> keys = dataPerKey.keySet()

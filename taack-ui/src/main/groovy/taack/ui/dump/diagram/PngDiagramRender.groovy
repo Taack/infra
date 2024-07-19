@@ -134,17 +134,11 @@ class PngDiagramRender implements IDiagramRender {
     void renderPoly(List<BigDecimal> coords) {
         def p = new Polygon()
         def it = coords.iterator()
-        p.addPoint(trX.toInteger(), trY.toInteger())
         ig2.setPaint(fillStyle)
         while (it.hasNext()) {
             p.addPoint((it.next() + trX).toInteger(), (it.next() + trY).toInteger())
         }
         ig2.fill(p)
-    }
-
-    @Override
-    void renderPoly(BigDecimal... coords) {
-        renderPoly(coords.collect() as List<BigDecimal>)
     }
 
     @Override
@@ -182,16 +176,16 @@ class PngDiagramRender implements IDiagramRender {
         fillStyle = Color.BLACK
         if (isDown) {
             renderPoly(
-                    0.0, 0.0,
+                    [0.0, 0.0,
                     length, 0.0,
-                    length / 2.0, length
+                    length / 2.0, length]
             )
         }
         else {
             renderPoly(
-                    0.0, 0.0,
+                    [0.0, 0.0,
                     length, length / 2.0,
-                    0.0, length
+                    0.0, length]
             )
         }
         fillStyle = tmp

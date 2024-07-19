@@ -48,22 +48,22 @@ class LineDiagramScene extends ScatterDiagramScene {
                 yDataListPerKey.put(key, dataPerKey[key].values() as List<BigDecimal>)
             }
 
-            int gapNumberX = xLabelList.size() - 1
-            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / gapNumberX
-            for (int i = 0; i < gapNumberX + 1; i++) {
-                BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
+            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
+            for (int i = 0; i < xLabelList.size(); i++) {
+                BigDecimal xWidth = gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {
-                    BigDecimal yData = yDataListPerKey[keys[j]][i]
-                    BigDecimal lineHeight = (yData - startLabelY) / gapY * gapHeight
+                    List<BigDecimal> yList = yDataListPerKey[keys[j]]
+                    BigDecimal y = i < yList.size() ? yList[i] : 0.0
+                    BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     Color circleColor = LegendColor.colorFrom(j)
 
                     // line to next circle
-                    if (i < gapNumberX) { // not the last point
-                        BigDecimal lineHeight2 = (yDataListPerKey[keys[j]][i + 1] - startLabelY) / gapY * gapHeight
-                        BigDecimal startX2 = DIAGRAM_MARGIN_LEFT + gapWidth * (i + 1)
-                        render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
+                    if (i < xLabelList.size() - 1) { // not the last point
+                        BigDecimal yHeight2 = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
+                        BigDecimal xWidth2 = gapWidth * (i + 1)
+                        render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
                         render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 192))
-                        render.renderLine(startX2 - startX, lineHeight - lineHeight2)
+                        render.renderLine(xWidth2 - xWidth, yHeight - yHeight2)
                     }
                 }
             }

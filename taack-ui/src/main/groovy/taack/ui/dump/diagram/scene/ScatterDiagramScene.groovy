@@ -54,10 +54,14 @@ class ScatterDiagramScene extends DiagramScene {
         }
     }
 
-    void drawHorizontalBackground() {
-        Set<BigDecimal> values = dataPerKey.collect { it.value.values() }.flatten().sort() as Set<BigDecimal>
-        startLabelY = values.first() >= 0 ? 0.0 : Math.floor(values.first().toDouble()).toBigDecimal()
-        BigDecimal totalGapY = values.last() - startLabelY
+    void drawHorizontalBackground(BigDecimal minY = null, BigDecimal maxY = null) {
+        if (minY == null || maxY == null) {
+            Set<BigDecimal> values = dataPerKey.collect { it.value.values() }.flatten().sort() as Set<BigDecimal>
+            minY ?= values.first() >= 0 ? 0.0 : Math.floor(values.first().toDouble()).toBigDecimal()
+            maxY ?= values.last()
+        }
+        startLabelY = minY
+        BigDecimal totalGapY = maxY - startLabelY
         int gapNumberY
         if (totalGapY <= 1) {
             gapY = 0.2
@@ -127,20 +131,22 @@ class ScatterDiagramScene extends DiagramScene {
                 for (int j = 0; j < xList.size(); j++) {
                     Number x = xList[j]
                     Number y = pointList[x]
+                    BigDecimal xWidth = (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
-                    BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * totalWidth
                     Color circleColor = LegendColor.colorFrom(i)
                     render.fillStyle(circleColor)
 
                     // data point
-                    if (i < pointImageHref.size()) {
-                        render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
-                        render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
-                    } else {
-                        render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
-                        render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
-                        render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
+                    if (dataPointRadius > 0) {
+                        if (i < pointImageHref.size()) {
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
+                            render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
+                        } else {
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                            render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
+                            render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
+                            render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
+                        }
                     }
 
                     // data label
@@ -149,9 +155,9 @@ class ScatterDiagramScene extends DiagramScene {
                         String yLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
                         String dataLabel = "($xLabel, $yLabel)"
                         if (dataPointRadius > 5) { // put label at right
-                            render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
                         } else { // put label at top
-                            render.translateTo(xWidth - render.measureText(dataLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth - render.measureText(dataLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
                         }
                         render.renderLabel(dataLabel)
                     }
@@ -164,34 +170,36 @@ class ScatterDiagramScene extends DiagramScene {
                 yDataListPerKey.put(key, dataPerKey[key].values() as List<BigDecimal>)
             }
 
-            int gapNumberX = xLabelList.size() - 1
-            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / gapNumberX
-            for (int i = 0; i < gapNumberX + 1; i++) {
-                BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
+            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
+            for (int i = 0; i < xLabelList.size(); i++) {
+                BigDecimal xWidth = gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {
-                    BigDecimal yData = yDataListPerKey[keys[j]][i]
-                    BigDecimal lineHeight = (yData - startLabelY) / gapY * gapHeight
+                    List<BigDecimal> yList = yDataListPerKey[keys[j]]
+                    BigDecimal y = i < yList.size() ? yList[i] : 0.0
+                    BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
 
                     // data point
-                    if (j < pointImageHref.size()) {
-                        render.translateTo(startX - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - dataPointRadius)
-                        render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
-                    } else {
-                        Color circleColor = LegendColor.colorFrom(j)
-                        render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight)
-                        render.fillStyle(circleColor)
-                        render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
-                        render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
-                        render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
+                    if (dataPointRadius > 0) {
+                        if (j < pointImageHref.size()) {
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
+                            render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
+                        } else {
+                            Color circleColor = LegendColor.colorFrom(j)
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                            render.fillStyle(circleColor)
+                            render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
+                            render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
+                            render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
+                        }
                     }
 
                     // data label
-                    if (yData > startLabelY && gapWidth > MIN_GAP_WIDTH) {
-                        String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
+                    if (y > startLabelY && gapWidth > MIN_GAP_WIDTH) {
+                        String yDataLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
                         if (dataPointRadius > 5) { // put label at right
-                            render.translateTo(startX + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - fontSize / 2)
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
                         } else { // put label at top
-                            render.translateTo(startX, height - DIAGRAM_MARGIN_BOTTOM - lineHeight - dataPointRadius - fontSize - 2.0)
+                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
                         }
                         render.renderLabel(yDataLabel)
                     }

@@ -36,7 +36,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitAreaDiagram(boolean isStacked) {
+    void visitAreaDiagram() {
 
     }
 
