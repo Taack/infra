@@ -7,10 +7,13 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.ConsoleErrorListener
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.mapping.core.Datastore
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
 import taack.ast.type.FieldConstraint
 import taack.ast.type.FieldInfo
+import taack.ast.type.GetMethodReturn
 import taack.jdbc.TaackANTLRErrorListener
 import taack.jdbc.TaackJdbcError
 import taack.jdbc.common.TaackResultSetOuterClass
@@ -20,7 +23,6 @@ import taack.jdbc.common.tql.gen.TQLParser
 import taack.jdbc.common.tql.listener.TQLTranslator
 
 import java.sql.DatabaseMetaData
-
 /**
  * Service managing JDBC connection. Queries support TQL. It can be viewed as a subset of the HQL.
  * <p>Target supported features:
@@ -40,18 +42,33 @@ final class TaackJdbcService {
     @Autowired
     SessionFactory sessionFactory
 
+    @Autowired
+    Datastore datastore
+
     private class ColumnDesc {
-        FieldInfo fieldInfo
-        String alias
-        String colName
+        final FieldInfo fieldInfo
+        final GetMethodReturn methodReturn
+        final String alias
+        final String colName
 
         ColumnDesc(FieldInfo fieldInfo, String alias, String colName) {
             this.fieldInfo = fieldInfo
             this.alias = alias
             this.colName = colName
+            this.methodReturn = null
+        }
+
+        ColumnDesc(GetMethodReturn methodReturn, String alias, String colName) {
+            this.fieldInfo = null
+            this.alias = alias
+            this.colName = colName
+            this.methodReturn = methodReturn
         }
 
         Class getFieldType() {
+            if (methodReturn)
+                return methodReturn.method.returnType
+
             if (fieldInfo == null) return BigDecimal
             if (!colName.contains('.')) fieldInfo.fieldConstraint.field.type
             else {
@@ -82,6 +99,7 @@ final class TaackJdbcService {
         }
     }
     private final static Map<Class<? extends GormEntity>, FieldInfo[]> fieldInfoMap = [:]
+    private final static Map<Class<? extends GormEntity>, GetMethodReturn[]> methodMap = [:]
     private final static Map<String, Class<? extends GormEntity>> gormClassesMap = [:]
     private final static Map<String, Class<? extends GormEntity>> gormRealClassesMap = [:]
 
@@ -103,6 +121,10 @@ final class TaackJdbcService {
             registerJdbcClass(aClass, fieldInfos)
         }
 
+        static final void registerClassMethod(Class<? extends GormEntity> aClass, GetMethodReturn... methodReturns) {
+            registerJdbcClass(aClass, methodReturns)
+        }
+
         static final Map<Class<? extends GormEntity>, FieldInfo[]> getFieldInfoMap() {
             TaackJdbcService.fieldInfoMap
         }
@@ -112,6 +134,12 @@ final class TaackJdbcService {
         def fieldInfoWithId = fieldInfos.toList()
         fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), aClass.getDeclaredField('id'), null), 'id', (Long) 0)
         fieldInfoMap.put(aClass, fieldInfoWithId as FieldInfo[])
+        gormClassesMap.put(aClass.simpleName, aClass)
+        gormRealClassesMap.put(aClass.name, aClass)
+    }
+
+    final static void registerJdbcClass(Class<? extends GormEntity> aClass, GetMethodReturn... methodReturns) {
+        methodMap.put(aClass, methodReturns)
         gormClassesMap.put(aClass.simpleName, aClass)
         gormRealClassesMap.put(aClass.name, aClass)
     }
@@ -187,7 +215,7 @@ final class TaackJdbcService {
                 } else if (!f && ct == TQLTranslator.Col.Type.FORMULA) {
                     // Complex case like t.* or *
 //                    def fi = new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), null, null), 'id', (BigDecimal) 0)
-                    columnDescs << new ColumnDesc(null, translator.colAliasMap[col], col.colName)
+                    columnDescs << new ColumnDesc(null as FieldInfo, translator.colAliasMap[col], col.colName)
                 } else if (translator.isStar()) {
                     for (def fi in fieldInfoMap[gec]) columnDescs << new ColumnDesc(fi, fi.fieldName, fi.fieldName)
                     translator.columns.removeAll { true }
@@ -198,6 +226,11 @@ final class TaackJdbcService {
                     translator.columns.removeAll { true }
                     translator.addColumnNames(fieldInfoMap[gec]*.fieldName as List<String>, alias)
                 } else {
+                    def m = methodMap[gec].find { (cn == it.method.getName().substring(3).uncapitalize()) }
+                    if (m) {
+                        columnDescs << new ColumnDesc(m, translator.colAliasMap[col], cn)
+                        col.colType = TQLTranslator.Col.Type.GETTER
+                    } else
                     throw new TaackJdbcError("Select clause analysis", "No column ${col.colName}, avalaible columns ${fieldInfoMap[gec]*.fieldName as List<String>}")
                 }
             }
@@ -310,6 +343,7 @@ final class TaackJdbcService {
                     if (!itColList.hasNext()) itColList = b.columnsList.iterator()
                     def c = TaackResultSetOuterClass.Cell.newBuilder()
                     def col = itColList.next()
+
                     switch (col.javaType) {
                         case TaackResultSetOuterClass.Column.JavaType.DATE:
                             if (cell) c.dateValue = (cell as Date).time
@@ -354,6 +388,27 @@ final class TaackJdbcService {
         Class<? extends GormEntity> aClass = gormClassesMap[simpleName]
         TaackFilter tf = new TaackFilter.FilterBuilder<>(aClass, sessionFactory, null).build()
         def res = tf.executeQuery(hqlFromTranslator(translator), [:], max, offset)
+        if (methodMap[aClass]) {
+            List<Integer> mi = []
+            List<String> ni = []
+            GetMethodReturn[] m = methodMap[aClass]
+            translator.columns.eachWithIndex{ TQLTranslator.Col entry, int i ->
+                if (entry.colType == TQLTranslator.Col.Type.GETTER) {
+                    mi << i
+                    ni << translator.colAliasMap[entry]
+                }
+            }
+            res.each { line ->
+                mi.eachWithIndex { index, i ->
+                    Long o = line[index] as Long
+                    GetMethodReturn mo = m[mi[i]]
+                    def aObject = new GormStaticApi(aClass, datastore, null).read(o)
+                    String ov = mo.method.invoke(aObject)
+                    line[index] = ov
+                }
+            }
+
+        }
         def num = tf.executeQueryUniqueResult(Long, [:], hqlFromTranslator(translator, true)) as Long
         log.info "AUO num: ${num}, #ofRes: ${res.size()}"
         return new Pair<List<Object[]>, Long>(res, num)

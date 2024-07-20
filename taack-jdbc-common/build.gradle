@@ -14,7 +14,6 @@ dependencies {
 }
 
 protobuf {
-    generatedFilesBaseDir = "$projectDir/src/"
 
     if (new File("/usr/local/bin/protoc").exists()) {
         protoc {
