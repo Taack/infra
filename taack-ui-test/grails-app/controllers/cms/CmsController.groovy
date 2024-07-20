@@ -1330,7 +1330,7 @@ class CmsController implements WebAttributes {
                 diagram(barDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
                 diagram(barDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
 
-                diagram(areaDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
+                diagram(areaDiagram(null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
 
                 diagram pieDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.ONE), BlockSpec.Width.MAX
                 diagram pieDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX
@@ -1356,9 +1356,9 @@ class CmsController implements WebAttributes {
             }, widthInPx, heightWidthRadio) // widthInPx to define the diagram width, heightWidthRadio to define the diagram height
         }
     }
-    private static UiDiagramSpecifier areaDiagram(boolean isStacked, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+    private static UiDiagramSpecifier areaDiagram(BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
         new UiDiagramSpecifier().ui {
-            area(["T1", "T2", "T3", "T4"] as Set<Object>, isStacked, {
+            area(["T1", "T2", "T3", "T4"] as Set<Object>, {
                 dataset 'Truc1', [1.0, 1.0, 1.0, 2.0]
                 dataset 'Truc2', [2.0, 2.0, 1.0, 0.0]
                 dataset 'Truc3', [3.0, 3.0, 1.0, 3.0]
@@ -1456,7 +1456,7 @@ class CmsController implements WebAttributes {
                     })
 
                     // ------- Area diagram -------
-                    diagram areaDiagram(true, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    diagram areaDiagram(1000.0, DiagramTypeSpec.HeightWidthRadio.HALF)
 
                     // ------- Pie diagram -------
                     // No slice: all information is shown

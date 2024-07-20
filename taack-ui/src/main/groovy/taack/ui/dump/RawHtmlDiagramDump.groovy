@@ -7,6 +7,7 @@ import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.diagram.IDiagramRender
 import taack.ui.dump.diagram.PngDiagramRender
 import taack.ui.dump.diagram.SvgDiagramRender
+import taack.ui.dump.diagram.scene.AreaDiagramScene
 import taack.ui.dump.diagram.scene.BarDiagramScene
 import taack.ui.dump.diagram.scene.LineDiagramScene
 import taack.ui.dump.diagram.scene.PieDiagramScene
@@ -95,9 +96,9 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitAreaDiagram(boolean isStacked) {
-//        AreaDiagramScene scene = new AreaDiagramScene(render, xDataList, yDataPerKey, isStacked)
-//        scene.draw()
+    void visitAreaDiagram() {
+        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey)
+        scene.draw()
     }
 
     @Override

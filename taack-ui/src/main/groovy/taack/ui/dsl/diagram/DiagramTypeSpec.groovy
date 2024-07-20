@@ -67,13 +67,20 @@ final class DiagramTypeSpec {
         diagramVisitor.visitLineDiagram()
     }
 
-    void area(Set<Object> xDataList, boolean isStacked = true,
-              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+    void area(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
               BigDecimal widthInPx = null, HeightWidthRadio radio) {
         diagramVisitor.visitDiagramPreparation(xDataList, widthInPx, radio)
         closure.delegate = diagramDatasetSpec
         closure.call()
-        diagramVisitor.visitAreaDiagram(isStacked)
+        diagramVisitor.visitAreaDiagram()
+    }
+
+    void area(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
+              BigDecimal widthInPx = null, HeightWidthRadio radio) {
+        diagramVisitor.visitDiagramPreparation([] as Set<Object>, widthInPx, radio)
+        closure.delegate = diagramDatasetSpec
+        closure.call()
+        diagramVisitor.visitAreaDiagram()
     }
 
     void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,

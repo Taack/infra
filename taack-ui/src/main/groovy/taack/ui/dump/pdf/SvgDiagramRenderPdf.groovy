@@ -132,7 +132,6 @@ class SvgDiagramRenderPdf implements IDiagramRender {
     void renderPoly(List<BigDecimal> coords) {
         Iterator<BigDecimal> it = coords.iterator()
         def sb = new StringBuilder()
-        sb.append(" ${trX},${trY}")
         while (it.hasNext()) {
             sb.append(" ${it.next() + trX},${it.next() + trY}")
         }
@@ -141,11 +140,6 @@ class SvgDiagramRenderPdf implements IDiagramRender {
                 <polygon points="$sb" style="fill:${fillStyle}" />
         """.stripIndent()
         )
-    }
-
-    @Override
-    void renderPoly(BigDecimal... coords) {
-        renderPoly(coords.collect() as List<BigDecimal>)
     }
 
     @Override
@@ -181,15 +175,15 @@ class SvgDiagramRenderPdf implements IDiagramRender {
         fillStyle = "black"
         if (isDown) {
             renderPoly(
-                    0.0, 0.0,
+                    [0.0, 0.0,
                     length, 0.0,
-                    length / 2.0, length
+                    length / 2.0, length]
             )
         } else {
             renderPoly(
-                    0.0, 0.0,
+                    [0.0, 0.0,
                     length, length / 2.0,
-                    0.0, length
+                    0.0, length]
             )
         }
         fillStyle = tmp
