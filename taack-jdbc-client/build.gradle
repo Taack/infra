@@ -14,5 +14,7 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
     implementation project(':taack-jdbc-common')
     implementation 'com.google.guava:guava:33.2.1-jre'
+    implementation('org.asciidoctor:asciidoctorj:2.5.13')
+    implementation 'org.asciidoctor:asciidoctorj-api:2.5.13'
 
 }
