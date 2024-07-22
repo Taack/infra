@@ -117,11 +117,11 @@ final class TaackJdbcService {
      * }</pre>
      */
     final static class Jdbc {
-        static final void registerClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
+        static final void registerClassProperties(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
             registerJdbcClass(aClass, fieldInfos)
         }
 
-        static final void registerClassMethod(Class<? extends GormEntity> aClass, GetMethodReturn... methodReturns) {
+        static final void registerClassGetters(Class<? extends GormEntity> aClass, GetMethodReturn... methodReturns) {
             registerJdbcClass(aClass, methodReturns)
         }
 
