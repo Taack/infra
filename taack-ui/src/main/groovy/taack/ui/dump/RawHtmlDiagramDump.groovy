@@ -2,7 +2,6 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
-import taack.ui.dsl.diagram.DiagramTypeSpec
 import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.diagram.IDiagramRender
 import taack.ui.dump.diagram.PngDiagramRender
@@ -22,6 +21,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     UiDiagramSpecifier.DiagramBase diagramBase
+    private BigDecimal diagramWidth
+    private BigDecimal diagramHeight
     private IDiagramRender render
     private Set<Object> xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
@@ -32,19 +33,11 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramPreparation(Set<Object> xDataList, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio radio) {
-        this.dataPerKey = [:]
+    void visitDiagramDataInitialization(Set<Object> xDataList, BigDecimal widthInPx, BigDecimal heightInPx) {
         this.xDataList = xDataList
-        if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
-            BigDecimal width = widthInPx ?: 960.0
-            this.render = new SvgDiagramRender(width, width * radio.radio, widthInPx == null)
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_PDF) {
-            BigDecimal width = widthInPx ?: 720.0
-            this.render = new SvgDiagramRender(width, width * radio.radio, false)
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            BigDecimal width = widthInPx ?: 720.0
-            this.render = new PngDiagramRender(width, width * radio.radio)
-        }
+        this.diagramWidth = widthInPx
+        this.diagramHeight = heightInPx
+        this.dataPerKey = [:]
     }
 
     @Override
@@ -76,32 +69,50 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         }
     }
 
+    void createDiagramRender(BigDecimal defaultHeightWidthRadio) {
+        if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
+            BigDecimal width = diagramWidth ?: 960.0
+            this.render = new SvgDiagramRender(width, diagramHeight ?: (width * defaultHeightWidthRadio), diagramWidth == null)
+        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_PDF) {
+            BigDecimal width = diagramWidth ?: 720.0
+            this.render = new SvgDiagramRender(width, diagramHeight ?: (width * defaultHeightWidthRadio), false)
+        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
+            BigDecimal width = diagramWidth ?: 720.0
+            this.render = new PngDiagramRender(width, diagramHeight ?: (width * defaultHeightWidthRadio))
+        }
+    }
+
     @Override
     void visitBarDiagram(boolean isStacked) {
+        createDiagramRender(0.5)
         BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, isStacked)
         scene.draw()
     }
 
     @Override
     void visitScatterDiagram(String... pointImageHref) {
+        createDiagramRender(0.5)
         ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, pointImageHref)
         scene.draw()
     }
 
     @Override
     void visitLineDiagram() {
+        createDiagramRender(0.5)
         LineDiagramScene scene = new LineDiagramScene(render, dataPerKey)
         scene.draw()
     }
 
     @Override
     void visitAreaDiagram() {
+        createDiagramRender(0.5)
         AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey)
         scene.draw()
     }
 
     @Override
     void visitPieDiagram(boolean hasSlice) {
+        createDiagramRender(1.0)
         PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice)
         scene.draw()
     }

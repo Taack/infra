@@ -7,7 +7,7 @@ import taack.ui.dsl.UiDiagramSpecifier
 interface IUiDiagramVisitor {
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase)
 
-    void visitDiagramPreparation(Set<Object> xDataList, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio radio)
+    void visitDiagramDataInitialization(Set<Object> xDataList, BigDecimal widthInPx, BigDecimal heightInPx)
 
     void dataset(String key, List<BigDecimal> yDataList)
 

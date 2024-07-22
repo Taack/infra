@@ -11,12 +11,17 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramEnd() {
+    void visitDiagramDataInitialization(Set<Object> xDataList, BigDecimal widthInPx, BigDecimal heightInPx) {
 
     }
 
     @Override
-    void visitDiagramPreparation(Set<Object> xDataList, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio radio) {
+    void dataset(String key, List<BigDecimal> yDataList) {
+
+    }
+
+    @Override
+    void dataset(String key, Map<Object, BigDecimal> dataMap) {
 
     }
 
@@ -46,12 +51,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void dataset(String key, List<BigDecimal> yDataList) {
-
-    }
-
-    @Override
-    void dataset(String key, Map<Object, BigDecimal> dataMap) {
+    void visitDiagramEnd() {
 
     }
 }

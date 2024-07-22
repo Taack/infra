@@ -1268,10 +1268,10 @@ class CmsController implements WebAttributes {
             }
             row {
                 col {
-                    barDiagram(false, 360.0, DiagramTypeSpec.HeightWidthRadio.ONE)
+                    barDiagram(false, 360.0, 360.0)
                 }
                 col {
-                    barDiagram(true, 300.0, DiagramTypeSpec.HeightWidthRadio.ONE)
+                    barDiagram(true, 300.0, 300.0)
                 }
             }
         }, 100)
@@ -1325,15 +1325,15 @@ class CmsController implements WebAttributes {
             }
 
             printableBody {
-                // width will be set to default value (720px) if null. (No auto-fit width in PDF)
-                diagram(barDiagram(false, 300.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-                diagram(barDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-                diagram(barDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-
-                diagram(areaDiagram(null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX)
-
-                diagram pieDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.ONE), BlockSpec.Width.MAX
-                diagram pieDiagram(true, null, DiagramTypeSpec.HeightWidthRadio.HALF), BlockSpec.Width.MAX
+                // if width is null, it will be set to default value "720px"
+                // if height is null, it will be set depending on width (Pie: height = width; Else: height = width / 2)
+                // See details in RawHtmlDiagramDump.createDiagramRender()
+                diagram barDiagram(false, 300.0, 250.0), BlockSpec.Width.MAX
+                diagram barDiagram(true, 600.0, null), BlockSpec.Width.MAX
+                diagram barDiagram(true, null, null), BlockSpec.Width.MAX
+                diagram areaDiagram(null, null), BlockSpec.Width.MAX
+                diagram pieDiagram(false, null, null), BlockSpec.Width.MAX
+                diagram pieDiagram(true, null, null), BlockSpec.Width.MAX
             }
 
             printableFooter {
@@ -1347,25 +1347,25 @@ class CmsController implements WebAttributes {
         taackUiService.downloadPdf(pdf, 'testChart', false)
     }
 
-    private static UiDiagramSpecifier barDiagram(boolean isStacked, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+    private static UiDiagramSpecifier barDiagram(boolean isStacked, BigDecimal widthInPx, BigDecimal heightInPx) {
         new UiDiagramSpecifier().ui {
             bar(["T1", "T2", "T3", "T4"] as Set<Object>, isStacked, {
                 dataset 'Truc1', [1.0, 2.0, 1.0, 4.0]
                 dataset 'Truc2', [2.0, 0.1, 1.0, 0.0]
                 dataset 'Truc3', [2.0, 0.1, 1.0, 1.0]
-            }, widthInPx, heightWidthRadio) // widthInPx to define the diagram width, heightWidthRadio to define the diagram height
+            }, widthInPx, heightInPx)
         }
     }
-    private static UiDiagramSpecifier areaDiagram(BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+    private static UiDiagramSpecifier areaDiagram(BigDecimal widthInPx, BigDecimal heightInPx) {
         new UiDiagramSpecifier().ui {
             area(["T1", "T2", "T3", "T4"] as Set<Object>, {
                 dataset 'Truc1', [1.0, 1.0, 1.0, 2.0]
                 dataset 'Truc2', [2.0, 2.0, 1.0, 0.0]
                 dataset 'Truc3', [3.0, 3.0, 1.0, 3.0]
-            }, widthInPx, heightWidthRadio)
+            }, widthInPx, heightInPx)
         }
     }
-    private static UiDiagramSpecifier pieDiagram(boolean hasSlice, BigDecimal widthInPx, DiagramTypeSpec.HeightWidthRadio heightWidthRadio) {
+    private static UiDiagramSpecifier pieDiagram(boolean hasSlice, BigDecimal widthInPx, BigDecimal heightInPx) {
         new UiDiagramSpecifier().ui({
             pie(hasSlice, {
                 dataset("cli", 1.47)
@@ -1387,7 +1387,7 @@ class CmsController implements WebAttributes {
                 dataset("client55555", 0.3)
                 dataset("admin", 1.6)
                 dataset("test1", 0.05)
-            }, widthInPx, heightWidthRadio)
+            }, widthInPx, heightInPx)
         })
     }
     def testDiagramHtml() {
@@ -1395,15 +1395,15 @@ class CmsController implements WebAttributes {
             ajaxBlock 'blocks', {
                 row {
                     // ------- Bar diagram -------
-                    // widthInPx was set (Font size is always same, no matter how large/small the diagramWidth is)
-                    diagram barDiagram(false, 600.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
-                    diagram barDiagram(false, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    // diagramSize was set (Font size is always same, no matter how large/small the diagramWidth is)
+                    diagram barDiagram(false, 600.0, 200.0)
+                    diagram barDiagram(false, 1500.0, 500.0)
 
-                    // widthInPx was not set / was set to null -> the diagram width is auto-fit to 100% of section width (by doing ZOOM)
+                    // diagramSize was not set / was set to null -> the diagram width is auto-fit to 100% of section width (by doing ZOOM)
                     // We see that everything (including font size) is zoomed
-                    // zoomRate = sectionWidth / 960.0 (960px is the default width value which is saved in RawHtmlDiagramDump.visitDiagramPreparation())
-                    col BlockSpec.Width.QUARTER, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
-                    col BlockSpec.Width.MAX, { diagram barDiagram(false, null, DiagramTypeSpec.HeightWidthRadio.THIRD) }
+                    // zoomRate = sectionWidth / 960.0 (Default width value "960px" is saved in RawHtmlDiagramDump.createDiagramRender())
+                    col BlockSpec.Width.QUARTER, { diagram barDiagram(false, null, null) }
+                    col BlockSpec.Width.MAX, { diagram barDiagram(false, null, null) }
 
                     // ------- Line diagram -------
                     // discrete (X axis contains at least 1 non-Number value)
@@ -1413,16 +1413,16 @@ class CmsController implements WebAttributes {
                             dataset("client", [10.0, 20.1, 30.0])
                             dataset("admin", [5.0, 7.0])
                             dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
+                        }, 1500.0, 500.0
                     })
                     // continuous (X axis is all of Number type)
                     diagram new UiDiagramSpecifier().ui({
-                        Set<Object> xNumbers = [1, 3, 4.4, 5, 7.8, 8] // first way to set X axis
+                        Set<Object> xNumbers = [1.5, 3, 4.4, 5, 7.8, 8] // first way to set X axis
                         line xNumbers, {
                             dataset("client", [10.0, 20.1, 30.0])
                             dataset("admin", [5.0, 7.0])
                             dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
+                        }, 1500.0, 500.0
                     })
                     diagram new UiDiagramSpecifier().ui({
                         line({
@@ -1430,7 +1430,7 @@ class CmsController implements WebAttributes {
                             dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
                             dataset("admin", [3: 5.0, 6.9: 7.5])
                             dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
-                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                        }, 1500.0, 500.0)
                     })
 
                     // ------- Scatter diagram -------
@@ -1441,7 +1441,7 @@ class CmsController implements WebAttributes {
                             dataset("client", [10.0, 20.1, 30.0])
                             dataset("admin", [5.0, 7.0])
                             dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
+                        }, 1500.0, 500.0
                     })
                     // continuous (with free forms)
                     diagram new UiDiagramSpecifier().ui({
@@ -1449,7 +1449,7 @@ class CmsController implements WebAttributes {
                             dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
                             dataset("admin", [3: 5.0, 6.9: 7.5])
                             dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
-                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD, "/assets/skin/house.png", "/assets/skin/exclamation.png", "/assets/taack/intranet.png")
+                        }, 1500.0, 500.0, "/assets/skin/house.png", "/assets/skin/exclamation.png", "/assets/taack/intranet.png")
                         // todo:
                         // the pointImageHref doesn't work in PDF (So in PDF we will replace it by default image)
                         // because in PDF the href will locate from client side... So instead of a href, we should give an url that refers to our online server assets ?
@@ -1457,21 +1457,21 @@ class CmsController implements WebAttributes {
 
                     // ------- Area diagram -------
                     // discrete
-                    diagram areaDiagram(1000.0, DiagramTypeSpec.HeightWidthRadio.HALF)
+                    diagram areaDiagram(1000.0, 500.0)
                     // continuous
                     diagram new UiDiagramSpecifier().ui({
                         area({
                             dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
                             dataset("admin", [3: 5.0, 6.9: 7.5])
                             dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
-                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                        }, 1500.0, 500.0)
                     })
 
                     // ------- Pie diagram -------
                     // No slice: all information is shown
-                    col { diagram pieDiagram(false, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
+                    col { diagram pieDiagram(false, 600.0, 600.0) }
                     // has slice: make the first dataset as slice, and a part of information is hidden
-                    col { diagram pieDiagram(true, 600.0, DiagramTypeSpec.HeightWidthRadio.ONE) }
+                    col { diagram pieDiagram(true, 600.0, 600.0) }
                 }
             }
         }), buildMenu())
