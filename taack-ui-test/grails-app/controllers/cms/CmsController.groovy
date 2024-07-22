@@ -1434,7 +1434,7 @@ class CmsController implements WebAttributes {
                     })
 
                     // ------- Scatter diagram -------
-                    // discrete
+                    // discrete (with default forms)
                     diagram new UiDiagramSpecifier().ui({
                         Set<Object> xLabels = ["day1", "day2", "day3", "day4", "day5", "day6"]
                         scatter xLabels, {
@@ -1443,7 +1443,7 @@ class CmsController implements WebAttributes {
                             dataset("other", [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
                         }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD
                     })
-                    // continuous
+                    // continuous (with free forms)
                     diagram new UiDiagramSpecifier().ui({
                         scatter({
                             dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
@@ -1456,7 +1456,16 @@ class CmsController implements WebAttributes {
                     })
 
                     // ------- Area diagram -------
+                    // discrete
                     diagram areaDiagram(1000.0, DiagramTypeSpec.HeightWidthRadio.HALF)
+                    // continuous
+                    diagram new UiDiagramSpecifier().ui({
+                        area({
+                            dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
+                            dataset("admin", [3: 5.0, 6.9: 7.5])
+                            dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                        }, 1500.0, DiagramTypeSpec.HeightWidthRadio.THIRD)
+                    })
 
                     // ------- Pie diagram -------
                     // No slice: all information is shown

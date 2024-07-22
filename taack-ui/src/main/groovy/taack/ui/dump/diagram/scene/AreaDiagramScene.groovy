@@ -11,7 +11,6 @@ class AreaDiagramScene extends ScatterDiagramScene {
     AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
         super(render, dataPerKey)
         this.dataPointRadius = 0.0
-        this.legendFullColor = true
     }
 
     void drawHorizontalBackgroundAndDataArea() {
@@ -74,11 +73,12 @@ class AreaDiagramScene extends ScatterDiagramScene {
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
+                LegendColor areaColor = LegendColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
-//                Color legendColor = LegendColor.colorFrom(i)
-//                render.fillStyle(new Color(legendColor.red, legendColor.green, legendColor.blue, 128))
-                render.fillStyle(LegendColor.colorFrom(i))
-                render.renderPoly(coordsToDraw)
+                render.fillStyle(areaColor.light)
+                render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
+                render.fillStyle(areaColor.deep)
+                render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.stroke)
             }
         } else { // discrete
             // rebuild data to be stacked
@@ -113,11 +113,12 @@ class AreaDiagramScene extends ScatterDiagramScene {
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
+                LegendColor areaColor = LegendColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
-//                Color legendColor = LegendColor.colorFrom(i)
-//                render.fillStyle(new Color(legendColor.red, legendColor.green, legendColor.blue, 128))
-                render.fillStyle(LegendColor.colorFrom(i))
-                render.renderPoly(coordsToDraw)
+                render.fillStyle(areaColor.light)
+                render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
+                render.fillStyle(areaColor.deep)
+                render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.stroke)
             }
         }
     }

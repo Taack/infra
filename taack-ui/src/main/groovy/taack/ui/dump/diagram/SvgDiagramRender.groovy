@@ -37,7 +37,7 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void fillStyle(Color color) {
-        fillStyle = "rgba(${color.red}, ${color.green}, ${color.blue}, ${color.alpha / 255})"
+        fillStyle = "rgb(${color.red}, ${color.green}, ${color.blue})"
     }
 
     @Override
@@ -133,17 +133,24 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderPoly(List<BigDecimal> coords) {
+    void renderPoly(List<BigDecimal> coords, DiagramStyle diagramStyle = DiagramStyle.fill) {
         def it = coords.iterator()
         def sb = new StringBuilder()
         while (it.hasNext()) {
             sb.append(" ${it.next() + trX},${it.next() + trY}")
         }
 
-        outStr.append("""
+        if (diagramStyle == DiagramStyle.fill) {
+            outStr.append("""
                 <polygon points="$sb" style="fill:${fillStyle}" />
-        """.stripIndent()
-        )
+            """.stripIndent()
+            )
+        } else {
+            outStr.append("""
+                <polygon points="$sb" stroke="${fillStyle}" stroke-width="1.3" fill="none" />
+            """.stripIndent()
+            )
+        }
     }
 
     @Override

@@ -12,7 +12,6 @@ import taack.ui.dump.diagram.scene.BarDiagramScene
 import taack.ui.dump.diagram.scene.LineDiagramScene
 import taack.ui.dump.diagram.scene.PieDiagramScene
 import taack.ui.dump.diagram.scene.ScatterDiagramScene
-import taack.ui.dump.pdf.SvgDiagramRenderPdf
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
@@ -39,9 +38,9 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
             BigDecimal width = widthInPx ?: 960.0
             this.render = new SvgDiagramRender(width, width * radio.radio, widthInPx == null)
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_CSS21) {
+        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_PDF) {
             BigDecimal width = widthInPx ?: 720.0
-            this.render = new SvgDiagramRenderPdf(width, width * radio.radio)
+            this.render = new SvgDiagramRender(width, width * radio.radio, false)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
             BigDecimal width = widthInPx ?: 720.0
             this.render = new PngDiagramRender(width, width * radio.radio)
@@ -109,12 +108,10 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitDiagramEnd() {
-        if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
-            out << (this.render as SvgDiagramRender).getRendered()
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_CSS21) {
-            out << (this.render as SvgDiagramRenderPdf).getRendered()
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
+        if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
             (this.render as PngDiagramRender).writeImage(out)
+        } else {
+            out << (this.render as SvgDiagramRender).getRendered()
         }
     }
 }

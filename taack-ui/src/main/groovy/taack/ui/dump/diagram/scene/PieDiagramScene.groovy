@@ -18,7 +18,6 @@ class PieDiagramScene extends DiagramScene {
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
-        this.legendFullColor = true
         this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
 
         Map<String, BigDecimal> pieDataPerKey = [:]
@@ -57,7 +56,7 @@ class PieDiagramScene extends DiagramScene {
             } else {
                 render.translateTo(centerX, centerY)
             }
-            render.fillStyle(LegendColor.colorFrom(i))
+            render.fillStyle(LegendColor.colorFrom(i).deep)
             render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
 
             angle1 = angle2
