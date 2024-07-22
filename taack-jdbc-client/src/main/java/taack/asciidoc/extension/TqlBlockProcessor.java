@@ -28,11 +28,11 @@ public class TqlBlockProcessor extends BlockProcessor {
     final Properties infos;
 
     public TqlBlockProcessor() {
-        URL r = Thread.currentThread().getContextClassLoader().getResource("");
-        String rootPath;
-        if (r == null) rootPath = ""; else rootPath = r.getPath();
-        System.out.println("Getting app.properties from " + rootPath);
-        String appConfigPath = rootPath + "app.properties";
+        String rootPath = System.getProperty("user.home");
+        String appConfigPath = rootPath + "/taackJdbc.properties";
+
+        System.out.println("Getting taackJdbc.properties from " + rootPath);
+
 
         Properties appProps = new Properties();
         try {
