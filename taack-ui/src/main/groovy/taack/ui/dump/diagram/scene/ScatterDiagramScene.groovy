@@ -133,8 +133,8 @@ class ScatterDiagramScene extends DiagramScene {
                     Number y = pointList[x]
                     BigDecimal xWidth = (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
-                    Color circleColor = LegendColor.colorFrom(i)
-                    render.fillStyle(circleColor)
+                    LegendColor circleColor = LegendColor.colorFrom(i)
+                    render.fillStyle(circleColor.deep)
 
                     // data point
                     if (dataPointRadius > 0) {
@@ -144,7 +144,7 @@ class ScatterDiagramScene extends DiagramScene {
                         } else {
                             render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
-                            render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
+                            render.fillStyle(circleColor.light)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                     }
@@ -184,11 +184,11 @@ class ScatterDiagramScene extends DiagramScene {
                             render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
                         } else {
-                            Color circleColor = LegendColor.colorFrom(j)
+                            LegendColor circleColor = LegendColor.colorFrom(j)
                             render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                            render.fillStyle(circleColor)
+                            render.fillStyle(circleColor.deep)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
-                            render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 128))
+                            render.fillStyle(circleColor.light)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                     }

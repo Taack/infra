@@ -22,7 +22,7 @@ class LineDiagramScene extends ScatterDiagramScene {
             for (int i = 0; i < keys.size(); i++) {
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
                 List<Number> xList = pointList.keySet().sort() as List<Number>
-                Color circleColor = LegendColor.colorFrom(i)
+                LegendColor circleColor = LegendColor.colorFrom(i)
                 for (int j = 0; j < xList.size(); j++) {
                     Number x = xList[j]
                     Number y = pointList[x]
@@ -36,7 +36,7 @@ class LineDiagramScene extends ScatterDiagramScene {
                         BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 192))
+                        render.fillStyle(circleColor.light)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                     }
                 }
@@ -55,14 +55,13 @@ class LineDiagramScene extends ScatterDiagramScene {
                     List<BigDecimal> yList = yDataListPerKey[keys[j]]
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
-                    Color circleColor = LegendColor.colorFrom(j)
 
                     // line to next circle
                     if (i < xLabelList.size() - 1) { // not the last point
                         BigDecimal yHeight2 = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
                         BigDecimal xWidth2 = gapWidth * (i + 1)
                         render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(new Color(circleColor.red, circleColor.green, circleColor.blue, 192))
+                        render.fillStyle(LegendColor.colorFrom(j).light)
                         render.renderLine(xWidth2 - xWidth, yHeight - yHeight2)
                     }
                 }

@@ -140,10 +140,10 @@ class BarDiagramScene extends DiagramScene {
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 if (yData > startLabelY) {
                     render.translateTo(barX, barY - barHeight)
-                    Color rectColor = LegendColor.colorFrom(j)
-                    render.fillStyle(new Color(rectColor.red, rectColor.green, rectColor.blue, 128))
+                    LegendColor rectColor = LegendColor.colorFrom(j)
+                    render.fillStyle(rectColor.light)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
-                    render.fillStyle(rectColor)
+                    render.fillStyle(rectColor.deep)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.stroke)
                 }
 

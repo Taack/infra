@@ -131,14 +131,18 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderPoly(List<BigDecimal> coords) {
+    void renderPoly(List<BigDecimal> coords, DiagramStyle diagramStyle = DiagramStyle.fill) {
         def p = new Polygon()
         def it = coords.iterator()
         ig2.setPaint(fillStyle)
         while (it.hasNext()) {
             p.addPoint((it.next() + trX).toInteger(), (it.next() + trY).toInteger())
         }
-        ig2.fill(p)
+        if (diagramStyle == DiagramStyle.fill) {
+            ig2.fill(p)
+        } else {
+            ig2.draw(p)
+        }
     }
 
     @Override

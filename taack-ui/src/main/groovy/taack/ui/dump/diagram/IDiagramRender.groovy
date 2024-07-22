@@ -38,7 +38,7 @@ interface IDiagramRender {
 
     void renderCircle(BigDecimal radius, DiagramStyle diagramStyle)
 
-    void renderPoly(List<BigDecimal> coords)
+    void renderPoly(List<BigDecimal> coords, DiagramStyle diagramStyle)
 
     void renderArrow(BigDecimal... coords)
 
