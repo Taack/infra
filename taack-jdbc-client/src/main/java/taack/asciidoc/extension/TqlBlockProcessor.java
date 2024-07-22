@@ -12,6 +12,7 @@ import taack.jdbc.common.TaackResultSetOuterClass;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
@@ -20,14 +21,16 @@ import java.util.Properties;
 @Name("tql")
 @Contexts({Contexts.LISTING})
 @ContentModel(ContentModel.RAW)
-class TqlBlockProcessor extends BlockProcessor {
+public class TqlBlockProcessor extends BlockProcessor {
 
 
     final String serverUrl;
     final Properties infos;
 
     public TqlBlockProcessor() {
-        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        URL r = Thread.currentThread().getContextClassLoader().getResource("");
+        String rootPath;
+        if (r == null) rootPath = ""; else rootPath = r.getPath();
         System.out.println("Getting app.properties from " + rootPath);
         String appConfigPath = rootPath + "app.properties";
 
