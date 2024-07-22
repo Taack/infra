@@ -41,7 +41,7 @@ public class TqlBlockProcessor extends BlockProcessor {
             throw new RuntimeException(e);
         }
 
-        this.serverUrl = appProps.getProperty("serverUrl");
+        this.serverUrl = appProps.getProperty("url");
         this.infos = appProps;
     }
 
@@ -52,8 +52,11 @@ public class TqlBlockProcessor extends BlockProcessor {
         TaackResultSetJdbc rs;
         try {
             TaackDriver driver = new TaackDriver();
-            TaackConnection connection = (TaackConnection) driver.connect(serverUrl, infos);
-            Statement statement = connection.createStatement();
+            Statement statement;
+            try (TaackConnection connection = (TaackConnection) driver.connect(serverUrl, infos)) {
+                assert connection != null;
+                statement = connection.createStatement();
+            }
             statement.setMaxRows(20);
             rs = (TaackResultSetJdbc) statement.executeQuery(content);
         } catch (SQLException e) {

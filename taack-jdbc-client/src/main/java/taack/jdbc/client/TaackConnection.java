@@ -42,7 +42,7 @@ public final class TaackConnection implements Connection {
         this.url = url;
         this.password = password;
         this.user = username;
-        String protocol = Objects.equals(url, "localhost:8080") ? "http://" : "https://";
+        String protocol = url.startsWith("localhost:") ? "http://" : "https://";
         HttpPost req = new HttpPost(protocol + url + "/login/authenticate");
         req.setEntity(
                 new UrlEncodedFormEntity(
@@ -80,7 +80,7 @@ public final class TaackConnection implements Connection {
 
     private byte[] executeReqAction(Map<String, String> params, String action) throws UnsupportedEncodingException {
         logInfo("executeReqAction " + params + " action: " + action);
-        String protocol = Objects.equals(url, "localhost:8080") ? "http://" : "https://";
+        String protocol = url.startsWith("localhost:") ? "http://" : "https://";
         HttpPost req = new HttpPost(protocol + url + "/taackJdbc/" + action);
         CloseableHttpResponse response;
         ArrayList<BasicNameValuePair> valuePairs = new ArrayList<>();

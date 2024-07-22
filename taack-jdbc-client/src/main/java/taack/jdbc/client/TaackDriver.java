@@ -59,7 +59,7 @@ public final class TaackDriver implements Driver {
         String serverDb = Arrays.stream(parts).skip(2).collect(Collectors.joining(":"));
         String server = serverDb.substring(0, serverDb.lastIndexOf('/'));
         try {
-            return new TaackConnection(server, info.getProperty("user"), info.getProperty("password"));
+            return new TaackConnection(server, info.getProperty("username"), info.getProperty("password"));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
