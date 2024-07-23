@@ -2,21 +2,20 @@ grammar TDL;
 
 @header{package taack.jdbc.common.tql.gen;}
 
-tdl : displayKind columnsExpression;
+tdl: displayKind columnExpressions EOF;
 
 displayKind: TABLE | BARCHART;
-
-//alias: COLUMN_FRAGMANT;
-columnsExpression: columnExpression (',' columnExpression)*;
+columnExpressions: columnExpression (',' columnExpression)*;
 columnExpression: (idColumn) ( AS aliasColumn)?;
 idColumn:  COLUMN_NAME_FRAGMANT;
-aliasColumn: STRING;
 
+AS: 'AS' | 'as';
 TABLE: 'TABLE' | 'table';
 BARCHART: 'BARCHART' | 'barchart';
-AS: 'AS' | 'as';
 COLUMN_NAME_FRAGMANT : LOWER_CHARS ALL_ASCII* ;
-STRING:	'\'' STRING_CHARACTERS? '\'';
+
+aliasColumn: STRING;
+STRING:	'"' STRING_CHARACTERS? '"';
 
 fragment STRING_CHARACTERS : StringCharacter+;
 fragment StringCharacter : ~['"\\\r\n];
