@@ -8,15 +8,21 @@ import java.util.List
 
 @CompileStatic
 abstract class RectBackgroundDiagramScene extends DiagramScene {
+    final protected BigDecimal LEGEND_IMAGE_WIDTH = 20.0
+    final private BigDecimal LEGEND_RECT_WIDTH = 40.0
+    final private BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
+    final private BigDecimal LEGEND_MARGIN = 10.0
     final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
     final private BigDecimal AXIS_LABEL_MARGIN = 10.0
     final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
     final private Integer GAP_NUMBER_WHEN_CONTINUOUS_X_AXIS = 5
 
+    private BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP // will be increased by legend height
     protected Set<Object> xLabelList
     protected BigDecimal startLabelY
     protected BigDecimal gapY
     protected BigDecimal gapHeight
+    protected Map<String, Map<Object, BigDecimal>> dataPerKey
 
     RectBackgroundDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean canXAxisBeNumeralContinuous) {
         this.fontSize = render.getFontSize()

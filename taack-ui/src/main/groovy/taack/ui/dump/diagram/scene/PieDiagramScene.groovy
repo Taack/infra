@@ -38,9 +38,9 @@ class PieDiagramScene extends DiagramScene {
         }
 
         BigDecimal total = pieDataPerKey.values().sum() as BigDecimal
-        BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - diagramMarginTop - 5.0) / (2 + slicePositionRate)).toDouble())
+        BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - DIAGRAM_MARGIN_TOP - 5.0) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = width / 2
-        BigDecimal centerY = diagramMarginTop + radius * (1 + slicePositionRate)
+        BigDecimal centerY = DIAGRAM_MARGIN_TOP + radius * (1 + slicePositionRate)
 
         // sector
         BigDecimal angle1 = 0.0

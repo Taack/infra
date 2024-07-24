@@ -5,13 +5,13 @@ import taack.ui.dump.diagram.IDiagramRender
 
 @CompileStatic
 class ScatterDiagramScene extends RectBackgroundDiagramScene {
-    protected BigDecimal dataPointRadius
     final private List<String> pointImageHref
+    protected BigDecimal dataPointRadius
 
     ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, String... pointImageHref) {
         super(render, dataPerKey, true)
-        this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
         this.pointImageHref = pointImageHref.toList()
+        this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
     }
 
     void drawDataPoint() {

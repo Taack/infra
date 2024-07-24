@@ -7,10 +7,6 @@ import java.awt.*
 
 @CompileStatic
 abstract class DiagramScene {
-    final protected BigDecimal LEGEND_IMAGE_WIDTH = 20.0
-    final protected BigDecimal LEGEND_RECT_WIDTH = 40.0
-    final protected BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
-    final protected BigDecimal LEGEND_MARGIN = 10.0
     final protected BigDecimal DIAGRAM_MARGIN_LEFT = 60.0
     final protected BigDecimal DIAGRAM_MARGIN_RIGHT = 20.0
     final protected BigDecimal DIAGRAM_MARGIN_TOP = 20.0
@@ -20,8 +16,6 @@ abstract class DiagramScene {
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
-    protected Map<String, Map<Object, BigDecimal>> dataPerKey
-    protected BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP
 
     enum KeyColor {
         RED(new Color(255, 99, 132), new Color(255, 177, 193)),
