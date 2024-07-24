@@ -3,14 +3,10 @@ package taack.ui.dump.diagram.scene
 import groovy.transform.CompileStatic
 import taack.ui.dump.diagram.IDiagramRender
 
-import java.awt.*
-import java.util.List
-
 @CompileStatic
-class AreaDiagramScene extends ScatterDiagramScene {
+class AreaDiagramScene extends RectBackgroundDiagramScene {
     AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
-        super(render, dataPerKey)
-        this.dataPointRadius = 0.0
+        super(render, dataPerKey, true)
     }
 
     void drawHorizontalBackgroundAndDataArea() {
@@ -52,7 +48,7 @@ class AreaDiagramScene extends ScatterDiagramScene {
             }
 
             // draw horizontal background
-            drawHorizontalBackground(minY, maxY)
+            super.drawHorizontalBackground(minY, maxY)
 
             // draw data area from top to lowest, and next one will cover the previous one
             Integer minX = xLabelList.first() as Integer
@@ -73,7 +69,7 @@ class AreaDiagramScene extends ScatterDiagramScene {
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
-                LegendColor areaColor = LegendColor.colorFrom(i)
+                KeyColor areaColor = KeyColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
                 render.fillStyle(areaColor.light)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
@@ -94,7 +90,7 @@ class AreaDiagramScene extends ScatterDiagramScene {
             // draw horizontal background
             BigDecimal minY = Math.min(Math.floor(stackedYDataListPerKey[keys.first()].min().toDouble()), 0.0 as Double).toBigDecimal()
             BigDecimal maxY = stackedYDataListPerKey[keys.last()].max()
-            drawHorizontalBackground(minY, maxY)
+            super.drawHorizontalBackground(minY, maxY)
 
             // draw data area one by one
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
@@ -113,7 +109,7 @@ class AreaDiagramScene extends ScatterDiagramScene {
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
-                LegendColor areaColor = LegendColor.colorFrom(i)
+                KeyColor areaColor = KeyColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
                 render.fillStyle(areaColor.light)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
@@ -128,7 +124,7 @@ class AreaDiagramScene extends ScatterDiagramScene {
             return
         }
         drawLegend()
-        drawVerticalBackground()
+        drawVerticalBackground(false)
         drawHorizontalBackgroundAndDataArea()
     }
 }

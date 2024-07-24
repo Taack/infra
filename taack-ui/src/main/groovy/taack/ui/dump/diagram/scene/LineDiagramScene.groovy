@@ -3,9 +3,6 @@ package taack.ui.dump.diagram.scene
 import groovy.transform.CompileStatic
 import taack.ui.dump.diagram.IDiagramRender
 
-import java.awt.*
-import java.util.List
-
 @CompileStatic
 class LineDiagramScene extends ScatterDiagramScene {
     LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
@@ -22,7 +19,7 @@ class LineDiagramScene extends ScatterDiagramScene {
             for (int i = 0; i < keys.size(); i++) {
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
                 List<Number> xList = pointList.keySet().sort() as List<Number>
-                LegendColor circleColor = LegendColor.colorFrom(i)
+                KeyColor circleColor = KeyColor.colorFrom(i)
                 for (int j = 0; j < xList.size(); j++) {
                     Number x = xList[j]
                     Number y = pointList[x]
@@ -61,7 +58,7 @@ class LineDiagramScene extends ScatterDiagramScene {
                         BigDecimal yHeight2 = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
                         BigDecimal xWidth2 = gapWidth * (i + 1)
                         render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(LegendColor.colorFrom(j).light)
+                        render.fillStyle(KeyColor.colorFrom(j).light)
                         render.renderLine(xWidth2 - xWidth, yHeight - yHeight2)
                     }
                 }
@@ -75,7 +72,7 @@ class LineDiagramScene extends ScatterDiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
-        drawVerticalBackground()
+        drawVerticalBackground(false)
         drawDataLine()
         drawDataPoint()
     }

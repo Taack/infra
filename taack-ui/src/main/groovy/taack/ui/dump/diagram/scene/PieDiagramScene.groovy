@@ -7,11 +7,11 @@ import java.awt.Color
 
 @CompileStatic
 class PieDiagramScene extends DiagramScene {
-    final private Map<String, BigDecimal> pieDataPerKey
-    final private BigDecimal slicePositionRate
-
     final private BigDecimal SLICE_DISTANCE_FROM_CENTER = 0.3 // define how far the slice should be: 0.3 * radius
     final private BigDecimal OUTSIDE_LABEL_MARGIN = 2.0
+
+    final private Map<String, BigDecimal> pieDataPerKey
+    final private BigDecimal slicePositionRate
 
     PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice) {
         this.fontSize = render.getFontSize()
@@ -56,7 +56,7 @@ class PieDiagramScene extends DiagramScene {
             } else {
                 render.translateTo(centerX, centerY)
             }
-            render.fillStyle(LegendColor.colorFrom(i).deep)
+            render.fillStyle(KeyColor.colorFrom(i).deep)
             render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
 
             angle1 = angle2
