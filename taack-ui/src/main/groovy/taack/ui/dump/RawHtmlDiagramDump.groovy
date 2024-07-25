@@ -11,6 +11,7 @@ import taack.ui.dump.diagram.scene.BarDiagramScene
 import taack.ui.dump.diagram.scene.LineDiagramScene
 import taack.ui.dump.diagram.scene.PieDiagramScene
 import taack.ui.dump.diagram.scene.ScatterDiagramScene
+import taack.ui.dump.diagram.scene.WhiskersDiagramScene
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
@@ -26,6 +27,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private IDiagramRender render
     private Set<Object> xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
+    private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
 
     @Override
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
@@ -38,6 +40,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         this.diagramWidth = widthInPx
         this.diagramHeight = heightInPx
         this.dataPerKey = [:]
+        this.whiskersYDataListPerKey = [:]
     }
 
     @Override
@@ -115,6 +118,24 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         createDiagramRender(1.0)
         PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice)
         scene.draw()
+    }
+
+    @Override
+    void whiskersBoxData(String key, List<BigDecimal> boxData) {
+        if (!xDataList.isEmpty()) {
+            List<List<BigDecimal>> yDataList = whiskersYDataListPerKey.get(key) ?: []
+            yDataList.add(boxData)
+            whiskersYDataListPerKey[key] = yDataList
+        }
+    }
+
+    @Override
+    void visitWhiskersDiagram() {
+        if (!xDataList.isEmpty()) {
+            createDiagramRender(0.5)
+            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey)
+            scene.draw()
+        }
     }
 
     @Override

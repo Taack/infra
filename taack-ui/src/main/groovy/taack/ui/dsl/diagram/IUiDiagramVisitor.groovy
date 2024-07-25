@@ -23,5 +23,9 @@ interface IUiDiagramVisitor {
 
     void visitPieDiagram(boolean hasSlice)
 
+    void whiskersBoxData(String key, List<BigDecimal> boxData)
+
+    void visitWhiskersDiagram()
+
     void visitDiagramEnd()
 }

@@ -1334,6 +1334,23 @@ class CmsController implements WebAttributes {
                 diagram areaDiagram(null, null), BlockSpec.Width.MAX
                 diagram pieDiagram(false, null, null), BlockSpec.Width.MAX
                 diagram pieDiagram(true, null, null), BlockSpec.Width.MAX
+
+                diagram new UiDiagramSpecifier().ui({
+                    whiskers(["T1", "T2", "T3", "T4"] as Set<Object>, {
+                        dataset 'Truc1', {
+                            boxData([1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0]) // for "T1"
+                            boxData([1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0]) // for "T2"
+                            boxData([2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7]) // for "T3"
+                            boxData([1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3]) // for "T4"
+                        }
+                        dataset 'Truc2', {
+                            boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                            boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                            boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                            boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                        }
+                    }, null, null)
+                }), BlockSpec.Width.MAX
             }
 
             printableFooter {
@@ -1472,6 +1489,24 @@ class CmsController implements WebAttributes {
                     col { diagram pieDiagram(false, 600.0, 600.0) }
                     // has slice: make the first dataset as slice, and a part of information is hidden
                     col { diagram pieDiagram(true, 600.0, 600.0) }
+
+                    // ------- Whiskers diagram -------
+                    diagram new UiDiagramSpecifier().ui({
+                        whiskers(["T1", "T2", "T3", "T4"] as Set<Object>, {
+                            dataset 'Truc1', {
+                                boxData([1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0]) // for "T1"
+                                boxData([1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0]) // for "T2"
+                                boxData([2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7]) // for "T3"
+                                boxData([1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3]) // for "T4"
+                            }
+                            dataset 'Truc2', {
+                                boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                                boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                                boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                                boxData([0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5])
+                            }
+                        }, 1500.0, 500.0)
+                    })
                 }
             }
         }), buildMenu())

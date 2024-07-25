@@ -19,6 +19,7 @@ class SvgDiagramRender implements IDiagramRender {
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private String fillStyle = "black"
+    private BigDecimal lineWidth = 1.3
 
     SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false) {
         // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params "width/height" will be used to do ZOOM
@@ -47,7 +48,7 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void lineWidth(BigDecimal width) {
-
+        lineWidth = width
     }
 
     @Override
@@ -64,7 +65,7 @@ class SvgDiagramRender implements IDiagramRender {
     void renderLine(BigDecimal toX, BigDecimal toY) {
         outStr.append(
                 """
-            <line x1="${trX}" y1="${trY}" x2="${toX + trX}" y2="${toY + trY}" style="stroke:${fillStyle};stroke-width:1.3" />
+            <line x1="${trX}" y1="${trY}" x2="${toX + trX}" y2="${toY + trY}" style="stroke:${fillStyle};stroke-width:${lineWidth}" />
         """.stripIndent())
     }
 
@@ -111,7 +112,7 @@ class SvgDiagramRender implements IDiagramRender {
             )
         } else {
             outStr.append("""
-                <rect x="${trX}" y="${trY}" width="${width}" height="${height}" style="stroke:${fillStyle};" fill-opacity="0" />
+                <rect x="${trX}" y="${trY}" width="${width}" height="${height}" style="stroke:${fillStyle};" stroke-width="${lineWidth}" fill-opacity="0" />
           """.stripIndent()
             )
         }
@@ -126,7 +127,7 @@ class SvgDiagramRender implements IDiagramRender {
             )
         } else {
             outStr.append("""
-                <circle cx="${trX}" cy="${trY}" r="${radius}" stroke="${fillStyle}" stroke-width="1.3" fill="none" />
+                <circle cx="${trX}" cy="${trY}" r="${radius}" stroke="${fillStyle}" stroke-width="${lineWidth}" fill="none" />
           """.stripIndent()
             )
         }
@@ -147,7 +148,7 @@ class SvgDiagramRender implements IDiagramRender {
             )
         } else {
             outStr.append("""
-                <polygon points="$sb" stroke="${fillStyle}" stroke-width="1.3" fill="none" />
+                <polygon points="$sb" stroke="${fillStyle}" stroke-width="${lineWidth}" fill="none" />
             """.stripIndent()
             )
         }
@@ -182,7 +183,7 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void renderTriangle(BigDecimal length, boolean isDown) {
-        def tmp = fillStyle
+        String tmpStyle = fillStyle
         fillStyle = "black"
         if (isDown) {
             renderPoly(
@@ -197,7 +198,7 @@ class SvgDiagramRender implements IDiagramRender {
                     0.0, length]
             )
         }
-        fillStyle = tmp
+        fillStyle = tmpStyle
     }
 
     @Override
@@ -225,7 +226,7 @@ class SvgDiagramRender implements IDiagramRender {
             )
         } else {
             outStr.append("""
-                <path d="M ${trX} ${trY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z" fill="transparent" stroke="${fillStyle}" stroke-width="1.3" />
+                <path d="M ${trX} ${trY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z" fill="transparent" stroke="${fillStyle}" stroke-width="${lineWidth}" />
           """.stripIndent()
             )
         }

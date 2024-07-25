@@ -17,6 +17,7 @@ abstract class DiagramScene {
     protected BigDecimal height
     protected IDiagramRender render
 
+    final protected Color BLACK_COLOR = new Color(64, 64, 64)
     enum KeyColor {
         RED(new Color(255, 99, 132), new Color(255, 177, 193)),
         ORANGE(new Color(255, 159, 64), new Color(255, 207, 159)),

@@ -23,6 +23,7 @@ class PngDiagramRender implements IDiagramRender {
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private Color fillStyle = Color.BLACK
+    private BigDecimal lineWidth = 1.3
 
     PngDiagramRender(BigDecimal width, BigDecimal height) {
         pngWidth = width
@@ -55,7 +56,7 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void lineWidth(BigDecimal width) {
-
+        lineWidth = width
     }
 
     @Override
@@ -71,6 +72,7 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderLine(BigDecimal toX, BigDecimal toY) {
         ig2.setPaint(fillStyle)
+        ig2.setStroke(new BasicStroke(lineWidth.toFloat()))
         ig2.draw(new Line2D.Double(trX.toDouble(), trY.toDouble(), (toX + trX).toDouble(), (toY + trY).toDouble()))
     }
 
@@ -111,6 +113,7 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle = DiagramStyle.fill) {
         ig2.setPaint(fillStyle)
+        ig2.setStroke(new BasicStroke(lineWidth.toFloat()))
         Rectangle2D.Double rect = new Rectangle2D.Double(trX.toDouble(), trY.toDouble(), width.toDouble(), height.toDouble())
         if (diagramStyle == DiagramStyle.fill) {
             ig2.fill(rect)
@@ -122,6 +125,7 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderCircle(BigDecimal radius, DiagramStyle diagramStyle = DiagramStyle.fill) {
         ig2.setPaint(fillStyle)
+        ig2.setStroke(new BasicStroke(lineWidth.toFloat()))
         Ellipse2D.Double circle = new Ellipse2D.Double((trX - radius).toDouble(), (trY - radius).toDouble(), radius.toDouble() * 2, radius.toDouble() * 2)
         if (diagramStyle == DiagramStyle.fill) {
             ig2.fill(circle)
@@ -135,6 +139,7 @@ class PngDiagramRender implements IDiagramRender {
         def p = new Polygon()
         def it = coords.iterator()
         ig2.setPaint(fillStyle)
+        ig2.setStroke(new BasicStroke(lineWidth.toFloat()))
         while (it.hasNext()) {
             p.addPoint((it.next() + trX).toInteger(), (it.next() + trY).toInteger())
         }
@@ -176,7 +181,7 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderTriangle(BigDecimal length, boolean isDown) {
-        def tmp = fillStyle
+        Color tmpStyle = fillStyle
         fillStyle = Color.BLACK
         if (isDown) {
             renderPoly(
@@ -192,7 +197,7 @@ class PngDiagramRender implements IDiagramRender {
                     0.0, length]
             )
         }
-        fillStyle = tmp
+        fillStyle = tmpStyle
     }
 
     @Override
@@ -203,6 +208,7 @@ class PngDiagramRender implements IDiagramRender {
         }
 
         ig2.setPaint(fillStyle)
+        ig2.setStroke(new BasicStroke(lineWidth.toFloat()))
         Arc2D.Double sector = new Arc2D.Double((trX - r).toDouble(), (trY - r).toDouble(), 2 * r.toDouble(), 2 * r.toDouble(), (90 - angle1).toDouble(), ( - angle2 + angle1).toDouble(), Arc2D.PIE)
         if (diagramStyle == DiagramStyle.fill) {
             ig2.fill(sector)

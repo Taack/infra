@@ -51,6 +51,16 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
+    void whiskersBoxData(String key, List<BigDecimal> boxData) {
+
+    }
+
+    @Override
+    void visitWhiskersDiagram() {
+
+    }
+
+    @Override
     void visitDiagramEnd() {
 
     }

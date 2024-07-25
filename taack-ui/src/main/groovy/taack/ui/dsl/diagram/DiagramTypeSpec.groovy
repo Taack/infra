@@ -76,4 +76,13 @@ final class DiagramTypeSpec {
         closure.call()
         diagramVisitor.visitPieDiagram(hasSlice)
     }
+
+    void whiskers(Set<Object> xDataList,
+                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersDatasetSpec) Closure closure,
+                  BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
+        diagramVisitor.visitDiagramDataInitialization(xDataList, widthInPx, heightInPx)
+        closure.delegate = new DiagramWhiskersDatasetSpec(diagramVisitor)
+        closure.call()
+        diagramVisitor.visitWhiskersDiagram()
+    }
 }
