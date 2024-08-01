@@ -247,7 +247,7 @@ final class TaackJdbcService {
             c.setIsNullable(columnDesc.fieldInfo?.fieldConstraint?.nullable ?: false)
             c.setTableName(simpleName)
 
-            switch (columnDesc.fieldType) {
+            switch (columnDesc.fieldType) { // todo [ccn]: when "count(object.field)/sum()/...", javaType should be INT, instead of object.field.fieldType
                 case String:
                     c.javaType = TaackResultSetOuterClass.Column.JavaType.STRING
                     c.sqlType = 12

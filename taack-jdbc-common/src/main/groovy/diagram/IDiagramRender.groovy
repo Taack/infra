@@ -1,6 +1,4 @@
-package taack.ui.dump.diagram
-
-import taack.ui.dsl.common.Style
+package diagram
 
 import java.awt.Color
 
@@ -13,8 +11,6 @@ interface IDiagramRender {
     void translateTo(BigDecimal x, BigDecimal y)
 
     void fillStyle(Color color)
-
-    void strokeStyle(Style style)
 
     void lineWidth(BigDecimal width)
 

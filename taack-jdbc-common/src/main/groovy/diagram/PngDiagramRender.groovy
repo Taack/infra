@@ -1,7 +1,6 @@
-package taack.ui.dump.diagram
+package diagram
 
 import groovy.transform.CompileStatic
-import taack.ui.dsl.common.Style
 
 import javax.imageio.ImageIO
 import java.awt.*
@@ -47,11 +46,6 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void fillStyle(Color color) {
         fillStyle = color
-    }
-
-    @Override
-    void strokeStyle(Style style) {
-
     }
 
     @Override

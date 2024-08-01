@@ -1,7 +1,6 @@
-package taack.ui.dump.diagram
+package diagram
 
 import groovy.transform.CompileStatic
-import taack.ui.dsl.common.Style
 
 import java.awt.Color
 import java.awt.Font
@@ -39,11 +38,6 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void fillStyle(Color color) {
         fillStyle = "rgb(${color.red}, ${color.green}, ${color.blue})"
-    }
-
-    @Override
-    void strokeStyle(Style style) {
-
     }
 
     @Override

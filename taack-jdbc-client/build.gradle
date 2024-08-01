@@ -18,3 +18,7 @@ dependencies {
     implementation 'org.asciidoctor:asciidoctorj-api:2.5.13'
 
 }
+
+shadowJar {
+    zip64 true
+}

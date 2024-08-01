@@ -1,7 +1,7 @@
-package taack.ui.dump.diagram.scene
+package diagram.scene
 
 import groovy.transform.CompileStatic
-import taack.ui.dump.diagram.IDiagramRender
+import diagram.IDiagramRender
 
 import java.awt.*
 import java.util.List

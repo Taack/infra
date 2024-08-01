@@ -1,6 +1,7 @@
 plugins {
     id 'com.google.protobuf' version '0.9.4'
     id 'antlr'
+    id 'groovy'
 }
 
 repositories {
@@ -11,6 +12,7 @@ dependencies {
     api "com.google.protobuf:protobuf-java:${protobufVersion}"
     antlr "org.antlr:antlr4:${antlr4}"
     implementation "org.antlr:antlr4-runtime:${antlr4}"
+    api "org.codehaus.groovy:groovy-all:3.0.19"
 }
 
 protobuf {
