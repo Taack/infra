@@ -6,6 +6,7 @@ import taack.ui.IEnumOptions
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.BootstrapLayout
+import taack.ui.dump.html.script.CheckboxDisableIsZero
 import taack.ui.dump.html.script.DeleteSiblingInputContent
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
@@ -118,7 +119,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
         if (!nullable)
             el.addChildren(
-                    HTMLInput.inputCheck(value ? '1' : '0', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
+                    new HTMLInput(InputType.HIDDEN, '0', qualifiedName),
+                    HTMLInput.inputCheck('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").setOnclick(new CheckboxDisableIsZero()).build(),
             )
         else
             el.addChildren(
