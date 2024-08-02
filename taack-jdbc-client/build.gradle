@@ -16,7 +16,7 @@ dependencies {
     implementation 'com.google.guava:guava:33.2.1-jre'
     implementation('org.asciidoctor:asciidoctorj:2.5.13')
     implementation 'org.asciidoctor:asciidoctorj-api:2.5.13'
-
+    implementation "org.codehaus.groovy:groovy:3.0.21"
 }
 
 shadowJar {

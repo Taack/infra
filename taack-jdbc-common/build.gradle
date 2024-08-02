@@ -12,7 +12,7 @@ dependencies {
     api "com.google.protobuf:protobuf-java:${protobufVersion}"
     antlr "org.antlr:antlr4:${antlr4}"
     implementation "org.antlr:antlr4-runtime:${antlr4}"
-    api "org.codehaus.groovy:groovy-all:3.0.19"
+    implementation "org.codehaus.groovy:groovy:3.0.21"
 }
 
 protobuf {
