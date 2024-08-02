@@ -107,52 +107,43 @@ public class TqlBlockProcessor extends BlockProcessor {
         for (int i = 0; i < lineCount; i++) {
             ArrayList<String> xLabel = new ArrayList<>();
             for (int j = 0; j < res.getColumnsCount(); j++) {
-                String columnHeaderName = res.getColumns(j).getName();
-                if (cols != null && cols.containsKey(columnHeaderName)) {
-                    columnHeaderName = cols.get(columnHeaderName);
-                }
                 int index = i * res.getColumnsCount() + j;
+                String cellValue = null;
                 switch (res.getColumns(j).getJavaType()) {
-                    // combine non-numeral columns, and use the value as xLabel
-                    case DATE -> xLabel.add(res.getCells(index).getDateValue() + "");
+                    case DATE -> cellValue = res.getCells(index).getDateValue() + "";
                     case STRING -> {
-                        String cc = res.getCells(index).getStringValue();
-                        if (cc.startsWith("<")) {
-                            cc = "\n+++\n" + cc + "\n+++\n";
+                        cellValue = res.getCells(index).getStringValue();
+                        if (cellValue.startsWith("<")) {
+                            cellValue = "\n+++\n" + cellValue + "\n+++\n";
                         }
-                        xLabel.add(cc);
                     }
-                    case BOOL -> xLabel.add(res.getCells(index).getBoolValue() + "");
-                    case BYTE -> xLabel.add(res.getCells(index).getByteValue() + "");
-                    case BYTES -> xLabel.add(res.getCells(index).getBytesValue() + "");
-
-                    // use the value of numeral column as yData
-                    case LONG -> {
-                        if (!yDataListPerKey.containsKey(columnHeaderName)) {
-                            yDataListPerKey.put(columnHeaderName, new ArrayList<>());
-                        }
-                        yDataListPerKey.get(columnHeaderName).add(new BigDecimal(res.getCells(index).getLongValue()));
-                    }
-                    case BIG_DECIMAL -> {
-                        if (!yDataListPerKey.containsKey(columnHeaderName)) {
-                            yDataListPerKey.put(columnHeaderName, new ArrayList<>());
-                        }
-                        yDataListPerKey.get(columnHeaderName).add(new BigDecimal(res.getCells(index).getBigDecimal()));
-                    }
-                    case SHORT -> {
-                        if (!yDataListPerKey.containsKey(columnHeaderName)) {
-                            yDataListPerKey.put(columnHeaderName, new ArrayList<>());
-                        }
-                        yDataListPerKey.get(columnHeaderName).add(new BigDecimal(res.getCells(index).getShortValue()));
-                    }
-                    case INT -> {
-                        if (!yDataListPerKey.containsKey(columnHeaderName)) {
-                            yDataListPerKey.put(columnHeaderName, new ArrayList<>());
-                        }
-                        yDataListPerKey.get(columnHeaderName).add(new BigDecimal(res.getCells(index).getIntValue()));
-                    }
-
+                    case BOOL -> cellValue = res.getCells(index).getBoolValue() + "";
+                    case BYTE -> cellValue = res.getCells(index).getByteValue() + "";
+                    case BYTES -> cellValue = res.getCells(index).getBytesValue() + "";
+                    case LONG -> cellValue = res.getCells(index).getLongValue() + "";
+                    case BIG_DECIMAL -> cellValue = res.getCells(index).getBigDecimal();
+                    case SHORT -> cellValue = res.getCells(index).getShortValue() + "";
+                    case INT -> cellValue = res.getCells(index).getIntValue() + "";
                     case UNRECOGNIZED -> System.out.println("|UNRECOGNIZED Column index " + j);
+                }
+                if (cellValue != null) {
+                    if (j == res.getColumnsCount() - 1) { // consider last column as numeric, and use the value as yData
+                        try {
+                            BigDecimal cellValueToNumber = new BigDecimal(cellValue);
+                            String columnHeaderName = res.getColumns(j).getName();
+                            if (cols != null && cols.containsKey(columnHeaderName)) {
+                                columnHeaderName = cols.get(columnHeaderName);
+                            }
+                            if (!yDataListPerKey.containsKey(columnHeaderName)) {
+                                yDataListPerKey.put(columnHeaderName, new ArrayList<>());
+                            }
+                            yDataListPerKey.get(columnHeaderName).add(cellValueToNumber);
+                        } catch (NumberFormatException ignored) {
+                            System.out.println("Last column value is not a number");
+                        }
+                    } else { // combine values of non-last columns, and use the result as xLabel
+                        xLabel.add(cellValue);
+                    }
                 }
             }
             xLabelList.add(String.join(" ", xLabel));
