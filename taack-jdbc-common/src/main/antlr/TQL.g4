@@ -13,7 +13,7 @@ selectExpression: ( idTableStar | selectFunctionExpression | columnExpression ) 
 
 groupByExpression: ( selectFunctionExpression | columnExpression) (',' ( selectFunctionExpression | columnExpression ))*;
 
-selectFunctionExpression: selFunc LPAREN ( idColumn | additionalExpression | '*') RPAREN;
+selectFunctionExpression: selFunc LPAREN ( idColumn | additionalExpression | '*') RPAREN ( AS aliasColumn)?;
 
 fromExpression: ( idTableWithAlias | idTable ) (',' ( idTableWithAlias | idTable ) )*;
 
