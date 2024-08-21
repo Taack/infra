@@ -22,8 +22,6 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     UiDiagramSpecifier.DiagramBase diagramBase
-    private BigDecimal diagramWidth
-    private BigDecimal diagramHeight
     private IDiagramRender render
     private Object[] xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
@@ -35,9 +33,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramDataInitialization(BigDecimal widthInPx, BigDecimal heightInPx) {
-        this.diagramWidth = widthInPx
-        this.diagramHeight = heightInPx
+    void visitDiagramDataInitialization() {
         this.dataPerKey = [:]
         this.whiskersYDataListPerKey = [:]
     }
@@ -81,16 +77,16 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         }
     }
 
-    void createDiagramRender(BigDecimal defaultHeightWidthRadio) {
+    void createDiagramRender(BigDecimal heightWidthRadio) {
         if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
-            BigDecimal width = diagramWidth ?: 960.0
-            this.render = new SvgDiagramRender(width, diagramHeight ?: (width * defaultHeightWidthRadio), diagramWidth == null)
+            BigDecimal width = 960.0
+            this.render = new SvgDiagramRender(width, width * heightWidthRadio, true)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_PDF) {
-            BigDecimal width = diagramWidth ?: 720.0
-            this.render = new SvgDiagramRender(width, diagramHeight ?: (width * defaultHeightWidthRadio), false)
+            BigDecimal width = 720.0
+            this.render = new SvgDiagramRender(width, width * heightWidthRadio, false)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            BigDecimal width = diagramWidth ?: 720.0
-            this.render = new PngDiagramRender(width, diagramHeight ?: (width * defaultHeightWidthRadio))
+            BigDecimal width = 720.0
+            this.render = new PngDiagramRender(width, width * heightWidthRadio)
         }
     }
 

@@ -7,7 +7,7 @@ import taack.ui.dsl.UiDiagramSpecifier
 interface IUiDiagramVisitor {
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase)
 
-    void visitDiagramDataInitialization(BigDecimal widthInPx, BigDecimal heightInPx)
+    void visitDiagramDataInitialization()
 
     void visitLabels(Number... labels)
 

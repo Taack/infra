@@ -11,7 +11,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramDataInitialization(BigDecimal widthInPx, BigDecimal heightInPx) {
+    void visitDiagramDataInitialization() {
 
     }
 

@@ -1331,7 +1331,7 @@ class CmsController implements WebAttributes {
                 diagram barDiagram(false), BlockSpec.Width.MAX
                 diagram barDiagram(true), BlockSpec.Width.MAX
                 diagram barDiagram(true), BlockSpec.Width.MAX
-                diagram areaDiagram(null, null), BlockSpec.Width.MAX
+                diagram areaDiagram(), BlockSpec.Width.MAX
                 diagram pieDiagram(false), BlockSpec.Width.MAX
                 diagram pieDiagram(true), BlockSpec.Width.MAX
 
@@ -1376,7 +1376,7 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private static UiDiagramSpecifier areaDiagram(BigDecimal widthInPx, BigDecimal heightInPx) {
+    private static UiDiagramSpecifier areaDiagram() {
         new UiDiagramSpecifier().ui {
             area({
                 labels "T1", "T2", "T3", "T4"
@@ -1484,7 +1484,7 @@ class CmsController implements WebAttributes {
 
                 }
                 col BlockSpec.Width.THIRD, {
-                    diagram areaDiagram(1000.0, 500.0)
+                    diagram areaDiagram()
                     diagram new UiDiagramSpecifier().ui({
                         area {
                             dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
@@ -1497,7 +1497,7 @@ class CmsController implements WebAttributes {
                 col BlockSpec.Width.THIRD, {
                     // ------- Area diagram -------
                     // discrete
-                    diagram areaDiagram(1000.0, 500.0)
+                    diagram areaDiagram()
                     // continuous
                     diagram new UiDiagramSpecifier().ui({
                         area {
@@ -1511,11 +1511,9 @@ class CmsController implements WebAttributes {
             row {
                 // ------- Pie diagram -------
                 // No slice: all information is shown
-                    // ------- Pie diagram -------
-                    // No slice: all information is shown
-                    col { diagram pieDiagram(false) }
-                    // has slice: make the first dataset as slice, and a part of information is hidden
-                    col { diagram pieDiagram(true) }
+                col { diagram pieDiagram(false) }
+                // has slice: make the first dataset as slice, and a part of information is hidden
+                col { diagram pieDiagram(true) }
             }
             // ------- Whiskers diagram -------
             diagram new UiDiagramSpecifier().ui({

@@ -14,7 +14,7 @@ final class DiagramTypeSpec {
 
     void bar(boolean isStacked = true,
              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization(null, null)
+        diagramVisitor.visitDiagramDataInitialization()
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitBarDiagram(isStacked)
@@ -22,35 +22,35 @@ final class DiagramTypeSpec {
 
     void scatter(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
               String... pointImageHref) {
-        diagramVisitor.visitDiagramDataInitialization(null, null)
+        diagramVisitor.visitDiagramDataInitialization()
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitScatterDiagram(pointImageHref)
     }
 
     void line(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization(null, null)
+        diagramVisitor.visitDiagramDataInitialization()
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitLineDiagram()
     }
 
     void area(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization(null, null)
+        diagramVisitor.visitDiagramDataInitialization()
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitAreaDiagram()
     }
 
     void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization(null, null)
+        diagramVisitor.visitDiagramDataInitialization()
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitPieDiagram(hasSlice)
     }
 
     void whiskers(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization(null, null)
+        diagramVisitor.visitDiagramDataInitialization()
         closure.delegate = new DiagramWhiskersDatasetSpec(diagramVisitor)
         closure.call()
         diagramVisitor.visitWhiskersDiagram()
