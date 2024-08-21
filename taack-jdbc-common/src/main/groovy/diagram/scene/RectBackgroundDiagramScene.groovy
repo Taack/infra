@@ -92,10 +92,8 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                 } else {
                     render.translateTo(startX, startY)
                     KeyColor rectColor = KeyColor.colorFrom(legendIndex)
-                    render.fillStyle(rectColor.light)
+                    render.fillStyle(rectColor.color)
                     render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
-                    render.fillStyle(rectColor.deep)
-                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.stroke)
 
                     // text
                     render.translateTo(startX + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)

@@ -33,7 +33,7 @@ class LineDiagramScene extends ScatterDiagramScene {
                         BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(circleColor.light)
+                        render.fillStyle(circleColor.color)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                     }
                 }
@@ -58,7 +58,7 @@ class LineDiagramScene extends ScatterDiagramScene {
                         BigDecimal yHeight2 = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
                         BigDecimal xWidth2 = gapWidth * (i + 1)
                         render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(KeyColor.colorFrom(j).light)
+                        render.fillStyle(KeyColor.colorFrom(j).color)
                         render.renderLine(xWidth2 - xWidth, yHeight - yHeight2)
                     }
                 }

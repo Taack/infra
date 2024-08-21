@@ -97,7 +97,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
 
                         // rect from lowerQuartile to upperQuartile
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
-                        render.fillStyle(KeyColor.colorFrom(j).light)
+                        render.fillStyle(KeyColor.colorFrom(j).color)
                         render.renderRect(boxWidth, (upperQuartile - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
                         render.fillStyle(BLACK_COLOR)
                         render.renderRect(boxWidth, (upperQuartile - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)

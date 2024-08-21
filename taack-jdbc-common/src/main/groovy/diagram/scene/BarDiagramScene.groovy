@@ -80,10 +80,8 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     // rect
                     render.translateTo(barX, barY - barHeight)
                     KeyColor rectColor = KeyColor.colorFrom(j)
-                    render.fillStyle(rectColor.light)
+                    render.fillStyle(rectColor.color)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
-                    render.fillStyle(rectColor.deep)
-                    render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.stroke)
 
                     // label
                     String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"

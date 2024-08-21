@@ -7,21 +7,19 @@ import java.awt.*
 
 @CompileStatic
 enum KeyColor {
-    RED(new Color(255, 99, 132), new Color(255, 177, 193)),
-    ORANGE(new Color(255, 159, 64), new Color(255, 207, 159)),
-    BLUE(new Color(54, 162, 235), new Color(154, 208, 245)),
-    GREEN(new Color(75, 192, 192), new Color(165, 223, 223)),
-    PURPLE(new Color(153, 102, 255), new Color(204, 178, 255)),
-    YELLOW(new Color(255, 205, 86), new Color(255, 230, 170)),
-    GREY(new Color(201, 203, 207), new Color(228, 229, 231))
+    RED(new Color(255, 99, 132)),
+    ORANGE(new Color(255, 159, 64)),
+    BLUE(new Color(54, 162, 235)),
+    GREEN(new Color(75, 192, 192)),
+    PURPLE(new Color(153, 102, 255)),
+    YELLOW(new Color(255, 205, 86)),
+    GREY(new Color(201, 203, 207))
 
-    KeyColor(Color deep, Color light) {
-        this.deep = deep
-        this.light = light
+    KeyColor(Color color) {
+        this.color = color
     }
 
-    final Color deep
-    final Color light
+    final Color color
 
     static KeyColor colorFrom(int i) {
         values()[i % values().size()]

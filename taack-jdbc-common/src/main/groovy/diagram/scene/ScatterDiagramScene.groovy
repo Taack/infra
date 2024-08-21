@@ -29,7 +29,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal xWidth = (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     KeyColor circleColor = KeyColor.colorFrom(i)
-                    render.fillStyle(circleColor.deep)
+                    render.fillStyle(circleColor.color)
 
                     // data point
                     if (dataPointRadius > 0) {
@@ -38,8 +38,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                             render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
                         } else {
                             render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                            render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
-                            render.fillStyle(circleColor.light)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                     }
@@ -81,9 +79,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         } else {
                             KeyColor circleColor = KeyColor.colorFrom(j)
                             render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                            render.fillStyle(circleColor.deep)
-                            render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.stroke)
-                            render.fillStyle(circleColor.light)
+                            render.fillStyle(circleColor.color)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                     }

@@ -71,10 +71,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
 
                 KeyColor areaColor = KeyColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
-                render.fillStyle(areaColor.light)
+                render.fillStyle(areaColor.color)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
-                render.fillStyle(areaColor.deep)
-                render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.stroke)
             }
         } else { // discrete
             // rebuild data to be stacked
@@ -111,10 +109,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
 
                 KeyColor areaColor = KeyColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
-                render.fillStyle(areaColor.light)
+                render.fillStyle(areaColor.color)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
-                render.fillStyle(areaColor.deep)
-                render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.stroke)
             }
         }
     }

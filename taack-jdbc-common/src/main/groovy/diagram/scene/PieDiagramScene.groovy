@@ -56,7 +56,7 @@ class PieDiagramScene extends DiagramScene {
             } else {
                 render.translateTo(centerX, centerY)
             }
-            render.fillStyle(KeyColor.colorFrom(i).deep)
+            render.fillStyle(KeyColor.colorFrom(i).color)
             render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
 
             angle1 = angle2
