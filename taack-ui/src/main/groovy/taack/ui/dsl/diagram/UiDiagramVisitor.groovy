@@ -11,12 +11,22 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramDataInitialization(Set<Object> xDataList, BigDecimal widthInPx, BigDecimal heightInPx) {
+    void visitDiagramDataInitialization(BigDecimal widthInPx, BigDecimal heightInPx) {
 
     }
 
     @Override
-    void dataset(String key, List<BigDecimal> yDataList) {
+    void visitLabels(Number... labels) {
+
+    }
+
+    @Override
+    void visitLabels(String... labels) {
+
+    }
+
+    @Override
+    void dataset(String key, BigDecimal... yDataList) {
 
     }
 
@@ -51,7 +61,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void whiskersBoxData(String key, List<BigDecimal> boxData) {
+    void whiskersBoxData(String key, BigDecimal... boxData) {
 
     }
 

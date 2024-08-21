@@ -12,75 +12,45 @@ final class DiagramTypeSpec {
         this.diagramDatasetSpec = new DiagramDatasetSpec(diagramVisitor)
     }
 
-    void bar(Set<Object> xDataList, boolean isStacked = true,
-             @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-             BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization(xDataList, widthInPx, heightInPx)
+    void bar(boolean isStacked = true,
+             @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
+        diagramVisitor.visitDiagramDataInitialization(null, null)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitBarDiagram(isStacked)
     }
 
-    void scatter(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-              BigDecimal widthInPx = null, BigDecimal heightInPx = null, String... pointImageHref) {
-        diagramVisitor.visitDiagramDataInitialization(xDataList, widthInPx, heightInPx)
-        closure.delegate = diagramDatasetSpec
-        closure.call()
-        diagramVisitor.visitScatterDiagram(pointImageHref)
-    }
-
     void scatter(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-              BigDecimal widthInPx = null, BigDecimal heightInPx = null, String... pointImageHref) {
-        diagramVisitor.visitDiagramDataInitialization([] as Set<Object>, widthInPx, heightInPx)
+              String... pointImageHref) {
+        diagramVisitor.visitDiagramDataInitialization(null, null)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitScatterDiagram(pointImageHref)
     }
 
-    void line(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-              BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization(xDataList, widthInPx, heightInPx)
+    void line(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
+        diagramVisitor.visitDiagramDataInitialization(null, null)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitLineDiagram()
     }
 
-    void line(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-              BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization([] as Set<Object>, widthInPx, heightInPx)
-        closure.delegate = diagramDatasetSpec
-        closure.call()
-        diagramVisitor.visitLineDiagram()
-    }
-
-    void area(Set<Object> xDataList, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-              BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization(xDataList, widthInPx, heightInPx)
+    void area(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
+        diagramVisitor.visitDiagramDataInitialization(null, null)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitAreaDiagram()
     }
 
-    void area(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-              BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization([] as Set<Object>, widthInPx, heightInPx)
-        closure.delegate = diagramDatasetSpec
-        closure.call()
-        diagramVisitor.visitAreaDiagram()
-    }
-
-    void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
-             BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization(["pieData"] as Set<Object>, widthInPx, heightInPx)
+    void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
+        diagramVisitor.visitDiagramDataInitialization(null, null)
         closure.delegate = diagramDatasetSpec
         closure.call()
         diagramVisitor.visitPieDiagram(hasSlice)
     }
 
-    void whiskers(Set<Object> xDataList,
-                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersDatasetSpec) Closure closure,
-                  BigDecimal widthInPx = null, BigDecimal heightInPx = null) {
-        diagramVisitor.visitDiagramDataInitialization(xDataList, widthInPx, heightInPx)
+    void whiskers(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersDatasetSpec) Closure closure) {
+        diagramVisitor.visitDiagramDataInitialization(null, null)
         closure.delegate = new DiagramWhiskersDatasetSpec(diagramVisitor)
         closure.call()
         diagramVisitor.visitWhiskersDiagram()

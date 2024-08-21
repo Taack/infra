@@ -11,7 +11,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
 
     final private Map<String, List<List<BigDecimal>>> yDataListPerKey
 
-    WhiskersDiagramScene(IDiagramRender render, Set<Object> xDataList, Map<String, List<List<BigDecimal>>> yDataListPerKey) {
+    WhiskersDiagramScene(IDiagramRender render, Object[] xDataList, Map<String, List<List<BigDecimal>>> yDataListPerKey) {
         super(render, yDataListPerKey.collectEntries { [(it.key): xDataList.collectEntries { xData -> [(xData): 0.0] }] } as Map<String, Map<Object, BigDecimal>>, false)
         this.yDataListPerKey = yDataListPerKey
     }

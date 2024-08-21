@@ -12,7 +12,7 @@ final class DiagramWhiskersBoxDataSpec {
         this.diagramVisitor = diagramVisitor
     }
 
-    void boxData(List<BigDecimal> boxDataList) {
+    void boxData(BigDecimal... boxDataList) {
         diagramVisitor.whiskersBoxData(key, boxDataList)
     }
 }

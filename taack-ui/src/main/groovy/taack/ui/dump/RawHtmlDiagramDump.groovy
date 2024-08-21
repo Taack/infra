@@ -25,7 +25,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private BigDecimal diagramWidth
     private BigDecimal diagramHeight
     private IDiagramRender render
-    private Set<Object> xDataList
+    private Object[] xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
 
@@ -35,8 +35,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitDiagramDataInitialization(Set<Object> xDataList, BigDecimal widthInPx, BigDecimal heightInPx) {
-        this.xDataList = xDataList
+    void visitDiagramDataInitialization(BigDecimal widthInPx, BigDecimal heightInPx) {
         this.diagramWidth = widthInPx
         this.diagramHeight = heightInPx
         this.dataPerKey = [:]
@@ -44,8 +43,18 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void dataset(String key, List<BigDecimal> yDataList) {
-        if (!xDataList.isEmpty()) {
+    void visitLabels(Number... labels) {
+        this.xDataList = labels
+    }
+
+    @Override
+    void visitLabels(String... labels) {
+        this.xDataList = labels
+    }
+
+    @Override
+    void dataset(String key, BigDecimal... yDataList) {
+        if (xDataList) {
             Map<Object, BigDecimal> dataMap = [:]
             for (i in 0..< xDataList.size()) {
                 if (i < yDataList.size()) {
@@ -61,8 +70,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void dataset(String key, Map<Object, BigDecimal> dataMap) {
         if (!dataMap.isEmpty()) {
-            if (xDataList.isEmpty()) {
-                xDataList = dataMap.keySet()
+            if (!xDataList) {
+                xDataList = dataMap.keySet().toArray()
             } else if (!xDataList.every { it instanceof Number }) {
                 for (int i = dataMap.size(); i < xDataList.size(); i++) {
                     dataMap.put(xDataList[i], 0.0)
@@ -121,17 +130,17 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void whiskersBoxData(String key, List<BigDecimal> boxData) {
-        if (!xDataList.isEmpty()) {
+    void whiskersBoxData(String key, BigDecimal... boxData) {
+        if (xDataList) {
             List<List<BigDecimal>> yDataList = whiskersYDataListPerKey.get(key) ?: []
-            yDataList.add(boxData)
+            yDataList.add(boxData.toList())
             whiskersYDataListPerKey[key] = yDataList
         }
     }
 
     @Override
     void visitWhiskersDiagram() {
-        if (!xDataList.isEmpty()) {
+        if (xDataList) {
             createDiagramRender(0.5)
             WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey)
             scene.draw()

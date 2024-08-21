@@ -10,12 +10,20 @@ final class DiagramDatasetSpec {
         this.diagramVisitor = diagramVisitor
     }
 
-    void dataset(final String key, final List<BigDecimal> yDataList) {
+    void labels(Number... labels) {
+        diagramVisitor.visitLabels(labels)
+    }
+
+    void labels(String... labels) {
+        diagramVisitor.visitLabels(labels)
+    }
+
+    void dataset(final String key, final BigDecimal... yDataList) {
         diagramVisitor.dataset(key, yDataList)
     }
 
     void dataset(final String key, final BigDecimal pieData) {
-        diagramVisitor.dataset(key, [pieData])
+        diagramVisitor.dataset(key, pieData)
     }
 
     void dataset(final String key, final Map<Object, BigDecimal> dataMap) {

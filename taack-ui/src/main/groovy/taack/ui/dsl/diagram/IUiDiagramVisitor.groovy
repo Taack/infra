@@ -7,9 +7,13 @@ import taack.ui.dsl.UiDiagramSpecifier
 interface IUiDiagramVisitor {
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase)
 
-    void visitDiagramDataInitialization(Set<Object> xDataList, BigDecimal widthInPx, BigDecimal heightInPx)
+    void visitDiagramDataInitialization(BigDecimal widthInPx, BigDecimal heightInPx)
 
-    void dataset(String key, List<BigDecimal> yDataList)
+    void visitLabels(Number... labels)
+
+    void visitLabels(String... labels)
+
+    void dataset(String key, BigDecimal[] yDataList)
 
     void dataset(String key, Map<Object, BigDecimal> dataMap)
 
@@ -23,7 +27,7 @@ interface IUiDiagramVisitor {
 
     void visitPieDiagram(boolean hasSlice)
 
-    void whiskersBoxData(String key, List<BigDecimal> boxData)
+    void whiskersBoxData(String key, BigDecimal... boxData)
 
     void visitWhiskersDiagram()
 
