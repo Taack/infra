@@ -75,6 +75,7 @@ class CmsController implements WebAttributes {
             label "Admin", {
                 subMenu this.&confSites as MC
                 subMenu this.&menuEntries as MC
+                subMenu this.&testDiagram as MC
             }
             menuIcon ActionIcon.CHART, this.&testProgressBar as MC
 
