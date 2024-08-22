@@ -9,8 +9,6 @@ import taack.ui.dsl.table.IUiTableVisitor
  *
  * <p>A simple table is created with:
  * {@link taack.ui.dsl.block.BlockSpec#table(UiTableSpecifier)}
- *
- * <p>A table along with a filter is created with:
  */
 @CompileStatic
 final class UiTableSpecifier {

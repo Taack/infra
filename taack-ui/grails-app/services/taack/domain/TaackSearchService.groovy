@@ -98,6 +98,14 @@ final class TaackSearchService implements WebAttributes {
         mapSolrSpecifier.putIfAbsent(solrSpecifier.type, new Pair(indexService, solrSpecifier))
     }
 
+    /**
+     * Build search block
+     *
+     * @param q         query
+     * @param search    Action that will display the block (that will call this method)
+     * @param classes   registered class
+     * @return  block with search results
+     */
     final UiBlockSpecifier search(String q, MC search, Class<? extends GormEntity>... classes) {
         List<String> facetsClicked = params.list("facetsClicked")
         List<String> rangesClicked = params.list("rangesClicked")
