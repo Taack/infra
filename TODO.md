@@ -72,15 +72,14 @@
 # 0.5.x
 
 - Improve/fix mail rendering using bootstrap
-- Improve PDF rendering using bootstrap
-- Vertical / Horizontal menu switch
+- ~~Improve PDF rendering using bootstrap~~
 - Add toast and websockets events
 - SVG theme, use id
 - Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
 - Ajax scrollable tables
 - PDF / Docx / pptx / HTML from Asciidoc
-- PoC inline DSL JS (IJavascriptDescriptor.groovy)
-- PoC inline DSL CSS (with params)
+- ~~PoC inline DSL JS (IJavascriptDescriptor.groovy)~~
+- ~~PoC inline DSL CSS (with params)~~
 - Asciidoc online editor (paragraph only)
 - inlineForms custom in show and tables (row or cells)
 - improve history when browsing, allow seeing opened modals ...
@@ -90,24 +89,19 @@
 - PoC PDF forms ...
 - Modern Graph DSL (groupBy, sortBy)
   - timeSeries
-  - areaChart
+  - ~~areaChart~~
   - boxPot
   - bubbleChart
   - calendar
   - gantt
   - countries
   - webGl charts
-- Remove Chart.js
-  - Need server side rendering (simpler)
-  - Why not JFreeCharts ? NO... but why ??
-- AsciidoctorJ
-  - remove external kotlin code transpiled
-  - support offline plugins
-  - allow code on TQL like language
-- Remove PlantUML deps for Gantt / graphs
-  - Server side raster and SVG
-  - Low level first
-- Allow dynamic graphs for Web only
-  - manage picking, hover
-  - manage moving, freedom degrees, constraints ...
-  - PoC: DSLs describing actions
+- ~~Remove Chart.js~~
+  - ~~Need server side rendering (simpler)~~
+  - ~~Why not JFreeCharts ? NO... but why ??~~
+- ~~AsciidoctorJ~~
+  - ~~support offline plugins~~
+  - ~~allow code on TQL like language~~
+- ~~Remove PlantUML deps for Gantt / graphs~~
+  - ~~Server side raster and SVG~~
+  - ~~Low level first~~
