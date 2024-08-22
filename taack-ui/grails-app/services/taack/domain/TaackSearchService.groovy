@@ -18,6 +18,7 @@ import org.apache.solr.common.SolrInputDocument
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.MessageSource
 import taack.solr.SolrIndexerVisitor
 import taack.solr.SolrSearcherVisitor
 import taack.solr.SolrSpecifier
@@ -29,6 +30,8 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 
 import javax.annotation.PostConstruct
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
+
 
 /**
  * Full text search service support.
@@ -69,6 +72,9 @@ final class TaackSearchService implements WebAttributes {
 
     @Autowired
     TaackUiConfiguration taackUiConfiguration
+
+    @Autowired
+    MessageSource messageSource
 
     private SolrClient solrClient
 
@@ -152,7 +158,7 @@ final class TaackSearchService implements WebAttributes {
         sq.add("fq", fqType)
         for (def c in targetClasses) {
             def s = mapSolrSpecifier[c]?.bValue
-            def visitor = new SolrSearcherVisitor()
+            def visitor = new SolrSearcherVisitor(RCU.getLocale(webRequest.request), messageSource)
             s.visitSolr(visitor)
             for (def f in visitor.facets) {
                 sq.addFacetField(f)
@@ -170,28 +176,29 @@ final class TaackSearchService implements WebAttributes {
         List<RangeFacet> ranges = queryResponse.facetRanges
         Map<String, Map<String, List<String>>> highlighting = queryResponse.highlighting
         def response = queryResponse.response
+
         new UiBlockSpecifier().ui {
             row {
                 col BlockSpec.Width.THIRD, {
                     ajaxBlock "range", {
                         table new UiTableSpecifier().ui {
-                            header {
-                                label "Value"
-                                label "Action"
-                            }
                             for (def r in ranges) {
                                 if (i18nMap[r.name]) {
-                                    row {
-                                        rowColumn(2) {
-                                            rowField(i18nMap[r.name] ?: 'Type')
+                                    header {
+                                        column (2) {
+                                            label(i18nMap[r.name] ?: 'Type')
                                         }
                                     }
                                     for (def c in r.counts) {
                                         String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
                                         row {
-                                            rowField c.value + "(${c.count})"
-                                            if (rangesClicked.contains(currentRange)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
-                                            else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
+                                            rowColumn() {
+                                                rowField c.value + "(${c.count})"
+                                            }
+                                            rowColumn {
+                                                if (rangesClicked.contains(currentRange)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
+                                                else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
+                                            }
                                         }
                                     }
                                 }
@@ -200,22 +207,22 @@ final class TaackSearchService implements WebAttributes {
                     }
                     ajaxBlock "faceting", {
                         table new UiTableSpecifier().ui {
-                            header {
-                                label "Value"
-                                label "Action"
-                            }
                             for (def f in facets) {
-                                row {
-                                    rowColumn(2) {
-                                        rowField(i18nMap[f.name] ?: 'Type')
+                                header {
+                                    column (2) {
+                                        label(i18nMap[f.name] ?: 'Type')
                                     }
                                 }
                                 for (def v in f.values) {
                                     String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                     row {
-                                        rowField v.name + "(${v.count})"
-                                        if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
-                                        else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
+                                        rowColumn {
+                                            rowField v.name + "(${v.count})"
+                                        }
+                                        rowColumn {
+                                            if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
+                                            else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
+                                        }
                                     }
                                 }
                             }
@@ -225,10 +232,6 @@ final class TaackSearchService implements WebAttributes {
                 col BlockSpec.Width.TWO_THIRD, {
                     ajaxBlock "results", {
                         table new UiTableSpecifier().ui {
-                            header {
-                                label "Field"
-                                label "Value"
-                            }
                             for (def resp in response["response"]) {
                                 def docId = resp['id'] as String
                                 def hl = highlighting[docId]
@@ -239,7 +242,7 @@ final class TaackSearchService implements WebAttributes {
                                     String label = solrSpecifier.label.call(id)
                                     row {
                                         rowColumn(2) {
-                                            rowAction(ActionIcon.FILTER, solrSpecifier.show, id)
+                                            rowAction(ActionIcon.SELECT*IconStyle.SCALE_DOWN, solrSpecifier.show, id)
                                             rowField label
                                         }
                                     }
