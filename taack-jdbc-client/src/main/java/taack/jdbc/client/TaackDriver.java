@@ -54,12 +54,15 @@ public final class TaackDriver implements Driver {
         String[] parts = url.split(":");
 
         if (parts.length < 2 ||	!parts[0].toLowerCase().equals("jdbc") || !parts[1].toLowerCase().equals("taack"))
-            return null;
+            throw new RuntimeException(new Exception("invalid url: " + url));
 
         String serverDb = Arrays.stream(parts).skip(2).collect(Collectors.joining(":"));
         String server = serverDb.substring(0, serverDb.lastIndexOf('/'));
         try {
-            return new TaackConnection(server, info.getProperty("username"), info.getProperty("password"));
+            if (info.getProperty("user") == null) {
+                throw new RuntimeException(new Exception("no username in info: " + info));
+            }
+            return new TaackConnection(server, info.getProperty("user"), info.getProperty("password"));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

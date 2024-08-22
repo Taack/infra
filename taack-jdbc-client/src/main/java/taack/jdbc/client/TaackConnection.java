@@ -39,6 +39,9 @@ public final class TaackConnection implements Connection {
 
         logInfo("TaackConnection " + url + " u: " + username + " p: " + password);
 
+        if (username == null || password == null) {
+            throw new RuntimeException(new Exception("invalid username: " + username + " or password: " + password));
+        }
         this.url = url;
         this.password = password;
         this.user = username;
