@@ -103,7 +103,7 @@ class TaackUiEnablerService implements WebAttributes {
      * is not allowed to execute the action as predicted.
      */
     void checkAccess() {
-        if (!hasAccess(controllerName, actionName, null, params)) {
+        if (!hasAccess(controllerName, actionName, params.long('id'), params)) {
             throw new AccessDeniedException("Not allowed to execute /$controllerName/$actionName with $params")
         }
     }
