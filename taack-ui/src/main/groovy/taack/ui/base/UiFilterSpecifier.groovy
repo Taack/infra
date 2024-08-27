@@ -44,7 +44,7 @@ final class UiFilterSpecifier {
     UiFilterSpecifier ui(final Class aClass, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FilterSpec) final Closure closure, final FieldInfo<?>... fieldInfos) {
         this.closure = closure
         this.aClass = aClass
-        this.additionalParams = fieldInfos.findAll {it.value }.collectEntries {
+        this.additionalParams = fieldInfos.toList().findAll {it.value }.collectEntries {
             if (it.value.hasProperty("id"))
                 new MapEntry("ajaxParams." + it.fieldName + ".id", it.value.getAt("id"))
             else
