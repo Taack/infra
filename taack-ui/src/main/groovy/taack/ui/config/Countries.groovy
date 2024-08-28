@@ -330,7 +330,7 @@ enum Country {
     BZ(Continent.NA, "Belize", "BZ", "BLZ", 84, 17.25f),
     CA(Continent.NA, "Canada", "CA", "CAN", 124, 60f),
     CC(Continent.AS, "Cocos (Keeling), Islands", "CC", "CCK", 166, -12.5f),
-    CD(Continent.AF, '"Congo, the Democratic Republic of the"', "CD", "COD", 180, 0f),
+    CD(Continent.AF, "Congo, the Democratic Republic of the", "CD", "COD", 180, 0f),
     CF(Continent.AF, "Central African Republic", "CF", "CAF", 140, 7f),
     CG(Continent.AF, "Congo", "CG", "COG", 178, -1f),
     CH(Continent.EU, "Switzerland", "CH", "CHE", 756, 47f),
@@ -365,7 +365,7 @@ enum Country {
     FJ(Continent.OC, "Fiji", "FJ", "FJI", 242, -18f),
     FK(Continent.SA, "Falkland Islands (Malvinas),", "FK", "FLK", 238, -51.75f),
     FL(Continent.EU, "Liechtenstein", "FL", "LIE", 47, 9.55f),
-    FM(Continent.OC, '"Micronesia, Federated States of"', "FM", "FSM", 583, 6.9167f),
+    FM(Continent.OC, "Micronesia, Federated States of", "FM", "FSM", 583, 6.9167f),
     FO(Continent.EU, "Faroe Islands", "FO", "FRO", 234, 62f),
     FR(Continent.EU, "France", "FR", "FRA", 250, 46f),
     GA(Continent.AF, "Gabon", "GA", "GAB", 266, -1f),
@@ -400,7 +400,7 @@ enum Country {
     IN(Continent.AS, "India", "IN", "IND", 356, 20f),
     IO(Continent.AF, "British Indian Ocean Territory", "IO", "IOT", 86, -6f),
     IQ(Continent.AS, "Iraq", "IQ", "IRQ", 368, 33f),
-    IR(Continent.AS, '"Iran, Islamic Republic of"', "IR", "IRN", 364, 32f),
+    IR(Continent.AS, "Iran, Islamic Republic of", "IR", "IRN", 364, 32f),
     IS(Continent.EU, "Iceland", "IS", "ISL", 352, 65f),
     IT(Continent.EU, "Italy", "IT", "ITA", 380, 42.8333f),
     JE(Continent.EU, "Jersey", "JE", "JEY", 832, 49.21f),
@@ -431,12 +431,12 @@ enum Country {
     LY(Continent.AF, "Libya", "LY", "LBY", 434, 25f),
     MA(Continent.AF, "Morocco", "MA", "MAR", 504, 32f),
     MC(Continent.EU, "Monaco", "MC", "MCO", 492, 43.7333f),
-    MD(Continent.EU, '"Moldova, Republic of"', "MD", "MDA", 498, 47f),
+    MD(Continent.EU, "Moldova, Republic of", "MD", "MDA", 498, 47f),
     ME(Continent.EU, "Montenegro", "ME", "MNE", 499, 42f),
     MF(Continent.NA, "Saint Martin", "MF", "MAF", 99, 0.0f),
     MG(Continent.AF, "Madagascar", "MG", "MDG", 450, -20f),
     MH(Continent.OC, "Marshall Islands", "MH", "MHL", 584, 9f),
-    MK(Continent.EU, '"Macedonia, the former Yugoslav Republic of"', "MK", "MKD", 807, 41.8333f),
+    MK(Continent.EU, "Macedonia, the former Yugoslav Republic of", "MK", "MKD", 807, 41.8333f),
     ML(Continent.AF, "Mali", "ML", "MLI", 466, 17f),
     MM(Continent.AS, "Burma", "MM", "MMR", 104, 22f),
     MN(Continent.AS, "Mongolia", "MN", "MNG", 496, 46f),
@@ -475,7 +475,7 @@ enum Country {
     PM(Continent.NA, "Saint Pierre and Miquelon", "PM", "SPM", 666, 46.8333f),
     PN(Continent.OC, "Pitcairn", "PN", "PCN", 612, -24.7f),
     PR(Continent.NA, "Puerto Rico", "PR", "PRI", 630, 18.25f),
-    PS(Continent.AS, '"Palestinian Territory, Occupied"', "PS", "PSE", 275, 32f),
+    PS(Continent.AS, "Palestinian Territory, Occupied", "PS", "PSE", 275, 32f),
     PT(Continent.EU, "Portugal", "PT", "PRT", 620, 39.5f),
     PW(Continent.OC, "Palau", "PW", "PLW", 585, 7.5f),
     PY(Continent.SA, "Paraguay", "PY", "PRY", 600, -23f),
@@ -491,7 +491,7 @@ enum Country {
     SD(Continent.AF, "Sudan", "SD", "SDN", 736, 15f),
     SE(Continent.EU, "Sweden", "SE", "SWE", 752, 62f),
     SG(Continent.AS, "Singapore", "SG", "SGP", 702, 1.3667f),
-    SH(Continent.AF, '"Saint Helena, Ascension and Tristan da Cunha"', "SH", "SHN", 654, -15.9333f),
+    SH(Continent.AF, "Saint Helena, Ascension and Tristan da Cunha", "SH", "SHN", 654, -15.9333f),
     SI(Continent.EU, "Slovenia", "SI", "SVN", 705, 46f),
     SJ(Continent.EU, "Svalbard and Jan Mayen", "SJ", "SJM", 744, 78f),
     SK(Continent.EU, "Slovakia", "SK", "SVK", 703, 48.6667f),
@@ -521,7 +521,7 @@ enum Country {
     TT(Continent.NA, "Trinidad and Tobago", "TT", "TTO", 780, 11f),
     TV(Continent.OC, "Tuvalu", "TV", "TUV", 798, -8f),
     TW(Continent.AS, "Taiwan", "TW", "TWN", 158, 23.5f),
-    TZ(Continent.AF, '"Tanzania, United Republic of"', "TZ", "TZA", 834, -6f),
+    TZ(Continent.AF, "Tanzania, United Republic of", "TZ", "TZA", 834, -6f),
     UA(Continent.EU, "Ukraine", "UA", "UKR", 804, 49f),
     UG(Continent.AF, "Uganda", "UG", "UGA", 800, 1f),
     UM(Continent.OC, "United States Minor Outlying Islands", "UM", "UMI", 581, 19.2833f),
@@ -531,8 +531,8 @@ enum Country {
     VA(Continent.EU, "Holy See (Vatican City State),", "VA", "VAT", 336, 41.9f),
     VC(Continent.NA, "St. Vincent and the Grenadines", "VC", "VCT", 670, 13.25f),
     VE(Continent.SA, "Venezuela", "VE", "VEN", 862, 8f),
-    VG(Continent.NA, '"Virgin Islands, British"', "VG", "VGB", 92, 18.5f),
-    VI(Continent.NA, '"Virgin Islands, U.S."', "VI", "VIR", 850, 18.3333f),
+    VG(Continent.NA, "Virgin Islands, British", "VG", "VGB", 92, 18.5f),
+    VI(Continent.NA, "Virgin Islands, U.S.", "VI", "VIR", 850, 18.3333f),
     VN(Continent.AS, "Vietnam", "VN", "VNM", 704, 16f),
     VU(Continent.OC, "Vanuatu", "VU", "VUT", 548, -16f),
     WF(Continent.OC, "Wallis and Futuna", "WF", "WLF", 876, -13.3f),
@@ -582,10 +582,12 @@ enum Country {
         return locale.getDisplayCountry(new Locale(lang, this.alphaIso2))
     }
 
-    static EnumOption[] getEnumOptions() {
+    static EnumOption[] getEnumOptions(Country... firsts = null) {
         EnumOption[] res = new EnumOption[values().size()]
         int i = 0
-        for (def option in values()) {
+        Country[] countries = firsts ? firsts + (values() - firsts).sort {it.name } : values().sort {it.name }
+
+        for (def option in countries) {
             res[i++] = new EnumOption(option.alphaIso2, option.name)
         }
         return res
