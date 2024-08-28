@@ -4,11 +4,11 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ast.type.WidgetKind
-import taack.ui.EnumOption
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
-import taack.ui.base.show.IUiShowVisitor
+import taack.ui.IEnumOption
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.helper.Utils
+import taack.ui.dsl.show.IUiShowVisitor
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -116,12 +116,13 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowAction(String i18n, String controller, String action, Long id, Map additionalParams, boolean isAjax = true) {
+        i18n ?= parameter.trField(controller, action, id != null || additionalParams.containsKey('id'))
         additionalParams ?= [:]
         additionalParams['isAjax'] = isAjax
-        out << """<a class="taackShowAction" ${isAjax ? "taackShowActionLink" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""
+        out << """<a class="taackShowAction" ${isAjax ? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""
     }
 
-    private static String inputField(final String qualifiedName, final FieldInfo field, final EnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
+    private static String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
         final String showClass = 'taackShowInput'
         final Class type = field.fieldConstraint.field.type
         final boolean isEnum = field.fieldConstraint.field.type.isEnum()
@@ -135,7 +136,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
                     <input type="hidden" name="${qualifiedName}" value="0" id="${qualifiedName}Check" ${!field.value ? 'checked=""' : ''} class="many-to-one pure-u-22-24">
                     """
         } else if (eos) {
-            EnumOption[] enumConstraints = eos
+            IEnumOption[] enumConstraints = eos
             result.append """
                 <div class="center-flex pure-u-1">
                 <select $ajax name="${qualifiedName}" id="${qualifiedName}Select" ${isListOrSet ? "multiple" : ""} class="${showClass}" >
@@ -219,7 +220,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
             if (field.fieldConstraint.widget == WidgetKind.AJAX.name) {
                 widget = """
                 <img class="close" src="/assets/delete.png" width="16" onclick="document.getElementById('ajaxBlock${parameter.modalId}Modal-${qualifiedName}').value='';document.getElementById('${qualifiedName}${parameter.modalId}').value='';">
-                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24" autocomplete="off" id="${qualifiedName}${parameter.modalId}" inputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" onclick="openAutocompleteSelect(this, 'ajaxBlock${parameter.modalId}Modal', '${parameter.originController}', '${field.fieldConstraint.field.declaringClass.name}', '${qualifiedName}');"/>
+                <input value="${field.value ?: ''}" readonly="on" class="many-to-one pure-u-22-24" autocomplete="off" id="${qualifiedName}${parameter.modalId}" inputId="ajaxBlock${parameter.modalId}Modal-${qualifiedName}" onclick="openAutocompleteSelect(this, 'ajaxBlock${parameter.modalId}Modal', '${parameter.applicationTagLib.controllerName}', '${field.fieldConstraint.field.declaringClass.name}', '${qualifiedName}');"/>
                 <input value="${field.value ? field.value["id"] : ''}" type="hidden" name="${qualifiedName}" id="ajaxBlock${parameter.modalId}Modal-${qualifiedName}"/>
             """
             } else {
@@ -260,7 +261,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (isAjax) {
             out << """
                      <div class='icon'>
-                        <a class='ajaxLink taackShowAction' taackShowActionLink='${parameter.urlMapped(controller, action, id, additionalParams)}'>
+                        <a class='ajaxLink taackShowAction' ajaxAction='${parameter.urlMapped(controller, action, id, additionalParams)}'>
                             ${actionIcon.getHtml(i18n)}
                         </a>
                      </div>

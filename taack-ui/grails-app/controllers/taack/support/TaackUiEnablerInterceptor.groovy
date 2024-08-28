@@ -4,7 +4,7 @@ import grails.artefact.Interceptor
 import grails.compiler.GrailsCompileStatic
 import org.grails.web.util.WebUtils
 import org.springframework.security.core.context.SecurityContextHolder
-import taack.base.TaackUiEnablerService
+import taack.render.TaackUiEnablerService
 
 @GrailsCompileStatic
 class TaackUiEnablerInterceptor implements Interceptor {

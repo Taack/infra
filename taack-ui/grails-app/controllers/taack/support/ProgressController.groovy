@@ -2,9 +2,10 @@ package taack.support
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
-import taack.base.TaackUiProgressBarService
-import taack.base.TaackUiSimpleService
-import taack.ui.base.UiBlockSpecifier
+import taack.render.TaackUiProgressBarService
+import taack.render.TaackUiService
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.block.UiBlockVisitor
 
 /**
  * Support Controller for progressbar.
@@ -12,7 +13,9 @@ import taack.ui.base.UiBlockSpecifier
  * <p>Here is how to add a progress bar to a long duration job:
  *
  * <pre>{@code
- *  String pId = taackUiProgressBarService.progressStart(CrewUiService.messageBlock("Done .."), rowCount)
+ *          String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
+ *                            custom("""<p>Test ended</p>""")
+ *          }, 100)
  *  def task = task {
  *      customerRows.eachWithIndex { String[] row, int i ->
  *          importCustomer(row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17])
@@ -31,7 +34,7 @@ import taack.ui.base.UiBlockSpecifier
 class ProgressController {
 
     TaackUiProgressBarService taackUiProgressBarService
-    TaackUiSimpleService taackUiSimpleService
+    TaackUiService taackUiService
 
     def drawProgress(String id) {
         if (id && taackUiProgressBarService.progressMax(id)) {
@@ -39,16 +42,12 @@ class ProgressController {
             int value = taackUiProgressBarService.progress(id)
             boolean ended = taackUiProgressBarService.progressHasEnded(id)
             if (!ended) {
-                response.outputStream << taackUiSimpleService.visit(new UiBlockSpecifier().ui {
-                    closeModalAndUpdateBlock(TaackUiProgressBarService.buildProgressBlock(id, max, value).closure)
-                }, true)
-                response.outputStream.flush()
-                response.outputStream.close()
+                response.outputStream << taackUiService.visit(TaackUiProgressBarService.buildProgressBlock(id, max, value), true)
             } else {
-                taackUiSimpleService.show(new UiBlockSpecifier().ui {
-                    closeModalAndUpdateBlock(taackUiProgressBarService.progressEnds(id).closure)
-                })
+                response.outputStream << taackUiService.visit(taackUiProgressBarService.buildEndBlock(id), true)
             }
+            response.outputStream.flush()
+            response.outputStream.close()
         } else {
             return true
         }
@@ -56,7 +55,7 @@ class ProgressController {
 
     def echoSelect(Long id, String label) {
         if (id && label)
-            taackUiSimpleService.show(
+            taackUiService.show(
                     new UiBlockSpecifier().ui {
                         closeModal id, label
                     }

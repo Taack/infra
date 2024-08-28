@@ -1,16 +1,16 @@
 package taack.jdbc.client;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.protocol.BasicHttpContext;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import taack.jdbc.common.TaackResultSetOuterClass;
 
 import java.io.IOException;
@@ -39,27 +39,30 @@ public final class TaackConnection implements Connection {
 
         logInfo("TaackConnection " + url + " u: " + username + " p: " + password);
 
+        if (username == null || password == null) {
+            throw new RuntimeException(new Exception("invalid username: " + username + " or password: " + password));
+        }
         this.url = url;
         this.password = password;
         this.user = username;
-        String protocol = Objects.equals(url, "localhost:8080") ? "http://" : "https://";
+        String protocol = url.startsWith("localhost:") ? "http://" : "https://";
         HttpPost req = new HttpPost(protocol + url + "/login/authenticate");
         req.setEntity(
                 new UrlEncodedFormEntity(
                         Arrays.asList(new BasicNameValuePair("username", username),
                                 new BasicNameValuePair("password", password)),
-                        "UTF-8"
+                        StandardCharsets.UTF_8
                 ));
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
             BasicCookieStore cookieStore = new BasicCookieStore();
             httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
             var response = httpClient.execute(req, httpContext);
-            logInfo("Status " + response.getStatusLine().getStatusCode() + " R: " + response.getStatusLine().getReasonPhrase());
+            logInfo("Status " + response.getCode() + " R: " + response.getReasonPhrase());
             String responseString = new String(response.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
             logInfo("responseString: " + responseString);
             HttpPost req2 = new HttpPost(protocol + url + "/taackJdbc/initConn");
             var response2 = httpClient.execute(req2, httpContext);
-            System.out.println("Status2 " + response2.getStatusLine().getStatusCode() + " R: " + response2.getStatusLine().getReasonPhrase());
+            System.out.println("Status2 " + response2.getCode() + " R: " + response2.getReasonPhrase());
             String responseString2 = new String(response2.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
             System.out.println("responseString2: " + responseString2);
 
@@ -80,14 +83,14 @@ public final class TaackConnection implements Connection {
 
     private byte[] executeReqAction(Map<String, String> params, String action) throws UnsupportedEncodingException {
         logInfo("executeReqAction " + params + " action: " + action);
-        String protocol = Objects.equals(url, "localhost:8080") ? "http://" : "https://";
+        String protocol = url.startsWith("localhost:") ? "http://" : "https://";
         HttpPost req = new HttpPost(protocol + url + "/taackJdbc/" + action);
         CloseableHttpResponse response;
         ArrayList<BasicNameValuePair> valuePairs = new ArrayList<>();
         for (Map.Entry<String, String> e : params.entrySet()) {
             valuePairs.add(new BasicNameValuePair(e.getKey(), e.getValue()));
         }
-        req.setEntity(new UrlEncodedFormEntity(valuePairs, "UTF-8"));
+        req.setEntity(new UrlEncodedFormEntity(valuePairs, StandardCharsets.UTF_8));
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
             response = httpClient.execute(req, httpContext);
             return response.getEntity().getContent().readAllBytes();

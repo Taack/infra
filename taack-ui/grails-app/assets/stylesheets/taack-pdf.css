@@ -7,21 +7,9 @@
     color: #212529;
 }
 
-.pure-table-odd td, .pure-table-odd th {
-    background-color: var(--bs-gray-200);
-}
-
 .taackColorBlue {
     color-scheme: dark;
     color: #000099;
-}
-
-/*html * {
-    margin: 0;
-}*/
-
-h1, h2, h3, h4, h5, h6 {
-    line-height: 1.1;
 }
 
 a {
@@ -29,13 +17,213 @@ a {
     text-decoration: none;
 }
 
-h1 {
-    color: #48802c;
-    font-weight: normal;
-    font-size: 1.25em;
-    margin: 0.8em 0 0.3em 0;
-}
-
 .taackTable {
     width: 18.4cm;
+}
+
+div#header {
+    /*display: inline-block;*/
+    border: 1px black solid;
+    /*margin-left: -1cm;*/
+    text-align: center;
+    position: running(header-top-center);
+}
+
+div#header-left {
+    /*margin-left: -1cm;*/
+    /*display: inline-block;*/
+    /*border: 1px red solid;*/
+    text-align: left;
+    position: running(header-top-left);
+}
+
+div#header-right {
+    /*display: inline-block;*/
+    border: 1px blue solid;
+    /*margin-left: -1cm;*/
+    text-align: right;
+    position: running(header-top-right);
+}
+
+div#footer {
+    display: block;
+    text-align: center;
+    font-size: 3mm;
+    position: running(footer);
+}
+
+body {
+    width: 190mm;
+    /*height: 297mm;*/
+}
+
+/*@page {*/
+/*    !*-fs-page-orientation: portrait;*!*/
+/*    size: 210mm 297mm;*/
+/*    @top-left {*/
+/*        content: element(header-top-left)*/
+/*    }*/
+/*    @top-center {*/
+/*        content: element(header-top-center)*/
+/*    }*/
+/*    @top-right {*/
+/*        content: element(header-top-right)*/
+/*    }*/
+
+/*    margin-top: ${headerHeight?:"5cm"};*/
+/*    @bottom-center {*/
+/*        !*font-style: italic;*!*/
+/*        !*font-family: "DINPro-LightItalic";*!*/
+/*        content: element(footer)*/
+/*    }*/
+/*    @bottom-right {*/
+/*        font-size: 3mm;*/
+/*        content: counter(page) " / " counter(pages)*/
+/*    }*/
+/*}*/
+
+div.pure-u-1 {
+    /*border: 1px red solid;*/
+
+    page-break-before: avoid;
+    page-break-inside: auto;
+    page-break-after: avoid;
+}
+
+table {
+    -fs-table-paginate: paginate;
+    width: 18.4cm;
+    page-break-before: avoid;
+    page-break-inside: auto;
+    page-break-after: auto;
+    /*margin-left: 1mm;*/
+    margin-top: 6mm;
+    border-collapse: collapse;
+    font-size: 3mm;
+
+}
+
+.columnSmall {
+    width: 12mm;
+}
+
+.terms {
+    page-break-inside: auto;
+    font-size: 2.5mm;
+    line-height: 3mm;
+}
+
+.separator td {
+    border-bottom: 0.3mm solid black;
+}
+
+tr, td {
+    page-break-before: auto;
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+
+tbody {
+    page-break-before: auto;
+    page-break-inside: auto;
+    page-break-after: auto;
+}
+
+thead {
+    page-break-before: auto;
+    page-break-inside: auto;
+    page-break-after: auto;
+    display: table-header-group;
+}
+
+tfoot {
+    display: table-footer-group;
+}
+
+li {
+    list-style-type: none;
+}
+
+.markdown-body ul{
+    list-style: none;
+    padding-left: 20px;
+}
+
+.markdown-body li:before{ content:"•"; font-size:10pt; }
+
+.markdown-body li li:before{ content:"•"; font-size:10pt; }
+
+ol {
+    /*padding-inline-start: 0;*/
+    padding-left: 0;
+}
+
+body {
+    font-size: small;
+}
+
+/*@font-face {*/
+/*    font-family: NotoSansSC;*/
+/*    font-style: normal;*/
+/*    font-weight: normal;*/
+/*    src: url("file://${root}/pdf/fonts/NotoSansSC-Regular.ttf");*/
+/*    !*-fs-font-subset: complete-font;*!*/
+/*}*/
+
+/*@font-face {*/
+/*    font-family: Roboto;*/
+/*    font-style: normal;*/
+/*    font-weight: normal;*/
+/*    src: url("file://${root}/pdf/fonts/Roboto-Medium.ttf");*/
+/*    !*-fs-font-subset: complete-font;*!*/
+/*}*/
+
+
+html {
+    font-family: NotoSansSC, Roboto, sans-serif;
+}
+
+.pure-g {
+    font-family: NotoSansSC, Roboto, sans-serif;
+}
+
+.pure-g [class *= 'pure-u'] {
+    font-family: NotoSansSC, Roboto, sans-serif;
+}
+
+table.general-condition {
+    font-size: smaller;
+    page-break-inside: avoid;
+}
+
+span.property-value p {
+    margin: 0.3cm;
+}
+ul.property-list, ul.taackSection {
+    padding: 0;
+}
+
+ul.taackSection {
+    padding-top: 0.5cm;
+}
+
+ul.taackSection>li {
+    padding-left: 0.5cm;
+}
+
+span.property-value li {
+    margin-top:0.1cm;
+    list-style-type: disc;
+}
+
+li.fieldcontain {
+    page-break-inside: avoid;
+}
+
+.taackMarkdown li {
+    all: revert;
+}
+
+.taackMarkdown ol {
+    all: revert;
 }

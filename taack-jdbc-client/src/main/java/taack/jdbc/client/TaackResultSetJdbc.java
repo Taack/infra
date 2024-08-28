@@ -14,7 +14,7 @@ import java.util.Map;
 public final class TaackResultSetJdbc implements ResultSet {
 //    final static Logger logger = LoggerFactory.getLogger(TaackResultSetJdbc.class);
 
-    final TaackResultSetOuterClass.TaackResultSet taackResultSetProto;
+    public final TaackResultSetOuterClass.TaackResultSet taackResultSetProto;
     final int numberOfColumn;
     final int numberOfCellsInProto;
     final Map<String, Integer> columnNames;

@@ -15,21 +15,7 @@
 <html>
 <head>
 
-    <style>
-    .modal-content {
-        width: unset;
-        max-width: 85%;
-        height: unset;
-        max-height: 90%;
-        overflow: auto;
-        filter: unset;
-    }
-
-    .modal-content > div.container {
-        margin: unset;
-    }
-
-    </style></head>
+</head>
 
 <body>
 

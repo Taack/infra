@@ -4,12 +4,12 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.proxy.HibernateProxy
-import taack.ui.base.block.BlockSpec
+import taack.ui.dump.Parameter
 
 /**
  * Specify how to index a domain, how to label it in the search.
  *
- * See {@link taack.base.TaackSearchService#registerSolrSpecifier(taack.base.TaackSearchService.IIndexService, taack.solr.SolrSpecifier)}
+ * See {@link taack.domain.TaackSearchService#registerSolrSpecifier(taack.domain.TaackSearchService.IIndexService, taack.solr.SolrSpecifier)}
  * To register a domain search.
  */
 @CompileStatic

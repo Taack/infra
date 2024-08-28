@@ -2,8 +2,8 @@ package taack.support
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
-import taack.base.TaackMetaModelService
-import taack.base.TaackSearchService
+import taack.domain.TaackMetaModelService
+import taack.domain.TaackSearchService
 
 
 // TODO: Develop the UI

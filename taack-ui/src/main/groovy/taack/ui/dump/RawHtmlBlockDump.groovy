@@ -1,358 +1,509 @@
 package taack.ui.dump
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
-import taack.ui.base.UiChartSpecifier
-import taack.ui.base.UiDiagramSpecifier
-import taack.ui.base.UiFilterSpecifier
-import taack.ui.base.UiFormSpecifier
-import taack.ui.base.UiShowSpecifier
-import taack.ui.base.UiTableSpecifier
-import taack.ui.base.block.BlockSpec
-import taack.ui.base.block.IUiBlockVisitor
-import taack.ui.base.common.ActionIcon
-import taack.ui.base.common.Style
-import taack.ui.base.helper.Utils
+import taack.ui.IEnumOption
+import taack.ui.IEnumOptions
+import taack.ui.dsl.*
+import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.block.IUiBlockVisitor
+import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.helper.Utils
+import taack.ui.dsl.menu.MenuSpec
+import taack.ui.dump.common.BlockLog
+import taack.ui.dump.html.block.*
+import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLTxtContent
+import taack.ui.dump.html.element.IHTMLElement
+import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.layout.HTMLEmpty
+import taack.ui.dump.html.menu.BootstrapMenu
 
 @CompileStatic
-class RawHtmlBlockDump implements IUiBlockVisitor {
-    private ByteArrayOutputStream out
-    final Parameter parameter
+final class RawHtmlBlockDump implements IUiBlockVisitor {
+    private String currentAjaxBlockId = null
+    final String modalId
+    String futurCurrentAjaxBlockId
+    String theCurrentExplicitAjaxBlockId
 
-    private String id
-
-    private boolean hasTitle = false
-    private int hasPureG = 0
-    private String ajaxBlockId = null
-    final private Long blockId = System.currentTimeMillis()
     boolean isModal = false
+    boolean isRefreshing = false
+    int poll = 0
 
     private int tabOccurrence = 0
-    private int tabOccurrencePrevious = 0
-    private int tabIds = 0
 
-    RawHtmlBlockDump(final ByteArrayOutputStream out, final Parameter parameter) {
-        this.out = out
+    final BootstrapBlock block
+    final Parameter parameter
+
+    private final BlockLog blockLog
+
+    RawHtmlBlockDump(final Parameter parameter) {
         this.parameter = parameter
+        this.modalId = modalId
+        if (parameter.params.boolean('refresh'))
+            isRefreshing = true
+        blockLog = new BlockLog(parameter.uiThemeService.themeSelector)
+        block = new BootstrapBlock(blockLog)
+//        menu = new BootstrapMenu(blockLog)
+        blockLog.topElement = new HTMLEmpty()
+        blockLog.topElement.setTaackTag(TaackTag.BLOCK)
+    }
+
+    /**
+     * Check if a block DSL element has to be rendered. If a page contains multiple block, and user click on
+     * a table to sort, only the table will be rendered when processing the DSL.
+     *
+     * * If the page is not ajax, everything is rendered
+     * * else
+     * * * If no explicit ajaxBlock, only current or target ajaxBlock is rendered
+     * * * If explicit ajaxBlocks are specified (via {@link #setExplicitAjaxBlockId(String id) setAjaxBlockId}),
+     *     only then will be rendered if in ajax mode (parameter.isAjaxRendering == true)
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    boolean doRenderElement(String id = null) {
+        // if many blocks in the same response, only redraw current block
+        // further the first block must be in ajaxMode until current block ends
+        blockLog.stayBlock("doDisplay1 id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
+        if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
+            return true
+        } else if (!id) return isModal
+        if (parameter.isAjaxRendering && currentAjaxBlockId == null)
+            currentAjaxBlockId = parameter.ajaxBlockId
+
+        if (parameter.targetAjaxBlockId) currentAjaxBlockId = parameter.targetAjaxBlockId
+
+        boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal) || parameter.targetAjaxBlockId
+        blockLog.stayBlock("doDisplay2 currentAjaxBlockId: $currentAjaxBlockId, targetAjaxBlockId: ${parameter.targetAjaxBlockId}, ajaxBlockId: ${parameter.ajaxBlockId}, doRender = $doRender")
+        return doRender
     }
 
     @Override
     void visitBlock() {
-        if (!parameter.isAjaxRendering || isModal)
-            out << "<div id='blockId${blockId}' class='pure-g taackBlock' blockId='${parameter.map['controller']}-${parameter.map['action']}'>"
+        blockLog.enterBlock('visitBlock')
+        blockLog.topElement = block.block(blockLog.topElement, "${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
     }
 
     @Override
     void visitBlockEnd() {
-        if (!parameter.isAjaxRendering || isModal)
-            out << "</div>"
+        blockLog.exitBlock('visitBlockEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.BLOCK)
     }
 
     @Override
-    void visitInnerBlock(final String i18n, final BlockSpec.Width width) {
-        if (!(!i18n || i18n.isEmpty())) {
-            hasTitle = true
-            out << """
-                <div class='${width.css}'><div>
-                <div class='grid-left-title grid-title'>
-                    <div class='title'>${i18n}</div>
-            """
-        } else {
-            if (!parameter.isAjaxRendering || isModal)
-                out << "<div class='${width.css} ${!isModal ? 'taackContainer' : ''} ${ajaxBlockId ? "ajaxBlock ${hasPureG == 0?'taackAjaxBlock': ''}" : ""}' ${ajaxBlockId ? "ajaxBlockId=${ajaxBlockId}" : ""}>"
-            if (hasPureG == 0)
-                out << "<div class='pure-g'>"
-            else
-                out << "<div>"
+    void visitBlockHeader() {
+        blockLog.enterBlock('visitBlockHeader')
+        blockLog.topElement.setTaackTag(TaackTag.MENU_BLOCK)
+        blockLog.topElement = block.blockHeader(blockLog.topElement)
+    }
+
+    @Override
+    void visitBlockHeaderEnd() {
+        blockLog.exitBlock('visitBlockHeaderEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_BLOCK)
+    }
+
+    @Override
+    void visitCol(final BlockSpec.Width width) {
+        blockLog.enterBlock('visitCol')
+        blockLog.topElement.setTaackTag(TaackTag.COL)
+        blockLog.topElement = block.col(blockLog.topElement, width)
+    }
+
+    @Override
+    void visitColEnd() {
+        blockLog.exitBlock('visitColEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.COL)
+    }
+
+    /**
+     * 2 modes of rendering:
+     * * either we transmit to the browser which blocks that should be updated
+     * * either we transmit a div, placeholder for the subsequent updates
+     *
+     * @param id
+     */
+    @Override
+    void visitAjaxBlock(String id) {
+        blockLog.enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering + " parameter.ajaxBlockId: " + parameter.ajaxBlockId)
+        if (!id) id = parameter.ajaxBlockId
+        blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
+        // if many blocks in the same response, only redraw current block
+        // further the first block must be in ajaxMode until current block ends
+        boolean doAjaxRendering = parameter.isRefresh && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
+        if (!doAjaxRendering && parameter.targetAjaxBlockId) {
+            id = parameter.targetAjaxBlockId
+            doAjaxRendering = true
         }
-        hasPureG++
-    }
-
-    @Override
-    void visitInnerBlockEnd() {
-        hasPureG--
-        out << "</div>"
-        out << "</div>"
-    }
-
-    @Override
-    void visitCloseTitle() {
-        if (hasTitle) {
-            out << "</div>"
-            hasTitle = false
-        }
-    }
-
-    @Override
-    void visitAjaxBlock(final String id) {
-        if (!parameter.isAjaxRendering || isModal) ajaxBlockId = id
-        else out << "__ajaxBlockStart__$id:"
+        blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering)
     }
 
     @Override
     void visitAjaxBlockEnd() {
-        if (!parameter.isAjaxRendering || isModal) ajaxBlockId = null
-        else out << "__ajaxBlockEnd__"
+        blockLog.exitBlock('visitAjaxBlockEnd')
+        currentAjaxBlockId = null
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
     }
 
     @Override
-    void visitForm(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, width)
+    void visitForm(UiFormSpecifier formSpecifier) {
+        blockLog.stayBlock('visitForm')
+        formSpecifier.visitForm(new RawHtmlFormDump(blockLog, parameter))
     }
 
-    @Override
-    void visitFormEnd(UiFormSpecifier formSpecifier) {
-        visitCloseTitle()
-        formSpecifier.visitForm(new RawHtmlFormDump(out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
-    }
 
     @Override
-    void visitShow(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
-    }
-
-    @Override
-    void visitShowEnd(final UiShowSpecifier uiShowSpecifier) {
-        visitCloseTitle()
+    void visitShow(final UiShowSpecifier uiShowSpecifier) {
+        blockLog.stayBlock('visitShow')
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
         if (uiShowSpecifier) uiShowSpecifier.visitShow(new RawHtmlShowDump(id, out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+        blockLog.topElement.addChildren(new HTMLOutput(out))
     }
 
     @Override
     void visitCloseModalAndUpdateBlock() {
-        out << "closeLastModalAndUpdateBlock:"
+        blockLog.enterBlock('visitCloseModalAndUpdateBlock')
+        blockLog.topElement = new HTMLAjaxCloseModal()
     }
 
     @Override
     void visitCloseModalAndUpdateBlockEnd() {
-
+        blockLog.exitBlock('visitCloseModalAndUpdateBlockEnd')
     }
 
     @Override
     void visitHtmlBlock(String html, Style style) {
-        out << """
-            <div class="${style?.cssClassesString ?: ''}">${html}</div>
-        """
+        blockLog.stayBlock('visitHtmlBlock')
+        blockLog.topElement.addChildren(
+                new HTMLDiv().builder.addClasses(style?.cssClassesString).addChildren(
+                        new HTMLTxtContent(html)
+                ).build()
+        )
     }
 
     @Override
-    void visitTable(final String id, final String i18n, final BlockSpec.Width width) {
-        this.id = id
-        def recordStateForId = parameter.map['recordStateDecoded']?[id] as Map
-        if (recordStateForId) {
-            parameter.map.putAll(recordStateForId)
-        }
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
+    void visitPoll(int millis, MethodClosure polledAction) {
+        blockLog.enterBlock('visitPoll ' + millis + ' ms ' + polledAction.toString())
+        poll = millis
+        HTMLAjaxPoll poll = new HTMLAjaxPoll(millis, parameter.urlMapped(polledAction))
+        blockLog.topElement.addChildren(poll)
+        blockLog.topElement.setTaackTag(TaackTag.POLL)
+
     }
 
     @Override
-    void visitTableEnd(UiTableSpecifier tableSpecifier) {
-        visitCloseTitle()
-//        UiFilterSpecifier f = new UiFilterSpecifier()
-        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(id, out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+    void visitPollEnd() {
+        blockLog.enterBlock('visitPollEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
+        poll = 0
     }
 
     @Override
-    void visitTableFilter(final String id, final String i18nFilter,
-                          final UiFilterSpecifier filterSpecifier, final String i18nTable, final BlockSpec.Width width) {
-        def recordStateForId = parameter.map['recordStateDecoded']?[id] as Map
-        if (recordStateForId) {
-            parameter.map.putAll(recordStateForId)
-        }
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18nFilter, BlockSpec.Width.QUARTER)
-        visitCloseTitle()
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlock(i18nTable, BlockSpec.Width.THREE_QUARTER)
+    void visitTable(String id, final UiTableSpecifier tableSpecifier) {
+        blockLog.stayBlock('visitTable ' + id)
+        tableSpecifier.visitTableWithNoFilter(new RawHtmlTableDump(blockLog, id, parameter))
     }
 
     @Override
-    void visitTableFilterEnd(final UiTableSpecifier tableSpecifier) {
-        visitCloseTitle()
-        tableSpecifier.visitTable(new RawHtmlTableDump(id, out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+    void visitTableFilter(final String id,
+                          final UiFilterSpecifier filterSpecifier,
+                          final UiTableSpecifier tableSpecifier) {
+        blockLog.stayBlock('visitTableFilter ' + id)
+        visitCol(BlockSpec.Width.QUARTER)
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog, id, parameter))
+        visitColEnd()
+        visitCol(BlockSpec.Width.THREE_QUARTER)
+        tableSpecifier.visitTable(new RawHtmlTableDump(blockLog, id, parameter))
+        visitColEnd()
+    }
+
+//    @Override
+//    void visitChart(final UiChartSpecifier chartSpecifier) {
+//        blockLog.stayBlock('visitChart')
+//        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
+//        chartSpecifier.visitChart(new RawHtmlChartDump(out, "ajaxBlockId"))
+//        blockLog.topElement.addChildren(new HTMLOutput(out))
+//    }
+
+    @Override
+    void visitDiagramFilter(final UiDiagramSpecifier diagramSpecifier, final UiFilterSpecifier filterSpecifier) {
+        blockLog.stayBlock('visitDiagramFilter')
+        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog, id, parameter))
     }
 
     @Override
-    void visitChart(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
-    }
-
-    @Override
-    void visitChartEnd(final UiChartSpecifier chartSpecifier) {
-        visitCloseTitle()
-        chartSpecifier.visitChart(new RawHtmlChartDump(out, ajaxBlockId))
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
-    }
-
-    @Override
-    void visitDiagram(final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
-    }
-
-    @Override
-    void visitDiagramFilter(final String i18nFilter, final UiFilterSpecifier filterSpecifier, final String i18n, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18nFilter, BlockSpec.Width.QUARTER)
-        visitCloseTitle()
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(out, parameter))
-        visitInnerBlockEnd()
-        visitInnerBlock(i18n, BlockSpec.Width.THREE_QUARTER)
-    }
-
-    @Override
-    void visitDiagramEnd(final UiDiagramSpecifier diagramSpecifier, final BlockSpec.Width width = BlockSpec.Width.MAX) {
-        visitCloseTitle()
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out, ajaxBlockId, width), UiDiagramSpecifier.DiagramBase.SVG)
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
+    void visitDiagram(final UiDiagramSpecifier diagramSpecifier) {
+        blockLog.stayBlock('visitDiagram')
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out), UiDiagramSpecifier.DiagramBase.SVG)
+        blockLog.topElement.addChildren(new HTMLOutput(out))
     }
 
     @Override
     void visitCloseModal(final String id, final String value, FieldInfo[] fields = null) {
-        out << "closeLastModal:${id?:""}:${value?:""}"
+        blockLog.stayBlock('visitCloseModal')
+        blockLog.topElement.addChildren(new HTMLAjaxCloseLastModal(id, value))
         for (FieldInfo fi : fields) {
             if (fi.value) {
-                if (parameter.nf && fi.value instanceof Number) out << ":__FieldInfo__:${fi.fieldName}:${parameter.nf.format(fi.value)}:__FieldInfoEnd__"
-                else out << ":__FieldInfo__:${fi.fieldName}:${fi.value.toString()}:__FieldInfoEnd__"
+                if (parameter.nf && fi.value instanceof Number)
+                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
+                else
+                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
             }
         }
     }
 
     @Override
     void visitBlockTab(final String i18n) {
+        blockLog.enterBlock('visitBlockTab')
         currentTabNames << i18n
-        out << """<div class="tab${++tabOccurrence}${tabOccurrencePrevious != 0?"Inner":""} pure-g">"""
+        blockLog.topElement.setTaackTag(TaackTag.TAB)
+        blockLog.topElement = block.tab(blockLog.topElement, tabOccurrence++)
     }
 
     @Override
     void visitBlockTabEnd() {
-        out << '</div>'
+        blockLog.exitBlock('visitBlockTabEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TAB)
     }
 
-    private List<String> currentTabNames
-    private ByteArrayOutputStream outBkup
-    private BlockSpec.Width blockTabWidth
+    private List<String> currentTabNames = []
+    private IHTMLElement oldParent = null
 
     @Override
-    void visitBlockTabs(final BlockSpec.Width width) {
-        outBkup = out
-        out = new ByteArrayOutputStream()
-        blockTabWidth = width
-        currentTabNames = []
+    void visitBlockTabs() {
+        blockLog.enterBlock('visitBlockTabs')
+        oldParent = blockLog.topElement
+        oldParent.setTaackTag(TaackTag.TABS)
+        blockLog.topElement = new HTMLEmpty()
     }
 
     @Override
     void visitBlockTabsEnd() {
-        outBkup << """<div class="pc-tab ${blockTabWidth.css} taackContainer">"""
-        currentTabNames.eachWithIndex { it, occ ->
-            outBkup << """<input ${occ == 0 ? 'checked="checked"' : ''} id="tab${occ + 1}-${tabIds}" type="radio" class="taackBlockInputTab inputTab${occ + 1}${/*tabOccurrence != 0*/ false ?"Inner":""}" name="pct-${tabIds}" />"""
-        }
-        outBkup << "<nav><ul>"
-        currentTabNames.eachWithIndex { it, occ ->
-            outBkup << """
-                <li class="tab${occ + 1}">
-                    <label for="tab${occ + 1}-${tabIds}">${it}</label>
-                </li>
-            """
-        }
-        outBkup << "</ul></nav>"
-        outBkup << "<section>"
-        tabIds++
-        if (tabOccurrence != 0) tabOccurrencePrevious = tabOccurrence
-        tabOccurrence = 0
-        out.writeTo(outBkup)
-        out = outBkup
-
-        tabOccurrence = tabOccurrencePrevious
-        tabOccurrencePrevious = 0
-        out << "</section></div>"
+        blockLog.exitBlock('visitBlockTabsEnd')
+        IHTMLElement tabsContent = blockLog.topElement
+        blockLog.topElement = block.tabs(oldParent, currentTabNames)
+        blockLog.topElement.addChildren(tabsContent)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }
 
     @Override
-    void visitCustom(final String i18n, final String html, Style style, final BlockSpec.Width width) {
-        visitInnerBlock(null, width)
-        visitInnerBlock(i18n, BlockSpec.Width.MAX)
-        visitCloseTitle()
+    void visitCustom(final String html, Style style) {
+        blockLog.stayBlock('visitCustom')
         visitHtmlBlock(html, style)
-        visitInnerBlockEnd()
-        visitInnerBlockEnd()
-    }
-
-    @Override
-    void anonymousBlock(BlockSpec.Width width) {
-        out << """<div class="${width.css}">"""
-    }
-
-    @Override
-    void anonymousBlockEnd() {
-        out << "</div>"
-    }
-
-    @Override
-    void visitActionStart() {
-        out << "<div class='icon right'>"
-    }
-
-    @Override
-    void visitActionEnd() {
-        out << "</div>"
-    }
-
-    @Override
-    void visitAction(final String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ? extends Object> params, boolean isAjaxRendering) {
-        if (isAjaxRendering) {
-            out << """
-                <a class='ajaxLink taackAjaxLink' ajaxAction='${parameter.urlMapped(controller, action, id, params, true)}'>
-                    ${actionIcon.getHtml(i18n)}
-                </a>
-            """
-        } else {
-            out << "<a href='${parameter.urlMapped(controller, action, id, params)}'>${actionIcon.getHtml(i18n)}</a>"
-        }
-    }
-
-    @Override
-    void visitOutsideAction(final String i18n, final ActionIcon actionIcon, final String baseUrl, Map<String, ? extends Object> params) {
-        out << "<a target='_blank' href='${baseUrl}${params ? "?${Utils.paramsString params}'" : ''}'>${actionIcon.getHtml(i18n)}</a>"
     }
 
     @Override
     void visitModal() {
+        blockLog.enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isRefreshing)
         isModal = true
-//        out << """
-//          <a class="close">&times;</a>
-//        """
+        HTMLAjaxModal modal = new HTMLAjaxModal(isRefreshing)
+        blockLog.topElement.addChildren(modal)
+        blockLog.topElement.setTaackTag(TaackTag.MODAL)
+        blockLog.topElement = modal
     }
 
     @Override
     void visitModalEnd() {
+        blockLog.exitBlock('visitModalEnd')
         isModal = false
-//        out << """
-//            <div id="ajaxBlock${parameter.modalId}Modal" class="modal">
-//                <div class="modal-content">
-//
-//                </div>
-//            </div>
-//        """
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
+    }
+
+    /**
+     * Set explicit ajaxBlockId to for ajax mode and for render.
+     * (See {@link #visitAjaxBlock}
+     *
+     * @param id
+     */
+    @Override
+    void setExplicitAjaxBlockId(String id) {
+        theCurrentExplicitAjaxBlockId = id
     }
 
     @Override
     Map getParameterMap() {
-        parameter.map
+        parameter.applicationTagLib.params
     }
 
+    @Override
+    void visitRow() {
+        blockLog.enterBlock('visitRow')
+        blockLog.topElement.setTaackTag(TaackTag.ROW)
+        blockLog.topElement = block.row(blockLog.topElement)
+    }
+
+    @Override
+    void visitRowEnd() {
+        blockLog.exitBlock('visitRowEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ROW)
+    }
+
+    BootstrapMenu menu
+
+    @Override
+    void visitMenuLabel(String i18n, boolean hasClosure) {
+        if (hasClosure) blockLog.enterBlock('visitMenuLabel ' + i18n)
+        else blockLog.stayBlock('visitMenuLabel ' + i18n)
+        blockLog.topElement.setTaackTag(TaackTag.LABEL)
+
+        blockLog.topElement = menu.label(blockLog.topElement, i18n, hasClosure)
+    }
+
+    @Override
+    void visitMenuLabelEnd() {
+        blockLog.exitBlock('visitMenuLabelEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.LABEL)
+    }
+
+    @Override
+    void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
+        blockLog.enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
+        futurCurrentAjaxBlockId = ajaxBlockId
+        blockLog.topElement.setTaackTag(TaackTag.MENU)
+        menu = new BootstrapMenu(blockLog)
+        blockLog.topElement = menu.menuStart(blockLog.topElement)
+    }
+
+    @Override
+    void visitMenuStartEnd() {
+        blockLog.exitBlock('visitMenuStartEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU)
+    }
+
+    private void splitMenu() {
+        if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
+            blockLog.stayBlock('splitMenu +++')
+            blockLog.topElement = menu.splitMenuStart(blockLog.topElement.parent)
+            blockLog.topElement.setTaackTag(TaackTag.MENU_SPLIT)
+            blockLog.stayBlock('splitMenu ---')
+        } else {
+            blockLog.stayBlock('splitMenu -+-+-+-')
+        }
+
+    }
+
+    private void splitMenuEnd() {
+        if (blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
+            blockLog.stayBlock('splitMenuEnd TRUE')
+            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_SPLIT)
+        } else {
+            blockLog.stayBlock('splitMenuEnd FALSE')
+        }
+    }
+
+    @Override
+    void visitMenu(String controller, String action, Map<String, ?> params) {
+        blockLog.stayBlock('visitMenu')
+        visitLabeledSubMenu(null, controller, action, params)
+    }
+
+
+    @Override
+    void visitSubMenu(String controller, String action, Map<String, ?> params) {
+        blockLog.stayBlock('visitSubMenu')
+        visitLabeledSubMenu(null, controller, action, params)
+    }
+
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+        i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
+
+        blockLog.stayBlock('visitLabeledSubMenu ' + i18n)
+        if (futurCurrentAjaxBlockId) {
+            params ?= [:]
+            params.put('targetAjaxBlockId', futurCurrentAjaxBlockId)
+        }
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, parameter.isAjaxRendering, parameter.urlMapped(controller, action, params))
+    }
+
+    @Override
+    void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
+        blockLog.enterBlock('visitMenuSection ' + i18n)
+        menu.section(blockLog.topElement, i18n)
+    }
+
+    @Override
+    void visitMenuSectionEnd() {
+        blockLog.exitBlock('visitMenuSectionEnd')
+
+    }
+
+    @Override
+    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
+        i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
+        blockLog.stayBlock('visitSubMenuIcon ' + i18n)
+        if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
+            splitMenu()
+        }
+        menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+    }
+
+    @Override
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
+        blockLog.enterBlock('visitMenuSelect')
+        String valueSelected = params[paramName]
+        IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
+        String controller = params['controller'] as String
+        String action = params['action'] as String
+        visitLabeledSubMenu(enumSelected.value, controller, action, params)
+        for (def eo in enumOptions.getOptions()) {
+            params.put(paramName, eo.key)
+            visitLabeledSubMenu(eo.value, controller, action, params)
+        }
+    }
+
+    @Override
+    void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
+        blockLog.enterBlock('visitMenuSearch')
+        splitMenu()
+        menu.menuSearch(blockLog.topElement, q?.replace('"', "&quot;"), parameter.urlMapped(Utils.getControllerName(action), action.method))
+        splitMenuEnd()
+        blockLog.exitBlock('visitMenuSearch')
+    }
+
+    @Override
+    void visitMenuOptions(IEnumOptions enumOptions) {
+        blockLog.enterBlock('visitMenuOptions')
+        splitMenu()
+        String selectedOptionKey = parameter.params[enumOptions.paramKey]
+
+        IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
+        String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
+        String img = currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
+
+        blockLog.topElement = menu.menuOptions(blockLog.topElement, img, selectedOptionValue)
+        blockLog.topElement.setTaackTag(TaackTag.MENU_OPTION)
+
+        String controller = parameter.params['controller'] as String
+        String action = parameter.params['action'] as String
+
+        final IEnumOption[] options = enumOptions.options
+        final int im = options.size()
+
+        int i = 0
+        for (i; i < im;) {
+            IEnumOption option = options[i++]
+            parameter.params.put(enumOptions.paramKey, option.key)
+            img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
+            if (option.section) {
+                menu.menuOptionSection(blockLog.topElement, img, option.value)
+            } else {
+                String url = parameter.urlMapped(controller, action, parameter.params as Map, false)
+                menu.menuOption(blockLog.topElement, img, option.value, url)
+            }
+        }
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_OPTION)
+        splitMenuEnd()
+        blockLog.exitBlock('visitMenuOptions')
+    }
+
+    @Override
+    String getOutput() {
+        blockLog.topElement.output
+    }
 }

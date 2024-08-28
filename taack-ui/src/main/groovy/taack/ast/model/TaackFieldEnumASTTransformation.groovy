@@ -22,6 +22,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 
 import static org.codehaus.groovy.ast.ClassHelper.make
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*
@@ -438,17 +439,18 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
         final BlockStatement body = new BlockStatement()
 
         StaticMethodCallExpression callGetMethod = callX(
-                methodNode.returnType,
+                classNode,
                 'getMethod',
-                args(methodNode.name)
+                args(constX(methodNode.name))
         )
-        callGetMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, methodNode)
-        callGetMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, methodNode.returnType)
+
+//        callGetMethod.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, methodNode)
+//        callGetMethod.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, make(Method))
 
         MethodCallExpression callMethod = callThisX(methodNode.name)
 
         callMethod.putNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, methodNode)
-        callMethod.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, classNode)
+        callMethod.putNodeMetaData(StaticTypesMarker.INFERRED_TYPE, methodNode.returnType)
 
         ConstructorCallExpression ctorGetMethodReturn = ctorX(
                 GRM_TYPE,

@@ -15,7 +15,7 @@ public final class TQLTranslator extends TQLBaseListener {
 
     public static class Col {
         public enum Type {
-            DATA, FORMULA, TABLE_STAR, STAR
+            DATA, FORMULA, TABLE_STAR, STAR, GETTER
         }
 
         Col(Type colType, String colName) {
@@ -30,7 +30,7 @@ public final class TQLTranslator extends TQLBaseListener {
             this.colName = colName;
         }
 
-        public final Type colType;
+        public Type colType;
         public final String colName;
         public final String formula;
     }
@@ -67,7 +67,9 @@ public final class TQLTranslator extends TQLBaseListener {
             if (first) {
                 first = false;
             } else res.append(',');
-            if (c.colType == Col.Type.FORMULA) {
+            if (c.colType == Col.Type.GETTER) {
+                res.append("id as " + colAliasMap.get(c));
+            } else if (c.colType == Col.Type.FORMULA) {
                 if (c.formula != null) {
                     res.append(c.formula + '(' + c.colName + ')');
                 } else res.append(c.colName);
@@ -77,7 +79,7 @@ public final class TQLTranslator extends TQLBaseListener {
                 } else res.append(c.colName);
             }
             String alias = colAliasMap.get(c);
-            if (alias != null) {
+            if (alias != null && c.colType != Col.Type.GETTER) {
                 res.append(" as ");
                 res.append(alias);
             }
@@ -226,13 +228,13 @@ public final class TQLTranslator extends TQLBaseListener {
     }
 
     @Override
-    public void enterSelectFuntionExpression(TQLParser.SelectFuntionExpressionContext ctx) {
-        super.enterSelectFuntionExpression(ctx);
+    public void enterSelectFunctionExpression(TQLParser.SelectFunctionExpressionContext ctx) {
+        super.enterSelectFunctionExpression(ctx);
     }
 
     @Override
-    public void exitSelectFuntionExpression(TQLParser.SelectFuntionExpressionContext ctx) {
-        super.exitSelectFuntionExpression(ctx);
+    public void exitSelectFunctionExpression(TQLParser.SelectFunctionExpressionContext ctx) {
+        super.exitSelectFunctionExpression(ctx);
     }
 
     @Override
