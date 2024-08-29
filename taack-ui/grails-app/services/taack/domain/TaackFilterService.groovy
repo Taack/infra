@@ -21,4 +21,8 @@ final class TaackFilterService implements WebAttributes {
         new TaackFilter.FilterBuilder<T>(cClass, sessionFactory, params.toSorted())
     }
 
+    final<T extends GormEntity<T>> TaackFilter.FilterBuilder<T> getBuilder(T oObject) {
+        new TaackFilter.FilterBuilder<T>(oObject, sessionFactory, params.toSorted())
+    }
+
 }
