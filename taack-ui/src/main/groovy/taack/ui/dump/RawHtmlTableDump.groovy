@@ -55,8 +55,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
+        Style displayBlock = new Style(null, 'display: block;')
+        if (style) {
+            displayBlock += style
+        }
         if (!url) return new HTMLSpan().builder
-                .setStyle(new DisplayBlock())
+                .setStyle(displayBlock)
                 .addChildren(new HTMLTxtContent(cell)).build()
         return new HTMLAnchor(true, url).builder.addChildren(
                 new HTMLTxtContent(cell)

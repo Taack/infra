@@ -10,7 +10,7 @@ import taack.ui.dsl.show.ShowSpec
  * Class allowing to build a show graphical element in a block.
  *
  * <p>To add a show graphical element in a block, call
- * {@link taack.ui.dsl.block.BlockSpec#show(java.lang.String, UiShowSpecifier, taack.ui.dsl.block.BlockSpec.Width)}
+ * {@link taack.ui.dsl.block.BlockSpec#show(UiShowSpecifier)}
  *
  * <pre>{@code
  *  UiShowSpecifier buildShowItem(Item item, Subsidiary subsidiary) {
@@ -33,9 +33,9 @@ import taack.ui.dsl.show.ShowSpec
  * }</pre>
  */
 @CompileStatic
-final class UiShowSpecifier {
+final class UiShowSpecifier<T> {
     Closure closure
-    Object object
+    T object
     String controller
     String action
 
@@ -48,7 +48,7 @@ final class UiShowSpecifier {
      * @param closure description of what to show
      * @return itself
      */
-    UiShowSpecifier ui(final Object aObject = null, final String controller = null, final String action = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+    public UiShowSpecifier ui(final T aObject = null, final String controller = null, final String action = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
         this.closure = closure
         this.object = aObject
         this.controller = controller
@@ -64,7 +64,7 @@ final class UiShowSpecifier {
      * @param closure description of what to show
      * @return itself
      */
-    UiShowSpecifier ui(final Object aObject = null, final MethodClosure action, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+    UiShowSpecifier ui(final T aObject = null, final MethodClosure action, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
         this.closure = closure
         this.object = aObject
         this.controller = Utils.getControllerName(action)

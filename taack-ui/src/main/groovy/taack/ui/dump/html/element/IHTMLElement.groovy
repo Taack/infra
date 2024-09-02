@@ -109,12 +109,14 @@ trait IHTMLElement {
             res += ['id': id]
         if (taackTag)
             res += ['taackTag': taackTag.toString()]
+        if (styleDescriptor) {
+            if (styleDescriptor.classes) classes += styleDescriptor.classes.trim().split(/ +/)
+            res += ['style': styleDescriptor.styleOutput]
+        }
         if (classes)
             res += ['class': classes.grep { it != null} .join(' ')]
         if (onClick)
             res += ['onclick': onClick.output]
-        if (styleDescriptor)
-            res += ['style': styleDescriptor.output]
         res
     }
 

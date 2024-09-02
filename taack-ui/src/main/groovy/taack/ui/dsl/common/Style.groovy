@@ -1,6 +1,7 @@
 package taack.ui.dsl.common
 
 import groovy.transform.CompileStatic
+import taack.ui.dump.html.style.IStyleDescriptor
 
 @CompileStatic
 enum CssContent {
@@ -33,7 +34,7 @@ enum CssContent {
 }
 
 @CompileStatic
-class Style {
+class Style implements IStyleDescriptor {
     final static Style RED = new Style(CssContent.COLOR_RED)
     final static Style BLUE = new Style(CssContent.COLOR_BLUE)
     final static Style GREEN = new Style(CssContent.COLOR_GREEN)
@@ -108,6 +109,16 @@ class Style {
         res.labelCssClassesString += "${labelCssClassesString?:""} ${other.labelCssClassesString?:""}"
         res.labelCssStyleString += "${labelCssStyleString?:""} ${other.labelCssStyleString?:""}"
         res
+    }
+
+    @Override
+    String getStyleOutput() {
+        return cssStyleString
+    }
+
+    @Override
+    String getClasses() {
+        return cssClassesString
     }
 }
 
