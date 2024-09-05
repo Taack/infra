@@ -15,6 +15,11 @@ import org.apache.solr.client.solrj.response.GroupResponse
 import org.apache.solr.client.solrj.response.QueryResponse
 import org.apache.solr.client.solrj.response.RangeFacet
 import org.apache.solr.common.SolrInputDocument
+import org.apache.tika.metadata.Metadata
+import org.apache.tika.parser.AutoDetectParser
+import org.apache.tika.parser.ParseContext
+import org.apache.tika.parser.ocr.TesseractOCRConfig
+import org.apache.tika.sax.BodyContentHandler
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,13 +43,13 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
  *
  * <p>To add domain to the search, in a service:
  * <pre>{@code
- *  @GrailsCompileStatic
+ * @GrailsCompileStatic
  *  class CrewSearchService implements TaackSearchService.IIndexService {
  *
  *      static lazyInit = false
  *      TaackSearchService taackSearchService
  *
- *      @PostConstruct
+ * @PostConstruct
  *      private void init() {
  *          taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MC, this.&labeling as MC, { User u ->
  *              u ?= new User()
@@ -59,7 +64,7 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
  *          }))
  *      }
  *
- *      @Override
+ * @Override
  *      List<? extends GormEntity> indexThose(Class<? extends GormEntity> toIndex) {
  *          if (toIndex.isAssignableFrom(Ticket2Issue)) return Ticket2Issue.findAllByActive(true)
  *          else null
@@ -107,10 +112,10 @@ final class TaackSearchService implements WebAttributes {
     /**
      * Build search block
      *
-     * @param q         query
-     * @param search    Action that will display the block (that will call this method)
-     * @param classes   registered class
-     * @return  block with search results
+     * @param q query
+     * @param search Action that will display the block (that will call this method)
+     * @param classes registered class
+     * @return block with search results
      */
     final UiBlockSpecifier search(String q, MC search, Class<? extends GormEntity>... classes) {
         List<String> facetsClicked = params.list("facetsClicked")
@@ -185,7 +190,7 @@ final class TaackSearchService implements WebAttributes {
                             for (def r in ranges) {
                                 if (i18nMap[r.name]) {
                                     header {
-                                        column (2) {
+                                        column(2) {
                                             label(i18nMap[r.name] ?: 'Type')
                                         }
                                     }
@@ -209,7 +214,7 @@ final class TaackSearchService implements WebAttributes {
                         table new UiTableSpecifier().ui {
                             for (def f in facets) {
                                 header {
-                                    column (2) {
+                                    column(2) {
                                         label(i18nMap[f.name] ?: 'Type')
                                     }
                                 }
@@ -242,7 +247,7 @@ final class TaackSearchService implements WebAttributes {
                                     String label = solrSpecifier.label.call(id)
                                     row {
                                         rowColumn(2) {
-                                            rowAction(ActionIcon.SELECT*IconStyle.SCALE_DOWN, solrSpecifier.show, id)
+                                            rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, solrSpecifier.show, id)
                                             rowField label
                                         }
                                     }
@@ -313,4 +318,26 @@ final class TaackSearchService implements WebAttributes {
         dynamicFieldRequest.process(solrClient)
         solrClient.commit()
     }
+
+    String fileContentToStringWithoutOcr(InputStream stream) {
+        AutoDetectParser parser = new AutoDetectParser()
+        BodyContentHandler handler = new BodyContentHandler(500_000)
+        Metadata metadata = new Metadata()
+
+        TesseractOCRConfig config = new TesseractOCRConfig()
+        config.setSkipOcr(true)
+        ParseContext context = new ParseContext()
+        context.set(TesseractOCRConfig.class, config)
+        parser.parse(stream, handler, metadata, context)
+        handler.toString()
+    }
+
+    String fileContentToStringWithOcr(InputStream stream) {
+        AutoDetectParser parser = new AutoDetectParser()
+        BodyContentHandler handler = new BodyContentHandler(500_000)
+        Metadata metadata = new Metadata()
+        parser.parse(stream, handler, metadata)
+        handler.toString()
+    }
+
 }

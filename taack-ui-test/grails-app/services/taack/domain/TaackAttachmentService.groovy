@@ -6,11 +6,6 @@ import grails.util.Pair
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import org.apache.commons.io.FileUtils
-import org.apache.tika.metadata.Metadata
-import org.apache.tika.parser.AutoDetectParser
-import org.apache.tika.parser.ParseContext
-import org.apache.tika.parser.ocr.TesseractOCRConfig
-import org.apache.tika.sax.BodyContentHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import attachment.Attachment
@@ -25,6 +20,7 @@ import javax.annotation.PostConstruct
 class TaackAttachmentService implements WebAttributes, DataBinder {
     final Object imageConverter = new Object()
 
+    TaackSearchService taackSearchService
     @Autowired
     TaackUiConfiguration taackUiConfiguration
 
@@ -263,24 +259,15 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
         if (txt.exists()) return txt.text
         File a = new File(attachmentPath(attachment))
         if (a.exists()) {
-            AutoDetectParser parser = new AutoDetectParser()
-            BodyContentHandler handler = new BodyContentHandler(500_000)
-            Metadata metadata = new Metadata()
 
             try (InputStream stream = new FileInputStream(a)) {
                 if (attachment.contentTypeCategoryEnum == AttachmentContentTypeCategory.IMAGE) {
                     log.info "creating ${txt.path} with OCR"
-                    parser.parse(stream, handler, metadata)
-                    txt << handler.toString()
+                    txt << taackSearchService.fileContentToStringWithOcr(stream)
                     return txt.text
                 } else {
                     log.info "creating ${txt.path} without OCR"
-                    TesseractOCRConfig config = new TesseractOCRConfig()
-                    config.setSkipOcr(true)
-                    ParseContext context = new ParseContext()
-                    context.set(TesseractOCRConfig.class, config)
-                    parser.parse(stream, handler, metadata, context)
-                    txt << handler.toString()
+                    txt << taackSearchService.fileContentToStringWithoutOcr(stream)
                     return txt.text
                 }
             } catch (e) {
@@ -292,17 +279,5 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
         null
     }
 
-    String fileContentToStringWithoutOcr(InputStream stream) {
-        AutoDetectParser parser = new AutoDetectParser()
-        BodyContentHandler handler = new BodyContentHandler(500_000)
-        Metadata metadata = new Metadata()
-
-        TesseractOCRConfig config = new TesseractOCRConfig()
-        config.setSkipOcr(true)
-        ParseContext context = new ParseContext()
-        context.set(TesseractOCRConfig.class, config)
-        parser.parse(stream, handler, metadata, context)
-        handler.toString()
-    }
 
 }
