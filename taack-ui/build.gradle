@@ -77,11 +77,11 @@ dependencies {
 
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
 
-    api "org.apache.solr:solr-solrj:${solrj}"
-    api "org.apache.tika:tika-core:${tika}"
-    api "org.apache.tika:tika-parsers-standard:${tika}"
-    api "org.apache.tika:tika-parser-ocr-module:${tika}"
-    api "org.apache.tika:tika-parser-html-module:${tika}"
+    implementation "org.apache.solr:solr-solrj:${solrj}"
+    implementation "org.apache.tika:tika-core:${tika}"
+    implementation "org.apache.tika:tika-parsers-standard:${tika}"
+    implementation "org.apache.tika:tika-parser-ocr-module:${tika}"
+    implementation "org.apache.tika:tika-parser-html-module:${tika}"
 
     implementation 'net.i2p.crypto:eddsa:0.3.0'
     implementation "org.apache.sshd:sshd:${minaSshd}"
