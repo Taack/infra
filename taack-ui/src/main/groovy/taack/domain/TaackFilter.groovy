@@ -627,7 +627,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         private final Map<String, ?> theParams
         private int maxNumberOfLine = 0
         private List<UiFilterSpecifier> additionalFilters = []
-        private List<Long> restrictedIds = []
+        private List<Long> restrictedIds = null
         private FieldInfo[] sortFields
         private Order order
 
@@ -662,6 +662,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         }
 
         FilterBuilder addRestrictedIds(Long... ids) {
+            restrictedIds ?= []
             if (ids) this.restrictedIds.addAll ids
             this
         }
