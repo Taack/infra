@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value
 import taack.domain.*
 import taack.render.TaackUiService
 import taack.ui.dsl.*
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
@@ -34,20 +35,17 @@ class AttachmentController {
     String rootPath
 
     static private UiMenuSpecifier buildMenu(String q = null) {
-        UiMenuSpecifier m = new UiMenuSpecifier()
-
-        m.ui {
+        new UiMenuSpecifier().ui {
             menu AttachmentController.&index as MC
             label 'Tagged', {
                 for (def tagGroup : TermGroupConfig.values().findAll { it.active }) {
-                    subMenu AttachmentController.&showTermGroup as MC, [group: tagGroup.toString()]
+                    subMenu tagGroup.toString(), AttachmentController.&showTermGroup as MC, [group: tagGroup.toString()]
                 }
             }
             menu AttachmentController.&listTerm as MC
             menuSearch this.&search as MC, q
             menuOptions(SupportedLanguage.fromContext())
         }
-        m
     }
 
     def index() {
@@ -235,7 +233,6 @@ class AttachmentController {
         ts.ui {
             header {
                 label 'Name'
-                label 'Action'
             }
             Closure rec
 
@@ -265,10 +262,18 @@ class AttachmentController {
             }
         }
         taackUiService.show new UiBlockSpecifier().ui {
-            table ts
-            show new UiShowSpecifier().ui(new Object(), {
-                field Markdown.getContentHtml('# Click on a tag ..')
-            })
+            row {
+                col BlockSpec.Width.THIRD, {
+                    table ts
+                }
+                col {
+                    ajaxBlock('taggedFiles') {
+                        show new UiShowSpecifier().ui(new Object(), {
+                            field Markdown.getContentHtml('# Click on a tag ..')
+                        })
+                    }
+                }
+            }
         }, buildMenu()
     }
 
@@ -276,7 +281,9 @@ class AttachmentController {
         Attachment a = new Attachment()
         DocumentAccess ad = new DocumentAccess()
         User u = new User()
-        def attachments = Attachment.executeQuery('from Attachment a where a.active = true and ?0 in elements(a.tags)', term) as List<Attachment>
+
+        def attachments = Attachment.executeQuery('from Attachment a where a.active = true and ?0 in elements(a.documentCategory.tags)', term) as List<Attachment>
+        println "attachments.size(): ${attachments?.size()}"
         def ts = new UiTableSpecifier().ui {
             header {
                 column {
@@ -303,10 +310,10 @@ class AttachmentController {
                     .setSortOrder(TaackFilter.Order.DESC, a.dateCreated_)
                     .setMaxNumberOfLine(20)
                     .addRestrictedIds(attachments*.id as Long[])
-                    .build()) { Attachment aIt, Long counter ->
+                    .build()) { Attachment aIt ->
 
                 rowColumn {
-                    rowField attachmentUiService.preview(aIt.id)
+                    rowField this.attachmentUiService.preview(aIt.id)
                 }
                 rowColumn {
                     rowField aIt.originalName
@@ -326,9 +333,11 @@ class AttachmentController {
                 }
             }
         }
-        taackUiService.show new UiBlockSpecifier().ui {
-            table ts
-        }
+        taackUiService.show(new UiBlockSpecifier().ui {
+            ajaxBlock('taggedFiles') {
+                table ts
+            }
+        })
     }
 
     def selectDocumentAccess() {

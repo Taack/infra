@@ -135,7 +135,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        boolean doAjaxRendering = parameter.isRefresh && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
+        boolean doAjaxRendering = (parameter.isRefresh && isModal || !isModal) && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
         if (!doAjaxRendering && parameter.targetAjaxBlockId) {
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true

@@ -49,7 +49,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         this.oObject = (filterBuilder.oObject ?: null) as T
         this.max = filterBuilder.maxNumberOfLine ?: 0 as int
         this.additionalFilters = filterBuilder.additionalFilters.empty ? null : filterBuilder.additionalFilters
-        this.restrictedIds = filterBuilder.restrictedIds.empty ? null : filterBuilder.restrictedIds
+        this.restrictedIds = filterBuilder.restrictedIds
         this.sortFields = filterBuilder.sortFields
         this.order = filterBuilder.order
     }

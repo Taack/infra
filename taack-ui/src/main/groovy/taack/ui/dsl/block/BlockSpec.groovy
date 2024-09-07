@@ -151,8 +151,8 @@ final class BlockSpec {
      * @param closure description of the user interface
      */
     void ajaxBlock(final String id = null, Boolean visitAjax = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        if (visitAjax && id) blockVisitor.setExplicitAjaxBlockId(id)
         if (!id || blockVisitor.doRenderElement(id)) {
-            if (visitAjax) blockVisitor.setExplicitAjaxBlockId(id)
             if (visitAjax) blockVisitor.visitAjaxBlock(id)
             closure.delegate = this
             closure.call()
