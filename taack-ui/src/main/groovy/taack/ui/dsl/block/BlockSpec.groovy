@@ -201,8 +201,8 @@ final class BlockSpec {
     void form(final UiFormSpecifier formSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('form')
-        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
+            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitForm(formSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -221,8 +221,8 @@ final class BlockSpec {
     void show(final UiShowSpecifier showSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('show')
-        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
+            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitShow(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -232,8 +232,8 @@ final class BlockSpec {
     void table(final UiTableSpecifier tableSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('table')
-        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
+            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitTable(aId, tableSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -253,8 +253,8 @@ final class BlockSpec {
                      final UiTableSpecifier tableSpecifier,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('tableFilter')
-        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
+            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitRow()
             blockVisitor.visitTableFilter(aId, filterSpecifier, tableSpecifier)
@@ -273,8 +273,8 @@ final class BlockSpec {
     void diagram(final UiDiagramSpecifier diagramSpecifier,
                  @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
-        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
+            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitDiagram(diagramSpecifier)
             blockVisitor.visitAjaxBlockEnd()
@@ -297,8 +297,8 @@ final class BlockSpec {
     void custom(final String html, final Style style = null,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('custom')
-        processMenuBlock(aId, closure)
         if (blockVisitor.doRenderElement(aId)) {
+            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitCustom(html, style)
             blockVisitor.visitAjaxBlockEnd()

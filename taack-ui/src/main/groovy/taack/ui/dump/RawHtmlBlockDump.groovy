@@ -74,7 +74,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
             blockLog.simpleLog("doRenderElement1 return true, because NOT AJAX OR MODAL")
             return true
-        } else if (!id) {
+        } else if (!id && !parameter.ajaxBlockId) {
             blockLog.simpleLog("doRenderElement2 return isModal($isModal)")
             return isModal
         }
@@ -89,7 +89,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         blockLog.simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
-        boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal) || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
+        boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal && !parameter.isRefresh) || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
         blockLog.simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
     }
