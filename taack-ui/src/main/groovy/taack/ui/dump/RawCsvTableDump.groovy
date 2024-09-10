@@ -118,6 +118,11 @@ final class RawCsvTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitRowAction(String i18n, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
+
+    }
+
+    @Override
     void visitRowIndent() {
 
     }

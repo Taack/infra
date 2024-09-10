@@ -117,11 +117,6 @@ form .bootstrap legend {
     bottom: 0;
 }
 
-a:hover {
-    color: #83B6E3;
-    text-decoration: none;
-}
-
 .filter {
     font-size: small;
 }
