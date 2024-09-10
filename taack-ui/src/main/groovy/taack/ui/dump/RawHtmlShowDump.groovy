@@ -37,7 +37,6 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         this.aObject = currentObject
         this.controller = controller
         this.action = action
-        parameter.aClassSimpleName = currentObject?.class?.simpleName
 
         out << "<div class='property-list taackShow col-12'>"
     }

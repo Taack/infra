@@ -48,7 +48,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
-        parameter.aClassSimpleName = aClass.simpleName
         formThemed = new BootstrapForm(blockLog, false, true)
         formThemed.attributes.put('action', parameter.urlMapped())
         blockLog.topElement.setTaackTag(TaackTag.FILTER)

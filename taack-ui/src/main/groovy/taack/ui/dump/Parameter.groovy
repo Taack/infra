@@ -56,7 +56,6 @@ final class Parameter implements WebAttributes {
     static TaackUiOverriderService uiOverriderService = null
     static ThemeService uiThemeService = null
 
-    String aClassSimpleName
 
     Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target) {
         this.messageSource = messageSource
@@ -148,7 +147,7 @@ final class Parameter implements WebAttributes {
     String trField(final FieldInfo... fieldInfo) {
         def fieldNames = fieldInfo*.fieldName
         def fieldTypes = fieldInfo*.fieldConstraint.field*.type
-        String cn = aClassSimpleName?.uncapitalize() ?: fieldInfo[0].fieldConstraint.field.declaringClass.simpleName.uncapitalize()
+        String cn = fieldInfo[0].fieldConstraint.field.declaringClass.simpleName.uncapitalize()
         final int s = fieldNames.size() - 1
 
         List<String> keys = []

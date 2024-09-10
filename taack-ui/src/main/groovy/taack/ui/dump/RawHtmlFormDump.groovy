@@ -70,7 +70,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitForm(final Object aObject, final FieldInfo[] lockedFields = null) {
         this.lockedFields = lockedFields
         this.aObject = aObject
-        parameter.aClassSimpleName = aObject.class.simpleName
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
         blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(

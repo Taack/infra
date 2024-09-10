@@ -22,7 +22,6 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShow(Object currentObject, String controller = null, String action = null) {
         this.aObject = currentObject
-        parameter.aClassSimpleName = currentObject?.class?.simpleName
         out << "<ul class='property-list taackShow pure-u-1'>"
     }
 
