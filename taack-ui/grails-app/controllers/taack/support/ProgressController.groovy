@@ -42,9 +42,9 @@ class ProgressController {
             int value = taackUiProgressBarService.progress(id)
             boolean ended = taackUiProgressBarService.progressHasEnded(id)
             if (!ended) {
-                response.outputStream << taackUiService.visit(TaackUiProgressBarService.buildProgressBlock(id, max, value), true)
+                response.outputStream << taackUiService.visit(TaackUiProgressBarService.buildProgressBlock(id, max, value))
             } else {
-                response.outputStream << taackUiService.visit(taackUiProgressBarService.buildEndBlock(id), true)
+                response.outputStream << taackUiService.visit(taackUiProgressBarService.buildEndBlock(id))
             }
             response.outputStream.flush()
             response.outputStream.close()

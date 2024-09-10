@@ -202,6 +202,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.enterBlock('visitTableWithoutFilter')
         IHTMLElement table = themableTable.table(blockLog.topElement, blockId)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
+
+        List<HTMLInput> inputList = []
+
+        parameter.paramsToKeep.each {
+            inputList.add(new HTMLInput(InputType.HIDDEN, it.value, it.key))
+        }
+
         blockLog.topElement.addChildren(
                 new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
                         new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
@@ -211,7 +218,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                         new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
                         new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-                ).build(),
+                ).addChildren(inputList as HTMLInput[]).build(),
         )
         blockLog.topElement = table
     }

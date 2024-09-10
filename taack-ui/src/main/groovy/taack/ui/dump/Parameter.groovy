@@ -47,6 +47,7 @@ final class Parameter implements WebAttributes {
     final String ajaxBlockId
     final String targetAjaxBlockId
     final String fieldName
+    final Map<String, String> paramsToKeep
     final Long modalId = System.currentTimeMillis()
     final NumberFormat nf
     final MessageSource messageSource
@@ -57,7 +58,7 @@ final class Parameter implements WebAttributes {
     static ThemeService uiThemeService = null
 
 
-    Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target) {
+    Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target, String... paramsToKeep) {
         this.messageSource = messageSource
         this.target = target
         this.sort = params.get(P_SORT) ?: null
@@ -68,6 +69,10 @@ final class Parameter implements WebAttributes {
         this.beanId = params.long(P_ID) ?: null
         this.brand = params.get(P_BRAND) ?: null
         this.fieldName = params.get(P_FIELD_NAME) ?: null
+        this.paramsToKeep = [:]
+        paramsToKeep.each {
+            this.paramsToKeep.put(it, params[it] as String)
+        }
         this.ajaxBlockId = params.get('ajaxBlockId') ?: null
         this.targetAjaxBlockId = params.get('targetAjaxBlockId') ?: null
         this.isAjaxRendering = params.boolean('isAjax') == true
@@ -75,6 +80,7 @@ final class Parameter implements WebAttributes {
         this.lcl = lcl
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null
+        this
         if (!applicationTagLib) applicationTagLib = grailsApplication.mainContext.getBean(ApplicationTagLib)
         if (!uiOverriderService) uiOverriderService = grailsApplication.mainContext.getBean(TaackUiOverriderService)
         if (!uiThemeService) uiThemeService = grailsApplication.mainContext.getBean(ThemeService)

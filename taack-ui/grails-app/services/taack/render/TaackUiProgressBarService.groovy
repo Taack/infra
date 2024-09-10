@@ -77,7 +77,7 @@ class TaackUiProgressBarService {
         endsRegister.put(ret, ends)
 
         GrailsWebRequest webRequest = WebUtils.retrieveGrailsWebRequest()
-        webRequest.currentResponse.outputStream << taackUiService.visit(buildProgressBlock(ret, max, 0), true)
+        webRequest.currentResponse.outputStream << taackUiService.visit(buildProgressBlock(ret, max, 0))
         webRequest.currentResponse.outputStream.flush()
         webRequest.currentResponse.outputStream.close()
 

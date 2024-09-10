@@ -119,12 +119,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * Allows to retrieve the content of a block without rendering it.
      *
      * @param blockSpecifier block descriptor
-     * @param isAjaxRendering if false a complete page will be generated, if true the ajax version is returned
      * @return String that contains the HTML snippet
      */
-    String visit(final UiBlockSpecifier blockSpecifier, final boolean isAjaxRendering = false) {
+    String visit(final UiBlockSpecifier blockSpecifier, String... paramsToKeep) {
         if (!blockSpecifier) return ''
-        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB))
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep))
         blockSpecifier.visitBlock(htmlBlock)
         htmlBlock.output
     }
@@ -170,10 +169,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menu menu descriptor
      * @return
      */
-    final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null) {
+    final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null, String... paramsToKeep) {
         if (menu && !params.containsKey('refresh')) params.remove('isAjax')
         if (params.boolean('isAjax')) {
-            render visit(block, true)
+            render visit(block, paramsToKeep)
         } else {
             ThemeSelector themeSelector = themeService.themeSelector
             ThemeSize themeSize = themeSelector.themeSize
@@ -184,7 +183,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     themeSize      : themeSize,
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
-                    block          : visit(block),
+                    block          : visit(block, paramsToKeep),
                     menu           : visitMenu(menu),
                     conf           : taackUiPluginConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
