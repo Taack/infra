@@ -69,17 +69,28 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean doRenderElement(String id = null) {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        blockLog.stayBlock("doDisplay1 id: $id, isAjax: ${parameter.isAjaxRendering}, isModal: $isModal")
+
+        blockLog.simpleLog("doRenderElement0 :> $id")
         if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
+            blockLog.simpleLog("doRenderElement1 return true, because NOT AJAX OR MODAL")
             return true
-        } else if (!id) return isModal
-        if (parameter.isAjaxRendering && currentAjaxBlockId == null)
+        } else if (!id) {
+            blockLog.simpleLog("doRenderElement2 return isModal($isModal)")
+            return isModal
+        }
+
+        if (parameter.isAjaxRendering && currentAjaxBlockId == null) {
             currentAjaxBlockId = parameter.ajaxBlockId
+        }
 
-        if (parameter.targetAjaxBlockId) currentAjaxBlockId = parameter.targetAjaxBlockId
+        if (parameter.targetAjaxBlockId) {
+            currentAjaxBlockId = parameter.targetAjaxBlockId
+        }
 
-        boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal) || parameter.targetAjaxBlockId
-        blockLog.stayBlock("doDisplay2 currentAjaxBlockId: $currentAjaxBlockId, targetAjaxBlockId: ${parameter.targetAjaxBlockId}, ajaxBlockId: ${parameter.ajaxBlockId}, doRender = $doRender")
+        blockLog.simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
+
+        boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id || isModal) || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
+        blockLog.simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
     }
 

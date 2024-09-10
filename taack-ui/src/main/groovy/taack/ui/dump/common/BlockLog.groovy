@@ -20,14 +20,20 @@ final class BlockLog {
 
     void stayBlock(String method) {
         if (debug) {
-            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
+//            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
             println(indent*occ + method + ' === ' + topElement)
+        }
+    }
+    void simpleLog(String method) {
+        if (debug) {
+//            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
+            println(indent*occ + method)
         }
     }
 
     void exitBlock(String method) {
         if (debug) {
-            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
+//            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
             println(indent*--occ + method + ' --- ' + topElement)
         }
     }
