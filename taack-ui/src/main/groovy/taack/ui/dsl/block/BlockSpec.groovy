@@ -222,8 +222,8 @@ final class BlockSpec {
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('show')
         if (blockVisitor.doRenderElement(aId)) {
-            processMenuBlock(aId, closure)
             blockVisitor.visitAjaxBlock(aId)
+            processMenuBlock(aId, closure)
             blockVisitor.visitShow(showSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
