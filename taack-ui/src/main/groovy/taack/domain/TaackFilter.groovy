@@ -625,7 +625,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         private final U oObject
         private final SessionFactory sessionFactory
         private final Map<String, ?> theParams
-        private int maxNumberOfLine = 0
+        private int maxNumberOfLine = 6
         private List<UiFilterSpecifier> additionalFilters = []
         private List<Long> restrictedIds = null
         private FieldInfo[] sortFields
