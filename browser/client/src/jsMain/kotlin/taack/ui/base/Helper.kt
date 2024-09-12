@@ -92,7 +92,7 @@ class Helper {
             if (offset != null) fd.set("offset", offset.toString())
             if (sort != null) fd.set("sort", sort)
             if (order != null && order != "neutral") fd.set("order", order)
-            else fd.delete("order")
+//            else fd.delete("order")
 
             window.fetch(b?.formAction ?: f.action, RequestInit(method = "POST", body = fd)).then {
                 if (it.ok) {

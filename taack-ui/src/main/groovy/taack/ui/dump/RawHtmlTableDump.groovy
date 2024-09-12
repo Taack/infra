@@ -33,6 +33,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     boolean firstInCol = false
     private final IHTMLElement initialForm
     private Pair<String, String> initalSortingOrder
+    private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
 
     protected final BlockLog blockLog
 
@@ -73,6 +74,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableEnd() {
+        initialForm.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
         blockLog.exitBlock('visitTableEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
     }
@@ -146,10 +148,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         firstInCol = true
     }
 
-    void visitRowRO(Style style, boolean hasChildren) {
-        visitRow style, hasChildren
-    }
-
     @Override
     void visitRowEnd() {
         blockLog.exitBlock('visitRowEnd')
@@ -207,15 +205,14 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         IHTMLElement table = themableTable.table(blockLog.topElement, blockId)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
 
-        List<HTMLInput> inputList = []
+//        List<HTMLInput> inputList = []
 
         parameter.paramsToKeep.each {
-            inputList.add(new HTMLInput(InputType.HIDDEN, it.value, it.key))
+            mapAdditionalHiddenParams.put(it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key))
         }
-        println "AUAUOUAOUOA0 $parameter.sort $parameter.order"
 
-        if (parameter.sort && !parameter.sort.empty) inputList.add new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
-        if (parameter.order && !parameter.order.empty) inputList.add new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+        if (parameter.sort && !parameter.sort.empty) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+        if (parameter.order && !parameter.order.empty) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
 
         initialForm.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
@@ -223,7 +220,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
                 new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-        ).addChildren(inputList as HTMLInput[]).build()
+        ).build()
 
         blockLog.topElement.addChildren(initialForm)
         blockLog.topElement = table
@@ -318,10 +315,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     void setSortingOrder(String sort, String order) {
-        initialForm.builder.addChildren(
-                new HTMLInput(InputType.HIDDEN, sort, 'sort'),
-                new HTMLInput(InputType.HIDDEN, order, 'order')
-        )
 
+        mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, sort, 'sort')
+        mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, order, 'order')
     }
 }

@@ -32,4 +32,6 @@ interface IUiFilterVisitor  {
     void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style)
 
     void setAdditionalParams(String key, String value)
+
+    void addHiddenInputs()
 }

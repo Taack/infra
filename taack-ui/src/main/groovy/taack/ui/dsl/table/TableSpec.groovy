@@ -59,7 +59,7 @@ final class TableSpec {
     }
 
     final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
-        if (taackFilter.orderString) {
+        if (taackFilter.getSortString()) {
             tableVisitor.setSortingOrder(new Pair<String, String>(taackFilter.sortString, taackFilter.orderString))
         }
         c.delegate = new RowColumnSpec(tableVisitor)

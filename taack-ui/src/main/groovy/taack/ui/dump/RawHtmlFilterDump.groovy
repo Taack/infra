@@ -1,6 +1,5 @@
 package taack.ui.dump
 
-
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
@@ -10,12 +9,8 @@ import taack.ui.IEnumOption
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dump.common.BlockLog
-import taack.ui.dump.html.element.ButtonStyle
-import taack.ui.dump.html.element.HTMLInput
-import taack.ui.dump.html.element.InputType
-import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.element.*
 import taack.ui.dump.html.form.BootstrapForm
-import taack.ui.dump.html.form.IFormTheme
 
 @CompileStatic
 final class RawHtmlFilterDump implements IUiFilterVisitor {
@@ -23,8 +18,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     final private Parameter parameter
     final private List<Triple<String, ButtonStyle, String>> filterActions = []
     final String blockId
+    private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
 
-    IFormTheme formThemed
+    BootstrapForm formThemed
     final BlockLog blockLog
 
     RawHtmlFilterDump(final BlockLog blockLog, final String id, final Parameter parameter) {
@@ -53,31 +49,29 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         formThemed.attributes.put('action', parameter.urlMapped())
         blockLog.topElement.setTaackTag(TaackTag.FILTER)
 
-        if (parameter.sort && !parameter.sort.empty) formThemed.builder.addChildren new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
-        if (parameter.order && !parameter.order.empty) formThemed.builder.addChildren new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+        if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+        if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+        if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
+        if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
+        if (parameter.additionalId) mapAdditionalHiddenParams.put 'additionalId', new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId')
+        if (parameter.brand) mapAdditionalHiddenParams.put 'brand', new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand')
+        if (aClass.name) mapAdditionalHiddenParams.put 'className', new HTMLInput(InputType.HIDDEN, aClass.name, 'className')
+        if (parameter.fieldName) mapAdditionalHiddenParams.put 'fieldName', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
+
+        additionalParams?.each {
+            mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
+        }
 
         blockLog.topElement.addChildren(
-                formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
-                        new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
-                        new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
-                        new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId'),
-                        new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand'),
-                        new HTMLInput(InputType.HIDDEN, aClass.name, 'className'),
-                        new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-                ).build()
+                formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()
         )
 
-        HTMLInput[] addedInputs = additionalParams?.collect {
-            new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
-        } as HTMLInput[]
-        if (addedInputs)
-            formThemed.addChildren(addedInputs)
         blockLog.topElement = formThemed
     }
 
     @Override
     void visitHiddenId(Long id) {
-        formThemed.addChildren(
+        formThemed.builder.addChildren(
                 new HTMLInput(InputType.HIDDEN, id, 'id'),
         )
     }
@@ -104,7 +98,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final boolean isBoolean = fieldInfo?.fieldConstraint?.field?.type == Boolean
         final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
-        final String qualifiedId = qualifiedName + "-" + parameter.modalId
         if (enumOptions) {
             blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), true, false, true)
         } else if (isEnum) {
@@ -141,7 +134,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
         blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, i18n, false, false, isChecked)
-        blockLog.topElement.addChildren(new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default"))
+        mapAdditionalHiddenParams.put qualifiedName + 'Default', new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default")
     }
 
     @Override
@@ -151,6 +144,11 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void setAdditionalParams(String key, String value) {
-        formThemed.addChildren(new HTMLInput(InputType.HIDDEN, value, key))
+        mapAdditionalHiddenParams.put(key, new HTMLInput(InputType.HIDDEN, value, key))
+    }
+
+    @Override
+    void addHiddenInputs() {
+        formThemed.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
     }
 }

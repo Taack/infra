@@ -36,6 +36,11 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
+    void addHiddenInputs() {
+
+    }
+
+    @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
 
     }
