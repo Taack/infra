@@ -111,8 +111,7 @@ ${CmsHtmlGeneratorService.translateNoMatcher(insert.hat.get(lang) as String)}
                         while (m.find()) {
                             switch (elementName[j]) {
                                 case "Dash":
-                                    println("Dash ++" + elementName[j]
-                                    )
+                                    println("Dash ++" + elementName[j])
                                     Line line = getLine(m.group(1))
                                     println("Line else = " + line.left + ", " + line.width + ", " + line.rotate + ", " + line.top)
                                     System.out.println("enter title")

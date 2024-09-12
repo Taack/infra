@@ -185,7 +185,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             render visit(block, paramsToKeep)
         } else {
             block.visitBlock(isModalVisitor)
-            println "isModal $isModal"
             if (isModal) {
                 params['isAjax'] = true
                 render visit(block, paramsToKeep)

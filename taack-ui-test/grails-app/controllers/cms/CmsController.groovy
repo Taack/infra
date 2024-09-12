@@ -1300,7 +1300,6 @@ class CmsController implements WebAttributes {
             sleep(1_000)
             taackUiProgressBarService.progressEnded(pId)
         }
-        println "test action ends"
     }
 
     def downloadBinPdf2() {

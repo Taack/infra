@@ -391,7 +391,6 @@ class Parser {
 
     static List<Triple<String, String, String>> suggestSecondArg(String seq) {
         List<Triple<String, String, String>> res = []
-        println "$seq"
         for (SecondaryParameter p : SecondaryParameter.values()) {
             String tokenString = p.token
             if (tokenString.startsWith(seq.trim())) {

@@ -283,7 +283,7 @@ class AttachmentController {
         User u = new User()
 
         def attachments = Attachment.executeQuery('from Attachment a where a.active = true and ?0 in elements(a.documentCategory.tags)', term) as List<Attachment>
-        println "attachments.size(): ${attachments?.size()}"
+
         def ts = new UiTableSpecifier().ui {
             header {
                 column {
