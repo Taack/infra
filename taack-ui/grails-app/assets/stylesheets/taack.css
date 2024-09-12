@@ -46,15 +46,22 @@
     white-space: pre;
 }
 
-span.taackDefaultDesc:not(.desc):not(.asc) a, span.desc a {
-    background-image: url(../images/taack/icons/modifiers/sorted_desc_tr.webp);
+span.neutral {
+    background-image: url(../images/taack/icons/modifiers/neutral.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
 }
 
-span.taackDefaultAsc:not(.desc):not(.asc) a, span.asc a {
-    background-image: url(../images/taack/icons/modifiers/sorted_asc_tr.webp);
+span.desc {
+    background-image: url(../images/taack/icons/modifiers/descw.svg);
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-position-y: center;
+}
+
+span.asc {
+    background-image: url(../images/taack/icons/modifiers/ascw.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
