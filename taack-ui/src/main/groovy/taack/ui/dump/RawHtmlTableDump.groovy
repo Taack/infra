@@ -87,12 +87,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (isInHeader) {
             HTMLTh th = new HTMLTh(colSpan, rowSpan)
             th.setTaackTag(TaackTag.TABLE_COL)
-            blockLog.topElement.addChildren(th)
+            blockLog.topElement.builder.addChildren(th)
             blockLog.topElement = th
         } else {
             HTMLTd th = new HTMLTd(colSpan, rowSpan)
             th.setTaackTag(TaackTag.TABLE_COL)
-            blockLog.topElement.addChildren(th)
+            blockLog.topElement.builder.addChildren(th)
             blockLog.topElement = th
         }
     }
@@ -103,7 +103,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         isInHeader = true
         HTMLTr tr = new HTMLTr()
         tr.addClasses('align-middle')
-        blockLog.topElement.addChildren(
+        blockLog.topElement.builder.addChildren(
                 new HTMLTHead().builder.setTaackTag(TaackTag.TABLE_HEAD).addChildren(
                         tr
                 ).build()
@@ -117,7 +117,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         isInHeader = false
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
         HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
-        blockLog.topElement.addChildren(tb)
+        blockLog.topElement.builder.addChildren(tb)
         blockLog.topElement = tb
     }
 
@@ -143,7 +143,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (indent > 0 && parameter.target == Parameter.RenderingTarget.WEB) {
             tr.setStyleDescriptor(new DisplayNone())
         }
-        blockLog.topElement.addChildren(tr)
+        blockLog.topElement.builder.addChildren(tr)
         blockLog.topElement = tr
         firstInCol = true
     }
@@ -172,7 +172,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
 
         params ?= [:]
-        blockLog.topElement.addChildren(
+        blockLog.topElement.builder.addChildren(
                 new HTMLDiv().builder.addChildren(
                         new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
                                 new HTMLTxtContent(actionIcon.getHtml(i18n))
@@ -188,7 +188,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         HTMLTd td = new HTMLTd(colSpan, rowSpan)
         if (firstInCol) td.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
         firstInCol = false
-        blockLog.topElement.addChildren(td)
+        blockLog.topElement.builder.addChildren(td)
         blockLog.topElement = td
     }
 
@@ -211,18 +211,17 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             mapAdditionalHiddenParams.put(it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key))
         }
 
-        if (parameter.sort && !parameter.sort.empty) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
-        if (parameter.order && !parameter.order.empty) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+        if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+        if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+        if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
+        if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
+        if (parameter.beanId) mapAdditionalHiddenParams.put 'id', new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id')
+        if (parameter.applicationTagLib.params['grouping']) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping')
+        if (parameter.fieldName) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
 
-        initialForm.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
-                new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
-                new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
-                new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
-                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
-                new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-        ).build()
+        initialForm.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()
 
-        blockLog.topElement.addChildren(initialForm)
+        blockLog.topElement.builder.addChildren(initialForm)
         blockLog.topElement = table
     }
 
@@ -232,7 +231,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         i18n ?= parameter.trField(fields)
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        blockLog.topElement.addChildren(
+        blockLog.topElement.builder.addChildren(
                 new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
                         new HTMLTxtContent("<a>${i18n}</a>")
                 ).build()
@@ -245,7 +244,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitFieldHeader(final String i18n) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        blockLog.topElement.addChildren(
+        blockLog.topElement.builder.addChildren(
                 new HTMLSpan().builder.setStyle(new DisplayBlock()).addChildren(
                         new HTMLTxtContent("${i18n}")
                 ).build()
@@ -278,7 +277,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowField(final String value, final Style style) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        blockLog.topElement.addChildren(displayCell(value, style, null, firstInCol, isInCol))
+        blockLog.topElement.builder.addChildren(displayCell(value, style, null, firstInCol, isInCol))
         if (addColumn) visitColumnEnd()
     }
 
@@ -293,7 +292,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitPaginate(Number max, Number count) {
         if (count > max) {
-            blockLog.topElement.addChildren(new HTMLDiv().builder
+            blockLog.topElement.builder.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
                     .putAttribute('taackMax', max?.toString())
                     .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: "0")
@@ -315,8 +314,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     void setSortingOrder(String sort, String order) {
-
-        mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, sort, 'sort')
-        mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, order, 'order')
+        if (!parameter.order || !parameter.sort) {
+            mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, sort, 'sort')
+            mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, order, 'order')
+        }
     }
 }
