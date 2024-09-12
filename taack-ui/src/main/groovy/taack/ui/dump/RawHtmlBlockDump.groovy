@@ -234,7 +234,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
         tableSpecifier.visitTable(tableVisitor)
-        if (tableVisitor.getSortingOrder() && !parameter.order) {
+        if (tableVisitor.getSortingOrder() && (!parameter.order || !parameter.sort)) {
             filterVisitor.setAdditionalParams('sort', tableVisitor.getSortingOrder().aValue)
             filterVisitor.setAdditionalParams('order', tableVisitor.getSortingOrder().bValue)
         }

@@ -44,7 +44,7 @@ class TableSortableColumn(private val parent: Table, private val s: HTMLSpanElem
     private fun onClick(e: MouseEvent) {
         e.preventDefault()
         trace("SortableColumn::onClick")
-        val dir = if (direction == "neutral") "desc" else if (direction == "desc") "asc" else if (direction == "asc") "neutral" else "neutral"
+        val dir = if (direction == "neutral") "desc" else if (direction == "desc") "asc" else if (direction == "asc") "neutral" else null
         Helper.filterForm(parent.filter, null, property, dir)
     }
 }
