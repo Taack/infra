@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
+import taack.ui.dsl.block.UiBlockVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawCsvTableDump
 import taack.ui.dump.RawHtmlBlockDump
@@ -171,25 +172,41 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      */
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null, String... paramsToKeep) {
         if (menu && !params.containsKey('refresh')) params.remove('isAjax')
+
+        boolean isModal = false
+        final UiBlockVisitor isModalVisitor = new UiBlockVisitor() {
+            @Override
+            void visitModal() {
+                isModal = true
+            }
+        }
+
         if (params.boolean('isAjax')) {
             render visit(block, paramsToKeep)
         } else {
-            ThemeSelector themeSelector = themeService.themeSelector
-            ThemeSize themeSize = themeSelector.themeSize
-            ThemeMode themeMode = themeSelector.themeMode
-            ThemeMode themeAuto = themeSelector.themeAuto
+            block.visitBlock(isModalVisitor)
+            println "isModal $isModal"
+            if (isModal) {
+                params['isAjax'] = true
+                render visit(block, paramsToKeep)
+            } else {
+                ThemeSelector themeSelector = themeService.themeSelector
+                ThemeSize themeSize = themeSelector.themeSize
+                ThemeMode themeMode = themeSelector.themeMode
+                ThemeMode themeAuto = themeSelector.themeAuto
 
-            return new ModelAndView("/taackUi/block", [
-                    themeSize      : themeSize,
-                    themeMode      : themeMode,
-                    themeAuto      : themeAuto,
-                    block          : visit(block, paramsToKeep),
-                    menu           : visitMenu(menu),
-                    conf           : taackUiPluginConfiguration,
-                    clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
-                    bootstrapJsTag : bootstrapJsTag,
-                    bootstrapCssTag: bootstrapCssTag
-            ])
+                return new ModelAndView("/taackUi/block", [
+                        themeSize      : themeSize,
+                        themeMode      : themeMode,
+                        themeAuto      : themeAuto,
+                        block          : visit(block, paramsToKeep),
+                        menu           : visitMenu(menu),
+                        conf           : taackUiPluginConfiguration,
+                        clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+                        bootstrapJsTag : bootstrapJsTag,
+                        bootstrapCssTag: bootstrapCssTag
+                ])
+            }
         }
     }
 

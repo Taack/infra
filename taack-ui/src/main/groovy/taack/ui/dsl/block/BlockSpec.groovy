@@ -34,7 +34,7 @@ final class BlockSpec {
     BlockSpec(final IUiBlockVisitor blockVisitor) {
         this.blockVisitor = blockVisitor
         this.menuSpec = new MenuSpec(blockVisitor)
-        this.filterTableId = blockVisitor.parameterMap['filterTableId']
+        this.filterTableId = blockVisitor.parameterMap?['filterTableId']
     }
 
     private final String theAjaxBlockId(String suffix) {
