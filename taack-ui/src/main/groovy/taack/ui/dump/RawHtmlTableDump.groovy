@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
@@ -30,6 +31,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     boolean isInHeader = false
     int level = 0
     boolean firstInCol = false
+    private final IHTMLElement initialForm
+    private Pair<String, String> initalSortingOrder
 
     protected final BlockLog blockLog
 
@@ -38,6 +41,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         this.parameter = parameter
         this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
         this.blockId = id ?: '' + parameter.modalId
+        this.initialForm = new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}")
     }
 
     static final <T> String dataFormat(T value, String format) {
@@ -208,18 +212,20 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         parameter.paramsToKeep.each {
             inputList.add(new HTMLInput(InputType.HIDDEN, it.value, it.key))
         }
+        println "AUAUOUAOUOA0 $parameter.sort $parameter.order"
 
-        blockLog.topElement.addChildren(
-                new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}").builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
-                        new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
-                        new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
-                        new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
-                        new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
-                        new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
-                        new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
-                        new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
-                ).addChildren(inputList as HTMLInput[]).build(),
-        )
+        if (parameter.sort && !parameter.sort.empty) inputList.add new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+        if (parameter.order && !parameter.order.empty) inputList.add new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+
+        initialForm.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
+                new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
+                new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
+                new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id'),
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping'),
+                new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName'),
+        ).addChildren(inputList as HTMLInput[]).build()
+
+        blockLog.topElement.addChildren(initialForm)
         blockLog.topElement = table
     }
 
@@ -298,5 +304,24 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                     .build()
             )
         }
+    }
+
+    @Override
+    void setSortingOrder(Pair<String, String> sortingOrderParam) {
+        initalSortingOrder = sortingOrderParam
+        setSortingOrder(sortingOrderParam.aValue, sortingOrderParam.bValue)
+    }
+
+    @Override
+    Pair<String, String> getSortingOrder() {
+        return initalSortingOrder
+    }
+
+    void setSortingOrder(String sort, String order) {
+        initialForm.builder.addChildren(
+                new HTMLInput(InputType.HIDDEN, sort, 'sort'),
+                new HTMLInput(InputType.HIDDEN, order, 'order')
+        )
+
     }
 }

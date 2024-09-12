@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
@@ -130,5 +131,15 @@ final class RawCsvTableDump implements IUiTableVisitor {
     @Override
     void visitPaginate(Number max, Number count) {
 
+    }
+
+    @Override
+    void setSortingOrder(Pair<String, String> sortingOrder) {
+
+    }
+
+    @Override
+    Pair<String, String> getSortingOrder() {
+        return null
     }
 }

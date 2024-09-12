@@ -11,8 +11,10 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
+import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.menu.MenuSpec
+import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.*
 import taack.ui.dump.html.element.HTMLDiv
@@ -226,10 +228,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                           final UiTableSpecifier tableSpecifier) {
         blockLog.stayBlock('visitTableFilter ' + id)
         visitCol(BlockSpec.Width.QUARTER)
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog, id, parameter))
+        IUiTableVisitor tableVisitor = new RawHtmlTableDump(blockLog, id, parameter)
+        IUiFilterVisitor filterVisitor = new RawHtmlFilterDump(blockLog, id, parameter)
+        filterSpecifier.visitFilter(filterVisitor)
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
-        tableSpecifier.visitTable(new RawHtmlTableDump(blockLog, id, parameter))
+        tableSpecifier.visitTable(tableVisitor)
+        if (tableVisitor.getSortingOrder()) {
+            filterVisitor.setAdditionalParams('sort', tableVisitor.getSortingOrder().aValue)
+            filterVisitor.setAdditionalParams('order', tableVisitor.getSortingOrder().bValue)
+        }
+
         visitColEnd()
     }
 

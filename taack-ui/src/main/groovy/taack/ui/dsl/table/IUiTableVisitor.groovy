@@ -1,7 +1,7 @@
 package taack.ui.dsl.table
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
@@ -52,4 +52,8 @@ interface IUiTableVisitor {
     void visitRowIndentEnd()
     
     void visitPaginate(Number max, Number count)
+
+    void setSortingOrder(Pair<String, String>sortingOrder)
+
+    Pair<String, String> getSortingOrder()
 }

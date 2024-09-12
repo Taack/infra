@@ -163,6 +163,14 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
 
+    String getSortString() {
+        sortFields*.fieldName.join('.')
+    }
+    String getOrderString() {
+        if (order == Order.ASC) "asc"
+        else if (order == Order.DESC) "desc"
+        else null
+    }
     /**
      * Helper method allowing to execute a query
      * @param query

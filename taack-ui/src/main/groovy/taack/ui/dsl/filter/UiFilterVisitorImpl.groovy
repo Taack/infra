@@ -1,13 +1,12 @@
 package taack.ui.dsl.filter
 
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dump.html.element.ButtonStyle
-import taack.ui.dump.html.element.IHTMLElement
-import taack.ui.dump.html.form.IFormTheme
 
 @CompileStatic
 class UiFilterVisitorImpl implements IUiFilterVisitor {
@@ -28,6 +27,11 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
 
     @Override
     void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style) {
+
+    }
+
+    @Override
+    void setAdditionalParams(String key, String value) {
 
     }
 

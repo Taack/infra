@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
@@ -51,10 +52,12 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         formThemed = new BootstrapForm(blockLog, false, true)
         formThemed.attributes.put('action', parameter.urlMapped())
         blockLog.topElement.setTaackTag(TaackTag.FILTER)
+
+        if (parameter.sort && !parameter.sort.empty) formThemed.builder.addChildren new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+        if (parameter.order && !parameter.order.empty) formThemed.builder.addChildren new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+
         blockLog.topElement.addChildren(
                 formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).addChildren(
-                        new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort'),
-                        new HTMLInput(InputType.HIDDEN, parameter.order, 'order'),
                         new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset'),
                         new HTMLInput(InputType.HIDDEN, parameter.max, 'max'),
                         new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId'),
@@ -146,4 +149,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         filterActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${action.toString()}/${action.method}" as String)
     }
 
+    @Override
+    void setAdditionalParams(String key, String value) {
+        formThemed.addChildren(new HTMLInput(InputType.HIDDEN, value, key))
+    }
 }

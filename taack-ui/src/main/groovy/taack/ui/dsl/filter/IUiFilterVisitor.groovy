@@ -1,5 +1,6 @@
 package taack.ui.dsl.filter
 
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
@@ -29,4 +30,6 @@ interface IUiFilterVisitor  {
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression... filterExpressions)
 
     void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style)
+
+    void setAdditionalParams(String key, String value)
 }

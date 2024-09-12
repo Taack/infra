@@ -1,5 +1,6 @@
 package taack.ui.dump.vt100
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
@@ -148,6 +149,16 @@ final class RenderingTable implements IUiTableVisitor {
     @Override
     void visitPaginate(Number max, Number count) {
 
+    }
+
+    @Override
+    void setSortingOrder(Pair<String, String> sortingOrder) {
+
+    }
+
+    @Override
+    Pair<String, String> getSortingOrder() {
+        return null
     }
 
     @Override

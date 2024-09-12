@@ -2,11 +2,9 @@ package taack.ui.dsl.table
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.domain.TaackFilter
 import taack.ui.dsl.common.Style
-
 /**
  *
  * <p>This class allows to draw a table. A table is composed of a header and rows.
@@ -61,6 +59,9 @@ final class TableSpec {
     }
 
     final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
+        if (taackFilter.orderString) {
+            tableVisitor.setSortingOrder(new Pair<String, String>(taackFilter.sortString, taackFilter.orderString))
+        }
         c.delegate = new RowColumnSpec(tableVisitor)
         Pair<List<T>, Long> res = taackFilter.list()
         for (T t in res.aValue) {
