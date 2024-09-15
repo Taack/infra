@@ -182,6 +182,18 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitRowAction(String linkText, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        params ?= [:]
+        blockLog.topElement.addChildren(
+                new HTMLDiv().builder.addChildren(
+                        new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
+                                new HTMLTxtContent(linkText)
+                        ).addClasses('table-link').build()
+                ).build()
+        )
+    }
+
+    @Override
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
         blockLog.enterBlock('visitRowColumn')
         isInCol = true

@@ -56,4 +56,20 @@ class RowColumnFieldSpec implements BranchingSpec {
         }
     }
 
+    void rowAction(final String linkText, final MethodClosure action, final Map params) {
+        rowAction(linkText, action, null, params)
+    }
+
+    void rowAction(final String linkText, final MethodClosure action, final Long id) {
+        rowAction(linkText, action, id, null)
+    }
+
+    void rowAction(final String linkText, final MethodClosure action, final Long id, final Map params) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) {
+            Map<String, ?> p = params ?: [:]
+            p.put('id', id)
+            tableVisitor.visitRowAction(linkText, Utils.getControllerName(action), action.method, null, p, true)
+        }
+    }
+
 }
