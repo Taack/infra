@@ -15,10 +15,12 @@ import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
 final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
-
+    static int blockCounter = 0
 
     BootstrapBlock(BlockLog blockLog) {
         super(blockLog)
+        blockCounter++
+        if (blockCounter > 1000) blockCounter = 0
     }
 
     static IHTMLElement block(IHTMLElement topElement, String blockId) {
@@ -29,6 +31,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
     }
 
     static IHTMLElement blockHeader(IHTMLElement topElement) {
+        HTMLDiv menuDiv = new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent' + blockCounter).build() as HTMLDiv
         HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
                 new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
                         .addClasses('navbar-toggler', 'navbar-dark')
@@ -38,7 +41,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
                         .putAttribute('aria-expanded', 'false')
                         .putAttribute('aria-label', 'Toggle navigation')
                         .build(),
-                new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent').build()
+                menuDiv
         ).build() as HTMLDiv
 
         topElement.addChildren(
@@ -46,7 +49,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
                         div
                 ).build()
         )
-        div
+        menuDiv
     }
 
     static IHTMLElement blockAjax(IHTMLElement topElement, String blockId, boolean isAjax) {
