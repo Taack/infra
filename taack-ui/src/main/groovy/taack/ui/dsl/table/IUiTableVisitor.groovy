@@ -47,6 +47,8 @@ interface IUiTableVisitor {
 
     void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax)
 
+    void visitRowAction(String i18n, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax)
+
     void visitRowIndent()
 
     void visitRowIndentEnd()
