@@ -438,7 +438,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             params ?= [:]
             params.put('targetAjaxBlockId', futurCurrentAjaxBlockId)
         }
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, parameter.isAjaxRendering, parameter.urlMapped(controller, action, params))
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, parameter.urlMapped(controller, action, params))
     }
 
     @Override

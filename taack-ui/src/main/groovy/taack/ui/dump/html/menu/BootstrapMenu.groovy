@@ -66,7 +66,7 @@ final class BootstrapMenu implements IHTMLElement {
     static IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String url) {
         topElement.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                        new HTMLAnchor(false, url).builder.addClasses('nav-link', 'taackMenu').addChildren(new HTMLTxtContent(i18n)).build()
+                        new HTMLAnchor(isAjax, url).builder.addClasses('nav-link', 'taackMenu').addChildren(new HTMLTxtContent(i18n)).build()
                 ).build()
         )
         topElement
