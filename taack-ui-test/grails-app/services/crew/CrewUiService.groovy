@@ -97,9 +97,9 @@ class CrewUiService implements WebAttributes {
                 }
                 rowColumn {
                     if (!UserRole.exists(user.id, r.id)) {
-                        rowAction ActionIcon.ADD, CrewController.&addRoleToUser as MC, [userId: user.id, roleId: r.id, refresh: true]
+                        rowAction ActionIcon.ADD, CrewController.&addRoleToUser as MC, [userId: user.id, roleId: r.id]
                     } else {
-                        rowAction ActionIcon.DELETE, CrewController.&removeRoleToUser as MC, [userId: user.id, roleId: r.id, refresh: true]
+                        rowAction ActionIcon.DELETE, CrewController.&removeRoleToUser as MC, [userId: user.id, roleId: r.id]
                     }
                 }
             }
