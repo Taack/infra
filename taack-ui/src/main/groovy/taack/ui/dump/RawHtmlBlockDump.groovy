@@ -434,10 +434,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
         blockLog.stayBlock('visitLabeledSubMenu ' + i18n)
-        if (futurCurrentAjaxBlockId) {
-            params ?= [:]
-            params.put('targetAjaxBlockId', futurCurrentAjaxBlockId)
-        }
+//        if (futurCurrentAjaxBlockId) {
+//            params ?= [:]
+//            params.put('targetAjaxBlockId', futurCurrentAjaxBlockId)
+//        }
         blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, parameter.urlMapped(controller, action, params))
     }
 
