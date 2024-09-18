@@ -59,7 +59,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         if (parameter.fieldName) mapAdditionalHiddenParams.put 'fieldName', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
 
         additionalParams?.each {
-            mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.key, it.value?.toString())
+            mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key)
         }
 
         blockLog.topElement.addChildren(
