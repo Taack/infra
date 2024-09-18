@@ -62,6 +62,10 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
 
+    abstract IHTMLElement markdownInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
+
+    abstract IHTMLElement asciidocInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
+
     abstract IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
 
     abstract IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)

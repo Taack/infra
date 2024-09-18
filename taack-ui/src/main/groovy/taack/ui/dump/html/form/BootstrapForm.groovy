@@ -239,6 +239,38 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     }
 
     @Override
+    IHTMLElement markdownInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
+        IHTMLElement el = themeStartInputs(topElement)
+
+        HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
+        HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses("wysiwyg-content", "markdown").setId(qualifiedName).build() as HTMLTextarea
+        container.addChildren(textareaInput)
+        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses("wysiwyg-markdown-preview").build() as HTMLDiv
+        container.addChildren(preview)
+        HTMLInput attachmentSelectInput = new HTMLInput(InputType.STRING, null, null, null, false, true).builder.setId("${qualifiedName}-attachment-select").addClasses(formControl).putAttribute('taackajaxformm2oaction', '/markdown/selectAttachment').build() as HTMLInput
+        container.addChildren(attachmentSelectInput)
+        HTMLInput attachmentLinkInput = new HTMLInput(InputType.HIDDEN, null, null).builder.setId("${qualifiedName}-attachment-link").build() as HTMLInput
+        container.addChildren(attachmentLinkInput)
+
+        el.addChildren(container)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(divError(qualifiedName))
+        topElement
+    }
+
+    @Override
+    IHTMLElement asciidocInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
+        IHTMLElement el = themeStartInputs(topElement)
+        HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
+        HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses("wysiwyg-content", "asciidoctor").setId(qualifiedName).putAttribute("contenteditable", "true").build() as HTMLTextarea
+        container.addChildren(textareaInput)
+        el.addChildren(container)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(divError(qualifiedName))
+        topElement
+    }
+
+    @Override
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput

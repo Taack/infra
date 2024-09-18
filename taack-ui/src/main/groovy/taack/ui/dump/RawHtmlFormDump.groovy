@@ -157,20 +157,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
                 blockLog.topElement = formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
-                result.append """\
-                <div id="${qualifiedName}-editor">
-                    <textarea id="${qualifiedName}" name="${qualifiedName}" class="wysiwyg-content markdown many-to-one pure-u-12-24" autocomplete="off" ${isDisabled(field) ? "disabled" : ""} rows="8">${field.value ?: ""}</textarea>
-                    <div id="${qualifiedName}-markdown-preview" class="pure-u-10-24 markdown-body wysiwyg-markdown-preview"></div>
-                    <input value="" readonly="on" class="many-to-one taackAjaxFormM2O" autocomplete="off" id="${qualifiedName}-attachment-select" taackAjaxFormM2OInputId="${qualifiedName}-attachment-link" taackAjaxFormM2OAction="${parameter.urlMapped('markdown', 'selectAttachment')}"/>
-                    <input value="" type="hidden" id="${qualifiedName}-attachment-link"/>
-                </div>\
-                """.stripIndent().strip()
+                blockLog.topElement = formThemed.markdownInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
-                result.append """\
-                <div id="${qualifiedName}-editor">
-                    <div id="${qualifiedName}" contenteditable="true" class="wysiwyg-content asciidoctor" style="width: 90%" ${isDisabled(field) ? "disabled" : ""}>${field.value ?: ''}</div>
-                </div>\
-                """.stripIndent().strip()
+                blockLog.topElement = formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else {
                 String valueString = inputEscape(field.value?.toString())
                 if (numberFormat && field.value instanceof Number) {

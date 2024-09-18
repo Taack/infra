@@ -11,10 +11,12 @@
 
 .wysiwyg-content.markdown {
     height: 300px;
+    width: 50%;
 }
 
 .wysiwyg-content.asciidoctor {
     height: 500px;
+    width: 90%;
 }
 
 .wysiwyg-content-paragraph {
@@ -178,6 +180,7 @@
     display: inline-block;
     overflow-y: auto;
     height: 300px;
+    width: 42%;
     padding: .5em .6em;
     border: 1px solid black;
     border-radius: 4px;
