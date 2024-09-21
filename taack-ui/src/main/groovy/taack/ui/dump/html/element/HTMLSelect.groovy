@@ -37,5 +37,10 @@ final class HTMLSelect implements IHTMLElement {
         attributes.put('name', options.paramKey)
 //        if (readOnly) attributes.put('readonly', null)
         if (disabled) attributes.put('disabled', null)
+        if (multiple) {
+            attributes.put('multiple', null)
+            attributes.put('size', '7')
+            attributes.put('aria-label', "multiple select")
+        }
     }
 }
