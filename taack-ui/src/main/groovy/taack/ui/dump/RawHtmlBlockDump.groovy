@@ -494,7 +494,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
-        String img = currentOption ? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
+        String img = currentOption && currentOption.asset? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
 
         blockLog.topElement = menu.menuOptions(blockLog.topElement, img, selectedOptionValue)
         blockLog.topElement.setTaackTag(TaackTag.MENU_OPTION)
@@ -509,7 +509,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         for (i; i < im;) {
             IEnumOption option = options[i++]
             parameter.params.put(enumOptions.paramKey, option.key)
-            img = parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;")
+            img = option.asset ? parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;") : null
             if (option.section) {
                 menu.menuOptionSection(blockLog.topElement, img, option.value)
             } else {
