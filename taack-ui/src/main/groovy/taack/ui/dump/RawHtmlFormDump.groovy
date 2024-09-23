@@ -232,7 +232,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     @Override
     void visitFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
         i18n ?= parameter.trField(controller, action, id != null || params?.containsKey('id'))
-        formActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${controller}/${action}" as String)
+        formActions.add new Triple<String, ButtonStyle, String>(i18n, style, parameter.urlMapped(controller, action, id, params))
     }
 
     @Override
