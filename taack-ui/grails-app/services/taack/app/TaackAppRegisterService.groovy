@@ -1,12 +1,14 @@
 package taack.app
 
 import grails.compiler.GrailsCompileStatic
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.jetbrains.annotations.NotNull
 import taack.render.TaackUiService
+import taack.ui.EnumOption
 import taack.ui.dsl.helper.Utils
 
-
+@CompileStatic
 final class TaackApp implements Comparable {
     final MethodClosure entryPoint
     final String svg
@@ -45,5 +47,12 @@ class TaackAppRegisterService {
 
     static List<TaackApp> getApps() {
         taackApps.toList()
+    }
+    static EnumOption[] getOptions() {
+        List<EnumOption> res = []
+        apps.each {
+            res.add new EnumOption(Utils.getControllerName(it.entryPoint), it.label)
+        }
+        res as EnumOption[]
     }
 }
