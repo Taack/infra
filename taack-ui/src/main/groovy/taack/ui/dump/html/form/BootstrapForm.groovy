@@ -138,7 +138,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
                     ).build(),
                     new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio('?', qualifiedName, value == null).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
+                            HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
                             new HTMLLabel(qualifiedName, '?').builder.addClasses('form-check-label').build()
                     ).build(),
             )
