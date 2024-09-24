@@ -184,13 +184,17 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         if (isListOrSet)
             formThemed.ajaxField(blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
         else {
-            GormEntity v = (field?.value) as GormEntity
-            formThemed.ajaxField(blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+            if (field.fieldConstraint.field.type.isAssignableFrom(GormEntity)) {
+                GormEntity v = field.value as GormEntity
+                formThemed.ajaxField(blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+            } else {
+                formThemed.ajaxField(blockLog.topElement, trI18n, null as GormEntity, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+            }
         }
     }
 
     private static List<String> fieldInfoCollect(FieldInfo[] fieldInfos) {
-        fieldInfos.collect { it.fieldConstraint.field.type.getDeclaredField('id') ? "${it.fieldName}.id" : it.fieldName } as List<String>
+        fieldInfos.collect { it.fieldConstraint.field.type.getDeclaredFields()*.name.contains('id') ? "${it.fieldName}.id" : it.fieldName } as List<String>
     }
 
     @Override

@@ -50,6 +50,22 @@ class TestBugController {
         })
     }
 
+    def bugsForm3() {
+        Attachment a = new Attachment(active: false, contentTypeEnum: AttachmentContentType.CSV)
+        taackUiService.show(new UiBlockSpecifier().ui {
+            form(new UiFormSpecifier().ui new Attachment(), {
+                section {
+                    field a.active_
+                    ajaxField a.contentTypeEnum_, this.&logForm as MethodClosure, a.contentTypeCategoryEnum_
+                    field a.contentTypeCategoryEnum_
+                }
+                formAction this.&logForm as MethodClosure, 12, [test1: 'test1']
+            })
+        }, new UiMenuSpecifier().ui {
+            label('test form')
+        })
+    }
+
     def logForm() {
         println params
         render "OK"
