@@ -99,10 +99,10 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         final boolean isBoolean = fieldInfo?.fieldConstraint?.field?.type == Boolean
         final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
         if (enumOptions) {
-            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), true, false, true)
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), false, false, true)
         } else if (isEnum) {
             final Class type = fieldInfo.fieldConstraint.field.type
-            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value), true, false, true)
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value), false, false, true)
         } else if (isBoolean) {
             Boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ?
                     ((parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '1') ? true : (parameter.applicationTagLib.params[qualifiedName] && parameter.applicationTagLib.params[qualifiedName] == '0') ? false : null) : fieldInfo.value

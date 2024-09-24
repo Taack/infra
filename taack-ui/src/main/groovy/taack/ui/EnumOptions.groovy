@@ -76,12 +76,12 @@ final class EnumOptions implements IEnumOptions {
     }
 
     EnumOptions(Class<? extends Enum> options, String paramKey, String... currents) {
-        String[] values = options.invokeMethod('values', null) as String[]
+        Enum[] values = options.invokeMethod('values', null) as Enum[]
         this.options = new EnumOption[values.size()]
 
         for (int i = 0; i < values.size(); i++) {
-            final String v = values[i]
-            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
+            final String v = values[i].name()
+            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
             this.options[i] = new EnumOption(v, name, null, false)
         }
 

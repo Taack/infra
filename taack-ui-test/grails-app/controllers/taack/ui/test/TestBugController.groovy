@@ -9,8 +9,10 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.config.Country
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiMenuSpecifier
+import taack.ui.dsl.UiTableSpecifier
 
 @GrailsCompileStatic
 @Secured(['ROLE_ADMIN'])
@@ -37,7 +39,7 @@ class TestBugController {
     def bugsForm2() {
         TestCountry a = new TestCountry(country: Country.AD)
         taackUiService.show(new UiBlockSpecifier().ui {
-            form(new UiFormSpecifier().ui new Attachment(), {
+            form(new UiFormSpecifier().ui new TestCountry(country: Country.FR), {
                 section {
                     field a.country_
                 }
@@ -51,5 +53,23 @@ class TestBugController {
     def logForm() {
         println params
         render "OK"
+    }
+
+    def bugFilter1() {
+        TestCountry tc = new TestCountry(country: Country.FR)
+        UiFilterSpecifier f = new UiFilterSpecifier().ui TestCountry, {
+            section {
+                filterField tc.country_
+            }
+        }
+        UiTableSpecifier t = new UiTableSpecifier().ui {
+            header {}
+            row {}
+        }
+        taackUiService.show(new UiBlockSpecifier().ui {
+            tableFilter f, t
+        }, new UiMenuSpecifier().ui {
+            label('test filter')
+        })
     }
 }
