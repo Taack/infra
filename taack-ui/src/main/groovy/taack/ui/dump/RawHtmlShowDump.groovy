@@ -257,6 +257,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitFieldAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
+        i18n ?= parameter.trField(controller, action, id != null)
         if (isAjax) {
             out << """
                      <div class='icon'>
