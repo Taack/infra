@@ -1,6 +1,7 @@
 package taack.ui
 
 import groovy.transform.CompileStatic
+import taack.ast.type.FieldInfo
 
 @CompileStatic
 final class EnumOption implements IEnumOption {
@@ -36,6 +37,13 @@ final class EnumOptions implements IEnumOptions {
         this.currents = currents
         this.options = options
         this.paramKey = paramKey
+    }
+
+    EnumOptions(IEnumOption[] options, FieldInfo info) {
+        Enum v = info.value as Enum
+        this.currents = [new EnumOption(v.name(), v.toString())]
+        this.options = options
+        this.paramKey = info.fieldName
     }
 
     EnumOptions(Class<? extends Enum> options, String paramKey, EnumOption... currents) {
