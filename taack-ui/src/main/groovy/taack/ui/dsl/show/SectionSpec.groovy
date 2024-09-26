@@ -104,7 +104,7 @@ class SectionSpec {
      * @param id id parameter
      * @param isAjax true if target action is an ajax one
      */
-    void fieldAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id = null) {
+    void fieldAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
         if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, id, null, true)
     }
 
