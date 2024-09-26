@@ -30,7 +30,7 @@ class SectionSpec {
      * @param field
      * @param style Portable style
      */
-    void field(final String i18n, final FieldInfo field, final Style style = null) {
+    void field(final Style style = null, final String i18n = null, final FieldInfo field) {
         showVisitor.visitShowField(i18n, field, style)
     }
 
@@ -40,7 +40,7 @@ class SectionSpec {
      * @param html
      * @param style Portable and static element style
      */
-    void field(final String html, final Style style) {
+    void field(final Style style, final String html) {
         showVisitor.visitShowField(null, html, style)
     }
 
@@ -51,7 +51,7 @@ class SectionSpec {
      * @param field value
      * @param style Portable and static element style
      */
-    void field(final String i18n, final String field, final Style style = null) {
+    void field(final Style style = null, final String i18n, final String field) {
         showVisitor.visitShowField(i18n, field, style)
     }
 
@@ -104,21 +104,20 @@ class SectionSpec {
      * @param id id parameter
      * @param isAjax true if target action is an ajax one
      */
-    void fieldAction(final String i18n, final ActionIcon icon, final MethodClosure action, final Long id = null, final boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, id, null, isAjax)
+    void fieldAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id = null) {
+        if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, id, null, true)
     }
 
     /**
-     * see {@link #fieldAction(java.lang.String, ActionIcon, org.codehaus.groovy.runtime.MethodClosure, java.lang.Long, boolean)}
+     * see {@link #fieldAction(java.lang.String, ActionIcon, org.codehaus.groovy.runtime.MethodClosure, java.lang.Long)}
      *
      * @param i18n hover text
      * @param icon
      * @param action target action if icon is clicked
      * @param additionalParams target action additional parameters
-     * @param isAjax true if target action is an ajax one
      */
-    void fieldAction(final String i18n, final ActionIcon icon, final MethodClosure action, final Map<String, ?> additionalParams, final boolean isAjax = true) {
-        if (taackUiEnablerService.hasAccess(action, additionalParams)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, null, additionalParams, isAjax)
+    void fieldAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map<String, ?> additionalParams) {
+        if (taackUiEnablerService.hasAccess(action, additionalParams)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, null, additionalParams, true)
     }
 
     /**
@@ -145,9 +144,8 @@ class SectionSpec {
      *
      * @param i18n label
      * @param field target field (require action and object to be set in {@link taack.ui.dsl.UiShowSpecifier#ui(java.lang.Object, org.codehaus.groovy.runtime.MethodClosure, groovy.lang.Closure)}
-     * @param isAjax if true, the target action is an ajax one
      */
-    void showInputField(final String i18n, final FieldInfo field, final boolean isAjax = true) {
-        showVisitor.visitShowInputField(i18n, field, isAjax)
+    void showInputField(final String i18n = null, final FieldInfo field) {
+        showVisitor.visitShowInputField(i18n, field, true)
     }
 }

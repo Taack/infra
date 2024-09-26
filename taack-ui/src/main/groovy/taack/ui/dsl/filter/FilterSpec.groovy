@@ -23,7 +23,7 @@ final class FilterSpec extends FilterCommon {
         if (i18n) filterVisitor.visitSectionEnd()
     }
 
-    void filterAction(final String i18n, final MethodClosure action) {
+    void filterAction(final String i18n = null, final MethodClosure action) {
         filterVisitor.visitFilterAction(i18n, action, ButtonStyle.SECONDARY)
     }
 }

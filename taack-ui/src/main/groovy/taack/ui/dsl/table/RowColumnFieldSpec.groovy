@@ -36,7 +36,7 @@ class RowColumnFieldSpec implements BranchingSpec {
         tableVisitor.visitRowField(field, format, style)
     }
 
-    void rowAction(final String i18n, final ActionIcon icon, final Long id, String label) {
+    void rowAction(final String i18n = null, final ActionIcon icon, final Long id, String label) {
         tableVisitor.visitRowAction(i18n, icon, id, label, null, true)
     }
 
