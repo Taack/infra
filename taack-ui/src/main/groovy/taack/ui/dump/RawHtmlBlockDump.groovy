@@ -503,8 +503,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement = menu.menuOptions(blockLog.topElement, img, selectedOptionValue)
         blockLog.topElement.setTaackTag(TaackTag.MENU_OPTION)
 
-        String controller = parameter.params['controller'] as String
-        String action = parameter.params['action'] as String
+        String controller = parameter.controllerName
+        String action = parameter.actionName
 
         final IEnumOption[] options = enumOptions.options
         final int im = options.size()
@@ -517,7 +517,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             if (option.section) {
                 menu.menuOptionSection(blockLog.topElement, img, option.value)
             } else {
-                String url = parameter.urlMapped(controller, action, parameter.params as Map, false)
+                String url = parameter.urlMapped(controller, action, parameter.params as Map)
                 menu.menuOption(blockLog.topElement, img, option.value, url)
             }
         }
