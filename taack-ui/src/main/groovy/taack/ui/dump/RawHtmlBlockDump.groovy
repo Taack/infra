@@ -442,7 +442,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
         if (cp.containsKey('action')) cp.remove('action')
         if (cp.containsKey('controller')) cp.remove('controller')
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && params.equals(cp))
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
     }
 
     @Override
