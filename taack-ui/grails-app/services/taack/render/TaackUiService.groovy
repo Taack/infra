@@ -237,6 +237,33 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     /**
+     * Render the block to the browser. Either the page is updated with the block content, either the
+     * full page is rendered if 'isAjax' params is true.
+     *
+     * @param html inline to render
+     * @param menu menu descriptor
+     * @return
+     */
+    final def showView(String viewName, Map model, UiMenuSpecifier menu) {
+        ThemeSelector themeSelector = themeService.themeSelector
+        ThemeSize themeSize = themeSelector.themeSize
+        ThemeMode themeMode = themeSelector.themeMode
+        ThemeMode themeAuto = themeSelector.themeAuto
+
+        return new ModelAndView(viewName, [
+                themeSize      : themeSize,
+                themeMode      : themeMode,
+                themeAuto      : themeAuto,
+                block          : "",
+                menu           : visitMenu(menu),
+                conf           : taackUiPluginConfiguration,
+                clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+                bootstrapJsTag : bootstrapJsTag,
+                bootstrapCssTag: bootstrapCssTag
+        ] + model)
+    }
+
+    /**
      * Build a modal from a form and shows it.
      *
      * @param formSpecifier form descriptor
