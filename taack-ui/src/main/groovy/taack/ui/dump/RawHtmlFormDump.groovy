@@ -125,7 +125,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isDate = Date.isAssignableFrom(type)
         final boolean isNullable = field.fieldConstraint.nullable
         final boolean isFieldDisabled = isDisabled(field)
-        StringBuffer result = new StringBuffer()
 
         if (isBoolean) {
             blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as boolean)
@@ -184,7 +183,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         if (isListOrSet)
             formThemed.ajaxField(blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
         else {
-            if (field.fieldConstraint.field.type.isAssignableFrom(GormEntity)) {
+            if (GormEntity.isAssignableFrom(field.fieldConstraint.field.type)) {
                 GormEntity v = field.value as GormEntity
                 formThemed.ajaxField(blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
             } else {
@@ -194,7 +193,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     private static List<String> fieldInfoCollect(FieldInfo[] fieldInfos) {
-        fieldInfos.collect { it.fieldConstraint.field.type.getDeclaredFields()*.name.contains('id') ? "${it.fieldName}.id" : it.fieldName } as List<String>
+        fieldInfos.collect { GormEntity.isAssignableFrom(it.fieldConstraint.field.type) ? "${it.fieldName}.id" : it.fieldName } as List<String>
     }
 
     @Override
