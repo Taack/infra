@@ -41,7 +41,10 @@ final class EnumOptions implements IEnumOptions {
 
     EnumOptions(IEnumOption[] options, FieldInfo info) {
         Enum v = info.value as Enum
-        this.currents = [new EnumOption(v.name(), v.toString())]
+        if (v)
+            this.currents = [new EnumOption(v.name(), v.toString())]
+        else
+            this.currents = null
         this.options = options
         this.paramKey = info.fieldName
     }

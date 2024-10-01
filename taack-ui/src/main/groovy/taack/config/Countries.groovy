@@ -334,7 +334,7 @@ enum Country {
         IEnumOption[] res = new IEnumOption[values().size() + Continent.values().size()]
         int i = 0
 
-        for (def c in Continent.values()) {
+        for (Continent c in Continent.values()) {
             res[i++] = new IEnumOption() {
                 @Override
                 String getKey() {
@@ -356,21 +356,22 @@ enum Country {
                     return true
                 }
             }
-            for (def country in values().findAll { it.continent == c }.sort({ it.name })) {
+
+            values().findAll {it.continent == c }.sort { it.name() }.each {
                 res[i++] = new IEnumOption() {
                     @Override
                     String getKey() {
-                        return country.alphaIso2
+                        return it.alphaIso2
                     }
 
                     @Override
                     String getValue() {
-                        return country.name
+                        return it.name
                     }
 
                     @Override
                     String getAsset() {
-                        return "taack/icons/countries/4x3/${country.alphaIso2.toLowerCase()}.webp"
+                        return "taack/icons/countries/4x3/${it.alphaIso2.toLowerCase()}.webp"
                     }
 
                     @Override
@@ -378,6 +379,7 @@ enum Country {
                         return false
                     }
                 }
+
             }
         }
 
