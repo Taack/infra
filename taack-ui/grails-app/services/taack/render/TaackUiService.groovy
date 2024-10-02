@@ -428,7 +428,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final def downloadCsv(final UiTableSpecifier tableSpecifier, final String fileNamePrefix) {
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType("text/csv")
-        webUtils.currentResponse.setHeader("Content-disposition", "filename=\"${URLEncoder.encode("${fileNamePrefix}.csv", "UTF-8")}\"")
+        webUtils.currentResponse.setHeader("Content-disposition", "filename=${fileNamePrefix}.csv")
         webUtils.currentResponse.outputStream << visitTable(tableSpecifier)
     }
 
