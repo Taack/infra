@@ -1308,8 +1308,8 @@ class CmsController implements WebAttributes {
         def pdf = new UiPrintableSpecifier().ui {
             printableHeaderLeft('8.5cm') {
                 show new UiShowSpecifier().ui {
-                    field null, "Printed for", Style.BOLD
-                    field null, """${cu.firstName} ${cu.lastName}"""
+                    field Style.BOLD, "Printed for"
+                    field """${cu.firstName} ${cu.lastName}"""
                 }, BlockSpec.Width.THIRD
                 show new UiShowSpecifier().ui {
                     field """\
@@ -1319,7 +1319,7 @@ class CmsController implements WebAttributes {
                     """.stripIndent()
                 }, BlockSpec.Width.THIRD
                 show new UiShowSpecifier().ui {
-                    field null, """${new Date()}""", Style.ALIGN_RIGHT
+                    field Style.ALIGN_RIGHT, """${new Date()}"""
                 }, BlockSpec.Width.THIRD
 
             }
