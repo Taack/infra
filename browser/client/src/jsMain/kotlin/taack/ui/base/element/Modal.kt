@@ -67,7 +67,7 @@ class Modal(val parent: Block) : BaseElement {
         val modalBackdrop = document.createElement("div") as HTMLDivElement
         modalBackdrop.id = "modal-backdrop-$mId"
         modalBackdrop.addClass("modal-backdrop", "fade", "show")
-        document.body!!.appendChild(modalBackdrop)
+        parent.d.parentElement!!.appendChild(modalBackdrop)
     }
 
     fun close() {
