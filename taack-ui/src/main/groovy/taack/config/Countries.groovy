@@ -321,20 +321,11 @@ enum Country {
         return locale.getDisplayCountry(new Locale(lang, this.alphaIso2))
     }
 
-//<<<<<<< HEAD:taack-ui/src/main/groovy/taack/ui/config/Countries.groovy
-//    static EnumOption[] getEnumOptions(Country... firsts = null) {
-//        EnumOption[] res = new EnumOption[values().size()]
-//        int i = 0
-//        Country[] countries = firsts ? firsts + (values() - firsts).sort {it.name } : values().sort {it.name }
-//
-//        for (def option in countries) {
-//            res[i++] = new EnumOption(option.alphaIso2, option.name)
-//=======
     static IEnumOption[] getEnumOptions(Country... firsts = null) {
         IEnumOption[] res = new IEnumOption[values().size() + Continent.values().size()]
         int i = 0
 
-        for (def c in Continent.values()) {
+        Continent.values().sort {it.name }.each { c ->
             res[i++] = new IEnumOption() {
                 @Override
                 String getKey() {
@@ -356,21 +347,21 @@ enum Country {
                     return true
                 }
             }
-            for (def country in values().findAll { it.continent == c }.sort({ it.name })) {
+            values().findAll {it.continent == c }.sort { it.name() }.each {
                 res[i++] = new IEnumOption() {
                     @Override
                     String getKey() {
-                        return country.alphaIso2
+                        return it.alphaIso2
                     }
 
                     @Override
                     String getValue() {
-                        return country.name
+                        return it.name
                     }
 
                     @Override
                     String getAsset() {
-                        return "taack/icons/countries/4x3/${country.alphaIso2.toLowerCase()}.webp"
+                        return "taack/icons/countries/4x3/${it.alphaIso2.toLowerCase()}.webp"
                     }
 
                     @Override

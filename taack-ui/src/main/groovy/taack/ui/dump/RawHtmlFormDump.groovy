@@ -298,7 +298,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         if (fieldInfo.value?.hasProperty(ST_ID)) {
             value = "${fieldInfo.value.getAt(ST_ID)}"
             formThemed.addChildren(
-                    new HTMLInput(InputType.HIDDEN, value, qualifiedName)
+                    new HTMLInput(InputType.HIDDEN, value, qualifiedName + '.id')
             )
         } else if (isListOrSet) {
             fieldInfo.value.eachWithIndex { Object it, Integer occ ->
