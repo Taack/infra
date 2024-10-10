@@ -23,4 +23,5 @@ class TaackUiConfiguration {
     String javaPath
     String plantUmlPath
     String solrUrl
+    Boolean disableSecurity = false
 }

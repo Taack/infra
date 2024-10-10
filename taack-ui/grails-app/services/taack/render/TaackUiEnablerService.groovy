@@ -1,11 +1,15 @@
 package taack.render
 
 import grails.compiler.GrailsCompileStatic
+import grails.util.Environment
 import grails.web.api.WebAttributes
 import org.codehaus.groovy.runtime.MethodClosure
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
+import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.helper.Utils
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
@@ -34,6 +38,9 @@ import taack.ui.dsl.helper.Utils
 @GrailsCompileStatic
 class TaackUiEnablerService implements WebAttributes {
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
+
+    @Autowired
+    TaackUiConfiguration taackUiConfiguration
 
     private final static Map<String, Closure> securityClosures = [:]
 
@@ -66,7 +73,16 @@ class TaackUiEnablerService implements WebAttributes {
         }
 
         def path = '/' + controller + '/' + action
-        def isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+        boolean isAllowed = true
+        switch (Environment.current) {
+            case Environment.DEVELOPMENT:
+                if (!taackUiConfiguration.disableSecurity)
+                    isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+                break
+            case Environment.PRODUCTION:
+                isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+                break
+        }
         if (isAllowed) {
             def c = securityClosures[path]
             if (c) {
