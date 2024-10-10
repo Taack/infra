@@ -193,6 +193,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     private static List<String> fieldInfoCollect(FieldInfo[] fieldInfos) {
+        fieldInfos ?= new FieldInfo[0]
         fieldInfos.collect { GormEntity.isAssignableFrom(it.fieldConstraint.field.type) ? "${it.fieldName}.id" : it.fieldName } as List<String>
     }
 
