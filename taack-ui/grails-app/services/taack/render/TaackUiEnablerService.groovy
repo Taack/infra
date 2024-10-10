@@ -70,7 +70,7 @@ class TaackUiEnablerService implements WebAttributes {
         if (isAllowed) {
             def c = securityClosures[path]
             if (c) {
-                return c.call(id, params)
+                return c.call(id != null ? id : params['id'], params)
             }
             return true
         }
