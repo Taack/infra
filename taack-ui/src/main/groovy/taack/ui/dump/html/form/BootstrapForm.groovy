@@ -181,7 +181,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         vals?.each {
             String id = idPrefix + "-${occ++}"
             HTMLSpan span = new HTMLSpan().builder.addClasses('M2MParent').build() as HTMLSpan
-            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it?.ident(), null, null, disabled).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
+            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it?.ident(), null).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
             HTMLInput input = new HTMLInput(InputType.STRING, it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
             if (!disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
@@ -192,7 +192,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         String id = idPrefix + "-${occ++}"
 
         HTMLSpan span2 = new HTMLSpan().builder.addClasses('M2MToDuplicate').build() as HTMLSpan
-        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, '', null, null, disabled).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, '', null).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
         input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
@@ -208,7 +208,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     def <T1 extends GormEntity> IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, T1 val, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
 
-        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName, null, disabled).builder.addClasses(formControl).build() as HTMLInput
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val?.ident(), qualifiedName).builder.addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), null, null, disabled, true).builder.setId(qualifiedName + 'Id').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
