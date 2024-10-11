@@ -89,7 +89,7 @@ class TaackUiEnablerService implements WebAttributes {
                 if (id != null) {
                     return c.call(id, params)
                 } else {
-                    String idFromParams = params.getOrDefault('id', '').toString()
+                    String idFromParams = params?.get('id')?.toString() ?: ''
                     return c.call(idFromParams.isNumber() ? idFromParams.toLong() : null, params)
                 }
             }
