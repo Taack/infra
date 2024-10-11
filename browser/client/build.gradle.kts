@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform")  version "2.0.0"
+    kotlin("multiplatform")  version "2.0.21"
 //    id "org.jetbrains.kotlin.multiplatform" version "1.9.23"
 //    id "org.jetbrains.kotlin.plugin.serialization" version "1.9.23"
 
@@ -10,7 +10,7 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     js(IR) {
-        moduleName = "auo4ever"
+//        moduleName = "auo4ever"
         browser {
         }
         binaries.executable()
@@ -21,7 +21,7 @@ kotlin {
             dependencies {
                 // No need for the js prefix here, you can just copy and paste it from the top-level block
 //                implementation("org.jetbrains.kotlinx:kotlinx-html:0.8.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 //                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             }
         }
