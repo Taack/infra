@@ -77,8 +77,8 @@ final class EnumOptions implements IEnumOptions {
             for (int i = 0; i < currents.size(); i++) {
                 final Enum v = currents[i]
                 if (v) {
-                    final String name = v?.hasProperty(ST_NAME) ? values[i]?.getAt(ST_NAME) : v
-                    this.currents[i] = new EnumOption(v.toString(), name, null, false)
+                    final String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : v
+                    this.currents[i] = new EnumOption(v.name(), name, null, false)
                 }
             }
         }
