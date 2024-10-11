@@ -10,5 +10,5 @@ fun main() {
             if (window.location.hash.isEmpty()) window.location.reload()
         })
     }
-    MainCanvas().draw()
+    MainCanvas.addCanvas()?.draw()
 }
