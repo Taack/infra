@@ -86,7 +86,12 @@ class TaackUiEnablerService implements WebAttributes {
         if (isAllowed) {
             def c = securityClosures[path]
             if (c) {
-                return c.call(id != null ? id : params['id'], params)
+                if (id != null) {
+                    return c.call(id, params)
+                } else {
+                    String idFromParams = params.getOrDefault('id', '').toString()
+                    return c.call(idFromParams.isNumber() ? idFromParams.toLong() : null, params)
+                }
             }
             return true
         }
