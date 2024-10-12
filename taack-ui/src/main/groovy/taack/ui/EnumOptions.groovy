@@ -39,6 +39,40 @@ final class EnumOptions implements IEnumOptions {
         this.paramKey = paramKey
     }
 
+    EnumOptions(IEnumOption[] options, String paramKey, String... currents) {
+        this.options = options
+
+        if (currents && currents.size() > 0) {
+            this.currents = new EnumOption[currents.size()]
+
+            for (int i = 0; i < currents.size(); i++) {
+                final String v = currents[i]
+                final String name = v
+                if (v) this.currents[i] = new EnumOption(v, name)
+            }
+        }
+
+        this.paramKey = paramKey
+    }
+
+    EnumOptions(IEnumOption[] options, String paramKey, Enum... currents) {
+        this.options = options
+
+        if (currents && currents.size() > 0) {
+            this.currents = new EnumOption[currents.size()]
+
+            for (int i = 0; i < currents.size(); i++) {
+                final Enum v = currents[i]
+                if (v) {
+                    final String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : v
+                    this.currents[i] = new EnumOption(v.name(), name, null, false)
+                }
+            }
+        }
+
+        this.paramKey = paramKey
+    }
+
     EnumOptions(IEnumOption[] options, FieldInfo info) {
         Enum v = info.value as Enum
         if (v)

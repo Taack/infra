@@ -12,6 +12,8 @@ import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
 
+import java.text.SimpleDateFormat
+
 @CompileStatic
 final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout implements IFormTheme<T> {
 
@@ -222,7 +224,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.DATE, value?.toString(), qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd').format(value) : null, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
