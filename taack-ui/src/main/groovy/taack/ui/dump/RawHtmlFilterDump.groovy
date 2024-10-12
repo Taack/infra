@@ -96,16 +96,17 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
-        final boolean isBoolean = fieldInfo?.fieldConstraint?.field?.type == Boolean
-        final boolean isEnum = fieldInfo?.fieldConstraint?.field?.type?.isEnum()
+        final Class type = fieldInfo?.fieldConstraint?.field?.type
+        final boolean isBoolean = type == boolean || type == Boolean
+        final boolean isEnum = type?.isEnum()
         if (enumOptions) {
-            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(enumOptions, qualifiedName), false, false, true)
+            EnumOptions eos = value != null ? new EnumOptions(enumOptions, qualifiedName, value) : isEnum ? new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value as Enum) : new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value?.toString())
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, eos, false, false, true)
         } else if (isEnum) {
-            final Class type = fieldInfo.fieldConstraint.field.type
-            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, new EnumOptions(type as Class<Enum>, qualifiedName, value), false, false, true)
+            EnumOptions eos = value != null ? new EnumOptions(type as Class<Enum>, qualifiedName, value) : new EnumOptions(type as Class<Enum>, qualifiedName, fieldInfo?.value as Enum)
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, eos, false, false, true)
         } else if (isBoolean) {
-            Boolean isChecked = parameter.applicationTagLib.params[qualifiedName] == "1" ? true : parameter.applicationTagLib.params[qualifiedName] == "0" ? false : null
-            if (!parameter.applicationTagLib.params.containsKey(qualifiedName)) isChecked = fieldInfo?.value as Boolean
+            Boolean isChecked = value != null ? (value == "1" ? true : value == "0" ? false : null) : (fieldInfo?.value as Boolean)
             blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, i18n, false, true, isChecked)
         } else {
             blockLog.topElement = formThemed.normalInput(blockLog.topElement, qualifiedName, i18n, false, true, value)
