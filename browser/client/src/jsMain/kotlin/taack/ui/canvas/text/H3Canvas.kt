@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class H3Canvas() : ICanvasCharSequence() {
+class H3Canvas() : ICanvasText() {
     override val font: String
         get() = "27px sans-serif"
     override val fillStyle: String
@@ -20,4 +20,5 @@ class H3Canvas() : ICanvasCharSequence() {
         num2++
         return "$num1.$num2. "
     }
+
 }

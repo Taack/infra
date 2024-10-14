@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class PCanvas() : ICanvasCharSequence() {
+class PCanvas() : ICanvasText() {
     override val font: String
         get() = "17px sans-serif"
     override val fillStyle: String
@@ -19,4 +19,5 @@ class PCanvas() : ICanvasCharSequence() {
     override fun computeNum(): String {
         return ""
     }
+
 }

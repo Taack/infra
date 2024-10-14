@@ -3,7 +3,6 @@ package taack.ui.canvas
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.CanvasRenderingContext2D
-import org.w3c.dom.CaretPosition
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.KeyboardEvent
@@ -12,11 +11,27 @@ import taack.ui.canvas.text.*
 
 class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2D) {
 
+    val texts = mutableListOf<ICanvasText>()
+
+    var currentText: ICanvasText? = null
+    var currentMouseEvent: MouseEvent? = null
+    var currentKeyboardEvent: KeyboardEvent? = null
+    var consecutiveCharSequence: Int = 0
+    var clickYPosBefore: Double = 0.0
+
+    fun addText() {
+        currentText?.drawText(currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
+        draw()
+    }
+
+    private fun addText(text: ICanvasText) {
+        texts.add(text)
+    }
+
     companion object {
         fun addCanvas(): MainCanvas? {
             console.log("addCanvas")
-            val d = document.getElementById("canvas-holder") as HTMLDivElement?
-            if (d == null) return null
+            val d = document.getElementById("canvas-holder") as HTMLDivElement? ?: return null
             val canvas = document.createElement("canvas") as HTMLCanvasElement
             canvas.id = "canvas"
             canvas.width = document.body!!.offsetWidth
@@ -28,11 +43,12 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     }
 
     init {
+        addInitialTexts()
         window.onresize = {
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 100
-            ICanvasCharSequence.lastHeight = 0.0
+            ICanvasText.lastHeight = 0.0
             draw()
         }
 
@@ -53,6 +69,27 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
 
         }
 
+        canvas.onclick = { event: MouseEvent ->
+            console.log("onclick ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
+
+            var h = 0.0
+            currentText = null
+            currentMouseEvent = event
+            event.preventDefault()
+            event.stopPropagation()
+            for (text in texts) {
+                var hOld = h
+                h += text.totalHeight
+                if (event.offsetY > hOld) {
+                    if (event.offsetY < h) {
+                        clickYPosBefore = hOld
+                        currentText = text
+                        break
+                    }
+                }
+            }
+        }
+
         canvas.onmousemove = { event: MouseEvent ->
             if (event.buttons.toInt() != 0)
                 console.log("onmousemove ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
@@ -70,78 +107,61 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
 
         canvas.onkeydown = { event: KeyboardEvent ->
             console.log("onkeydown ${event.code} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey} ${event.key} ${event.repeat}")
+            currentKeyboardEvent = event
+            addText()
+            event.preventDefault()
+            event.stopPropagation()
         }
 
         canvas.onkeyup = { event: KeyboardEvent ->
             console.log("onkeyup ${event.code} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey} ${event.key} ${event.repeat}")
+            event.preventDefault()
+            event.stopPropagation()
         }
     }
 
-    fun draw() {
+    fun addInitialTexts() {
         console.log("canvas $canvas")
         console.log("ctx $ctx")
 
-        ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
-
-        ctx.fillStyle = "rgb(200 0 0)"
-        ctx.fillRect(10.0, 10.0, 50.0, 50.0)
-
-        ctx.fillStyle = "rgb(0.0 0.0 200 / 50.0%)"
-        ctx.fillRect(30.0, 30.0, 50.0, 50.0)
-
         val h2 = H2Canvas()
-        val h3 = H3Canvas()
-        val h4 = H4Canvas()
-        val p = PCanvas()
 
         h2.txt = "Topology Filters and Selectors Example for various data layout"
-        h2.draw(ctx, canvas.width)
+        addText(h2)
 
+        val h3 = H3Canvas()
         h3.txt = "Directed Acyclic Graphs (the most common in computer sciences)"
-        h3.draw(ctx, canvas.width)
+        addText(h3)
 
-        p.txt = "DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently."
-        p.draw(ctx, canvas.width)
+        val p1 = PCanvas()
+        p1.txt =
+            "DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently."
+        addText(p1)
 
-        h3.txt = "For Assemblies and bodies"
-        h3.draw(ctx, canvas.width)
+        val h31 = H3Canvas()
+        h31.txt = "For Assemblies and bodies"
+        addText(h31)
 
+        val h4 = H4Canvas()
         h4.txt = "Category"
-        h4.draw(ctx, canvas.width)
+        addText(h4)
 
-        p.txt = "Matched by feature, body name, but also by position DSL."
-        p.draw(ctx, canvas.width)
+        val p2 = PCanvas()
+        p2.txt = "Matched by feature, body name, but also by position DSL."
+        addText(h4)
+        draw()
+    }
 
+    fun draw() {
+        ICanvasText.num1 = 0
+        ICanvasText.num2 = 0
 
+        println(texts)
+        for (text in texts) {
+            println("text: $text")
 
-//        ctx.font = "48px sans-serif"
-//        ctx.fillStyle = "rgb(0 0 0)"
-//
-//        console.log("txt ${ctx.measureText(txt).width}")
-//
-//        val txtMetrics = ctx.measureText(txt)
-//        val width = txtMetrics.width
-//        val height = txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent
-//        val canvasWidth = canvas.width
-//
-//        if (width > canvasWidth) {
-//            val listTxt = txt.split(" ")
-//            var posX = 10.0
-//            var posY = 50.0
-//            for (i in 0 .. (listTxt.size - 1)) {
-//                val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
-//                console.log("i $i, height $height, posX $posX, posY $posY, width $width, listTxt[i] ${listTxt[i]}")
-//                if (posX + ctx.measureText(t).width > canvasWidth) {
-//                    posX = 10.0
-//                    posY += height
-//                }
-//                ctx.fillText(t, posX, posY)
-//                posX += ctx.measureText(t).width
-//            }
-//        } else {
-//            ctx.fillText(txt, 10.0, 50.0)
-//        }
-
-
+            text.draw(ctx, canvas.width)
+        }
+        println(texts)
     }
 }
