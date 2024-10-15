@@ -10,6 +10,8 @@ abstract class ICanvasText {
         var num2: Int = 0
     }
 
+    val debugLines = false
+
     abstract val font: String
     abstract val fillStyle: String
     abstract val letterSpacing: Double
@@ -51,16 +53,19 @@ abstract class ICanvasText {
                 posX = 10.0
                 posY += height
                 totalHeight = posY
-                lines += CanvasLine(txtLetterPosBegin, txtLetterPosEnd, posY - height, posY + marginBottom + marginTop)
+                lines += CanvasLine(txtLetterPosBegin, txtLetterPosEnd, posY - 2 * height, posY - height + marginBottom + marginTop, 10.0 + ctx.measureText(numTxt).width)
                 txtLetterPosBegin = txtLetterPosEnd
             }
             ctx.fillText(t, posX, posY + lastHeight)
             posX += ctx.measureText(t).width
             txtLetterPos += t.length
         }
-        if (lines.isEmpty()) lines += CanvasLine(0, txt.length, 0.0, height + marginTop + marginBottom)
+        if (lines.isEmpty()) lines += CanvasLine(0, txt.length, 0.0, height + marginTop + marginBottom, 10.0 + ctx.measureText(numTxt).width)
+        if (debugLines)
+            lines.forEach { it.drawLine(ctx, lastHeight) }
         lastHeight += totalHeight + marginBottom
         ctx.restore()
+
     }
 
     abstract fun computeNum(): String
@@ -76,7 +81,7 @@ abstract class ICanvasText {
                 println("Find line: $l => $t")
                 for (e in t.indices) {
                     val eX = ctx.measureText(t.substring(0, e)).width
-                    if (eX + 10.0 >= x) {
+                    if (eX + l.leftMargin >= x) {
                         println("Find letter: ${t.substring(0, e)}, $eX <= $x, e: $e")
                         if (key.code == "Backspace") {
                             txt = txt.substring(0, l.posBegin + e - n - 1) + txt.substring(l.posBegin + e - n)

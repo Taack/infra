@@ -20,7 +20,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     private var clickYPosBefore: Double = 0.0
 
     private fun addText() {
-        currentText?.drawText(ctx, currentKeyboardEvent!!, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
+        currentText?.drawText(ctx, currentKeyboardEvent!!, consecutiveCharSequence++, currentMouseEvent!!.offsetX, currentMouseEvent!!.offsetY - clickYPosBefore)
         draw()
     }
 
