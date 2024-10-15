@@ -26,14 +26,14 @@ abstract class ICanvasText {
         ctx.save()
         ctx.font = font
         ctx.fillStyle = fillStyle
-
+        words = emptyList()
         lastHeight += marginTop
 
         val numTxt = computeNum()
         val tmpTxt = numTxt + txt
         val txtMetrics = ctx.measureText(numTxt + tmpTxt)
         totalWidth = txtMetrics.width
-        val height = lineHeight//txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent
+        val height = txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent//lineHeight
 
         if (totalWidth > canvasWidth) {
             val listTxt = tmpTxt.split(" ")
@@ -49,7 +49,7 @@ abstract class ICanvasText {
                 val posXOld = posX
                 ctx.fillText(t, posX, posY + lastHeight)
                 posX += ctx.measureText(t).width
-                words += CanvasWord(t, posXOld, posX, posY, posY + lastHeight)
+                words += CanvasWord(t, posXOld, posX, posY - height + marginTop, posY + marginTop)
             }
         } else {
             ctx.fillText(tmpTxt, 10.0, height + lastHeight)
@@ -62,10 +62,14 @@ abstract class ICanvasText {
     abstract fun computeNum():String
 
     fun drawText(inputText: String, n: Int,  x: Double, y: Double) {
+        println("$inputText, $n, $x, $y")
         for (w in words) {
-            if (x > w.posX1 && x < w.posX2 && w.posY1 < y && w.posY2 > y) {
+            println(w)
+            if (x > w.posX1 && x < w.posX2 && w.posY1 <= y && w.posY2 >= y) {
                 val letterPos = ((x - w.posX1 + w.posX2 - x) / 2 * txt.length).toInt()
+                println("txt before: $txt")
                 txt = txt.substring(0, letterPos) + inputText + txt.substring(letterPos)
+                println("txt after: $txt")
             }
         }
     }

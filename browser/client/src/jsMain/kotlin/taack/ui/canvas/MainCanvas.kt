@@ -13,14 +13,14 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
 
     val texts = mutableListOf<ICanvasText>()
 
-    var currentText: ICanvasText? = null
-    var currentMouseEvent: MouseEvent? = null
-    var currentKeyboardEvent: KeyboardEvent? = null
-    var consecutiveCharSequence: Int = 0
-    var clickYPosBefore: Double = 0.0
+    private var currentText: ICanvasText? = null
+    private var currentMouseEvent: MouseEvent? = null
+    private var currentKeyboardEvent: KeyboardEvent? = null
+    private var consecutiveCharSequence: Int = 0
+    private var clickYPosBefore: Double = 0.0
 
-    fun addText() {
-        currentText?.drawText(currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
+    private fun addText() {
+        currentText!!.drawText(currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
         draw()
     }
 
@@ -42,6 +42,10 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         }
     }
 
+    private fun logMouseEvent(ev: MouseEvent) {
+        console.log("logMouseEvent", ev)
+    }
+
     init {
         addInitialTexts()
         window.onresize = {
@@ -52,25 +56,9 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             draw()
         }
 
-//        canvas.onclick = { event: MouseEvent ->
-//            console.log("onclick ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-//        }
-
-        canvas.onmouseup = { event: MouseEvent ->
-            console.log("onmouseup ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-        }
-
-        canvas.onmousedown = { event: MouseEvent ->
-            console.log("onmousedown ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-        }
-
-        canvas.ondblclick = { event: MouseEvent ->
-            console.log("ondblclick ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-
-        }
-
         canvas.onclick = { event: MouseEvent ->
-            console.log("onclick ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
+            logMouseEvent(event)
+            consecutiveCharSequence = 0
 
             var h = 0.0
             currentText = null
@@ -78,12 +66,14 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             event.preventDefault()
             event.stopPropagation()
             for (text in texts) {
-                var hOld = h
+                val hOld = h
                 h += text.totalHeight
-                if (event.offsetY > hOld) {
-                    if (event.offsetY < h) {
+                println("th: ${text.totalHeight}, h: $h, hOld: $hOld, txt: ${text.txt}")
+                if (event.y > hOld) {
+                    if (event.y < h) {
                         clickYPosBefore = hOld
                         currentText = text
+                        println("find text area ... at (${event.x}, ${event.y}) = ${text.txt}")
                         break
                     }
                 }
@@ -95,16 +85,6 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
                 console.log("onmousemove ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
         }
 
-        canvas.onmouseout = { event: MouseEvent ->
-            console.log("onmouseout ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-
-        }
-
-        canvas.onmouseover = { event: MouseEvent ->
-            console.log("onmouseover ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-
-        }
-
         canvas.onkeydown = { event: KeyboardEvent ->
             console.log("onkeydown ${event.code} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey} ${event.key} ${event.repeat}")
             currentKeyboardEvent = event
@@ -113,11 +93,6 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             event.stopPropagation()
         }
 
-        canvas.onkeyup = { event: KeyboardEvent ->
-            console.log("onkeyup ${event.code} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey} ${event.key} ${event.repeat}")
-            event.preventDefault()
-            event.stopPropagation()
-        }
     }
 
     fun addInitialTexts() {
@@ -152,16 +127,12 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         draw()
     }
 
-    fun draw() {
+    private fun draw() {
         ICanvasText.num1 = 0
         ICanvasText.num2 = 0
 
-        println(texts)
         for (text in texts) {
-            println("text: $text")
-
             text.draw(ctx, canvas.width)
         }
-        println(texts)
     }
 }

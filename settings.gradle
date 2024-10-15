@@ -13,7 +13,7 @@ include 'taack-jdbc-common'
 include 'taack-ui'
 
 if (taackReleaseVersion.endsWith('SNAPSHOT')) {
-    include 'taack-ui-test'
+    //include 'taack-ui-test'
     include 'browser:client'
 }
 

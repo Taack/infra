@@ -87,12 +87,12 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         } else {
             """<div class="${style ? style.cssClassesString : ''}">${field}</div>  """
         }
-        """
-                <li class="fieldcontain">
-                    ${i18n?"""<span class="property-label ref-prefix">${i18n}</span>""":""}
-                    <span class="${i18n?"property-value":""} ${style ? style.cssClassesString : ''}">${field}</span>
-                </li> 
-        """
+//        """
+//                <li class="fieldcontain">
+//                    ${i18n?"""<span class="property-label ref-prefix">${i18n}</span>""":""}
+//                    <span class="${i18n?"property-value":""} ${style ? style.cssClassesString : ''}">${field}</span>
+//                </li>
+//        """
     }
 
     @Override
