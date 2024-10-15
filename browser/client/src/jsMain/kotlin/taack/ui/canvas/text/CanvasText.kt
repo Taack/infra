@@ -53,14 +53,26 @@ abstract class CanvasText {
                 posX = 10.0
                 posY += height
                 totalHeight = posY
-                lines += CanvasLine(txtLetterPosBegin, txtLetterPosEnd, posY - 2 * height, posY - height + marginBottom + marginTop, 10.0 + ctx.measureText(numTxt).width)
+                lines += CanvasLine(
+                    txtLetterPosBegin,
+                    txtLetterPosEnd,
+                    posY - 2 * height - marginTop,
+                    posY - height + marginTop,
+                    10.0 + ctx.measureText(numTxt).width
+                )
                 txtLetterPosBegin = txtLetterPosEnd
             }
             ctx.fillText(t, posX, posY + lastHeight)
             posX += ctx.measureText(t).width
             txtLetterPos += t.length
         }
-        if (lines.isEmpty()) lines += CanvasLine(0, txt.length, 0.0, height + marginTop + marginBottom, 10.0 + ctx.measureText(numTxt).width)
+        if (lines.isEmpty()) lines += CanvasLine(
+            0,
+            txt.length,
+            0.0,
+            height + marginTop + marginBottom,
+            10.0 + ctx.measureText(numTxt).width
+        )
         if (debugLines)
             lines.forEach { it.drawLine(ctx, lastHeight) }
         lastHeight += totalHeight + marginBottom
