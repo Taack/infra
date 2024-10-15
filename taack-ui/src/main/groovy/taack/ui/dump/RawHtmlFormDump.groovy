@@ -140,8 +140,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final Class actualClass = Class.forName(actualType.typeName)
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
-                        Enum[] values = actualClass.invokeMethod(ST_VALUES, null) as Enum[]
-                        blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(actualClass as Class<Enum>, qualifiedName, values), true, isDisabled(field), field.fieldConstraint.nullable)
+                        blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(actualClass as Class<Enum>, qualifiedName, field.value as Enum[]), true, isDisabled(field), field.fieldConstraint.nullable)
                     } else {
                         String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
                         blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isDisabled(field), field.fieldConstraint.nullable)
