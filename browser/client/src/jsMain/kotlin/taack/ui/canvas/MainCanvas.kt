@@ -20,7 +20,8 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     private var clickYPosBefore: Double = 0.0
 
     private fun addText() {
-        currentText?.drawText(currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
+        currentText?.drawText(ctx, currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
+        draw()
     }
 
     private fun addText(text: ICanvasText) {
@@ -45,6 +46,10 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         console.log("logMouseEvent", ev)
     }
 
+    private fun logKeyEvent(ev: KeyboardEvent) {
+        console.log("logKeyEvent", ev)
+    }
+
     init {
         window.onresize = {
             console.log("onresize ${document.body!!.offsetWidth}")
@@ -66,7 +71,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             for (text in texts) {
                 val hOld = h
                 h += text.totalHeight + text.marginTop + text.marginBottom
-                println("th: ${text.totalHeight}, h: $h, hOld: $hOld, txt: ${text.txt}")
+                println("${text}, h: $h, hOld: $hOld")
                 if (event.y > hOld) {
                     if (event.y < h) {
                         clickYPosBefore = hOld
@@ -84,7 +89,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         }
 
         canvas.onkeydown = { event: KeyboardEvent ->
-            console.log("onkeydown ${event.code} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey} ${event.key} ${event.repeat}")
+            logKeyEvent(event)
             currentKeyboardEvent = event
             addText()
             event.preventDefault()
@@ -148,6 +153,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         ICanvasText.num1 = 0
         ICanvasText.num2 = 0
         ICanvasText.lastHeight = 0.0
+        ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble());
 
         for (text in texts) {
             text.draw(ctx, canvas.width)
