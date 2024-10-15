@@ -20,8 +20,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     private var clickYPosBefore: Double = 0.0
 
     private fun addText() {
-        currentText!!.drawText(currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
-        draw()
+        currentText?.drawText(currentKeyboardEvent!!.key, consecutiveCharSequence++, currentMouseEvent!!.x, currentMouseEvent!!.y - clickYPosBefore)
     }
 
     private fun addText(text: ICanvasText) {
@@ -47,7 +46,6 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     }
 
     init {
-        addInitialTexts()
         window.onresize = {
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
@@ -67,7 +65,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             event.stopPropagation()
             for (text in texts) {
                 val hOld = h
-                h += text.totalHeight
+                h += text.totalHeight + text.marginTop + text.marginBottom
                 println("th: ${text.totalHeight}, h: $h, hOld: $hOld, txt: ${text.txt}")
                 if (event.y > hOld) {
                     if (event.y < h) {
@@ -93,9 +91,11 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             event.stopPropagation()
         }
 
+        addInitialTexts()
+        draw()
     }
 
-    fun addInitialTexts() {
+    private fun addInitialTexts() {
         console.log("canvas $canvas")
         console.log("ctx $ctx")
 
@@ -123,13 +123,31 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
 
         val p2 = PCanvas()
         p2.txt = "Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        addText(p2)
+        addText(p2)
+        addText(p2)
+
         addText(h4)
-        draw()
+
     }
 
     private fun draw() {
         ICanvasText.num1 = 0
         ICanvasText.num2 = 0
+        ICanvasText.lastHeight = 0.0
 
         for (text in texts) {
             text.draw(ctx, canvas.width)
