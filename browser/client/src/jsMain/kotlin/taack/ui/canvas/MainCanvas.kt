@@ -7,13 +7,14 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.MouseEvent
+import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.text.*
 
 class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2D) {
 
-    val texts = mutableListOf<ICanvasText>()
+    val texts = mutableListOf<CanvasText>()
 
-    private var currentText: ICanvasText? = null
+    private var currentText: CanvasText? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
     private var consecutiveCharSequence: Int = 0
@@ -24,7 +25,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         draw()
     }
 
-    private fun addText(text: ICanvasText) {
+    private fun addText(text: CanvasText) {
         texts.add(text)
     }
 
@@ -55,7 +56,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 100
-            ICanvasText.lastHeight = 0.0
+            CanvasText.lastHeight = 0.0
             draw()
         }
 
@@ -63,6 +64,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             logMouseEvent(event)
             consecutiveCharSequence = 0
 
+            CanvasCaret.draw(ctx, event.offsetX, event.offsetY)
             var h = 0.0
             currentText = null
             currentMouseEvent = event
@@ -150,9 +152,9 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     }
 
     private fun draw() {
-        ICanvasText.num1 = 0
-        ICanvasText.num2 = 0
-        ICanvasText.lastHeight = 0.0
+        CanvasText.num1 = 0
+        CanvasText.num2 = 0
+        CanvasText.lastHeight = 0.0
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble());
 
         for (text in texts) {

@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class H4Canvas() : ICanvasText() {
+class H4Canvas() : CanvasText() {
     override val font: String
         get() = "23px sans-serif"
     override val fillStyle: String

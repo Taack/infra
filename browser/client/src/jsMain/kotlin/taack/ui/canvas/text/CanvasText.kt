@@ -3,7 +3,7 @@ package taack.ui.canvas.text
 import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.events.KeyboardEvent
 
-abstract class ICanvasText {
+abstract class CanvasText {
     companion object {
         var lastHeight: Double = 0.0
         var num1: Int = 0

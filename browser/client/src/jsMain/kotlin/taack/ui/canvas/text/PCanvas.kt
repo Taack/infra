@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class PCanvas() : ICanvasText() {
+class PCanvas() : CanvasText() {
     override val font: String
         get() = "17px sans-serif"
     override val fillStyle: String
