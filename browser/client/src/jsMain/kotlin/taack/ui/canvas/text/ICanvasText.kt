@@ -1,6 +1,7 @@
 package taack.ui.canvas.text
 
 import org.w3c.dom.CanvasRenderingContext2D
+import org.w3c.dom.events.KeyboardEvent
 
 abstract class ICanvasText {
     companion object {
@@ -42,6 +43,7 @@ abstract class ICanvasText {
         var txtLetterPos = 0
         var txtLetterPosBegin = 0
         var txtLetterPosEnd = 0
+        lines = emptyList()
         for (i in listTxt.indices) {
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
             if (posX + ctx.measureText(t).width > canvasWidth) {
@@ -49,43 +51,45 @@ abstract class ICanvasText {
                 posX = 10.0
                 posY += height
                 totalHeight = posY
-                lines += CanvasLine(txtLetterPosBegin, txtLetterPosEnd, posY - height - marginTop, posY + marginBottom)
+                lines += CanvasLine(txtLetterPosBegin, txtLetterPosEnd, posY - height, posY + marginBottom + marginTop)
                 txtLetterPosBegin = txtLetterPosEnd
             }
-//            val posXOld = posX
             ctx.fillText(t, posX, posY + lastHeight)
             posX += ctx.measureText(t).width
-//            if (numTxt.isEmpty() || (numTxt.isNotEmpty() && i > 0)) {
-//                var j = 0
-//                var posXLetter = posXOld
-//                for (letter in t) {
-//                    val letterX = ctx.measureText(letter.toString()).width
-//                    letters += CanvasLetter(txtLetterPos + j++, posXLetter, posXLetter + letterX)
-//                    posXLetter += letterX
-//                }
-//            }
             txtLetterPos += t.length
         }
+        if (lines.isEmpty()) lines += CanvasLine(0, txt.length, 0.0, height + marginTop + marginBottom)
         lastHeight += totalHeight + marginBottom
         ctx.restore()
     }
 
     abstract fun computeNum(): String
 
-    fun drawText(ctx: CanvasRenderingContext2D, inputText: String, n: Int, x: Double, y: Double) {
+    fun drawText(ctx: CanvasRenderingContext2D, key: KeyboardEvent, n: Int, x: Double, y: Double) {
+        ctx.save()
+        ctx.font = font
+        ctx.fillStyle = fillStyle
+
         for (l in lines) {
             if (l.posY1 <= y && l.posY2 >= y) {
                 val t = txt.substring(l.posBegin, l.posEnd)
+                println("Find line: $l => $t")
                 for (e in t.indices) {
-                    val eX = ctx.measureText(t.substring(e)).width
-                    if (eX <= x) {
-                        txt = txt.substring(0, l.posBegin + e + n) + inputText + txt.substring(l.posBegin + e + n)
+                    val eX = ctx.measureText(t.substring(0, e)).width
+                    if (eX + 10.0 >= x) {
+                        println("Find letter: ${t.substring(0, e)}, $eX <= $x, e: $e")
+                        if (key.code == "Backspace") {
+                            txt = txt.substring(0, l.posBegin + e - n - 1) + txt.substring(l.posBegin + e - n)
+                        } else {
+                            txt = txt.substring(0, l.posBegin + e + n) + key.key + txt.substring(l.posBegin + e + n)
+                        }
                         return
                     }
                 }
                 break
             }
         }
+        ctx.restore()
     }
 
     override fun toString(): String {
