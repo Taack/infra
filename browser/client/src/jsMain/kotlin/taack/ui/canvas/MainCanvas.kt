@@ -22,8 +22,8 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     private var clickYPosBefore: Double = 0.0
 
     private fun addText() {
-        var co:Int = 0
-        var lo:Int = 0
+        var co: Int = 0
+        var lo: Int = 0
         if (currentKeyboardEvent!!.code == "Backspace") {
             co = charOffset--
         } else if (currentKeyboardEvent!!.code == "Enter") {
@@ -38,7 +38,14 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         } else {
             co = charOffset++
         }
-        currentText?.drawText(ctx, currentKeyboardEvent!!, co, lo, currentMouseEvent!!.offsetX, currentMouseEvent!!.offsetY - clickYPosBefore)
+        currentText?.drawText(
+            ctx,
+            currentKeyboardEvent!!,
+            co,
+            lo,
+            currentMouseEvent!!.offsetX,
+            currentMouseEvent!!.offsetY - clickYPosBefore
+        )
         draw()
     }
 
@@ -73,29 +80,27 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 100
-            CanvasText.lastHeight = 0.0
+            CanvasText.globalPosY = 0.0
             draw()
         }
 
         canvas.onclick = { event: MouseEvent ->
             logMouseEvent(event)
+            draw()
             charOffset = 0
 
-            CanvasCaret.draw(ctx, event.offsetX, event.offsetY)
-            var h = 0.0
             currentText = null
             currentMouseEvent = event
             event.preventDefault()
             event.stopPropagation()
             for (text in texts) {
-                val hOld = h
-                h += text.totalHeight + text.marginTop + text.marginBottom
-                println("${text}, h: $h, hOld: $hOld")
-                if (event.y > hOld) {
-                    if (event.y < h) {
-                        clickYPosBefore = hOld
+                for (line in text.lines) {
+                    if (event.offsetY in line.textY..line.textY + line.height) {
+                        clickYPosBefore = line.textY
                         currentText = text
-                        println("find text area ... at (${event.x}, ${event.y}) = ${text.txt}")
+                        console.log("find text area ... at (${event.offsetX}, ${event.offsetY}) = ${text.txt}")
+                        val xCaret = line.caretXCoords(ctx, text, event.offsetX)
+                        CanvasCaret.draw(ctx, xCaret, line.textY + line.height)
                         break
                     }
                 }
@@ -171,7 +176,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     private fun draw() {
         CanvasText.num1 = 0
         CanvasText.num2 = 0
-        CanvasText.lastHeight = 0.0
+        CanvasText.globalPosY = 0.0
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble());
 
         for (text in texts) {
