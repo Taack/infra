@@ -82,7 +82,7 @@ abstract class CanvasText {
 
     abstract fun computeNum(): String
 
-    fun drawText(ctx: CanvasRenderingContext2D, key: KeyboardEvent, n: Int, x: Double, y: Double) {
+    fun drawText(ctx: CanvasRenderingContext2D, key: KeyboardEvent, charOffset: Int, lineOffset: Int, x: Double, y: Double) {
         ctx.save()
         ctx.font = font
         ctx.fillStyle = fillStyle
@@ -96,9 +96,9 @@ abstract class CanvasText {
                     if (eX + l.leftMargin >= x) {
                         println("Find letter: ${t.substring(0, e)}, $eX <= $x, e: $e")
                         if (key.code == "Backspace") {
-                            txt = txt.substring(0, l.posBegin + e - n - 1) + txt.substring(l.posBegin + e - n)
+                            txt = txt.substring(0, l.posBegin + e + charOffset - 2) + txt.substring(l.posBegin + e + charOffset - 1)
                         } else {
-                            txt = txt.substring(0, l.posBegin + e + n) + key.key + txt.substring(l.posBegin + e + n)
+                            txt = txt.substring(0, l.posBegin + e + charOffset - 1) + key.key + txt.substring(l.posBegin + e + charOffset - 1)
                         }
                         return
                     }

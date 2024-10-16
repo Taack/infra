@@ -17,11 +17,28 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     private var currentText: CanvasText? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
-    private var consecutiveCharSequence: Int = 0
+    private var charOffset: Int = 0
+    private var lineOffset: Int = 0
     private var clickYPosBefore: Double = 0.0
 
     private fun addText() {
-        currentText?.drawText(ctx, currentKeyboardEvent!!, consecutiveCharSequence++, currentMouseEvent!!.offsetX, currentMouseEvent!!.offsetY - clickYPosBefore)
+        var co:Int = 0
+        var lo:Int = 0
+        if (currentKeyboardEvent!!.code == "Backspace") {
+            co = charOffset--
+        } else if (currentKeyboardEvent!!.code == "Enter") {
+        } else if (currentKeyboardEvent!!.code == "ArrowUp") {
+            lo = lineOffset--
+        } else if (currentKeyboardEvent!!.code == "ArrowDown") {
+            lo = lineOffset++
+        } else if (currentKeyboardEvent!!.code == "ArrowRight") {
+            co = charOffset++
+        } else if (currentKeyboardEvent!!.code == "ArrowLeft") {
+            co = charOffset--
+        } else {
+            co = charOffset++
+        }
+        currentText?.drawText(ctx, currentKeyboardEvent!!, co, lo, currentMouseEvent!!.offsetX, currentMouseEvent!!.offsetY - clickYPosBefore)
         draw()
     }
 
@@ -62,7 +79,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
 
         canvas.onclick = { event: MouseEvent ->
             logMouseEvent(event)
-            consecutiveCharSequence = 0
+            charOffset = 0
 
             CanvasCaret.draw(ctx, event.offsetX, event.offsetY)
             var h = 0.0
