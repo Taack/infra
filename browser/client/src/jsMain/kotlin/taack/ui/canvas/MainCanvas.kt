@@ -15,6 +15,7 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     val texts = mutableListOf<CanvasText>()
 
     private var currentText: CanvasText? = null
+    private var currentLine: CanvasLine? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
     private var charOffset: Int = 0
@@ -38,7 +39,8 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         } else {
             co = charOffset++
         }
-        currentText?.drawText(
+        currentText?.drawLine(
+            currentLine!!,
             ctx,
             currentKeyboardEvent!!,
             co,
@@ -96,10 +98,18 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
                 for (line in text.lines) {
                     if (event.offsetY in line.textY - line.height..line.textY) {
                         clickYPosBefore = line.textY
+                        currentLine = line
                         currentText = text
                         val xCaret = line.caretXCoords(ctx, text, event.offsetX)
                         CanvasCaret.draw(ctx, xCaret, line.textY)
-                        console.log("find text line ... at (${event.offsetX}, ${event.offsetY})($xCaret, ${line.textY + line.height}) = ${text.txt.substring(line.posBegin, line.posEnd)}")
+                        console.log(
+                            "find text line ... at (${event.offsetX}, ${event.offsetY})($xCaret, ${line.textY + line.height}) = ${
+                                text.txt.substring(
+                                    line.posBegin,
+                                    line.caretNCoords(ctx, text, event.offsetX)
+                                )
+                            }"
+                        )
                         break
                     }
                 }

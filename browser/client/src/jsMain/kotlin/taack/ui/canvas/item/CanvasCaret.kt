@@ -20,7 +20,7 @@ class CanvasCaret {
             ctx.save()
             ctx.fillStyle = "green"
             ctx.beginPath()
-            ctx.rect(posX, posY - height, width, height)
+            ctx.rect(posX - width, posY - height, width, height)
             ctx.stroke()
             ctx.restore()
         }

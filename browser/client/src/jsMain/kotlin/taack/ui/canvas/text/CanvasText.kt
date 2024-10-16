@@ -93,6 +93,25 @@ abstract class CanvasText {
 
     abstract fun computeNum(): String
 
+    fun drawLine(line: CanvasLine,         ctx: CanvasRenderingContext2D,
+        key: KeyboardEvent,
+        charOffset: Int,
+        lineOffset: Int,
+        x: Double,
+        y: Double) {
+        val j = line.caretNCoords(ctx, this, x)
+
+        val e = j
+        if (key.code == "Backspace") {
+            txt = txt.substring(0, line.posBegin + e + charOffset - 2) + txt.substring(line.posBegin + e + charOffset - 1)
+        } else {
+            txt = txt.substring(
+                0,
+                line.posBegin + e + charOffset - 1
+            ) + key.key + txt.substring(line.posBegin + e + charOffset - 1)
+        }
+
+    }
 
     fun drawText(
         ctx: CanvasRenderingContext2D,
@@ -105,17 +124,7 @@ abstract class CanvasText {
         val l = lines.find {
             it.textY >= y
         } ?: lines.last()
-        val j = l.caretNCoords(ctx, this, x)
-
-        val e = j
-        if (key.code == "Backspace") {
-            txt = txt.substring(0, l.posBegin + e + charOffset - 2) + txt.substring(l.posBegin + e + charOffset - 1)
-        } else {
-            txt = txt.substring(
-                0,
-                l.posBegin + e + charOffset - 1
-            ) + key.key + txt.substring(l.posBegin + e + charOffset - 1)
-        }
+        drawLine(l, ctx, key, charOffset, lineOffset, x, y)
     }
 
     override fun toString(): String {
