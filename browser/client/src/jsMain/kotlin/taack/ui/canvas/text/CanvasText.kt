@@ -93,18 +93,6 @@ abstract class CanvasText {
 
     abstract fun computeNum(): String
 
-    private fun caretPositionInLine(ctx: CanvasRenderingContext2D, x: Double, l: CanvasLine): Int {
-        val t = txt.substring(l.posBegin, l.posEnd)
-        for (e in t.indices) {
-            val eX = ctx.measureText(t.substring(0, e)).width
-            if (eX + l.leftMargin >= x) {
-                return e
-            }
-        }
-        return t.length + 1
-    }
-
-
 
     fun drawText(
         ctx: CanvasRenderingContext2D,
@@ -117,7 +105,7 @@ abstract class CanvasText {
         val l = lines.find {
             it.textY >= y
         } ?: lines.last()
-        val j = caretPositionInLine(ctx, x, l)
+        val j = l.caretNCoords(ctx, this, x)
 
         val e = j
         if (key.code == "Backspace") {

@@ -86,7 +86,6 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
 
         canvas.onclick = { event: MouseEvent ->
             logMouseEvent(event)
-            draw()
             charOffset = 0
 
             currentText = null
@@ -95,12 +94,12 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
             event.stopPropagation()
             for (text in texts) {
                 for (line in text.lines) {
-                    if (event.offsetY in line.textY..line.textY + line.height) {
+                    if (event.offsetY in line.textY - line.height..line.textY) {
                         clickYPosBefore = line.textY
                         currentText = text
-                        console.log("find text area ... at (${event.offsetX}, ${event.offsetY}) = ${text.txt}")
                         val xCaret = line.caretXCoords(ctx, text, event.offsetX)
-                        CanvasCaret.draw(ctx, xCaret, line.textY + line.height)
+                        CanvasCaret.draw(ctx, xCaret, line.textY)
+                        console.log("find text line ... at (${event.offsetX}, ${event.offsetY})($xCaret, ${line.textY + line.height}) = ${text.txt.substring(line.posBegin, line.posEnd)}")
                         break
                     }
                 }

@@ -40,20 +40,24 @@ class CanvasLine(
     }
 
     fun caretXCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Double {
+        return ctx.measureText(text.txt.substring(posBegin, posBegin + caretNCoords(ctx, text, x))).width
+    }
+
+    fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {
         ctx.save()
         ctx.font = text.font
         ctx.fillStyle = text.fillStyle
 
-        for (i in text.txt.indices) {
-            val pos = ctx.measureText(text.txt.substring(0, i)).width
-            if (pos >= x) {
+        for (i in posBegin..posEnd) {
+            val pos = ctx.measureText(text.txt.substring(posBegin, posBegin + i)).width
+            if (pos >= x - 10.0) {
                 ctx.restore()
-                return pos
+                return i
             }
         }
         ctx.restore()
 
-        return ctx.measureText(text.txt).width
+        return text.txt.length
     }
 
 
