@@ -93,22 +93,24 @@ abstract class CanvasText {
 
     abstract fun computeNum(): String
 
-    fun drawLine(line: CanvasLine,         ctx: CanvasRenderingContext2D,
+    fun drawLine(
+        line: CanvasLine, ctx: CanvasRenderingContext2D,
         key: KeyboardEvent,
         charOffset: Int,
         lineOffset: Int,
         x: Double,
-        y: Double) {
+        y: Double
+    ) {
         val j = line.caretNCoords(ctx, this, x)
 
         val e = j
         if (key.code == "Backspace") {
-            txt = txt.substring(0, line.posBegin + e + charOffset - 2) + txt.substring(line.posBegin + e + charOffset - 1)
+            txt = txt.substring(0, e + charOffset - 2) + txt.substring(e + charOffset - 1)
         } else {
             txt = txt.substring(
                 0,
-                line.posBegin + e + charOffset - 1
-            ) + key.key + txt.substring(line.posBegin + e + charOffset - 1)
+                e + charOffset - 1
+            ) + key.key + txt.substring(e + charOffset - 1)
         }
 
     }
