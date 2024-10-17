@@ -27,37 +27,62 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private fun addText() {
         var co: Int = 0
         var lo: Int = 0
-        when (currentKeyboardEvent!!.code) {
+        var doDraw = false
+        when (currentKeyboardEvent!!.key) {
             "Backspace" -> {
                 co = charOffset--
             }
+
             "Enter" -> {
+                doDraw = false
+                val i = texts.indexOf(currentText!!) + 1
+                if (currentText is H2Canvas) {
+                    currentText = H3Canvas()
+                    texts.add(i, currentText as H3Canvas)
+                } else if (currentText is H3Canvas) {
+                    currentText = H4Canvas()
+                    texts.add(i, currentText as H4Canvas)
+                } else {
+                    currentText = PCanvas()
+                    texts.add(i, currentText as PCanvas)
+                }
             }
+
             "ArrowUp" -> {
                 lo = lineOffset--
             }
+
             "ArrowDown" -> {
                 lo = lineOffset++
             }
+
             "ArrowRight" -> {
                 co = charOffset++
             }
+
+            "Shift", "ShiftLeft", "ShiftRight" -> {
+
+            }
+
             "ArrowLeft" -> {
                 co = charOffset--
             }
+
             else -> {
+                doDraw = true
                 co = charOffset++
             }
         }
-        currentText?.drawLine(
-            currentLine!!,
-            ctx,
-            currentKeyboardEvent!!,
-            co,
-            lo,
-            currentMouseEvent!!.offsetX,
-            currentMouseEvent!!.offsetY - clickYPosBefore
-        )
+        if (doDraw)
+            currentText?.drawLine(
+                currentLine!!,
+                ctx,
+                currentKeyboardEvent!!,
+                co,
+                lo,
+                currentMouseEvent!!.offsetX,
+                currentMouseEvent!!.offsetY - clickYPosBefore
+            )
         draw()
     }
 
@@ -92,7 +117,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         window.onresize = {
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
-            canvas.height = window.innerHeight - 100
+            canvas.height = window.innerHeight - 10
             CanvasText.globalPosY = -dy
             draw()
         }

@@ -36,17 +36,18 @@ class CanvasLine(
     }
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText) {
-        ctx.fillText(text.txt.substring(posBegin, posEnd), 10.0, textY)
+        ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), 10.0, textY)
     }
 
     fun caretXCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Double {
-        val txt = text.txt.substring(posBegin, caretNCoords(ctx, text, x))
+        val cp = caretNCoords(ctx, text, x) + if (posBegin == 0) text.txtPrefix.length else 0
+        val txt = (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, cp) + if (cp > text.txt.length) " " else ""
         ctx.save()
         ctx.font = text.font
         ctx.fillStyle = text.fillStyle
         val txtWidth = ctx.measureText(txt).width
         ctx.restore()
-        println("txt: $txt width: $txtWidth")
+        println("txt: <$txt> width: $txtWidth")
         return txtWidth
     }
 
@@ -56,15 +57,16 @@ class CanvasLine(
         ctx.fillStyle = text.fillStyle
 
         for (i in posBegin..posEnd) {
-            val pos = ctx.measureText(text.txt.substring(posBegin, i)).width
+            val pos = ctx.measureText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, i)).width
             if (pos >= x - 10.0) {
+                println("i: $i pos: $pos; x: $x")
                 ctx.restore()
                 return i
             }
         }
         ctx.restore()
 
-        return text.txt.length
+        return text.txt.length + 1
     }
 
 

@@ -10,7 +10,7 @@ abstract class CanvasText {
         var num2: Int = 0
     }
 
-    val debugLines = true
+    val debugLines = false
 
     abstract val font: String
     abstract val fillStyle: String
@@ -22,6 +22,7 @@ abstract class CanvasText {
     abstract val marginBottom: Double
 
     var lines: List<CanvasLine> = emptyList()
+    var txtPrefix = ""
     var txt = ""
     var totalWidth: Double = 0.0
 
@@ -30,9 +31,9 @@ abstract class CanvasText {
         ctx.font = font
         ctx.fillStyle = fillStyle
 
-        val numTxt = computeNum()
-        val tmpTxt = numTxt + txt
-        val txtMetrics = ctx.measureText(tmpTxt)
+        txtPrefix = computeNum()
+        val tmpTxt = txtPrefix + txt
+        val txtMetrics = ctx.measureText(if (tmpTxt.isEmpty()) "|" else tmpTxt)
         totalWidth = txtMetrics.width
         val height = txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent//lineHeight
 
@@ -55,7 +56,7 @@ abstract class CanvasText {
                     posLetterLineEnd,
                     globalPosY + totalHeight,
                     height,
-                    10.0 + ctx.measureText(numTxt).width
+                    10.0 + ctx.measureText(txtPrefix).width
                 )
                 posY += height
                 totalHeight = posY
@@ -64,14 +65,14 @@ abstract class CanvasText {
             posLetterLineEnd = currentLetterPos
             posX += ctx.measureText(t).width
         }
-        if (posLetterLineBegin != currentLetterPos) {
+        if (posLetterLineBegin != currentLetterPos || currentLetterPos == 0) {
 
             lines += CanvasLine(
                 posLetterLineBegin,
                 txt.length,
                 globalPosY + totalHeight,
                 height,
-                10.0 + ctx.measureText(numTxt).width
+                10.0 + ctx.measureText(txtPrefix).width
             )
         }
         lines.forEach {
