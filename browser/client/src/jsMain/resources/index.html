@@ -4,13 +4,32 @@
     <meta charset="UTF-8">
     <title>client</title>
     <style>
-        canvas {
-            border: 1px solid black;
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            height: 100%;
         }
-    </style>
+
+        #large-container {
+            overflow: hidden;
+        }
+
+        #scroll-container {
+            width: calc(100% - 22px);
+            height: calc(100vh - 22px);
+            overflow: auto;
+            margin: 10px;
+            border: 1px solid grey;
+        }    </style>
 </head>
 <body>
-<div id="canvas-holder"></div>
+<div id="scroll-container">
+    <div id="large-container">
+    <div id="canvas-container"></div>
+    </div>
+</div>
 <script src="client.js"></script>
 </body>
 </html>

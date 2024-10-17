@@ -10,10 +10,11 @@ import org.w3c.dom.events.MouseEvent
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.text.*
 
-class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2D) {
-
+class MainCanvas(private val divHolder: HTMLDivElement, val divScroll: HTMLDivElement) {
+    val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
+    val ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D
     val texts = mutableListOf<CanvasText>()
-
+    var dy: Double = 0.0
     private var currentText: CanvasText? = null
     private var currentLine: CanvasLine? = null
     private var currentMouseEvent: MouseEvent? = null
@@ -55,20 +56,6 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         texts.add(text)
     }
 
-    companion object {
-        fun addCanvas(): MainCanvas? {
-            console.log("addCanvas")
-            val d = document.getElementById("canvas-holder") as HTMLDivElement? ?: return null
-            val canvas = document.createElement("canvas") as HTMLCanvasElement
-            canvas.id = "canvas"
-            canvas.width = document.body!!.offsetWidth
-            canvas.height = window.innerHeight - 100
-            canvas.tabIndex = 1
-            d.appendChild(canvas)
-            return MainCanvas(canvas, canvas.getContext("2d") as CanvasRenderingContext2D)
-        }
-    }
-
     private fun logMouseEvent(ev: MouseEvent) {
         console.log("logMouseEvent", ev)
     }
@@ -78,11 +65,25 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
     }
 
     init {
+        canvas.id = "canvas"
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+        canvas.tabIndex = 1
+        divHolder.appendChild(canvas)
+
+        divScroll.onscroll = {
+            dy = divScroll.scrollTop
+            divHolder.style.transform = "translateY('${dy}px')"
+            console.log("Scroll $dy", it)
+            draw()
+            dy
+        }
+
         window.onresize = {
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 100
-            CanvasText.globalPosY = 0.0
+            CanvasText.globalPosY = -dy
             draw()
         }
 
@@ -179,17 +180,22 @@ class MainCanvas(val canvas: HTMLCanvasElement, val ctx: CanvasRenderingContext2
         addText(p2)
 
         addText(h4)
-
     }
 
     private fun draw() {
         CanvasText.num1 = 0
         CanvasText.num2 = 0
-        CanvasText.globalPosY = 0.0
+        CanvasText.globalPosY = -dy
+
+        console.log("draw +++ CanvasText.globalPosY = ${CanvasText.globalPosY}")
+
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble());
 
         for (text in texts) {
             text.draw(ctx, canvas.width)
         }
+
+        console.log("draw --- CanvasText.globalPosY = ${CanvasText.globalPosY}")
+        divHolder!!.style.height = "${CanvasText.globalPosY + dy}px"
     }
 }
