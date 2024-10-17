@@ -14,6 +14,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, val divScroll: HTMLDivEl
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
     val ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D
     val texts = mutableListOf<CanvasText>()
+    val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     var dy: Double = 0.0
     private var currentText: CanvasText? = null
     private var currentLine: CanvasLine? = null
@@ -69,11 +70,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, val divScroll: HTMLDivEl
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
+        divContainer.appendChild(canvas)
         divHolder.appendChild(canvas)
 
         divScroll.onscroll = {
             dy = divScroll.scrollTop
-            divHolder.style.transform = "translateY('${dy}px')"
+            divHolder.style.transform = "translate(0px, ${dy}px)"
             console.log("Scroll $dy", it)
             draw()
             dy

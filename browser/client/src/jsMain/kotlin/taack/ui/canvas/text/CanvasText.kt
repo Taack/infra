@@ -30,7 +30,7 @@ abstract class CanvasText {
         ctx.font = font
         ctx.fillStyle = fillStyle
 
-        println("draw $this")
+        //println("draw $this")
 
         val numTxt = computeNum()
         val tmpTxt = numTxt + txt
@@ -82,7 +82,6 @@ abstract class CanvasText {
 
         if (debugLines)
             lines.forEach {
-                println(it.toString())
                 it.drawLine(ctx)
             }
         totalHeight += marginBottom
