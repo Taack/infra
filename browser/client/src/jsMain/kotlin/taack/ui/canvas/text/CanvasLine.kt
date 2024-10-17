@@ -5,10 +5,10 @@ import taack.ui.canvas.text.CanvasText.Companion.globalPosY
 
 class CanvasLine(
     val posBegin: Int,
-    val posEnd: Int,
+    private val posEnd: Int,
     val textY: Double,
     val height: Double,
-    val leftMargin: Double = 0.0
+    private val leftMargin: Double = 0.0
 ) {
     override fun toString(): String {
         return "CanvasLine(posBegin=$posBegin, posEnd=$posEnd, textY=$textY, height=$height, leftMargin=$leftMargin)"

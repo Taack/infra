@@ -10,12 +10,12 @@ import org.w3c.dom.events.MouseEvent
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.text.*
 
-class MainCanvas(private val divHolder: HTMLDivElement, val divScroll: HTMLDivElement) {
+class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
-    val ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D
-    val texts = mutableListOf<CanvasText>()
-    val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
-    var dy: Double = 0.0
+    private val ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D
+    private val texts = mutableListOf<CanvasText>()
+    private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
+    private var dy: Double = 0.0
     private var currentText: CanvasText? = null
     private var currentLine: CanvasLine? = null
     private var currentMouseEvent: MouseEvent? = null
@@ -27,19 +27,27 @@ class MainCanvas(private val divHolder: HTMLDivElement, val divScroll: HTMLDivEl
     private fun addText() {
         var co: Int = 0
         var lo: Int = 0
-        if (currentKeyboardEvent!!.code == "Backspace") {
-            co = charOffset--
-        } else if (currentKeyboardEvent!!.code == "Enter") {
-        } else if (currentKeyboardEvent!!.code == "ArrowUp") {
-            lo = lineOffset--
-        } else if (currentKeyboardEvent!!.code == "ArrowDown") {
-            lo = lineOffset++
-        } else if (currentKeyboardEvent!!.code == "ArrowRight") {
-            co = charOffset++
-        } else if (currentKeyboardEvent!!.code == "ArrowLeft") {
-            co = charOffset--
-        } else {
-            co = charOffset++
+        when (currentKeyboardEvent!!.code) {
+            "Backspace" -> {
+                co = charOffset--
+            }
+            "Enter" -> {
+            }
+            "ArrowUp" -> {
+                lo = lineOffset--
+            }
+            "ArrowDown" -> {
+                lo = lineOffset++
+            }
+            "ArrowRight" -> {
+                co = charOffset++
+            }
+            "ArrowLeft" -> {
+                co = charOffset--
+            }
+            else -> {
+                co = charOffset++
+            }
         }
         currentText?.drawLine(
             currentLine!!,
@@ -198,6 +206,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, val divScroll: HTMLDivEl
         }
 
         console.log("draw --- CanvasText.globalPosY = ${CanvasText.globalPosY}")
-        divHolder!!.style.height = "${CanvasText.globalPosY + dy}px"
+        divHolder.style.height = "${CanvasText.globalPosY + dy}px"
     }
 }

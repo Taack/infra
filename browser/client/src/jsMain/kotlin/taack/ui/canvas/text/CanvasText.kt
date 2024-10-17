@@ -30,8 +30,6 @@ abstract class CanvasText {
         ctx.font = font
         ctx.fillStyle = fillStyle
 
-        //println("draw $this")
-
         val numTxt = computeNum()
         val tmpTxt = numTxt + txt
         val txtMetrics = ctx.measureText(tmpTxt)
