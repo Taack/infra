@@ -28,12 +28,18 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private fun addText() {
         when (currentKeyboardEvent!!.key) {
             "Backspace" -> {
-                currentText?.rmChar(caretPosInCurrentText + charOffset)
-                charOffset--
+                if (currentText?.rmChar(caretPosInCurrentText + charOffset) == 0) {
+                    val i = texts.indexOf(currentText!!)
+                    texts.remove(currentText!!)
+                } else
+                    charOffset--
             }
 
             "Delete" -> {
-                currentText?.delChar(caretPosInCurrentText + charOffset)
+                if (currentText?.delChar(caretPosInCurrentText + charOffset) == 0) {
+                    val i = texts.indexOf(currentText!!)
+                    texts.remove(currentText!!)
+                }
             }
 
             "Enter" -> {
@@ -153,6 +159,30 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     val p = PCanvas()
                     p.txt = currentText!!.txt
                     texts.add(i, p)
+                }
+            }
+
+            "F5" -> {
+                if (currentText != null && currentLine != null) {
+                    val i = texts.indexOf(currentText!!)
+                    if (i != -1) {
+                        texts.remove(currentText!!)
+                        val p = LiCanvas()
+                        p.txt = currentText!!.txt
+                        texts.add(i, p)
+                    }
+                }
+            }
+
+            "F6" -> {
+                if (currentText != null && currentLine != null) {
+                    val i = texts.indexOf(currentText!!)
+                    if (i != -1) {
+                        texts.remove(currentText!!)
+                        val p = Li2Canvas()
+                        p.txt = currentText!!.txt
+                        texts.add(i, p)
+                    }
                 }
             }
 
@@ -351,6 +381,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
             } else {
                 CanvasCaret.draw(ctx, currentText!!, currentText!!.lines.first(), caretPosInCurrentText + charOffset)
+                currentLine = currentText!!.lines.first()
             }
         }
 

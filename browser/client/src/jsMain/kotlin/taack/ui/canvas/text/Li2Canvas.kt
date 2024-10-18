@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class PCanvas() : CanvasText() {
+class Li2Canvas() : CanvasText() {
     override val font: String
         get() = "17px sans-serif"
     override val fillStyle: String
@@ -12,12 +12,12 @@ class PCanvas() : CanvasText() {
     override val wordSpacing: Double
         get() = -0.05
     override val marginTop: Double
-        get() = 10.0
+        get() = 0.0
     override val marginBottom: Double
-        get() = 10.0
+        get() = 8.0
 
     override fun computeNum(): String {
-        return ""
+        return "    ‧ "
     }
 
 }

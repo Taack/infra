@@ -24,7 +24,6 @@ abstract class CanvasText {
     var lines: List<CanvasLine> = emptyList()
     var txtPrefix = ""
     var txt = ""
-    var totalWidth: Double = 0.0
 
     fun draw(ctx: CanvasRenderingContext2D, canvasWidth: Int) {
         ctx.save()
@@ -34,7 +33,6 @@ abstract class CanvasText {
         txtPrefix = computeNum()
         val tmpTxt = txtPrefix + txt
         val txtMetrics = ctx.measureText(if (tmpTxt.isEmpty()) "|" else tmpTxt)
-        totalWidth = txtMetrics.width
         val height = txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent//lineHeight
 
         val listTxt = tmpTxt.split(" ")
@@ -50,12 +48,13 @@ abstract class CanvasText {
             currentLetterPos += t.length
 
             if (posX + ctx.measureText(t).width >= canvasWidth) {
-                posX = 10.0
+                posX = 10.0 + ctx.measureText(txtPrefix).width
                 lines += CanvasLine(
                     posLetterLineBegin,
                     posLetterLineEnd,
                     globalPosY + totalHeight,
                     height,
+//                    10.0 + if (posLetterLineBegin == 0) ctx.measureText(txtPrefix).width else 0.0
                     10.0 + ctx.measureText(txtPrefix).width
                 )
                 posY += height
@@ -72,6 +71,7 @@ abstract class CanvasText {
                 txt.length,
                 globalPosY + totalHeight,
                 height,
+//                10.0 + if (posLetterLineBegin == 0) ctx.measureText(txtPrefix).width else 0.0
                 10.0 + ctx.measureText(txtPrefix).width
             )
         }
@@ -94,12 +94,14 @@ abstract class CanvasText {
     fun addChar(c: Char, p: Int) {
         txt = txt.substring(0, p) + c + txt.substring(p)
     }
-    fun delChar(p: Int) {
+    fun delChar(p: Int): Int {
         txt = txt.substring(0, p) + txt.substring(p + 1)
+        return txt.length
     }
 
-    fun rmChar(p: Int) {
+    fun rmChar(p: Int): Int {
         txt = txt.substring(0, p - 1) + txt.substring(p)
+        return txt.length
     }
 //
 //    fun drawLine(
