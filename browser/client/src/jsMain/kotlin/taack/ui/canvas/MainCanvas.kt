@@ -16,6 +16,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private val texts = mutableListOf<CanvasText>()
     private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dy: Double = 0.0
+    private var caretPos: Int = 0
     private var currentText: CanvasText? = null
     private var currentLine: CanvasLine? = null
     private var currentMouseEvent: MouseEvent? = null
@@ -25,16 +26,17 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var clickYPosBefore: Double = 0.0
 
     private fun addText() {
-        var co: Int = 0
-        var lo: Int = 0
-        var doDraw = false
         when (currentKeyboardEvent!!.key) {
             "Backspace" -> {
-                co = charOffset--
+                currentText?.rmChar(caretPos + charOffset)
+                charOffset--
+            }
+
+            "Delete" -> {
+                currentText?.delChar(caretPos + charOffset)
             }
 
             "Enter" -> {
-                doDraw = false
                 val i = texts.indexOf(currentText!!) + 1
                 if (currentText is H2Canvas) {
                     currentText = H3Canvas()
@@ -49,40 +51,125 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
 
             "ArrowUp" -> {
-                lo = lineOffset--
+                val i = currentText!!.lines.indexOfFirst {
+                    it.posBegin == currentLine!!.posBegin
+                } //+ --lineOffset
+                console.log("ArrowUp +++ $i $lineOffset ${currentText!!.lines}")
+                if (i > 0 && i < currentText!!.lines.size) {
+                    currentLine = currentText!!.lines[i - 1]
+                    console.log("ArrowUp => Previous Line $currentLine")
+                } else {
+                    val j = texts.indexOf(currentText) - 1
+                    console.log("ArrowUp => Previous Text")
+                    if (j >= 0) {
+                        currentText = texts[j]
+                        currentLine = currentText!!.lines.last()
+                    }
+                }
             }
 
             "ArrowDown" -> {
-                lo = lineOffset++
+                val i = currentText!!.lines.indexOfFirst {
+                    it.posBegin == currentLine!!.posBegin
+                } //+ --lineOffset
+                console.log("ArrowDown $i $lineOffset $currentLine ${currentText!!.lines}")
+
+                if (i >= 0 && i < currentText!!.lines.size - 1) {
+                    currentLine = currentText!!.lines[i + 1]
+                    console.log("ArrowDown => Next Line $currentLine")
+                } else {
+                    val j = texts.indexOf(currentText) + 1
+                    console.log("ArrowDown => Next Text")
+                    if (j > 0 && j < texts.size) {
+                        currentText = texts[j]
+                        currentLine = currentText!!.lines.first()
+                    }
+                }
             }
 
             "ArrowRight" -> {
-                co = charOffset++
+                charOffset++
             }
 
-            "Shift", "ShiftLeft", "ShiftRight" -> {
+            "F2" -> {
+                if (currentText != null) {
+                    val i = texts.indexOf(currentText!!)
+                    texts.remove(currentText!!)
+                    val h2 = H2Canvas()
+                    h2.txt = currentText!!.txt
+                    texts.add(i, h2)
+                }
+            }
+
+            "F3" -> {
+                if (currentText != null) {
+                    val i = texts.indexOf(currentText!!)
+                    texts.remove(currentText!!)
+                    val h3 = H3Canvas()
+                    h3.txt = currentText!!.txt
+                    texts.add(i, h3)
+                }
+            }
+
+            "F4" -> {
+                if (currentText != null) {
+                    val i = texts.indexOf(currentText!!)
+                    texts.remove(currentText!!)
+                    val h4 = H4Canvas()
+                    h4.txt = currentText!!.txt
+                    texts.add(i, h4)
+                }
+            }
+
+            "F1" -> {
+                if (currentText != null) {
+                    val i = texts.indexOf(currentText!!)
+                    texts.remove(currentText!!)
+                    val p = PCanvas()
+                    p.txt = currentText!!.txt
+                    texts.add(i, p)
+                }
+            }
+
+            "End" -> {
+                charOffset = 0
+
+                if (currentKeyboardEvent!!.ctrlKey) {
+                    if (currentKeyboardEvent!!.shiftKey) {
+                        currentText = texts.last()
+                    }
+                    currentLine = currentText!!.lines.last()
+                }
+                caretPos = currentLine!!.posEnd
+            }
+
+            "Home" -> {
+                charOffset = 0
+                if (currentKeyboardEvent!!.ctrlKey) {
+                    if (currentKeyboardEvent!!.shiftKey) {
+                        currentText = texts.first()
+                    }
+                    currentLine = currentText!!.lines.first()
+                }
+                caretPos = currentLine!!.posEnd
+
+                caretPos = 0
+            }
+
+            "Shift", "ShiftLeft", "ShiftRight", "Control" -> {
 
             }
 
             "ArrowLeft" -> {
-                co = charOffset--
+                charOffset--
             }
 
             else -> {
-                doDraw = true
-                co = charOffset++
+                if (currentKeyboardEvent != null)
+                    currentText?.addChar(currentKeyboardEvent!!.key[0], caretPos + charOffset++)
             }
         }
-        if (doDraw)
-            currentText?.drawLine(
-                currentLine!!,
-                ctx,
-                currentKeyboardEvent!!,
-                co,
-                lo,
-                currentMouseEvent!!.offsetX,
-                currentMouseEvent!!.offsetY - clickYPosBefore
-            )
+
         draw()
     }
 
@@ -136,13 +223,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         clickYPosBefore = line.textY
                         currentLine = line
                         currentText = text
-                        val xCaret = line.caretXCoords(ctx, text, event.offsetX)
-                        CanvasCaret.draw(ctx, xCaret, line.textY)
+//                        val xCaret = line.caretXCoords(ctx, text, event.offsetX)
+//                        CanvasCaret.draw(ctx, xCaret, line.textY)
+                        caretPos = line.caretNCoords(ctx, text, event.offsetX)
                         console.log(
-                            "find text line ... at (${event.offsetX}, ${event.offsetY})($xCaret, ${line.textY + line.height}) = ${
+                            "find text line ... at (${event.offsetX}, ${event.offsetY})(${line.textY + line.height}) = ${
                                 text.txt.substring(
-                                    line.posBegin,
-                                    line.caretNCoords(ctx, text, event.offsetX)
+                                    line.posBegin, caretPos
+
                                 )
                             }"
                         )
@@ -150,6 +238,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     }
                 }
             }
+            draw()
         }
 
         canvas.onmousemove = { event: MouseEvent ->
@@ -228,6 +317,15 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         for (text in texts) {
             text.draw(ctx, canvas.width)
+        }
+        console.log("draw text done")
+
+        if (currentText != null) {
+            if (currentLine != null) {
+                CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPos + charOffset)
+            } else {
+                CanvasCaret.draw(ctx, currentText!!, currentText!!.lines.first(), caretPos + charOffset)
+            }
         }
 
         console.log("draw --- CanvasText.globalPosY = ${CanvasText.globalPosY}")

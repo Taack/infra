@@ -91,43 +91,54 @@ abstract class CanvasText {
 
     abstract fun computeNum(): String
 
-    fun drawLine(
-        line: CanvasLine, ctx: CanvasRenderingContext2D,
-        key: KeyboardEvent,
-        charOffset: Int,
-        lineOffset: Int,
-        x: Double,
-        y: Double
-    ) {
-        val j = line.caretNCoords(ctx, this, x)
-
-        val e = j
-        if (key.code == "Backspace") {
-            txt = txt.substring(0, e + charOffset - 2) + txt.substring(e + charOffset - 1)
-        } else {
-            txt = txt.substring(
-                0,
-                e + charOffset - 1
-            ) + key.key + txt.substring(e + charOffset - 1)
-        }
-
+    fun addChar(c: Char, p: Int) {
+        txt = txt.substring(0, p) + c + txt.substring(p)
+    }
+    fun delChar(p: Int) {
+        txt = txt.substring(0, p) + txt.substring(p + 1)
     }
 
-    fun drawText(
-        ctx: CanvasRenderingContext2D,
-        key: KeyboardEvent,
-        charOffset: Int,
-        lineOffset: Int,
-        x: Double,
-        y: Double
-    ) {
-        val l = lines.find {
-            it.textY >= y
-        } ?: lines.last()
-        drawLine(l, ctx, key, charOffset, lineOffset, x, y)
+    fun rmChar(p: Int) {
+        txt = txt.substring(0, p - 1) + txt.substring(p)
     }
-
-    override fun toString(): String {
-        return "CanvasText(globalPosY='$globalPosY', font='$font', fillStyle='$fillStyle', letterSpacing=$letterSpacing, lineHeight=$lineHeight, wordSpacing=$wordSpacing, totalHeight=$totalHeight, marginTop=$marginTop, marginBottom=$marginBottom, txt='$txt', totalWidth=$totalWidth)"
-    }
+//
+//    fun drawLine(
+//        line: CanvasLine, ctx: CanvasRenderingContext2D,
+//        key: KeyboardEvent,
+//        charOffset: Int,
+//        lineOffset: Int,
+//        x: Double,
+//        y: Double
+//    ) {
+//        val j = line.caretNCoords(ctx, this, x)
+//
+//        val e = j
+//        if (key.code == "Backspace") {
+//            txt = txt.substring(0, e + charOffset - 2) + txt.substring(e + charOffset - 1)
+//        } else {
+//            txt = txt.substring(
+//                0,
+//                e + charOffset - 1
+//            ) + key.key + txt.substring(e + charOffset - 1)
+//        }
+//
+//    }
+//
+//    fun drawText(
+//        ctx: CanvasRenderingContext2D,
+//        key: KeyboardEvent,
+//        charOffset: Int,
+//        lineOffset: Int,
+//        x: Double,
+//        y: Double
+//    ) {
+//        val l = lines.find {
+//            it.textY >= y
+//        } ?: lines.last()
+//        drawLine(l, ctx, key, charOffset, lineOffset, x, y)
+//    }
+//
+//    override fun toString(): String {
+//        return "CanvasText(globalPosY='$globalPosY', font='$font', fillStyle='$fillStyle', letterSpacing=$letterSpacing, lineHeight=$lineHeight, wordSpacing=$wordSpacing, totalHeight=$totalHeight, marginTop=$marginTop, marginBottom=$marginBottom, txt='$txt', totalWidth=$totalWidth)"
+//    }
 }
