@@ -22,8 +22,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
     private var charOffset: Int = 0
+    private var wordOffset: Int = 0
     private var lineOffset: Int = 0
     private var clickYPosBefore: Double = 0.0
+    private var isDoubleClick: Boolean = false
+    private var charSelectStartNInText: Int = 0
+    private var charSelectStopNInText: Int = 0
 
     private fun addText() {
         when (currentKeyboardEvent!!.key) {
@@ -249,6 +253,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             dy = divScroll.scrollTop
             divHolder.style.transform = "translate(0px, ${dy}px)"
             console.log("Scroll $dy", it)
+            isDoubleClick = false
             draw()
             dy
         }
@@ -258,12 +263,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 10
             CanvasText.globalPosY = -dy
+            isDoubleClick = false
             draw()
         }
 
         canvas.onclick = { event: MouseEvent ->
             logMouseEvent(event)
             charOffset = 0
+            isDoubleClick = false
 
 //            currentText = null
             currentMouseEvent = event
@@ -275,8 +282,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         clickYPosBefore = line.textY
                         currentLine = line
                         currentText = text
-//                        val xCaret = line.caretXCoords(ctx, text, event.offsetX)
-//                        CanvasCaret.draw(ctx, xCaret, line.textY)
                         caretPosInCurrentText = line.caretNCoords(ctx, text, event.offsetX)
                         console.log(
                             "find text line ... at (${event.offsetX}, ${event.offsetY})(${line.textY + line.height}) = ${
@@ -301,11 +306,49 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.onkeydown = { event: KeyboardEvent ->
             logKeyEvent(event)
             currentKeyboardEvent = event
+            isDoubleClick = false
             addText()
             event.preventDefault()
             event.stopPropagation()
+
         }
 
+        canvas.ondblclick = { event: MouseEvent ->
+            logMouseEvent(event)
+            event.preventDefault()
+            event.stopPropagation()
+            isDoubleClick = true
+            wordOffset = 0
+            for (text in texts) {
+                for (line in text.lines) {
+                    if (event.offsetY in line.textY - line.height..line.textY) {
+                        clickYPosBefore = line.textY
+                        currentLine = line
+                        currentText = text
+                        caretPosInCurrentText = line.caretNCoords(ctx, text, event.offsetX)
+                        charSelectStartNInText = currentText!!.txt.substring(currentLine!!.posBegin, caretPosInCurrentText).indexOfLast { it == ' ' } + 1
+                        charSelectStartNInText += currentLine!!.posBegin
+                        charSelectStopNInText = currentText!!.txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
+                        charSelectStopNInText += caretPosInCurrentText + 1
+                        console.log(
+                            "click find text line ... at (${event.offsetX}, ${event.offsetY})(${line.textY + line.height}) = ${
+                                text.txt.substring(
+                                    line.posBegin, caretPosInCurrentText
+                                )
+                            }")
+                        console.log(
+                            "double click find text line ... at (${charSelectStartNInText}, ${charSelectStopNInText}) = ${
+                                text.txt.substring(
+                                    charSelectStartNInText, charSelectStopNInText
+                                )
+                            }"
+                        )
+                        break
+                    }
+                }
+            }
+            draw()
+        }
         addInitialTexts()
         draw()
     }
@@ -379,8 +422,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             if (currentLine != null) {
                 val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
+                if (isDoubleClick)
+                    CanvasCaret.drawDblClick(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset, charSelectStartNInText, charSelectStopNInText)
+
             } else {
                 CanvasCaret.draw(ctx, currentText!!, currentText!!.lines.first(), caretPosInCurrentText + charOffset)
+                if (isDoubleClick)
+                    CanvasCaret.drawDblClick(ctx, currentText!!, currentText!!.lines.first(), caretPosInCurrentText + charOffset, charSelectStartNInText, charSelectStopNInText)
+
                 currentLine = currentText!!.lines.first()
             }
         }
