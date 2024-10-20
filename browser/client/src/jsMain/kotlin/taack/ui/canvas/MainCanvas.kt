@@ -27,7 +27,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var clickYPosBefore: Double = 0.0
     private var isDoubleClick: Boolean = false
     private var charSelectStartNInText: Int = 0
-    private var charSelectStopNInText: Int = 0
+    private var charSelectEndNInText: Int = 0
 
     private fun addText() {
         when (currentKeyboardEvent!!.key) {
@@ -40,9 +40,17 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
 
             "Delete" -> {
-                if (currentText?.delChar(caretPosInCurrentText + charOffset) == 0) {
-                    val i = texts.indexOf(currentText!!)
-                    texts.remove(currentText!!)
+                var pos1 = caretPosInCurrentText + charOffset
+                var pos2: Int? = null
+                if (isDoubleClick && currentKeyboardEvent!!.ctrlKey) {
+                    pos1 = charSelectStartNInText
+                    pos2 = charSelectEndNInText - charSelectStartNInText
+                    isDoubleClick = false
+                    println("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
+                }
+                if (currentText?.delChar(pos1, pos2) == 0) {
+                        val i = texts.indexOf(currentText!!)
+                        texts.remove(currentText!!)
                 }
             }
 
@@ -120,11 +128,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
             "ArrowRight" -> {
                 if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
-                    val decay = currentText!!.txt.substring(charSelectStopNInText + 1).indexOf(' ') + 1
+                    val decay = currentText!!.txt.substring(charSelectEndNInText + 1).indexOf(' ') + 1
                     if (decay == 0) {
-                        charSelectStopNInText = currentText!!.txt.length
+                        charSelectEndNInText = currentText!!.txt.length
                     }
-                    charSelectStopNInText += decay
+                    charSelectEndNInText += decay
                 } else {
                     charOffset++
                 }
@@ -275,7 +283,13 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             logMouseEvent(event)
             charOffset = 0
             isDoubleClick = false
-
+            if (event.detail == 3) {
+                isDoubleClick = true
+                wordOffset = 0
+                charSelectStartNInText = 0
+                charSelectEndNInText = currentText!!.txt.length
+                console.log("click double click == triple click")
+            }
 //            currentText = null
             currentMouseEvent = event
             event.preventDefault()
@@ -331,20 +345,24 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         currentLine = line
                         currentText = text
                         caretPosInCurrentText = line.caretNCoords(ctx, text, event.offsetX)
-                        charSelectStartNInText = currentText!!.txt.substring(currentLine!!.posBegin, caretPosInCurrentText).indexOfLast { it == ' ' } + 1
+                        charSelectStartNInText =
+                            currentText!!.txt.substring(currentLine!!.posBegin, caretPosInCurrentText)
+                                .indexOfLast { it == ' ' } + 1
                         charSelectStartNInText += currentLine!!.posBegin
-                        charSelectStopNInText = currentText!!.txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
-                        charSelectStopNInText += caretPosInCurrentText + 1
+                        charSelectEndNInText =
+                            currentText!!.txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
+                        charSelectEndNInText += caretPosInCurrentText + 1
                         console.log(
                             "click find text line ... at (${event.offsetX}, ${event.offsetY})(${line.textY + line.height}) = ${
                                 text.txt.substring(
                                     line.posBegin, caretPosInCurrentText
                                 )
-                            }")
+                            }"
+                        )
                         console.log(
-                            "double click find text line ... at (${charSelectStartNInText}, ${charSelectStopNInText}) = ${
+                            "double click find text line ... at (${charSelectStartNInText}, ${charSelectEndNInText}) = ${
                                 text.txt.substring(
-                                    charSelectStartNInText, charSelectStopNInText
+                                    charSelectStartNInText, charSelectEndNInText
                                 )
                             }"
                         )
@@ -428,12 +446,26 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
                 if (isDoubleClick)
-                    CanvasCaret.drawDblClick(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset, charSelectStartNInText, charSelectStopNInText)
+                    CanvasCaret.drawDblClick(
+                        ctx,
+                        currentText!!,
+                        currentLine!!,
+                        caretPosInLine + charOffset,
+                        charSelectStartNInText,
+                        charSelectEndNInText
+                    )
 
             } else {
                 CanvasCaret.draw(ctx, currentText!!, currentText!!.lines.first(), caretPosInCurrentText + charOffset)
                 if (isDoubleClick)
-                    CanvasCaret.drawDblClick(ctx, currentText!!, currentText!!.lines.first(), caretPosInCurrentText + charOffset, charSelectStartNInText, charSelectStopNInText)
+                    CanvasCaret.drawDblClick(
+                        ctx,
+                        currentText!!,
+                        currentText!!.lines.first(),
+                        caretPosInCurrentText + charOffset,
+                        charSelectStartNInText,
+                        charSelectEndNInText
+                    )
 
                 currentLine = currentText!!.lines.first()
             }

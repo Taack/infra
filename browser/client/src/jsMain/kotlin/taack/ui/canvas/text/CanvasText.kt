@@ -96,8 +96,8 @@ abstract class CanvasText {
         txt = txt.substring(0, p) + c + txt.substring(p)
     }
 
-    fun delChar(p: Int): Int {
-        txt = txt.substring(0, p) + txt.substring(p + 1)
+    fun delChar(p: Int, pEnd: Int? = null): Int {
+        txt = txt.substring(0, p) + txt.substring(p + (pEnd ?: 1))
         return txt.length
     }
 

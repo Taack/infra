@@ -31,6 +31,7 @@ class CanvasCaret {
             var cLine: CanvasLine? = null
             posX = ctx.measureText(text.txt.substring(line.posBegin, line.posBegin + n)).width + line.leftMargin
             do {
+                if (i >= text.lines.size) break
                 cLine = text.lines[i]
 
                 val posXStart = if (isFirstLine) ctx.measureText(text.txt.substring(cLine.posBegin, posNStart)).width + cLine.leftMargin else cLine.leftMargin
