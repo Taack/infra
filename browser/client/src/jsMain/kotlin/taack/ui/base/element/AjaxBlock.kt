@@ -1,9 +1,6 @@
 package taack.ui.base.element
 
 import kotlinx.browser.window
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.await
-import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.Node
 import org.w3c.dom.asList
@@ -46,7 +43,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }
 
-    private suspend fun onPoll() {
+    private fun onPoll() {
         Helper.trace("AjaxBlock::onPoll")
 
         window.fetch("/progress/drawProgress/$progressId?isAjax=true&refresh=true", RequestInit(method = "GET")).then {
@@ -60,19 +57,15 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
             }
         }.then {
             Helper.processAjaxLink(it, parent)
-        }.await()
+        }
 
-        // window.setTimeout(handler = {}, timeout = 1000)
+        window.setTimeout(onPoll(), 1500)
     }
 
     private fun poolDrawProgress(blockId: String) {
         progressId = blockId.substring(13)
         Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
-        window.setTimeout(handler = {
-            GlobalScope.launch {
-                onPoll()
-            }
-        }, timeout = 1500)
+        window.setTimeout(onPoll(), 1500)
         Helper.traceDeIndent("poolDrawProgress::start ---")
     }
 
