@@ -25,7 +25,7 @@ class CanvasCaret {
             posY = line.textY
             ctx.save()
             ctx.font = text.font
-            var i = text.findLine(line)
+            var i = if (posNStart == 0) 0 else text.findLine(line)
             var isFirstLine = true
             println("text.lines: ${text.lines}")
             var cLine: CanvasLine? = null

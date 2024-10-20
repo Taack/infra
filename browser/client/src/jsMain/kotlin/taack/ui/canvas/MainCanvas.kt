@@ -285,7 +285,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             isDoubleClick = false
             if (event.detail == 3) {
                 isDoubleClick = true
-                wordOffset = 0
                 charSelectStartNInText = 0
                 charSelectEndNInText = currentText!!.txt.length
                 console.log("click double click == triple click")
