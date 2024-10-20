@@ -72,9 +72,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         currentLine = currentText!!.lines.last()
                     }
                 } else {
-                    val i = currentText!!.lines.indexOfFirst {
-                        it.posBegin == currentLine!!.posBegin
-                    } //+ --lineOffset
+                    val i = currentText!!.findLine(currentLine!!)
                     console.log("ArrowUp +++ $i $lineOffset ${currentText!!.lines}")
                     if (i > 0 && i < currentText!!.lines.size) {
                         caretPosInCurrentText -= currentLine!!.posBegin
@@ -101,9 +99,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         currentLine = currentText!!.lines.first()
                     }
                 } else {
-                    val i = currentText!!.lines.indexOfFirst {
-                        it.posBegin == currentLine!!.posBegin
-                    } //+ --lineOffset
+                    val i = currentText!!.findLine(currentLine!!)
                     console.log("ArrowDown $i $lineOffset $currentLine ${currentText!!.lines}")
 
                     if (i >= 0 && i < currentText!!.lines.size - 1) {
@@ -123,7 +119,15 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
 
             "ArrowRight" -> {
-                charOffset++
+                if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
+                    val decay = currentText!!.txt.substring(charSelectStopNInText + 1).indexOf(' ') + 1
+                    if (decay == 0) {
+                        charSelectStopNInText = currentText!!.txt.length
+                    }
+                    charSelectStopNInText += decay
+                } else {
+                    charOffset++
+                }
             }
 
             "F2" -> {
@@ -212,7 +216,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 caretPosInCurrentText = currentLine!!.posBegin
             }
 
-            "Shift", "ShiftLeft", "ShiftRight", "Control" -> {
+            "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight" -> {
 
             }
 
@@ -306,7 +310,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.onkeydown = { event: KeyboardEvent ->
             logKeyEvent(event)
             currentKeyboardEvent = event
-            isDoubleClick = false
+            if (!event.ctrlKey) isDoubleClick = false
+
             addText()
             event.preventDefault()
             event.stopPropagation()

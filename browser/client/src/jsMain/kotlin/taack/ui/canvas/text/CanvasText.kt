@@ -64,6 +64,7 @@ abstract class CanvasText {
             posLetterLineEnd = currentLetterPos
             posX += ctx.measureText(t).width
         }
+
         if (posLetterLineBegin != currentLetterPos || currentLetterPos == 0) {
 
             lines += CanvasLine(
@@ -94,6 +95,7 @@ abstract class CanvasText {
     fun addChar(c: Char, p: Int) {
         txt = txt.substring(0, p) + c + txt.substring(p)
     }
+
     fun delChar(p: Int): Int {
         txt = txt.substring(0, p) + txt.substring(p + 1)
         return txt.length
@@ -102,6 +104,24 @@ abstract class CanvasText {
     fun rmChar(p: Int): Int {
         txt = txt.substring(0, p - 1) + txt.substring(p)
         return txt.length
+    }
+
+    fun findLine(y: Double): Int {
+        var i = 0
+        lines.find {
+            i++
+            it.textY >= y
+        }
+        return i - 1
+    }
+
+    fun findLine(line: CanvasLine): Int {
+        var i = 0
+        lines.find {
+            i++
+            it.textY == line.textY
+        }
+        return i - 1
     }
 //
 //    fun drawLine(

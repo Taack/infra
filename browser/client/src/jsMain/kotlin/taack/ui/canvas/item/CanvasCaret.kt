@@ -25,18 +25,29 @@ class CanvasCaret {
             posY = line.textY
             ctx.save()
             ctx.font = text.font
+            var i = text.findLine(line)
+            var isFirstLine = true
+            println("text.lines: ${text.lines}")
+            var cLine: CanvasLine? = null
             posX = ctx.measureText(text.txt.substring(line.posBegin, line.posBegin + n)).width + line.leftMargin
-            val posXStart = ctx.measureText(text.txt.substring(line.posBegin, posNStart)).width + line.leftMargin
-            val posXEnd = ctx.measureText(text.txt.substring(line.posBegin, posNEnd)).width + line.leftMargin
+            do {
+                cLine = text.lines[i]
+
+                val posXStart = if (isFirstLine) ctx.measureText(text.txt.substring(cLine.posBegin, posNStart)).width + cLine.leftMargin else cLine.leftMargin
+                val posXEnd = ctx.measureText(text.txt.substring(cLine.posBegin, posNEnd)).width + cLine.leftMargin
+                draw(ctx, posXStart, cLine.textY, posXEnd)
+                console.log("i: $i posNStart: $posNStart posNEnd: $posNEnd posXEnd: $posXEnd cLine: $cLine, txt: ${text.txt.substring(cLine.posBegin, posNEnd)}")
+                i += 1
+                isFirstLine = false
+            } while (posNEnd >= cLine!!.posEnd)
             ctx.restore()
-            draw(ctx, posXStart, posY, posXEnd)
         }
 
         fun draw(ctx: CanvasRenderingContext2D, x: Double, y: Double, posXEnd: Double? = null) {
             this.posX = x
             this.posY = y
             ctx.save()
-            ctx.strokeStyle = if (posXEnd == null) "green" else "lightblue"
+            ctx.strokeStyle = if (posXEnd == null) "green" else "blue"
             ctx.beginPath()
             ctx.rect(posX - if (posXEnd != null) 0.0 else width, posY - height, if (posXEnd != null) posXEnd - posX else width, height)
             ctx.stroke()
