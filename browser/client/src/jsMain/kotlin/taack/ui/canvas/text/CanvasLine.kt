@@ -1,7 +1,7 @@
 package taack.ui.canvas.text
 
-import org.w3c.dom.CanvasRenderingContext2D
-import taack.ui.canvas.text.CanvasText.Companion.globalPosY
+import web.canvas.CanvasRenderingContext2D
+
 
 class CanvasLine(
     val posBegin: Int,
@@ -36,29 +36,14 @@ class CanvasLine(
     }
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText) {
-//        ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), 10.0, textY)
         ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (posBegin > 0) leftMargin else 10.0, textY)
     }
 
-//    fun caretXCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Double {
-//        val cp = caretNCoords(ctx, text, x) + if (posBegin == 0) text.txtPrefix.length else 0
-//        val txt = (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, cp) + if (cp > text.txt.length) " " else ""
-//        ctx.save()
-//        ctx.font = text.font
-//        ctx.fillStyle = text.fillStyle
-//        val txtWidth = ctx.measureText(txt).width
-//        ctx.restore()
-//        println("txt: <$txt> width: $txtWidth")
-//        return txtWidth
-//    }
-//
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {
         ctx.save()
-        ctx.font = text.font
-        ctx.fillStyle = text.fillStyle
+        text.initCtx(ctx)
 
         for (i in posBegin..posEnd) {
-//            val pos = ctx.measureText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, i)).width
             val pos = ctx.measureText(text.txt.substring(posBegin, i)).width + leftMargin
             if (pos >= x - 10.0) {
                 println("i: $i pos: $pos; x: $x")
@@ -70,6 +55,5 @@ class CanvasLine(
 
         return text.txt.length + 1
     }
-
 
 }

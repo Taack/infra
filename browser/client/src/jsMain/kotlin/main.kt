@@ -1,8 +1,8 @@
 import kotlinx.browser.document
 import kotlinx.browser.window
-import org.w3c.dom.HTMLDivElement
 import taack.ui.base.element.Block
 import taack.ui.canvas.MainCanvas
+import web.html.HTMLDivElement
 
 fun main() {
     if (!window.location.href.contains("login")) {

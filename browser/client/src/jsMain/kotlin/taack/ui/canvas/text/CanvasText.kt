@@ -1,7 +1,7 @@
 package taack.ui.canvas.text
 
-import org.w3c.dom.CanvasRenderingContext2D
-import org.w3c.dom.events.KeyboardEvent
+import web.canvas.CanvasRenderingContext2D
+
 
 abstract class CanvasText {
     companion object {
@@ -25,11 +25,16 @@ abstract class CanvasText {
     var txtPrefix = ""
     var txt = ""
 
-    fun draw(ctx: CanvasRenderingContext2D, canvasWidth: Int) {
-        ctx.save()
+    fun initCtx(ctx: CanvasRenderingContext2D) {
         ctx.font = font
         ctx.fillStyle = fillStyle
+        ctx.letterSpacing = letterSpacing.toString() + "px"
+        ctx.wordSpacing = wordSpacing.toString() + "px"
+    }
 
+    fun draw(ctx: CanvasRenderingContext2D, canvasWidth: Int) {
+        ctx.save()
+        initCtx(ctx)
         txtPrefix = computeNum()
         val tmpTxt = txtPrefix + txt
         val txtMetrics = ctx.measureText(if (tmpTxt.isEmpty()) "|" else tmpTxt)

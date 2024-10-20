@@ -1,8 +1,8 @@
 package taack.ui.canvas.item
 
-import org.w3c.dom.CanvasRenderingContext2D
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
+import web.canvas.CanvasRenderingContext2D
 
 class CanvasCaret {
 
@@ -15,7 +15,7 @@ class CanvasCaret {
         fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int) {
             posY = line.textY
             ctx.save()
-            ctx.font = text.font
+            text.initCtx(ctx)
             posX = ctx.measureText(text.txt.substring(line.posBegin, line.posBegin + n)).width + line.leftMargin
             ctx.restore()
             draw(ctx, posX, posY)
@@ -24,7 +24,7 @@ class CanvasCaret {
         fun drawDblClick(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int, posNStart: Int, posNEnd: Int) {
             posY = line.textY
             ctx.save()
-            ctx.font = text.font
+            text.initCtx(ctx)
             var i = if (posNStart == 0) 0 else text.findLine(line)
             var isFirstLine = true
             println("text.lines: ${text.lines}")
