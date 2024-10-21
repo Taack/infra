@@ -1,6 +1,8 @@
 package taack.ui.canvas.text
 
 import web.canvas.CanvasRenderingContext2D
+import kotlin.math.max
+import kotlin.math.min
 
 
 abstract class CanvasText {
@@ -39,6 +41,17 @@ abstract class CanvasText {
         ctx.wordSpacing = wordSpacing.toString() + "px"
     }
 
+    fun initCtx(ctx: CanvasRenderingContext2D, posN: Int) {
+        if (styles.isNotEmpty()) {
+            styles.find { it.posNStart <= posN && it.posNEnd >= posN }?.initCtx(ctx, this)
+        } else {
+            ctx.font = font()
+            ctx.fillStyle = fillStyle
+            ctx.letterSpacing = letterSpacing.toString() + "px"
+            ctx.wordSpacing = wordSpacing.toString() + "px"
+        }
+    }
+
     fun draw(ctx: CanvasRenderingContext2D, canvasWidth: Int) {
         ctx.save()
         initCtx(ctx)
@@ -58,7 +71,8 @@ abstract class CanvasText {
         for (i in listTxt.indices) {
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
             currentLetterPos += t.length
-
+            ctx.save()
+            initCtx(ctx, currentLetterPos)
             if (posX + ctx.measureText(t).width >= canvasWidth) {
                 posX = 10.0 + ctx.measureText(txtPrefix).width
                 lines += CanvasLine(
@@ -74,6 +88,7 @@ abstract class CanvasText {
             }
             posLetterLineEnd = currentLetterPos
             posX += ctx.measureText(t).width
+            ctx.restore()
         }
 
         if (posLetterLineBegin != currentLetterPos || currentLetterPos == 0) {
@@ -168,4 +183,40 @@ abstract class CanvasText {
         }
         return i - 1
     }
+
+    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
+        if (styles.isEmpty()) {
+            return ctx.measureText(txt.substring(from, to)).width
+        } else {
+            val stylesInRangeInclusive = styles.filter {
+                it.posNStart >= from && it.posNEnd <= to                        // [...]
+            }
+            var remaining = styles - stylesInRangeInclusive
+            val stylesInRangeIncluded = remaining.filter {
+                it.posNStart <= from && it.posNEnd >= to                        // ...[]...
+            }
+            remaining = remaining - stylesInRangeIncluded
+            val stylesInRangeLeft = remaining.filter {
+                it.posNStart < from && it.posNEnd > from && it.posNEnd < to    // ..].]
+            }
+            remaining = remaining - stylesInRangeLeft
+            val stylesInRangeRight = remaining.filter {
+                it.posNStart > from && it.posNStart < to && it.posNEnd > to    // [.[..
+            }
+
+            var width = 0.0
+            (stylesInRangeInclusive + stylesInRangeIncluded + stylesInRangeLeft + stylesInRangeRight).forEach {
+                val begin = max(it.posNStart, from)
+                val end = min(it.posNEnd, to)
+                ctx.save()
+                it.initCtx(ctx, this)
+                width += ctx.measureText(txt.substring(begin, end)).width
+                ctx.restore()
+            }
+
+            console.log("measureText: $width, from: $from, to: $to, stylesInRangeIncluded: $stylesInRangeIncluded, stylesInRangeInclusive: $stylesInRangeInclusive, stylesInRangeLeft: $stylesInRangeLeft, stylesInRangeRight: $stylesInRangeRight")
+            return width
+        }
+    }
+
 }

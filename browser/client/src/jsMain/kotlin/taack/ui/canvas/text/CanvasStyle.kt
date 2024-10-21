@@ -15,9 +15,8 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
 
     var posXStart: Double = 0.0
 
-    fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, posXStart: Double): Double {
-        ctx.save()
-
+    fun initCtx(ctx: CanvasRenderingContext2D, text: CanvasText) {
+        text.initCtx(ctx)
         ctx.font = when(this.type) {
             Type.NORMAL -> {
                 text.font()
@@ -32,10 +31,16 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
                 "bold ${text.fontSize} monospace"
             }
         }
+    }
+
+    fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, posXStart: Double): Double {
+        ctx.save()
+        initCtx(ctx, text)
         val txt = text.txt.substring(max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
         ctx.fillText((if (posNStart == 0) text.txtPrefix else "") + txt, (if (posNStart > 0) line.leftMargin else 10.0) + posXStart, line.textY)
         this.posXStart = posXStart
-        val width = ctx.measureText(txt).width
+        val width = text.measureText(ctx,  max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
+        console.log("CanvasStyle::draw width: $width from: ${max(posNStart, line.posBegin)}, to: ${min(posNEnd, line.posEnd)}")
         ctx.restore()
         return width
     }

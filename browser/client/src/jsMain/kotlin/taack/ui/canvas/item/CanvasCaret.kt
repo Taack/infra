@@ -16,7 +16,7 @@ class CanvasCaret {
             posY = line.textY
             ctx.save()
             text.initCtx(ctx)
-            posX = ctx.measureText(text.txt.substring(line.posBegin, line.posBegin + n)).width + line.leftMargin
+            posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin
             ctx.restore()
             draw(ctx, posX, posY)
         }
@@ -29,13 +29,13 @@ class CanvasCaret {
             var isFirstLine = true
             println("text.lines: ${text.lines}")
             var cLine: CanvasLine? = null
-            posX = ctx.measureText(text.txt.substring(line.posBegin, line.posBegin + n)).width + line.leftMargin
+            posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin
             do {
                 if (i >= text.lines.size) break
                 cLine = text.lines[i]
 
-                val posXStart = if (isFirstLine) ctx.measureText(text.txt.substring(cLine.posBegin, posNStart)).width + cLine.leftMargin else cLine.leftMargin
-                val posXEnd = ctx.measureText(text.txt.substring(cLine.posBegin, posNEnd)).width + cLine.leftMargin
+                val posXStart = if (isFirstLine) text.measureText(ctx, cLine.posBegin, posNStart) + cLine.leftMargin else cLine.leftMargin
+                val posXEnd = text.measureText(ctx, cLine.posBegin, posNEnd) + cLine.leftMargin
                 draw(ctx, posXStart, cLine.textY, posXEnd)
                 console.log("i: $i posNStart: $posNStart posNEnd: $posNEnd posXEnd: $posXEnd cLine: $cLine, txt: ${text.txt.substring(cLine.posBegin, posNEnd)}")
                 i += 1

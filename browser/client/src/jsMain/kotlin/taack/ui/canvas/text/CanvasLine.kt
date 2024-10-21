@@ -42,7 +42,8 @@ class CanvasLine(
             containedStyles = styles
             var posXStart = 0.0
             for (style in styles) {
-                posXStart += style.draw(ctx, text, this, posXStart)
+                val w = style.draw(ctx, text, this, posXStart)
+                posXStart += w
             }
         } else {
             ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (posBegin > 0) leftMargin else 10.0, textY)
@@ -54,7 +55,7 @@ class CanvasLine(
         text.initCtx(ctx)
 
         for (i in posBegin..posEnd) {
-            val pos = ctx.measureText(text.txt.substring(posBegin, i)).width + leftMargin
+            val pos = text.measureText(ctx, posBegin, i) + leftMargin
             if (pos >= x - 10.0) {
                 println("i: $i pos: $pos; x: $x")
                 ctx.restore()
