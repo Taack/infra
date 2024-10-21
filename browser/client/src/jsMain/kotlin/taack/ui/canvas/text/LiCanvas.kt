@@ -1,8 +1,12 @@
 package taack.ui.canvas.text
 
 class LiCanvas() : CanvasText() {
-    override val font: String
-        get() = "17px sans-serif"
+    override val fontWeight: String
+        get() = "normal"
+    override val fontSize: String
+        get() = "17px"
+    override val fontFace: String
+        get() = "sans-serif"
     override val fillStyle: String
         get() = "#555"
     override val letterSpacing: Double

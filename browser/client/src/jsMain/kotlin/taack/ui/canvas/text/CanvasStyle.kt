@@ -13,30 +13,34 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
         BOLD_MONOSPACED,
     }
 
-    fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine) {
-        val weight: String = when(this.type) {
+    var posXStart: Double = 0.0
+
+    fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, posXStart: Double): Double {
+        ctx.save()
+
+        ctx.font = when(this.type) {
             Type.NORMAL -> {
-                ""
+                text.font()
             }
             Type.BOLD -> {
-                "bold "
+                "bold ${text.fontSize} ${text.fontFace}"
             }
             Type.MONOSPACED -> {
-                "monospace "
+                "${text.fontWeight} ${text.fontSize} monospace"
             }
             Type.BOLD_MONOSPACED -> {
-                "bold monospace "
+                "bold ${text.fontSize} monospace"
             }
         }
-        ctx.save()
-        val xStart = ctx.measureText(text.txt.substring(line.posBegin, posNStart)).width
-        ctx.font = weight + text.font
-        console.log("xStart: $xStart")
-        ctx.fillText((if (posNStart == 0) text.txtPrefix else "") + text.txt.substring(max(posNStart, line.posBegin), min(posNEnd, line.posEnd)), (if (posNStart > 0) line.leftMargin else 10.0) + xStart, line.textY)
+        val txt = text.txt.substring(max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
+        ctx.fillText((if (posNStart == 0) text.txtPrefix else "") + txt, (if (posNStart > 0) line.leftMargin else 10.0) + posXStart, line.textY)
+        this.posXStart = posXStart
+        val width = ctx.measureText(txt).width
         ctx.restore()
+        return width
     }
 
     override fun toString(): String {
-        return "CanvasStyle(type=$type, posNStart=$posNStart, posNEnd=$posNEnd)"
+        return "CanvasStyle(type=$type, posNStart=$posNStart, posNEnd=$posNEnd, posXStart=$posXStart)"
     }
 }

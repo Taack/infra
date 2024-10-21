@@ -12,7 +12,9 @@ abstract class CanvasText {
 
     val debugLines = false
 
-    abstract val font: String
+    abstract val fontWeight: String
+    abstract val fontSize: String
+    abstract val fontFace: String
     abstract val fillStyle: String
     abstract val letterSpacing: Double
     abstract val lineHeight: Double
@@ -26,8 +28,12 @@ abstract class CanvasText {
     var txtPrefix = ""
     var txt = ""
 
+    fun font(): String {
+        return "$fontWeight ${fontSize} $fontFace"
+    }
+
     fun initCtx(ctx: CanvasRenderingContext2D) {
-        ctx.font = font
+        ctx.font = font()
         ctx.fillStyle = fillStyle
         ctx.letterSpacing = letterSpacing.toString() + "px"
         ctx.wordSpacing = wordSpacing.toString() + "px"
@@ -60,7 +66,6 @@ abstract class CanvasText {
                     posLetterLineEnd,
                     globalPosY + totalHeight,
                     height,
-//                    10.0 + if (posLetterLineBegin == 0) ctx.measureText(txtPrefix).width else 0.0
                     10.0 + ctx.measureText(txtPrefix).width
                 )
                 posY += height
@@ -78,13 +83,12 @@ abstract class CanvasText {
                 txt.length,
                 globalPosY + totalHeight,
                 height,
-//                10.0 + if (posLetterLineBegin == 0) ctx.measureText(txtPrefix).width else 0.0
                 10.0 + ctx.measureText(txtPrefix).width
             )
         }
         lines.forEach { l ->
             val stylesInLine = styles.filter { s ->
-                s.posNStart >= l.posBegin || s.posNEnd <= l.posEnd
+                s.posNStart >= l.posBegin && s.posNEnd <= l.posEnd || s.posNStart <= l.posBegin && s.posNEnd >= l.posBegin || s.posNStart >= l.posBegin && s.posNEnd >= l.posEnd
             }
             console.log("line: $l, stylesInLine: $stylesInLine")
             l.drawLine(ctx, this, stylesInLine)
@@ -127,8 +131,8 @@ abstract class CanvasText {
             p > it.posNStart && it.posNEnd > pEnd
         }
         if (toSplit != null) {
-            styles += CanvasStyle(toSplit.type, pEnd + 1, toSplit.posNEnd)
-            toSplit.posNEnd = p - 1
+            styles += CanvasStyle(toSplit.type, pEnd, toSplit.posNEnd)
+            toSplit.posNEnd = p
 
         }
         val changePosNStart = styles.filter {
@@ -164,44 +168,4 @@ abstract class CanvasText {
         }
         return i - 1
     }
-//
-//    fun drawLine(
-//        line: CanvasLine, ctx: CanvasRenderingContext2D,
-//        key: KeyboardEvent,
-//        charOffset: Int,
-//        lineOffset: Int,
-//        x: Double,
-//        y: Double
-//    ) {
-//        val j = line.caretNCoords(ctx, this, x)
-//
-//        val e = j
-//        if (key.code == "Backspace") {
-//            txt = txt.substring(0, e + charOffset - 2) + txt.substring(e + charOffset - 1)
-//        } else {
-//            txt = txt.substring(
-//                0,
-//                e + charOffset - 1
-//            ) + key.key + txt.substring(e + charOffset - 1)
-//        }
-//
-//    }
-//
-//    fun drawText(
-//        ctx: CanvasRenderingContext2D,
-//        key: KeyboardEvent,
-//        charOffset: Int,
-//        lineOffset: Int,
-//        x: Double,
-//        y: Double
-//    ) {
-//        val l = lines.find {
-//            it.textY >= y
-//        } ?: lines.last()
-//        drawLine(l, ctx, key, charOffset, lineOffset, x, y)
-//    }
-//
-//    override fun toString(): String {
-//        return "CanvasText(globalPosY='$globalPosY', font='$font', fillStyle='$fillStyle', letterSpacing=$letterSpacing, lineHeight=$lineHeight, wordSpacing=$wordSpacing, totalHeight=$totalHeight, marginTop=$marginTop, marginBottom=$marginBottom, txt='$txt', totalWidth=$totalWidth)"
-//    }
 }

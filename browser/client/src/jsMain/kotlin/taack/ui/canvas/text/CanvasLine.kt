@@ -14,6 +14,8 @@ class CanvasLine(
         return "CanvasLine(posBegin=$posBegin, posEnd=$posEnd, textY=$textY, height=$height, leftMargin=$leftMargin)"
     }
 
+    var containedStyles: List<CanvasStyle>? = null
+
     fun drawLine(ctx: CanvasRenderingContext2D) {
         ctx.save()
         ctx.beginPath()
@@ -37,8 +39,10 @@ class CanvasLine(
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
         if (!styles.isNullOrEmpty()) {
+            containedStyles = styles
+            var posXStart = 0.0
             for (style in styles) {
-                style.draw(ctx, text, this)
+                posXStart += style.draw(ctx, text, this, posXStart)
             }
         } else {
             ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (posBegin > 0) leftMargin else 10.0, textY)

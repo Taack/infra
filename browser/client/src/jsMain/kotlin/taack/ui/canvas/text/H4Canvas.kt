@@ -1,8 +1,12 @@
 package taack.ui.canvas.text
 
 class H4Canvas() : CanvasText() {
-    override val font: String
-        get() = "23px sans-serif"
+    override val fontWeight: String
+        get() = "normal"
+    override val fontSize: String
+        get() = "23px"
+    override val fontFace: String
+        get() = "sans-serif"
     override val fillStyle: String
         get() = "#ba3925"
     override val letterSpacing: Double
