@@ -5,11 +5,12 @@ import kotlinx.browser.window
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
+import taack.ui.canvas.table.CanvasCell
+import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
 import web.events.Event
 import web.events.EventHandler
-import web.events.EventType
 import web.events.addEventListener
 import web.html.HTMLCanvasElement
 import web.html.HTMLDivElement
@@ -22,6 +23,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private val ctx: CanvasRenderingContext2D =
         canvas.getContext(CanvasRenderingContext2D.ID) as CanvasRenderingContext2D
     private val texts = mutableListOf<CanvasText>()
+//    private val texts: List<CanvasText>
+//        get() = drawables.filter { drawable -> drawable is CanvasText } as List<CanvasText>
+    private val drawables = mutableListOf<ICanvasDrawable>()
     private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dy: Double = 0.0
     private var caretPosInCurrentText: Int = 0
@@ -38,8 +42,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var charSelectEndNInText: Int = 0
     private var currentMenuEntries: List<MenuEntry>? = null
     private var menu: Menu? = null
+    private var posYGlobal: Double = 0.0
 
-    private fun addText() {
+    private fun addDrawable() {
         if (menu != null) {
 
         } else
@@ -270,8 +275,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         draw()
     }
 
-    private fun addText(text: CanvasText) {
-        texts.add(text)
+    private fun addDrawable(drawable: ICanvasDrawable) {
+        drawables.add(drawable)
+        if (drawable is CanvasText) {
+            texts.add(drawable)
+        }
     }
 
     private fun logMouseEvent(ev: MouseEvent) {
@@ -306,7 +314,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 10
-            CanvasText.globalPosY = -dy
+            posYGlobal = -dy
             isDoubleClick = false
             draw()
         }
@@ -374,7 +382,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             currentKeyboardEvent = event
             if (!event.ctrlKey) isDoubleClick = false
 
-            addText()
+            addDrawable()
             event.preventDefault()
             event.stopPropagation()
 
@@ -446,61 +454,68 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         val h2 = H2Canvas()
 
         h2.txt = "Topology Filters and Selectors Example for various data layout"
-        addText(h2)
+        addDrawable(h2)
 
         val h3 = H3Canvas()
         h3.txt = "Directed Acyclic Graphs (the most common in computer sciences)"
-        addText(h3)
+        addDrawable(h3)
 
         val p1 = PCanvas()
         p1.txt =
             "DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently."
-        addText(p1)
+        addDrawable(p1)
 
         val h31 = H3Canvas()
         h31.txt = "For Assemblies and bodies"
-        addText(h31)
+        addDrawable(h31)
 
         val h4 = H4Canvas()
         h4.txt = "Category"
-        addText(h4)
+        addDrawable(h4)
+
+        val t = CanvasTable(3)
+
+        t.addCell(CanvasCell("Hello World!")).addCell(CanvasCell("Hello World2!")).addCell(CanvasCell("Hello World3!"))
+        t.addCell(CanvasCell("Hello World!")).addCell(CanvasCell("Hello World2!")).addCell(CanvasCell("Hello World3!"))
+
+        addDrawable(t)
 
         val p2 = PCanvas()
         p2.txt = "Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-//        p2.txt += " Matched by feature, body name, but also by position DSL."
-        addText(p2)
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        p2.txt += " Matched by feature, body name, but also by position DSL."
+        addDrawable(p2)
         val p3 = PCanvas()
         p3.txt = p2.txt
-        addText(p3)
+        addDrawable(p3)
         val p4 = PCanvas()
         p4.txt = p2.txt
 
-        addText(p4)
+        addDrawable(p4)
     }
 
     private fun draw() {
         CanvasText.num1 = 0
         CanvasText.num2 = 0
-        CanvasText.globalPosY = -dy
+        posYGlobal = -dy
 
-        console.log("draw +++ CanvasText.globalPosY = ${CanvasText.globalPosY}")
+        console.log("draw +++ CanvasText.globalPosY = ${posYGlobal}")
 
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble());
 
-        for (text in texts) {
-            text.draw(ctx, canvas.width)
+        for (text in drawables) {
+            posYGlobal = text.draw(ctx, canvas.width, posYGlobal)
         }
         console.log("draw text done")
 
@@ -520,7 +535,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 )
         }
 
-        console.log("draw --- CanvasText.globalPosY = ${CanvasText.globalPosY} $caretPosInCurrentText $charOffset")
-        divHolder.style.height = "${CanvasText.globalPosY + dy}px"
+        console.log("draw --- CanvasText.globalPosY = $posYGlobal $caretPosInCurrentText $charOffset")
+        divHolder.style.height = "${posYGlobal + dy}px"
     }
 }

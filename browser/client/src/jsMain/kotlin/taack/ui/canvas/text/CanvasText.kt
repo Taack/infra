@@ -1,13 +1,13 @@
 package taack.ui.canvas.text
 
+import taack.ui.canvas.ICanvasDrawable
 import web.canvas.CanvasRenderingContext2D
 import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText {
+abstract class CanvasText : ICanvasDrawable {
     companion object {
-        var globalPosY: Double = 0.0
         var num1: Int = 0
         var num2: Int = 0
     }
@@ -52,7 +52,7 @@ abstract class CanvasText {
         }
     }
 
-    fun draw(ctx: CanvasRenderingContext2D, canvasWidth: Int) {
+    override fun draw(ctx: CanvasRenderingContext2D, canvasWidth: Int, globalPosY: Double): Double {
         ctx.save()
         initCtx(ctx)
         txtPrefix = computeNum()
@@ -114,9 +114,10 @@ abstract class CanvasText {
                 it.drawLine(ctx)
             }
         totalHeight += marginBottom
-        globalPosY += totalHeight
+        val ret = globalPosY + totalHeight
 
         ctx.restore()
+        return ret
     }
 
     abstract fun computeNum(): String
