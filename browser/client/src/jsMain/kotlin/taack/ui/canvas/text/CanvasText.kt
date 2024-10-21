@@ -22,6 +22,7 @@ abstract class CanvasText {
     abstract val marginBottom: Double
 
     var lines: List<CanvasLine> = emptyList()
+    var styles: List<CanvasStyle> = emptyList()
     var txtPrefix = ""
     var txt = ""
 
@@ -81,8 +82,12 @@ abstract class CanvasText {
                 10.0 + ctx.measureText(txtPrefix).width
             )
         }
-        lines.forEach {
-            it.drawLine(ctx, this)
+        lines.forEach { l ->
+            val stylesInLine = styles.filter { s ->
+                s.posNStart >= l.posBegin || s.posNEnd <= l.posEnd
+            }
+            console.log("line: $l, stylesInLine: $stylesInLine")
+            l.drawLine(ctx, this, stylesInLine)
         }
 
         if (debugLines)
@@ -109,6 +114,37 @@ abstract class CanvasText {
     fun rmChar(p: Int): Int {
         txt = txt.substring(0, p - 1) + txt.substring(p)
         return txt.length
+    }
+
+    fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
+        val newStyle = CanvasStyle(style, p, pEnd)
+        if (styles.isEmpty())
+            styles += CanvasStyle(CanvasStyle.Type.NORMAL, 0, txt.length)
+        styles = styles.filterNot {
+            it.posNStart >= p && it.posNStart <= pEnd && it.posNEnd >= p && it.posNEnd <= pEnd
+        }
+        val toSplit = styles.find {
+            p > it.posNStart && it.posNEnd > pEnd
+        }
+        if (toSplit != null) {
+            styles += CanvasStyle(toSplit.type, pEnd + 1, toSplit.posNEnd)
+            toSplit.posNEnd = p - 1
+
+        }
+        val changePosNStart = styles.filter {
+            it.posNStart >= p && it.posNStart <= pEnd
+        }
+        changePosNStart.forEach {
+            it.posNStart = pEnd
+        }
+        val changePosNEnd = styles.filter {
+            it.posNStart >= p && it.posNEnd >= p && it.posNEnd <= pEnd
+        }
+        changePosNEnd.forEach {
+            it.posNEnd = p
+        }
+        styles += newStyle
+        styles = styles.sortedBy { it.posNStart }
     }
 
     fun findLine(y: Double): Int {

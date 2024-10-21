@@ -313,18 +313,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         canvas.oncontextmenu = EventHandler({ event: MouseEvent ->
             console.log(event)
-            currentMenuEntries = listOf(
-                MenuEntry("Coucou", {
-                    console.log("Coucou")
-                }),
-                MenuEntry("Caca", {
-                    console.log("Caca")
-                }),
-                MenuEntry("Quiqui", {
-                    console.log("Kiki")
-                })
-            )
-
             if (currentMenuEntries != null) {
                 event.preventDefault()
                 event.stopPropagation()
@@ -426,6 +414,21 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                                 )
                             }"
                         )
+                        currentMenuEntries = emptyList()
+                        currentMenuEntries = listOf(
+                            MenuEntry("NORMAL", {
+                                currentText!!.addStyle(CanvasStyle.Type.NORMAL, charSelectStartNInText, charSelectEndNInText)
+                            }),
+                            MenuEntry("BOLD", {
+                                currentText!!.addStyle(CanvasStyle.Type.BOLD, charSelectStartNInText, charSelectEndNInText)
+                            }),
+                            MenuEntry("MONOSPACED", {
+                                currentText!!.addStyle(CanvasStyle.Type.MONOSPACED, charSelectStartNInText, charSelectEndNInText)
+                            }),
+                            MenuEntry("BOLD + MONOSPACED", {
+                                currentText!!.addStyle(CanvasStyle.Type.BOLD_MONOSPACED, charSelectStartNInText, charSelectEndNInText)
+                            }),
+                        )
                         break
                     }
                 }
@@ -464,19 +467,19 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         val p2 = PCanvas()
         p2.txt = "Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
+//        p2.txt += " Matched by feature, body name, but also by position DSL."
         addText(p2)
         val p3 = PCanvas()
         p3.txt = p2.txt

@@ -35,8 +35,14 @@ class CanvasLine(
         ctx.restore()
     }
 
-    fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText) {
-        ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (posBegin > 0) leftMargin else 10.0, textY)
+    fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
+        if (!styles.isNullOrEmpty()) {
+            for (style in styles) {
+                style.draw(ctx, text, this)
+            }
+        } else {
+            ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (posBegin > 0) leftMargin else 10.0, textY)
+        }
     }
 
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {
