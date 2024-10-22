@@ -10,32 +10,12 @@ class CanvasLine(
     val height: Double,
     val leftMargin: Double = 0.0
 ) {
+
     override fun toString(): String {
         return "CanvasLine(posBegin=$posBegin, posEnd=$posEnd, textY=$textY, height=$height, leftMargin=$leftMargin)"
     }
 
     var containedStyles: List<CanvasStyle>? = null
-
-    fun drawLine(ctx: CanvasRenderingContext2D) {
-        ctx.save()
-        ctx.beginPath()
-        ctx.strokeStyle = "blue"
-        ctx.moveTo(0.0, textY - height)
-        ctx.lineTo(100.0, textY - height)
-        ctx.fillStyle = "violet"
-        ctx.fillText("+++ $posBegin to $posEnd", 100.0, textY)
-        ctx.stroke()
-        ctx.restore()
-        ctx.save()
-        ctx.beginPath()
-        ctx.strokeStyle = "red"
-        ctx.moveTo(100.0, textY)
-        ctx.lineTo(200.0, textY)
-        ctx.fillStyle = "green"
-        ctx.fillText("--- $posBegin to $posEnd", 500.0, textY)
-        ctx.stroke()
-        ctx.restore()
-    }
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
         if (!styles.isNullOrEmpty()) {

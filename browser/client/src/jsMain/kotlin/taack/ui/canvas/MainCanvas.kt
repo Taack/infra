@@ -5,8 +5,7 @@ import kotlinx.browser.window
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
-import taack.ui.canvas.table.CanvasCell
-import taack.ui.canvas.table.CanvasTable
+import taack.ui.canvas.table.*
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
 import web.events.Event
@@ -22,21 +21,23 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
     private val ctx: CanvasRenderingContext2D =
         canvas.getContext(CanvasRenderingContext2D.ID) as CanvasRenderingContext2D
-    private val texts = mutableListOf<CanvasText>()
-//    private val texts: List<CanvasText>
-//        get() = drawables.filter { drawable -> drawable is CanvasText } as List<CanvasText>
+    private val texts: List<CanvasText>
+        get() = drawables.mapNotNull { it.getSelectedText(0.0, 0.0) }.toMutableList()
+    private var currentLine: CanvasLine? = null
     private val drawables = mutableListOf<ICanvasDrawable>()
     private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dy: Double = 0.0
     private var caretPosInCurrentText: Int = 0
-    private var currentText: CanvasText? = null
-    private var currentLine: CanvasLine? = null
+    private var currentDrawable: ICanvasDrawable? = null
+    private val currentText: CanvasText?
+        get() = currentDrawable?.getSelectedText(currentMouseEvent?.offsetX ?: 0.0, currentMouseEvent?.offsetY ?: 0.0)
+    private var currentClick: Pair<CanvasLine, Int>? = null
+    private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
     private var charOffset: Int = 0
     private var wordOffset: Int = 0
     private var lineOffset: Int = 0
-    private var clickYPosBefore: Double = 0.0
     private var isDoubleClick: Boolean = false
     private var charSelectStartNInText: Int = 0
     private var charSelectEndNInText: Int = 0
@@ -52,7 +53,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 "Backspace" -> {
                     if (currentText?.rmChar(caretPosInCurrentText + charOffset) == 0) {
                         val i = texts.indexOf(currentText!!)
-                        texts.remove(currentText!!)
+                        drawables.remove(currentText!!)
                     } else
                         charOffset--
                 }
@@ -68,21 +69,21 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     }
                     if (currentText?.delChar(pos1, pos2) == 0) {
                         val i = texts.indexOf(currentText!!)
-                        texts.remove(currentText!!)
+                        drawables.remove(currentText!!)
                     }
                 }
 
                 "Enter" -> {
-                    val i = texts.indexOf(currentText!!) + 1
+                    val i = drawables.indexOf(currentText!!) + 1
                     if (currentText is H2Canvas) {
-                        currentText = H3Canvas()
-                        texts.add(i, currentText as H3Canvas)
+                        currentDrawable = H3Canvas()
+                        drawables.add(i, currentText as H3Canvas)
                     } else if (currentText is H3Canvas) {
-                        currentText = H4Canvas()
-                        texts.add(i, currentText as H4Canvas)
+                        currentDrawable = H4Canvas()
+                        drawables.add(i, currentText as H4Canvas)
                     } else {
-                        currentText = PCanvas()
-                        texts.add(i, currentText as PCanvas)
+                        currentDrawable = PCanvas()
+                        drawables.add(i, currentText as PCanvas)
                     }
                     currentLine = null
                     caretPosInCurrentText = 0
@@ -94,7 +95,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         val j = texts.indexOf(currentText) - 1
                         console.log("ArrowUp => Previous Text")
                         if (j >= 0) {
-                            currentText = texts[j]
+                            currentDrawable = texts[j]
                             currentLine = currentText!!.lines.last()
                         }
                     } else {
@@ -109,7 +110,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                             val j = texts.indexOf(currentText) - 1
                             console.log("ArrowUp => Previous Text")
                             if (j >= 0) {
-                                currentText = texts[j]
+                                currentDrawable = texts[j]
                                 currentLine = currentText!!.lines.last()
                             }
                         }
@@ -121,7 +122,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         val j = texts.indexOf(currentText) + 1
                         console.log("ArrowDown => Next Text")
                         if (j > 0 && j < texts.size) {
-                            currentText = texts[j]
+                            currentDrawable = texts[j]
                             currentLine = currentText!!.lines.first()
                         }
                     } else {
@@ -137,7 +138,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                             val j = texts.indexOf(currentText) + 1
                             console.log("ArrowDown => Next Text")
                             if (j > 0 && j < texts.size) {
-                                currentText = texts[j]
+                                currentDrawable = texts[j]
                                 currentLine = currentText!!.lines.first()
                             }
                         }
@@ -160,11 +161,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentText != null) {
                         val i = texts.indexOf(currentText!!)
                         if (i != -1) {
-                            texts.remove(currentText!!)
+                            drawables.remove(currentText!!)
                             val h2 = H2Canvas()
                             h2.txt = currentText!!.txt
-                            texts.add(i, h2)
-                            currentText = h2
+                            drawables.add(i, h2)
+                            currentDrawable = h2
                             currentLine = null
                         }
                     }
@@ -174,11 +175,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentText != null) {
                         val i = texts.indexOf(currentText!!)
                         if (i != -1) {
-                            texts.remove(currentText!!)
+                            drawables.remove(currentText!!)
                             val h3 = H3Canvas()
                             h3.txt = currentText!!.txt
-                            texts.add(i, h3)
-                            currentText = h3
+                            drawables.add(i, h3)
+                            currentDrawable = h3
                             currentLine = null
                         }
                     }
@@ -187,11 +188,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 "F4" -> {
                     if (currentText != null && currentLine != null) {
                         val i = texts.indexOf(currentText!!)
-                        texts.remove(currentText!!)
+                        drawables.remove(currentText!!)
                         val h4 = H4Canvas()
                         h4.txt = currentText!!.txt
-                        texts.add(i, h4)
-                        currentText = h4
+                        drawables.add(i, h4)
+                        currentDrawable = h4
                         currentLine = null
                     }
                 }
@@ -199,11 +200,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 "F1" -> {
                     if (currentText != null && currentLine != null) {
                         val i = texts.indexOf(currentText!!)
-                        texts.remove(currentText!!)
+                        drawables.remove(currentText!!)
                         val p = PCanvas()
                         p.txt = currentText!!.txt
-                        texts.add(i, p)
-                        currentText = p
+                        drawables.add(i, p)
+                        currentDrawable = p
                         currentLine = null
                     }
                 }
@@ -212,11 +213,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentText != null && currentLine != null) {
                         val i = texts.indexOf(currentText!!)
                         if (i != -1) {
-                            texts.remove(currentText!!)
+                            drawables.remove(currentText!!)
                             val p = LiCanvas()
                             p.txt = currentText!!.txt
-                            texts.add(i, p)
-                            currentText = p
+                            drawables.add(i, p)
+                            currentDrawable = p
                             currentLine = null
                         }
                     }
@@ -226,11 +227,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentText != null && currentLine != null) {
                         val i = texts.indexOf(currentText!!)
                         if (i != -1) {
-                            texts.remove(currentText!!)
+                            drawables.remove(currentText!!)
                             val p = Li2Canvas()
                             p.txt = currentText!!.txt
-                            texts.add(i, p)
-                            currentText = p
+                            drawables.add(i, p)
+                            currentDrawable = p
                             currentLine = null
                         }
                     }
@@ -240,7 +241,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     charOffset = 0
                     if (currentKeyboardEvent!!.ctrlKey) {
                         if (currentKeyboardEvent!!.shiftKey) {
-                            currentText = texts.last()
+                            currentDrawable = texts.last()
                         }
                         currentLine = currentText!!.lines.last()
                     }
@@ -251,7 +252,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     charOffset = 0
                     if (currentKeyboardEvent!!.ctrlKey) {
                         if (currentKeyboardEvent!!.shiftKey) {
-                            currentText = texts.first()
+                            currentDrawable = texts.first()
                         }
                         currentLine = currentText!!.lines.first()
                     }
@@ -278,7 +279,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private fun addDrawable(drawable: ICanvasDrawable) {
         drawables.add(drawable)
         if (drawable is CanvasText) {
-            texts.add(drawable)
+            drawables.add(drawable)
         }
     }
 
@@ -342,30 +343,18 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 if (event.detail == 3) {
                     isDoubleClick = true
                     charSelectStartNInText = 0
-                    charSelectEndNInText = currentText!!.txt.length
+                    charSelectEndNInText = currentDrawable?.getSelectedText(event.offsetX, event.offsetY)!!.txt.length
                     console.log("click double click == triple click")
                 }
 
                 currentMouseEvent = event
                 event.preventDefault()
                 event.stopPropagation()
-                for (text in texts) {
-                    for (line in text.lines) {
-                        if (event.offsetY in line.textY - line.height..line.textY) {
-                            clickYPosBefore = line.textY
-                            currentLine = line
-                            currentText = text
-                            caretPosInCurrentText = line.caretNCoords(ctx, text, event.offsetX)
-                            console.log(
-                                "find text line ... at (${event.offsetX}, ${event.offsetY})(${line.textY + line.height}) = ${
-                                    text.txt.substring(
-                                        line.posBegin, caretPosInCurrentText
-
-                                    )
-                                }"
-                            )
-                            break
-                        }
+                for (d in drawables) {
+                    if (d.isClicked(event.offsetX, event.offsetY)) {
+                        currentDrawable = d
+                        val text = d.getSelectedText(event.offsetX, event.offsetY)!!
+                        currentClick = text.click(ctx, event.offsetX, event.offsetY)
                     }
                 }
             }
@@ -394,51 +383,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             event.stopPropagation()
             isDoubleClick = true
             wordOffset = 0
-            for (text in texts) {
-                for (line in text.lines) {
-                    if (event.offsetY in line.textY - line.height..line.textY) {
-                        clickYPosBefore = line.textY
-                        currentLine = line
-                        currentText = text
-                        caretPosInCurrentText = line.caretNCoords(ctx, text, event.offsetX)
-                        charSelectStartNInText =
-                            currentText!!.txt.substring(currentLine!!.posBegin, caretPosInCurrentText)
-                                .indexOfLast { it == ' ' } + 1
-                        charSelectStartNInText += currentLine!!.posBegin
-                        charSelectEndNInText =
-                            currentText!!.txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
-                        charSelectEndNInText += caretPosInCurrentText + 1
-                        console.log(
-                            "click find text line ... at (${event.offsetX}, ${event.offsetY})(${line.textY + line.height}) = ${
-                                text.txt.substring(
-                                    line.posBegin, caretPosInCurrentText
-                                )
-                            }"
-                        )
-                        console.log(
-                            "double click find text line ... at (${charSelectStartNInText}, ${charSelectEndNInText}) = ${
-                                text.txt.substring(
-                                    charSelectStartNInText, charSelectEndNInText
-                                )
-                            }"
-                        )
-                        currentMenuEntries = emptyList()
-                        currentMenuEntries = listOf(
-                            MenuEntry("NORMAL", {
-                                currentText!!.addStyle(CanvasStyle.Type.NORMAL, charSelectStartNInText, charSelectEndNInText)
-                            }),
-                            MenuEntry("BOLD", {
-                                currentText!!.addStyle(CanvasStyle.Type.BOLD, charSelectStartNInText, charSelectEndNInText)
-                            }),
-                            MenuEntry("MONOSPACED", {
-                                currentText!!.addStyle(CanvasStyle.Type.MONOSPACED, charSelectStartNInText, charSelectEndNInText)
-                            }),
-                            MenuEntry("BOLD + MONOSPACED", {
-                                currentText!!.addStyle(CanvasStyle.Type.BOLD_MONOSPACED, charSelectStartNInText, charSelectEndNInText)
-                            }),
-                        )
-                        break
-                    }
+            for (d in drawables) {
+                if (d.isClicked(event.offsetX, event.offsetY)) {
+                    currentDrawable = d
+                    val text = d.getSelectedText(event.offsetX, event.offsetY)!!
+                    currentDoubleClick = text.doubleClick(ctx, event.offsetX, event.offsetY)
+                    if (currentDoubleClick != null)
+                        currentMenuEntries = text.getContextualMenuEntries(currentDoubleClick!!)
+                    else currentDoubleClick = null
                 }
             }
             draw()
@@ -475,8 +427,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         val t = CanvasTable(3)
 
-        t.addCell(CanvasCell("Hello World!")).addCell(CanvasCell("Hello World2!")).addCell(CanvasCell("Hello World3!"))
-        t.addCell(CanvasCell("Hello World!")).addCell(CanvasCell("Hello World2!")).addCell(CanvasCell("Hello World3!"))
+        t.addCell(CanvasCellHeader(TxtHeaderCanvas("Hello World!"))).addCell(CanvasCellHeader(TxtHeaderCanvas("Hello World2!"))).addCell(CanvasCellHeader(TxtHeaderCanvas("Hello World3!")))
+        t.addCell(CanvasCellRow(TxtRowCanvas("Hello World!"))).addCell(CanvasCellRow(TxtRowCanvas("Hello World2!"))).addCell(CanvasCellRow(TxtRowCanvas("Hello World3!")))
 
         addDrawable(t)
 
