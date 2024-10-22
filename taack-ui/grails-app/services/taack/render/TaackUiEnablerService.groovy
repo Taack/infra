@@ -3,14 +3,18 @@ package taack.render
 import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
 import grails.web.api.WebAttributes
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.runtime.MethodClosure
+import org.owasp.html.PolicyFactory
+import org.owasp.html.Sanitizers
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.helper.Utils
+
+import javax.annotation.PostConstruct
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.
@@ -37,10 +41,30 @@ import taack.ui.dsl.helper.Utils
  */
 @GrailsCompileStatic
 class TaackUiEnablerService implements WebAttributes {
+
+    static lazyInit = false
+
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
     @Autowired
     TaackUiConfiguration taackUiConfiguration
+
+    def policy
+
+    @PostConstruct
+    void init() {
+        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS)
+    }
+
+    void sanitizeParameters(GrailsParameterMap parameters) {
+        parameters.each { Map.Entry entry ->
+            if (entry.value instanceof String) {
+                entry.value = (policy as PolicyFactory).sanitize(entry.value as String)
+            } else if(entry.value instanceof GrailsParameterMap) {
+                sanitizeParameters(entry.value as GrailsParameterMap)
+            }
+        }
+    }
 
     private final static Map<String, Closure> securityClosures = [:]
 
