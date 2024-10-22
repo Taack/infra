@@ -16,4 +16,9 @@ final class HTMLTxtContent implements IHTMLElement {
     String getOutput() {
         content
     }
+
+    @Override
+    void addChildren(IHTMLElement... elements) {
+        throw new Exception("NO Children for this tag !!")
+    }
 }
