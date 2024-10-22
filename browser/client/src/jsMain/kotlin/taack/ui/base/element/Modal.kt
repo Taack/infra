@@ -2,13 +2,12 @@ package taack.ui.base.element
 
 import kotlinx.browser.document
 import kotlinx.dom.addClass
-import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.trace
-import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.Helper.Companion.traceDeIndent
+import taack.ui.base.Helper.Companion.traceIndent
 
 class Modal(val parent: Block) : BaseElement {
     companion object {
