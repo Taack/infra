@@ -1,5 +1,6 @@
 package taack.ui.canvas.item
 
+import taack.ui.base.Helper.Companion.trace
 import web.canvas.CanvasRenderingContext2D
 
 
@@ -12,6 +13,7 @@ class Menu(val entries: List<MenuEntry>) {
     var posY: Double = 0.0
 
     fun draw(ctx: CanvasRenderingContext2D, posX: Double, posY: Double) {
+        trace("Menu::draw: $posX, $posY")
         ctx.save()
         ctx.font = font
         this.posX = posX
@@ -30,6 +32,7 @@ class Menu(val entries: List<MenuEntry>) {
     }
 
     fun onClick(posX: Double, posY: Double) {
+        trace("Menu::onClick: $posX, $posY")
         if (posX > this.posX && posX < this.posX + 100.0 && posY > this.posY && posY < this.posY + entries.size * 20.0 + 10.0) {
             val i = ((posY - this.posY) / 20.0).toInt()
             entries[i].onClick()

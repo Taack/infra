@@ -1,5 +1,7 @@
 package taack.ui.canvas.text
 
+import taack.ui.base.Helper.Companion.traceDeIndent
+import taack.ui.base.Helper.Companion.traceIndent
 import web.canvas.CanvasRenderingContext2D
 import kotlin.math.max
 import kotlin.math.min
@@ -16,6 +18,7 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
     var posXStart: Double = 0.0
 
     fun initCtx(ctx: CanvasRenderingContext2D, text: CanvasText) {
+        traceIndent("CanvasStyle::initCtx: $this")
         text.initCtx(ctx)
         ctx.font = when(this.type) {
             Type.NORMAL -> {
@@ -31,9 +34,11 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
                 "bold ${text.fontSize} monospace"
             }
         }
+        traceDeIndent("CanvasStyle::initCtx: $this")
     }
 
     fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, posXStart: Double): Double {
+        traceIndent("CanvasStyle::draw: $this")
         ctx.save()
         initCtx(ctx, text)
         val txt = text.txt.substring(max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
@@ -42,6 +47,7 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
         val width = text.measureText(ctx,  max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
         console.log("CanvasStyle::draw width: $width from: ${max(posNStart, line.posBegin)}, to: ${min(posNEnd, line.posEnd)}")
         ctx.restore()
+        traceDeIndent("CanvasStyle::draw: $this")
         return width
     }
 

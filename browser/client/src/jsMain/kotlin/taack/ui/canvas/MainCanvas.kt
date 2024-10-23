@@ -2,6 +2,10 @@ package taack.ui.canvas
 
 import kotlinx.browser.document
 import kotlinx.browser.window
+import taack.ui.base.Helper
+import taack.ui.base.Helper.Companion.trace
+import taack.ui.base.Helper.Companion.traceDeIndent
+import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
@@ -57,6 +61,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
 
     private fun changeTextCanvasStyle(text: CanvasText) {
+        trace("MainCanvas::changeTextCanvasStyle")
         if (currentDrawable != null && !(currentDrawable is CanvasTable)) {
             val i = drawables.indexOf(currentDrawable!!)
             if (i != -1) {
@@ -74,6 +79,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         if (menu == null)
             when (currentKeyboardEvent!!.key) {
                 "Backspace" -> {
+                    trace("MainCanvas::addDrawable press Backspace")
                     if (currentText?.rmChar(caretPosInCurrentText + charOffset) == 0) {
                         drawables.remove(currentText!!)
                     } else
@@ -81,6 +87,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "Delete" -> {
+                    trace("MainCanvas::addDrawable press Delete")
                     var pos1 = caretPosInCurrentText + charOffset
                     var pos2: Int? = null
                     if (isDoubleClick && currentKeyboardEvent!!.ctrlKey) {
@@ -95,6 +102,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "Enter" -> {
+                    trace("MainCanvas::addDrawable press Enter")
                     val i = drawables.indexOf(currentText!!) + 1
                     when (currentText) {
                         is H2Canvas -> {
@@ -118,24 +126,21 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "ArrowUp" -> {
+                    trace("MainCanvas::addDrawable press ArrowUp")
                     if (currentLine == null) {
                         val j = texts.indexOf(currentText) - 1
-                        console.log("ArrowUp => Previous Text")
                         if (j >= 0) {
                             currentDrawable = texts[j]
                             currentLine = currentText!!.lines.last()
                         }
                     } else {
                         val i = currentText!!.findLine(currentLine!!)
-                        console.log("ArrowUp +++ $i $lineOffset ${currentText!!.lines}")
                         if (i > 0 && i < currentText!!.lines.size) {
                             caretPosInCurrentText -= currentLine!!.posBegin
                             currentLine = currentText!!.lines[i - 1]
                             caretPosInCurrentText += currentLine!!.posBegin
-                            console.log("ArrowUp => Previous Line $currentLine")
                         } else {
                             val j = texts.indexOf(currentText) - 1
-                            console.log("ArrowUp => Previous Text")
                             if (j >= 0) {
                                 currentDrawable = texts[j]
                                 currentLine = currentText!!.lines.last()
@@ -145,25 +150,22 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "ArrowDown" -> {
+                    trace("MainCanvas::addDrawable press ArrowDown")
                     if (currentLine == null) {
                         val j = texts.indexOf(currentText) + 1
-                        console.log("ArrowDown => Next Text")
                         if (j > 0 && j < texts.size) {
                             currentDrawable = texts[j]
                             currentLine = currentText!!.lines.first()
                         }
                     } else {
                         val i = currentText!!.findLine(currentLine!!)
-                        console.log("ArrowDown $i $lineOffset $currentLine ${currentText!!.lines}")
 
                         if (i >= 0 && i < currentText!!.lines.size - 1) {
                             caretPosInCurrentText -= currentLine!!.posBegin
                             currentLine = currentText!!.lines[i + 1]
                             caretPosInCurrentText += currentLine!!.posBegin
-                            console.log("ArrowDown => Next Line $currentLine")
                         } else {
                             val j = texts.indexOf(currentText) + 1
-                            console.log("ArrowDown => Next Text")
                             if (j > 0 && j < texts.size) {
                                 currentDrawable = texts[j]
                                 currentLine = currentText!!.lines.first()
@@ -173,6 +175,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "ArrowRight" -> {
+                    trace("MainCanvas::addDrawable press ArrowRight")
                     if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
                         val decay = currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOf(' ') + 1
                         if (decay == 0) {
@@ -209,6 +212,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "End" -> {
+                    trace("MainCanvas::addDrawable press End")
                     charOffset = 0
                     if (currentKeyboardEvent!!.ctrlKey) {
                         if (currentKeyboardEvent!!.shiftKey) {
@@ -220,6 +224,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "Home" -> {
+                    trace("MainCanvas::addDrawable press Home")
                     charOffset = 0
                     if (currentKeyboardEvent!!.ctrlKey) {
                         if (currentKeyboardEvent!!.shiftKey) {
@@ -235,10 +240,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "ArrowLeft" -> {
+                    trace("MainCanvas::addDrawable press ArrowLeft")
                     charOffset--
                 }
 
                 else -> {
+                    trace("MainCanvas::addDrawable else branch")
                     if (currentKeyboardEvent != null)
                         currentText?.addChar(currentKeyboardEvent!!.key[0], caretPosInCurrentText + charOffset++)
                 }
@@ -248,15 +255,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     }
 
     private fun addDrawable(drawable: ICanvasDrawable) {
+        trace("MainCanvas::addDrawable")
         drawables.add(drawable)
-    }
-
-    private fun logMouseEvent(ev: MouseEvent) {
-        console.log("logMouseEvent", ev)
-    }
-
-    private fun logKeyEvent(ev: KeyboardEvent) {
-        console.log("logKeyEvent", ev)
     }
 
     init {
@@ -268,7 +268,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(canvas)
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
-            console.log("onscroll", ev)
+            trace("divScroll scroll")
             menu = null
             dy = divScroll.scrollTop
             divHolder.style.transform = "translate(0px, ${dy}px)"
@@ -279,8 +279,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         })
 
         window.onresize = {
+            trace("window resize")
             menu = null
-            console.log("onresize ${document.body!!.offsetWidth}")
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 10
             posYGlobal = -dy
@@ -289,7 +289,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         }
 
         canvas.oncontextmenu = EventHandler { event: MouseEvent ->
-            console.log(event)
+            trace("canvas contextmenu")
             if (currentDrawable != null && currentClick != null)
                 currentDrawable!!.getContextualMenuEntries(currentDoubleClick!!)
             if (currentMenuEntries != null) {
@@ -302,7 +302,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         }
 
         canvas.onclick = EventHandler { event: MouseEvent ->
-            logMouseEvent(event)
+            trace("canvas click")
             if (menu != null) {
                 menu!!.onClick(event.offsetX, event.offsetY)
                 menu = null
@@ -313,7 +313,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     isDoubleClick = true
                     charSelectStartNInText = 0
                     charSelectEndNInText = currentDrawable?.getSelectedText(event.offsetX, event.offsetY)!!.txt.length
-                    console.log("click double click == triple click")
+                    trace("canvas click double click == triple click")
                 }
 
                 currentMouseEvent = event
@@ -333,13 +333,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             draw()
         }
 
-        canvas.onmousemove = EventHandler { event: MouseEvent ->
-            if (event.buttons != MouseButton.MAIN)
-                console.log("onmousemove ${event.button} ${event.buttons} ${event.clientX} ${event.clientY} ${event.offsetX} ${event.offsetY} ${event.pageX} ${event.pageY} ${event.ctrlKey} ${event.altKey} ${event.shiftKey} ${event.metaKey}")
-        }
-
         canvas.onkeydown = EventHandler { event: KeyboardEvent ->
-            logKeyEvent(event)
             currentKeyboardEvent = event
             if (!event.ctrlKey) isDoubleClick = false
 
@@ -350,7 +344,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         }
 
         canvas.ondblclick = EventHandler { event: MouseEvent ->
-            logMouseEvent(event)
+            trace("canvas dblclick")
             event.preventDefault()
             event.stopPropagation()
             isDoubleClick = true
@@ -359,7 +353,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 if (d.isClicked(event.offsetX, event.offsetY)) {
                     currentDrawable = d
                     currentDoubleClick = d.doubleClick(ctx, event.offsetX, event.offsetY)
-                    console.log(currentDoubleClick)
                     if (currentDoubleClick != null)
                         currentMenuEntries = d.getContextualMenuEntries(currentDoubleClick!!)
                     else currentDoubleClick = null
@@ -372,9 +365,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     }
 
     private fun addInitialTexts() {
-        console.log("canvas $canvas")
-        console.log("ctx $ctx")
-
         val h2 = H2Canvas()
 
         h2.txt = "Topology Filters and Selectors Example for various data layout"
@@ -430,29 +420,28 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     }
 
     private fun draw() {
+        traceIndent("MainCanvas::draw")
         CanvasText.num1 = 0
         CanvasText.num2 = 0
         posYGlobal = -dy
 
-        console.log("draw +++ CanvasText.globalPosY = $posYGlobal")
-
+        trace("clearRect")
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
 
+        trace("Draw all drawables")
         for (text in drawables) {
             posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
         }
-        console.log("draw text done $currentText")
 
         if (currentText != null) {
             if (currentLine == null) currentLine = currentText!!.lines.first()
 
             if (currentLine != null) {
+                trace("Draw caret")
                 val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
-                console.log("draw caret ${caretPosInLine + charOffset}")
-                console.log(currentText)
-                console.log(currentLine)
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
-                if (isDoubleClick && currentDoubleClick != null)
+                if (isDoubleClick && currentDoubleClick != null) {
+                    trace("Draw dblClick")
                     CanvasCaret.drawDblClick(
                         ctx,
                         currentText!!,
@@ -461,10 +450,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         currentDoubleClick!!.second,
                         currentDoubleClick!!.third
                     )
+                }
             }
         }
-
-        console.log("draw --- CanvasText.globalPosY = $posYGlobal $caretPosInCurrentText $charOffset")
         divHolder.style.height = "${posYGlobal + dy}px"
+        traceDeIndent("MainCanvas::draw")
     }
 }

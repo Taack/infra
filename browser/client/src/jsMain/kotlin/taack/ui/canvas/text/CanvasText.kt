@@ -1,5 +1,8 @@
 package taack.ui.canvas.text
 
+import taack.ui.base.Helper.Companion.trace
+import taack.ui.base.Helper.Companion.traceDeIndent
+import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
 import taack.ui.canvas.item.MenuEntry
 import web.canvas.CanvasRenderingContext2D
@@ -31,20 +34,24 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     var posXStart: Double = 0.0
 
     fun addChar(c: Char, p: Int) {
+        trace("CanvasText::addChar: $c, $p")
         txt = txt.substring(0, p) + c + txt.substring(p)
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {
+        trace("CanvasText::delChar: $p, $pEnd")
         txt = txt.substring(0, p) + txt.substring(p + (pEnd ?: 1))
         return txt.length
     }
 
     fun rmChar(p: Int): Int {
+        trace("CanvasText::rmChar: $p")
         txt = txt.substring(0, p - 1) + txt.substring(p)
         return txt.length
     }
 
     private fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
+        trace("CanvasText::addStyle: $style, $p, $pEnd")
         val newStyle = CanvasStyle(style, p, pEnd)
         if (styles.isEmpty())
             styles += CanvasStyle(CanvasStyle.Type.NORMAL, 0, txt.length)
@@ -76,6 +83,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     }
 
     fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
+        trace("CanvasText::measureText: $from, $to")
         if (styles.isEmpty()) {
             return ctx.measureText(txt.substring(from, to)).width
         } else {
@@ -105,7 +113,6 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
                 ctx.restore()
             }
 
-            console.log("measureText: $width, from: $from, to: $to, stylesInRangeIncluded: $stylesInRangeIncluded, stylesInRangeInclusive: $stylesInRangeInclusive, stylesInRangeLeft: $stylesInRangeLeft, stylesInRangeRight: $stylesInRangeRight")
             return width
         }
     }
@@ -115,6 +122,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     }
 
     fun initCtx(ctx: CanvasRenderingContext2D) {
+        //trace("CanvasText::initCtx")
         ctx.font = font()
         ctx.fillStyle = fillStyle
         ctx.letterSpacing = letterSpacing.toString() + "px"
@@ -122,6 +130,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     }
 
     private fun initCtx(ctx: CanvasRenderingContext2D, posN: Int) {
+        //trace("CanvasText::initCtx: $posN")
         if (styles.isNotEmpty()) {
             styles.find { it.posNStart <= posN && it.posNEnd >= posN }?.initCtx(ctx, this)
         } else {
@@ -135,16 +144,18 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
 
-     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
-         if (posX == null || posY == null || isClicked(posX, posY)) {
-             return this
-         }
-         return null
-     }
+    override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
+        trace("CanvasText::getSelectedText")
+        if (posX == null || posY == null || isClicked(posX, posY)) {
+            return this
+        }
+        return null
+    }
 
-     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
-         this.posXStart = posX
-         this.posXEnd = width.toDouble()
+    override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
+        traceIndent("CanvasText::draw: $posX, $posY, $width")
+        this.posXStart = posX
+        this.posXEnd = width
         ctx.save()
         initCtx(ctx)
         txtPrefix = computeNum()
@@ -204,6 +215,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         val ret = posY + totalHeight
         globalPosYEnd = ret
         ctx.restore()
+        traceDeIndent("CanvasText::draw: $globalPosYEnd")
         return ret
     }
 
@@ -220,21 +232,15 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     }
 
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {
+        traceIndent("CanvasText::click: $posX, $posY")
         for (line in lines) {
-            console.log("CanvaText::click line: $line")
             if (posY in line.textY - line.height..line.textY) {
                 val caretPosInCurrentText = line.caretNCoords(ctx, this, posX)
-                console.log(
-                    "CanvaText::click find text line ... at (${posY}, ${posY})(${line.textY + line.height}) = ${
-                        txt.substring(
-                            line.posBegin, caretPosInCurrentText
-
-                        )
-                    }"
-                )
+                traceDeIndent("CanvasText::click: $line, $caretPosInCurrentText")
                 return Pair(line, caretPosInCurrentText)
             }
         }
+        traceDeIndent("CanvasText::click: null")
         return null
     }
 
@@ -243,6 +249,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         posX: Double,
         posY: Double
     ): Triple<CanvasLine, Int, Int>? {
+        traceIndent("CanvasText::doubleClick: $posX, $posY")
         for (line in lines) {
             if (posY in line.textY - line.height..line.textY) {
                 val caretPosInCurrentText = line.caretNCoords(ctx, this, posX)
@@ -256,20 +263,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
                     charSelectEndNInText = line.posEnd
                 }
                 charSelectEndNInText += caretPosInCurrentText + 1
-                console.log(
-                    "click find text line ... at (${posX}, ${posY})(${line.textY + line.height}) = ${
-                        txt.substring(
-                            line.posBegin, caretPosInCurrentText
-                        )
-                    }"
-                )
-                console.log(
-                    "double click find text line ... at (${charSelectStartNInText}, ${charSelectEndNInText}) = ${
-                        txt.substring(
-                            charSelectStartNInText, charSelectEndNInText
-                        )
-                    }"
-                )
+                traceDeIndent("CanvasText::doubleClick: $line, $charSelectStartNInText, $charSelectEndNInText")
                 return Triple(
                     line,
                     charSelectStartNInText,
@@ -277,10 +271,12 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
                 )
             }
         }
+        traceDeIndent("CanvasText::doubleClick: null")
         return null
     }
 
     override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
+        trace("CanvasText::getContextualMenuEntries")
         val charSelectStartNInText = dblClick.second
         val charSelectEndNInText = dblClick.third
         return listOf(
@@ -316,7 +312,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     }
 
     override fun toString(): String {
-        return "CanvasText(posX=$posXStart, width=$posXEnd, globalPosYStart=$globalPosYStart, globalPosYEnd=$globalPosYEnd)"
+        return "CanvasText(posXStart=$posXStart, posXEnd=$posXEnd, globalPosYStart=$globalPosYStart, globalPosYEnd=$globalPosYEnd, lines.size=${lines.size})"
     }
 
 }

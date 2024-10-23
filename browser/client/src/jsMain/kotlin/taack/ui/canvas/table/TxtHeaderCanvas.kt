@@ -1,5 +1,6 @@
 package taack.ui.canvas.table
 
+import taack.ui.base.Helper.Companion.trace
 import taack.ui.canvas.text.CanvasText
 
 class TxtHeaderCanvas(txt: String) : CanvasText(txt) {
@@ -27,7 +28,8 @@ class TxtHeaderCanvas(txt: String) : CanvasText(txt) {
     }
 
     override fun isClicked(posX: Double, posY: Double): Boolean {
-        if (super.isClicked(posX, posY)) return posX in this.posXStart..this.posXEnd.toDouble()
+        trace("TxtHeaderCanvas.isClicked($posX, $posY)")
+        if (super.isClicked(posX, posY)) return posX in this.posXStart..this.posXEnd
         return false
     }
 }
