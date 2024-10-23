@@ -52,17 +52,23 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
                     width.toDouble() / columns,
                     30.0
                 )
-                ctx.save()
-                ctx.fillStyle = "#11111111"
-                ctx.strokeRect(
-                    10.0 + (i % columns).toDouble() * width / columns,
-                    y + (i / columns) * 30.0,
-                    width.toDouble() / columns,
-                    30.0
-                )
-                ctx.restore()
-                rows[i].draw(ctx, (i % columns + 1) * width / columns, y + (i / columns) * 30.0, 20.0 + (i % columns).toDouble() * width / columns)
             }
+            ctx.save()
+            ctx.fillStyle = "#11111111"
+            ctx.strokeRect(
+                10.0 + (i % columns).toDouble() * width / columns,
+                y + (i / columns) * 30.0,
+                width.toDouble() / columns,
+                30.0
+            )
+            ctx.restore()
+            rows[i].draw(
+                ctx,
+                (i % columns + 1) * width / columns,
+                y + (i / columns) * 30.0,
+                20.0 + (i % columns).toDouble() * width / columns
+            )
+
         }
         ctx.restore()
         globalPosYEnd = y + (1 + (rows).size / columns) * 30.0

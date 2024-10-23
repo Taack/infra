@@ -252,6 +252,9 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
                 charSelectStartNInText += line.posBegin
                 var charSelectEndNInText =
                     txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
+                if (charSelectEndNInText == -1) {
+                    charSelectEndNInText = line.posEnd
+                }
                 charSelectEndNInText += caretPosInCurrentText + 1
                 console.log(
                     "click find text line ... at (${posX}, ${posY})(${line.textY + line.height}) = ${
