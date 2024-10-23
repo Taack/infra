@@ -14,6 +14,6 @@ interface ICanvasDrawable: ICanvasSelectable {
 
     fun getSelectedText(posX: Double? = null, posY: Double? = null): CanvasText?
 
-    fun draw(ctx: CanvasRenderingContext2D, width: Int, posY: Double): Double
+    fun draw(ctx: CanvasRenderingContext2D, width: Int, posY: Double, posX: Double): Double
 
 }

@@ -25,8 +25,10 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     abstract val marginBottom: Double
 
     var txtPrefix = ""
-    var styles: List<CanvasStyle> = emptyList()
+    private var styles: List<CanvasStyle> = emptyList()
     var lines: List<CanvasLine> = emptyList()
+    var posXEnd: Double = 0.0
+    var posXStart: Double = 0.0
 
     fun addChar(c: Char, p: Int) {
         txt = txt.substring(0, p) + c + txt.substring(p)
@@ -42,7 +44,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         return txt.length
     }
 
-    fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
+    private fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
         val newStyle = CanvasStyle(style, p, pEnd)
         if (styles.isEmpty())
             styles += CanvasStyle(CanvasStyle.Type.NORMAL, 0, txt.length)
@@ -140,7 +142,9 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
          return null
      }
 
-     override fun draw(ctx: CanvasRenderingContext2D, width: Int, posY: Double): Double {
+     override fun draw(ctx: CanvasRenderingContext2D, width: Int, posY: Double, posX: Double): Double {
+         this.posXStart = posX
+         this.posXEnd = width.toDouble()
         ctx.save()
         initCtx(ctx)
         txtPrefix = computeNum()
@@ -149,7 +153,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         val height = txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent//lineHeight
         globalPosYStart = posY
         val listTxt = tmpTxt.split(" ")
-        var pX = 10.0
+        var pX = posX
         var pY = marginTop + height
         totalHeight = pY
         var currentLetterPos = 0
@@ -162,13 +166,13 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
             ctx.save()
             initCtx(ctx, currentLetterPos)
             if (pX + ctx.measureText(t).width >= width) {
-                pX = 10.0 + ctx.measureText(txtPrefix).width
+                pX = posX + ctx.measureText(txtPrefix).width
                 lines += CanvasLine(
                     posLetterLineBegin,
                     posLetterLineEnd,
                     posY + totalHeight,
                     height,
-                    10.0 + ctx.measureText(txtPrefix).width
+                    posX + ctx.measureText(txtPrefix).width
                 )
                 pY += height
                 totalHeight = pY
@@ -186,7 +190,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
                 txt.length,
                 posY + totalHeight,
                 height,
-                10.0 + ctx.measureText(txtPrefix).width
+                posX + ctx.measureText(txtPrefix).width
             )
         }
         lines.forEach { l ->
@@ -277,35 +281,39 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         val charSelectStartNInText = dblClick.second
         val charSelectEndNInText = dblClick.third
         return listOf(
-            MenuEntry("NORMAL", {
+            MenuEntry("NORMAL") {
                 this.addStyle(
                     CanvasStyle.Type.NORMAL,
                     charSelectStartNInText,
                     charSelectEndNInText
                 )
-            }),
-            MenuEntry("BOLD", {
+            },
+            MenuEntry("BOLD") {
                 this.addStyle(
                     CanvasStyle.Type.BOLD,
                     charSelectStartNInText,
                     charSelectEndNInText
                 )
-            }),
-            MenuEntry("MONOSPACED", {
+            },
+            MenuEntry("MONOSPACED") {
                 this.addStyle(
                     CanvasStyle.Type.MONOSPACED,
                     charSelectStartNInText,
                     charSelectEndNInText
                 )
-            }),
-            MenuEntry("BOLD + MONOSPACED", {
+            },
+            MenuEntry("BOLD + MONOSPACED") {
                 this.addStyle(
                     CanvasStyle.Type.BOLD_MONOSPACED,
                     charSelectStartNInText,
                     charSelectEndNInText
                 )
-            })
+            }
         )
+    }
+
+    override fun toString(): String {
+        return "CanvasText(posX=$posXStart, width=$posXEnd, globalPosYStart=$globalPosYStart, globalPosYEnd=$globalPosYEnd)"
     }
 
 }

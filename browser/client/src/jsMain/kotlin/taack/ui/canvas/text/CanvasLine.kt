@@ -26,7 +26,7 @@ class CanvasLine(
                 posXStart += w
             }
         } else {
-            ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (posBegin > 0) leftMargin else 10.0, textY)
+            ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 10.0, textY)
         }
     }
 

@@ -4,13 +4,13 @@ import taack.ui.canvas.text.CanvasText
 
 class TxtHeaderCanvas(txt: String) : CanvasText(txt) {
     override val fontWeight: String
-        get() = "normal"
+        get() = "bold"
     override val fontSize: String
         get() = "17px"
     override val fontFace: String
         get() = "sans-serif"
     override val fillStyle: String
-        get() = "#555"
+        get() = "#fff"
     override val letterSpacing: Double
         get() = -0.17
     override val lineHeight: Double
@@ -26,4 +26,8 @@ class TxtHeaderCanvas(txt: String) : CanvasText(txt) {
         return ""
     }
 
+    override fun isClicked(posX: Double, posY: Double): Boolean {
+        if (super.isClicked(posX, posY)) return posX in this.posXStart..this.posXEnd.toDouble()
+        return false
+    }
 }
