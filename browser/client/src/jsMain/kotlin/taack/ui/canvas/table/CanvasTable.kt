@@ -23,7 +23,7 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
 
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
-    override fun getSelectedText(posX: Double, posY: Double): CanvasText? {
+    override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
         TODO("Not yet implemented")
     }
 

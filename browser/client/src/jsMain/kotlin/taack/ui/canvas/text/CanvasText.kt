@@ -133,8 +133,8 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
 
-     override fun getSelectedText(posX: Double, posY: Double): CanvasText? {
-         if (isClicked(posX, posY)) {
+     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
+         if (posX == null || posY == null || isClicked(posX, posY)) {
              return this
          }
          return null
@@ -193,7 +193,6 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
             val stylesInLine = styles.filter { s ->
                 s.posNStart >= l.posBegin && s.posNEnd <= l.posEnd || s.posNStart <= l.posBegin && s.posNEnd >= l.posBegin || s.posNStart >= l.posBegin && s.posNEnd >= l.posEnd
             }
-            console.log("line: $l, stylesInLine: $stylesInLine")
             l.drawLine(ctx, this, stylesInLine)
         }
 
@@ -218,10 +217,11 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
 
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {
         for (line in lines) {
-            if (posX in line.textY - line.height..line.textY) {
+            console.log("CanvaText::click line: $line")
+            if (posY in line.textY - line.height..line.textY) {
                 val caretPosInCurrentText = line.caretNCoords(ctx, this, posX)
                 console.log(
-                    "find text line ... at (${posY}, ${posY})(${line.textY + line.height}) = ${
+                    "CanvaText::click find text line ... at (${posY}, ${posY})(${line.textY + line.height}) = ${
                         txt.substring(
                             line.posBegin, caretPosInCurrentText
 

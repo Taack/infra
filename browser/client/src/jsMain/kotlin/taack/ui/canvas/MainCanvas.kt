@@ -23,14 +23,18 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.getContext(CanvasRenderingContext2D.ID) as CanvasRenderingContext2D
     private val texts: List<CanvasText>
         get() = drawables.mapNotNull { it.getSelectedText(0.0, 0.0) }.toMutableList()
-    private var currentLine: CanvasLine? = null
+    private var currentLine: CanvasLine?
+        get() = currentClick?.first
+        set(value) = run { currentClick = currentClick?.copy(first = value!!) }
     private val drawables = mutableListOf<ICanvasDrawable>()
     private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dy: Double = 0.0
-    private var caretPosInCurrentText: Int = 0
+    private var caretPosInCurrentText: Int
+        get() = currentClick?.second ?: 0
+        set(value) = run { currentClick = currentClick?.copy(second = value) }
     private var currentDrawable: ICanvasDrawable? = null
     private val currentText: CanvasText?
-        get() = currentDrawable?.getSelectedText(currentMouseEvent?.offsetX ?: 0.0, currentMouseEvent?.offsetY ?: 0.0)
+        get() = currentDrawable?.getSelectedText()
     private var currentClick: Pair<CanvasLine, Int>? = null
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
     private var currentMouseEvent: MouseEvent? = null
@@ -39,8 +43,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var wordOffset: Int = 0
     private var lineOffset: Int = 0
     private var isDoubleClick: Boolean = false
-    private var charSelectStartNInText: Int = 0
-    private var charSelectEndNInText: Int = 0
+    private var charSelectStartNInText: Int?
+        get() = currentDoubleClick?.second
+        set(value) = run { currentDoubleClick = currentDoubleClick?.copy(second = value!!) }
+    private var charSelectEndNInText: Int?
+        get() = currentDoubleClick?.third
+        set(value) = run { currentDoubleClick = currentDoubleClick?.copy(third = value!!) }
     private var currentMenuEntries: List<MenuEntry>? = null
     private var menu: Menu? = null
     private var posYGlobal: Double = 0.0
@@ -62,8 +70,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     var pos1 = caretPosInCurrentText + charOffset
                     var pos2: Int? = null
                     if (isDoubleClick && currentKeyboardEvent!!.ctrlKey) {
-                        pos1 = charSelectStartNInText
-                        pos2 = charSelectEndNInText - charSelectStartNInText
+                        pos1 = charSelectStartNInText!!
+                        pos2 = charSelectEndNInText!! - charSelectStartNInText!!
                         isDoubleClick = false
                         println("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
                     }
@@ -147,11 +155,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
                 "ArrowRight" -> {
                     if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
-                        val decay = currentText!!.txt.substring(charSelectEndNInText + 1).indexOf(' ') + 1
+                        val decay = currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOf(' ') + 1
                         if (decay == 0) {
                             charSelectEndNInText = currentText!!.txt.length
                         }
-                        charSelectEndNInText += decay
+                        charSelectEndNInText = charSelectEndNInText?.plus(decay)
                     } else {
                         charOffset++
                     }
@@ -278,9 +286,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
     private fun addDrawable(drawable: ICanvasDrawable) {
         drawables.add(drawable)
-        if (drawable is CanvasText) {
-            drawables.add(drawable)
-        }
     }
 
     private fun logMouseEvent(ev: MouseEvent) {
@@ -337,7 +342,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 menu!!.onClick(event.offsetX, event.offsetY)
                 menu = null
             } else {
-
                 charOffset = 0
                 isDoubleClick = false
                 if (event.detail == 3) {
@@ -355,6 +359,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         currentDrawable = d
                         val text = d.getSelectedText(event.offsetX, event.offsetY)!!
                         currentClick = text.click(ctx, event.offsetX, event.offsetY)
+                        console.log(currentClick)
+                        currentMenuEntries = text.getContextualMenuEntries(currentDoubleClick!!)
                     }
                 }
             }
@@ -482,8 +488,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     currentText!!,
                     currentLine!!,
                     caretPosInLine + charOffset,
-                    charSelectStartNInText,
-                    charSelectEndNInText
+                    charSelectStartNInText!!,
+                    charSelectEndNInText!!
                 )
         }
 
