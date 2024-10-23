@@ -19,6 +19,7 @@ import web.uievents.MouseEvent
 
 class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
+    private val canvasInnerBorder = 10.0
     private val ctx: CanvasRenderingContext2D =
         canvas.getContext(CanvasRenderingContext2D.ID) as CanvasRenderingContext2D
     private val texts: List<CanvasText>
@@ -438,7 +439,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
 
         for (text in drawables) {
-            posYGlobal = text.draw(ctx, canvas.width, posYGlobal, 10.0)
+            posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
         }
         console.log("draw text done $currentText")
 

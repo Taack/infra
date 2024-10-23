@@ -37,7 +37,7 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
         return null
     }
 
-    override fun draw(ctx: CanvasRenderingContext2D, width: Int, posY: Double, posX: Double): Double {
+    override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
         ctx.save()
         globalPosYStart = posY
         val y = posY + 10.0
@@ -49,7 +49,7 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
                 ctx.fillRect(
                     10.0 + (i % columns).toDouble() * width / columns,
                     y + (i / columns) * 30.0,
-                    width.toDouble() / columns,
+                    width / columns,
                     30.0
                 )
             }
@@ -58,7 +58,7 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
             ctx.strokeRect(
                 10.0 + (i % columns).toDouble() * width / columns,
                 y + (i / columns) * 30.0,
-                width.toDouble() / columns,
+                width / columns,
                 30.0
             )
             ctx.restore()

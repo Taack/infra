@@ -142,7 +142,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
          return null
      }
 
-     override fun draw(ctx: CanvasRenderingContext2D, width: Int, posY: Double, posX: Double): Double {
+     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
          this.posXStart = posX
          this.posXEnd = width.toDouble()
         ctx.save()
