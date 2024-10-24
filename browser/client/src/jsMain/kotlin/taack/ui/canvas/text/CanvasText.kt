@@ -10,7 +10,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
+abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -152,10 +152,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
         trace("CanvasText::getSelectedText")
-        if (posX == null || posY == null || isClicked(posX, posY)) {
-            return this
-        }
-        return null
+        return this
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {

@@ -47,7 +47,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var currentKeyboardEvent: KeyboardEvent? = null
     private var charOffset: Int = 0
     private var wordOffset: Int = 0
-    private var lineOffset: Int = 0
     private var isDoubleClick: Boolean = false
     private var charSelectStartNInText: Int?
         get() = currentDoubleClick?.second
@@ -69,7 +68,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 text.txt = currentText!!.txt
                 drawables.add(i, text)
                 currentDrawable = text
-                currentClick = null
+                currentLine = null
             }
         }
 
@@ -107,22 +106,20 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     when (currentText) {
                         is H2Canvas -> {
                             currentDrawable = H3Canvas()
-                            drawables.add(i, currentText as H3Canvas)
+                            drawables.add(i, currentDrawable as H3Canvas)
                         }
 
                         is H3Canvas -> {
                             currentDrawable = H4Canvas()
-                            drawables.add(i, currentText as H4Canvas)
+                            drawables.add(i, currentDrawable as H4Canvas)
                         }
 
                         else -> {
                             currentDrawable = PCanvas()
-                            drawables.add(i, currentText as PCanvas)
+                            drawables.add(i, currentDrawable as PCanvas)
                         }
                     }
                     currentLine = null
-                    caretPosInCurrentText = 0
-                    charOffset = 0
                 }
 
                 "ArrowUp" -> {
@@ -433,11 +430,17 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
         }
 
+        trace("currentText == $currentText")
         if (currentText != null) {
-            if (currentLine == null) currentLine = currentText!!.lines.first()
+            if (currentLine == null) {
+                trace("Draw caret currentLine == null")
+                currentLine = currentText!!.lines.first()
+                caretPosInCurrentText = currentLine!!.posEnd
+                charOffset = 0
+            }
 
             if (currentLine != null) {
-                trace("Draw caret")
+                trace("Draw caret currentLine != null")
                 val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
                 if (isDoubleClick && currentDoubleClick != null) {
