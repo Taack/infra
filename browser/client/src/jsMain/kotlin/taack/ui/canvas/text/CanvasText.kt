@@ -152,6 +152,9 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         return null
     }
 
+    /**
+     *
+     */
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
         traceIndent("CanvasText::draw: $posX, $posY, $width")
         this.posXStart = posX
@@ -160,8 +163,8 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         initCtx(ctx)
         txtPrefix = computeNum()
         val tmpTxt = txtPrefix + txt
-        val txtMetrics = ctx.measureText(tmpTxt.ifEmpty { "|" })
-        val height = txtMetrics.actualBoundingBoxAscent + txtMetrics.actualBoundingBoxDescent//lineHeight
+        //val txtMetrics = ctx.measureText(tmpTxt.ifEmpty { "|" })
+        val height = lineHeight//txtMetrics.actualBoundingBoxAscent// + txtMetrics.actualBoundingBoxDescent//lineHeight
         globalPosYStart = posY
         val listTxt = tmpTxt.split(" ")
         var pX = posX
@@ -174,23 +177,24 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         for (i in listTxt.indices) {
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
             currentLetterPos += t.length
+            val tWidth = measureText(ctx, posLetterLineEnd, currentLetterPos)
             ctx.save()
             initCtx(ctx, currentLetterPos)
-            if (pX + ctx.measureText(t).width >= width) {
+            if (pX + ctx.measureText(txtPrefix).width + tWidth >= width - 30.0) {
                 pX = posX + ctx.measureText(txtPrefix).width
                 lines += CanvasLine(
                     posLetterLineBegin,
                     posLetterLineEnd,
                     posY + totalHeight,
                     height,
-                    posX + ctx.measureText(txtPrefix).width
+                    pX
                 )
                 pY += height
                 totalHeight = pY
                 posLetterLineBegin = posLetterLineEnd
             }
             posLetterLineEnd = currentLetterPos
-            pX += ctx.measureText(t).width
+            pX += tWidth
             ctx.restore()
         }
 

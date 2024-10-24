@@ -15,8 +15,6 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
         BOLD_MONOSPACED,
     }
 
-    var posXStart: Double = 0.0
-
     fun initCtx(ctx: CanvasRenderingContext2D, text: CanvasText) {
         traceIndent("CanvasStyle::initCtx: $this")
         text.initCtx(ctx)
@@ -39,11 +37,11 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
 
     fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, posXStart: Double): Double {
         traceIndent("CanvasStyle::draw: $this")
+        if (posNStart == 0) ctx.fillText(text.txtPrefix, text.posXStart, line.textY)
         ctx.save()
         initCtx(ctx, text)
         val txt = text.txt.substring(max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
-        ctx.fillText((if (posNStart == 0) text.txtPrefix else "") + txt, (if (posNStart > 0) line.leftMargin else 10.0) + posXStart, line.textY)
-        this.posXStart = posXStart
+        ctx.fillText(txt, line.leftMargin + posXStart, line.textY)
         val width = text.measureText(ctx,  max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
         console.log("CanvasStyle::draw width: $width from: ${max(posNStart, line.posBegin)}, to: ${min(posNEnd, line.posEnd)}")
         ctx.restore()
@@ -52,6 +50,6 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
     }
 
     override fun toString(): String {
-        return "CanvasStyle(type=$type, posNStart=$posNStart, posNEnd=$posNEnd, posXStart=$posXStart)"
+        return "CanvasStyle(type=$type, posNStart=$posNStart, posNEnd=$posNEnd)"
     }
 }

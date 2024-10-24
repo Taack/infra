@@ -15,7 +15,7 @@ class TxtRowCanvas(txt: String) : CanvasText(txt) {
     override val letterSpacing: Double
         get() = -0.17
     override val lineHeight: Double
-        get() = 27.2
+        get() = 10.0
     override val wordSpacing: Double
         get() = -0.05
     override val marginTop: Double
