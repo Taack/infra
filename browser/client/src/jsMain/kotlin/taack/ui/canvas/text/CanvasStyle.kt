@@ -1,5 +1,6 @@
 package taack.ui.canvas.text
 
+import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import web.canvas.CanvasRenderingContext2D
@@ -16,7 +17,7 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
     }
 
     fun initCtx(ctx: CanvasRenderingContext2D, text: CanvasText) {
-        traceIndent("CanvasStyle::initCtx: $this")
+        trace("CanvasStyle::initCtx: $this")
         text.initCtx(ctx)
         ctx.font = when(this.type) {
             Type.NORMAL -> {
@@ -32,7 +33,6 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
                 "bold ${text.fontSize} monospace"
             }
         }
-        traceDeIndent("CanvasStyle::initCtx: $this")
     }
 
     fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, posXStart: Double): Double {

@@ -51,7 +51,7 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
     }
 
     private fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
-        trace("CanvasText::addStyle: $style, $p, $pEnd")
+        traceIndent("CanvasText::addStyle: $style, $p, $pEnd")
         val newStyle = CanvasStyle(style, p, pEnd)
         if (styles.isEmpty())
             styles += CanvasStyle(CanvasStyle.Type.NORMAL, 0, txt.length)
@@ -64,26 +64,32 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         if (toSplit != null) {
             styles += CanvasStyle(toSplit.type, pEnd, toSplit.posNEnd)
             toSplit.posNEnd = p
-
         }
+        trace("toSplit: $toSplit")
+
         val changePosNStart = styles.filter {
             it.posNStart in p..pEnd
         }
+        trace("changePosNStart: $changePosNStart")
+
         changePosNStart.forEach {
             it.posNStart = pEnd
         }
         val changePosNEnd = styles.filter {
-            it.posNStart >= p && it.posNEnd >= p && it.posNEnd <= pEnd
+            it.posNEnd in p..pEnd
         }
         changePosNEnd.forEach {
             it.posNEnd = p
         }
+        trace("changePosNEnd: $changePosNEnd")
+
         styles += newStyle
         styles = styles.sortedBy { it.posNStart }
+        traceDeIndent("CanvasText::addStyle: $styles")
     }
 
     fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
-        trace("CanvasText::measureText: $from, $to")
+//        trace("CanvasText::measureText: $from, $to")
         if (styles.isEmpty()) {
             return ctx.measureText(txt.substring(from, to)).width
         } else {
@@ -152,9 +158,6 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
         return null
     }
 
-    /**
-     *
-     */
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
         traceIndent("CanvasText::draw: $posX, $posY, $width")
         this.posXStart = posX
@@ -265,9 +268,9 @@ abstract class CanvasText(var txt: String = "") : ICanvasDrawable {
                     txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
                 if (charSelectEndNInText == -1) {
                     charSelectEndNInText = line.posEnd
-                }
-                charSelectEndNInText += caretPosInCurrentText + 1
-                traceDeIndent("CanvasText::doubleClick: $line, $charSelectStartNInText, $charSelectEndNInText")
+                } else
+                    charSelectEndNInText += caretPosInCurrentText + 1
+                traceDeIndent("CanvasText::doubleClick1: $line, $charSelectStartNInText, $charSelectEndNInText")
                 return Triple(
                     line,
                     charSelectStartNInText,

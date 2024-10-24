@@ -106,7 +106,7 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
     }
 
     override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
-        traceIndent("CanvasTable::getContextualMenuEntries: $dblClick")
+        trace("CanvasTable::getContextualMenuEntries: $dblClick")
         return currentRow?.getContextualMenuEntries(dblClick) ?: emptyList()
     }
 
