@@ -93,10 +93,13 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         pos1 = charSelectStartNInText!!
                         pos2 = charSelectEndNInText!! - charSelectStartNInText!!
                         isDoubleClick = false
-                        println("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
+                        trace("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
                     }
                     if (currentText?.delChar(pos1, pos2) == 0) {
+                        val i = drawables.indexOf(currentText!!)
                         drawables.remove(currentText!!)
+                        currentDrawable = drawables.getOrNull(i)
+                        currentLine = null
                     }
                 }
 

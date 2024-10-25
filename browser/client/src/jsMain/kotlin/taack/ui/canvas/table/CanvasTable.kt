@@ -26,7 +26,7 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
         return this
     }
 
-    override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
+    override fun getSelectedText(posX: Double?, posY: Double?): CanvasText {
         trace("CanvasTable::getSelectedText")
         if (posX == null || posY == null) {
             return this.rows.first()
@@ -37,7 +37,11 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
                 return r
             }
         }
-        return null
+        currentRow = rows.last()
+        if (posY < currentRow!!.globalPosYEnd) {
+            currentRow = rows.first()
+        }
+        return currentRow!!
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {

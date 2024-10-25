@@ -245,7 +245,10 @@ abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
             }
         }
         traceDeIndent("CanvasText::click: null")
-        return null
+        if (posY < lines.last().textY) {
+            return Pair(lines.first(), 0)
+        }
+        return Pair(lines.last(), txt.length)
     }
 
     override fun doubleClick(
