@@ -57,6 +57,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var currentMenuEntries: List<MenuEntry>? = null
     private var menu: Menu? = null
     private var posYGlobal: Double = 0.0
+    private var recomputeCurrentLineAfterDraw = false
 
 
     private fun changeTextCanvasStyle(text: CanvasText) {
@@ -270,8 +271,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
                 else -> {
                     trace("MainCanvas::addDrawable else branch")
-                    if (currentKeyboardEvent != null)
+                    if (currentKeyboardEvent != null) {
                         currentText?.addChar(currentKeyboardEvent!!.key[0], caretPosInCurrentText + charOffset++)
+                        recomputeCurrentLineAfterDraw = true
+                    }
                 }
             }
 
@@ -459,10 +462,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 currentLine = currentText!!.lines.first()
                 caretPosInCurrentText = currentLine!!.posEnd
                 charOffset = 0
-            } else if (charOffset + currentClick!!.second > currentLine!!.posEnd) {
-//                currentLine = currentText!!.lines.find { it.posBegin == currentLine!!.posBegin }
+            } else if (recomputeCurrentLineAfterDraw) {
                 trace("Draw caret2 currentLine == ${currentLine}, caretPosInCurrentText == $caretPosInCurrentText, charOffset == $charOffset")
-                currentLine = currentText!!.lines.find { it.posBegin <= charOffset + currentClick!!.second && it.posEnd > charOffset + currentClick!!.second }
+                currentLine = currentText!!.lines.find { it.posBegin <= charOffset + currentClick!!.second && it.posEnd >= charOffset + currentClick!!.second }
             }
 
             if (currentLine != null) {
