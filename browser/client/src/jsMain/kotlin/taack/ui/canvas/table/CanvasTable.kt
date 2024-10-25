@@ -173,7 +173,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
             if (rows[i] == currentText) {
                 rows.removeAt(i)
                 columns -= 1
-                for (j in ((columns + i)  until rows.size step columns)) {
+                for (j in ((columns + i)  until rows.size -i step columns)) {
                     rows.removeAt(j)
                 }
                 break

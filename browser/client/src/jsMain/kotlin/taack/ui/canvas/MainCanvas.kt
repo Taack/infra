@@ -112,7 +112,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 "Enter" -> {
                     trace("MainCanvas::addDrawable press Enter")
                     val i = drawables.indexOf(currentText!!) + 1
-                    if (currentKeyboardEvent!!.ctrlKey) {
+                    if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
                         currentDrawable = CanvasTable.createTable()
                         drawables.add(i, currentDrawable as CanvasTable)
                     } else
