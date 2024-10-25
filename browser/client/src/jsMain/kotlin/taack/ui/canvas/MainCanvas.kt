@@ -455,14 +455,18 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         trace("currentText == $currentText")
         if (currentText != null) {
             if (currentLine == null) {
-                trace("Draw caret currentLine == null")
+                trace("Draw caret1 currentLine == null")
                 currentLine = currentText!!.lines.first()
                 caretPosInCurrentText = currentLine!!.posEnd
                 charOffset = 0
+            } else if (charOffset + currentClick!!.second > currentLine!!.posEnd) {
+//                currentLine = currentText!!.lines.find { it.posBegin == currentLine!!.posBegin }
+                trace("Draw caret2 currentLine == ${currentLine}, caretPosInCurrentText == $caretPosInCurrentText, charOffset == $charOffset")
+                currentLine = currentText!!.lines.find { it.posBegin <= charOffset + currentClick!!.second && it.posEnd > charOffset + currentClick!!.second }
             }
 
             if (currentLine != null) {
-                trace("Draw caret currentLine != null")
+                trace("Draw caret currentLine != null ")
                 val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
                 if (isDoubleClick && currentDoubleClick != null) {

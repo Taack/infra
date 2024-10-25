@@ -96,7 +96,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
             y += hMax
         }
         ctx.restore()
-        globalPosYEnd = y + (1 + (rows).size / columns) * 30.0
+        globalPosYEnd = y
         traceDeIndent("CanvasTable::draw: $globalPosYEnd")
         return globalPosYEnd
     }

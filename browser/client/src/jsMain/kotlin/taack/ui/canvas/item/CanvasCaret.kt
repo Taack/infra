@@ -6,6 +6,7 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
+import kotlin.math.min
 
 class CanvasCaret {
 
@@ -16,11 +17,12 @@ class CanvasCaret {
         private val width: Double = 5.0
 
         fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int) {
-            traceIndent("CanvasCaret::draw: $n")
+            traceIndent("CanvasCaret::draw: $n line.posEnd: ${line.posEnd}")
             posY = line.textY
             ctx.save()
             text.initCtx(ctx)
-            posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin
+//            posX = text.measureText(ctx, line.posBegin, min(line.posBegin + n, line.posEnd)) + line.leftMargin
+            posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin
             ctx.restore()
             draw(ctx, posX, posY)
             traceDeIndent("CanvasCaret::draw: $n")

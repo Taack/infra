@@ -11,7 +11,7 @@ class TxtHeaderCanvas(txt: String) : CanvasText(txt) {
     override val fontFace: String
         get() = "sans-serif"
     override val fillStyle: String
-        get() = "#fff"
+        get() = "#0000ff"
     override val letterSpacing: Double
         get() = -0.17
     override val lineHeight: Double
