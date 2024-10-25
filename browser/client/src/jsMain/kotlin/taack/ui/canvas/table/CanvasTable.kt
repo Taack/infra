@@ -135,7 +135,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
         for (i in (rows.indices)) {
             if (rows[i] == currentText) {
                 for (j in (0 until columns)) {
-                    rows.add((i - (i%columns) + columns), TxtRowCanvas(">"))
+                    rows.add((i - (i % columns) + columns), TxtRowCanvas(">"))
                 }
                 break
             }
@@ -143,11 +143,11 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
     }
 
     fun removeLine(currentText: TxtRowCanvas) {
-        if (rows.size <= 2*columns) return
+        if (rows.size <= 2 * columns) return
         for (i in (rows.indices)) {
             if (rows[i] == currentText) {
                 for (j in (0 until columns)) {
-                    rows.removeAt(i - (i%columns) + columns)
+                    rows.removeAt(i - (i % columns) + columns)
                 }
                 break
             }
@@ -159,7 +159,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
             if (rows[i] == currentText) {
                 rows.add(i + 1, TxtHeaderCanvas(">"))
                 columns += 1
-                for (j in ((columns + i + 1)  until rows.size step columns)) {
+                for (j in ((columns + i + 1) until rows.size step columns)) {
                     rows.add(j, TxtRowCanvas(">"))
                 }
                 break
@@ -173,8 +173,10 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
             if (rows[i] == currentText) {
                 rows.removeAt(i)
                 columns -= 1
-                for (j in ((columns + i)  until rows.size -i step columns)) {
-                    rows.removeAt(j)
+                var n = 0
+                for (j in ((columns + i) until (rows.size) step columns)) {
+                    trace("CanvasTable::removeColumn: $j, on ${rows.size}")
+                    rows.removeAt(j - n++)
                 }
                 break
             }
