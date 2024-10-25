@@ -87,41 +87,65 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
                 "Delete" -> {
                     trace("MainCanvas::addDrawable press Delete")
-                    var pos1 = caretPosInCurrentText + charOffset
-                    var pos2: Int? = null
-                    if (isDoubleClick && currentKeyboardEvent!!.ctrlKey) {
-                        pos1 = charSelectStartNInText!!
-                        pos2 = charSelectEndNInText!! - charSelectStartNInText!!
-                        isDoubleClick = false
-                        trace("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
-                    }
-                    if (currentText?.delChar(pos1, pos2) == 0) {
-                        val i = drawables.indexOf(currentText!!)
-                        drawables.remove(currentText!!)
+                    if (currentKeyboardEvent!!.ctrlKey) {
+                        val i = drawables.indexOf(currentDrawable!!)
+                        drawables.remove(currentDrawable!!)
                         currentDrawable = drawables.getOrNull(i)
-                        currentLine = null
+                    } else {
+                        var pos1 = caretPosInCurrentText + charOffset
+                        var pos2: Int? = null
+                        if (isDoubleClick && currentKeyboardEvent!!.ctrlKey) {
+                            pos1 = charSelectStartNInText!!
+                            pos2 = charSelectEndNInText!! - charSelectStartNInText!!
+                            isDoubleClick = false
+                            trace("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
+                        }
+                        if (currentText?.delChar(pos1, pos2) == 0) {
+                            val i = drawables.indexOf(currentText!!)
+                            drawables.remove(currentText!!)
+                            currentDrawable = drawables.getOrNull(i)
+                            currentLine = null
+                        }
                     }
                 }
 
                 "Enter" -> {
                     trace("MainCanvas::addDrawable press Enter")
                     val i = drawables.indexOf(currentText!!) + 1
-                    when (currentText) {
-                        is H2Canvas -> {
-                            currentDrawable = H3Canvas()
-                            drawables.add(i, currentDrawable as H3Canvas)
-                        }
+                    if (currentKeyboardEvent!!.ctrlKey) {
+                        currentDrawable = CanvasTable.createTable()
+                        drawables.add(i, currentDrawable as CanvasTable)
+                    } else
+                        when (currentText) {
+                            is H2Canvas -> {
+                                currentDrawable = H3Canvas()
+                                drawables.add(i, currentDrawable as H3Canvas)
+                            }
 
-                        is H3Canvas -> {
-                            currentDrawable = H4Canvas()
-                            drawables.add(i, currentDrawable as H4Canvas)
-                        }
+                            is H3Canvas -> {
+                                currentDrawable = H4Canvas()
+                                drawables.add(i, currentDrawable as H4Canvas)
+                            }
 
-                        else -> {
-                            currentDrawable = PCanvas()
-                            drawables.add(i, currentDrawable as PCanvas)
+                            is TxtHeaderCanvas -> {
+                                val table = currentDrawable as CanvasTable
+                                if (currentKeyboardEvent!!.shiftKey)
+                                    table.removeColumn(currentText as TxtHeaderCanvas)
+                                else table.addColumn(currentText as TxtHeaderCanvas)
+                            }
+
+                            is TxtRowCanvas -> {
+                                val table = currentDrawable as CanvasTable
+                                if (currentKeyboardEvent!!.shiftKey)
+                                    table.removeLine(currentText as TxtRowCanvas)
+                                else table.addLine(currentText as TxtRowCanvas)
+                            }
+
+                            else -> {
+                                currentDrawable = PCanvas()
+                                drawables.add(i, currentDrawable as PCanvas)
+                            }
                         }
-                    }
                     currentLine = null
                 }
 
@@ -387,12 +411,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         h4.txt = "Category"
         addDrawable(h4)
 
-        val t = CanvasTable(3)
-
-        t.addCell("Hello World1!").addCell("Hello World2!").addCell("Hello World3!")
-        t.addCell("Hello World4!").addCell("Hello World5!").addCell("Hello World6!")
-
-        addDrawable(t)
+        addDrawable(CanvasTable.createTable())
 
         val p2 = PCanvas()
         p2.txt = "Matched by feature, body name, but also by position DSL."

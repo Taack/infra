@@ -9,12 +9,18 @@ import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 
-class CanvasTable(private val columns: Int) : ICanvasDrawable {
+class CanvasTable(private var columns: Int) : ICanvasDrawable {
 
     private val rows = mutableListOf<CanvasText>()
     private var currentRow: CanvasText? = null
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
+
+    companion object {
+        fun createTable() = CanvasTable(3)
+            .addCell("Header 1").addCell("Header 2").addCell("Header 3")
+            .addCell("Cell 1").addCell("Cell 2").addCell("Cell 3")
+    }
 
     fun addCell(cell: String): CanvasTable {
         trace("CanvasTable::addCell")
@@ -114,5 +120,54 @@ class CanvasTable(private val columns: Int) : ICanvasDrawable {
         return currentRow?.getContextualMenuEntries(dblClick) ?: emptyList()
     }
 
+    fun addLine(currentText: TxtRowCanvas) {
+        for (i in (rows.indices)) {
+            if (rows[i] == currentText) {
+                for (j in (0 until columns)) {
+                    rows.add((i - (i%columns) + columns), TxtRowCanvas(">"))
+                }
+                break
+            }
+        }
+    }
+
+    fun removeLine(currentText: TxtRowCanvas) {
+        if (rows.size <= 2*columns) return
+        for (i in (rows.indices)) {
+            if (rows[i] == currentText) {
+                for (j in (0 until columns)) {
+                    rows.removeAt(i - (i%columns) + columns)
+                }
+                break
+            }
+        }
+    }
+
+    fun addColumn(currentText: TxtHeaderCanvas) {
+        for (i in (rows.indices)) {
+            if (rows[i] == currentText) {
+                rows.add(i + 1, TxtHeaderCanvas(">"))
+                columns += 1
+                for (j in ((columns + i + 1)  until rows.size step columns)) {
+                    rows.add(j, TxtRowCanvas(">"))
+                }
+                break
+            }
+        }
+    }
+
+    fun removeColumn(currentText: TxtHeaderCanvas) {
+        if (rows.size <= 4) return
+        for (i in (rows.indices)) {
+            if (rows[i] == currentText) {
+                rows.removeAt(i)
+                columns -= 1
+                for (j in ((columns + i)  until rows.size step columns)) {
+                    rows.removeAt(j)
+                }
+                break
+            }
+        }
+    }
 
 }
