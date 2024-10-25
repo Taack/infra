@@ -149,10 +149,17 @@ abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
 
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
+    override var citationNumber: Int = 0
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
         trace("CanvasText::getSelectedText")
         return this
+    }
+
+    fun drawCitation(ctx: CanvasRenderingContext2D): Double {
+//       for ... ctx.fillRect()
+        // #dadde3 2px at 4px
+        return 16.0 * citationNumber
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
