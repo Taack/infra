@@ -54,35 +54,46 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
         traceIndent("CanvasTable::draw: $posX, $posY, $width")
         ctx.save()
         globalPosYStart = posY
-        val y = posY + 10.0
-        for (i in (rows.indices)) {
-            if (i < columns) {
-                ctx.save()
-                ctx.fillStyle = "#58b2eebf"
-                ctx.strokeStyle = "#ffffff"
-                ctx.fillRect(
-                    10.0 + (i % columns).toDouble() * width / columns,
-                    y + (i / columns) * 30.0,
-                    width / columns,
-                    30.0
-                )
+        var y = posY + 10.0
+        val w = width - 35.0
+        for (j in 0..<rows.size step columns) {
+            var hMax = 0.0
+            for (c in 0..<columns) {
+                val i = c + j;
+                val h = rows[i].draw(
+                    ctx,
+                    (i % columns + 1) * w / columns,
+                    y,
+                    20.0 + (i % columns).toDouble() * w / columns
+                ) - y
+                hMax = maxOf(hMax, h)
             }
-            ctx.save()
-            ctx.fillStyle = "#11111111"
-            ctx.strokeRect(
-                10.0 + (i % columns).toDouble() * width / columns,
-                y + (i / columns) * 30.0,
-                width / columns,
-                30.0
-            )
-            ctx.restore()
-            rows[i].draw(
-                ctx,
-                (i % columns + 1) * width / columns,
-                y + (i / columns) * 30.0,
-                20.0 + (i % columns).toDouble() * width / columns
-            )
+            for (c in 0..<columns) {
+                val i = c + j;
 
+                if (i < columns) {
+
+                    ctx.save()
+                    ctx.fillStyle = "#58b2ee11"
+                    ctx.strokeStyle = "#ffffff"
+                    ctx.fillRect(
+                        10.0 + (i % columns).toDouble() * w / columns,
+                        y,
+                        w / columns,
+                        hMax
+                    )
+                }
+                ctx.save()
+                ctx.fillStyle = "#11111111"
+                ctx.strokeRect(
+                    10.0 + (i % columns).toDouble() * w / columns,
+                    y,
+                    w / columns,
+                    hMax
+                )
+                ctx.restore()
+            }
+            y += hMax
         }
         ctx.restore()
         globalPosYEnd = y + (1 + (rows).size / columns) * 30.0
