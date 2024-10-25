@@ -27,11 +27,16 @@ abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
     abstract val marginTop: Double
     abstract val marginBottom: Double
 
+    override var globalPosYStart: Double = 0.0
+    override var globalPosYEnd: Double = 0.0
+    var citationNumber: Int = 2
+
     var txtPrefix = ""
     private var styles: List<CanvasStyle> = emptyList()
     var lines: List<CanvasLine> = emptyList()
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
+
 
     fun addChar(c: Char, p: Int) {
         trace("CanvasText::addChar: $c, $p")
@@ -147,19 +152,9 @@ abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
         }
     }
 
-    override var globalPosYStart: Double = 0.0
-    override var globalPosYEnd: Double = 0.0
-    override var citationNumber: Int = 0
-
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
         trace("CanvasText::getSelectedText")
         return this
-    }
-
-    fun drawCitation(ctx: CanvasRenderingContext2D): Double {
-//       for ... ctx.fillRect()
-        // #dadde3 2px at 4px
-        return 16.0 * citationNumber
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {

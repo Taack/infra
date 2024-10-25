@@ -14,23 +14,30 @@ class CanvasLine(
     val leftMargin: Double = 0.0
 ) {
 
-    override fun toString(): String {
-        return "CanvasLine(posBegin=$posBegin, posEnd=$posEnd, textY=$textY, height=$height, leftMargin=$leftMargin)"
-    }
-
     var containedStyles: List<CanvasStyle>? = null
+
+    fun drawCitation(ctx: CanvasRenderingContext2D, text: CanvasText, height: Double): Double {
+        ctx.save()
+        ctx.fillStyle = "#dadde3"
+        for (i in 0 until text.citationNumber) {
+            ctx.fillRect(4.0 + 8.0 * i, textY - height, 2.0, height * 1.5 + text.marginTop + text.marginBottom)
+        }
+        ctx.restore()
+        return 8.0 * text.citationNumber
+    }
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
         traceIndent("CanvasLine::drawLine: $this")
         if (!styles.isNullOrEmpty()) {
             containedStyles = styles
-            var posXStart = 0.0
+            var posXStart = drawCitation(ctx, text, height)
             for (style in styles) {
                 val w = style.draw(ctx, text, this, posXStart)
                 posXStart += w
             }
         } else {
-            ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 10.0, textY)
+            val posXStart = drawCitation(ctx, text, height)
+            ctx.fillText((if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd), (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 10.0) + posXStart, textY)
         }
         traceDeIndent("CanvasLine::drawLine: $this")
     }
@@ -50,6 +57,10 @@ class CanvasLine(
         ctx.restore()
 
         return text.txt.length + 1
+    }
+
+    override fun toString(): String {
+        return "CanvasLine(posBegin=$posBegin, posEnd=$posEnd, textY=$textY, height=$height, leftMargin=$leftMargin)"
     }
 
 }

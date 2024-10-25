@@ -7,7 +7,6 @@ interface ICanvasDrawable: ICanvasSelectable {
 
     var globalPosYStart: Double
     var globalPosYEnd: Double
-    var citationNumber: Int
 
     fun isClicked(posX: Double, posY: Double): Boolean {
         return posY in globalPosYStart..globalPosYEnd
