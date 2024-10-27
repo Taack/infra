@@ -2,14 +2,15 @@ package taack.ui.canvas
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
-import taack.ui.canvas.table.*
+import taack.ui.canvas.table.CanvasTable
+import taack.ui.canvas.table.TxtHeaderCanvas
+import taack.ui.canvas.table.TxtRowCanvas
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
 import web.events.Event
@@ -18,7 +19,6 @@ import web.events.addEventListener
 import web.html.HTMLCanvasElement
 import web.html.HTMLDivElement
 import web.uievents.KeyboardEvent
-import web.uievents.MouseButton
 import web.uievents.MouseEvent
 
 class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
@@ -84,6 +84,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         drawables.remove(currentText!!)
                     } else
                         charOffset--
+                }
+
+                "Tab" -> {
+                    trace("MainCanvas::addDrawable press Delete")
+                    if (currentDrawable != null)
+                        if (currentKeyboardEvent!!.shiftKey && currentDrawable!!.citationNumber > 0) {
+                            currentDrawable!!.citationNumber--
+                        } else currentDrawable!!.citationNumber++
                 }
 
                 "Delete" -> {
@@ -270,7 +278,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 else -> {
-                    trace("MainCanvas::addDrawable else branch")
+                    trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}")
                     if (currentKeyboardEvent != null) {
                         currentText?.addChar(currentKeyboardEvent!!.key[0], caretPosInCurrentText + charOffset++)
                         recomputeCurrentLineAfterDraw = true
@@ -464,7 +472,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 charOffset = 0
             } else if (recomputeCurrentLineAfterDraw) {
                 trace("Draw caret2 currentLine == ${currentLine}, caretPosInCurrentText == $caretPosInCurrentText, charOffset == $charOffset")
-                currentLine = currentText!!.lines.find { it.posBegin <= charOffset + currentClick!!.second && it.posEnd >= charOffset + currentClick!!.second }
+                currentLine =
+                    currentText!!.lines.find { it.posBegin <= charOffset + currentClick!!.second && it.posEnd >= charOffset + currentClick!!.second }
             }
 
             if (currentLine != null) {

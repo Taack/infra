@@ -8,8 +8,9 @@ import taack.ui.canvas.item.MenuEntry
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
+import web.cssom.atrule.height
 
-class CanvasTable(private var columns: Int) : ICanvasDrawable {
+class CanvasTable(private var columns: Int, override var citationNumber: Int = 0) : ICanvasDrawable {
 
     private val rows = mutableListOf<CanvasText>()
     private var currentRow: CanvasText? = null
@@ -55,7 +56,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
         ctx.save()
         globalPosYStart = posY
         var y = posY + 10.0
-        val w = width - 35.0
+        val w = width - 35.0 - citationNumber * 16.0
         for (j in 0..<rows.size step columns) {
             var hMax = 0.0
             for (c in 0..<columns) {
@@ -64,7 +65,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
                     ctx,
                     (i % columns + 1) * w / columns,
                     y,
-                    20.0 + (i % columns).toDouble() * w / columns
+                    citationNumber * 16.0 + 20.0 + (i % columns).toDouble() * w / columns
                 ) - y
                 hMax = maxOf(hMax, h)
             }
@@ -77,7 +78,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
                     ctx.fillStyle = "#58b2ee11"
                     ctx.strokeStyle = "#ffffff"
                     ctx.fillRect(
-                        10.0 + (i % columns).toDouble() * w / columns,
+                        (citationNumber * 16.0 - j % columns) + 10.0 + (i % columns).toDouble() * w / columns,
                         y,
                         w / columns,
                         hMax
@@ -86,7 +87,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
                 ctx.save()
                 ctx.fillStyle = "#11111111"
                 ctx.strokeRect(
-                    10.0 + (i % columns).toDouble() * w / columns,
+                    (citationNumber * 16.0 - j % columns) + 10.0 + (i % columns).toDouble() * w / columns,
                     y,
                     w / columns,
                     hMax
@@ -96,6 +97,7 @@ class CanvasTable(private var columns: Int) : ICanvasDrawable {
             y += hMax
         }
         ctx.restore()
+        drawCitation(ctx, y, y - posY)
         globalPosYEnd = y
         traceDeIndent("CanvasTable::draw: $globalPosYEnd")
         return globalPosYEnd

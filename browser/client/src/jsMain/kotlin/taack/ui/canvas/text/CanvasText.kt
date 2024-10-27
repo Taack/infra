@@ -10,7 +10,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
+abstract class CanvasText(var txt: String = ">", override var citationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -29,7 +29,6 @@ abstract class CanvasText(var txt: String = ">") : ICanvasDrawable {
 
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
-    var citationNumber: Int = 2
 
     var txtPrefix = ""
     private var styles: List<CanvasStyle> = emptyList()
