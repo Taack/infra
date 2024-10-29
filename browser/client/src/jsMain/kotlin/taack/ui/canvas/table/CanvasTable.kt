@@ -11,29 +11,27 @@ import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 import web.cssom.atrule.height
 
-class CanvasTable(private var columns: Int, private var txt: String, override var citationNumber: Int = 0) : ICanvasDrawable {
+class CanvasTable(val initHeaders: List<TxtHeaderCanvas>, val initCells: List<TxtRowCanvas>, txt: String, override var citationNumber: Int = 0) : ICanvasDrawable {
 
-    private val rows = mutableListOf<CanvasText>()
+    private val rows = initCells.toMutableList()
+    private val headers = initHeaders.toMutableList()
     private var currentRow: CanvasText? = null
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
-
+    private val columns
+        get() = headers.size
     val text = CanvasFigure(txt, citationNumber)
 
     companion object {
-        fun createTable() = CanvasTable(3,"test")
-            .addCell("Header 1").addCell("Header 2").addCell("Header 3")
-            .addCell("Cell 1").addCell("Cell 2").addCell("Cell 3")
-    }
-
-    fun addCell(cell: String): CanvasTable {
-        trace("CanvasTable::addCell")
-        if (rows.size < columns) {
-            rows.add(TxtHeaderCanvas(cell))
-        } else {
-            rows.add(TxtRowCanvas(cell))
-        }
-        return this
+        fun createTable() = CanvasTable(listOf(
+            TxtHeaderCanvas("Header 1"),
+            TxtHeaderCanvas("Header 2"),
+            TxtHeaderCanvas("Header 3"),
+        ), listOf(
+            TxtRowCanvas("Cell 1"),
+            TxtRowCanvas("Cell 2"),
+            TxtRowCanvas("Cell 3"),
+        ), "New Table", 0)
     }
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText {
@@ -41,7 +39,7 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
         if (posX == null || posY == null) {
             return this.rows.first()
         }
-        for (r in rows) {
+        for (r in headers + rows) {
             if (posY in r.globalPosYStart..r.globalPosYEnd && posX in r.posXStart..r.posXEnd) {
                 currentRow = r
                 return r
@@ -60,17 +58,27 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
         globalPosYStart = posY
         var y = posY + 10.0
         val w = width - 35.0 - citationNumber * 16.0
-        for (j in 0..<rows.size step columns) {
+        for (j in 0..<(headers + rows).size step columns) {
             var hMax = 0.0
             for (c in 0..<columns) {
                 val i = c + j
-                val h = rows[i].draw(
-                    ctx,
-                    (i % columns + 1) * w / columns,
-                    y,
-                    citationNumber * 16.0 + 20.0 + (i % columns).toDouble() * w / columns
-                ) - y
-                hMax = maxOf(hMax, h)
+                if (i < headers.size) {
+                    val h = headers[i].draw(
+                        ctx,
+                        (i % columns + 1) * w / columns,
+                        y,
+                        citationNumber * 16.0 + 20.0 + (i % columns).toDouble() * w / columns
+                    ) - y
+                    hMax = maxOf(hMax, h)
+                } else {
+                    val h = rows[i - headers.size].draw(
+                        ctx,
+                        (i % columns + 1) * w / columns,
+                        y,
+                        citationNumber * 16.0 + 20.0 + (i % columns).toDouble() * w / columns
+                    ) - y
+                    hMax = maxOf(hMax, h)
+                }
             }
             for (c in 0..<columns) {
                 val i = c + j
@@ -108,13 +116,18 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
     }
 
     override fun reset() {
+        headers.forEach { it.reset() }
+        headers.clear()
+        headers.addAll(initHeaders)
         rows.forEach { it.reset() }
+        rows.clear()
+        rows.addAll(initCells)
         text.reset()
     }
 
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {
         traceIndent("CanvasTable::click: $posX, $posY")
-        for (r in rows) {
+        for (r in headers + rows) {
             if (r.isClicked(posX, posY)) {
                 traceDeIndent("CanvasTable::click: $r, $posX, $posY")
                 return r.click(ctx, posX, posY)
@@ -126,7 +139,7 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
 
     override fun doubleClick(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Triple<CanvasLine, Int, Int>? {
         traceIndent("CanvasTable::doubleClick: $posX, $posY")
-        for (r in rows) {
+        for (r in headers + rows) {
             if (r.isClicked(posX, posY)) {
                 traceDeIndent("CanvasTable::doubleClick: $r, $posX, $posY")
                 return r.doubleClick(ctx, posX, posY)
@@ -166,11 +179,10 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
     }
 
     fun addColumn(currentText: TxtHeaderCanvas) {
-        for (i in (rows.indices)) {
-            if (rows[i] == currentText) {
-                rows.add(i + 1, TxtHeaderCanvas(">"))
-                columns += 1
-                for (j in ((columns + i + 1) until rows.size step columns)) {
+        for (i in (headers.indices)) {
+            if (headers[i] == currentText) {
+                headers.add(i + 1, TxtHeaderCanvas(">"))
+                for (j in ((i + 1) until rows.size step columns)) {
                     rows.add(j, TxtRowCanvas(">"))
                 }
                 break
@@ -181,9 +193,8 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
     fun removeColumn(currentText: TxtHeaderCanvas) {
         if (rows.size <= 4) return
         for (i in (rows.indices)) {
-            if (rows[i] == currentText) {
+            if (headers[i] == currentText) {
                 rows.removeAt(i)
-                columns -= 1
                 var n = 0
                 for (j in ((columns + i) until (rows.size) step columns)) {
                     trace("CanvasTable::removeColumn: $j, on ${rows.size}")

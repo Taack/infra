@@ -119,37 +119,49 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     trace("MainCanvas::addDrawable press Enter")
                     val i = drawables.indexOf(currentText!!) + 1
                     if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
-                        currentDrawable = CanvasTable.createTable()
-                        drawables.add(i, currentDrawable as CanvasTable)
+                        commandDoList.add(
+                            AddTableCommand(drawables, i)
+                        )
                     } else
                         when (currentText) {
                             is H2Canvas -> {
-                                currentDrawable = H3Canvas(">")
-                                drawables.add(i, currentDrawable as H3Canvas)
+                                commandDoList.add(
+                                    AddTextCommand(drawables, i, H3Canvas(">"))
+                                )
                             }
 
                             is H3Canvas -> {
-                                currentDrawable = H4Canvas(">")
-                                drawables.add(i, currentDrawable as H4Canvas)
+                                commandDoList.add(
+                                    AddTextCommand(drawables, i, H4Canvas(">"))
+                                )
                             }
 
                             is TxtHeaderCanvas -> {
                                 val table = currentDrawable as CanvasTable
                                 if (currentKeyboardEvent!!.shiftKey)
-                                    table.removeColumn(currentText as TxtHeaderCanvas)
-                                else table.addColumn(currentText as TxtHeaderCanvas)
+                                    commandDoList.add(
+                                        RemoveTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                    )
+                                else commandDoList.add(
+                                    AddTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                )
                             }
 
                             is TxtRowCanvas -> {
                                 val table = currentDrawable as CanvasTable
                                 if (currentKeyboardEvent!!.shiftKey)
-                                    table.removeLine(currentText as TxtRowCanvas)
-                                else table.addLine(currentText as TxtRowCanvas)
+                                    commandDoList.add(
+                                        RemoveTableRowCommand(table, currentText as TxtRowCanvas)
+                                    )
+                                else commandDoList.add(
+                                    AddTableRowCommand(table, currentText as TxtRowCanvas)
+                                )
                             }
 
                             else -> {
-                                currentDrawable = PCanvas(">")
-                                drawables.add(i, currentDrawable as PCanvas)
+                                commandDoList.add(
+                                    AddTextCommand(drawables, i, PCanvas(">"))
+                                )
                             }
                         }
                     currentLine = null
@@ -461,10 +473,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         """.trimIndent()
         )
         addDrawable(p2)
-//        val p3 = PCanvas(p2.txt)
-//        addDrawable(p3)
-//        val p4 = PCanvas(p2.txt)
-//        addDrawable(p4)
+        val p3 = PCanvas(p2.txt)
+        addDrawable(p3)
+        val p4 = PCanvas(p2.txt)
+        addDrawable(p4)
 
         val image = CanvasImg("Coucou", 0)
         addDrawable(image)
