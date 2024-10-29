@@ -11,7 +11,7 @@ import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 import web.cssom.atrule.height
 
-class CanvasTable(val initHeaders: List<TxtHeaderCanvas>, val initCells: List<TxtRowCanvas>, txt: String, override var citationNumber: Int = 0) : ICanvasDrawable {
+class CanvasTable(val initHeaders: List<TxtHeaderCanvas>, val initCells: List<TxtRowCanvas>, txt: String, val initCitationNumber: Int = 0) : ICanvasDrawable {
 
     private val rows = initCells.toMutableList()
     private val headers = initHeaders.toMutableList()
@@ -20,7 +20,8 @@ class CanvasTable(val initHeaders: List<TxtHeaderCanvas>, val initCells: List<Tx
     override var globalPosYEnd: Double = 0.0
     private val columns
         get() = headers.size
-    val text = CanvasFigure(txt, citationNumber)
+    val text = CanvasFigure(txt, initCitationNumber)
+    override var citationNumber: Int = initCitationNumber
 
     companion object {
         fun createTable() = CanvasTable(listOf(
@@ -123,6 +124,7 @@ class CanvasTable(val initHeaders: List<TxtHeaderCanvas>, val initCells: List<Tx
         rows.clear()
         rows.addAll(initCells)
         text.reset()
+        citationNumber = initCitationNumber
     }
 
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {

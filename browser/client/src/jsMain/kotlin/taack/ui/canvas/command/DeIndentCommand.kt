@@ -2,8 +2,9 @@ package taack.ui.canvas.command
 
 import taack.ui.canvas.ICanvasDrawable
 
-class DeIndentCommand(drawable: ICanvasDrawable) : ICanvasCommand{
+class DeIndentCommand(val drawable: ICanvasDrawable) : ICanvasCommand{
     override fun doIt() {
-        TODO("Not yet implemented")
+        if (drawable.citationNumber > 0)
+            drawable.citationNumber--
     }
 }

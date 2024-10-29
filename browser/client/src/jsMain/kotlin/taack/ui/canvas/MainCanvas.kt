@@ -95,9 +95,15 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 "Tab" -> {
                     trace("MainCanvas::addDrawable press Delete")
                     if (currentDrawable != null)
-                        if (currentKeyboardEvent!!.shiftKey && currentDrawable!!.citationNumber > 0) {
-                            currentDrawable!!.citationNumber--
-                        } else currentDrawable!!.citationNumber++
+                        if (currentKeyboardEvent!!.shiftKey)
+                            commandDoList.add(
+                                DeIndentCommand(currentDrawable!!)
+                            )
+                        else
+                            commandDoList.add(
+                                IndentCommand(currentDrawable!!)
+                            )
+
                 }
 
                 "Delete" -> {
@@ -375,7 +381,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 if (event.detail == 3) {
                     isDoubleClick = true
                     charSelectStartNInText = 0
-                    charSelectEndNInText = currentDrawable?.getSelectedText(event.offsetX, event.offsetY)!!.txt.length
+                    charSelectEndNInText =
+                        currentDrawable?.getSelectedText(event.offsetX, event.offsetY)!!.txt.length
                     trace("canvas click double click == triple click")
                 }
 

@@ -11,12 +11,12 @@ import web.html.Image
 import kotlin.math.min
 
 class CanvasImg(
-    txt: String, override var citationNumber: Int
+    txt: String, val initCitationNumber: Int
 ) : ICanvasDrawable {
 
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
-
+    override var citationNumber: Int = initCitationNumber
     val text = CanvasFigure(txt, citationNumber)
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
@@ -59,5 +59,6 @@ class CanvasImg(
 
     override fun reset() {
         text.reset()
+        citationNumber = initCitationNumber
     }
 }
