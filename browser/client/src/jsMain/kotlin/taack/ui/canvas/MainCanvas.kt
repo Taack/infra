@@ -64,20 +64,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private val commandDoList = mutableListOf<ICanvasCommand>()
     private val commandUndoList = mutableListOf<ICanvasCommand>()
 
-    private fun changeTextCanvasStyle(text: CanvasText) {
-        trace("MainCanvas::changeTextCanvasStyle")
-        if (currentDrawable != null && !(currentDrawable is CanvasTable)) {
-            val i = drawables.indexOf(currentDrawable!!)
-            if (i != -1) {
-                drawables.remove(currentDrawable!!)
-                drawables.add(i, text)
-                currentDrawable = text
-                currentLine = null
-            }
-        }
-
-    }
-
     private fun addDrawable() {
         var doNotDraw = false
         if (menu == null)
@@ -237,27 +223,39 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "F2" -> {
-                    changeTextCanvasStyle(H2Canvas(currentText!!.txt))
+                    commandDoList.add(
+                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
+                    )
                 }
 
                 "F3" -> {
-                    changeTextCanvasStyle(H3Canvas(currentText!!.txt))
+                    commandDoList.add(
+                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
+                    )
                 }
 
                 "F4" -> {
-                    changeTextCanvasStyle(H4Canvas(currentText!!.txt))
+                    commandDoList.add(
+                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
+                    )
                 }
 
                 "F1" -> {
-                    changeTextCanvasStyle(PCanvas(currentText!!.txt))
+                    commandDoList.add(
+                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
+                    )
                 }
 
                 "F5" -> {
-                    changeTextCanvasStyle(LiCanvas(currentText!!.txt))
+                    commandDoList.add(
+                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
+                    )
                 }
 
                 "F6" -> {
-                    changeTextCanvasStyle(Li2Canvas(currentText!!.txt))
+                    commandDoList.add(
+                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
+                    )
                 }
 
                 "End" -> {
@@ -501,11 +499,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             text.reset()
         }
 
-        trace("Remove New Drawables")
-        for (text in drawables) {
-            if (text !in initialDrawables)
-                drawables.remove(text)
-        }
+        trace("Reset Drawables")
+        drawables.clear()
+        drawables.addAll(initialDrawables)
+
+//        for (text in drawables) {
+//            if (text !in initialDrawables)
+//                drawables.remove(text)
+//        }
 
         trace("Execute commandList")
         for (cmd in commandDoList) {
@@ -521,8 +522,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         if (currentText != null) {
             if (currentLine == null) {
                 trace("Draw caret1 currentLine == null")
-                currentLine = currentText!!.lines.first()
-                caretPosInCurrentText = currentLine!!.posEnd
+                currentLine = currentText!!.lines.firstOrNull()
+                caretPosInCurrentText = currentLine?.posEnd ?: 0
                 charOffset = 0
             } else if (recomputeCurrentLineAfterDraw) {
                 trace("Draw caret2 currentLine == ${currentLine}, caretPosInCurrentText == $caretPosInCurrentText, charOffset == $charOffset")
