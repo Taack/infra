@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class LiCanvas() : CanvasText() {
+class LiCanvas(txtInit: String) : CanvasText(txtInit) {
     override val fontWeight: String
         get() = "normal"
     override val fontSize: String

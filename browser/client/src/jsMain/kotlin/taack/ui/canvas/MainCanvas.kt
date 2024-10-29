@@ -5,6 +5,8 @@ import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
+import taack.ui.canvas.command.AddCharCommand
+import taack.ui.canvas.command.ICanvasCommand
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
@@ -58,7 +60,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var menu: Menu? = null
     private var posYGlobal: Double = 0.0
     private var recomputeCurrentLineAfterDraw = false
-
+    private val commandDoList = mutableListOf<ICanvasCommand>()
+    private val commandUndoList = mutableListOf<ICanvasCommand>()
 
     private fun changeTextCanvasStyle(text: CanvasText) {
         trace("MainCanvas::changeTextCanvasStyle")
@@ -66,7 +69,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             val i = drawables.indexOf(currentDrawable!!)
             if (i != -1) {
                 drawables.remove(currentDrawable!!)
-                text.txt = currentText!!.txt
+                text.txtInit = currentText!!.txt
                 drawables.add(i, text)
                 currentDrawable = text
                 currentLine = null
@@ -127,12 +130,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     } else
                         when (currentText) {
                             is H2Canvas -> {
-                                currentDrawable = H3Canvas()
+                                currentDrawable = H3Canvas(">")
                                 drawables.add(i, currentDrawable as H3Canvas)
                             }
 
                             is H3Canvas -> {
-                                currentDrawable = H4Canvas()
+                                currentDrawable = H4Canvas(">")
                                 drawables.add(i, currentDrawable as H4Canvas)
                             }
 
@@ -151,7 +154,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                             }
 
                             else -> {
-                                currentDrawable = PCanvas()
+                                currentDrawable = PCanvas(">")
                                 drawables.add(i, currentDrawable as PCanvas)
                             }
                         }
@@ -221,27 +224,27 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "F2" -> {
-                    changeTextCanvasStyle(H2Canvas())
+                    changeTextCanvasStyle(H2Canvas(currentText!!.txt))
                 }
 
                 "F3" -> {
-                    changeTextCanvasStyle(H3Canvas())
+                    changeTextCanvasStyle(H3Canvas(currentText!!.txt))
                 }
 
                 "F4" -> {
-                    changeTextCanvasStyle(H4Canvas())
+                    changeTextCanvasStyle(H4Canvas(currentText!!.txt))
                 }
 
                 "F1" -> {
-                    changeTextCanvasStyle(PCanvas())
+                    changeTextCanvasStyle(PCanvas(currentText!!.txt))
                 }
 
                 "F5" -> {
-                    changeTextCanvasStyle(LiCanvas())
+                    changeTextCanvasStyle(LiCanvas(currentText!!.txt))
                 }
 
                 "F6" -> {
-                    changeTextCanvasStyle(Li2Canvas())
+                    changeTextCanvasStyle(Li2Canvas(currentText!!.txt))
                 }
 
                 "End" -> {
@@ -280,8 +283,24 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 else -> {
                     trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}")
                     if (currentKeyboardEvent != null) {
-                        currentText?.addChar(currentKeyboardEvent!!.key[0], caretPosInCurrentText + charOffset++)
-                        recomputeCurrentLineAfterDraw = true
+                        if (currentKeyboardEvent!!.ctrlKey) {
+                            if (currentKeyboardEvent!!.key[0] == 'z' && !currentKeyboardEvent!!.shiftKey) {
+                               commandUndoList.add(commandDoList.removeLast())
+                            } else if (currentKeyboardEvent!!.key[0] == 'z') {
+                                commandDoList.add(commandUndoList.removeLast())
+                            }
+                        } else
+                            if (currentText != null) {
+                                commandDoList.add(
+                                    AddCharCommand(
+                                        currentText!!,
+                                        currentKeyboardEvent!!.key[0],
+                                        caretPosInCurrentText + charOffset++
+                                    )
+                                )
+//                        currentText?.addChar(currentKeyboardEvent!!.key[0], caretPosInCurrentText + charOffset++)
+                                recomputeCurrentLineAfterDraw = true
+                            }
                     }
                 }
             }
@@ -400,52 +419,51 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     }
 
     private fun addInitialTexts() {
-        val h2 = H2Canvas()
-
-        h2.txt = "Topology Filters and Selectors Example for various data layout"
+        val h2 = H2Canvas( "Topology Filters and Selectors Example for various data layout")
         addDrawable(h2)
 
-        val h3 = H3Canvas()
-        h3.txt = "Directed Acyclic Graphs (the most common in computer sciences)"
+        val h3 = H3Canvas("Directed Acyclic Graphs (the most common in computer sciences)")
         addDrawable(h3)
 
-        val p1 = PCanvas()
-        p1.txt =
-            "DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently."
+        val p1 = PCanvas("DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently.")
         addDrawable(p1)
 
-        val h31 = H3Canvas()
-        h31.txt = "For Assemblies and bodies"
+        val h31 = H3Canvas("For Assemblies and bodies")
         addDrawable(h31)
 
-        val h4 = H4Canvas()
-        h4.txt = "Category"
+        val h4 = H4Canvas("Category")
         addDrawable(h4)
 
         addDrawable(CanvasTable.createTable())
 
-        val p2 = PCanvas()
-        p2.txt = "Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
-        p2.txt += " Matched by feature, body name, but also by position DSL."
+        val p2 = PCanvas("""
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+            Matched by feature, body name, but also by position DSL.
+        """.trimIndent())
         addDrawable(p2)
-        val p3 = PCanvas()
-        p3.txt = p2.txt
+        val p3 = PCanvas(p2.txt)
         addDrawable(p3)
-        val p4 = PCanvas()
-        p4.txt = p2.txt
-
+        val p4 = PCanvas(p2.txt)
         addDrawable(p4)
     }
 
@@ -457,6 +475,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         trace("clearRect")
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+
+        trace("Execute commandList")
+        for (cmd in commandDoList) {
+            cmd.doIt()
+        }
 
         trace("Draw all drawables")
         for (text in drawables) {

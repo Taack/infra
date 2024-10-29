@@ -17,7 +17,7 @@ class CanvasLine(
     var containedStyles: List<CanvasStyle>? = null
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
-        traceIndent("CanvasLine::drawLine: $this")
+        trace("CanvasLine::drawLine: $this")
         if (!styles.isNullOrEmpty()) {
             containedStyles = styles
             var posXStart = text.drawCitation(ctx, textY, height)
@@ -33,7 +33,6 @@ class CanvasLine(
                 textY
             )
         }
-        traceDeIndent("CanvasLine::drawLine: $this")
     }
 
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {

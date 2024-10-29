@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class PCanvas() : CanvasText() {
+class PCanvas(txtInit: String) : CanvasText(txtInit) {
     override val fontWeight: String
         get() = "normal"
     override val fontSize: String
