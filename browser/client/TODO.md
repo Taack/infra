@@ -3,7 +3,7 @@
 ## Editor
 
 * Save in hidden input in asciidoc
-* Quoting
+* ~~Quoting~~
 * History
 * Insert image
-* TQL
+* **TQL**

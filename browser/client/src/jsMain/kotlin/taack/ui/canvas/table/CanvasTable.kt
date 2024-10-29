@@ -5,20 +5,23 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
 import taack.ui.canvas.item.MenuEntry
+import taack.ui.canvas.text.CanvasFigure
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 import web.cssom.atrule.height
 
-class CanvasTable(private var columns: Int, override var citationNumber: Int = 0) : ICanvasDrawable {
+class CanvasTable(private var columns: Int, private var txt: String, override var citationNumber: Int = 0) : ICanvasDrawable {
 
     private val rows = mutableListOf<CanvasText>()
     private var currentRow: CanvasText? = null
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
 
+    val text = CanvasFigure(txt, citationNumber)
+
     companion object {
-        fun createTable() = CanvasTable(3)
+        fun createTable() = CanvasTable(3,"test")
             .addCell("Header 1").addCell("Header 2").addCell("Header 3")
             .addCell("Cell 1").addCell("Cell 2").addCell("Cell 3")
     }
@@ -99,6 +102,7 @@ class CanvasTable(private var columns: Int, override var citationNumber: Int = 0
         ctx.restore()
         drawCitation(ctx, y, y - posY)
         globalPosYEnd = y
+        globalPosYEnd = text.draw(ctx, width, globalPosYEnd, posX)
         traceDeIndent("CanvasTable::draw: $globalPosYEnd")
         return globalPosYEnd
     }

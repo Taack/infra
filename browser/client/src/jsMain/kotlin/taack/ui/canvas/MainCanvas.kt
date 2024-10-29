@@ -6,6 +6,7 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.item.CanvasCaret
+import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
 import taack.ui.canvas.table.CanvasTable
@@ -424,6 +425,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         addDrawable(CanvasTable.createTable())
 
+
+
         val p2 = PCanvas()
         p2.txt = "Matched by feature, body name, but also by position DSL."
         p2.txt += " Matched by feature, body name, but also by position DSL."
@@ -447,12 +450,16 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         p4.txt = p2.txt
 
         addDrawable(p4)
+
+        val image = CanvasImg("Coucou", 0)
+        addDrawable(image)
     }
 
     private fun draw() {
         traceIndent("MainCanvas::draw")
         CanvasText.num1 = 0
         CanvasText.num2 = 0
+        CanvasText.figNum = 1
         posYGlobal = -dy
 
         trace("clearRect")
@@ -493,6 +500,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
             }
         }
+//        posYGlobal = CanvasImg(0).draw(ctx, 200.0, posYGlobal, 100.0)
+//        posYGlobal = CanvasImg(0).draw(ctx, 200.0, posYGlobal, 100.0)
+//        posYGlobal = CanvasImg(0).draw(ctx, 200.0, posYGlobal, 100.0)
         divHolder.style.height = "${posYGlobal + dy}px"
         traceDeIndent("MainCanvas::draw")
     }
