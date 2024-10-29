@@ -5,8 +5,7 @@ import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
-import taack.ui.canvas.command.AddCharCommand
-import taack.ui.canvas.command.ICanvasCommand
+import taack.ui.canvas.command.*
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.item.Menu
@@ -79,14 +78,18 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     }
 
     private fun addDrawable() {
+        var doNotDraw = false
         if (menu == null)
             when (currentKeyboardEvent!!.key) {
                 "Backspace" -> {
                     trace("MainCanvas::addDrawable press Backspace")
-                    if (currentText?.rmChar(caretPosInCurrentText + charOffset) == 0) {
-                        drawables.remove(currentText!!)
-                    } else
-                        charOffset--
+                    commandDoList.add(
+                        RmCharCommand(
+                            drawables,
+                            currentDrawable!!.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)!!,
+                            caretPosInCurrentText + charOffset--
+                        )
+                    )
                 }
 
                 "Tab" -> {
@@ -99,25 +102,16 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
                 "Delete" -> {
                     trace("MainCanvas::addDrawable press Delete")
-                    if (currentKeyboardEvent!!.ctrlKey) {
-                        val i = drawables.indexOf(currentDrawable!!)
-                        drawables.remove(currentDrawable!!)
-                        currentDrawable = drawables.getOrNull(i)
+                    if (currentKeyboardEvent!!.ctrlKey && currentDrawable != null) {
+                        commandDoList.add(
+                            DeleteTextCommand(drawables, currentDrawable!!.getSelectedText()!!)
+                        )
                     } else {
-                        var pos1 = caretPosInCurrentText + charOffset
-                        var pos2: Int? = null
-                        if (isDoubleClick && currentKeyboardEvent!!.ctrlKey) {
-                            pos1 = charSelectStartNInText!!
-                            pos2 = charSelectEndNInText!! - charSelectStartNInText!!
-                            isDoubleClick = false
-                            trace("pg: ${caretPosInCurrentText + charOffset} pb1: $pos1 pb2: $pos2")
-                        }
-                        if (currentText?.delChar(pos1, pos2) == 0) {
-                            val i = drawables.indexOf(currentText!!)
-                            drawables.remove(currentText!!)
-                            currentDrawable = drawables.getOrNull(i)
-                            currentLine = null
-                        }
+                        val pos1 = caretPosInCurrentText + charOffset
+                        val pos2: Int? = null
+                        commandDoList.add(
+                            DeleteCharCommand(drawables, currentDrawable!!.getSelectedText()!!, pos1, pos2)
+                        )
                     }
                 }
 
@@ -272,7 +266,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight" -> {
-
+                    doNotDraw = true
                 }
 
                 "ArrowLeft" -> {
@@ -281,12 +275,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
 
                 else -> {
-                    trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}")
+                    trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}, CTRL: ${currentKeyboardEvent!!.ctrlKey}, SHIFT: ${currentKeyboardEvent!!.shiftKey}")
                     if (currentKeyboardEvent != null) {
                         if (currentKeyboardEvent!!.ctrlKey) {
                             if (currentKeyboardEvent!!.key[0] == 'z' && !currentKeyboardEvent!!.shiftKey && commandDoList.size > 0) {
-                               commandUndoList.add(commandDoList.removeLast())
-                            } else if (currentKeyboardEvent!!.key[0] == 'z' && commandUndoList.size > 0) {
+                                trace("MainCanvas::addDrawable undo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
+                                commandUndoList.add(commandDoList.removeLast())
+                            } else if (currentKeyboardEvent!!.key[0] == 'Z' && commandUndoList.size > 0) {
+                                trace("MainCanvas::addDrawable redo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
                                 commandDoList.add(commandUndoList.removeLast())
                             }
                         } else
@@ -305,7 +301,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
             }
 
-        draw()
+        if (!doNotDraw)
+            draw()
     }
 
     private fun addDrawable(drawable: ICanvasDrawable) {
@@ -419,13 +416,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     }
 
     private fun addInitialTexts() {
-        val h2 = H2Canvas( "Topology Filters and Selectors Example for various data layout")
+        val h2 = H2Canvas("Topology Filters and Selectors Example for various data layout")
         addDrawable(h2)
 
         val h3 = H3Canvas("Directed Acyclic Graphs (the most common in computer sciences)")
         addDrawable(h3)
 
-        val p1 = PCanvas("DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently.")
+        val p1 =
+            PCanvas("DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently.")
         addDrawable(p1)
 
         val h31 = H3Canvas("For Assemblies and bodies")
@@ -436,7 +434,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         addDrawable(CanvasTable.createTable())
 
-        val p2 = PCanvas("""
+        val p2 = PCanvas(
+            """
             Matched by feature, body name, but also by position DSL.
             Matched by feature, body name, but also by position DSL.
             Matched by feature, body name, but also by position DSL.
@@ -459,12 +458,13 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             Matched by feature, body name, but also by position DSL.
             Matched by feature, body name, but also by position DSL.
             Matched by feature, body name, but also by position DSL.
-        """.trimIndent())
+        """.trimIndent()
+        )
         addDrawable(p2)
-        val p3 = PCanvas(p2.txt)
-        addDrawable(p3)
-        val p4 = PCanvas(p2.txt)
-        addDrawable(p4)
+//        val p3 = PCanvas(p2.txt)
+//        addDrawable(p3)
+//        val p4 = PCanvas(p2.txt)
+//        addDrawable(p4)
 
         val image = CanvasImg("Coucou", 0)
         addDrawable(image)

@@ -63,7 +63,7 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
         for (j in 0..<rows.size step columns) {
             var hMax = 0.0
             for (c in 0..<columns) {
-                val i = c + j;
+                val i = c + j
                 val h = rows[i].draw(
                     ctx,
                     (i % columns + 1) * w / columns,
@@ -73,7 +73,7 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
                 hMax = maxOf(hMax, h)
             }
             for (c in 0..<columns) {
-                val i = c + j;
+                val i = c + j
 
                 if (i < columns) {
 
@@ -108,6 +108,8 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
     }
 
     override fun reset() {
+        rows.forEach { it.reset() }
+        text.reset()
     }
 
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {

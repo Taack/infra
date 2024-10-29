@@ -58,5 +58,6 @@ class CanvasImg(
     }
 
     override fun reset() {
+        text.reset()
     }
 }

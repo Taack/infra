@@ -1,4 +1,9 @@
 package taack.ui.canvas.command
 
-class IndentCommand {
+import taack.ui.canvas.ICanvasDrawable
+
+class IndentCommand(drawable: ICanvasDrawable) : ICanvasCommand{
+    override fun doIt() {
+        TODO("Not yet implemented")
+    }
 }

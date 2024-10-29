@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class CanvasFigure(txt: String, citationNumber: Int) : CanvasText(txt, citationNumber) {
+class CanvasFigure(txtInit: String, citationNumber: Int) : CanvasText(txtInit, citationNumber) {
 
     override val fontWeight: String
         get() = "italic"
