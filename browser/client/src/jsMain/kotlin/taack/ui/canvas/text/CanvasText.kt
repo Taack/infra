@@ -10,7 +10,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(var txtInit: String = ">", override var citationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(val txtInit: String = ">", override var citationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -45,19 +45,19 @@ abstract class CanvasText(var txtInit: String = ">", override var citationNumber
 
     fun addChar(c: Char, p: Int) {
         trace("CanvasText::addChar: $c, $p")
-        txtVar = txt.substring(0, p) + c + txt.substring(p)
+        txtVar = txtVar.substring(0, p) + c + txtVar.substring(p)
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {
         trace("CanvasText::delChar: $p, $pEnd")
-        txtVar = txt.substring(0, p) + txt.substring(p + (pEnd ?: 1))
-        return txt.length
+        txtVar = txtVar.substring(0, p) + txtVar.substring(p + (pEnd ?: 1))
+        return txtVar.length
     }
 
     fun rmChar(p: Int): Int {
         trace("CanvasText::rmChar: $p")
-        txtVar = txt.substring(0, p - 1) + txt.substring(p)
-        return txt.length
+        txtVar = txtVar.substring(0, p - 1) + txtVar.substring(p)
+        return txtVar.length
     }
 
     private fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
@@ -203,7 +203,7 @@ abstract class CanvasText(var txtInit: String = ">", override var citationNumber
             posLetterLineEnd = currentLetterPos
             pX += tWidth
             ctx.restore()
-            txtVar = txtInit
+//            txtVar = txtInit
         }
 
         if (posLetterLineBegin != currentLetterPos || currentLetterPos == 0) {
@@ -330,4 +330,7 @@ abstract class CanvasText(var txtInit: String = ">", override var citationNumber
         return "CanvasText(posXStart=$posXStart, posXEnd=$posXEnd, globalPosYStart=$globalPosYStart, globalPosYEnd=$globalPosYEnd, lines.size=${lines.size})"
     }
 
+    override fun reset() {
+        txtVar = txtInit
+    }
 }

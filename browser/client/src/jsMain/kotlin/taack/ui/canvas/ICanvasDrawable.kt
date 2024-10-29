@@ -30,4 +30,5 @@ interface ICanvasDrawable: ICanvasSelectable {
 
     fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double
 
+    fun reset()
 }

@@ -107,6 +107,9 @@ class CanvasTable(private var columns: Int, private var txt: String, override va
         return globalPosYEnd
     }
 
+    override fun reset() {
+    }
+
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {
         traceIndent("CanvasTable::click: $posX, $posY")
         for (r in rows) {

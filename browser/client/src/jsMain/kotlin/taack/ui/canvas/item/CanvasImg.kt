@@ -56,4 +56,7 @@ class CanvasImg(
     override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
         return emptyList()
     }
+
+    override fun reset() {
+    }
 }

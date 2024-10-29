@@ -70,7 +70,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             val i = drawables.indexOf(currentDrawable!!)
             if (i != -1) {
                 drawables.remove(currentDrawable!!)
-                text.txtInit = currentText!!.txt
                 drawables.add(i, text)
                 currentDrawable = text
                 currentLine = null
@@ -285,9 +284,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}")
                     if (currentKeyboardEvent != null) {
                         if (currentKeyboardEvent!!.ctrlKey) {
-                            if (currentKeyboardEvent!!.key[0] == 'z' && !currentKeyboardEvent!!.shiftKey) {
+                            if (currentKeyboardEvent!!.key[0] == 'z' && !currentKeyboardEvent!!.shiftKey && commandDoList.size > 0) {
                                commandUndoList.add(commandDoList.removeLast())
-                            } else if (currentKeyboardEvent!!.key[0] == 'z') {
+                            } else if (currentKeyboardEvent!!.key[0] == 'z' && commandUndoList.size > 0) {
                                 commandDoList.add(commandUndoList.removeLast())
                             }
                         } else
@@ -478,7 +477,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         CanvasText.figNum = 1
         posYGlobal = -dy
 
-        trace("clearRect")
+        trace("Clear")
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
 
         trace("Execute commandList")
@@ -522,6 +521,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
         }
         divHolder.style.height = "${posYGlobal + dy}px"
+
+        trace("Reset text")
+        for (text in drawables) {
+            text.reset()
+        }
+
         traceDeIndent("MainCanvas::draw")
     }
 }
