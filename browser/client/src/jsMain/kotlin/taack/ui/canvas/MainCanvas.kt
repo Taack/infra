@@ -8,6 +8,7 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.command.AddCharCommand
 import taack.ui.canvas.command.ICanvasCommand
 import taack.ui.canvas.item.CanvasCaret
+import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
 import taack.ui.canvas.table.CanvasTable
@@ -465,12 +466,16 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         addDrawable(p3)
         val p4 = PCanvas(p2.txt)
         addDrawable(p4)
+
+        val image = CanvasImg("Coucou", 0)
+        addDrawable(image)
     }
 
     private fun draw() {
         traceIndent("MainCanvas::draw")
         CanvasText.num1 = 0
         CanvasText.num2 = 0
+        CanvasText.figNum = 1
         posYGlobal = -dy
 
         trace("clearRect")

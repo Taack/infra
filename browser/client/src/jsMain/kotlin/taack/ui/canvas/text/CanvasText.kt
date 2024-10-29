@@ -14,6 +14,7 @@ abstract class CanvasText(var txtInit: String = ">", override var citationNumber
     companion object {
         var num1: Int = 0
         var num2: Int = 0
+        var figNum: Int = 0
     }
 
     abstract val fontWeight: String
