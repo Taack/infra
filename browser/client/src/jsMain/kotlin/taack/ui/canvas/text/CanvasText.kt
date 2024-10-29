@@ -46,7 +46,10 @@ abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int
 
     fun addChar(c: Char, p: Int) {
         trace("CanvasText::addChar: $c, $p")
-        txtVar = txtVar.substring(0, p) + c + txtVar.substring(p)
+        txtVar = if (txtVar == ">")
+            c.toString()
+        else
+            txtVar.substring(0, p) + c + txtVar.substring(p)
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {

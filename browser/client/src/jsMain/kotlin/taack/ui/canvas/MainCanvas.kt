@@ -35,6 +35,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         get() = currentClick?.first
         set(value) = run { currentClick = currentClick?.copy(first = value) }
     private val drawables = mutableListOf<ICanvasDrawable>()
+    private val initialDrawables = mutableListOf<ICanvasDrawable>()
     private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dy: Double = 0.0
     private var caretPosInCurrentText: Int
@@ -323,11 +324,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             draw()
     }
 
-    private fun addDrawable(drawable: ICanvasDrawable) {
-        trace("MainCanvas::addDrawable")
-        drawables.add(drawable)
-    }
-
     init {
         canvas.id = "canvas"
         canvas.width = window.innerWidth
@@ -436,22 +432,22 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
     private fun addInitialTexts() {
         val h2 = H2Canvas("Topology Filters and Selectors Example for various data layout")
-        addDrawable(h2)
+        initialDrawables.add(h2)
 
         val h3 = H3Canvas("Directed Acyclic Graphs (the most common in computer sciences)")
-        addDrawable(h3)
+        initialDrawables.add(h3)
 
         val p1 =
             PCanvas("DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently.")
-        addDrawable(p1)
+        initialDrawables.add(p1)
 
         val h31 = H3Canvas("For Assemblies and bodies")
-        addDrawable(h31)
+        initialDrawables.add(h31)
 
         val h4 = H4Canvas("Category")
-        addDrawable(h4)
+        initialDrawables.add(h4)
 
-        addDrawable(CanvasTable.createTable())
+        initialDrawables.add(CanvasTable.createTable())
 
         val p2 = PCanvas(
             """
@@ -479,14 +475,15 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             Matched by feature, body name, but also by position DSL.
         """.trimIndent()
         )
-        addDrawable(p2)
+        initialDrawables.add(p2)
         val p3 = PCanvas(p2.txt)
-        addDrawable(p3)
+        initialDrawables.add(p3)
         val p4 = PCanvas(p2.txt)
-        addDrawable(p4)
+        initialDrawables.add(p4)
 
         val image = CanvasImg("Coucou", 0)
-        addDrawable(image)
+        initialDrawables.add(image)
+        drawables.addAll(initialDrawables)
     }
 
     private fun draw() {
@@ -498,6 +495,17 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         trace("Clear")
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+
+        trace("Reset text")
+        for (text in drawables) {
+            text.reset()
+        }
+
+        trace("Remove New Drawables")
+        for (text in drawables) {
+            if (text !in initialDrawables)
+                drawables.remove(text)
+        }
 
         trace("Execute commandList")
         for (cmd in commandDoList) {
@@ -540,11 +548,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
         }
         divHolder.style.height = "${posYGlobal + dy}px"
-
-        trace("Reset text")
-        for (text in drawables) {
-            text.reset()
-        }
 
         traceDeIndent("MainCanvas::draw")
     }
