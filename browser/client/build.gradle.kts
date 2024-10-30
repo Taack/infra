@@ -21,7 +21,7 @@ kotlin {
             dependencies {
                 // No need for the js prefix here, you can just copy and paste it from the top-level block
 //                implementation("org.jetbrains.kotlinx:kotlinx-html:0.8.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 //                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
                 implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:1.0.0-pre.819")
             }

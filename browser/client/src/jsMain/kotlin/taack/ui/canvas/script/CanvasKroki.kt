@@ -50,7 +50,8 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
                 val txt = chars.concatToString()
                 return@then txt
             }.then {
-                imageSrc = "https://kroki.io/plantuml/svg/" + window.btoa(it)
+                imageSrc = "http://localhost:8000/graphviz/svg/" + window.btoa(it).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
+                trace("imageSrc: ${imageSrc}")
                 image = CanvasImg(imageSrc!!, "coucou", 0)
             }
             return txt
@@ -84,7 +85,7 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
         trace("CanvasKroki::compress: $str")
         return js("""
 function compress(string, encoding) {
-    var byteArray = new TextEncoder().encode(string);
+    var byteArray = new TextEncoder('utf-8').encode(string);
     var cs = new CompressionStream(encoding);
     var writer = cs.writable.getWriter();
     writer.write(byteArray);

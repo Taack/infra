@@ -514,22 +514,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         initialDrawables.add(CanvasTable.createTable())
 
-        val s = CanvasKroki("""rectangle "Main" {
-  (main.view)
-  (singleton)
-}
-rectangle "Base" {
-  (base.component)
-  (component)
-  (model)
-}
-rectangle "<b>main.ts</b>" as main_ts
-
-(component) ..> (base.component)
-main_ts ==> (main.view)
-(main.view) --> (component)
-(main.view) ...> (singleton)
-(singleton) ---> (model)""".trimIndent())
+        val s = CanvasKroki("digraph G {Hello->World}")
         initialDrawables.add(s)
 
         val p2 = PCanvas(
