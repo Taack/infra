@@ -51,7 +51,7 @@ class Helper {
             trace(--level, message)
         }
 
-        fun mapAjaxErrors(text: String): Map<String, String> {
+        private fun mapAjaxErrors(text: String): Map<String, String> {
             val m = mutableMapOf<String, String>()
             val errStart = "__ErrorKeyStart__"
             val errEnd = "__ErrorKeyEnd__"
@@ -131,7 +131,7 @@ class Helper {
             return m
         }
 
-        val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
+        private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
 
         fun processAjaxLink(text: String, base: BaseElement, process: CloseModalPostProcessing? = null) {
             val block = base.getParentBlock()

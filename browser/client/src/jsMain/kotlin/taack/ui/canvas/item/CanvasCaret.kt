@@ -6,15 +6,14 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
-import kotlin.math.min
 
 class CanvasCaret {
 
     companion object {
-        var posX: Double = 0.0
-        var posY: Double = 0.0
-        private val height: Double = 20.0
-        private val width: Double = 5.0
+        private var posX: Double = 0.0
+        private var posY: Double = 0.0
+        private const val HEIGHT: Double = 20.0
+        private const val WIDTH: Double = 5.0
 
         fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int) {
             traceIndent("CanvasCaret::draw: $n line.posEnd: ${line.posEnd}")
@@ -35,7 +34,7 @@ class CanvasCaret {
             text.initCtx(ctx)
             var i = if (posNStart == 0) 0 else text.findLine(line)
             var isFirstLine = true
-            var cLine: CanvasLine? = null
+            var cLine: CanvasLine?
             posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin
             do {
                 if (i >= text.lines.size) break
@@ -51,14 +50,14 @@ class CanvasCaret {
             traceDeIndent("CanvasCaret::drawDblClick: $n, $posNStart, $posNEnd")
         }
 
-        fun draw(ctx: CanvasRenderingContext2D, x: Double, y: Double, posXEnd: Double? = null) {
+        private fun draw(ctx: CanvasRenderingContext2D, x: Double, y: Double, posXEnd: Double? = null) {
             trace("CanvasCaret::draw: $x, $y, $posXEnd")
             this.posX = x
             this.posY = y
             ctx.save()
             ctx.strokeStyle = if (posXEnd == null) "green" else "blue"
             ctx.beginPath()
-            ctx.rect(posX - if (posXEnd != null) 0.0 else width, posY - height, if (posXEnd != null) posXEnd - posX else width, height)
+            ctx.rect(posX - if (posXEnd != null) 0.0 else WIDTH, posY - HEIGHT, if (posXEnd != null) posXEnd - posX else WIDTH, HEIGHT)
             ctx.stroke()
             ctx.restore()
         }

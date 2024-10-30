@@ -1,4 +1,5 @@
 package taack.ui.canvas.item
 
-class MenuEntry(val label: String, val onClick: () -> Unit) {
-}
+import taack.ui.canvas.command.ICanvasCommand
+
+class MenuEntry(val label: String, val onClick: () -> ICanvasCommand)

@@ -23,9 +23,9 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
 
     val ajaxBlockElements = mutableMapOf<String, AjaxBlock>()
     val modal: Modal
-    var tabs: List<AjaxBlockInputTab>
+    private var tabs: List<AjaxBlockInputTab>
     val blockId: String
-    var modalNumber = 0
+    private var modalNumber = 0
 
     init {
         val tmpBlockId= d.attributes.getNamedItem("blockId")?.value

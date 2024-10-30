@@ -367,7 +367,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.onclick = EventHandler { event: MouseEvent ->
             trace("canvas click")
             if (menu != null) {
-                menu!!.onClick(event.offsetX, event.offsetY)
+                val c = menu!!.onClick(event.offsetX, event.offsetY)
+                if (c !=null)
+                    commandDoList.add(c)
                 menu = null
             } else {
                 charOffset = 0

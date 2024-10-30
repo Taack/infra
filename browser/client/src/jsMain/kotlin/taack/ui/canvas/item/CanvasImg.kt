@@ -11,7 +11,7 @@ import web.html.Image
 import kotlin.math.min
 
 class CanvasImg(
-    txt: String, val initCitationNumber: Int
+    txt: String, private val initCitationNumber: Int
 ) : ICanvasDrawable {
 
     override var globalPosYStart: Double = 0.0

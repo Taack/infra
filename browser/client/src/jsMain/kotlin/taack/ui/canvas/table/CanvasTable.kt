@@ -9,9 +9,8 @@ import taack.ui.canvas.text.CanvasFigure
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
-import web.cssom.atrule.height
 
-class CanvasTable(val initHeaders: List<TxtHeaderCanvas>, val initCells: List<TxtRowCanvas>, txt: String, val initCitationNumber: Int = 0) : ICanvasDrawable {
+class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val initCells: List<TxtRowCanvas>, txt: String, private val initCitationNumber: Int = 0) : ICanvasDrawable {
 
     private val rows = initCells.toMutableList()
     private val headers = initHeaders.toMutableList()

@@ -24,13 +24,13 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
             }
         }
     }
-    val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")!!.value
+    private val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")!!.value
     val blockId = ajaxBlockId ?: parent.blockId
     var filters: Map<String, Filter> = mutableMapOf()
-    var tables: Map<String, Table> = mutableMapOf()
-    var forms: List<Form> = mutableListOf()
-    var shows: List<Show> = mutableListOf()
-    var progressId: String = ""
+    private var tables: Map<String, Table> = mutableMapOf()
+    private var forms: List<Form> = mutableListOf()
+    private var shows: List<Show> = mutableListOf()
+    private var progressId: String = ""
 
     private val innerScripts = d.getElementsByTagName("script")
 

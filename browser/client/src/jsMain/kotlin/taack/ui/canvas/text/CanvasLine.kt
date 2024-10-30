@@ -1,8 +1,6 @@
 package taack.ui.canvas.text
 
 import taack.ui.base.Helper.Companion.trace
-import taack.ui.base.Helper.Companion.traceDeIndent
-import taack.ui.base.Helper.Companion.traceIndent
 import web.canvas.CanvasRenderingContext2D
 
 
@@ -14,7 +12,7 @@ class CanvasLine(
     val leftMargin: Double = 0.0
 ) {
 
-    var containedStyles: List<CanvasStyle>? = null
+    private var containedStyles: List<CanvasStyle>? = null
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
         trace("CanvasLine::drawLine: $this")

@@ -7,7 +7,7 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 
-class TableRow(val parent: Table, val r: HTMLTableRowElement) :
+class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
         BaseElement {
     companion object {
         fun getSiblingRows(p: Table): List<TableRow> {

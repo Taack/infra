@@ -4,13 +4,14 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
+import taack.ui.canvas.command.AddStyleCommand
 import taack.ui.canvas.item.MenuEntry
 import web.canvas.CanvasRenderingContext2D
 import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(val txtInit: String = ">", private val initCitationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -64,7 +65,7 @@ abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int
         return txtVar.length
     }
 
-    private fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
+    fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
         traceIndent("CanvasText::addStyle: $style, $p, $pEnd")
         val newStyle = CanvasStyle(style, p, pEnd)
         if (styles.isEmpty())
@@ -300,32 +301,16 @@ abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int
         val charSelectEndNInText = dblClick.third
         return listOf(
             MenuEntry("NORMAL") {
-                this.addStyle(
-                    CanvasStyle.Type.NORMAL,
-                    charSelectStartNInText,
-                    charSelectEndNInText
-                )
+                AddStyleCommand(this, CanvasStyle.Type.NORMAL, charSelectStartNInText, charSelectEndNInText)
             },
             MenuEntry("BOLD") {
-                this.addStyle(
-                    CanvasStyle.Type.BOLD,
-                    charSelectStartNInText,
-                    charSelectEndNInText
-                )
+                AddStyleCommand(this, CanvasStyle.Type.BOLD, charSelectStartNInText, charSelectEndNInText)
             },
             MenuEntry("MONOSPACED") {
-                this.addStyle(
-                    CanvasStyle.Type.MONOSPACED,
-                    charSelectStartNInText,
-                    charSelectEndNInText
-                )
+                AddStyleCommand(this, CanvasStyle.Type.MONOSPACED, charSelectStartNInText, charSelectEndNInText)
             },
             MenuEntry("BOLD + MONOSPACED") {
-                this.addStyle(
-                    CanvasStyle.Type.BOLD_MONOSPACED,
-                    charSelectStartNInText,
-                    charSelectEndNInText
-                )
+                AddStyleCommand(this, CanvasStyle.Type.BOLD_MONOSPACED, charSelectStartNInText, charSelectEndNInText)
             }
         )
     }
@@ -337,5 +322,6 @@ abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int
     override fun reset() {
         citationNumber = initCitationNumber
         txtVar = txtInit
+        styles = emptyList()
     }
 }
