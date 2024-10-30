@@ -10,9 +10,6 @@ import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
-import web.compression.CompressionFormat
-import web.compression.CompressionStream
-import web.encoding.TextEncoder
 import kotlin.js.Promise
 
 class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
@@ -63,24 +60,6 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
         return ""
     }
 
-    suspend fun utf8ToB64(): String {
-        val ba = TextEncoder().encode(txt)
-        val cs = CompressionStream(CompressionFormat.deflate)
-        val w = cs.writable.getWriter()
-        var res = ""
-        console.log("AUOAUOAUO0")
-//            GlobalScope.launch {
-        console.log("AUOAUOAUO1")
-        w.write(ba)
-        w.close()
-        res = cs.readable.getReader().read().toString()
-        console.log("AUOAUOAUO2")
-//            }
-        console.log("AUOAUOAUO3")
-        return res
-    }
-
-
     fun compress(str: String): Promise<ArrayBuffer> {
         trace("CanvasKroki::compress: $str")
         return js("""
@@ -104,7 +83,6 @@ compress(str, "deflate");
         initCtx(ctx)
         txtPrefix = computeNum()
         val tmpTxt = txtPrefix + txtScript
-        //val txtMetrics = ctx.measureText(tmpTxt.ifEmpty { "|" })
         val height = lineHeight//txtMetrics.actualBoundingBoxAscent// + txtMetrics.actualBoundingBoxDescent//lineHeight
         globalPosYStart = posY
         var pX = posX
@@ -147,8 +125,8 @@ compress(str, "deflate");
         globalPosYEnd = ret
         ctx.restore()
         traceDeIndent("CanvasKroki::draw: $globalPosYEnd")
-        image?.draw(ctx, posX + 100.0, posY, width)
-        return ret
+
+        return (image?.draw(ctx, width, ret, posX) ?: ret)
     }
 
 }
