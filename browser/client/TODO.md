@@ -2,8 +2,11 @@
 
 ## Editor
 
-* Save in hidden input in asciidoc
+* Save in hidden input in AsciiDoc
 * ~~Quoting~~
-* History
+* ~~History~~
+* Serialize history
+* Serialize document
 * Insert image
+* Add Buttons
 * **TQL**

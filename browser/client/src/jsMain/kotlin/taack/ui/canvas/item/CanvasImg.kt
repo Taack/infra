@@ -11,7 +11,7 @@ import web.html.Image
 import kotlin.math.min
 
 class CanvasImg(
-    txt: String, private val initCitationNumber: Int
+   val src: String, txt: String, private val initCitationNumber: Int, floatingRight: Boolean = false
 ) : ICanvasDrawable {
 
     override var globalPosYStart: Double = 0.0
@@ -27,8 +27,6 @@ class CanvasImg(
         trace("CanvasImg::draw width: $width, posY: $posY, posX: $posX")
       globalPosYStart = posY
         val image = Image()
-//        image.style.maxHeight = "320px"
-//        image.style.maxWidth = "512px"
         image.onload = EventHandler {
             val w = image.width
             val h = image.height
@@ -37,8 +35,7 @@ class CanvasImg(
             ctx.drawImage(image, posX, posY, w * r, h * r)
         }
 //        image.src = "https://mdn.github.io/shared-assets/images/examples/rhino.jpg";
-        image.src =
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Oryctolagus_cuniculus_Tasmania_2.jpg/479px-Oryctolagus_cuniculus_Tasmania_2.jpg";
+        image.src = src
 
       globalPosYEnd = 320.0 + globalPosYStart
       globalPosYEnd = text.draw(ctx, width, globalPosYEnd, posX)

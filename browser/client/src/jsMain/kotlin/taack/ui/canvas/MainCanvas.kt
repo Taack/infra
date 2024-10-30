@@ -10,6 +10,7 @@ import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.item.Menu
 import taack.ui.canvas.item.MenuEntry
+import taack.ui.canvas.script.CanvasKroki
 import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
 import taack.ui.canvas.table.TxtRowCanvas
@@ -18,6 +19,7 @@ import web.canvas.CanvasRenderingContext2D
 import web.events.Event
 import web.events.EventHandler
 import web.events.addEventListener
+import web.html.HTMLButtonElement
 import web.html.HTMLCanvasElement
 import web.html.HTMLDivElement
 import web.uievents.KeyboardEvent
@@ -36,7 +38,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         set(value) = run { currentClick = currentClick?.copy(first = value) }
     private val drawables = mutableListOf<ICanvasDrawable>()
     private val initialDrawables = mutableListOf<ICanvasDrawable>()
-    private val divContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dy: Double = 0.0
     private var caretPosInCurrentText: Int
         get() = currentClick?.second ?: 0
@@ -110,54 +111,64 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
                 "Enter" -> {
                     trace("MainCanvas::addDrawable press Enter")
-                    val i = drawables.indexOf(currentText!!) + 1
-                    if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
+                    if (currentDrawable is CanvasKroki) {
                         commandDoList.add(
-                            AddTableCommand(drawables, i)
+                            AddCharCommand(
+                                currentText!!,
+                                '\n',
+                                caretPosInCurrentText + charOffset++
+                            )
                         )
-                    } else
-                        when (currentText) {
-                            is H2Canvas -> {
-                                commandDoList.add(
-                                    AddTextCommand(drawables, i, H3Canvas(">"))
-                                )
-                            }
-
-                            is H3Canvas -> {
-                                commandDoList.add(
-                                    AddTextCommand(drawables, i, H4Canvas(">"))
-                                )
-                            }
-
-                            is TxtHeaderCanvas -> {
-                                val table = currentDrawable as CanvasTable
-                                if (currentKeyboardEvent!!.shiftKey)
+                    } else {
+                        val i = drawables.indexOf(currentText!!) + 1
+                        if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
+                            commandDoList.add(
+                                AddTableCommand(drawables, i)
+                            )
+                        } else
+                            when (currentText) {
+                                is H2Canvas -> {
                                     commandDoList.add(
-                                        RemoveTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                        AddTextCommand(drawables, i, H3Canvas(">"))
                                     )
-                                else commandDoList.add(
-                                    AddTableColumnCommand(table, currentText as TxtHeaderCanvas)
-                                )
-                            }
+                                }
 
-                            is TxtRowCanvas -> {
-                                val table = currentDrawable as CanvasTable
-                                if (currentKeyboardEvent!!.shiftKey)
+                                is H3Canvas -> {
                                     commandDoList.add(
-                                        RemoveTableRowCommand(table, currentText as TxtRowCanvas)
+                                        AddTextCommand(drawables, i, H4Canvas(">"))
                                     )
-                                else commandDoList.add(
-                                    AddTableRowCommand(table, currentText as TxtRowCanvas)
-                                )
-                            }
+                                }
 
-                            else -> {
-                                commandDoList.add(
-                                    AddTextCommand(drawables, i, PCanvas(">"))
-                                )
+                                is TxtHeaderCanvas -> {
+                                    val table = currentDrawable as CanvasTable
+                                    if (currentKeyboardEvent!!.shiftKey)
+                                        commandDoList.add(
+                                            RemoveTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                        )
+                                    else commandDoList.add(
+                                        AddTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                    )
+                                }
+
+                                is TxtRowCanvas -> {
+                                    val table = currentDrawable as CanvasTable
+                                    if (currentKeyboardEvent!!.shiftKey)
+                                        commandDoList.add(
+                                            RemoveTableRowCommand(table, currentText as TxtRowCanvas)
+                                        )
+                                    else commandDoList.add(
+                                        AddTableRowCommand(table, currentText as TxtRowCanvas)
+                                    )
+                                }
+
+                                else -> {
+                                    commandDoList.add(
+                                        AddTextCommand(drawables, i, PCanvas(">"))
+                                    )
+                                }
                             }
-                        }
-                    currentLine = null
+                        currentLine = null
+                    }
                 }
 
                 "ArrowUp" -> {
@@ -282,7 +293,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     caretPosInCurrentText = currentLine!!.posBegin
                 }
 
-                "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight" -> {
+                "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight", "AltGraph" -> {
                     doNotDraw = true
                 }
 
@@ -327,7 +338,61 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
-        divContainer.appendChild(canvas)
+        val bBold = document.createElement("button") as HTMLButtonElement
+        bBold.id = "buttonBold"
+        bBold.innerHTML = "<b>BOLD</b>"
+        bBold.onclick = EventHandler {
+            if (currentDrawable != null && currentDoubleClick != null)
+                commandDoList.add(
+                    AddStyleCommand(currentText!!, CanvasStyle.Type.BOLD, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                )
+            draw()
+        }
+        divHolder.appendChild(bBold)
+        val bNormal = document.createElement("button") as HTMLButtonElement
+        bNormal.id = "buttonNormal"
+        bNormal.innerHTML = "Normal"
+        bNormal.onclick = EventHandler {
+            if (currentDrawable != null && currentDoubleClick != null)
+                commandDoList.add(
+                    AddStyleCommand(currentText!!, CanvasStyle.Type.NORMAL, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                )
+            draw()
+        }
+        divHolder.appendChild(bNormal)
+        val bMono = document.createElement("button") as HTMLButtonElement
+        bMono.id = "buttonMono"
+        bMono.innerHTML = "<code>Mono</code>"
+        bMono.onclick = EventHandler {
+            if (currentDrawable != null && currentDoubleClick != null)
+                commandDoList.add(
+                    AddStyleCommand(currentText!!, CanvasStyle.Type.MONOSPACED, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                )
+            draw()
+        }
+        divHolder.appendChild(bMono)
+        val bBoldMono = document.createElement("button") as HTMLButtonElement
+        bBoldMono.id = "buttonBoldMono"
+        bBoldMono.innerHTML = "<code><b>Mono</b></code>"
+        bBoldMono.onclick = EventHandler {
+            if (currentDrawable != null && currentDoubleClick != null)
+                commandDoList.add(
+                    AddStyleCommand(currentText!!, CanvasStyle.Type.BOLD_MONOSPACED, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                )
+            draw()
+        }
+        divHolder.appendChild(bBoldMono)
+        val bScript = document.createElement("button") as HTMLButtonElement
+        bScript.id = "buttonScript"
+        bScript.innerHTML = "<code><em>Kroki</em></code>"
+        bScript.onclick = EventHandler {
+            if (currentDrawable != null && currentDoubleClick != null)
+                commandDoList.add(
+                    AddStyleCommand(currentText!!, CanvasStyle.Type.BOLD_MONOSPACED, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                )
+            draw()
+        }
+        divHolder.appendChild(bScript)
         divHolder.appendChild(canvas)
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
@@ -449,6 +514,24 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         initialDrawables.add(CanvasTable.createTable())
 
+        val s = CanvasKroki("""rectangle "Main" {
+  (main.view)
+  (singleton)
+}
+rectangle "Base" {
+  (base.component)
+  (component)
+  (model)
+}
+rectangle "<b>main.ts</b>" as main_ts
+
+(component) ..> (base.component)
+main_ts ==> (main.view)
+(main.view) --> (component)
+(main.view) ...> (singleton)
+(singleton) ---> (model)""".trimIndent())
+        initialDrawables.add(s)
+
         val p2 = PCanvas(
             """
             Matched by feature, body name, but also by position DSL.
@@ -481,7 +564,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         val p4 = PCanvas(p2.txt)
         initialDrawables.add(p4)
 
-        val image = CanvasImg("Coucou", 0)
+        val image = CanvasImg("https://mdn.github.io/shared-assets/images/examples/rhino.jpg", "Coucou", 0)
         initialDrawables.add(image)
         drawables.addAll(initialDrawables)
     }

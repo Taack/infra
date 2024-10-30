@@ -25,7 +25,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
     abstract val letterSpacing: Double
     abstract val lineHeight: Double
     abstract val wordSpacing: Double
-    private var totalHeight: Double = 0.0
+    var totalHeight: Double = 0.0
     abstract val marginTop: Double
     abstract val marginBottom: Double
 
@@ -38,7 +38,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
     var lines: List<CanvasLine> = emptyList()
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
-    private var txtVar:String = txtInit
+    private var txtVar: String = txtInit
     val txt: String
         get() {
             return txtVar
@@ -150,7 +150,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
         ctx.wordSpacing = wordSpacing.toString() + "px"
     }
 
-    private fun initCtx(ctx: CanvasRenderingContext2D, posN: Int) {
+    fun initCtx(ctx: CanvasRenderingContext2D, posN: Int) {
         //trace("CanvasText::initCtx: $posN")
         if (styles.isNotEmpty()) {
             styles.find { it.posNStart <= posN && it.posNEnd >= posN }?.initCtx(ctx, this)
@@ -178,7 +178,6 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
         //val txtMetrics = ctx.measureText(tmpTxt.ifEmpty { "|" })
         val height = lineHeight//txtMetrics.actualBoundingBoxAscent// + txtMetrics.actualBoundingBoxDescent//lineHeight
         globalPosYStart = posY
-        val listTxt = tmpTxt.split(" ")
         var pX = posX
         var pY = marginTop + height
         totalHeight = pY
@@ -186,6 +185,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
         var posLetterLineBegin = 0
         var posLetterLineEnd = 0
         lines = emptyList()
+        val listTxt = tmpTxt.split(" ")
         for (i in listTxt.indices) {
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
             currentLetterPos += t.length
@@ -208,9 +208,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
             posLetterLineEnd = currentLetterPos
             pX += tWidth
             ctx.restore()
-//            txtVar = txtInit
         }
-
         if (posLetterLineBegin != currentLetterPos || currentLetterPos == 0) {
 
             lines += CanvasLine(
@@ -221,6 +219,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
                 posX + ctx.measureText(txtPrefix).width
             )
         }
+
         lines.forEach { l ->
             val stylesInLine = styles.filter { s ->
                 s.posNStart >= l.posBegin && s.posNEnd <= l.posEnd || s.posNStart <= l.posBegin && s.posNEnd >= l.posBegin || s.posNStart >= l.posBegin && s.posNEnd >= l.posEnd
