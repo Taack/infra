@@ -212,7 +212,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 "ArrowRight" -> {
                     trace("MainCanvas::addDrawable press ArrowRight")
                     if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
-                        val decay = currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOf(' ') + 1
+                        val decay = currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOfFirst { !it.isLetter() } + 1
                         if (decay == 0) {
                             charSelectEndNInText = currentText!!.txt.length
                         }
@@ -354,7 +354,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.oncontextmenu = EventHandler { event: MouseEvent ->
             trace("canvas contextmenu")
             if (currentDrawable != null && currentClick != null)
-                currentDrawable!!.getContextualMenuEntries(currentDoubleClick!!)
+                currentMenuEntries = currentDrawable!!.getContextualMenuEntries(currentDoubleClick!!)
             if (currentMenuEntries != null) {
                 event.preventDefault()
                 event.stopPropagation()

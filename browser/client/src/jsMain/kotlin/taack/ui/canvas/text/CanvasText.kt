@@ -274,10 +274,10 @@ abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int
                 val caretPosInCurrentText = line.caretNCoords(ctx, this, posX)
                 var charSelectStartNInText =
                     txt.substring(line.posBegin, caretPosInCurrentText)
-                        .indexOfLast { it == ' ' } + 1
+                        .indexOfLast { !it.isLetter() } + 1
                 charSelectStartNInText += line.posBegin
                 var charSelectEndNInText =
-                    txt.substring(caretPosInCurrentText + 1).indexOfFirst { it == ' ' }
+                    txt.substring(caretPosInCurrentText + 1).indexOfFirst { !it.isLetter() }
                 if (charSelectEndNInText == -1) {
                     charSelectEndNInText = line.posEnd
                 } else
@@ -295,7 +295,7 @@ abstract class CanvasText(val txtInit: String = ">", val initCitationNumber: Int
     }
 
     override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
-        trace("CanvasText::getContextualMenuEntries")
+        trace("CanvasText::getContextualMenuEntries $dblClick")
         val charSelectStartNInText = dblClick.second
         val charSelectEndNInText = dblClick.third
         return listOf(
