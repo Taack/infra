@@ -47,7 +47,7 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
                 val txt = chars.concatToString()
                 return@then txt
             }.then {
-                imageSrc = "http://localhost:8000/graphviz/svg/" + window.btoa(it).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
+                imageSrc = "http://10.109.55.107:8000/graphviz/svg/" + window.btoa(it).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
                 trace("imageSrc: ${imageSrc}")
                 image = CanvasImg(imageSrc!!, "coucou", 0)
             }
