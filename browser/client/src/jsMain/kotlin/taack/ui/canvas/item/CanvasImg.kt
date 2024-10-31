@@ -29,7 +29,7 @@ class CanvasImg(
         set(value) {
             srcRatio[src] = value!!
         }
-    private val image: Image = srcImage.getOrPut(src) {
+    val image: Image = srcImage.getOrPut(src) {
         val i = Image()
         i.src = src
         i

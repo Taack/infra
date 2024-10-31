@@ -15,7 +15,7 @@ class CanvasLine(
     private var containedStyles: List<CanvasStyle>? = null
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
-        trace("CanvasLine::drawLine: $this")
+//        trace("CanvasLine::drawLine: $this")
         if (!styles.isNullOrEmpty()) {
             containedStyles = styles
             var posXStart = text.drawCitation(ctx, textY, height)
@@ -24,10 +24,9 @@ class CanvasLine(
                 posXStart += w
             }
         } else {
-            val posXStart = text.drawCitation(ctx, textY, height)
             ctx.fillText(
                 (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
-                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 10.0) + posXStart,
+                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 10.0) +  text.posXStart,
                 textY
             )
         }
