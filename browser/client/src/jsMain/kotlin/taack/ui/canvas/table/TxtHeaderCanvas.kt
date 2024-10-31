@@ -3,7 +3,7 @@ package taack.ui.canvas.table
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.canvas.text.CanvasText
 
-class TxtHeaderCanvas(txtInit: String) : CanvasText(txtInit) {
+class TxtHeaderCanvas(txtVar: String) : CanvasText(txtVar) {
     override val fontWeight: String
         get() = "bold"
     override val fontSize: String
