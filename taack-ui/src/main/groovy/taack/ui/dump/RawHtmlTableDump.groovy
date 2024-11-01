@@ -198,6 +198,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.enterBlock('visitRowColumn')
         isInCol = true
         HTMLTd td = new HTMLTd(colSpan, rowSpan)
+        if (style?.cssClassesString) td.addClasses(style.cssClassesString)
+        if (style?.cssStyleString) td.attributes.put('style', style.cssStyleString)
         if (firstInCol) td.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
         firstInCol = false
         blockLog.topElement.builder.addChildren(td)
