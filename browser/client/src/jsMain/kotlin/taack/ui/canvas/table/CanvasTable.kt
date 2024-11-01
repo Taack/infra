@@ -4,7 +4,6 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
-import taack.ui.canvas.item.MenuEntry
 import taack.ui.canvas.text.CanvasFigure
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
@@ -149,11 +148,6 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
         traceDeIndent("CanvasTable::doubleClick: null")
         return null
 
-    }
-
-    override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
-        trace("CanvasTable::getContextualMenuEntries: $dblClick")
-        return currentRow?.getContextualMenuEntries(dblClick) ?: emptyList()
     }
 
     fun addLine(currentText: TxtRowCanvas) {

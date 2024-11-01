@@ -5,7 +5,6 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
 import taack.ui.canvas.command.AddStyleCommand
-import taack.ui.canvas.item.MenuEntry
 import web.canvas.CanvasRenderingContext2D
 import kotlin.math.max
 import kotlin.math.min
@@ -347,26 +346,6 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
         }
         traceDeIndent("CanvasText::doubleClick: null")
         return null
-    }
-
-    override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
-        trace("CanvasText::getContextualMenuEntries $dblClick")
-        val charSelectStartNInText = dblClick.second
-        val charSelectEndNInText = dblClick.third
-        return listOf(
-            MenuEntry("NORMAL") {
-                AddStyleCommand(this, CanvasStyle.Type.NORMAL, charSelectStartNInText, charSelectEndNInText)
-            },
-            MenuEntry("BOLD") {
-                AddStyleCommand(this, CanvasStyle.Type.BOLD, charSelectStartNInText, charSelectEndNInText)
-            },
-            MenuEntry("MONOSPACED") {
-                AddStyleCommand(this, CanvasStyle.Type.MONOSPACED, charSelectStartNInText, charSelectEndNInText)
-            },
-            MenuEntry("BOLD + MONOSPACED") {
-                AddStyleCommand(this, CanvasStyle.Type.BOLD_MONOSPACED, charSelectStartNInText, charSelectEndNInText)
-            }
-        )
     }
 
     override fun toString(): String {

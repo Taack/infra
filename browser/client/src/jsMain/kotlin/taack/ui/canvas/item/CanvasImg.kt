@@ -69,10 +69,6 @@ class CanvasImg(
         TODO("Not yet implemented")
     }
 
-    override fun getContextualMenuEntries(dblClick: Triple<CanvasLine, Int, Int>): List<MenuEntry> {
-        return emptyList()
-    }
-
     override fun reset() {
         text.reset()
         citationNumber = initCitationNumber

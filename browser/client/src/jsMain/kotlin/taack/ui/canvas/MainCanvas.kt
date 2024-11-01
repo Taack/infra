@@ -8,8 +8,6 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.command.*
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.CanvasImg
-import taack.ui.canvas.item.Menu
-import taack.ui.canvas.item.MenuEntry
 import taack.ui.canvas.script.CanvasKroki
 import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
@@ -49,7 +47,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
-    private var wordOffset: Int = 0
     private var isDoubleClick: Boolean = false
     private var charSelectStartNInText: Int?
         get() = currentDoubleClick?.second
@@ -57,8 +54,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var charSelectEndNInText: Int?
         get() = currentDoubleClick?.third
         set(value) = run { currentDoubleClick = currentDoubleClick?.copy(third = value!!) }
-    private var currentMenuEntries: List<MenuEntry>? = null
-    private var menu: Menu? = null
     private var posYGlobal: Double = 0.0
     private val commandDoList = mutableListOf<ICanvasCommand>()
     private val commandUndoList = mutableListOf<ICanvasCommand>()
@@ -67,283 +62,282 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
     private fun addDrawable() {
         var doNotDraw = false
-        if (menu == null)
-            when (currentKeyboardEvent!!.key) {
-                "Backspace" -> {
-                    trace("MainCanvas::addDrawable press Backspace")
-                    commandDoList.add(
-                        RmCharCommand(
-                            drawables,
-                            currentDrawable!!.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)!!,
-                            caretPosInCurrentText--
+        when (currentKeyboardEvent!!.key) {
+            "Backspace" -> {
+                trace("MainCanvas::addDrawable press Backspace")
+                commandDoList.add(
+                    RmCharCommand(
+                        drawables,
+                        currentDrawable!!.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)!!,
+                        caretPosInCurrentText--
+                    )
+                )
+            }
+
+            "Tab" -> {
+                trace("MainCanvas::addDrawable press Delete")
+                if (currentDrawable != null)
+                    if (currentKeyboardEvent!!.shiftKey)
+                        commandDoList.add(
+                            DeIndentCommand(currentDrawable!!)
                         )
+                    else
+                        commandDoList.add(
+                            IndentCommand(currentDrawable!!)
+                        )
+
+            }
+
+            "Delete" -> {
+                trace("MainCanvas::addDrawable press Delete")
+                if (currentKeyboardEvent!!.ctrlKey && currentDrawable != null) {
+                    commandDoList.add(
+                        DeleteTextCommand(drawables, currentDrawable!!.getSelectedText()!!)
+                    )
+                } else {
+                    val pos1 = caretPosInCurrentText
+                    val pos2: Int? = null
+                    commandDoList.add(
+                        DeleteCharCommand(drawables, currentDrawable!!.getSelectedText()!!, pos1, pos2)
                     )
                 }
+            }
 
-                "Tab" -> {
-                    trace("MainCanvas::addDrawable press Delete")
-                    if (currentDrawable != null)
-                        if (currentKeyboardEvent!!.shiftKey)
-                            commandDoList.add(
-                                DeIndentCommand(currentDrawable!!)
-                            )
-                        else
-                            commandDoList.add(
-                                IndentCommand(currentDrawable!!)
-                            )
-
-                }
-
-                "Delete" -> {
-                    trace("MainCanvas::addDrawable press Delete")
-                    if (currentKeyboardEvent!!.ctrlKey && currentDrawable != null) {
-                        commandDoList.add(
-                            DeleteTextCommand(drawables, currentDrawable!!.getSelectedText()!!)
+            "Enter" -> {
+                trace("MainCanvas::addDrawable press Enter")
+                if (currentDrawable is CanvasKroki) {
+                    commandDoList.add(
+                        AddCharCommand(
+                            currentText!!,
+                            '\n',
+                            caretPosInCurrentText++
                         )
-                    } else {
-                        val pos1 = caretPosInCurrentText
-                        val pos2: Int? = null
+                    )
+                } else {
+                    val i = drawables.indexOf(currentText!!) + 1
+                    if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
                         commandDoList.add(
-                            DeleteCharCommand(drawables, currentDrawable!!.getSelectedText()!!, pos1, pos2)
+                            AddTableCommand(drawables, i)
                         )
-                    }
-                }
-
-                "Enter" -> {
-                    trace("MainCanvas::addDrawable press Enter")
-                    if (currentDrawable is CanvasKroki) {
-                        commandDoList.add(
-                            AddCharCommand(
-                                currentText!!,
-                                '\n',
-                                caretPosInCurrentText++
-                            )
-                        )
-                    } else {
-                        val i = drawables.indexOf(currentText!!) + 1
-                        if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
-                            commandDoList.add(
-                                AddTableCommand(drawables, i)
-                            )
-                        } else
-                            when (currentText) {
-                                is H2Canvas -> {
-                                    commandDoList.add(
-                                        AddTextCommand(drawables, i, H3Canvas(">"))
-                                    )
-                                }
-
-                                is H3Canvas -> {
-                                    commandDoList.add(
-                                        AddTextCommand(drawables, i, H4Canvas(">"))
-                                    )
-                                }
-
-                                is TxtHeaderCanvas -> {
-                                    val table = currentDrawable as CanvasTable
-                                    if (currentKeyboardEvent!!.shiftKey)
-                                        commandDoList.add(
-                                            RemoveTableColumnCommand(table, currentText as TxtHeaderCanvas)
-                                        )
-                                    else commandDoList.add(
-                                        AddTableColumnCommand(table, currentText as TxtHeaderCanvas)
-                                    )
-                                }
-
-                                is TxtRowCanvas -> {
-                                    val table = currentDrawable as CanvasTable
-                                    if (currentKeyboardEvent!!.shiftKey)
-                                        commandDoList.add(
-                                            RemoveTableRowCommand(table, currentText as TxtRowCanvas)
-                                        )
-                                    else commandDoList.add(
-                                        AddTableRowCommand(table, currentText as TxtRowCanvas)
-                                    )
-                                }
-
-                                else -> {
-                                    commandDoList.add(
-                                        AddTextCommand(drawables, i, PCanvas(">"))
-                                    )
-                                }
+                    } else
+                        when (currentText) {
+                            is H2Canvas -> {
+                                commandDoList.add(
+                                    AddTextCommand(drawables, i, H3Canvas(">"))
+                                )
                             }
-                        currentLine = null
-                    }
-                }
 
-                "ArrowUp" -> {
-                    trace("MainCanvas::addDrawable press ArrowUp")
-                    if (currentLine == null) {
+                            is H3Canvas -> {
+                                commandDoList.add(
+                                    AddTextCommand(drawables, i, H4Canvas(">"))
+                                )
+                            }
+
+                            is TxtHeaderCanvas -> {
+                                val table = currentDrawable as CanvasTable
+                                if (currentKeyboardEvent!!.shiftKey)
+                                    commandDoList.add(
+                                        RemoveTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                    )
+                                else commandDoList.add(
+                                    AddTableColumnCommand(table, currentText as TxtHeaderCanvas)
+                                )
+                            }
+
+                            is TxtRowCanvas -> {
+                                val table = currentDrawable as CanvasTable
+                                if (currentKeyboardEvent!!.shiftKey)
+                                    commandDoList.add(
+                                        RemoveTableRowCommand(table, currentText as TxtRowCanvas)
+                                    )
+                                else commandDoList.add(
+                                    AddTableRowCommand(table, currentText as TxtRowCanvas)
+                                )
+                            }
+
+                            else -> {
+                                commandDoList.add(
+                                    AddTextCommand(drawables, i, PCanvas(">"))
+                                )
+                            }
+                        }
+                    currentLine = null
+                }
+            }
+
+            "ArrowUp" -> {
+                trace("MainCanvas::addDrawable press ArrowUp")
+                if (currentLine == null) {
+                    val j = texts.indexOf(currentText) - 1
+                    if (j >= 0) {
+                        currentDrawable = texts[j]
+                        currentLine = currentText!!.lines.last()
+                    }
+                } else {
+                    val i = currentText!!.findLine(currentLine!!)
+                    if (i > 0 && i < currentText!!.lines.size) {
+                        caretPosInCurrentText -= currentLine!!.posBegin
+                        currentLine = currentText!!.lines[i - 1]
+                        caretPosInCurrentText += currentLine!!.posBegin
+                    } else {
                         val j = texts.indexOf(currentText) - 1
                         if (j >= 0) {
                             currentDrawable = texts[j]
                             currentLine = currentText!!.lines.last()
                         }
-                    } else {
-                        val i = currentText!!.findLine(currentLine!!)
-                        if (i > 0 && i < currentText!!.lines.size) {
-                            caretPosInCurrentText -= currentLine!!.posBegin
-                            currentLine = currentText!!.lines[i - 1]
-                            caretPosInCurrentText += currentLine!!.posBegin
-                        } else {
-                            val j = texts.indexOf(currentText) - 1
-                            if (j >= 0) {
-                                currentDrawable = texts[j]
-                                currentLine = currentText!!.lines.last()
-                            }
-                        }
                     }
                 }
+            }
 
-                "ArrowDown" -> {
-                    trace("MainCanvas::addDrawable press ArrowDown")
-                    if (currentLine == null) {
+            "ArrowDown" -> {
+                trace("MainCanvas::addDrawable press ArrowDown")
+                if (currentLine == null) {
+                    val j = texts.indexOf(currentText) + 1
+                    if (j > 0 && j < texts.size) {
+                        currentDrawable = texts[j]
+                        currentLine = currentText!!.lines.first()
+                    }
+                } else {
+                    val i = currentText!!.findLine(currentLine!!)
+
+                    if (i >= 0 && i < currentText!!.lines.size) {
+                        caretPosInCurrentText -= currentLine!!.posBegin
+                        currentLine = currentText!!.lines[i + 1]
+                        caretPosInCurrentText += currentLine!!.posBegin
+                    } else {
                         val j = texts.indexOf(currentText) + 1
                         if (j > 0 && j < texts.size) {
                             currentDrawable = texts[j]
                             currentLine = currentText!!.lines.first()
                         }
-                    } else {
-                        val i = currentText!!.findLine(currentLine!!)
-
-                        if (i >= 0 && i < currentText!!.lines.size) {
-                            caretPosInCurrentText -= currentLine!!.posBegin
-                            currentLine = currentText!!.lines[i + 1]
-                            caretPosInCurrentText += currentLine!!.posBegin
-                        } else {
-                            val j = texts.indexOf(currentText) + 1
-                            if (j > 0 && j < texts.size) {
-                                currentDrawable = texts[j]
-                                currentLine = currentText!!.lines.first()
-                            }
-                        }
                     }
                 }
+            }
 
-                "ArrowRight" -> {
-                    trace("MainCanvas::addDrawable press ArrowRight caretPosInCurrentText: $caretPosInCurrentText")
-                    if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
-                        val decay = currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOfFirst { !it.isLetter() } + 1
-                        if (decay == 0) {
-                            charSelectEndNInText = currentText!!.txt.length
-                        }
-                        charSelectEndNInText = charSelectEndNInText?.plus(decay)
-                    } else {
-                        if (currentLine != null) {
-                            if (currentLine!!.length > caretPosInLine  && currentText!!.txt[caretPosInCurrentText] != '\n')
-                                caretPosInCurrentText++
-                            else {
-                                val i = currentText!!.findLine(currentLine!!)
-                                if (i >= 0 && i < currentText!!.lines.size - 1) {
-                                    trace("Caret eol")
-                                    currentLine = currentText!!.lines[i + 1]
-                                    caretPosInCurrentText = currentLine!!.posBegin
-                                } else {
-                                    trace("Caret eol last line")
-                                    val j = texts.indexOf(currentText) + 1
-                                    if (j > 0 && j < texts.size) {
-                                        currentDrawable = texts[j]
-                                        currentLine = currentText!!.lines.first()
-                                        caretPosInCurrentText = 0
-                                    }
+            "ArrowRight" -> {
+                trace("MainCanvas::addDrawable press ArrowRight caretPosInCurrentText: $caretPosInCurrentText")
+                if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
+                    val decay =
+                        currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOfFirst { !it.isLetter() } + 1
+                    if (decay == 0) {
+                        charSelectEndNInText = currentText!!.txt.length
+                    }
+                    charSelectEndNInText = charSelectEndNInText?.plus(decay)
+                } else {
+                    if (currentLine != null) {
+                        if (currentLine!!.length > caretPosInLine && currentText!!.txt[caretPosInCurrentText] != '\n')
+                            caretPosInCurrentText++
+                        else {
+                            val i = currentText!!.findLine(currentLine!!)
+                            if (i >= 0 && i < currentText!!.lines.size - 1) {
+                                trace("Caret eol")
+                                currentLine = currentText!!.lines[i + 1]
+                                caretPosInCurrentText = currentLine!!.posBegin
+                            } else {
+                                trace("Caret eol last line")
+                                val j = texts.indexOf(currentText) + 1
+                                if (j > 0 && j < texts.size) {
+                                    currentDrawable = texts[j]
+                                    currentLine = currentText!!.lines.first()
+                                    caretPosInCurrentText = 0
                                 }
                             }
                         }
                     }
                 }
-
-                "F2" -> {
-                    commandDoList.add(
-                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
-                    )
-                }
-
-                "F3" -> {
-                    commandDoList.add(
-                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
-                    )
-                }
-
-                "F4" -> {
-                    commandDoList.add(
-                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
-                    )
-                }
-
-                "F1" -> {
-                    commandDoList.add(
-                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
-                    )
-                }
-
-                "F5" -> {
-                    commandDoList.add(
-                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
-                    )
-                }
-
-                "F6" -> {
-                    commandDoList.add(
-                        ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
-                    )
-                }
-
-                "End" -> {
-                    trace("MainCanvas::addDrawable press End")
-                    if (currentKeyboardEvent!!.ctrlKey) {
-                        if (currentKeyboardEvent!!.shiftKey) {
-                            currentDrawable = texts.last()
-                        }
-                        currentLine = currentText!!.lines.last()
-                    }
-                    caretPosInCurrentText = currentLine!!.posEnd
-                }
-
-                "Home" -> {
-                    trace("MainCanvas::addDrawable press Home")
-                    if (currentKeyboardEvent!!.ctrlKey) {
-                        if (currentKeyboardEvent!!.shiftKey) {
-                            currentDrawable = texts.first()
-                        }
-                        currentLine = currentText!!.lines.first()
-                    }
-                    caretPosInCurrentText = currentLine!!.posBegin
-                }
-
-                "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight", "AltGraph" -> {
-                    doNotDraw = true
-                }
-
-                "ArrowLeft" -> {
-                    trace("MainCanvas::addDrawable press ArrowLeft")
-                    caretPosInCurrentText--
-                }
-
-                else -> {
-                    trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}, CTRL: ${currentKeyboardEvent!!.ctrlKey}, SHIFT: ${currentKeyboardEvent!!.shiftKey}")
-                    if (currentKeyboardEvent != null) {
-                        if (currentKeyboardEvent!!.ctrlKey) {
-                            if (currentKeyboardEvent!!.key[0] == 'z' && !currentKeyboardEvent!!.shiftKey && commandDoList.size > 0) {
-                                trace("MainCanvas::addDrawable undo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
-                                commandUndoList.add(commandDoList.removeLast())
-                            } else if (currentKeyboardEvent!!.key[0] == 'Z' && commandUndoList.size > 0) {
-                                trace("MainCanvas::addDrawable redo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
-                                commandDoList.add(commandUndoList.removeLast())
-                            }
-                        } else
-                            if (currentText != null) {
-                                commandDoList.add(
-                                    AddCharCommand(
-                                        currentText!!,
-                                        currentKeyboardEvent!!.key[0],
-                                        caretPosInCurrentText++
-                                    )
-                                )
-                            }
-                    }
-                }
             }
 
+            "F2" -> {
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
+                )
+            }
+
+            "F3" -> {
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
+                )
+            }
+
+            "F4" -> {
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
+                )
+            }
+
+            "F1" -> {
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
+                )
+            }
+
+            "F5" -> {
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
+                )
+            }
+
+            "F6" -> {
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
+                )
+            }
+
+            "End" -> {
+                trace("MainCanvas::addDrawable press End")
+                if (currentKeyboardEvent!!.ctrlKey) {
+                    if (currentKeyboardEvent!!.shiftKey) {
+                        currentDrawable = texts.last()
+                    }
+                    currentLine = currentText!!.lines.last()
+                }
+                caretPosInCurrentText = currentLine!!.posEnd
+            }
+
+            "Home" -> {
+                trace("MainCanvas::addDrawable press Home")
+                if (currentKeyboardEvent!!.ctrlKey) {
+                    if (currentKeyboardEvent!!.shiftKey) {
+                        currentDrawable = texts.first()
+                    }
+                    currentLine = currentText!!.lines.first()
+                }
+                caretPosInCurrentText = currentLine!!.posBegin
+            }
+
+            "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight", "AltGraph" -> {
+                doNotDraw = true
+            }
+
+            "ArrowLeft" -> {
+                trace("MainCanvas::addDrawable press ArrowLeft")
+                caretPosInCurrentText--
+            }
+
+            else -> {
+                trace("MainCanvas::addDrawable else branch ${currentKeyboardEvent!!.key}, CTRL: ${currentKeyboardEvent!!.ctrlKey}, SHIFT: ${currentKeyboardEvent!!.shiftKey}")
+                if (currentKeyboardEvent != null) {
+                    if (currentKeyboardEvent!!.ctrlKey) {
+                        if (currentKeyboardEvent!!.key[0] == 'z' && !currentKeyboardEvent!!.shiftKey && commandDoList.size > 0) {
+                            trace("MainCanvas::addDrawable undo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
+                            commandUndoList.add(commandDoList.removeLast())
+                        } else if (currentKeyboardEvent!!.key[0] == 'Z' && commandUndoList.size > 0) {
+                            trace("MainCanvas::addDrawable redo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
+                            commandDoList.add(commandUndoList.removeLast())
+                        }
+                    } else
+                        if (currentText != null) {
+                            commandDoList.add(
+                                AddCharCommand(
+                                    currentText!!,
+                                    currentKeyboardEvent!!.key[0],
+                                    caretPosInCurrentText++
+                                )
+                            )
+                        }
+                }
+            }
+        }
         if (!doNotDraw)
             draw()
     }
@@ -359,7 +353,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         bBold.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
-                    AddStyleCommand(currentText!!, CanvasStyle.Type.BOLD, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                    AddStyleCommand(
+                        currentText!!,
+                        CanvasStyle.Type.BOLD,
+                        currentDoubleClick!!.second,
+                        currentDoubleClick!!.third
+                    )
                 )
             draw()
         }
@@ -370,7 +369,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         bNormal.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
-                    AddStyleCommand(currentText!!, CanvasStyle.Type.NORMAL, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                    AddStyleCommand(
+                        currentText!!,
+                        CanvasStyle.Type.NORMAL,
+                        currentDoubleClick!!.second,
+                        currentDoubleClick!!.third
+                    )
                 )
             draw()
         }
@@ -381,7 +385,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         bMono.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
-                    AddStyleCommand(currentText!!, CanvasStyle.Type.MONOSPACED, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                    AddStyleCommand(
+                        currentText!!,
+                        CanvasStyle.Type.MONOSPACED,
+                        currentDoubleClick!!.second,
+                        currentDoubleClick!!.third
+                    )
                 )
             draw()
         }
@@ -392,7 +401,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         bBoldMono.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
-                    AddStyleCommand(currentText!!, CanvasStyle.Type.BOLD_MONOSPACED, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                    AddStyleCommand(
+                        currentText!!,
+                        CanvasStyle.Type.BOLD_MONOSPACED,
+                        currentDoubleClick!!.second,
+                        currentDoubleClick!!.third
+                    )
                 )
             draw()
         }
@@ -403,7 +417,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         bScript.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
-                    AddStyleCommand(currentText!!, CanvasStyle.Type.BOLD_MONOSPACED, currentDoubleClick!!.second, currentDoubleClick!!.third)
+                    AddStyleCommand(
+                        currentText!!,
+                        CanvasStyle.Type.BOLD_MONOSPACED,
+                        currentDoubleClick!!.second,
+                        currentDoubleClick!!.third
+                    )
                 )
             draw()
         }
@@ -412,7 +431,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
             trace("divScroll scroll")
-            menu = null
             dy = divScroll.scrollTop
             divHolder.style.transform = "translate(0px, ${dy}px)"
             isDoubleClick = false
@@ -423,7 +441,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         window.onresize = {
             trace("window resize")
-            menu = null
             canvas.width = document.body!!.offsetWidth
             canvas.height = window.innerHeight - 10
             posYGlobal = -dy
@@ -431,48 +448,26 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             draw()
         }
 
-        canvas.oncontextmenu = EventHandler { event: MouseEvent ->
-            trace("canvas contextmenu")
-            if (currentDrawable != null && currentClick != null)
-                currentMenuEntries = currentDrawable!!.getContextualMenuEntries(currentDoubleClick!!)
-            if (currentMenuEntries != null) {
-                event.preventDefault()
-                event.stopPropagation()
-
-                menu = Menu(currentMenuEntries!!)
-                menu!!.draw(ctx, event.offsetX, event.offsetY)
-            }
-        }
-
         canvas.onclick = EventHandler { event: MouseEvent ->
             trace("canvas click")
-            if (menu != null) {
-                val c = menu!!.onClick(event.offsetX, event.offsetY)
-                if (c !=null)
-                    commandDoList.add(c)
-                menu = null
-            } else {
-                isDoubleClick = false
-                if (event.detail == 3) {
-                    isDoubleClick = true
-                    charSelectStartNInText = 0
-                    charSelectEndNInText =
-                        currentDrawable?.getSelectedText(event.offsetX, event.offsetY)!!.txt.length
-                    trace("canvas click double click == triple click")
-                }
+            isDoubleClick = false
+            if (event.detail == 3) {
+                isDoubleClick = true
+                charSelectStartNInText = 0
+                charSelectEndNInText =
+                    currentDrawable?.getSelectedText(event.offsetX, event.offsetY)!!.txt.length
+                trace("canvas click double click == triple click")
+            }
 
-                currentMouseEvent = event
-                event.preventDefault()
-                event.stopPropagation()
-                for (d in drawables) {
-                    if (d.isClicked(event.offsetX, event.offsetY)) {
-                        currentDrawable = d
-                        val text = d.getSelectedText(event.offsetX, event.offsetY)!!
-                        currentClick = text.click(ctx, event.offsetX, event.offsetY)
-                        console.log(currentClick)
-                        if (currentDoubleClick != null)
-                            currentMenuEntries = text.getContextualMenuEntries(currentDoubleClick!!)
-                    }
+            currentMouseEvent = event
+            event.preventDefault()
+            event.stopPropagation()
+            for (d in drawables) {
+                if (d.isClicked(event.offsetX, event.offsetY)) {
+                    currentDrawable = d
+                    val text = d.getSelectedText(event.offsetX, event.offsetY)!!
+                    currentClick = text.click(ctx, event.offsetX, event.offsetY)
+                    console.log(currentClick)
                 }
             }
             draw()
@@ -493,14 +488,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             event.preventDefault()
             event.stopPropagation()
             isDoubleClick = true
-            wordOffset = 0
             for (d in drawables) {
                 if (d.isClicked(event.offsetX, event.offsetY)) {
                     currentDrawable = d
                     currentDoubleClick = d.doubleClick(ctx, event.offsetX, event.offsetY)
-                    if (currentDoubleClick != null)
-                        currentMenuEntries = d.getContextualMenuEntries(currentDoubleClick!!)
-                    else currentDoubleClick = null
                 }
             }
             draw()
@@ -528,10 +519,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         initialDrawables.add(CanvasTable.createTable())
 
-        val s = CanvasKroki("""
+        val s = CanvasKroki(
+            """
             GraphViz
             digraph G {Hello->World}
-            """.trimIndent())
+            """.trimIndent()
+        )
         initialDrawables.add(s)
 
         val p2 = PCanvas(
