@@ -51,17 +51,72 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
             c.toString()
         else
             txtVar.substring(0, p) + c + txtVar.substring(p)
+
+        println("CanvasText::addChar styles: $styles")
+        if (styles.isNotEmpty()) {
+            val stylesAfter = styles.filter {
+                it.posNStart > p
+            }
+            println("CanvasText::addChar stylesAfter: $stylesAfter")
+            stylesAfter.forEach {
+                it.posNStart += 1
+                it.posNEnd += 1
+            }
+            val currentStyle = styles.find {
+                it.posNStart <= p && it.posNEnd >= p
+            }
+            if (currentStyle != null)
+                currentStyle.posNEnd += 1
+        }
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {
         trace("CanvasText::delChar: $p, $pEnd")
         txtVar = txtVar.substring(0, p) + txtVar.substring(p + (pEnd ?: 1))
+        if (styles.isNotEmpty()) {
+            val stylesAfter = styles.filter {
+                it.posNStart > p
+            }
+            println("CanvasText::addChar stylesAfter: $stylesAfter")
+            stylesAfter.forEach {
+                it.posNStart -= 1
+                it.posNEnd -= 1
+            }
+            val currentStyle = styles.find {
+                it.posNStart <= p && it.posNEnd >= p
+            }
+            if (currentStyle != null)
+                currentStyle.posNEnd -= 1
+            styles = styles.filterNot {
+                it.posNStart >= it.posNEnd
+            }
+        }
+
         return txtVar.length
     }
 
     fun rmChar(p: Int): Int {
         trace("CanvasText::rmChar: $p")
         txtVar = txtVar.substring(0, p - 1) + txtVar.substring(p)
+        if (styles.isNotEmpty()) {
+            val stylesAfter = styles.filter {
+                it.posNStart > p - 1
+            }
+            println("CanvasText::addChar stylesAfter: $stylesAfter")
+            stylesAfter.forEach {
+                it.posNStart -= 1
+                it.posNEnd -= 1
+            }
+            val currentStyle = styles.find {
+                it.posNStart <= p - 1 && it.posNEnd >= p - 1
+            }
+            if (currentStyle != null)
+                currentStyle.posNEnd -= 1
+            styles = styles.filterNot {
+                it.posNStart >= it.posNEnd
+            }
+        }
+
         return txtVar.length
     }
 
