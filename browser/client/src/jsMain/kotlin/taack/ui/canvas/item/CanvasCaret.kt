@@ -20,6 +20,15 @@ class CanvasCaret {
             posY = line.textY
             ctx.save()
             text.initCtx(ctx)
+            if (text.txt[line.posBegin + n] == '\n' || n >= line.posEnd) {
+                val i = text.findLine(line)
+                if (i >= text.lines.size) return
+                val cLine = text.lines[i + 1]
+                val posXStart = text.posXStart + text.measureText(ctx, cLine.posBegin, line.posBegin + n) + cLine.leftMargin
+                draw(ctx, posXStart, cLine.textY)
+                traceDeIndent("CanvasCaret::draw: $n")
+                return
+            }
             posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin + text.posXStart
             ctx.restore()
             draw(ctx, posX, posY)

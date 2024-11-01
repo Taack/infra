@@ -64,6 +64,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private var recomputeCurrentLineAfterDraw = false
     private val commandDoList = mutableListOf<ICanvasCommand>()
     private val commandUndoList = mutableListOf<ICanvasCommand>()
+    private val caretPosInLine
+        get() = caretPosInCurrentText - currentLine!!.posBegin
 
     private fun addDrawable() {
         var doNotDraw = false
@@ -229,7 +231,24 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         }
                         charSelectEndNInText = charSelectEndNInText?.plus(decay)
                     } else {
-                        charOffset++
+                        if (currentLine != null) {
+                            if (currentLine!!.length > caretPosInLine + charOffset)
+                                charOffset++
+                            else {
+                                val i = currentText!!.findLine(currentLine!!)
+                                charOffset = 0
+                                if (i >= 0 && i < currentText!!.lines.size - 1) {
+                                    currentLine = currentText!!.lines[i + 1]
+                                    caretPosInCurrentText = currentLine!!.posBegin
+                                } else {
+                                    val j = texts.indexOf(currentText) + 1
+                                    if (j > 0 && j < texts.size) {
+                                        currentDrawable = texts[j]
+                                        currentLine = currentText!!.lines.first()
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -605,8 +624,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
 
             if (currentLine != null) {
-                val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
-                trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, $charOffset")
+                trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, $charOffset, currentLine!!.length = ${currentLine!!.length}")
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
                 if (isDoubleClick && currentDoubleClick != null) {
                     trace("Draw dblClick")

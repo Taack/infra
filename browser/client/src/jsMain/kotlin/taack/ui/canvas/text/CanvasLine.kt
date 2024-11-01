@@ -13,6 +13,9 @@ class CanvasLine(
     val leftMargin: Double = 0.0
 ) {
 
+    val length: Int
+        get() = posEnd - posBegin
+
     private var containedStyles: List<CanvasStyle>? = null
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
