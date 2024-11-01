@@ -39,14 +39,20 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
         traceIndent("CanvasStyle::draw: $this")
         if (posNStart == 0) ctx.fillText(text.txtPrefix, text.posXStart, line.textY)
         ctx.save()
-        initCtx(ctx, text)
-        val txt = text.txt.substring(max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
-        ctx.fillText(txt, line.leftMargin + posXStart, line.textY)
-        val width = text.measureText(ctx,  max(posNStart, line.posBegin), min(posNEnd, line.posEnd))
-        console.log("CanvasStyle::draw width: $width from: ${max(posNStart, line.posBegin)}, to: ${min(posNEnd, line.posEnd)}")
-        ctx.restore()
+        val from = max(posNStart, line.posBegin)
+        val to = min(posNEnd, line.posEnd)
+        if (from < to) {
+            initCtx(ctx, text)
+            val txt = text.txt.substring(from, to)
+            ctx.fillText(txt, line.leftMargin + posXStart, line.textY)
+            val width = text.measureText(ctx,  from, to)
+            console.log("CanvasStyle::draw width: $width from: $from, to: $to")
+            ctx.restore()
+            traceDeIndent("CanvasStyle::draw: $this")
+            return width
+        }
         traceDeIndent("CanvasStyle::draw: $this")
-        return width
+        return 0.0
     }
 
     override fun toString(): String {
