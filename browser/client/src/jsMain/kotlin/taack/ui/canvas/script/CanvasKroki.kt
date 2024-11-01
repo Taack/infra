@@ -2,6 +2,7 @@ package taack.ui.canvas.script
 
 import js.buffer.ArrayBuffer
 import js.typedarrays.Uint8Array
+import kotlinx.browser.document
 import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
@@ -14,6 +15,19 @@ import kotlin.js.Promise
 
 class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
 
+    private val apps: Array<String> = arrayOf(
+        "BlockDiag", "BPMN", "Bytefield", "SeqDiag", "ActDiag", "NewDiag",
+        "PacketDiag", "RackDiag", "c4Plantuml", "d2", "dbml", "ditaa", "erd", "excalidraw", "GraphViz", "Mermaid",
+        "Nomnoml", "Pikchr", "PlantUML", "Structurizr", "Svgbob", "Symbolator", "TikZ", "WaveDrom", "WireViz"
+    )
+    private val srcURI: String?
+        get() {
+            val ret = txt.substring(0, txt.indexOfFirst { !it.isLetter() })
+            if (apps.contains(ret)) {
+                return ret.lowercase()
+            }
+            return null
+        }
     override val fontWeight: String
         get() = "400"
     override val fontSize: String
@@ -35,21 +49,26 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
 
     private var image: CanvasImg? = null
 
-    val txtScript: String
+    private val txtScript: String
         get() {
-            compress(txt).then {
-                val bytes = Uint8Array(it)
-                val len = bytes.length
-                val chars = CharArray(len)
-                for (i in 0 until len) {
-                    chars[i] = bytes[i].toInt().toChar()
+            if (srcURI != null) {
+                val txt = txt.substring(srcURI!!.length)
+                compress(txt).then {
+                    val bytes = Uint8Array(it)
+                    val len = bytes.length
+                    val chars = CharArray(len)
+                    for (i in 0 until len) {
+                        chars[i] = bytes[i].toInt().toChar()
+                    }
+                    val txt = chars.concatToString()
+                    return@then txt
+                }.then {
+                    imageSrc =
+                        "${document.location?.protocol}//${document.location?.hostname}:8000/" + srcURI + "/svg/" + window.btoa(
+                            it
+                        ).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
+                    image = CanvasImg(imageSrc!!, srcURI!!, 0)
                 }
-                val txt = chars.concatToString()
-                return@then txt
-            }.then {
-                imageSrc = "http://localhost:8000/graphviz/svg/" + window.btoa(it).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
-                trace("imageSrc: ${imageSrc}")
-                image = CanvasImg(imageSrc!!, "coucou", 0)
             }
             return txt
         }
@@ -60,9 +79,10 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
         return ""
     }
 
-    fun compress(str: String): Promise<ArrayBuffer> {
+    private fun compress(str: String): Promise<ArrayBuffer> {
         trace("CanvasKroki::compress: $str")
-        return js("""
+        return js(
+            """
 function compress(string, encoding) {
     var byteArray = new TextEncoder('utf-8').encode(string);
     var cs = new CompressionStream(encoding);
@@ -72,7 +92,8 @@ function compress(string, encoding) {
     return new Response(cs.readable).arrayBuffer();
 }
 compress(str, "deflate");
-""")
+"""
+        )
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
@@ -126,7 +147,7 @@ compress(str, "deflate");
         ctx.restore()
         traceDeIndent("CanvasKroki::draw: $globalPosYEnd")
 
-        return (image?.draw(ctx, width, ret, posX) ?: ret)
+        return (image?.draw(ctx, width, ret, posX + width / 2 - ( image?.image?.width ?: 0)) ?: ret)
     }
 
 }

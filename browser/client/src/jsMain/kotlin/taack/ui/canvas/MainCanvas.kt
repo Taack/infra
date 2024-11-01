@@ -514,7 +514,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         initialDrawables.add(CanvasTable.createTable())
 
-        val s = CanvasKroki("digraph G {Hello->World}")
+        val s = CanvasKroki("""
+            GraphViz
+            digraph G {Hello->World}
+            """.trimIndent())
         initialDrawables.add(s)
 
         val p2 = PCanvas(
@@ -602,8 +605,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             }
 
             if (currentLine != null) {
-                trace("Draw caret currentLine != null ")
                 val caretPosInLine = caretPosInCurrentText - currentLine!!.posBegin
+                trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, $charOffset")
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine + charOffset)
                 if (isDoubleClick && currentDoubleClick != null) {
                     trace("Draw dblClick")

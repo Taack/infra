@@ -21,7 +21,7 @@ class CanvasCaret {
             ctx.save()
             text.initCtx(ctx)
 //            posX = text.measureText(ctx, line.posBegin, min(line.posBegin + n, line.posEnd)) + line.leftMargin
-            posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin
+            posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin + text.posXStart
             ctx.restore()
             draw(ctx, posX, posY)
             traceDeIndent("CanvasCaret::draw: $n")
@@ -35,7 +35,7 @@ class CanvasCaret {
             var i = if (posNStart == 0) 0 else text.findLine(line)
             var isFirstLine = true
             var cLine: CanvasLine?
-            posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin
+            posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin + text.posXStart
             do {
                 if (i >= text.lines.size) break
                 cLine = text.lines[i]

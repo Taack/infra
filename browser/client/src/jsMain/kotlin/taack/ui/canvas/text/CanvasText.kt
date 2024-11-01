@@ -254,7 +254,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
                     posLetterLineEnd,
                     posY + totalHeight,
                     height,
-                    pX
+                    ctx.measureText(txtPrefix).width
                 )
                 pY += height
                 totalHeight = pY
@@ -271,7 +271,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
                 txt.length,
                 posY + totalHeight,
                 height,
-                posX + ctx.measureText(txtPrefix).width
+                ctx.measureText(txtPrefix).width
             )
         }
 
