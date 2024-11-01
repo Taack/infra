@@ -20,7 +20,6 @@ class CanvasCaret {
             posY = line.textY
             ctx.save()
             text.initCtx(ctx)
-//            posX = text.measureText(ctx, line.posBegin, min(line.posBegin + n, line.posEnd)) + line.leftMargin
             posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin + text.posXStart
             ctx.restore()
             draw(ctx, posX, posY)
@@ -40,8 +39,8 @@ class CanvasCaret {
                 if (i >= text.lines.size) break
                 cLine = text.lines[i]
 
-                val posXStart = if (isFirstLine) text.measureText(ctx, cLine.posBegin, posNStart) + cLine.leftMargin else cLine.leftMargin
-                val posXEnd = text.measureText(ctx, cLine.posBegin, posNEnd) + cLine.leftMargin
+                val posXStart = text.posXStart + if (isFirstLine) text.measureText(ctx, cLine.posBegin, posNStart) + cLine.leftMargin else cLine.leftMargin
+                val posXEnd = text.measureText(ctx, cLine.posBegin, posNEnd) + cLine.leftMargin + text.posXStart
                 draw(ctx, posXStart, cLine.textY, posXEnd)
                 i += 1
                 isFirstLine = false
