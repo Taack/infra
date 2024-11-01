@@ -2,6 +2,7 @@ package taack.ui.canvas.text
 
 import taack.ui.base.Helper.Companion.trace
 import web.canvas.CanvasRenderingContext2D
+import web.html.HTML.i
 
 
 class CanvasLine(
@@ -16,9 +17,10 @@ class CanvasLine(
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
 //        trace("CanvasLine::drawLine: $this")
+        var posXStart = text.drawCitation(ctx, textY, height) + text.posXStart
+
         if (!styles.isNullOrEmpty()) {
             containedStyles = styles
-            var posXStart = text.drawCitation(ctx, textY, height)
             for (style in styles) {
                 val w = style.draw(ctx, text, this, posXStart)
                 posXStart += w
@@ -26,27 +28,28 @@ class CanvasLine(
         } else {
             ctx.fillText(
                 (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
-                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 10.0) +  text.posXStart,
+                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,
                 textY
             )
         }
     }
 
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {
-        trace("CanvasLine::caretNCoords: $x")
         ctx.save()
         text.initCtx(ctx)
 
         for (i in posBegin..posEnd) {
-            val pos = text.measureText(ctx, posBegin, i) + leftMargin
-            if (pos >= x - 10.0) {
+            val pos = text.measureText(ctx, posBegin, i) + leftMargin + text.posXStart
+            if (pos >= x) {
                 ctx.restore()
-                return i
+                trace("CanvasLine::caretNCoords: $x, ret ${i - 1}")
+                return i - 1
             }
         }
         ctx.restore()
 
-        return text.txt.length + 1
+        trace("CanvasLine::caretNCoords: $x, ret txt.length = ${text.txt.length}")
+        return text.txt.length
     }
 
     override fun toString(): String {
