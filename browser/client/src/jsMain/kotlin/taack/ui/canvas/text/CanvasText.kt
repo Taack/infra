@@ -304,7 +304,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
         var i = 0
         lines.find {
             i++
-            it.posBegin <= pos && it.posEnd >= pos
+            it.posBegin <= pos && it.posEnd > pos
         }
         return i - 1
     }
