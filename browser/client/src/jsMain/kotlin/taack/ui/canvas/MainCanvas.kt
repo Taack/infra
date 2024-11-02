@@ -31,19 +31,52 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private val texts: List<CanvasText>
         get() = drawables.mapNotNull { it.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY) }
             .toMutableList()
-    private var currentLine: CanvasLine?
-        get() = currentClick?.first
-        set(value) = run { currentClick = currentClick?.copy(first = value) }
+    private val currentLine: CanvasLine?
+        get() = currentText!!.lines[currentText!!.indexOfLine(caretPosInCurrentText)]
+//        set(value) = run { currentClick = currentClick?.copy(first = value) }
     private val drawables = mutableListOf<ICanvasDrawable>()
     private val initialDrawables = mutableListOf<ICanvasDrawable>()
     private var dy: Double = 0.0
+    private var _caretPosInCurrentText: Int = 0
     private var caretPosInCurrentText: Int
-        get() = currentClick?.second ?: 0
-        set(value) = run { currentClick = currentClick?.copy(second = value) }
+        get() = _caretPosInCurrentText
+        set(value) = run {
+            var v = value
+            val decrease = _caretPosInCurrentText - value
+            if (caretPosInLine < decrease) {
+                val i = currentText!!.indexOfLine(currentLine!!)
+                if (i > 0) {
+//                    currentLine = currentText!!.lines[i - 1]
+                    v = currentText!!.lines[i - 1].posEnd - 1
+                } else {
+                    val j = texts.indexOf(currentText) - 1
+                    if (j >= 0) {
+                        currentDrawable = texts[j]
+//                        currentLine = currentText!!.lines.last()
+                        v = currentText!!.lines.last().posEnd
+                    } else {
+                        v = 0
+                    }
+                }
+            } else if (caretPosInLine - decrease > currentLine!!.length) {
+                val i = currentText!!.indexOfLine(currentLine!!)
+                if (i < currentText!!.lines.size - 1) {
+//                    currentLine = currentText!!.lines[i + 1]
+                    v = currentText!!.lines[i + 1].posBegin
+                } else {
+                    val j = texts.indexOf(currentText) + 1
+                    if (j < texts.size) {
+                        currentDrawable = texts[j]
+//                        currentLine = currentText!!.lines.first()
+                        v = 0
+                    }
+                }
+            }
+            _caretPosInCurrentText = v
+        }
     private var currentDrawable: ICanvasDrawable? = null
     private val currentText: CanvasText?
         get() = currentDrawable?.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)
-    private var currentClick: Pair<CanvasLine?, Int>? = null
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
@@ -161,61 +194,23 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                                 )
                             }
                         }
-                    currentLine = null
+//                    currentLine = null
                 }
             }
 
             "ArrowUp" -> {
-                trace("MainCanvas::addDrawable press ArrowUp")
-                if (currentLine == null) {
-                    val j = texts.indexOf(currentText) - 1
-                    if (j >= 0) {
-                        currentDrawable = texts[j]
-                        currentLine = currentText!!.lines.last()
-                    }
-                } else {
-                    val i = currentText!!.findLine(currentLine!!)
-                    if (i > 0 && i < currentText!!.lines.size) {
-                        caretPosInCurrentText -= currentLine!!.posBegin
-                        currentLine = currentText!!.lines[i - 1]
-                        caretPosInCurrentText += currentLine!!.posBegin
-                    } else {
-                        val j = texts.indexOf(currentText) - 1
-                        if (j >= 0) {
-                            currentDrawable = texts[j]
-                            currentLine = currentText!!.lines.last()
-                        }
-                    }
-                }
+                caretPosInCurrentText -= (if (caretPosInCurrentText == currentText!!.txt.length) 1 else 0) + currentLine!!.length
             }
 
             "ArrowDown" -> {
-                trace("MainCanvas::addDrawable press ArrowDown")
-                if (currentLine == null) {
-                    val j = texts.indexOf(currentText) + 1
-                    if (j > 0 && j < texts.size) {
-                        currentDrawable = texts[j]
-                        currentLine = currentText!!.lines.first()
-                    }
-                } else {
-                    val i = currentText!!.findLine(currentLine!!)
+                caretPosInCurrentText += (if (caretPosInCurrentText == 0) 1 else 0) + currentLine!!.length
+            }
 
-                    if (i >= 0 && i < currentText!!.lines.size) {
-                        caretPosInCurrentText -= currentLine!!.posBegin
-                        currentLine = currentText!!.lines[i + 1]
-                        caretPosInCurrentText += currentLine!!.posBegin
-                    } else {
-                        val j = texts.indexOf(currentText) + 1
-                        if (j > 0 && j < texts.size) {
-                            currentDrawable = texts[j]
-                            currentLine = currentText!!.lines.first()
-                        }
-                    }
-                }
+            "ArrowLeft" -> {
+                caretPosInCurrentText--
             }
 
             "ArrowRight" -> {
-                trace("MainCanvas::addDrawable press ArrowRight caretPosInCurrentText: $caretPosInCurrentText")
                 if (currentKeyboardEvent!!.ctrlKey && isDoubleClick) {
                     val decay =
                         currentText!!.txt.substring(charSelectEndNInText!! + 1).indexOfFirst { !it.isLetter() } + 1
@@ -224,26 +219,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     }
                     charSelectEndNInText = charSelectEndNInText?.plus(decay)
                 } else {
-                    if (currentLine != null) {
-                        if (currentLine!!.length > caretPosInLine && currentText!!.txt[caretPosInCurrentText] != '\n')
-                            caretPosInCurrentText++
-                        else {
-                            val i = currentText!!.findLine(currentLine!!)
-                            if (i >= 0 && i < currentText!!.lines.size - 1) {
-                                trace("Caret eol")
-                                currentLine = currentText!!.lines[i + 1]
-                                caretPosInCurrentText = currentLine!!.posBegin
-                            } else {
-                                trace("Caret eol last line")
-                                val j = texts.indexOf(currentText) + 1
-                                if (j > 0 && j < texts.size) {
-                                    currentDrawable = texts[j]
-                                    currentLine = currentText!!.lines.first()
-                                    caretPosInCurrentText = 0
-                                }
-                            }
-                        }
-                    }
+                    caretPosInCurrentText++
                 }
             }
 
@@ -289,7 +265,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentKeyboardEvent!!.shiftKey) {
                         currentDrawable = texts.last()
                     }
-                    currentLine = currentText!!.lines.last()
+//                    currentLine = currentText!!.lines.last()
+                    caretPosInCurrentText = currentText!!.lines.last().posEnd - 1
                 }
                 caretPosInCurrentText = currentLine!!.posEnd
             }
@@ -300,18 +277,14 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentKeyboardEvent!!.shiftKey) {
                         currentDrawable = texts.first()
                     }
-                    currentLine = currentText!!.lines.first()
+//                    currentLine = currentText!!.lines.first()
+                    caretPosInCurrentText = 0
                 }
                 caretPosInCurrentText = currentLine!!.posBegin
             }
 
             "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight", "AltGraph" -> {
                 doNotDraw = true
-            }
-
-            "ArrowLeft" -> {
-                trace("MainCanvas::addDrawable press ArrowLeft")
-                caretPosInCurrentText--
             }
 
             else -> {
@@ -466,8 +439,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 if (d.isClicked(event.offsetX, event.offsetY)) {
                     currentDrawable = d
                     val text = d.getSelectedText(event.offsetX, event.offsetY)!!
-                    currentClick = text.click(ctx, event.offsetX, event.offsetY)
-                    console.log(currentClick)
+                    val currentClick = text.click(ctx, event.offsetX, event.offsetY)
+                    _caretPosInCurrentText = currentClick!!.second
                 }
             }
             draw()
@@ -595,13 +568,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         trace("currentText == $currentText")
         if (currentText != null) {
-            if (currentLine == null) {
-                trace("Draw caret1 currentLine == null")
-                currentLine = currentText!!.lines.firstOrNull()
-                caretPosInCurrentText = currentLine?.posEnd ?: 0
-            }
-
-            if (currentLine != null) {
                 trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine!!.length}")
                 CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine)
                 if (isDoubleClick && currentDoubleClick != null) {
@@ -615,7 +581,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                         currentDoubleClick!!.third
                     )
                 }
-            }
         }
         divHolder.style.height = "${posYGlobal + dy}px"
 

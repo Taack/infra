@@ -31,7 +31,7 @@ class CanvasCaret {
             posY = line.textY
             ctx.save()
             text.initCtx(ctx)
-            var i = if (posNStart == 0) 0 else text.findLine(line)
+            var i = if (posNStart == 0) 0 else text.indexOfLine(line)
             var isFirstLine = true
             var cLine: CanvasLine?
             posX = text.measureText(ctx, line.posBegin, line.posBegin + n) + line.leftMargin + text.posXStart

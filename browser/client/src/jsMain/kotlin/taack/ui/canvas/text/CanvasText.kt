@@ -4,7 +4,6 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
-import taack.ui.canvas.command.AddStyleCommand
 import web.canvas.CanvasRenderingContext2D
 import kotlin.math.max
 import kotlin.math.min
@@ -292,11 +291,20 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
 
     abstract fun computeNum(): String
 
-    fun findLine(line: CanvasLine): Int {
+    fun indexOfLine(line: CanvasLine): Int {
         var i = 0
         lines.find {
             i++
             it.textY == line.textY
+        }
+        return i - 1
+    }
+
+    fun indexOfLine(pos: Int): Int {
+        var i = 0
+        lines.find {
+            i++
+            it.posBegin <= pos && it.posEnd >= pos
         }
         return i - 1
     }
