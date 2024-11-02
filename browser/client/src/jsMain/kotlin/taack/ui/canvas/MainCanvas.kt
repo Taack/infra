@@ -31,9 +31,16 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private val texts: List<CanvasText>
         get() = drawables.mapNotNull { it.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY) }
             .toMutableList()
-    private val currentLine: CanvasLine?
-        get() = currentText!!.lines[currentText!!.indexOfLine(caretPosInCurrentText)]
-//        set(value) = run { currentClick = currentClick?.copy(first = value) }
+    private val lineOverLine: CanvasLine
+        get() {
+            val i = currentText!!.indexOfLine(_caretPosInCurrentText)
+            return if (i > 0)
+                currentText!!.lines[i - 1]
+            else
+                currentText!!.lines[0]
+        }
+    private val currentLine: CanvasLine
+        get() = currentText!!.lines[currentText!!.indexOfLine(_caretPosInCurrentText)]
     private val drawables = mutableListOf<ICanvasDrawable>()
     private val initialDrawables = mutableListOf<ICanvasDrawable>()
     private var dy: Double = 0.0
@@ -44,30 +51,24 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             var v = value
             val decrease = _caretPosInCurrentText - value
             if (caretPosInLine < decrease) {
-                val i = currentText!!.indexOfLine(currentLine!!)
-                if (i > 0) {
-//                    currentLine = currentText!!.lines[i - 1]
-                    v = currentText!!.lines[i - 1].posEnd - 1
-                } else {
+                val i = currentText!!.indexOfLine(currentLine)
+                if (i <= 0) {
                     val j = texts.indexOf(currentText) - 1
                     if (j >= 0) {
                         currentDrawable = texts[j]
-//                        currentLine = currentText!!.lines.last()
                         v = currentText!!.lines.last().posEnd
                     } else {
                         v = 0
                     }
                 }
-            } else if (caretPosInLine - decrease > currentLine!!.length) {
-                val i = currentText!!.indexOfLine(currentLine!!)
+            } else if (caretPosInLine - decrease > currentLine.length) {
+                val i = currentText!!.indexOfLine(currentLine)
                 if (i < currentText!!.lines.size - 1) {
-//                    currentLine = currentText!!.lines[i + 1]
-                    v = currentText!!.lines[i + 1].posBegin
+                    v = value
                 } else {
                     val j = texts.indexOf(currentText) + 1
                     if (j < texts.size) {
                         currentDrawable = texts[j]
-//                        currentLine = currentText!!.lines.first()
                         v = 0
                     }
                 }
@@ -91,7 +92,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
     private val commandDoList = mutableListOf<ICanvasCommand>()
     private val commandUndoList = mutableListOf<ICanvasCommand>()
     private val caretPosInLine
-        get() = caretPosInCurrentText - currentLine!!.posBegin
+        get() = _caretPosInCurrentText - currentLine.posBegin
 
     private fun addDrawable() {
         var doNotDraw = false
@@ -194,16 +195,15 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                                 )
                             }
                         }
-//                    currentLine = null
                 }
             }
 
             "ArrowUp" -> {
-                caretPosInCurrentText -= (if (caretPosInCurrentText == currentText!!.txt.length) 1 else 0) + currentLine!!.length
+                caretPosInCurrentText -= (if (caretPosInCurrentText == currentText!!.txt.length) 1 else 0) + lineOverLine.length
             }
 
             "ArrowDown" -> {
-                caretPosInCurrentText += (if (caretPosInCurrentText == 0) 1 else 0) + currentLine!!.length
+                caretPosInCurrentText += (if (caretPosInCurrentText == 0) 1 else 0) + currentLine.length
             }
 
             "ArrowLeft" -> {
@@ -265,10 +265,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentKeyboardEvent!!.shiftKey) {
                         currentDrawable = texts.last()
                     }
-//                    currentLine = currentText!!.lines.last()
                     caretPosInCurrentText = currentText!!.lines.last().posEnd - 1
                 }
-                caretPosInCurrentText = currentLine!!.posEnd
+                caretPosInCurrentText = currentLine.posEnd
             }
 
             "Home" -> {
@@ -277,10 +276,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     if (currentKeyboardEvent!!.shiftKey) {
                         currentDrawable = texts.first()
                     }
-//                    currentLine = currentText!!.lines.first()
                     caretPosInCurrentText = 0
                 }
-                caretPosInCurrentText = currentLine!!.posBegin
+                caretPosInCurrentText = currentLine.posBegin
             }
 
             "Shift", "ShiftLeft", "ShiftRight", "Control", "ControlLeft", "ControlRight", "AltGraph" -> {
@@ -568,8 +566,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         trace("currentText == $currentText")
         if (currentText != null) {
-                trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine!!.length}")
-                CanvasCaret.draw(ctx, currentText!!, currentLine!!, caretPosInLine)
+                trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine.length}")
+                CanvasCaret.draw(ctx, currentText!!, currentLine, caretPosInLine)
                 if (isDoubleClick && currentDoubleClick != null) {
                     trace("Draw dblClick")
                     CanvasCaret.drawDblClick(
