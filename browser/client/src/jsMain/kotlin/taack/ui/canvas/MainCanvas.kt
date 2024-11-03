@@ -1,6 +1,5 @@
 package taack.ui.canvas
 
-import kotlinx.browser.document
 import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
@@ -13,17 +12,24 @@ import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
 import taack.ui.canvas.table.TxtRowCanvas
 import taack.ui.canvas.text.*
+import web.assembly.ImportExportKind.Companion.function
 import web.canvas.CanvasRenderingContext2D
 import web.clipboard.ClipboardEvent
+import web.dom.document
 import web.events.Event
 import web.events.EventHandler
 import web.events.addEventListener
+import web.file.FileReader
 import web.html.HTMLButtonElement
 import web.html.HTMLCanvasElement
 import web.html.HTMLDivElement
+import web.html.HTMLImageElement
+import web.http.CrossOrigin
 import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
+import kotlin.math.max
+import kotlin.math.min
 
 class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
@@ -320,7 +326,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
-//        canvas.draggable = true
+        divHolder.draggable = true
+        divHolder.style.border = "1px solid red"
+        divScroll.style.border = "1px solid blue"
+
         val bBold = document.createElement("button") as HTMLButtonElement
         bBold.id = "buttonBold"
         bBold.innerHTML = "<b style='margin: 0;height: 23px;'>BOLD</b>"
@@ -398,7 +407,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bScript)
         val bH2 = document.createElement("button") as HTMLButtonElement
         bH2.id = "bH2"
-        bH2.innerHTML = "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"
+        bH2.innerHTML =
+            "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"
         bH2.onclick = EventHandler {
             if (currentDrawable != null)
                 commandDoList.add(
@@ -409,7 +419,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bH2)
         val bH3 = document.createElement("button") as HTMLButtonElement
         bH3.id = "bH3"
-        bH3.innerHTML = "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>"
+        bH3.innerHTML =
+            "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>"
         bH3.onclick = EventHandler {
             if (currentDrawable != null)
                 commandDoList.add(
@@ -420,7 +431,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bH3)
         val bH4 = document.createElement("button") as HTMLButtonElement
         bH4.id = "bH4"
-        bH4.innerHTML = "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>"
+        bH4.innerHTML =
+            "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>"
         bH4.onclick = EventHandler {
             if (currentDrawable != null)
                 commandDoList.add(
@@ -522,7 +534,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.ondblclick = EventHandler { event: MouseEvent ->
             trace("canvas dblclick")
             event.preventDefault()
-            event.stopPropagation()
+//            event.stopPropagation()
             isDoubleClick = true
             for (d in drawables) {
                 if (d.isClicked(event.offsetX, event.offsetY)) {
@@ -533,10 +545,8 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             draw()
         }
 
-        web.dom.document.onpaste = EventHandler { event: ClipboardEvent ->
+        document.onpaste = EventHandler { event: ClipboardEvent ->
             trace("canvasEvent paste")
-            event.preventDefault()
-            event.stopPropagation()
             val txt = event.clipboardData!!.getData("text")
             commandDoList.add(
                 AddCharCommand(
@@ -545,24 +555,75 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     caretPosInCurrentText
                 )
             )
-
             trace("canvasEvent paste: $txt")
+            draw()
         }
 
         divHolder.ondrop = EventHandler { event: DragEvent ->
             trace("canvasEvent drop")
             event.preventDefault()
-            event.stopPropagation()
+            if (event.dataTransfer?.items?.length!! > 0) {
+                // Use DataTransferItemList interface to access the file(s)
+                for (item in event.dataTransfer?.items!!) {
+                    // If dropped items aren't files, reject them
+                    if (item.kind === "file") {
+                        val file = item.getAsFile()
+                        trace("canvasEvent1 file[].name = ${file?.name}")
+                        if (file != null) {
+                            val reader = FileReader()
+                            reader.onload = EventHandler {
+                                val img = document.createElement("img") as HTMLImageElement
+                                img.crossOrigin = CrossOrigin.anonymous
+                                img.onload = EventHandler {
+                                    val c = document.createElement("canvas") as HTMLCanvasElement
+                                    val rw = img.width / min(img.width, 1024)
+                                    val rh = img.height / min(img.height, 1024)
+                                    val r = max(rw, rh)
+                                    c.width = img.width / r
+                                    c.height = img.height / r
+                                    val ctx = c.getContext(CanvasRenderingContext2D.ID)
+                                    ctx!!.drawImage(img, 0.0, 0.0, img.width.toDouble(), img.height.toDouble(), 0.0, 0.0, c.width.toDouble(), c.height.toDouble())
+
+                                    val dataurl = c.toDataURL(file.type)
+                                    commandDoList.add(
+                                        AddImageCommand(
+                                            drawables,
+                                            drawables.indexOf(currentDrawable),
+                                            CanvasImg(dataurl, file.name, 0),
+                                        )
+                                    )
+                                }
+                                img.src = reader.result.toString()
+
+                            }
+                            reader.readAsDataURL(file)
+                        }
+                    }
+                }
+            } else {
+                // Use DataTransfer interface to access the file(s)
+                for (file in event.dataTransfer?.files!!) {
+                    trace("canvasEvent2 file[].name = ${file.name}")
+                }
+            }
+
             val txt = event.dataTransfer!!.getData("text")
             trace("canvasEvent drop: $txt")
         }
 
+        divHolder.ondragover = EventHandler { event: DragEvent ->
+//            trace("canvasEvent ondragover")
+            event.preventDefault()
+//            event.stopPropagation()
+//            val txt = event.dataTransfer!!.getData("text")
+//            trace("canvasEvent ondragover: $txt")
+        }
         divHolder.ondrag = EventHandler { event: DragEvent ->
-            trace("canvasEvent drop")
+            trace("canvasEvent ondrag")
             event.preventDefault()
             event.stopPropagation()
             val txt = event.dataTransfer!!.getData("text")
-            trace("canvasEvent drop: $txt")
+            trace("canvasEvent ondrag: $txt")
         }
         addInitialTexts()
         draw()
@@ -663,19 +724,19 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         trace("currentText == $currentText")
         if (currentText != null) {
-                trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine.length}")
-                CanvasCaret.draw(ctx, currentText!!, currentLine, caretPosInLine)
-                if (isDoubleClick && currentDoubleClick != null) {
-                    trace("Draw dblClick")
-                    CanvasCaret.drawDblClick(
-                        ctx,
-                        currentText!!,
-                        currentDoubleClick!!.first,
-                        caretPosInLine,
-                        currentDoubleClick!!.second,
-                        currentDoubleClick!!.third
-                    )
-                }
+            trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine.length}")
+            CanvasCaret.draw(ctx, currentText!!, currentLine, caretPosInLine)
+            if (isDoubleClick && currentDoubleClick != null) {
+                trace("Draw dblClick")
+                CanvasCaret.drawDblClick(
+                    ctx,
+                    currentText!!,
+                    currentDoubleClick!!.first,
+                    caretPosInLine,
+                    currentDoubleClick!!.second,
+                    currentDoubleClick!!.third
+                )
+            }
         }
         divHolder.style.height = "${posYGlobal + dy}px"
 

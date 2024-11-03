@@ -1,7 +1,10 @@
 package taack.ui.canvas.command
 
-class AddImageCommand : ICanvasCommand {
+import taack.ui.canvas.ICanvasDrawable
+import taack.ui.canvas.item.CanvasImg
+
+class AddImageCommand(private val drawables: MutableList<ICanvasDrawable>, val i: Int, val image: CanvasImg) : ICanvasCommand {
     override fun doIt() {
-        TODO("Not yet implemented")
+        drawables.add(i, image)
     }
 }
