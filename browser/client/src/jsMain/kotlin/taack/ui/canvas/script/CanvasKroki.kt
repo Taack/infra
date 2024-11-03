@@ -147,7 +147,8 @@ compress(str, "deflate");
         ctx.restore()
         traceDeIndent("CanvasKroki::draw: $globalPosYEnd")
 
-        return (image?.draw(ctx, width, ret, posX + width / 2 - ( image?.image?.width ?: 0)) ?: ret)
+//        return (image?.draw(ctx, width, ret, posX + width / 2 - ( image?.image?.width ?: 0)) ?: ret)
+        return (image?.draw(ctx, width, ret, posX) ?: ret)
     }
 
 }

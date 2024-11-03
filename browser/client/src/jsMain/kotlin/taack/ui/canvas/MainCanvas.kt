@@ -14,12 +14,14 @@ import taack.ui.canvas.table.TxtHeaderCanvas
 import taack.ui.canvas.table.TxtRowCanvas
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
+import web.clipboard.ClipboardEvent
 import web.events.Event
 import web.events.EventHandler
 import web.events.addEventListener
 import web.html.HTMLButtonElement
 import web.html.HTMLCanvasElement
 import web.html.HTMLDivElement
+import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
 
@@ -143,7 +145,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                     commandDoList.add(
                         AddCharCommand(
                             currentText!!,
-                            '\n',
+                            "\n",
                             caretPosInCurrentText++
                         )
                     )
@@ -301,7 +303,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                             commandDoList.add(
                                 AddCharCommand(
                                     currentText!!,
-                                    currentKeyboardEvent!!.key[0],
+                                    currentKeyboardEvent!!.key[0].toString(),
                                     caretPosInCurrentText++
                                 )
                             )
@@ -318,9 +320,10 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
+//        canvas.draggable = true
         val bBold = document.createElement("button") as HTMLButtonElement
         bBold.id = "buttonBold"
-        bBold.innerHTML = "<b>BOLD</b>"
+        bBold.innerHTML = "<b style='margin: 0;height: 23px;'>BOLD</b>"
         bBold.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
@@ -336,7 +339,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bBold)
         val bNormal = document.createElement("button") as HTMLButtonElement
         bNormal.id = "buttonNormal"
-        bNormal.innerHTML = "Normal"
+        bNormal.innerHTML = "<span style='margin: 0;height: 23px;'>Normal</span>"
         bNormal.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
@@ -352,7 +355,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bNormal)
         val bMono = document.createElement("button") as HTMLButtonElement
         bMono.id = "buttonMono"
-        bMono.innerHTML = "<code>Mono</code>"
+        bMono.innerHTML = "<code style='margin: 0;height: 23px;'>Mono</code>"
         bMono.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
@@ -368,7 +371,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bMono)
         val bBoldMono = document.createElement("button") as HTMLButtonElement
         bBoldMono.id = "buttonBoldMono"
-        bBoldMono.innerHTML = "<code><b>Mono</b></code>"
+        bBoldMono.innerHTML = "<code style='margin: 0;height: 23px;'><b>Mono</b></code>"
         bBoldMono.onclick = EventHandler {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
@@ -384,20 +387,82 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         divHolder.appendChild(bBoldMono)
         val bScript = document.createElement("button") as HTMLButtonElement
         bScript.id = "buttonScript"
-        bScript.innerHTML = "<code><em>Kroki</em></code>"
+        bScript.innerHTML = "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>"
         bScript.onclick = EventHandler {
-            if (currentDrawable != null && currentDoubleClick != null)
+            if (currentDrawable != null)
                 commandDoList.add(
-                    AddStyleCommand(
-                        currentText!!,
-                        CanvasStyle.Type.BOLD_MONOSPACED,
-                        currentDoubleClick!!.second,
-                        currentDoubleClick!!.third
-                    )
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, CanvasKroki(currentText!!.txt))
                 )
             draw()
         }
         divHolder.appendChild(bScript)
+        val bH2 = document.createElement("button") as HTMLButtonElement
+        bH2.id = "bH2"
+        bH2.innerHTML = "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"
+        bH2.onclick = EventHandler {
+            if (currentDrawable != null)
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
+                )
+            draw()
+        }
+        divHolder.appendChild(bH2)
+        val bH3 = document.createElement("button") as HTMLButtonElement
+        bH3.id = "bH3"
+        bH3.innerHTML = "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>"
+        bH3.onclick = EventHandler {
+            if (currentDrawable != null)
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
+                )
+            draw()
+        }
+        divHolder.appendChild(bH3)
+        val bH4 = document.createElement("button") as HTMLButtonElement
+        bH4.id = "bH4"
+        bH4.innerHTML = "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>"
+        bH4.onclick = EventHandler {
+            if (currentDrawable != null)
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
+                )
+            draw()
+        }
+        divHolder.appendChild(bH4)
+        val bP = document.createElement("button") as HTMLButtonElement
+        bP.id = "bP"
+        bP.innerHTML = "<span style='margin: 0;height: 23px;'>P</span>"
+        bP.onclick = EventHandler {
+            if (currentDrawable != null)
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
+                )
+            draw()
+        }
+
+        divHolder.appendChild(bP)
+        val bBullet = document.createElement("button") as HTMLButtonElement
+        bBullet.id = "bBullet"
+        bBullet.innerHTML = " • Bullet"
+        bBullet.onclick = EventHandler {
+            if (currentDrawable != null)
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
+                )
+            draw()
+        }
+        divHolder.appendChild(bBullet)
+        val bBullet2 = document.createElement("button") as HTMLButtonElement
+        bBullet2.id = "bBullet2"
+        bBullet2.innerHTML = "    ‧ Bullet"
+        bBullet2.onclick = EventHandler {
+            if (currentDrawable != null)
+                commandDoList.add(
+                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
+                )
+            draw()
+        }
+        divHolder.appendChild(bBullet2)
         divHolder.appendChild(canvas)
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
@@ -466,6 +531,38 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
             }
             draw()
+        }
+
+        web.dom.document.onpaste = EventHandler { event: ClipboardEvent ->
+            trace("canvasEvent paste")
+            event.preventDefault()
+            event.stopPropagation()
+            val txt = event.clipboardData!!.getData("text")
+            commandDoList.add(
+                AddCharCommand(
+                    currentText!!,
+                    txt,
+                    caretPosInCurrentText
+                )
+            )
+
+            trace("canvasEvent paste: $txt")
+        }
+
+        divHolder.ondrop = EventHandler { event: DragEvent ->
+            trace("canvasEvent drop")
+            event.preventDefault()
+            event.stopPropagation()
+            val txt = event.dataTransfer!!.getData("text")
+            trace("canvasEvent drop: $txt")
+        }
+
+        divHolder.ondrag = EventHandler { event: DragEvent ->
+            trace("canvasEvent drop")
+            event.preventDefault()
+            event.stopPropagation()
+            val txt = event.dataTransfer!!.getData("text")
+            trace("canvasEvent drop: $txt")
         }
         addInitialTexts()
         draw()

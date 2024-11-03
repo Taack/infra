@@ -49,7 +49,8 @@ class CanvasImg(
             image.onload = EventHandler {
                 val w = image.width
                 val h = image.height
-                ratio = min(320.0 / h, width / w)
+                ratio = min(640.0 / h, width / w)
+//                ratio = width / w
                 trace("CanvasImg::draw.onLoad $image ${image.width}x${image.height}, r: $ratio")
             }
         } else if (image.complete) {
