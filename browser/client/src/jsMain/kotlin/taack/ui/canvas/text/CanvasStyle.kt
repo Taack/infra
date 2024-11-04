@@ -58,4 +58,14 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
     override fun toString(): String {
         return "CanvasStyle(type=$type, posNStart=$posNStart, posNEnd=$posNEnd)"
     }
+
+    fun dumpAsciidoc(text: CanvasText): String {
+        val str = text.txt.substring(posNStart, posNEnd)
+        return when(type) {
+            Type.NORMAL -> str
+            Type.BOLD -> "*$str*"
+            Type.MONOSPACED -> "`$str`"
+            Type.BOLD_MONOSPACED -> "**$str**"
+        }
+    }
 }

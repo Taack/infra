@@ -24,4 +24,7 @@ class PCanvas(txtInit: String) : CanvasText(txtInit) {
         return ""
     }
 
+    override fun dumpAsciidoc(): String {
+        return "\n\n${super.dumpAsciidoc()}\n\n"
+    }
 }

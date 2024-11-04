@@ -231,42 +231,6 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
                 }
             }
 
-            "F2" -> {
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
-                )
-            }
-
-            "F3" -> {
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
-                )
-            }
-
-            "F4" -> {
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
-                )
-            }
-
-            "F1" -> {
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
-                )
-            }
-
-            "F5" -> {
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
-                )
-            }
-
-            "F6" -> {
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
-                )
-            }
-
             "End" -> {
                 trace("MainCanvas::addDrawable press End")
                 if (currentKeyboardEvent!!.ctrlKey) {
@@ -475,7 +439,23 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             draw()
         }
         divHolder.appendChild(bBullet2)
+
+        val bAsciidoc = document.createElement("button") as HTMLButtonElement
+        bAsciidoc.id = "bAsciidoc"
+        bAsciidoc.innerHTML = "Asciidoc"
+        bAsciidoc.onclick = EventHandler { event: MouseEvent ->
+            kotlinx.browser.document.execCommand("copy")
+        }
+        divHolder.appendChild(bAsciidoc)
+
         divHolder.appendChild(canvas)
+
+        document.oncopy = EventHandler { e ->
+            draw()
+            val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
+            e.clipboardData?.setData("text/plain", asciidoc)
+            e.preventDefault()
+        }
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
             trace("divScroll scroll")

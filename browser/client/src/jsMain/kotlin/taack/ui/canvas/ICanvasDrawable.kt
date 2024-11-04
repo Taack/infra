@@ -5,6 +5,27 @@ import web.canvas.CanvasRenderingContext2D
 
 interface ICanvasDrawable: ICanvasSelectable {
 
+    companion object {
+        fun dumpAsciidoc(drawables: List<ICanvasDrawable>): String {
+            val out = StringBuilder()
+            out.append("= Titre\n")
+            out.append(":doctype: book\n")
+            out.append(":toc: left\n")
+            out.append(":toc-title: Table of Contents of {doctitle}\n")
+            out.append(":toclevels: 2\n")
+            out.append(":sectnums: 2\n")
+            out.append(":sectnumlevels: 2\n")
+            out.append("\n")
+
+            drawables.forEach {
+                out.append("\n")
+                out.append(it.dumpAsciidoc())
+            }
+            out.append("\n")
+            return out.toString()
+        }
+    }
+
     var globalPosYStart: Double
     var globalPosYEnd: Double
     var citationNumber: Int
@@ -25,10 +46,11 @@ interface ICanvasDrawable: ICanvasSelectable {
         return 16.0 * citationNumber
     }
 
-
     fun getSelectedText(posX: Double? = null, posY: Double? = null): CanvasText?
 
     fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double
+
+    fun dumpAsciidoc(): String
 
     fun reset()
 }

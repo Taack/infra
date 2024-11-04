@@ -114,6 +114,22 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
         return globalPosYEnd
     }
 
+    override fun dumpAsciidoc(): String {
+        val ret = StringBuilder()
+        ret.append("\n|===\n|")
+        for (h in headers) {
+            ret.append(h.dumpAsciidoc())
+            if (headers.indexOf(h) < headers.size - 1)
+                ret.append("|")
+        }
+        ret.append("\n")
+        for (r in rows) {
+            ret.append("\n|${r.dumpAsciidoc()}")
+        }
+        ret.append("\n|===\n")
+        return ret.toString()
+    }
+
     override fun reset() {
         headers.forEach { it.reset() }
         headers.clear()

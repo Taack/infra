@@ -25,4 +25,8 @@ class CanvasFigure(txtInit: String, citationNumber: Int) : CanvasText(txtInit, c
         return "Fig. ${figNum++}: "
     }
 
+    override fun dumpAsciidoc(): String {
+        return "." + super.dumpAsciidoc()
+    }
+
 }

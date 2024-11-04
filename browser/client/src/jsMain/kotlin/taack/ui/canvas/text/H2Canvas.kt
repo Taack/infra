@@ -26,4 +26,7 @@ class H2Canvas(txtInit: String) : CanvasText(txtInit) {
         return "$num1. "
     }
 
+    override fun dumpAsciidoc(): String {
+        return "\n== " + super.dumpAsciidoc() + "\n"
+    }
 }

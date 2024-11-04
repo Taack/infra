@@ -24,4 +24,8 @@ class H4Canvas(txtInit: String) : CanvasText(txtInit) {
         return ""
     }
 
+    override fun dumpAsciidoc(): String {
+        return "\n==== " + super.dumpAsciidoc() + "\n"
+    }
+
 }

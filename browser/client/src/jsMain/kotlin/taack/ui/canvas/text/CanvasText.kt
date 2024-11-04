@@ -365,4 +365,16 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
         txtVar = txtInit
         styles = emptyList()
     }
+
+    override fun dumpAsciidoc(): String {
+        if (styles.isNotEmpty()) {
+            val ret = StringBuilder()
+            for (s in styles) {
+                ret.append(s.dumpAsciidoc(this))
+            }
+            return ret.toString()
+        } else {
+            return txt
+        }
+    }
 }

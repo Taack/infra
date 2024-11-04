@@ -151,5 +151,9 @@ compress(str, "deflate");
         return (image?.draw(ctx, width, ret, posX) ?: ret)
     }
 
+    override fun dumpAsciidoc(): String {
+        return image?.dumpAsciidoc() ?: ""
+    }
+
 }
 

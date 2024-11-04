@@ -25,4 +25,8 @@ class H3Canvas(txtInit: String) : CanvasText(txtInit) {
         return "$num1.$num2. "
     }
 
+    override fun dumpAsciidoc(): String {
+        return "\n=== " + super.dumpAsciidoc() + "\n"
+    }
+
 }

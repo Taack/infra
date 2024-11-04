@@ -24,4 +24,8 @@ class LiCanvas(txtInit: String) : CanvasText(txtInit) {
         return " • "
     }
 
+    override fun dumpAsciidoc(): String {
+        return "* " + super.dumpAsciidoc() + "\n"
+    }
+
 }
