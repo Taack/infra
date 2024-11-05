@@ -2,8 +2,6 @@ package taack.ui.canvas.script
 
 import js.buffer.ArrayBuffer
 import js.typedarrays.Uint8Array
-import kotlinx.browser.document
-import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
@@ -11,6 +9,8 @@ import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
+import web.encoding.btoa
+import web.location.location
 import kotlin.js.Promise
 
 class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
@@ -64,7 +64,7 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
                     return@then txt
                 }.then {
                     imageSrc =
-                        "${document.location?.protocol}//${document.location?.hostname}:8000/" + srcURI + "/svg/" + window.btoa(
+                        "${location.protocol}//${location.hostname}:8000/" + srcURI + "/svg/" + btoa(
                             it
                         ).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
                     image = CanvasImg(imageSrc!!, srcURI!!, 0)
@@ -81,8 +81,7 @@ class CanvasKroki(txtInit: String) : CanvasText(txtInit, 0) {
 
     private fun compress(str: String): Promise<ArrayBuffer> {
         trace("CanvasKroki::compress: $str")
-        return js(
-            """
+        return js("""
 function compress(string, encoding) {
     var byteArray = new TextEncoder('utf-8').encode(string);
     var cs = new CompressionStream(encoding);
@@ -92,8 +91,7 @@ function compress(string, encoding) {
     return new Response(cs.readable).arrayBuffer();
 }
 compress(str, "deflate");
-"""
-        )
+""")
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
@@ -147,7 +145,6 @@ compress(str, "deflate");
         ctx.restore()
         traceDeIndent("CanvasKroki::draw: $globalPosYEnd")
 
-//        return (image?.draw(ctx, width, ret, posX + width / 2 - ( image?.image?.width ?: 0)) ?: ret)
         return (image?.draw(ctx, width, ret, posX) ?: ret)
     }
 

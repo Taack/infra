@@ -17,20 +17,23 @@ fun main() {
         }
     }
 
-    val textareas = document.querySelectorAll("textarea.asciidoctor") as List<*>
-    for (element in textareas) {
+    val textareaList = document.querySelectorAll("textarea.asciidoctor")
+
+    for (element in textareaList) {
         val textarea = element as HTMLTextAreaElement
         textarea.style.display = "none"
-        val scrollContainer = document.createElement("div") as HTMLDivElement?
-        scrollContainer?.style?.width = "${textarea.clientWidth}px"
-        scrollContainer?.style?.height = "${textarea.clientHeight}px"
-        scrollContainer?.style?.margin = "10px"
-        scrollContainer?.style?.border = "1px solid grey"
-        val canvasContainer = document.createElement("div") as HTMLDivElement?
-        if (canvasContainer != null) {
-            if (scrollContainer != null) {
-                MainCanvas(canvasContainer, scrollContainer)
-            }
-        }
+        val scrollContainer = document.createElement("div") as HTMLDivElement
+        scrollContainer.style.width = "calc(100% - 22px)"
+        scrollContainer.style.height = "calc(100vh - 22px)"
+        scrollContainer.style.margin = "10px"
+        scrollContainer.style.border = "1px solid grey"
+        scrollContainer.style.overflow = "auto"
+        val largeContainer = document.createElement("div") as HTMLDivElement
+        largeContainer.style.overflow = "hidden"
+        val canvasContainer = document.createElement("div") as HTMLDivElement
+        largeContainer.append(canvasContainer)
+        scrollContainer.append(largeContainer)
+        textarea.parentElement?.append(scrollContainer)
+        MainCanvas(canvasContainer, scrollContainer)
     }
 }

@@ -16,6 +16,7 @@ import web.clipboard.ClipboardEvent
 import web.dom.document
 import web.events.Event
 import web.events.EventHandler
+import web.events.EventType
 import web.events.addEventListener
 import web.file.FileReader
 import web.html.HTMLButtonElement
@@ -443,7 +444,12 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         bAsciidoc.id = "bAsciidoc"
         bAsciidoc.innerHTML = "Asciidoc"
         bAsciidoc.onclick = EventHandler {
-            kotlinx.browser.document.execCommand("copy")
+//            document.execCommand("copy")
+            draw()
+            val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
+            val clipboardEvent = ClipboardEvent(EventType("copy"))
+            clipboardEvent.clipboardData?.setData("text/plain", asciidoc)
+            document.dispatchEvent(clipboardEvent)
         }
         divHolder.appendChild(bAsciidoc)
 

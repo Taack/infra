@@ -11,9 +11,7 @@ import web.html.HTMLElement
 import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
 import web.html.HTMLTextAreaElement
-import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
-import kotlin.js.Promise
 
 class FormActionInputM2M(private val parent: Form, private val i: HTMLInputElement) : LeafElement {
     companion object {
@@ -43,8 +41,6 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         e.preventDefault()
         trace("FormActionInputM2M::onclick")
 
-        val action = i.attributes.getNamedItem("taackAjaxFormM2MAction")!!.value
-
         val additionalParams = mutableMapOf<String, String>()
         i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map { s: String ->
             val v = parent.f.elements.asList().find { it.attributes.getNamedItem("name")?.value == s }
@@ -57,8 +53,6 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
                     additionalParams["ajaxParams.$s"] = v.value
             }
         }
-
-        val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {

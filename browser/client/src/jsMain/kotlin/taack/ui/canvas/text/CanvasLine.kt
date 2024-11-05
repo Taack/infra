@@ -2,7 +2,6 @@ package taack.ui.canvas.text
 
 import taack.ui.base.Helper.Companion.trace
 import web.canvas.CanvasRenderingContext2D
-import web.html.HTML.i
 
 
 class CanvasLine(
