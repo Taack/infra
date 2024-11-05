@@ -1,24 +1,20 @@
 package taack.ui.base.leaf
 
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
+import web.html.HTMLAnchorElement
 
 class AnchorHref(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a) {
     companion object {
         fun getAnchorHref(p: AjaxBlock): List<AnchorHref> {
-            val elements: List<Node>?
-            elements = p.d.querySelectorAll("a.taackMenu[href]").asList()
-            return elements.map {
+            val elements: List<HTMLAnchorElement>?
+            elements = p.d.querySelectorAll("a.taackMenu[href]") as List<HTMLAnchorElement>?
+            return elements!!.map {
                 AnchorHref(p.parent, it as HTMLAnchorElement)
             }
         }
         fun getAnchorHref(p: Block): List<AnchorHref> {
-            val elements: List<Node>?
-//            elements = document.querySelectorAll("body>nav a.taackMenu[href]").asList()
-            return (/*elements +*/ p.d.querySelectorAll("a.taackMenu[href]").asList()).map {
+            return (p.d.querySelectorAll("a.taackMenu[href]") as List<HTMLAnchorElement>?)!!.map {
                 AnchorHref(p, it as HTMLAnchorElement)
             }
         }

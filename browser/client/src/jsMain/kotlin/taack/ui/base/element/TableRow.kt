@@ -1,26 +1,28 @@
 package taack.ui.base.element
 
-import kotlinx.browser.document
-import org.w3c.dom.*
-import org.w3c.dom.events.Event
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
+import web.dom.InsertPosition
+import web.dom.document
+import web.events.EventHandler
+import web.html.*
 
 class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
-        BaseElement {
+    BaseElement {
     companion object {
         fun getSiblingRows(p: Table): List<TableRow> {
-            val elements: List<Node>?
-            elements = p.t.querySelectorAll("tr[taacktag]").asList()
-            return elements.map {
-                TableRow(p, it as HTMLTableRowElement)
+            val elements: List<HTMLTableRowElement>?
+            elements = p.t.querySelectorAll("tr[taacktag]") as List<HTMLTableRowElement>?
+            return elements!!.map {
+                TableRow(p, it)
             }
         }
     }
 
     private val rowGroup: Int? = r.attributes.getNamedItem("taackTableRowGroup")?.value?.toInt()
-    private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
+    private val rowGroupHasChildren: Boolean? =
+        r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
     private var isExpended: Boolean = false
     private val innerButt = document.createElement("button") as HTMLButtonElement
 
@@ -44,7 +46,7 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
 
     init {
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")
-        innerButt.type = "button"
+        innerButt.type = ButtonType.button
         if (rowGroup != null) {
             val firstCell = r.firstElementChild!! as HTMLTableCellElement
             firstCell.classList.add("firstCellInGroup")
@@ -53,14 +55,12 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
             if (rowGroupHasChildren == true) {
 
                 innerButt.innerHTML = spanInnerText()
-                innerButt.onclick = {
-                    onclick(it)
-                }
-                firstCell.insertAdjacentElement("afterbegin", innerButt)
+                innerButt.onclick = EventHandler { onclick() }
+                firstCell.insertAdjacentElement(InsertPosition.afterbegin, innerButt)
             } else {
                 val innerSpan = document.createElement("span") as HTMLSpanElement
                 innerSpan.innerHTML = spanInnerText()
-                firstCell.insertAdjacentElement("afterbegin", innerSpan)
+                firstCell.insertAdjacentElement(InsertPosition.afterbegin, innerSpan)
             }
         }
         traceDeIndent("TableRow::init ---")
@@ -88,7 +88,7 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
     private fun collapse() {
         isExpended = false
         var collapse = false
-        var rg = rowGroup!! + 1
+        val rg = rowGroup!! + 1
         innerButt.innerHTML = spanInnerText()
 
         for (r in parent.rows) {
@@ -105,7 +105,7 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
 
     }
 
-    private fun onclick(e: Event):Boolean {
+    private fun onclick(): Boolean {
         if (isExpended) collapse()
         else expends()
         return false

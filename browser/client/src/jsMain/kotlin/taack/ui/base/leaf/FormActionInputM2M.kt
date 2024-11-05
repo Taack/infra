@@ -1,25 +1,22 @@
 package taack.ui.base.leaf
 
-import kotlinx.browser.window
-import kotlinx.dom.addClass
-import kotlinx.dom.hasClass
-import kotlinx.dom.removeClass
-import org.w3c.dom.*
-import org.w3c.dom.events.Event
-import org.w3c.fetch.RequestInit
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
+import web.events.Event
+import web.events.EventHandler
+import web.html.HTMLInputElement
+import web.html.HTMLSelectElement
 import kotlin.js.Promise
 
 class FormActionInputM2M(private val parent: Form, private val i: HTMLInputElement) : LeafElement {
     companion object {
         fun getSiblingFormActionInputM2M(f: Form): List<FormActionInputM2M> {
-            val elements: List<Node>?
-            elements = f.f.querySelectorAll("input[taackAjaxFormM2MAction]").asList()
+            val elements: List<HTMLInputElement>?
+            elements = f.f.querySelectorAll("input[taackAjaxFormM2MAction]") as List<HTMLInputElement>
             return elements.map {
-                FormActionInputM2M(f, it as HTMLInputElement)
+                FormActionInputM2M(f, it)
             }
         }
     }
@@ -32,7 +29,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
 
         trace("FormActionInputM2M::init $inputName $spanClassName")
         if (spanClassName == "M2MToDuplicate") input.name = ""
-        i.onclick = { e ->
+        i.onclick = EventHandler { e ->
             onClick(e)
         }
     }
@@ -41,25 +38,21 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         e.preventDefault()
         trace("FormActionInputM2M::onclick")
 
-//        val controller = i.attributes.getNamedItem("taackAjaxFormM2MController")!!.value
         val action = i.attributes.getNamedItem("taackAjaxFormM2MAction")!!.value
 
         val additionalParams = mutableMapOf<String, String>()
-        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
+        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map { it ->
             val v = parent.f[it]
             if (v is HTMLSelectElement) {
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
-//                    ajaxParams.append("ajaxParams.$it=${v.value}&")
             }
             if (v is HTMLInputElement) {
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
-//                    ajaxParams.append("ajaxParams.$it=${v.value}&")
             }
         }
 
-//        val params = i.attributes.getNamedItem("taackAjaxFormM2MParams")?.value
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
         window.fetch(url.toString(), RequestInit(method = "GET")).then {

@@ -1,22 +1,20 @@
 package taack.ui.base.element
 
-import org.w3c.dom.HTMLTableElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.TableGroupableColumn
 import taack.ui.base.leaf.TableSortableColumn
 import taack.ui.base.leaf.TablePaginate
+import web.html.HTMLTableElement
 
 class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
     BaseElement {
     companion object {
         fun getSiblingTable(p: AjaxBlock): List<Table> {
-            val elements: List<Node>?
-            elements = p.d.querySelectorAll("table[taackTableId]").asList()
-            return elements.map {
+            val elements: List<HTMLTableElement>?
+            elements = p.d.querySelectorAll("table[taackTableId]") as List<HTMLTableElement>?
+            return elements!!.map {
                 Table(p, it as HTMLTableElement)
             }
         }

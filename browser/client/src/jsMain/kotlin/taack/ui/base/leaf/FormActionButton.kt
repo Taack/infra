@@ -1,31 +1,35 @@
 package taack.ui.base.leaf
 
-import kotlinx.browser.window
-import org.w3c.dom.*
-import org.w3c.dom.events.Event
-import org.w3c.fetch.RequestInit
-import org.w3c.xhr.FormData
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
-import kotlin.js.Promise
+import web.dom.document
+import web.events.Event
+import web.events.EventHandler
+import web.form.FormData
+import web.html.HTMLButtonElement
+import web.html.HTMLInputElement
+import web.html.HTMLTextAreaElement
+import web.http.RequestMethod
+import web.location.location
+import web.xhr.XMLHttpRequest
 import kotlin.math.min
 
 class FormActionButton(private val parent: Form, private val b: HTMLButtonElement) : LeafElement {
     companion object {
         fun getSiblingFormAction(f: Form): List<FormActionButton> {
-            val elements: List<Node>?
-            elements = f.f.querySelectorAll("button[formaction]").asList()
+            val elements: List<HTMLButtonElement>?
+            elements = f.f.querySelectorAll("button[formaction]") as List<HTMLButtonElement>
             return elements.map {
-                FormActionButton(f, it as HTMLButtonElement)
+                FormActionButton(f, it)
             }
         }
     }
 
     init {
         trace("FormActionButton::init ${b.formAction}")
-        b.onclick = { e ->
+        b.onclick = EventHandler { e ->
             onClick(e)
         }
     }
@@ -48,29 +52,19 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         val f = parent.f
         val fd = FormData(f)
         fd.append("isAjax", "true")
-        window.fetch(b.formAction, RequestInit(method = "POST", body = fd)).then {
-            if (it.ok) {
-                it.text()
-            } else {
-                trace(it.statusText)
-                Promise.reject(Throwable())
-            }
-        }.then {
-            val t = it
-            if (t.substring(0, min(20, t.length)).contains("<!DOCTYPE html>", false)) {
-                window.location.href = b.formAction
-                window.document.clear()
-                window.document.write(t)
-                window.document.close()
-            } else {
-                Helper.processAjaxLink(it, parent)
-            }
-        }.then {
+        val xhr = XMLHttpRequest()
+        xhr.onloadend = EventHandler {
             b.disabled = false
             b.innerText = innerText
+            val t = xhr.responseText
+            if (t.substring(0, min(20, t.length)).contains("<!DOCTYPE html>", false)) {
+                location.href = b.formAction
+                document.write(t)
+                document.close()
+            } else {
+                Helper.processAjaxLink(t, parent)
+            }
         }
-
-//        }.then {
-//            AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
+        xhr.open(RequestMethod.POST, b.formAction)
     }
 }

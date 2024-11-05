@@ -1,36 +1,36 @@
 package taack.ui.base.element
 
-import kotlinx.browser.window
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
-import org.w3c.dom.get
-import org.w3c.fetch.RequestInit
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
-import kotlin.js.Promise
+import web.events.EventHandler
+import web.html.HTMLDivElement
+import web.http.RequestMethod
+import web.timers.TimerHandler
+import web.timers.setTimeout
+import web.xhr.XMLHttpRequest
+import kotlin.time.Duration
 
 class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     BaseElement {
     companion object {
         fun getSiblingAjaxBlock(p: Block): List<AjaxBlock> {
-            val divElements: List<Node>?
-            divElements = p.d.querySelectorAll("div[ajaxBlockId]").asList()
-//            return (divElements + p.d).map {
-            return divElements.map {
-                AjaxBlock(p, it as HTMLDivElement)
+            val divElements: List<HTMLDivElement>? = p.d.querySelectorAll("div[ajaxBlockId]") as List<HTMLDivElement>?
+            return divElements!!.map {
+                AjaxBlock(p, it)
             }
         }
     }
-    private val ajaxBlockId =  d.attributes.getNamedItem("ajaxBlockId")!!.value
-    val blockId = ajaxBlockId ?: parent.blockId
+
+    private val ajaxBlockId = d.attributes.getNamedItem("ajaxBlockId")!!.value
+    val blockId = ajaxBlockId
     var filters: Map<String, Filter> = mutableMapOf()
     private var tables: Map<String, Table> = mutableMapOf()
     private var forms: List<Form> = mutableListOf()
     private var shows: List<Show> = mutableListOf()
     private var progressId: String = ""
+    private val onPoll: TimerHandler = { onPoll() }
 
     private val innerScripts = d.getElementsByTagName("script")
 
@@ -38,34 +38,28 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
         refresh()
 
-        parent.ajaxBlockElements.put(blockId, this)
+        parent.ajaxBlockElements[blockId] = this
 
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }
 
+
     private fun onPoll() {
         Helper.trace("AjaxBlock::onPoll")
 
-        window.fetch("/progress/drawProgress/$progressId?isAjax=true&refresh=true", RequestInit(method = "GET")).then {
-            if (it.ok) {
-                Helper.trace("AjaxBlock::it.ok")
-                it.text()
-            } else {
-                Helper.trace("AjaxBlock::it.ok NOK")
-                Helper.trace(it.statusText)
-                Promise.reject(Throwable())
-            }
-        }.then {
-            Helper.processAjaxLink(it, parent)
+        val xhr = XMLHttpRequest()
+        xhr.onloadend = EventHandler {
+            Helper.processAjaxLink(xhr.responseText, parent)
         }
+        xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true")
 
-        window.setTimeout(onPoll(), 1500)
+        setTimeout(Duration.parse("1s"), onPoll)
     }
 
     private fun poolDrawProgress(blockId: String) {
         progressId = blockId.substring(13)
         Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
-        window.setTimeout(onPoll(), 1500)
+        setTimeout(Duration.parse("1s"), onPoll)
         Helper.traceDeIndent("poolDrawProgress::start ---")
     }
 
@@ -74,24 +68,24 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         if (blockId.startsWith("drawProgress=")) {
             poolDrawProgress(blockId)
         }
-        filters = Filter.getSiblingFilterBlock(this).map { it.filterId + blockId to it }.toMap()
-        tables = Table.getSiblingTable(this).map { it.tableId + blockId to it }.toMap()
+        filters = Filter.getSiblingFilterBlock(this).associateBy { it.filterId + blockId }
+        tables = Table.getSiblingTable(this).associateBy { it.tableId + blockId }
         forms = Form.getSiblingForm(this)
         shows = Show.getSiblingShow(this)
         for (i in 0 until innerScripts.length) {
-            eval(innerScripts.get(i)!!.innerHTML);
+            eval(innerScripts[i].innerHTML)
         }
         ActionLink.getActionLinks(this)
         AnchorHref.getAnchorHref(this)
         Helper.traceDeIndent("AjaxBlock::refresh --- ")
     }
 
-    fun updateContent(newContent: String) {
-        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
-        d.innerHTML = newContent
-        refresh()
-    }
-    
+//    fun updateContent(newContent: String) {
+//        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
+//        d.innerHTML = newContent
+//        refresh()
+//    }
+
     override fun getParentBlock(): Block {
         return parent
     }

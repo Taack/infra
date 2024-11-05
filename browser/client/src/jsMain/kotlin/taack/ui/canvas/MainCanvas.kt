@@ -1,6 +1,5 @@
 package taack.ui.canvas
 
-import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
@@ -12,7 +11,6 @@ import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
 import taack.ui.canvas.table.TxtRowCanvas
 import taack.ui.canvas.text.*
-import web.assembly.ImportExportKind.Companion.function
 import web.canvas.CanvasRenderingContext2D
 import web.clipboard.ClipboardEvent
 import web.dom.document
@@ -28,6 +26,7 @@ import web.http.CrossOrigin
 import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
+import web.window.window
 import kotlin.math.max
 import kotlin.math.min
 
@@ -443,7 +442,7 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         val bAsciidoc = document.createElement("button") as HTMLButtonElement
         bAsciidoc.id = "bAsciidoc"
         bAsciidoc.innerHTML = "Asciidoc"
-        bAsciidoc.onclick = EventHandler { event: MouseEvent ->
+        bAsciidoc.onclick = EventHandler {
             kotlinx.browser.document.execCommand("copy")
         }
         divHolder.appendChild(bAsciidoc)
@@ -467,9 +466,9 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
             ev.stopPropagation()
         })
 
-        window.onresize = {
+        window.onresize = EventHandler {
             trace("window resize")
-            canvas.width = document.body!!.offsetWidth
+            canvas.width = document.body.offsetWidth
             canvas.height = window.innerHeight - 10
             posYGlobal = -dy
             isDoubleClick = false

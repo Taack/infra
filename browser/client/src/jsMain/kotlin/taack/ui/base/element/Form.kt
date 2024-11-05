@@ -1,20 +1,18 @@
 package taack.ui.base.element
 
-import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
+import web.html.HTMLFormElement
 
 class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     BaseElement {
     companion object {
         fun getSiblingForm(p: AjaxBlock): List<Form> {
-            val elements: List<Node>?
-            elements = p.d.querySelectorAll("form.taackForm").asList()
-            return elements.map {
-                Form(p, it as HTMLFormElement)
+            val elements: List<HTMLFormElement>?
+            elements = p.d.querySelectorAll("form.taackForm") as List<HTMLFormElement>?
+            return elements!!.map {
+                Form(p, it)
             }
         }
     }

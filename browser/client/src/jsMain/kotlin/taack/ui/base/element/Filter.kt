@@ -1,20 +1,18 @@
 package taack.ui.base.element
 
-import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.FilterActionButton
+import web.html.HTMLFormElement
 
 class Filter(val parent: AjaxBlock, val f: HTMLFormElement):
     BaseElement {
     companion object {
         fun getSiblingFilterBlock(p: AjaxBlock): List<Filter> {
-            val elements: List<Node>?
-            elements = p.d.querySelectorAll("form[taackfilterid]").asList()
-            return elements.map {
-                Filter(p, it as HTMLFormElement)
+            val elements: List<HTMLFormElement>?
+            elements = p.d.querySelectorAll("form[taackfilterid]") as List<HTMLFormElement>?
+            return elements!!.map {
+                Filter(p, it)
             }
         }
     }

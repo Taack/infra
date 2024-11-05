@@ -1,18 +1,20 @@
 package taack.ui.base
 
-import kotlinx.browser.window
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.asList
-import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.url.URL
-import org.w3c.fetch.RequestInit
-import org.w3c.files.Blob
-import org.w3c.xhr.FormData
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
 import taack.ui.base.element.Form
-import kotlin.js.Promise
+import web.blob.Blob
+import web.dom.document
+import web.events.EventHandler
+import web.events.EventType
+import web.form.FormData
+import web.html.HTMLAnchorElement
+import web.html.HTMLButtonElement
+import web.http.RequestMethod
+import web.location.location
+import web.uievents.MouseEvent
+import web.url.URL
+import web.xhr.XMLHttpRequest
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
 
@@ -85,30 +87,25 @@ class Helper {
             b?.innerText = "Submitting ..."
             val f = filter.f
             val fd = FormData(f)
-            fd.set("isAjax", "true")
-            fd.set("refresh", "true")
-            fd.set("filterTableId", filter.filterId)
-            fd.set("ajaxBlockId", filter.parent.blockId)
-            if (offset != null) fd.set("offset", offset.toString())
+            fd["isAjax"] = "true"
+            fd["refresh"] = "true"
+            fd["filterTableId"] = filter.filterId
+            fd["ajaxBlockId"] = filter.parent.blockId
+            if (offset != null) fd["offset"] = offset.toString()
             else {
-                if (sort != null) fd.set("sort", sort)
-                if (order != null && order != "neutral") fd.set("order", order)
+                if (sort != null) fd["sort"] = sort
+                if (order != null && order != "neutral") fd["order"] = order
                 else fd.delete("order")
             }
 
-            window.fetch(b?.formAction ?: f.action, RequestInit(method = "POST", body = fd)).then {
-                if (it.ok) {
-                    it.text()
-                } else {
-                    trace(it.statusText)
-                    Promise.reject(Throwable())
-                }
-            }.then {
-                processAjaxLink(it, filter)
-            }.then {
+            val xhr = XMLHttpRequest()
+            xhr.onloadend = EventHandler {
+                processAjaxLink(xhr.responseText, filter)
                 b?.disabled = false
-                if (innerText != null) b?.innerText = innerText
+                if (innerText != null) b.innerText = innerText
+
             }
+            xhr.open(RequestMethod.POST, f.action)
         }
 
         fun mapAjaxBlock(text: String): Map<String, String> {
@@ -137,7 +134,7 @@ class Helper {
             val block = base.getParentBlock()
             when {
                 text.contains(RELOAD) -> {
-                    window.location.href = (Block.href ?: "")
+                    location.href = (Block.href ?: "")
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL) -> {
@@ -187,25 +184,11 @@ class Helper {
                     else block.modal.close()
                     val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
                     processAjaxLink(innerText, base, process)
-//                    if (innerText.startsWith(BLOCK_START)) {
-//                        mapAjaxBlock(innerText.substring(29)).map {
-//                            val target = block.ajaxBlockElements?.get(it.key)
-//                                ?: block.parent!!.parent.ajaxBlockElements!![it.key]
-//                            target!!.d.innerHTML = it.value
-//                            target.refresh()
-//                        }
-//                    } else if (text[29] == '<') {
-//                        if (block.parent != null) block.parent.open(text.substring(29))
-//                        else block.modal.open(text.substring(29))
-//
-//                    } else if (text.substring(29) == RELOAD) {
-//                        window.location.href = Block.href ?: ""
-//                    }
                 }
 
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
-                        val target = block.ajaxBlockElements.get(it.key)
+                        val target = block.ajaxBlockElements[it.key]
                         var pos1 = 0
                         if (it.value.startsWith(BLOCK_START))
                             pos1 += it.value.indexOf(':') + 1
@@ -223,7 +206,7 @@ class Helper {
                         processingStack.add(process)
                     }
                     block.modal.open(text.substring(OPEN_MODAL.length))
-                    val s = block.modal.dModalBody.getElementsByTagName("script").asList()
+                    val s = block.modal.dModalBody.getElementsByTagName("script")
                     trace("Executing $s")
                 }
 
@@ -233,13 +216,13 @@ class Helper {
                         processingStack.add(process)
                     }
                     block.modal.dModalBody.innerHTML = text
-                    val s = block.modal.dModalBody.getElementsByTagName("script").asList()
+                    val s = block.modal.dModalBody.getElementsByTagName("script")
                     trace("Executing $s")
                 }
 
                 text.startsWith(REDIRECT) -> {
                     trace("Helper::redirect ${text.substring(REDIRECT.length)}")
-                    window.location.href = text.substring(REDIRECT.length)
+                    location.href = text.substring(REDIRECT.length)
                 }
 
                 text.startsWith(ERROR_START) -> {
@@ -271,11 +254,11 @@ class Helper {
         }
 
         fun saveOrOpenBlob(blob: Blob, fileName: String) {
-            trace("Helper::saveOrOpenBlob blob.size: ${blob.size}, fileName: ${fileName}")
-            var a = window.document.createElement("a") as HTMLAnchorElement
+            trace("Helper::saveOrOpenBlob blob.size: ${blob.size}, fileName: $fileName")
+            val a = document.createElement("a") as HTMLAnchorElement
             a.href = URL.createObjectURL(blob)
             a.download = fileName
-            a.dispatchEvent(MouseEvent("click"))
+            a.dispatchEvent(MouseEvent(EventType("click")))
         }
 
     }
