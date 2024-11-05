@@ -1,29 +1,27 @@
 package taack.ui.base.leaf
 
-import org.w3c.dom.HTMLImageElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
-import org.w3c.dom.events.Event
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
+import web.events.Event
+import web.events.EventHandler
+import web.html.HTMLImageElement
 
 class FormOverrideField(private val parent: Form, private val i: HTMLImageElement) : LeafElement {
     companion object {
         fun getSiblingFormOverrideField(f: Form): List<FormOverrideField> {
-            val elements: List<Node>?
-            elements = f.f.querySelectorAll("img[taackonclickinnerhtml]").asList()
+            val elements: List<HTMLImageElement> = f.f.querySelectorAll("img[taackonclickinnerhtml]") as List<HTMLImageElement>
             return elements.map {
-                FormOverrideField(f, it as HTMLImageElement)
+                FormOverrideField(f, it)
             }
         }
     }
 
     init {
         trace("FormOverrideField::init ${i.id}")
-        i.onclick = { e ->
+        i.onclick = EventHandler { e ->
             onClick(e)
         }
     }

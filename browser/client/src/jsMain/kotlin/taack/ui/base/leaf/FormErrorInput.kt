@@ -1,19 +1,16 @@
 package taack.ui.base.leaf
 
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.Node
-import org.w3c.dom.asList
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
+import web.html.HTMLDivElement
 
 class FormErrorInput(private val parent: Form, val d: HTMLDivElement) : LeafElement {
     companion object {
         fun getSiblingErrorInput(p: Form): List<FormErrorInput> {
-            val elements: List<Node>?
-            elements = p.f.querySelectorAll("div[taackfielderror]").asList()
+            val elements: List<HTMLDivElement> = p.f.querySelectorAll("div[taackfielderror]") as List<HTMLDivElement>
             return elements.map {
-                FormErrorInput(p, it as HTMLDivElement)
+                FormErrorInput(p, it)
             }
         }
     }

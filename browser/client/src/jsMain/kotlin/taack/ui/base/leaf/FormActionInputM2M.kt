@@ -1,13 +1,18 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
 import web.events.Event
 import web.events.EventHandler
+import web.html.HTMLElement
 import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
+import web.html.HTMLTextAreaElement
+import web.http.RequestMethod
+import web.xhr.XMLHttpRequest
 import kotlin.js.Promise
 
 class FormActionInputM2M(private val parent: Form, private val i: HTMLInputElement) : LeafElement {
@@ -41,29 +46,23 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         val action = i.attributes.getNamedItem("taackAjaxFormM2MAction")!!.value
 
         val additionalParams = mutableMapOf<String, String>()
-        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map { it ->
-            val v = parent.f[it]
+        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map { s: String ->
+            val v = parent.f.elements.asList().find { it.attributes.getNamedItem("name")?.value == s }
             if (v is HTMLSelectElement) {
                 if (v.value.isNotBlank())
-                    additionalParams["ajaxParams.$it"] = v.value
+                    additionalParams["ajaxParams.$s"] = v.value
             }
             if (v is HTMLInputElement) {
                 if (v.value.isNotBlank())
-                    additionalParams["ajaxParams.$it"] = v.value
+                    additionalParams["ajaxParams.$s"] = v.value
             }
         }
 
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
-        window.fetch(url.toString(), RequestInit(method = "GET")).then {
-            if (it.ok) {
-                it.text()
-            } else {
-                trace(it.statusText)
-                Promise.reject(Throwable())
-            }
-        }.then {
-            Helper.processAjaxLink(it, parent.parent.parent, ::modalReturnSelect)
+        val xhr = XMLHttpRequest()
+        xhr.onloadend = EventHandler {
+            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
     }
 
@@ -71,17 +70,13 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         trace("FormActionInputM2M::modalReturnSelect $key $value")
         val span = i.parentElement!!
         trace("AUO1 $span")
-        if (span.hasClass("M2MToDuplicate")) {
-            trace("AUO111")
+        if (span.classList.contains("M2MToDuplicate")) {
             val span2 = span.cloneNode(true) as HTMLElement
-            trace("AUO112 $span2")
             FormActionInputM2M(parent, span2.querySelector("input[taackAjaxFormM2MAction]") as HTMLInputElement)
-            trace("AUO113")
             span.parentElement!!.appendChild(span2)
         }
-        trace("AUO2 $span")
-        span.removeClass("M2MToDuplicate")
-        span.addClass("M2MParent")
+        span.classList.remove("M2MToDuplicate")
+        span.classList.add("M2MParent")
         i.value = value
         val i2 = i.parentElement!!.querySelector("#${inputId}")!! as HTMLInputElement
         i2.name = inputName

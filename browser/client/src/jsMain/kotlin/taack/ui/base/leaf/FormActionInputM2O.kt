@@ -1,29 +1,30 @@
 package taack.ui.base.leaf
 
-import kotlinx.browser.window
-import org.w3c.dom.*
-import org.w3c.dom.events.Event
-import org.w3c.fetch.RequestInit
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
-import kotlin.js.Promise
+import web.events.Event
+import web.events.EventHandler
+import web.html.HTMLInputElement
+import web.html.HTMLSelectElement
+import web.html.HTMLTextAreaElement
+import web.http.RequestMethod
+import web.xhr.XMLHttpRequest
 
 class FormActionInputM2O(private val parent: Form, private val i: HTMLInputElement) : LeafElement {
     companion object {
         fun getSiblingFormActionInputO2M(f: Form): List<FormActionInputM2O> {
-            val elements: List<Node>?
-            elements = f.f.querySelectorAll("input[taackAjaxFormM2OAction]").asList()
+            val elements: List<HTMLInputElement> = f.f.querySelectorAll("input[taackAjaxFormM2OAction]") as List<HTMLInputElement>
             return elements.map {
-                FormActionInputM2O(f, it as HTMLInputElement)
+                FormActionInputM2O(f, it)
             }
         }
     }
 
     init {
         trace("FormActionInputM2O::init ${i.name}")
-        i.onclick = { e ->
+        i.onclick = EventHandler{ e ->
             onClick(e)
         }
     }
@@ -34,8 +35,8 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         val action = i.attributes.getNamedItem("taackAjaxFormM2OAction")!!.value
         val additionalParams = mutableMapOf<String, String>()
         i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
-            var v = parent.f[it.replace(".id", "")]
-            if (v == null) v = parent.f[it]
+            var v = parent.f.elements.namedItem(it.replace(".id", ""))
+            if (v == null) v = parent.f.elements.namedItem(it)
             if (v is HTMLSelectElement) {
                 if (v.value.isNotBlank())
                     additionalParams["ajaxParams.$it"] = v.value
@@ -48,19 +49,12 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         }
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
         // TODO: change to Post (see FilterActionButton.kt)
-        window.fetch(
-            url.toString(),
-            RequestInit(method = "GET")
-        ).then {
-            if (it.ok) {
-                it.text()
-            } else {
-                trace(it.statusText)
-                Promise.reject(Throwable())
-            }
-        }.then {
-            Helper.processAjaxLink(it, parent.parent.parent, ::modalReturnSelect)
+        val xhr = XMLHttpRequest()
+        xhr.onloadend = EventHandler {
+            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
+        xhr.open(RequestMethod.GET, url)
+        xhr.send()
     }
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {

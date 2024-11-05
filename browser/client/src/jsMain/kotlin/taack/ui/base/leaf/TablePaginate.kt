@@ -1,17 +1,17 @@
 package taack.ui.base.leaf
 
-import kotlinx.browser.document
-import kotlinx.dom.addClass
-import org.w3c.dom.*
-import org.w3c.dom.events.MouseEvent
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Table
+import web.dom.document
+import web.events.EventHandler
+import web.html.*
+import web.uievents.MouseEvent
 import kotlin.math.max
 import kotlin.math.min
 
-class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : LeafElement {
+class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement {
     companion object {
         fun getSiblingTablePaginate(p: Table): TablePaginate? {
             val d = p.t.parentElement!!.querySelector("div[taackmax]")
@@ -29,9 +29,9 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
         }
     }
 
-    private val max: Number = d.attributes["taackMax"]!!.value.toLong()
-    private val offset: Number = d.attributes["taackOffset"]?.value!!.toLong()
-    private val count: Number = d.attributes["taackCount"]!!.value.toLong()
+    private val max: Number = d.attributes.getNamedItem("taackMax")!!.value.toLong()
+    private val offset: Number = d.attributes.getNamedItem("taackOffset")?.value!!.toLong()
+    private val count: Number = d.attributes.getNamedItem("taackCount")!!.value.toLong()
     private val currentPage = (offset.toDouble() / max.toDouble()).toInt()
     private val numberOfPage = (count.toDouble() / max.toDouble()).toInt()
     private val ul = document.createElement("ul") as HTMLUListElement
@@ -40,9 +40,9 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
         trace("TablePaginate1 max: $max, offset: $offset, count: $count")
         trace("TablePaginate2 currentPage: $currentPage, numberOfPage: $numberOfPage")
 
-        val nav = document.createElement("nav") as HTMLElement
-        ul.addClass("pagination")
-        ul.addClass("pagination-sm")
+        val nav = document.createElement("nav")
+        ul.classList.add("pagination")
+        ul.classList.add("pagination-sm")
         nav.appendChild(ul)
         if (numberOfPage <= 1) {
             val f = count.toDouble() / max.toDouble()
@@ -126,18 +126,18 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
     private fun createAnchor(pageOffset: Int) {
         trace("createAnchor $pageOffset")
         val li = document.createElement("li") as HTMLLIElement
-        li.addClass("page-item")
+        li.classList.add("page-item")
         val a = document.createElement("a") as HTMLAnchorElement
         a.innerText = " ${pageOffset + 1} "
-        a.addClass("taackPageOffset")
-        a.addClass("page-link")
+        a.classList.add("taackPageOffset")
+        a.classList.add("page-link")
         if (pageOffset == currentPage) {
             a.style.fontWeight = "bold"
-            li.addClass("active")
+            li.classList.add("active")
         }
         a.setAttribute("taackPageOffset", pageOffset.toString())
-        a.onclick = {
-            onClick(it, a)
+        a.onclick = EventHandler { e ->
+            onClick(e, a)
         }
         li.appendChild(a)
         ul.appendChild(li)
@@ -145,7 +145,7 @@ class TablePaginate(private val parent: Table, private val d: HTMLDivElement) : 
 
     private fun onClick(e: MouseEvent, a: HTMLAnchorElement) {
         e.preventDefault()
-        val offset = (a.attributes["taackPageOffset"]!!.value.toDouble() * max.toDouble()).toInt()
+        val offset = (a.attributes.getNamedItem("taackPageOffset")!!.value.toDouble() * max.toDouble()).toInt()
         Helper.filterForm(parent.filter, offset, null)
     }
 }
