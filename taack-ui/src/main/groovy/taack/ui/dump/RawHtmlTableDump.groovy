@@ -52,7 +52,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
                 return df.format(value)
             case Date:
-                SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy/MM/dd")
+                SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
                 return sdf.format(value)
             default:
                 return value.toString()
