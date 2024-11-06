@@ -106,6 +106,7 @@ class Helper {
 
             }
             xhr.open(RequestMethod.POST, f.action)
+            xhr.send(fd)
         }
 
         fun mapAjaxBlock(text: String): Map<String, String> {

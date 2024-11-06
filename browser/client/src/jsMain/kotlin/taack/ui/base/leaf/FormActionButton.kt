@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -19,10 +20,9 @@ import kotlin.math.min
 class FormActionButton(private val parent: Form, private val b: HTMLButtonElement) : LeafElement {
     companion object {
         fun getSiblingFormAction(f: Form): List<FormActionButton> {
-            val elements: List<HTMLButtonElement>?
-            elements = f.f.querySelectorAll("button[formaction]") as List<HTMLButtonElement>
+            val elements: List<*> = f.f.querySelectorAll("button[formaction]").asList()
             return elements.map {
-                FormActionButton(f, it)
+                FormActionButton(f, it as HTMLButtonElement)
             }
         }
     }

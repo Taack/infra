@@ -1,5 +1,6 @@
 package taack.ui.base.element
 
+import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
@@ -16,9 +17,9 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     BaseElement {
     companion object {
         fun getSiblingAjaxBlock(p: Block): List<AjaxBlock> {
-            val divElements: List<HTMLDivElement>? = p.d.querySelectorAll("div[ajaxBlockId]") as List<HTMLDivElement>?
-            return divElements!!.map {
-                AjaxBlock(p, it)
+            val divElements: List<*> = p.d.querySelectorAll("div[ajaxBlockId]").asList()
+            return divElements.map {
+                AjaxBlock(p, it as HTMLDivElement)
             }
         }
     }

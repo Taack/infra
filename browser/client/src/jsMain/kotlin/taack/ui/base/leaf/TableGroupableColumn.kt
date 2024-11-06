@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -17,9 +18,9 @@ import web.xhr.XMLHttpRequest
 class TableGroupableColumn(private val parent: Table, s: HTMLSpanElement) : LeafElement {
     companion object {
         fun getSiblingGroupableColumn(p: Table): List<TableGroupableColumn> {
-            val elements: List<HTMLSpanElement> = p.t.querySelectorAll("span[groupField]") as List<HTMLSpanElement>
+            val elements: List<*> = p.t.querySelectorAll("span[groupField]").asList()
             return elements.map {
-                TableGroupableColumn(p, it)
+                TableGroupableColumn(p, it as HTMLSpanElement)
             }
         }
         var grouping = 0

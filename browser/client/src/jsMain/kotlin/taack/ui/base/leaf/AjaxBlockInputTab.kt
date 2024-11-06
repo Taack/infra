@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
@@ -13,9 +14,9 @@ class AjaxBlockInputTab(val parent: Block, val i: HTMLInputElement) :
     BaseElement {
     companion object {
         fun getSiblingBlockInputTab(p: Block): List<AjaxBlockInputTab> {
-            val elements: List<HTMLInputElement>? = p.d.querySelectorAll("input.taackBlockInputTab") as List<HTMLInputElement>?
-            return elements!!.map {
-                AjaxBlockInputTab(p, it)
+            val elements: List<*> = p.d.querySelectorAll("input.taackBlockInputTab").asList()
+            return elements.map {
+                AjaxBlockInputTab(p, it as HTMLInputElement)
             }
         }
     }

@@ -16,10 +16,9 @@ import web.xhr.XMLHttpRequest
 class FormActionInputM2M(private val parent: Form, private val i: HTMLInputElement) : LeafElement {
     companion object {
         fun getSiblingFormActionInputM2M(f: Form): List<FormActionInputM2M> {
-            val elements: List<HTMLInputElement>?
-            elements = f.f.querySelectorAll("input[taackAjaxFormM2MAction]") as List<HTMLInputElement>
+            val elements: List<*> = f.f.querySelectorAll("input[taackAjaxFormM2MAction]").asList()
             return elements.map {
-                FormActionInputM2M(f, it)
+                FormActionInputM2M(f, it as HTMLInputElement)
             }
         }
     }

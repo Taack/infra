@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -11,9 +12,8 @@ import web.html.HTMLButtonElement
 class FilterActionButton(private val parent: Filter, private val b: HTMLButtonElement?) : LeafElement {
     companion object {
         fun getSiblingFilterAction(f: Filter): List<FilterActionButton> {
-            val elements: List<HTMLButtonElement>?
-            elements = f.f.querySelectorAll("button[formaction]") as List<HTMLButtonElement>?
-            return elements!!.map {
+            val elements: List<*> = f.f.querySelectorAll("button[formaction]").asList()
+            return elements.map {
                 FilterActionButton(f, it as HTMLButtonElement)
             }
         }

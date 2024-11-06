@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
@@ -12,9 +13,9 @@ import web.html.HTMLImageElement
 class FormOverrideField(private val parent: Form, private val i: HTMLImageElement) : LeafElement {
     companion object {
         fun getSiblingFormOverrideField(f: Form): List<FormOverrideField> {
-            val elements: List<HTMLImageElement> = f.f.querySelectorAll("img[taackonclickinnerhtml]") as List<HTMLImageElement>
+            val elements: List<*> = f.f.querySelectorAll("img[taackonclickinnerhtml]").asList()
             return elements.map {
-                FormOverrideField(f, it)
+                FormOverrideField(f, it as HTMLImageElement)
             }
         }
     }

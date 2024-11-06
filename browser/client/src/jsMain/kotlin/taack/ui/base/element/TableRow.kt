@@ -1,5 +1,6 @@
 package taack.ui.base.element
 
+import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
@@ -12,10 +13,9 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
     BaseElement {
     companion object {
         fun getSiblingRows(p: Table): List<TableRow> {
-            val elements: List<HTMLTableRowElement>?
-            elements = p.t.querySelectorAll("tr[taacktag]") as List<HTMLTableRowElement>?
-            return elements!!.map {
-                TableRow(p, it)
+            val elements: List<*> = p.t.querySelectorAll("tr[taacktag]").asList()
+            return elements.map {
+                TableRow(p, it as HTMLTableRowElement)
             }
         }
     }

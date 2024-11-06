@@ -1,5 +1,6 @@
 package taack.ui.base.element
 
+import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
@@ -9,10 +10,9 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     BaseElement {
     companion object {
         fun getSiblingForm(p: AjaxBlock): List<Form> {
-            val elements: List<HTMLFormElement>?
-            elements = p.d.querySelectorAll("form.taackForm") as List<HTMLFormElement>?
-            return elements!!.map {
-                Form(p, it)
+            val elements: List<*> = p.d.querySelectorAll("form.taackForm").asList()
+            return elements.map {
+                Form(p, it as HTMLFormElement)
             }
         }
     }
@@ -40,9 +40,9 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
         m2mList = FormActionInputM2M.getSiblingFormActionInputM2M(this)
         overrideFields = FormOverrideField.getSiblingFormOverrideField(this)
         m2oSelectM2OList = FormActionSelectM2O.getSiblingFormActionSelectO2M(this)
-        errorPlaceHolders = FormErrorInput.getSiblingErrorInput(this).map {
-            it.fieldName to it
-        }.toMap()
+        errorPlaceHolders = FormErrorInput.getSiblingErrorInput(this).associateBy {
+            it.fieldName
+        }
         Helper.traceDeIndent("Form::init --- formName: $formName")
     }
 

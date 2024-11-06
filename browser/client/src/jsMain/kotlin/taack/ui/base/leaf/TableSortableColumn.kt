@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -13,10 +14,9 @@ import web.uievents.MouseEvent
 class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafElement {
     companion object {
         fun getSiblingSortableColumn(p: Table): List<TableSortableColumn> {
-            val elements: List<HTMLSpanElement>?
-            elements = p.t.querySelectorAll("span[sortField]") as List<HTMLSpanElement>
+            val elements: List<*> = p.t.querySelectorAll("span[sortField]").asList()
             return elements.map {
-                TableSortableColumn(p, it)
+                TableSortableColumn(p, it as HTMLSpanElement)
             }
         }
     }

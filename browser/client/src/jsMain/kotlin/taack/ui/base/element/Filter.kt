@@ -1,5 +1,6 @@
 package taack.ui.base.element
 
+import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.FilterActionButton
@@ -9,10 +10,9 @@ class Filter(val parent: AjaxBlock, val f: HTMLFormElement):
     BaseElement {
     companion object {
         fun getSiblingFilterBlock(p: AjaxBlock): List<Filter> {
-            val elements: List<HTMLFormElement>?
-            elements = p.d.querySelectorAll("form[taackfilterid]") as List<HTMLFormElement>?
-            return elements!!.map {
-                Filter(p, it)
+            val elements: List<*> = p.d.querySelectorAll("form[taackfilterid]").asList()
+            return elements.map {
+                Filter(p, it as HTMLFormElement)
             }
         }
     }

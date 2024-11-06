@@ -1,5 +1,6 @@
 package taack.ui.base.leaf
 
+import js.array.asList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -17,10 +18,9 @@ import web.xhr.XMLHttpRequest
 class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectElement) : LeafElement {
     companion object {
         fun getSiblingFormActionSelectO2M(f: Form): List<FormActionSelectM2O> {
-            val elements: List<HTMLSelectElement> =
-                f.f.querySelectorAll("select.taackAjaxFormSelectM2O") as List<HTMLSelectElement>
+            val elements: List<*> = f.f.querySelectorAll("select.taackAjaxFormSelectM2O").asList()
             return elements.map {
-                FormActionSelectM2O(f, it)
+                FormActionSelectM2O(f, it as HTMLSelectElement)
             }
         }
     }
