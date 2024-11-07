@@ -11,7 +11,7 @@ import web.html.Image
 import kotlin.math.min
 
 class CanvasImg(
-    val src: String, txt: String, private val initCitationNumber: Int, floatingRight: Boolean = false
+    private val src: String, txt: String, private val initCitationNumber: Int
 ) : ICanvasDrawable {
 
     companion object {
@@ -29,13 +29,13 @@ class CanvasImg(
         set(value) {
             srcRatio[src] = value!!
         }
-    val image: Image = srcImage.getOrPut(src) {
+    private val image: Image = srcImage.getOrPut(src) {
         val i = Image()
         i.src = src
         i
     }
 
-    override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
+    override fun getSelectedText(posX: Double?, posY: Double?): CanvasText {
         return text
     }
 
@@ -45,7 +45,6 @@ class CanvasImg(
         globalPosYStart = posY
         globalPosYEnd = posY
         if (ratio == null) {
-            image.src = src
             image.onload = EventHandler {
                 val w = image.width
                 val h = image.height
@@ -53,6 +52,7 @@ class CanvasImg(
 //                ratio = width / w
                 trace("CanvasImg::draw.onLoad $image ${image.width}x${image.height}, r: $ratio")
             }
+            image.src = src
         } else if (image.complete) {
             globalPosYEnd = ratio!! * (image.height) + globalPosYStart
             ctx.drawImage(image, posX, posY, image.width * ratio!!, image.height * ratio!!)

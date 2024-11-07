@@ -34,6 +34,6 @@ fun main() {
         largeContainer.append(canvasContainer)
         scrollContainer.append(largeContainer)
         textarea.parentElement?.append(scrollContainer)
-        MainCanvas(canvasContainer, scrollContainer)
+        MainCanvas(textarea, canvasContainer, scrollContainer)
     }
 }

@@ -16,14 +16,11 @@ import web.clipboard.ClipboardEvent
 import web.dom.document
 import web.events.Event
 import web.events.EventHandler
-import web.events.EventType
 import web.events.addEventListener
 import web.file.FileReader
-import web.html.HTMLButtonElement
-import web.html.HTMLCanvasElement
-import web.html.HTMLDivElement
-import web.html.HTMLImageElement
+import web.html.*
 import web.http.CrossOrigin
+import web.prompts.prompt
 import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
@@ -31,7 +28,7 @@ import web.window.window
 import kotlin.math.max
 import kotlin.math.min
 
-class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
+class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
     private val canvasInnerBorder = 10.0
     private val ctx: CanvasRenderingContext2D =
@@ -443,24 +440,18 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
         val bAsciidoc = document.createElement("button") as HTMLButtonElement
         bAsciidoc.id = "bAsciidoc"
         bAsciidoc.innerHTML = "Asciidoc"
-        bAsciidoc.onclick = EventHandler {
-//            document.execCommand("copy")
+        bAsciidoc.onclick = EventHandler { event ->
+            event.preventDefault()
+            event.stopPropagation()
             draw()
             val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
-            val clipboardEvent = ClipboardEvent(EventType("copy"))
-            clipboardEvent.clipboardData?.setData("text/plain", asciidoc)
-            document.dispatchEvent(clipboardEvent)
+            textarea.textContent = asciidoc
+            prompt("Copy to clipboard: Ctrl+C, Enter", asciidoc)
+
         }
         divHolder.appendChild(bAsciidoc)
 
         divHolder.appendChild(canvas)
-
-        document.oncopy = EventHandler { e ->
-            draw()
-            val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
-            e.clipboardData?.setData("text/plain", asciidoc)
-            e.preventDefault()
-        }
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
             trace("divScroll scroll")
@@ -704,7 +695,11 @@ class MainCanvas(private val divHolder: HTMLDivElement, private val divScroll: H
 
         trace("Draw all drawables")
         for (text in drawables) {
-            posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
+            try {
+                posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
+            } catch (e: Throwable) {
+                trace(e.message ?: "")
+            }
         }
 
         trace("currentText == $currentText")
