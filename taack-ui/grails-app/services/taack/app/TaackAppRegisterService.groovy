@@ -3,6 +3,7 @@ package taack.app
 import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import org.jetbrains.annotations.NotNull
 import taack.render.TaackUiService
 import taack.ui.EnumOption
@@ -39,10 +40,10 @@ final class TaackApp implements Comparable {
 
 @CompileStatic
 final class TaackLinkClass {
-    final Class linkClass
+    final Class<? extends GormEntity> linkClass
     final MethodClosure showMethod
 
-    TaackLinkClass(Class linkClass, MethodClosure showMethod) {
+    TaackLinkClass(Class<? extends GormEntity> linkClass, MethodClosure showMethod) {
         this.linkClass = linkClass
         this.showMethod = showMethod
     }
