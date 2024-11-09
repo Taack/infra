@@ -3,16 +3,17 @@ package taack.ui.canvas.script
 import js.typedarrays.Uint8Array
 import taack.ui.canvas.ICanvasDrawable
 import taack.ui.canvas.item.CanvasImg
+import taack.ui.canvas.table.CanvasTable
 import web.encoding.btoa
-import web.location.location
+import web.events.EventHandler
+import web.http.RequestMethod
+import web.xhr.XMLHttpRequest
 
-class CanvasKroki(txtInit: String) : CanvasScriptCommon(txtInit) {
+class CanvasTql(txtInit: String) : CanvasScriptCommon(txtInit) {
 
     private val apps: Array<String> = arrayOf(
-        "BlockDiag", "BPMN", "Bytefield", "SeqDiag", "ActDiag", "NewDiag",
-        "PacketDiag", "RackDiag", "c4Plantuml", "d2", "dbml", "ditaa", "erd", "excalidraw", "GraphViz", "Mermaid",
-        "Nomnoml", "Pikchr", "PlantUML", "Structurizr", "Svgbob", "Symbolator", "TikZ", "WaveDrom", "WireViz"
-    )
+        "tqlTable", "tqlDiagram")
+
     private val srcURI: String?
         get() {
             val ret = txt.substring(0, txt.indexOfFirst { !it.isLetter() })
@@ -23,7 +24,6 @@ class CanvasKroki(txtInit: String) : CanvasScriptCommon(txtInit) {
         }
 
 
-    private var image: CanvasImg? = null
 
     override val txtScript: String
         get() {
@@ -38,20 +38,24 @@ class CanvasKroki(txtInit: String) : CanvasScriptCommon(txtInit) {
                     }
                     return@then chars.concatToString()
                 }.then {
-                    imageSrc =
-                        "${location.protocol}//${location.hostname}:8000/" + srcURI + "/svg/" + btoa(
-                            it
-                        ).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
-                    image = CanvasImg(imageSrc!!, srcURI!!, 0)
+                    val script = btoa(it).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
+                    val imageSrc = "/taackEditor/$srcURI?script=$script"
+                    if (srcURI!!.contains("Table")) {
+                        val xhr = XMLHttpRequest()
+                        xhr.onloadend = EventHandler { e ->
+                            result = CanvasTable.createTableFromAsciidoc(e.target.responseText)
+                        }
+                        xhr.open(RequestMethod.POST, imageSrc, false)
+                        xhr.send()
+                    }else {
+                        result = CanvasImg(imageSrc, srcURI!!, 0)
+                    }
                 }
             }
             return txt
         }
 
-    private var imageSrc: String? = null
-
-    override val result: ICanvasDrawable?
-        get() = image
+    override var result: ICanvasDrawable? = null
 
 }
 

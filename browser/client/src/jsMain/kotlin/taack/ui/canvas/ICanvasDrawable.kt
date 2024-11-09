@@ -24,6 +24,9 @@ interface ICanvasDrawable: ICanvasSelectable {
             out.append("\n")
             return out.toString()
         }
+
+
+
     }
 
     var globalPosYStart: Double

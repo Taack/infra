@@ -318,10 +318,11 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
                 return Pair(line, caretPosInCurrentText)
             }
         }
-        traceDeIndent("CanvasText::click: null")
         if (posY < lines.last().textY) {
+            traceDeIndent("CanvasText::click: first ${lines.first()}")
             return Pair(lines.first(), 0)
         }
+        traceDeIndent("CanvasText::click: last ${lines.last()}")
         return Pair(lines.last(), txt.length)
     }
 

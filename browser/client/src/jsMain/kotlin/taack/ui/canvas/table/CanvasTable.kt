@@ -22,6 +22,11 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
     override var citationNumber: Int = initCitationNumber
 
     companion object {
+
+        fun createTableFromAsciidoc(txt: String): CanvasTable {
+            return createTable()
+        }
+
         fun createTable() = CanvasTable(listOf(
             TxtHeaderCanvas("Header 1"),
             TxtHeaderCanvas("Header 2"),
@@ -149,6 +154,10 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
                 return r.click(ctx, posX, posY)
             }
         }
+        if (text.isClicked(posX, posY)) {
+            traceDeIndent("CanvasTable::click: $text, $posX, $posY")
+            return text.click(ctx, posX, posY)
+        }
         traceDeIndent("CanvasTable::click: null")
         return null
     }
@@ -160,6 +169,10 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
                 traceDeIndent("CanvasTable::doubleClick: $r, $posX, $posY")
                 return r.doubleClick(ctx, posX, posY)
             }
+        }
+        if (text.isClicked(posX, posY)) {
+            traceDeIndent("CanvasTable::click: $text, $posX, $posY")
+            return text.doubleClick(ctx, posX, posY)
         }
         traceDeIndent("CanvasTable::doubleClick: null")
         return null
