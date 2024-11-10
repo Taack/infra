@@ -49,7 +49,11 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
                 return r
             }
         }
-        currentRow = rows.last()
+        if (posY in text.globalPosYStart..text.globalPosYEnd && posX in text.posXStart..text.posXEnd) {
+            currentRow = text
+            return text
+        }
+        currentRow = text
         if (posY < currentRow!!.globalPosYEnd) {
             currentRow = rows.first()
         }

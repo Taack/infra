@@ -42,7 +42,7 @@ abstract class CanvasScriptCommon(txtInit: String) : CanvasText(txtInit, 0) {
     }
 
     fun compress(str: String): Promise<ArrayBuffer> {
-        trace("CanvasKroki::compress: $str")
+        trace("CanvasScriptCommon::compress: $str")
         return js("""
 function compress(string, encoding) {
     var byteArray = new TextEncoder('utf-8').encode(string);
@@ -59,7 +59,7 @@ compress(str, "deflate");
     abstract val result: ICanvasDrawable?
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
-        traceIndent("CanvasKroki::draw: $posX, $posY, $width")
+        traceIndent("CanvasScriptCommon::draw: $posX, $posY, $width")
         this.posXStart = posX
         this.posXEnd = width
         ctx.save()
@@ -107,7 +107,7 @@ compress(str, "deflate");
         val ret = posY + totalHeight
         globalPosYEnd = ret
         ctx.restore()
-        traceDeIndent("CanvasKroki::draw: $globalPosYEnd")
+        traceDeIndent("CanvasScriptCommon::draw: $globalPosYEnd")
 
         return (result?.draw(ctx, width, ret, posX) ?: ret)
     }
