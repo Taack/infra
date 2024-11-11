@@ -7,6 +7,7 @@ import com.itextpdf.io.font.FontProgram
 import com.itextpdf.io.font.FontProgramFactory
 import com.itextpdf.layout.font.FontProvider
 import groovy.transform.CompileStatic
+
 /**
  * Convert HTML code to PDF (WiP).
  * <p>Fonts should be located in ${taackUiConfiguration.root}/pdf/fonts/
@@ -17,7 +18,7 @@ class TaackPdfConverterFromHtmlService {
     static final String FONT_ITALIC = "fonts/Roboto-Italic.ttf"
     static final String FONT_REG = "fonts/Roboto-Regular.ttf"
 
-            void generatePdfFromHtmlIText(OutputStream outputStream, final String html) {
+    void generatePdfFromHtmlIText(OutputStream outputStream, final String html) {
         try {
             ConverterProperties properties = new ConverterProperties()
             FontProvider fontProvider = new DefaultFontProvider()
