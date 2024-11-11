@@ -61,15 +61,14 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url, boolean firstInCol, boolean isInCol) {
         Style displayBlock = new Style(null, 'display: block;')
-        if (style) {
+        if (cell && style) {
             displayBlock += style
         }
+        HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: "<br>")
         if (!url) return new HTMLSpan().builder
                 .setStyle(displayBlock)
-                .addChildren(new HTMLTxtContent(cell)).build()
-        return new HTMLAnchor(true, url).builder.addChildren(
-                new HTMLTxtContent(cell)
-        ).build()
+                .addChildren(cellHTML).build()
+        return new HTMLAnchor(true, url).builder.addChildren(cellHTML).build()
     }
 
     @Override
@@ -291,7 +290,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowField(final String value, final Style style) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        blockLog.topElement.builder.addChildren(displayCell(value ?: "<br>", style, null, firstInCol, isInCol))
+        blockLog.topElement.builder.addChildren(displayCell(value, style, null, firstInCol, isInCol))
         if (addColumn) visitColumnEnd()
     }
 
