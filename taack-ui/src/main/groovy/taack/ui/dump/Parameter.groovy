@@ -109,6 +109,7 @@ final class Parameter implements WebAttributes {
     }
 
     String trField(final GetMethodReturn methodReturn) {
+        if (!methodReturn) return ''
         if (!testI18n) {
             String rv = tr(methodReturn.method.declaringClass.simpleName.uncapitalize() + '.' + methodReturn.method.name + '.label')
             if (rv) return rv
@@ -151,6 +152,7 @@ final class Parameter implements WebAttributes {
     }
 
     String trField(final FieldInfo... fieldInfo) {
+        if (!fieldInfo || fieldInfo.grep().isEmpty()) return ''
         def fieldNames = fieldInfo*.fieldName
         def fieldTypes = fieldInfo*.fieldConstraint.field*.type
         String cn = fieldInfo[0].fieldConstraint.field.declaringClass.simpleName.uncapitalize()

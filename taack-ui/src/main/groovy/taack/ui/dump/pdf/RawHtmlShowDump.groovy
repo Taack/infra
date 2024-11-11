@@ -42,12 +42,12 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowFieldUnLabeled(Style style, FieldInfo... fields) {
-        visitShowField(null, fields.last().value?.toString(), style)
+        visitShowField(null, fields.last(), style)
     }
 
     @Override
     void visitShowFieldLabeled(Style style, FieldInfo... fields) {
-        visitShowField(parameter.trField(fields), fields.last().value?.toString(), style)
+        visitShowField(parameter.trField(fields), fields.last(), style)
     }
 
     @Override
@@ -62,7 +62,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowField(final String i18n, final FieldInfo field, final Style style) {
-        if (field.value) {
+        if (field?.value) {
             boolean isDiv = style?.isDiv
             final String htmlElement = "${isDiv?"div":"span"}"
             String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n}</span>""" : ""

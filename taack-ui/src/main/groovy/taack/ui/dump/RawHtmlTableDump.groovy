@@ -278,12 +278,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowField(final FieldInfo fieldInfo, final String format, final Style style) {
-        visitRowField(dataFormat(fieldInfo.value, format), style)
+        visitRowField(dataFormat(fieldInfo?.value, format), style)
     }
 
     @Override
     void visitRowField(final GetMethodReturn fieldInfo, final String format, final Style style) {
-        visitRowField(dataFormat(fieldInfo.value, format), style)
+        visitRowField(dataFormat(fieldInfo?.value, format), style)
     }
 
     @Override
