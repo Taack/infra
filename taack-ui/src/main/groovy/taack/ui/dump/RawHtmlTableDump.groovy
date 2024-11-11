@@ -16,6 +16,8 @@ import taack.ui.dump.html.table.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
+import static taack.render.TaackUiService.tr
+
 @CompileStatic
 final class RawHtmlTableDump implements IUiTableVisitor {
 
@@ -54,6 +56,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             case Date:
                 SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
                 return sdf.format(value)
+            case Enum:
+                String i18n = tr("enum.value.${value.toString()}", null)
+                return i18n != "enum.value.${value.toString()}" ? i18n : value.toString()
             default:
                 return value.toString()
         }

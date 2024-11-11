@@ -98,7 +98,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowField(final String i18n, final FieldInfo field, final Style style) {
         if (field?.value)
-            out << showField(i18n, field.value.toString(), style)
+            out << showField(i18n, RawHtmlTableDump.dataFormat(field.value, null), style)
     }
 
     @Override

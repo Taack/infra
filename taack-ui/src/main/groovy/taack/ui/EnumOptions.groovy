@@ -3,6 +3,8 @@ package taack.ui
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 
+import static taack.render.TaackUiService.tr
+
 @CompileStatic
 final class EnumOption implements IEnumOption {
 
@@ -13,7 +15,8 @@ final class EnumOption implements IEnumOption {
 
     EnumOption(String key, String value, String asset = null, Boolean isSection = false) {
         this.key = key?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
-        this.value = value
+        String i18n = tr("enum.value.$value", null)
+        this.value = i18n != "enum.value.$value" ? i18n : value
         this.asset = asset
         this.section = isSection
     }
