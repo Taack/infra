@@ -6,7 +6,7 @@
 * ~~Quoting~~
 * ~~History~~
 * Serialize history
-* Serialize document
+* Serialize document (https://stackoverflow.com/questions/40370471/is-it-possible-to-specify-a-static-function-in-a-kotlin-interface)
 * Insert image
 * Add Buttons
 * **TQL**
