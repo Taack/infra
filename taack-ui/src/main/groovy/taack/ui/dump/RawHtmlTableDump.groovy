@@ -48,7 +48,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final <T> String dataFormat(T value, String format) {
-        if (!value) return ''
+        if (value == null) return ''
         switch (value.class) {
             case BigDecimal:
                 DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
@@ -59,6 +59,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             case Enum:
                 String i18n = tr("enum.value.${value.toString()}", null)
                 return i18n != "enum.value.${value.toString()}" ? i18n : value.toString()
+            case [Boolean, boolean]:
+                return tr("default.boolean.${value.toString()}", null)
             default:
                 return value.toString()
         }
