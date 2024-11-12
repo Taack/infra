@@ -14,6 +14,8 @@ import taack.ui.dump.html.theme.ThemeSize
 
 import java.text.SimpleDateFormat
 
+import static taack.render.TaackUiService.tr
+
 @CompileStatic
 final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout implements IFormTheme<T> {
 
@@ -131,12 +133,12 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             el.addChildren(
                     new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
                             HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, '1').builder.addClasses('form-check-label').build(),
+                            new HTMLLabel(qualifiedName, tr('default.boolean.true', null)).builder.addClasses('form-check-label').build(),
 
                     ).build(),
                     new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
                             HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, '0').builder.addClasses('form-check-label').build(),
+                            new HTMLLabel(qualifiedName, tr('default.boolean.false', null)).builder.addClasses('form-check-label').build(),
 
                     ).build(),
                     new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
