@@ -1263,16 +1263,16 @@ class CmsController implements WebAttributes {
     def testProgressBar() {
         String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
             row {
-                custom("""<p>Test ended</p>""", null) {
+                custom("""<p>Test ended2</p>""", null) {
                     menuIcon(ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC)
                 }
             }
             row {
                 col {
-                    barDiagram(false)
+                    diagram barDiagram(false)
                 }
                 col {
-                    barDiagram(true)
+                    diagram barDiagram(true)
                 }
             }
         }, 100)

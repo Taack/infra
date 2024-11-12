@@ -41,10 +41,12 @@ class TaackUiProgressBarService {
         new UiBlockSpecifier().ui {
             modal {
                 ajaxBlock "drawProgress=$ret", {
-                    custom """\
+                    row {
+                        custom """\
                         <label for="progress">Job progress:</label>
-                        <progress id="progress" max="$max" value="$value"> 0 / $max </progress>
+                        <progress id="progress" max="$max" value="$value"> $value / $max </progress>
                     """.stripIndent()
+                    }
                 }
             }
         }

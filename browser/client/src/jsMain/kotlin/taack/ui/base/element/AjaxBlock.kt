@@ -38,23 +38,19 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     init {
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
         refresh()
-
         parent.ajaxBlockElements[blockId] = this
-
         Helper.traceDeIndent("AjaxBlock::init --- blockId: $blockId")
     }
 
 
     private fun onPoll() {
         Helper.trace("AjaxBlock::onPoll")
-
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             Helper.processAjaxLink(xhr.responseText, parent)
         }
-        xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true")
-
-        setTimeout(Duration.parse("1s"), onPoll)
+        xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true", true)
+        xhr.send()
     }
 
     private fun poolDrawProgress(blockId: String) {
@@ -81,11 +77,11 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.traceDeIndent("AjaxBlock::refresh --- ")
     }
 
-//    fun updateContent(newContent: String) {
-//        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
-//        d.innerHTML = newContent
-//        refresh()
-//    }
+    fun updateContent(newContent: String) {
+        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
+        d.innerHTML = newContent
+        refresh()
+    }
 
     override fun getParentBlock(): Block {
         return parent
