@@ -143,7 +143,12 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             }
 
             "Enter" -> {
-                trace("MainCanvas::addDrawable press Enter")
+                trace("MainCanvas::addDrawable press Enter $caretPosInCurrentText")
+                if (caretPosInCurrentText == 0) {
+                    commandDoList.add(
+                        AddTextCommand(drawables, 0, PCanvas(">"))
+                    )
+                }
                 if (currentDrawable is CanvasKroki) {
                     commandDoList.add(
                         AddCharCommand(
