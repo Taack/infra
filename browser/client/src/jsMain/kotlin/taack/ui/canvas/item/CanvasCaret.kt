@@ -16,7 +16,7 @@ class CanvasCaret {
         private const val WIDTH: Double = 5.0
 
         fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int) {
-            traceIndent("CanvasCaret::draw: $n line.posEnd: ${line.posEnd}")
+            traceIndent("CanvasCaret::draw: $n line: $line")
             posY = line.textY
             ctx.save()
             text.initCtx(ctx)

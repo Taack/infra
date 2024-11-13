@@ -57,8 +57,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             val decrease = _caretPosInCurrentText - value
             if (caretPosInLine < decrease) {
                 val i = currentText!!.indexOfLine(currentLine)
+                println("AUO1 $i")
                 if (i <= 0) {
                     val j = texts.indexOf(currentText) - 1
+                    println("AUO2 $j")
                     if (j >= 0) {
                         currentDrawable = texts[j]
                         v = currentText!!.lines.last().posEnd
@@ -66,12 +68,14 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                         v = 0
                     }
                 }
-            } else if (caretPosInLine - decrease > currentLine.length) {
+            } else if (caretPosInLine - decrease >= currentLine.length) {
                 val i = currentText!!.indexOfLine(currentLine)
-                if (i < currentText!!.lines.size - 1) {
+                println("AUO3 $i")
+                if (i < currentText!!.lines.size) {
                     v = value
                 } else {
                     val j = texts.indexOf(currentText) + 1
+                    println("AUO4 $j")
                     if (j < texts.size) {
                         currentDrawable = texts[j]
                         v = 0
@@ -145,8 +149,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             "Enter" -> {
                 trace("MainCanvas::addDrawable press Enter $caretPosInCurrentText")
                 if (caretPosInCurrentText == 0) {
+                    val d = PCanvas(">")
+                    currentDrawable = d
                     commandDoList.add(
-                        AddTextCommand(drawables, 0, PCanvas(">"))
+                        AddTextCommand(drawables, 0, d)
                     )
                 }
                 if (currentDrawable is CanvasKroki) {
@@ -166,14 +172,18 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                     } else
                         when (currentText) {
                             is H2Canvas -> {
+                                val d = H3Canvas(">")
+                                currentDrawable = d
                                 commandDoList.add(
-                                    AddTextCommand(drawables, i, H3Canvas(">"))
+                                    AddTextCommand(drawables, i, d)
                                 )
                             }
 
                             is H3Canvas -> {
+                                val d = H4Canvas(">")
+                                currentDrawable = d
                                 commandDoList.add(
-                                    AddTextCommand(drawables, i, H4Canvas(">"))
+                                    AddTextCommand(drawables, i, d)
                                 )
                             }
 
@@ -200,8 +210,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                             }
 
                             else -> {
+                                val d = PCanvas(">")
+                                currentDrawable = d
                                 commandDoList.add(
-                                    AddTextCommand(drawables, i, PCanvas(">"))
+                                    AddTextCommand(drawables, i, d)
                                 )
                             }
                         }
@@ -287,14 +299,6 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             draw()
     }
 
-
-    /*
-    *
-    * public inline fun <E : Event, C : EventTarget, T : EventTarget, D : E> EventHandler(
-    noinline handler: (D) -> Unit
-): EventHandler<E, C, T> where D : HasTargets<C, T>
-    * */
-
     private fun createButton(id: String, innerHtml: String, handler: () -> Unit) {
         val b = document.createElement("button") as HTMLButtonElement
         b.id = id + textarea.name
@@ -321,7 +325,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         canvas.tabIndex = 1
         canvas.style.border = "1px solid black"
         divHolder.draggable = true
-        divHolder.contentEditable = "true"
+        divHolder.contentEditable = "false"
         divHolder.style.border = "1px solid red"
         divScroll.style.border = "1px solid blue"
 
@@ -429,6 +433,13 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             prompt("Copy to clipboard: Ctrl+C, Enter", asciidoc)
         }
 
+        val icp = document.createElement("input") as HTMLInputElement
+        icp.placeholder = "Paste/drop image, text, file"
+        icp.id = "icp" + textarea.name
+        icp.size = 11
+        divHolder.appendChild(icp)
+
+
         divHolder.appendChild(canvas)
 
         divScroll.addEventListener(Event.SCROLL, { ev: Event ->
@@ -496,7 +507,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             draw()
         }
 
-        divHolder.onpaste = EventHandler { event: ClipboardEvent ->
+        icp.onpaste = EventHandler { event: ClipboardEvent ->
             trace("canvasEvent paste $currentText $currentMouseEvent")
             val txt = event.clipboardData!!.getData("text")
             event.preventDefault()
@@ -514,9 +525,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             draw()
         }
 
-        divHolder.ondrop = EventHandler { event: DragEvent ->
+        icp.ondrop = EventHandler { event: DragEvent ->
             trace("canvasEvent drop")
             event.preventDefault()
+            event.stopPropagation()
             if (event.dataTransfer?.items?.length!! > 0) {
                 // Use DataTransferItemList interface to access the file(s)
                 for (item in event.dataTransfer?.items!!) {
