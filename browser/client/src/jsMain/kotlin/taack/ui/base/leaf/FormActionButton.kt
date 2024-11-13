@@ -66,5 +66,6 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
             }
         }
         xhr.open(RequestMethod.POST, b.formAction)
+        xhr.send(fd)
     }
 }
