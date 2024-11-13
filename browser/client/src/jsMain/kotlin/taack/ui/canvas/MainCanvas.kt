@@ -300,6 +300,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         b.style.margin = "2px"
         b.style.height = "29px"
         b.style.width = "80px"
+        b.contentEditable = "false"
         b.onclick = EventHandler { e ->
             e.preventDefault()
             e.stopPropagation()
