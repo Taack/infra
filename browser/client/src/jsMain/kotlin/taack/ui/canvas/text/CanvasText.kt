@@ -216,7 +216,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
     }
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
-        trace("CanvasText::getSelectedText")
+        trace("CanvasText::getSelectedText $this, $posX, $posY")
         return this
     }
 

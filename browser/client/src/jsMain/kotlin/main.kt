@@ -31,7 +31,7 @@ fun main() {
         val largeContainer = document.createElement("div") as HTMLDivElement
         largeContainer.style.overflow = "hidden"
         val canvasContainer = document.createElement("div") as HTMLDivElement
-        canvasContainer.style.display = "block"
+//        canvasContainer.style.display = "block"
         largeContainer.append(canvasContainer)
         scrollContainer.append(largeContainer)
         textarea.parentElement?.append(scrollContainer)

@@ -292,7 +292,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
     private fun createButton(id: String, innerHtml: String, handler: () -> Unit) {
         val b = document.createElement("button") as HTMLButtonElement
-        b.id = id
+        b.id = id + textarea.name
         b.innerHTML = innerHtml
         b.type = ButtonType.button
         b.classList.add("btn")
@@ -309,12 +309,13 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
     }
 
     init {
-        canvas.id = "canvas"
+        canvas.id = "canvas" + textarea.name
         canvas.width = divHolder.clientWidth
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
         canvas.style.border = "1px solid black"
         divHolder.draggable = true
+        divHolder.contentEditable = "true"
         divHolder.style.border = "1px solid red"
         divScroll.style.border = "1px solid blue"
 
@@ -415,7 +416,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        createButton("bAsciidoc", "Asciidoc") {
+        createButton("bAsciidoc", "ADoc") {
             draw()
             val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
             textarea.textContent = asciidoc
@@ -450,6 +451,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 trace("canvas click double click == triple click")
             }
 
+            trace("setting currentMouseEvent = $event")
             currentMouseEvent = event
             event.preventDefault()
             event.stopPropagation()
@@ -488,16 +490,20 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             draw()
         }
 
-        document.onpaste = EventHandler { event: ClipboardEvent ->
-            trace("canvasEvent paste")
+        divHolder.onpaste = EventHandler { event: ClipboardEvent ->
+            trace("canvasEvent paste $currentText $currentMouseEvent")
             val txt = event.clipboardData!!.getData("text")
-            commandDoList.add(
-                AddCharCommand(
-                    currentText!!,
-                    txt,
-                    caretPosInCurrentText
+            event.preventDefault()
+            event.stopPropagation()
+            if (currentText != null) {
+                commandDoList.add(
+                    AddCharCommand(
+                        currentText!!,
+                        txt,
+                        caretPosInCurrentText
+                    )
                 )
-            )
+            }
             trace("canvasEvent paste: $txt")
             draw()
         }
@@ -696,6 +702,6 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         }
         divHolder.style.minHeight = "${posYGlobal + dy}px"
 
-        traceDeIndent("MainCanvas::draw ${divHolder.clientWidth}")
+        traceDeIndent("MainCanvas::draw ${divHolder.clientWidth} $currentText")
     }
 }
