@@ -283,8 +283,17 @@ final class BlockSpec {
     }
 
     void diagramFilter(final UiFilterSpecifier filterSpecifier,
-                       final UiDiagramSpecifier diagramSpecifier) {
-        blockVisitor.visitDiagramFilter(diagramSpecifier, filterSpecifier)
+                       final UiDiagramSpecifier diagramSpecifier,
+                       @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+        String aId = theAjaxBlockId('chartFilter')
+        if (blockVisitor.doRenderElement(aId)) {
+            blockVisitor.visitAjaxBlock(aId)
+            processMenuBlock(aId, closure)
+            blockVisitor.visitRow()
+            blockVisitor.visitDiagramFilter(diagramSpecifier, filterSpecifier)
+            blockVisitor.visitRowEnd()
+            blockVisitor.visitAjaxBlockEnd()
+        }
     }
 
     /**

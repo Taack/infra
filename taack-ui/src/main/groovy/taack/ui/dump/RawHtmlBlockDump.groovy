@@ -253,7 +253,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitDiagramFilter(final UiDiagramSpecifier diagramSpecifier, final UiFilterSpecifier filterSpecifier) {
         blockLog.stayBlock('visitDiagramFilter')
-        filterSpecifier.visitFilter(new RawHtmlFilterDump(blockLog, id, parameter))
+        visitCol(BlockSpec.Width.QUARTER)
+        IUiFilterVisitor filterVisitor = new RawHtmlFilterDump(blockLog, id, parameter)
+        filterSpecifier.visitFilter(filterVisitor)
+        visitColEnd()
+        visitCol(BlockSpec.Width.THREE_QUARTER)
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
+        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(out), UiDiagramSpecifier.DiagramBase.SVG)
+        blockLog.topElement.addChildren(new HTMLOutput(out))
+        filterVisitor.addHiddenInputs()
+        visitColEnd()
     }
 
     @Override
