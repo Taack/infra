@@ -23,14 +23,15 @@ fun main() {
         val textarea = element as HTMLTextAreaElement
         textarea.style.display = "none"
         val scrollContainer = document.createElement("div") as HTMLDivElement
-        scrollContainer.style.width = "calc(100% - 22px)"
-        scrollContainer.style.height = "calc(100vh - 22px)"
-        scrollContainer.style.margin = "10px"
+//        scrollContainer.style.width = "calc(100% - 22px)"
+        scrollContainer.style.height = "calc(30vh - 22px)"
+//        scrollContainer.style.margin = "10px"
         scrollContainer.style.border = "1px solid grey"
         scrollContainer.style.overflow = "auto"
         val largeContainer = document.createElement("div") as HTMLDivElement
         largeContainer.style.overflow = "hidden"
         val canvasContainer = document.createElement("div") as HTMLDivElement
+        canvasContainer.style.display = "block"
         largeContainer.append(canvasContainer)
         scrollContainer.append(largeContainer)
         textarea.parentElement?.append(scrollContainer)

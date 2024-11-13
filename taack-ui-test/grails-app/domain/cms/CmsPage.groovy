@@ -78,7 +78,7 @@ class CmsPage {
         urlPart nullable: true
         title nullable: true
         hatContent nullable: true
-        bodyContent nullable: true, widget: 'textarea'
+        bodyContent nullable: true, widget: "asciidoc"
         mainImage nullable: true
         mainVideo nullable: true
         bodyImages nullable: true

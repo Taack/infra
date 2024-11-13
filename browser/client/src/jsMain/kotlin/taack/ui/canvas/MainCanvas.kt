@@ -282,19 +282,43 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             draw()
     }
 
+
+    /*
+    *
+    * public inline fun <E : Event, C : EventTarget, T : EventTarget, D : E> EventHandler(
+    noinline handler: (D) -> Unit
+): EventHandler<E, C, T> where D : HasTargets<C, T>
+    * */
+
+    private fun createButton(id: String, innerHtml: String, handler: () -> Unit) {
+        val b = document.createElement("button") as HTMLButtonElement
+        b.id = id
+        b.innerHTML = innerHtml
+        b.type = ButtonType.button
+        b.classList.add("btn")
+        b.classList.add("btn-light")
+        b.style.margin = "2px"
+        b.style.height = "29px"
+        b.style.width = "80px"
+        b.onclick = EventHandler { e ->
+            e.preventDefault()
+            e.stopPropagation()
+            handler()
+        }
+        divHolder.appendChild(b)
+    }
+
     init {
         canvas.id = "canvas"
-        canvas.width = window.innerWidth
+        canvas.width = divHolder.clientWidth
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
+        canvas.style.border = "1px solid black"
         divHolder.draggable = true
         divHolder.style.border = "1px solid red"
         divScroll.style.border = "1px solid blue"
 
-        val bBold = document.createElement("button") as HTMLButtonElement
-        bBold.id = "buttonBold"
-        bBold.innerHTML = "<b style='margin: 0;height: 23px;'>BOLD</b>"
-        bBold.onclick = EventHandler {
+        createButton("buttonBold", "<b style='margin: 0;height: 23px;'>BOLD</b>") {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
                     AddStyleCommand(
@@ -306,11 +330,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        divHolder.appendChild(bBold)
-        val bNormal = document.createElement("button") as HTMLButtonElement
-        bNormal.id = "buttonNormal"
-        bNormal.innerHTML = "<span style='margin: 0;height: 23px;'>Normal</span>"
-        bNormal.onclick = EventHandler {
+        createButton("buttonNormal","<span style='margin: 0;height: 23px;'>Normal</span>") {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
                     AddStyleCommand(
@@ -322,11 +342,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        divHolder.appendChild(bNormal)
-        val bMono = document.createElement("button") as HTMLButtonElement
-        bMono.id = "buttonMono"
-        bMono.innerHTML = "<code style='margin: 0;height: 23px;'>Mono</code>"
-        bMono.onclick = EventHandler {
+        createButton("buttonMono", "<code style='margin: 0;height: 23px;'>Mono</code>") {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
                     AddStyleCommand(
@@ -338,11 +354,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        divHolder.appendChild(bMono)
-        val bBoldMono = document.createElement("button") as HTMLButtonElement
-        bBoldMono.id = "buttonBoldMono"
-        bBoldMono.innerHTML = "<code style='margin: 0;height: 23px;'><b>Mono</b></code>"
-        bBoldMono.onclick = EventHandler {
+        createButton("buttonBoldMono", "<code style='margin: 0;height: 23px;'><b>Mono</b></code>") {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
                     AddStyleCommand(
@@ -354,102 +366,61 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        divHolder.appendChild(bBoldMono)
-        val bScript = document.createElement("button") as HTMLButtonElement
-        bScript.id = "buttonScript"
-        bScript.innerHTML = "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>"
-        bScript.onclick = EventHandler {
+        createButton("buttonScript", "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, CanvasKroki(currentText!!.txt))
                 )
             draw()
         }
-        divHolder.appendChild(bScript)
-        val bH2 = document.createElement("button") as HTMLButtonElement
-        bH2.id = "bH2"
-        bH2.innerHTML =
-            "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"
-        bH2.onclick = EventHandler {
+        createButton("bH2", "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
                 )
             draw()
         }
-        divHolder.appendChild(bH2)
-        val bH3 = document.createElement("button") as HTMLButtonElement
-        bH3.id = "bH3"
-        bH3.innerHTML =
-            "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>"
-        bH3.onclick = EventHandler {
+        createButton("bH3", "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
                 )
             draw()
         }
-        divHolder.appendChild(bH3)
-        val bH4 = document.createElement("button") as HTMLButtonElement
-        bH4.id = "bH4"
-        bH4.innerHTML =
-            "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>"
-        bH4.onclick = EventHandler {
+        createButton("bH4", "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
                 )
             draw()
         }
-        divHolder.appendChild(bH4)
-        val bP = document.createElement("button") as HTMLButtonElement
-        bP.id = "bP"
-        bP.innerHTML = "<span style='margin: 0;height: 23px;'>P</span>"
-        bP.onclick = EventHandler {
+        createButton("bP", "<span style='margin: 0;height: 23px;'>P</span>") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
                 )
             draw()
         }
-
-        divHolder.appendChild(bP)
-        val bBullet = document.createElement("button") as HTMLButtonElement
-        bBullet.id = "bBullet"
-        bBullet.innerHTML = " • Bullet"
-        bBullet.onclick = EventHandler {
+        createButton("bBullet", " • ") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
                 )
             draw()
         }
-        divHolder.appendChild(bBullet)
-        val bBullet2 = document.createElement("button") as HTMLButtonElement
-        bBullet2.id = "bBullet2"
-        bBullet2.innerHTML = "    ‧ Bullet"
-        bBullet2.onclick = EventHandler {
+        createButton("bBullet2", "    ‧ ") {
             if (currentDrawable != null)
                 commandDoList.add(
                     ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
                 )
             draw()
         }
-        divHolder.appendChild(bBullet2)
-
-        val bAsciidoc = document.createElement("button") as HTMLButtonElement
-        bAsciidoc.id = "bAsciidoc"
-        bAsciidoc.innerHTML = "Asciidoc"
-        bAsciidoc.onclick = EventHandler { event ->
-            event.preventDefault()
-            event.stopPropagation()
+        createButton("bAsciidoc", "Asciidoc") {
             draw()
             val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
             textarea.textContent = asciidoc
             prompt("Copy to clipboard: Ctrl+C, Enter", asciidoc)
-
         }
-        divHolder.appendChild(bAsciidoc)
 
         divHolder.appendChild(canvas)
 
@@ -464,14 +435,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         })
 
         window.onresize = EventHandler {
-            trace("window resize")
-            canvas.width = document.body.offsetWidth
-            canvas.height = window.innerHeight - 10
             posYGlobal = -dy
             isDoubleClick = false
             draw()
         }
-
         canvas.onclick = EventHandler { event: MouseEvent ->
             trace("canvas click")
             isDoubleClick = false
@@ -606,77 +573,85 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
     }
 
     private fun addInitialTexts() {
-        val h2 = H2Canvas("Topology Filters and Selectors Example for various data layout")
-        initialDrawables.add(h2)
-
-        val h3 = H3Canvas("Directed Acyclic Graphs (the most common in computer sciences)")
-        initialDrawables.add(h3)
-
-        val p1 =
-            PCanvas("DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently.")
-        initialDrawables.add(p1)
-
-        val h31 = H3Canvas("For Assemblies and bodies")
-        initialDrawables.add(h31)
-
-        val h4 = H4Canvas("Category")
-        initialDrawables.add(h4)
-
-        initialDrawables.add(CanvasTable.createTable())
-
-        val s = CanvasKroki(
-            """
-            GraphViz
-            digraph G {Hello->World}
-            """.trimIndent()
-        )
-        initialDrawables.add(s)
-
-        val p2 = PCanvas(
-            """
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-            Matched by feature, body name, but also by position DSL.
-        """.trimIndent()
-        )
-        initialDrawables.add(p2)
-        val p3 = PCanvas(p2.txt)
-        initialDrawables.add(p3)
-        val p4 = PCanvas(p2.txt)
-        initialDrawables.add(p4)
-
-        val image = CanvasImg("https://mdn.github.io/shared-assets/images/examples/rhino.jpg", "Coucou", 0)
-        initialDrawables.add(image)
+        if (textarea.innerText.isNotBlank()) {
+            trace("addInitialTexts ${textarea.innerText}")
+            initialDrawables.add(PCanvas(textarea.innerText))
+        } else {
+            trace("addInitialTexts BLANK")
+            initialDrawables.add(PCanvas("Type Here"))
+        }
+//        val h2 = H2Canvas("Topology Filters and Selectors Example for various data layout")
+//        initialDrawables.add(h2)
+//
+//        val h3 = H3Canvas("Directed Acyclic Graphs (the most common in computer sciences)")
+//        initialDrawables.add(h3)
+//
+//        val p1 =
+//            PCanvas("DSL are AI friendly, so we want to be able to use more natural language in the future to generate our assets, but generation will be translated into those DSLs, in order to be human editable, efficiently.")
+//        initialDrawables.add(p1)
+//
+//        val h31 = H3Canvas("For Assemblies and bodies")
+//        initialDrawables.add(h31)
+//
+//        val h4 = H4Canvas("Category")
+//        initialDrawables.add(h4)
+//
+//        initialDrawables.add(CanvasTable.createTable())
+//
+//        val s = CanvasKroki(
+//            """
+//            GraphViz
+//            digraph G {Hello->World}
+//            """.trimIndent()
+//        )
+//        initialDrawables.add(s)
+//
+//        val p2 = PCanvas(
+//            """
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//            Matched by feature, body name, but also by position DSL.
+//        """.trimIndent()
+//        )
+//        initialDrawables.add(p2)
+//        val p3 = PCanvas(p2.txt)
+//        initialDrawables.add(p3)
+//        val p4 = PCanvas(p2.txt)
+//        initialDrawables.add(p4)
+//
+//        val image = CanvasImg("https://mdn.github.io/shared-assets/images/examples/rhino.jpg", "Coucou", 0)
+//        initialDrawables.add(image)
         drawables.addAll(initialDrawables)
     }
 
     private fun draw() {
         traceIndent("MainCanvas::draw")
+        canvas.width = divHolder.clientWidth
         CanvasText.num1 = 0
         CanvasText.num2 = 0
         CanvasText.figNum = 1
         posYGlobal = -dy
 
-        trace("Clear")
+        trace("Clear ${canvas.width.toDouble()} x ${canvas.height.toDouble()}")
         ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
 
         trace("Reset text")
@@ -693,7 +668,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             cmd.doIt()
         }
 
-        trace("Draw all drawables")
+        trace("Draw all drawables +++")
         for (text in drawables) {
             try {
                 posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
@@ -701,6 +676,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 trace(e.message ?: "")
             }
         }
+        trace("Draw all drawables ---")
 
         trace("currentText == $currentText")
         if (currentText != null) {
@@ -718,8 +694,8 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             }
         }
-        divHolder.style.height = "${posYGlobal + dy}px"
+        divHolder.style.minHeight = "${posYGlobal + dy}px"
 
-        traceDeIndent("MainCanvas::draw")
+        traceDeIndent("MainCanvas::draw ${divHolder.clientWidth}")
     }
 }

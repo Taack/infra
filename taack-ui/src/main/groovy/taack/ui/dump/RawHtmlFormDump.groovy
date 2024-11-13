@@ -258,6 +258,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
             formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+        } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
+            formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
                 formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
