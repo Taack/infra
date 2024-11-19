@@ -341,6 +341,41 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
     /**
+     *  For dates we have a simple DSL:
+     *      2022        everything after 2022 included
+     *      10          since october this year
+     *      202210      since october 2022
+     *
+     *  End date is build the same way, so we can create interval:
+     *      2022-2023   every after 2022 but before 2023 excluded
+     */
+    static final Pair<Date, Date> parseDate(final String dateStringFromFilter) {
+        Closure parse = { String s ->
+            if (!s) return null
+            try {
+                if (s ==~ /([0-9]{2})/) {
+                    return DateFormat.parse('yyyy-MM-dd', "${Calendar.instance.get(Calendar.YEAR)}-${s.toInteger()}-01")
+                } else if (s ==~ /([0-9]{4})/) {
+                    return DateFormat.parse('yyyy-MM-dd', "${s.substring(0, 4).toInteger()}-01-01")
+                } else if (s ==~ /([0-9]{6})/) {
+                    return DateFormat.parse('yyyy-MM-dd', "${s.substring(0, 4).toInteger()}-${s.substring(4, 6).toInteger()}-01")
+                } else {
+                    return DateFormat.parse('yyyyMMdd', s)
+                }
+            } catch (e) {
+                println "Parse Date Error: ${e.message}"
+                return null
+            }
+        }
+
+        def v = dateStringFromFilter.replaceAll(' ', '')
+        def p = v.indexOf('-')
+        Date startDate = parse(p > 1 ? v.substring(0, p) : p == 0 ? null : v)
+        Date endDate = parse(p >= 0 ? v.substring(p + 1) : null)
+        return new Pair(startDate, endDate)
+    }
+
+    /**
      * list entities and number of results
      *
      * @param aClass type we want to list
@@ -404,49 +439,11 @@ final class TaackFilter<T extends GormEntity<T>> {
 
                     Field f = getTheField(aClass, entryKey)
                     if (f && f.type == Date) {
-                        /**
-                         *  For dates we have a simple DSL:
-                         *      2022        everything after 2022 included
-                         *      10          since october this year
-                         *      202210      since october 2022
-                         *
-                         *  End date is build the same way, so we can create interval:
-                         *      2022-2023   every after 2022 but before 2023 excluded
-                         */
-                        def v = (entry.value as String).replaceAll(' ', '')
-                        def p = v.indexOf('-')
-                        def v1 = p > 1 ? v.substring(0, p) : p == 0 ? null : v
-                        if (v1)
-                            if (v1 ==~ /([0-9]{2})/) {
-                                where << ("$aliasKey > '${Calendar.instance.get(Calendar.YEAR)}-${v1.toInteger()}-01'" as String)
-                            } else if (v1 ==~ /([0-9]{4})/) {
-                                where << ("$aliasKey > '${v1.substring(0, 4).toInteger()}-01-01'" as String)
-                            } else if (v1 ==~ /([0-9]{6})/) {
-                                where << ("$aliasKey > '${v1.substring(0, 4).toInteger()}-${v1.substring(4, 6).toInteger()}-01'" as String)
-                            } else {
-                                try {
-                                    Date d = DateFormat.parse('yyyyMMdd', v1)
-                                    where << ("$aliasKey >= '${DateFormat.format(d, 'yyyy-MM-dd')}'" as String)
-                                } catch (e) {
-                                    println "Parse Date Error: ${e.message}"
-                                }
-                            }
-                        def v2 = p >= 0 ? v.substring(p + 1) : null
-                        if (v2)
-                            if (v2 ==~ /([0-9]{2})/) {
-                                where << ("$aliasKey < '${Calendar.instance.get(Calendar.YEAR)}-${v2.toInteger()}-01'" as String)
-                            } else if (v2 ==~ /([0-9]{4})/) {
-                                where << ("$aliasKey < '${v2.substring(0, 4).toInteger()}-01-01'" as String)
-                            } else if (v2 ==~ /([0-9]{6})/) {
-                                where << ("$aliasKey < '${v2.substring(0, 4).toInteger()}-${v2.substring(4, 6).toInteger()}-01'" as String)
-                            } else {
-                                try {
-                                    Date d = DateFormat.parse('yyyyMMdd', v2)
-                                    where << ("$aliasKey < '${DateFormat.format(d, 'yyyy-MM-dd')}'" as String)
-                                } catch (e) {
-                                    println "Parse Date Error: ${e.message}"
-                                }
-                            }
+                        def dates = parseDate(entry.value as String)
+                        if (dates.aValue)
+                            where << ("$aliasKey >= '${DateFormat.format(dates.aValue, 'yyyy-MM-dd')}'" as String)
+                        if (dates.bValue)
+                            where << ("$aliasKey < '${DateFormat.format(dates.bValue, 'yyyy-MM-dd')}'" as String)
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
                         boolean entryValue = entry.value instanceof String ? entry.value == "1" : entry.value as Boolean
                         where << ("$aliasKey = $entryValue" as String)
