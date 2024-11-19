@@ -1416,6 +1416,25 @@ class CmsController implements WebAttributes {
 
     def testDiagram() {
         taackUiService.show(new UiBlockSpecifier().ui({
+            diagramFilter CmsUiService.buildCmsImageFilter(), new UiDiagramSpecifier().ui({
+                tabs {
+                    tab "diagram1", {
+                        bar(true, {
+                            labels "T1"
+                            dataset 'Truc1', 1.0
+                            dataset 'Truc2', 2.0
+                        })
+                    }
+                    tab "diagram2", {
+                        bar(false, {
+                            labels "T1"
+                            dataset 'Truc1', 1.0
+                            dataset 'Truc2', 2.0
+                        })
+                    }
+                }
+            })
+
             diagram barDiagram(false)
             row {
                 col { diagram barDiagram(false) }

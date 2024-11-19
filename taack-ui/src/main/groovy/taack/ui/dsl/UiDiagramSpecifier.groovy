@@ -23,7 +23,6 @@ final class UiDiagramSpecifier {
             diagramVisitor.visitDiagram(diagramBase)
             closure.delegate = new DiagramTypeSpec(diagramVisitor)
             closure.call()
-            diagramVisitor.visitDiagramEnd()
         }
     }
 }
