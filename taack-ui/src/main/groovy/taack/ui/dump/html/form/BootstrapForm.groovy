@@ -185,7 +185,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         vals?.each {
             String id = idPrefix + "-${occ++}"
             HTMLSpan span = new HTMLSpan().builder.addClasses('M2MParent').build() as HTMLSpan
-            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it?.ident(), null).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
+            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it?.ident(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
             HTMLInput input = new HTMLInput(InputType.STRING, it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
             if (!disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
