@@ -54,35 +54,53 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         get() = _caretPosInCurrentText
         set(value) = run {
             var v = value
+            traceIndent("BEFORE _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: $currentText, currentLine: $currentLine")
             val decrease = _caretPosInCurrentText - value
-            if (caretPosInLine < decrease) {
-                val i = currentText!!.indexOfLine(currentLine)
-                println("AUO1 $i")
-                if (i <= 0) {
-                    val j = texts.indexOf(currentText) - 1
-                    println("AUO2 $j")
-                    if (j >= 0) {
-                        currentDrawable = texts[j]
-                        v = currentText!!.lines.last().posEnd
-                    } else {
-                        v = 0
-                    }
-                }
-            } else if (caretPosInLine - decrease >= currentLine.length) {
-                val i = currentText!!.indexOfLine(currentLine)
-                println("AUO3 $i")
-                if (i < currentText!!.lines.size) {
-                    v = value
+            if (value > currentText!!.txt.length + 1) {
+                val j = texts.indexOf(currentText)
+                trace("value > currentText!!.txt.length, j: $j, texts.size: ${texts.size}")
+                if (j >= 0 && j < texts.size - 1) {
+                    currentDrawable = texts[j + 1]
+                    v = value - _caretPosInCurrentText
                 } else {
-                    val j = texts.indexOf(currentText) + 1
-                    println("AUO4 $j")
-                    if (j < texts.size) {
-                        currentDrawable = texts[j]
-                        v = 0
+                    v = currentText!!.txt.length + 1
+                }
+            } else if (value < 0) {
+                val j = texts.indexOf(currentText)
+                trace("value < 0")
+                if (j > 0) {
+                    currentDrawable = texts[j - 1]
+                    v = currentText!!.txt.length + value
+                } else {
+                    v = 0
+                }
+            } else {
+                val i = currentText!!.indexOfLine(currentLine)
+                trace("ELSE branch i: $i")
+                if (caretPosInLine < decrease) {
+                    if (i <= 0) {
+                        val j = texts.indexOf(currentText) - 1
+                        if (j >= 0) {
+                            currentDrawable = texts[j]
+                            v = currentText!!.lines.last().posEnd
+                        } else {
+                            v = 0
+                        }
+                    }
+                } else if (caretPosInLine - decrease >= currentLine.length) {
+                    if (i < currentText!!.lines.size) {
+                        v = value
+                    } else {
+                        val j = texts.indexOf(currentText) + 1
+                        if (j < texts.size) {
+                            currentDrawable = texts[j]
+                            v = 0
+                        }
                     }
                 }
             }
             _caretPosInCurrentText = v
+            traceDeIndent("AFTER  _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: $currentText, currentLine: $currentLine")
         }
     private var currentDrawable: ICanvasDrawable? = null
     private val currentText: CanvasText?
@@ -101,7 +119,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
     private val commandDoList = mutableListOf<ICanvasCommand>()
     private val commandUndoList = mutableListOf<ICanvasCommand>()
     private val caretPosInLine
-        get() = _caretPosInCurrentText - currentLine.posBegin
+        get() = caretPosInCurrentText - currentLine.posBegin
 
     private fun addDrawable() {
         var doNotDraw = false
@@ -149,7 +167,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             "Enter" -> {
                 trace("MainCanvas::addDrawable press Enter $caretPosInCurrentText")
                 if (caretPosInCurrentText == 0) {
-                    val d = PCanvas(">")
+                    val d = PCanvas("")
                     currentDrawable = d
                     commandDoList.add(
                         AddTextCommand(drawables, 0, d)
@@ -172,7 +190,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                     } else
                         when (currentText) {
                             is H2Canvas -> {
-                                val d = H3Canvas(">")
+                                val d = H3Canvas("")
                                 currentDrawable = d
                                 commandDoList.add(
                                     AddTextCommand(drawables, i, d)
@@ -180,7 +198,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                             }
 
                             is H3Canvas -> {
-                                val d = H4Canvas(">")
+                                val d = H4Canvas("")
                                 currentDrawable = d
                                 commandDoList.add(
                                     AddTextCommand(drawables, i, d)
@@ -210,7 +228,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                             }
 
                             else -> {
-                                val d = PCanvas(">")
+                                val d = PCanvas("")
                                 currentDrawable = d
                                 commandDoList.add(
                                     AddTextCommand(drawables, i, d)
@@ -602,7 +620,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             initialDrawables.add(PCanvas(textarea.innerText))
         } else {
             trace("addInitialTexts BLANK")
-            initialDrawables.add(PCanvas("Type Here"))
+            initialDrawables.add(PCanvas(""))
         }
 //        val h2 = H2Canvas("Topology Filters and Selectors Example for various data layout")
 //        initialDrawables.add(h2)

@@ -9,7 +9,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(val txtInit: String = ">", private val initCitationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(val txtInit: String = "", private val initCitationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -45,17 +45,15 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
 
     fun addChar(c: String, p: Int) {
         trace("CanvasText::addChar: $c, $p")
-        txtVar = if (txtVar == ">")
+        txtVar = if (txtVar.isEmpty())
             c
         else
             txtVar.substring(0, p) + c + txtVar.substring(p)
 
-        println("CanvasText::addChar styles: $styles")
         if (styles.isNotEmpty()) {
             val stylesAfter = styles.filter {
                 it.posNStart > p
             }
-            println("CanvasText::addChar stylesAfter: $stylesAfter")
             stylesAfter.forEach {
                 it.posNStart += 1
                 it.posNEnd += 1
@@ -75,7 +73,6 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
             val stylesAfter = styles.filter {
                 it.posNStart > p
             }
-            println("CanvasText::addChar stylesAfter: $stylesAfter")
             stylesAfter.forEach {
                 it.posNStart -= 1
                 it.posNEnd -= 1
@@ -100,7 +97,6 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
             val stylesAfter = styles.filter {
                 it.posNStart > p - 1
             }
-            println("CanvasText::addChar stylesAfter: $stylesAfter")
             stylesAfter.forEach {
                 it.posNStart -= 1
                 it.posNEnd -= 1
@@ -216,7 +212,7 @@ abstract class CanvasText(val txtInit: String = ">", private val initCitationNum
     }
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
-        trace("CanvasText::getSelectedText $this, $posX, $posY")
+        //trace("CanvasText::getSelectedText $this, $posX, $posY")
         return this
     }
 

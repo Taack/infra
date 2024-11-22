@@ -187,7 +187,7 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
         for (i in (rows.indices)) {
             if (rows[i] == currentText) {
                 for (j in (0 until columns)) {
-                    rows.add((i - (i % columns) + columns), TxtRowCanvas(">"))
+                    rows.add((i - (i % columns) + columns), TxtRowCanvas(""))
                 }
                 break
             }
@@ -209,9 +209,9 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas>, private val in
     fun addColumn(currentText: TxtHeaderCanvas) {
         for (i in (headers.indices)) {
             if (headers[i] == currentText) {
-                headers.add(i + 1, TxtHeaderCanvas(">"))
+                headers.add(i + 1, TxtHeaderCanvas(""))
                 for (j in ((i + 1) until rows.size step columns)) {
-                    rows.add(j, TxtRowCanvas(">"))
+                    rows.add(j, TxtRowCanvas(""))
                 }
                 break
             }
