@@ -92,6 +92,7 @@ abstract class CanvasText(val txtInit: String = "", private val initCitationNumb
 
     fun rmChar(p: Int): Int {
         trace("CanvasText::rmChar: $p")
+        if (txtVar.isEmpty()) return 0
         txtVar = txtVar.substring(0, p - 1) + txtVar.substring(p)
         if (styles.isNotEmpty()) {
             val stylesAfter = styles.filter {

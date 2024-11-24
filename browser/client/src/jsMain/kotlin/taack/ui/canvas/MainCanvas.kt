@@ -29,6 +29,29 @@ import kotlin.math.max
 import kotlin.math.min
 
 class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
+
+    inner class MyMutableList(val b: MutableList<ICanvasDrawable>) : MutableList<ICanvasDrawable> by b {
+        override fun add(element: ICanvasDrawable): Boolean {
+            currentDrawable = element
+            return b.add(element)
+        }
+
+        fun addAndChangeCurrent(index: Int, element: ICanvasDrawable) {
+            currentDrawable = element
+            return b.add(index, element)
+        }
+
+        override fun remove(element: ICanvasDrawable): Boolean {
+            val i = b.indexOf(element)
+            if (i > 1) {
+                currentDrawable = b[i - 1]
+                return b.remove(element)
+            }
+            return false
+        }
+    }
+
+
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
     private val canvasInnerBorder = 10.0
     private val ctx: CanvasRenderingContext2D =
@@ -46,7 +69,8 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         }
     private val currentLine: CanvasLine
         get() = currentText!!.lines[currentText!!.indexOfLine(_caretPosInCurrentText)]
-    private val drawables = mutableListOf<ICanvasDrawable>()
+    private val _drawables: MutableList<ICanvasDrawable> = mutableListOf()
+    private val drawables = MyMutableList(_drawables)
     private val initialDrawables = mutableListOf<ICanvasDrawable>()
     private var dy: Double = 0.0
     private var _caretPosInCurrentText: Int = 0
@@ -103,6 +127,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             traceDeIndent("AFTER  _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: $currentText, currentLine: $currentLine")
         }
     private var currentDrawable: ICanvasDrawable? = null
+        set(value) {
+            _caretPosInCurrentText = 0
+            field = value
+        }
     private val currentText: CanvasText?
         get() = currentDrawable?.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
@@ -166,14 +194,13 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
             "Enter" -> {
                 trace("MainCanvas::addDrawable press Enter $caretPosInCurrentText")
+                val i = drawables.indexOf(currentText!!)
                 if (caretPosInCurrentText == 0) {
                     val d = PCanvas("")
-                    currentDrawable = d
                     commandDoList.add(
-                        AddTextCommand(drawables, 0, d)
+                        AddTextCommand(drawables, i, d)
                     )
-                }
-                if (currentDrawable is CanvasKroki) {
+                } else if (currentDrawable is CanvasKroki) {
                     commandDoList.add(
                         AddCharCommand(
                             currentText!!,
@@ -191,7 +218,6 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                         when (currentText) {
                             is H2Canvas -> {
                                 val d = H3Canvas("")
-                                currentDrawable = d
                                 commandDoList.add(
                                     AddTextCommand(drawables, i, d)
                                 )
@@ -199,7 +225,6 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
                             is H3Canvas -> {
                                 val d = H4Canvas("")
-                                currentDrawable = d
                                 commandDoList.add(
                                     AddTextCommand(drawables, i, d)
                                 )
@@ -395,53 +420,71 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        createButton("buttonScript", "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>") {
-            if (currentDrawable != null)
-                commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, CanvasKroki(currentText!!.txt))
-                )
-            draw()
-        }
+//        createButton("buttonScript", "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>") {
+//            if (currentDrawable != null)
+//                commandDoList.add(
+//                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, CanvasKroki(currentText!!.txt))
+//                )
+//            draw()
+//        }
         createButton("bH2", "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>") {
-            if (currentDrawable != null)
+            if (currentDrawable != null) {
+                val cd = currentDrawable
+                currentDrawable = H2Canvas(currentText!!.txt)
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H2Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, initialDrawables, cd, currentDrawable as H2Canvas)
                 )
+            }
             draw()
         }
         createButton("bH3", "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>") {
-            if (currentDrawable != null)
+            if (currentDrawable != null) {
+                val cd = currentDrawable
+                currentDrawable = H3Canvas(currentText!!.txt)
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H3Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, initialDrawables, cd, currentDrawable as H3Canvas)
                 )
+            }
             draw()
         }
         createButton("bH4", "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>") {
-            if (currentDrawable != null)
+            if (currentDrawable != null) {
+                val cd = currentDrawable
+                currentDrawable = H4Canvas(currentText!!.txt)
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, H4Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, initialDrawables, cd, currentDrawable as H4Canvas)
                 )
+            }
             draw()
         }
         createButton("bP", "<span style='margin: 0;height: 23px;'>P</span>") {
-            if (currentDrawable != null)
+            if (currentDrawable != null) {
+                val cd = currentDrawable
+                currentDrawable = PCanvas(currentText!!.txt)
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, PCanvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, initialDrawables, cd, currentDrawable as PCanvas)
                 )
+            }
             draw()
         }
         createButton("bBullet", " • ") {
-            if (currentDrawable != null)
+            if (currentDrawable != null) {
+                val cd = currentDrawable
+                currentDrawable = LiCanvas(currentText!!.txt)
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, LiCanvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, initialDrawables, cd, currentDrawable as LiCanvas)
                 )
+            }
             draw()
         }
         createButton("bBullet2", "    ‧ ") {
-            if (currentDrawable != null)
+            if (currentDrawable != null) {
+                val cd = currentDrawable
+                currentDrawable = Li2Canvas(currentText!!.txt)
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, initialDrawables, currentDrawable, Li2Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, initialDrawables, cd, currentDrawable as Li2Canvas)
                 )
+            }
             draw()
         }
         createButton("bAsciidoc", "ADoc") {
@@ -611,6 +654,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             trace("canvasEvent ondrag: $txt")
         }
         addInitialTexts()
+        currentDrawable = drawables.first()
         draw()
     }
 
