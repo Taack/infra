@@ -8,11 +8,11 @@ import java.util.regex.Matcher
 class Tokenizer {
     static class TokenInfo {
         final String sequence
-        final cms.dsl.parser.Token token
+        final Token token
         final int start
         final int end
 
-        TokenInfo(cms.dsl.parser.Token token, String sequence, int start, int end) {
+        TokenInfo(Token token, String sequence, int start, int end) {
             this.sequence = sequence
             this.token = token
             this.start = start
@@ -38,7 +38,7 @@ class Tokenizer {
         while (!s.equals("")) {
             boolean match = false
 
-            for (cms.dsl.parser.Token t : cms.dsl.parser.Token.values()) {
+            for (Token t : Token.values()) {
                 Matcher m = t.regex.matcher(s)
 
                 if (m.find()) {
@@ -58,7 +58,7 @@ class Tokenizer {
                 }
             }
             if (!match) {
-                tokens.add(new TokenInfo(cms.dsl.parser.Token.ERROR, s, start, start))
+                tokens.add(new TokenInfo(Token.ERROR, s, start, start))
                 s = ""
 //                throw new TokenizerException("Unexpected character in input! ", s)
             }

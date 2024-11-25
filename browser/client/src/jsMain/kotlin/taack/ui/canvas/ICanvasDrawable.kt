@@ -1,33 +1,41 @@
 package taack.ui.canvas
 
 import taack.ui.canvas.text.CanvasText
-import taack.ui.canvas.text.H2Canvas
-import taack.ui.canvas.text.H3Canvas
-import taack.ui.canvas.text.H4Canvas
 import web.canvas.CanvasRenderingContext2D
 
 interface ICanvasDrawable: ICanvasSelectable {
 
-    enum class AsciidocToken(exp: Regex) {
+    enum class AdocToken(val regex: Regex) {
+        TITLE(Regex("^= ")),
+        ATTR(Regex("^:([a-z\\-]+): ([^*`\n]*)")),
         H2(Regex("^== ")),
         H3(Regex("^=== ")),
         H4(Regex("^==== ")),
-        B1(Regex("^\\*")),
+        B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
-        TABLE_START(Regex("^\\|===")),
-        TABLE_COL(Regex("\\|([^|]*)")),
-        TABLE_CELL(Regex("^\\|([^|]*)")),
-        BOLD(Regex("\\*\\*")),
-        MONO(Regex("`")),
-        NEXT_DRAWABLE(Regex("\n\n")),
-        NEXT_LINE(Regex("\n")),
-        P(Regex(".*")),
+        TABLE_START(Regex("^\\|===\n")),
+        TABLE_COL(Regex("\\|([^|*`\n]*)")),
+        TABLE_CELL(Regex("^\\|([^|*`\n]*)")),
+        NEXT_DRAWABLE(Regex("$\n[ ]*\n")),
+        NEXT_LINE(Regex("^\n")),
+        MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
+        BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
+        MONO(Regex("^`([^`\n]*)`")),
+        NORMAL(Regex("([^*`\n]*)")),
+
+        ERROR(Regex("ERRORRRORR"))
+    }
+
+    class TokenInfo(val sequence: String, val token: AdocToken, start: Int, end: Int) {
+        override fun toString(): String {
+            return "$token: $sequence"
+        }
     }
 
     companion object {
         fun dumpAsciidoc(drawables: List<ICanvasDrawable>): String {
             val out = StringBuilder()
-            out.append("= Titre\n")
+            out.append("= Title\n")
             out.append(":doctype: book\n")
             out.append(":toc: left\n")
             out.append(":toc-title: Table of Contents of {doctitle}\n")
@@ -44,18 +52,37 @@ interface ICanvasDrawable: ICanvasSelectable {
             return out.toString()
         }
 
-        fun readAsciidoc(file: String): List<ICanvasDrawable> {
-            val drawables = file.substring(file.indexOf("\n\n")).split("\n")
+        fun readAsciidoc(content: String): List<ICanvasDrawable> {
             val canvasDrawables = mutableListOf<ICanvasDrawable>()
-            for (drawable in drawables) {
-                if (drawable.startsWith("== ")) {
-                    canvasDrawables.add(H2Canvas(drawable.substring(3)))
-                } else if (drawable.startsWith("=== ")) {
-                    canvasDrawables.add(H3Canvas(drawable.substring(4)))
-                } else if (drawable.startsWith("==== ")) {
-                    canvasDrawables.add(H4Canvas(drawable.substring(5)))
+            val tokens = mutableListOf<TokenInfo>()
+            var start = 0
+            var end = 0
+
+            var s = content.trim()
+
+            while (s.isNotEmpty()) {
+                var match = false
+                for (t in AdocToken.entries ) {
+                    if (t.regex.containsMatchIn(s)) {
+                        val m = t.regex.find(s)
+                        if (m!!.value.length > 0) {
+                            match = true
+                            end += m.value.length
+                            tokens.add(TokenInfo(m.value, t, start, end))
+                            start += m.value.length
+                            s = s.substring(m.value.length).trim()
+                        }
+                        break
+                    }
+                }
+                if (!match) {
+                    tokens.add(TokenInfo(s, AdocToken.ERROR, start, start))
+                    break
                 }
             }
+
+            println(tokens.joinToString("\n"))
+
             return canvasDrawables
         }
 

@@ -661,7 +661,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
     private fun addInitialTexts() {
         if (textarea.innerText.isNotBlank()) {
             trace("addInitialTexts ${textarea.innerText}")
-            initialDrawables.add(PCanvas(textarea.innerText))
+            initialDrawables.addAll(ICanvasDrawable.readAsciidoc(textarea.innerText))
         } else {
             trace("addInitialTexts BLANK")
             initialDrawables.add(PCanvas(""))
