@@ -9,7 +9,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(val txtInit: String = "", private val initCitationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(var txtInit: String = "", private val initCitationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -43,7 +43,12 @@ abstract class CanvasText(val txtInit: String = "", private val initCitationNumb
         }
 
 
-    fun addChar(c: String, p: Int) {
+    fun addToTxtInit(txt: String) {
+        txtInit += txt
+    }
+
+    fun addChar(c: String, pos: Int? = null) {
+        val p = pos ?: txtVar.length
         trace("CanvasText::addChar: $c, $p")
         txtVar = if (txtVar.isEmpty())
             c
@@ -55,14 +60,14 @@ abstract class CanvasText(val txtInit: String = "", private val initCitationNumb
                 it.posNStart > p
             }
             stylesAfter.forEach {
-                it.posNStart += 1
-                it.posNEnd += 1
+                it.posNStart += c.length
+                it.posNEnd += c.length
             }
             val currentStyle = styles.find {
                 it.posNStart <= p && it.posNEnd >= p
             }
             if (currentStyle != null)
-                currentStyle.posNEnd += 1
+                currentStyle.posNEnd += c.length
         }
     }
 
@@ -375,4 +380,5 @@ abstract class CanvasText(val txtInit: String = "", private val initCitationNumb
             return txt
         }
     }
+
 }

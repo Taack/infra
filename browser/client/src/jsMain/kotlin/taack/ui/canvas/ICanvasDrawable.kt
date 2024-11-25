@@ -1,32 +1,32 @@
 package taack.ui.canvas
 
-import taack.ui.canvas.text.CanvasText
+import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
 
-interface ICanvasDrawable: ICanvasSelectable {
+interface ICanvasDrawable : ICanvasSelectable {
 
     enum class AdocToken(val regex: Regex) {
         TITLE(Regex("^= ")),
-        ATTR(Regex("^:([a-z\\-]+): ([^*`\n]*)")),
+        ATTR(Regex("^:([a-z-]+): ([^*`\n]*)")),
         H2(Regex("^== ")),
-        H3(Regex("^=== ")),
+        H3(Regex("^=== ", RegexOption.MULTILINE)),
         H4(Regex("^==== ")),
         B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
         TABLE_START(Regex("^\\|===\n")),
         TABLE_COL(Regex("\\|([^|*`\n]*)")),
         TABLE_CELL(Regex("^\\|([^|*`\n]*)")),
-        NEXT_DRAWABLE(Regex("$\n[ ]*\n")),
-        NEXT_LINE(Regex("^\n")),
         MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
-        NORMAL(Regex("([^*`\n]*)")),
-
+        NEXT_DRAWABLE(Regex("^ *\n *\n *", RegexOption.MULTILINE)),
+        NORMAL(Regex("(^[^*` \n][^*`\n]*)", RegexOption.MULTILINE)),
+        NEXT_LINE(Regex("[\r\n]", RegexOption.MULTILINE)),
+        OTHER(Regex("[ \t]*")),
         ERROR(Regex("ERRORRRORR"))
     }
 
-    class TokenInfo(val sequence: String, val token: AdocToken, start: Int, end: Int) {
+    class TokenInfo(val sequence: String, val token: AdocToken, val start: Int, val end: Int) {
         override fun toString(): String {
             return "$token: $sequence"
         }
@@ -62,15 +62,15 @@ interface ICanvasDrawable: ICanvasSelectable {
 
             while (s.isNotEmpty()) {
                 var match = false
-                for (t in AdocToken.entries ) {
+                for (t in AdocToken.entries) {
                     if (t.regex.containsMatchIn(s)) {
                         val m = t.regex.find(s)
-                        if (m!!.value.length > 0) {
+                        if (m!!.value.isNotEmpty()) {
                             match = true
                             end += m.value.length
                             tokens.add(TokenInfo(m.value, t, start, end))
                             start += m.value.length
-                            s = s.substring(m.value.length).trim()
+                            s = s.substring(m.value.length).trimStart(' ', '\t', '\r')
                         }
                         break
                     }
@@ -81,7 +81,101 @@ interface ICanvasDrawable: ICanvasSelectable {
                 }
             }
 
-            println(tokens.joinToString("\n"))
+            val it = tokens.iterator()
+            var currentText: CanvasText? = null
+            var currentTextPosition = 0
+            while (it.hasNext()) {
+                val token = it.next()
+                when (token.token) {
+                    AdocToken.TITLE -> {}
+                    AdocToken.ATTR -> {}
+                    AdocToken.H2 -> {
+                        currentText = H2Canvas()
+                        currentTextPosition = token.start
+                        canvasDrawables.add(currentText)
+                    }
+
+                    AdocToken.H3 -> {
+                        currentText = H3Canvas()
+                        currentTextPosition = token.start
+                        canvasDrawables.add(currentText)
+                    }
+
+                    AdocToken.H4 -> {
+                        currentText = H4Canvas()
+                        currentTextPosition = token.start
+                        canvasDrawables.add(currentText)
+                    }
+
+                    AdocToken.B1 -> {
+                        currentText = LiCanvas()
+                        currentTextPosition = token.start
+                        canvasDrawables.add(currentText)
+                    }
+
+                    AdocToken.B2 -> {
+                        currentText = Li2Canvas()
+                        currentTextPosition = token.start
+                        canvasDrawables.add(currentText)
+                    }
+
+                    AdocToken.TABLE_START -> TODO()
+                    AdocToken.TABLE_COL -> TODO()
+                    AdocToken.TABLE_CELL -> TODO()
+                    AdocToken.NEXT_DRAWABLE -> {
+                        currentText = PCanvas("")
+                        currentTextPosition = token.start
+                    }
+
+                    AdocToken.NEXT_LINE -> {}
+                    AdocToken.MONO_BOLD -> {
+                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
+                            canvasDrawables.add(currentText!!)
+                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addStyle(
+                            CanvasStyle.Type.BOLD_MONOSPACED,
+                            token.start - currentTextPosition,
+                            token.end - currentTextPosition
+                        )
+                    }
+
+                    AdocToken.BOLD -> {
+                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
+                            canvasDrawables.add(currentText!!)
+                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addStyle(
+                            CanvasStyle.Type.BOLD,
+                            token.start - currentTextPosition,
+                            token.end - currentTextPosition
+                        )
+                    }
+
+                    AdocToken.MONO -> {
+                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
+                            canvasDrawables.add(currentText!!)
+                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addStyle(
+                            CanvasStyle.Type.MONOSPACED,
+                            token.start - currentTextPosition,
+                            token.end - currentTextPosition
+                        )
+                    }
+
+                    AdocToken.NORMAL -> {
+                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
+                            canvasDrawables.add(currentText!!)
+                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addStyle(
+                            CanvasStyle.Type.NORMAL,
+                            token.start - currentTextPosition,
+                            token.end - currentTextPosition
+                        )
+                    }
+
+                    AdocToken.ERROR -> TODO()
+                    AdocToken.OTHER -> {}
+                }
+            }
 
             return canvasDrawables
         }
