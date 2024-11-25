@@ -3,7 +3,7 @@ package taack.ui.canvas.table
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.canvas.text.CanvasText
 
-class TxtRowCanvas(txtVar: String) : CanvasText(txtVar) {
+class TxtRowCanvas(txtVar: String = "") : CanvasText(txtVar) {
     override val fontWeight: String
         get() = "normal"
     override val fontSize: String

@@ -46,7 +46,6 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
             val txt = text.txt.substring(from, to)
             ctx.fillText(txt, line.leftMargin + posXStart, line.textY)
             val width = text.measureText(ctx,  from, to)
-            console.log("CanvasStyle::draw width: $width from: $from, to: $to")
             ctx.restore()
             traceDeIndent("CanvasStyle::draw: $this")
             return width

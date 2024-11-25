@@ -1,6 +1,9 @@
 package taack.ui.canvas
 
 import taack.ui.base.Helper.Companion.trace
+import taack.ui.canvas.table.CanvasTable
+import taack.ui.canvas.table.TxtHeaderCanvas
+import taack.ui.canvas.table.TxtRowCanvas
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
 
@@ -10,19 +13,19 @@ interface ICanvasDrawable : ICanvasSelectable {
         TITLE(Regex("^= ")),
         ATTR(Regex("^:([a-z-]+): ([^*`\n]*)")),
         H2(Regex("^== ")),
-        H3(Regex("^=== ", RegexOption.MULTILINE)),
+        H3(Regex("^=== ")),
         H4(Regex("^==== ")),
         B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
-        TABLE_START(Regex("^\\|===\n")),
-        TABLE_COL(Regex("\\|([^|*`\n]*)")),
-        TABLE_CELL(Regex("^\\|([^|*`\n]*)")),
+        TABLE_START(Regex("^\\|===")),
+        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
+        TABLE_CELL(Regex("^\\|")),
         MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
-        NEXT_DRAWABLE(Regex("^ *\n *\n *", RegexOption.MULTILINE)),
-        NORMAL(Regex("(^[^*`\n]+)", RegexOption.MULTILINE)),
-        NEXT_LINE(Regex("[\r\n]", RegexOption.MULTILINE)),
+        NEXT_DRAWABLE(Regex("^ *\n *\n *")),
+        NORMAL(Regex("(^[^*`\n]+)")),
+        NEXT_LINE(Regex("\n")),
         OTHER(Regex("[ \t]*")),
         ERROR(Regex("ERRORRRORR"))
     }
@@ -61,6 +64,7 @@ interface ICanvasDrawable : ICanvasSelectable {
 
             var s = content.trim()
 
+            var pt: AdocToken = AdocToken.TITLE
             while (s.isNotEmpty()) {
                 var match = false
                 for (t in AdocToken.entries) {
@@ -71,12 +75,13 @@ interface ICanvasDrawable : ICanvasSelectable {
                             end += m.value.length
                             tokens.add(TokenInfo(m.value, t, start, end))
                             start += m.value.length
-                            s = if (t in listOf(AdocToken.MONO, AdocToken.MONO_BOLD, AdocToken.NORMAL, AdocToken.BOLD)) {
+                            s = //if (pt in listOf(AdocToken.MONO, AdocToken.MONO_BOLD, AdocToken.NORMAL, AdocToken.BOLD)) {
                                 s.substring(m.value.length)
-                            } else {
-                                s.substring(m.value.length).trimStart(' ', '\t', '\r')
-                            }
+//                            } else {
+//                                s.substring(m.value.length).trimStart(' ', '\t', '\r')
+//                            }
                         }
+                        pt = t
                         break
                     }
                 }
@@ -89,9 +94,13 @@ interface ICanvasDrawable : ICanvasSelectable {
             val it = tokens.iterator()
             var currentText: CanvasText? = null
             var currentTextPosition = 0
+            var tableStart = false
+            val initCells: MutableList<TxtRowCanvas> = mutableListOf()
+            val initHeaders: MutableList<TxtHeaderCanvas> = mutableListOf()
+
             while (it.hasNext()) {
                 val token = it.next()
-                trace("token: $token")
+                trace("token: [$token]")
                 when (token.token) {
                     AdocToken.TITLE -> {}
                     AdocToken.ATTR -> {}
@@ -125,11 +134,37 @@ interface ICanvasDrawable : ICanvasSelectable {
                         canvasDrawables.add(currentText)
                     }
 
-                    AdocToken.TABLE_START -> TODO()
-                    AdocToken.TABLE_COL -> TODO()
-                    AdocToken.TABLE_CELL -> TODO()
+                    AdocToken.TABLE_START -> {
+                        if (tableStart) {
+                            canvasDrawables.add(CanvasTable(initHeaders, initCells))
+                            tableStart = false
+                        } else tableStart = true
+//                        currentTable = if (currentTable == null) {
+//                            CanvasTable()
+//                        } else null
+//                        if (currentTable != null) {
+//                            canvasDrawables.add(currentTable)
+//                        }
+                    }
+                    AdocToken.TABLE_COL -> {
+                        for (txt in token.sequence.split('|')) {
+                            if (txt.isNotEmpty()) {
+                                val h = TxtHeaderCanvas(txt)
+                                currentTextPosition = token.end
+                                initHeaders.add(h)
+                            }
+                        }
+                    }
+                    AdocToken.TABLE_CELL -> {
+                        val t = TxtRowCanvas()
+                        currentText = t
+                        currentTextPosition = token.end
+                        initCells.add(t)
+                    }
                     AdocToken.NEXT_DRAWABLE -> {
-                        currentText = PCanvas("")
+                        if (!tableStart) {
+                            currentText = PCanvas("")
+                        }
                         currentTextPosition = token.end
                     }
 
@@ -171,7 +206,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                     }
 
                     AdocToken.NORMAL -> {
-                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
+                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last() && !tableStart)
                             canvasDrawables.add(currentText!!)
                         currentText?.addToTxtInit(token.sequence)
                         currentText?.addStyle(

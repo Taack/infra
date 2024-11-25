@@ -145,12 +145,10 @@ abstract class CanvasText(var _txtInit: String = "", private val initCitationNum
             styles += CanvasStyle(toSplit.type, pEnd, toSplit.posNEnd)
             toSplit.posNEnd = p
         }
-        trace("toSplit: $toSplit")
 
         val changePosNStart = styles.filter {
             it.posNStart in p..pEnd
         }
-        trace("changePosNStart: $changePosNStart")
 
         changePosNStart.forEach {
             it.posNStart = pEnd
@@ -161,7 +159,6 @@ abstract class CanvasText(var _txtInit: String = "", private val initCitationNum
         changePosNEnd.forEach {
             it.posNEnd = p
         }
-        trace("changePosNEnd: $changePosNEnd")
 
         styles += newStyle
         styles = styles.sortedBy { it.posNStart }
