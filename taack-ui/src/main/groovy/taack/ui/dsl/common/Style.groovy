@@ -105,6 +105,7 @@ class Style implements IStyleDescriptor {
     String labelCssStyleString
 
     Style plus(Style other) {
+        if (other == null) return this
         Style res = new Style((this.cssClassesString ?: "") + " " + (other.cssClassesString ?: ""), (this.cssStyleString ?: "") + " " + (other.cssStyleString ?: ""), this.isDiv || other.isDiv)
         res.labelCssClassesString += "${labelCssClassesString?:""} ${other.labelCssClassesString?:""}"
         res.labelCssStyleString += "${labelCssStyleString?:""} ${other.labelCssStyleString?:""}"

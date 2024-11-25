@@ -141,6 +141,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         stripped++
         HTMLTr tr = new HTMLTr()
         tr.taackTag = TaackTag.TABLE_ROW
+        if (style?.cssClassesString) tr.addClasses(style.cssClassesString)
+        if (style?.cssStyleString) tr.attributes.put('style', style.cssStyleString)
         if (indent >= 0) {
             //tr.styleDescriptor = new DisplayNone()
             tr.attributes.put('taackTableRowGroup', indent.toString())
