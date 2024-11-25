@@ -1,5 +1,6 @@
 package taack.ui.canvas
 
+import taack.ui.base.Helper.Companion.trace
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
 
@@ -20,7 +21,7 @@ interface ICanvasDrawable : ICanvasSelectable {
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
         NEXT_DRAWABLE(Regex("^ *\n *\n *", RegexOption.MULTILINE)),
-        NORMAL(Regex("(^[^*` \n][^*`\n]*)", RegexOption.MULTILINE)),
+        NORMAL(Regex("(^[^*`\n]+)", RegexOption.MULTILINE)),
         NEXT_LINE(Regex("[\r\n]", RegexOption.MULTILINE)),
         OTHER(Regex("[ \t]*")),
         ERROR(Regex("ERRORRRORR"))
@@ -70,7 +71,11 @@ interface ICanvasDrawable : ICanvasSelectable {
                             end += m.value.length
                             tokens.add(TokenInfo(m.value, t, start, end))
                             start += m.value.length
-                            s = s.substring(m.value.length).trimStart(' ', '\t', '\r')
+                            s = if (t in listOf(AdocToken.MONO, AdocToken.MONO_BOLD, AdocToken.NORMAL, AdocToken.BOLD)) {
+                                s.substring(m.value.length)
+                            } else {
+                                s.substring(m.value.length).trimStart(' ', '\t', '\r')
+                            }
                         }
                         break
                     }
@@ -86,36 +91,37 @@ interface ICanvasDrawable : ICanvasSelectable {
             var currentTextPosition = 0
             while (it.hasNext()) {
                 val token = it.next()
+                trace("token: $token")
                 when (token.token) {
                     AdocToken.TITLE -> {}
                     AdocToken.ATTR -> {}
                     AdocToken.H2 -> {
                         currentText = H2Canvas()
-                        currentTextPosition = token.start
+                        currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.H3 -> {
                         currentText = H3Canvas()
-                        currentTextPosition = token.start
+                        currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.H4 -> {
                         currentText = H4Canvas()
-                        currentTextPosition = token.start
+                        currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.B1 -> {
                         currentText = LiCanvas()
-                        currentTextPosition = token.start
+                        currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.B2 -> {
                         currentText = Li2Canvas()
-                        currentTextPosition = token.start
+                        currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
@@ -124,41 +130,44 @@ interface ICanvasDrawable : ICanvasSelectable {
                     AdocToken.TABLE_CELL -> TODO()
                     AdocToken.NEXT_DRAWABLE -> {
                         currentText = PCanvas("")
-                        currentTextPosition = token.start
+                        currentTextPosition = token.end
                     }
 
                     AdocToken.NEXT_LINE -> {}
                     AdocToken.MONO_BOLD -> {
                         if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
                             canvasDrawables.add(currentText!!)
-                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addToTxtInit(token.sequence.substring(3,token.sequence.length - 3))
                         currentText?.addStyle(
                             CanvasStyle.Type.BOLD_MONOSPACED,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
+                        currentTextPosition += 6
                     }
 
                     AdocToken.BOLD -> {
                         if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
                             canvasDrawables.add(currentText!!)
-                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addToTxtInit(token.sequence.substring(2,token.sequence.length - 2))
                         currentText?.addStyle(
                             CanvasStyle.Type.BOLD,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
+                        currentTextPosition += 4
                     }
 
                     AdocToken.MONO -> {
                         if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
                             canvasDrawables.add(currentText!!)
-                        currentText?.addToTxtInit(token.sequence)
+                        currentText?.addToTxtInit(token.sequence.substring(1,token.sequence.length - 1))
                         currentText?.addStyle(
                             CanvasStyle.Type.MONOSPACED,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
+                        currentTextPosition += 2
                     }
 
                     AdocToken.NORMAL -> {

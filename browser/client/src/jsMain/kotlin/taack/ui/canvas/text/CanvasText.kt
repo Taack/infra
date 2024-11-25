@@ -9,7 +9,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-abstract class CanvasText(var txtInit: String = "", private val initCitationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(var _txtInit: String = "", private val initCitationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -31,12 +31,22 @@ abstract class CanvasText(var txtInit: String = "", private val initCitationNumb
     override var globalPosYEnd: Double = 0.0
     override var citationNumber: Int = initCitationNumber
 
+    var __txtInit: String = _txtInit
+    var txtInit: String
+        get() {
+            return __txtInit
+        }
+        set(value) {
+            txtVar = value
+            __txtInit = value
+        }
+
     var txtPrefix = ""
-    private var styles: List<CanvasStyle> = emptyList()
+    var styles: List<CanvasStyle> = emptyList()
     var lines: List<CanvasLine> = emptyList()
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
-    private var txtVar: String = txtInit
+    private var txtVar: String = _txtInit
     val txt: String
         get() {
             return txtVar
@@ -121,7 +131,7 @@ abstract class CanvasText(var txtInit: String = "", private val initCitationNumb
     }
 
     fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
-        traceIndent("CanvasText::addStyle: $style, $p, $pEnd")
+        traceIndent("CanvasText::addStyle: $style, $p, $pEnd, ${txt.substring(p, pEnd)}")
         val newStyle = CanvasStyle(style, p, pEnd)
         if (styles.isEmpty())
             styles += CanvasStyle(CanvasStyle.Type.NORMAL, 0, txt.length)
@@ -155,7 +165,7 @@ abstract class CanvasText(var txtInit: String = "", private val initCitationNumb
 
         styles += newStyle
         styles = styles.sortedBy { it.posNStart }
-        traceDeIndent("CanvasText::addStyle: $styles")
+        traceDeIndent("CanvasText::addStyle: $styles on $this: $txt")
     }
 
     fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
@@ -275,10 +285,15 @@ abstract class CanvasText(var txtInit: String = "", private val initCitationNumb
             )
         }
 
+
+        trace("draw: $this: $txt")
         lines.forEach { l ->
             val stylesInLine = styles.filter { s ->
                 s.posNStart >= l.posBegin && s.posNEnd <= l.posEnd || s.posNStart <= l.posBegin && s.posNEnd >= l.posBegin || s.posNStart >= l.posBegin && s.posNEnd >= l.posEnd
             }
+            trace("line: $l")
+            trace(styles.toString())
+            trace(stylesInLine.toString())
             l.drawLine(ctx, this, stylesInLine)
         }
 
@@ -366,7 +381,7 @@ abstract class CanvasText(var txtInit: String = "", private val initCitationNumb
     override fun reset() {
         citationNumber = initCitationNumber
         txtVar = txtInit
-        styles = emptyList()
+//        styles = emptyList()
     }
 
     override fun dumpAsciidoc(): String {
