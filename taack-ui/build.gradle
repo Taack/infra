@@ -23,12 +23,7 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
     dependencies {
         developmentOnly("org.springframework.boot:spring-boot-devtools")
         compileOnly "io.micronaut:micronaut-inject-groovy"
-//        implementation "org.springframework.boot:spring-boot-starter-logging"
-//        implementation "org.springframework.boot:spring-boot-starter-validation"
-//        implementation "org.springframework.boot:spring-boot-autoconfigure"
         implementation "org.grails:grails-core"
-//        implementation "org.springframework.boot:spring-boot-starter-actuator"
-//        implementation "org.springframework.boot:spring-boot-starter-tomcat"
         implementation "org.grails:grails-web-boot"
         implementation "org.grails:grails-logging"
         implementation "org.grails:grails-plugin-databinding"
@@ -73,11 +68,11 @@ dependencyManagement {
     }
 }
 dependencies {
-    implementation 'com.itextpdf:html2pdf:5.0.4'
+    implementation "com.itextpdf:html2pdf:${html2pdf}"
 
-    implementation "org.grails:grails-plugin-controllers"
+    implementation 'org.grails:grails-plugin-controllers'
 
-    implementation "org.grails.plugins:hibernate5"
+    implementation 'org.grails.plugins:hibernate5'
     implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
     implementation "org.grails:grails-plugin-interceptors"
 
