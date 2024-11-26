@@ -24,7 +24,8 @@ fun main() {
         textarea.style.display = "none"
         val scrollContainer = document.createElement("div") as HTMLDivElement
 //        scrollContainer.style.width = "calc(100% - 22px)"
-        scrollContainer.style.height = "calc(30vh - 22px)"
+        scrollContainer.style.height = "calc(max(30vh, 640px))"
+//        scrollContainer.style.height = "calc(640px - 22px)"
 //        scrollContainer.style.margin = "10px"
         scrollContainer.style.border = "1px solid grey"
         scrollContainer.style.overflow = "auto"
