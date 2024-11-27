@@ -17,7 +17,7 @@ class CanvasStyle(val type: Type, var posNStart: Int, var posNEnd: Int) {
     }
 
     fun initCtx(ctx: CanvasRenderingContext2D, text: CanvasText) {
-        trace("CanvasStyle::initCtx: $this")
+//        trace("CanvasStyle::initCtx: $this")
         text.initCtx(ctx)
         ctx.font = when(this.type) {
             Type.NORMAL -> {

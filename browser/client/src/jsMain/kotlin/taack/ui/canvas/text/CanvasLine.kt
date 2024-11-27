@@ -19,7 +19,8 @@ class CanvasLine(
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
 //        trace("CanvasLine::drawLine: $this")
-        var posXStart = text.drawCitation(ctx, textY, height) + text.posXStart
+        var posXStart = text.posXStart
+        text.drawCitation(ctx, textY, height)
 
         if (!styles.isNullOrEmpty()) {
             containedStyles = styles

@@ -1,6 +1,6 @@
 package taack.ui.canvas.text
 
-class H2Canvas(txtInit: String = "") : CanvasText(txtInit) {
+class H2Canvas(txtInit: String, indent: Int = 0) : CanvasText(txtInit, indent) {
     override val fontWeight: String
         get() = "normal"
     override val fontSize: String

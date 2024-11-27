@@ -12,6 +12,7 @@ interface ICanvasDrawable : ICanvasSelectable {
     enum class AdocToken(val regex: Regex) {
         TITLE(Regex("^= ")),
         ATTR(Regex("^:([a-z-]+): ([^*`\n]*)")),
+        INDENT(Regex("^> ")),
         H2(Regex("^== ")),
         H3(Regex("^=== ")),
         H4(Regex("^==== ")),
@@ -97,39 +98,45 @@ interface ICanvasDrawable : ICanvasSelectable {
             var tableStart = false
             val initCells: MutableList<TxtRowCanvas> = mutableListOf()
             val initHeaders: MutableList<TxtHeaderCanvas> = mutableListOf()
-
+            var currentIndent = 0
+            var wasIndent = false
             while (it.hasNext()) {
+                if (!wasIndent) {
+                    currentIndent = 0
+                } else {
+                    wasIndent = false
+                }
                 val token = it.next()
                 trace("token: [$token]")
                 when (token.token) {
                     AdocToken.TITLE -> {}
                     AdocToken.ATTR -> {}
                     AdocToken.H2 -> {
-                        currentText = H2Canvas()
+                        currentText = H2Canvas("", currentIndent)
                         currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.H3 -> {
-                        currentText = H3Canvas()
+                        currentText = H3Canvas("", currentIndent)
                         currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.H4 -> {
-                        currentText = H4Canvas()
+                        currentText = H4Canvas("", currentIndent)
                         currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.B1 -> {
-                        currentText = LiCanvas()
+                        currentText = LiCanvas("", currentIndent)
                         currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
 
                     AdocToken.B2 -> {
-                        currentText = Li2Canvas()
+                        currentText = Li2Canvas("", currentIndent)
                         currentTextPosition = token.end
                         canvasDrawables.add(currentText)
                     }
@@ -163,7 +170,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                     }
                     AdocToken.NEXT_DRAWABLE -> {
                         if (!tableStart) {
-                            currentText = PCanvas("")
+                            currentText = PCanvas("", currentIndent)
                         }
                         currentTextPosition = token.end
                     }
@@ -218,6 +225,10 @@ interface ICanvasDrawable : ICanvasSelectable {
 
                     AdocToken.ERROR -> TODO()
                     AdocToken.OTHER -> {}
+                    AdocToken.INDENT -> {
+                        wasIndent = true
+                        currentIndent ++
+                    }
                 }
             }
 
@@ -229,6 +240,8 @@ interface ICanvasDrawable : ICanvasSelectable {
     var globalPosYStart: Double
     var globalPosYEnd: Double
     var citationNumber: Int
+    val citationXPos: Double
+        get() = 16.0 * citationNumber
 
     fun isClicked(posX: Double, posY: Double): Boolean {
         return posY in globalPosYStart..globalPosYEnd
@@ -240,10 +253,9 @@ interface ICanvasDrawable : ICanvasSelectable {
         for (i in 0 until citationNumber) {
             val marginTop = getSelectedText()!!.marginTop
             val marginBottom = getSelectedText()!!.marginBottom
-            ctx.fillRect(8.0 + 16.0 * i, textY - height * 1.2, 4.0, height + marginTop + marginBottom)
-        }
+            ctx.fillRect(8.0 + 16.0 * i, textY - height - marginTop, 4.0, height + marginTop + marginBottom)        }
         ctx.restore()
-        return 16.0 * citationNumber
+        return citationXPos
     }
 
     fun getSelectedText(posX: Double? = null, posY: Double? = null): CanvasText?
