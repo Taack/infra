@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 enum InputType {
     STRING('text'),
     DATE('date'),
+    DATETIME('datetime-local'),
     EMAIL('email'),
     CHECK('checkbox'),
     RADIO('radio'),

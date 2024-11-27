@@ -148,7 +148,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 }
             }
         } else if (isDate) {
-            blockLog.topElement = formThemed.dateInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date)
+            blockLog.topElement = formThemed.dateInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date, field.fieldConstraint.widget == WidgetKind.DATETIME.name)
         } else {
             if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
                 blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)

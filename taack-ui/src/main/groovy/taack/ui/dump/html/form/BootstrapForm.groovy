@@ -224,9 +224,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     }
 
     @Override
-    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value) {
+    IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value, boolean isInTime) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd').format(value) : null, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value) : null, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         el.addChildren(formLabelInput(qualifiedName, trI18n))
