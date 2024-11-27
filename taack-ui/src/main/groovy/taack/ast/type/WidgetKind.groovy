@@ -9,7 +9,8 @@ enum WidgetKind {
     PASSWD("passwd"),
     AJAX("ajax"),
     MARKDOWN("markdown"),
-    ASCIIDOC("asciidoc")
+    ASCIIDOC("asciidoc"),
+    DATETIME("datetime")
 
     WidgetKind(final String name) {
         this.name = name

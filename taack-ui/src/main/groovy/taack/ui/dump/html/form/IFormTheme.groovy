@@ -58,7 +58,7 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract<T extends GormEntity> IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, T vals, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable)
 
-    abstract IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value)
+    abstract IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value, boolean isInTime)
 
     abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
 
