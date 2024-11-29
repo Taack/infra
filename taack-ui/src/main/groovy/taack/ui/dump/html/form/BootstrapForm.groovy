@@ -7,6 +7,7 @@ import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.script.CheckboxDisableIsZero
+import taack.ui.dump.html.script.DeleteM2MParentElement
 import taack.ui.dump.html.script.DeleteSiblingInputContent
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
@@ -188,7 +189,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it?.ident(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
             HTMLInput input = new HTMLInput(InputType.STRING, it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
-            if (!disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+            if (!disabled) span.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
             span.addChildren(input)
             span.addChildren(inputHidden)
             el.addChildren(span)
@@ -199,7 +200,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, '', null).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
         input.attributes.put('placeholder', inputEscape(trI18n))
-        if (!disabled) span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+        if (!disabled) span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
         span2.addChildren(input)
         span2.addChildren(inputHidden)
         el.addChildren(span2)
