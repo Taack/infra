@@ -344,6 +344,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
     }
 
+    @Override
+    String getExplicitAjaxBlockId() {
+        theCurrentExplicitAjaxBlockId
+    }
+
     /**
      * Set explicit ajaxBlockId to for ajax mode and for render.
      * (See {@link #visitAjaxBlock}

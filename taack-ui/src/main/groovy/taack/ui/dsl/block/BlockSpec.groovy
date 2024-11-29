@@ -38,10 +38,12 @@ final class BlockSpec {
     }
 
     private final String theAjaxBlockId(String suffix) {
+        if (blockVisitor.getExplicitAjaxBlockId())
+            return blockVisitor.getExplicitAjaxBlockId()
         if (ajaxCounter > 64_000)
             ajaxCounter = 0
         ajaxCounter++
-        "ajaxBlockId${ajaxCounter}$suffix"
+        return "ajaxBlockId${ajaxCounter}$suffix"
     }
 
     /**
@@ -153,11 +155,11 @@ final class BlockSpec {
     void ajaxBlock(final String id = null, Boolean visitAjax = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         if (visitAjax && id) blockVisitor.setExplicitAjaxBlockId(id)
         if (!id || blockVisitor.doRenderElement(id)) {
-            if (visitAjax) blockVisitor.visitAjaxBlock(id)
+//            if (visitAjax) blockVisitor.visitAjaxBlock(id)
             closure.delegate = this
             closure.call()
             counter++
-            if (visitAjax) blockVisitor.visitAjaxBlockEnd()
+//            if (visitAjax) blockVisitor.visitAjaxBlockEnd()
             if (visitAjax) blockVisitor.setExplicitAjaxBlockId(null)
         }
     }

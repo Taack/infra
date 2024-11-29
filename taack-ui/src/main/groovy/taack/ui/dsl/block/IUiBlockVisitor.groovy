@@ -36,6 +36,8 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitModalEnd()
 
+    String getExplicitAjaxBlockId()
+
     void setExplicitAjaxBlockId(String id)
 
     void visitAjaxBlock(String id)

@@ -69,6 +69,11 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    String getExplicitAjaxBlockId() {
+
+    }
+
+    @Override
     void setExplicitAjaxBlockId(String id) {
 
     }
