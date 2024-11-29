@@ -277,8 +277,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             if (fi.value) {
                 if (parameter.nf && fi.value instanceof Number)
                     blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
-                else
+                else {
                     blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
+                    if (GormEntity.isAssignableFrom(fi.fieldConstraint.field.type)) {
+                        blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', (fi.value as GormEntity).ident().toString()))
+                    }
+                }
             }
         }
     }
