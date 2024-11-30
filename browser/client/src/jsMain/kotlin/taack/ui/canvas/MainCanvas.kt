@@ -367,7 +367,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         canvas.height = window.innerHeight
         canvas.tabIndex = 1
         canvas.style.border = "1px solid black"
-        divHolder.draggable = true
+        divHolder.draggable = false
         divHolder.contentEditable = "false"
         divHolder.style.border = "1px solid red"
         divScroll.style.border = "1px solid blue"

@@ -18,6 +18,8 @@ interface ICanvasDrawable : ICanvasSelectable {
         H4(Regex("^==== ")),
         B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
+        IMAGE(Regex("^image::[^:|*`\n\\[\\]]+\\[[a-zA-Z.0-9]*]")),
+        IMAGE_INLINE(Regex("^image:[^:|*`\n\\[\\]]+\\[[a-zA-Z.0-9]*]")),
         TABLE_START(Regex("^\\|===")),
         TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
         TABLE_CELL(Regex("^\\|")),
@@ -213,8 +215,13 @@ interface ICanvasDrawable : ICanvasSelectable {
                     }
 
                     AdocToken.NORMAL -> {
-                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last() && !tableStart)
+                        if ((canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last()) && !tableStart)
                             canvasDrawables.add(currentText!!)
+                        else if (canvasDrawables.isEmpty()) {
+                            currentText = PCanvas("", currentIndent)
+                            canvasDrawables.add(currentText)
+                        }
+
                         currentText?.addToTxtInit(token.sequence)
                         currentText?.addStyle(
                             CanvasStyle.Type.NORMAL,
@@ -228,6 +235,13 @@ interface ICanvasDrawable : ICanvasSelectable {
                     AdocToken.INDENT -> {
                         wasIndent = true
                         currentIndent ++
+                    }
+
+                    AdocToken.IMAGE -> {
+
+                    }
+                    AdocToken.IMAGE_INLINE -> {
+
                     }
                 }
             }

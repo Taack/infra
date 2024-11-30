@@ -4,7 +4,11 @@ import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
+import taack.ui.canvas.MainCanvas
+import web.dom.document
+import web.html.HTMLDivElement
 import web.html.HTMLFormElement
+import web.html.HTMLTextAreaElement
 
 class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     BaseElement {
@@ -43,6 +47,26 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
         errorPlaceHolders = FormErrorInput.getSiblingErrorInput(this).associateBy {
             it.fieldName
         }
+
+        val textareaList = document.querySelectorAll("textarea.asciidoctor")
+
+        for (element in textareaList) {
+            val textarea = element as HTMLTextAreaElement
+            textarea.style.display = "none"
+            val scrollContainer = document.createElement("div") as HTMLDivElement
+            scrollContainer.style.height = "calc(max(30vh, 640px))"
+            scrollContainer.style.border = "1px solid grey"
+            scrollContainer.style.overflow = "auto"
+            val largeContainer = document.createElement("div") as HTMLDivElement
+            largeContainer.style.overflow = "hidden"
+            val canvasContainer = document.createElement("div") as HTMLDivElement
+            largeContainer.append(canvasContainer)
+            scrollContainer.append(largeContainer)
+            textarea.parentElement?.append(scrollContainer)
+            MainCanvas(textarea, canvasContainer, scrollContainer)
+        }
+
+
         Helper.traceDeIndent("Form::init --- formName: $formName")
     }
 
