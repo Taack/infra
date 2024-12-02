@@ -1,6 +1,5 @@
 package taack.ui.canvas.text
 
-import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import web.canvas.CanvasRenderingContext2D

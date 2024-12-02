@@ -25,6 +25,7 @@ import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
 import web.window.window
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
@@ -52,6 +53,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
     }
 
 
+    private val dpr = 2.0
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
     private val canvasInnerBorder = 10.0
     private val ctx: CanvasRenderingContext2D =
@@ -363,8 +365,16 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
     init {
         canvas.id = "canvas" + textarea.name
-        canvas.width = divHolder.clientWidth
-        canvas.height = window.innerHeight
+        canvas.style.width = "${divHolder.clientWidth}px"
+//        canvas.style.height = "${divScroll.clientHeight}px"
+        canvas.width = floor(divHolder.clientWidth * dpr).toInt()
+        canvas.height = floor(divScroll.clientHeight * dpr).toInt()
+
+        trace("Canvas width: ${canvas.width}, height: ${canvas.height}")
+
+//        ctx.setTransform(dpr, 0.0, 0.0, dpr, 0.0, 0.0)
+        ctx.scale(dpr, dpr)
+
         canvas.tabIndex = 1
         canvas.style.border = "1px solid black"
         divHolder.draggable = false
