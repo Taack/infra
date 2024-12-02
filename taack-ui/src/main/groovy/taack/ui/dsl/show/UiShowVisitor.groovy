@@ -65,17 +65,17 @@ class UiShowVisitor implements IUiShowVisitor {
     }
 
     @Override
-    void visitShowAction(String i18n, String controller, String action, Long id, Map additionalParams, boolean isAjax = true) {
-
-    }
-
-    @Override
     void visitShowInputField(String i18n, FieldInfo fieldInfo, boolean isAjax = false) {
 
     }
 
     @Override
-    void visitFieldAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
+    void visitShowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
+
+    }
+
+    @Override
+    void visitShowAction(String i18n, String linkText, String controller, String action, Long id, Map additionalParams, boolean isAjax) {
 
     }
 

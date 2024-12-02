@@ -28,17 +28,4 @@ class ShowSpec extends SectionSpec {
         closure.call()
         showVisitor.visitSectionEnd()
     }
-
-
-    /**
-     *
-     * @param i18n
-     * @param action action closure
-     * @param id
-     * @param params
-     * @param isAjax
-     */
-    void showAction(final MethodClosure action, final Long id = null, final Map params = null) {
-        showVisitor.visitShowAction(null, Utils.getControllerName(action), action.method, id, params, true)
-    }
 }

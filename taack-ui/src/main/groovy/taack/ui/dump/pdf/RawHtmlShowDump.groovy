@@ -98,16 +98,8 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     }
 
     @Override
-    void visitShowAction(String i18n, String controller, String action, Long id, Map additionalParams, boolean isAjax = true) {
-    }
-
-    @Override
     void visitShowInputField(String i18n, FieldInfo field, boolean isAjax = false) {
         visitShowField(i18n, field, null)
-    }
-
-    @Override
-    void visitFieldAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
     }
 
     @Override
@@ -115,6 +107,16 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         out << """<div class="$additionalCSSClass">"""
         out << html
         out << "</div>"
+    }
+
+    @Override
+    void visitShowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
+
+    }
+
+    @Override
+    void visitShowAction(String i18n, String linkText, String controller, String action, Long id, Map additionalParams, boolean isAjax) {
+
     }
 }
 

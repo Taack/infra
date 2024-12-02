@@ -69,7 +69,8 @@ class RowColumnFieldSpec implements BranchingSpec {
             Map<String, ?> p = params ?: [:]
             p.put('id', id)
             tableVisitor.visitRowAction(linkText, Utils.getControllerName(action), action.method, null, p, true)
+        } else {
+            tableVisitor.visitRowField(linkText, null)
         }
     }
-
 }

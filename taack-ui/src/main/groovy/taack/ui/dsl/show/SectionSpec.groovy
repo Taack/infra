@@ -10,7 +10,6 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
 
-// TODO: rename fieldAction to showAction
 /**
  * {@link ShowSpec#section(java.lang.String, groovy.lang.Closure)} delegated class
  */
@@ -102,22 +101,35 @@ class SectionSpec {
      * @param icon icon
      * @param action target action if icon is clicked
      * @param id id parameter
+     * @param additionalParams target action additional parameters
      * @param isAjax true if target action is an ajax one
      */
-    void fieldAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
-        if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, id, null, true)
+    void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
+        if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitShowAction(i18n, icon, Utils.getControllerName(action), action.method, id, additionalParams, true)
     }
 
-    /**
-     * see {@link #fieldAction(java.lang.String, ActionIcon, org.codehaus.groovy.runtime.MethodClosure, java.lang.Long)}
-     *
-     * @param i18n hover text
-     * @param icon
-     * @param action target action if icon is clicked
-     * @param additionalParams target action additional parameters
-     */
-    void fieldAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map<String, ?> additionalParams) {
-        if (taackUiEnablerService.hasAccess(action, additionalParams)) showVisitor.visitFieldAction(i18n, icon, Utils.getControllerName(action), action.method, null, additionalParams, true)
+    void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
+        showAction(i18n, icon, action, id, null)
+    }
+
+    void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map<String, ?> additionalParams) {
+        showAction(i18n, icon, action, null, additionalParams)
+    }
+
+    void showAction(final String i18n = null, final String linkText, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
+        if (taackUiEnablerService.hasAccess(action, id)) {
+            showVisitor.visitShowAction(i18n, linkText, Utils.getControllerName(action), action.method, id, additionalParams, true)
+        } else {
+            showVisitor.visitShowField(i18n, linkText, null)
+        }
+    }
+
+    void showAction(final String i18n = null, final String linkText, final MethodClosure action, final Long id) {
+        showAction(i18n, linkText, action, id, null)
+    }
+
+    void showAction(final String i18n = null, final String linkText, final MethodClosure action, final Map<String, ?> additionalParams) {
+        showAction(i18n, linkText, action, null, additionalParams)
     }
 
     /**

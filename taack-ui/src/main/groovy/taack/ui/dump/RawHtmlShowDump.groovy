@@ -113,14 +113,6 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         out << html
     }
 
-    @Override
-    void visitShowAction(String i18n, String controller, String action, Long id, Map additionalParams, boolean isAjax = true) {
-        i18n ?= parameter.trField(controller, action, id != null || additionalParams.containsKey('id'))
-        additionalParams ?= [:]
-        additionalParams['isAjax'] = isAjax
-        out << """<a class="taackShowAction" ${isAjax ? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${i18n}</a>"""
-    }
-
     private static String inputField(final String qualifiedName, final FieldInfo field, final IEnumOption[] eos = null, final String ajax = '', final NumberFormat nf = null) {
         final String showClass = 'taackShowInput'
         final Class type = field.fieldConstraint.field.type
@@ -256,7 +248,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     }
 
     @Override
-    void visitFieldAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
+    void visitShowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
         i18n ?= parameter.trField(controller, action, id != null)
         if (isAjax) {
             out << """
@@ -274,6 +266,16 @@ final class RawHtmlShowDump implements IUiShowVisitor {
                     </a>
                  </div>
                 """
+        }
+    }
+
+    @Override
+    void visitShowAction(String i18n, String linkText, String controller, String action, Long id, Map additionalParams, boolean isAjax = true) {
+        if (linkText) {
+            additionalParams ?= [:]
+            additionalParams['isAjax'] = isAjax
+            String link = """<a class="taackShowAction" ${isAjax ? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${linkText}</a>"""
+            out << showField(i18n, link, null)
         }
     }
 
