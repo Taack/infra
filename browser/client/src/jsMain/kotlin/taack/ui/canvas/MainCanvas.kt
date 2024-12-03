@@ -379,8 +379,8 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
         canvas.tabIndex = 1
         canvas.style.border = "0"
-        divHolder.draggable = false
-        divHolder.contentEditable = "false"
+//        divHolder.draggable = false
+//        divHolder.contentEditable = "false"
         divHolder.style.border = "0"
         divScroll.style.border = "0"
 
