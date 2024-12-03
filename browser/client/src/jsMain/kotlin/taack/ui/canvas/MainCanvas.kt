@@ -53,11 +53,12 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
     }
 
 
-    private val dpr = 2.0
+    private val dprX = 2.0
+    private val dprY = 2.0
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
     private val canvasInnerBorder = 10.0
-    private val ctx: CanvasRenderingContext2D =
-        canvas.getContext(CanvasRenderingContext2D.ID) as CanvasRenderingContext2D
+    private val ctx: CanvasRenderingContext2D
+        get() = canvas.getContext(CanvasRenderingContext2D.ID) as CanvasRenderingContext2D
     private val texts: List<CanvasText>
         get() = drawables.mapNotNull { it.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY) }
             .toMutableList()
@@ -365,22 +366,23 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
     init {
         canvas.id = "canvas" + textarea.name
+        canvas.width = floor(divHolder.clientWidth * dprX).toInt()
+        canvas.height = floor(divScroll.clientHeight * dprY).toInt()
         canvas.style.width = "${divHolder.clientWidth}px"
-//        canvas.style.height = "${divScroll.clientHeight}px"
-        canvas.width = floor(divHolder.clientWidth * dpr).toInt()
-        canvas.height = floor(divScroll.clientHeight * dpr).toInt()
+        canvas.style.height = "${divScroll.clientHeight}px"
 
         trace("Canvas width: ${canvas.width}, height: ${canvas.height}")
 
 //        ctx.setTransform(dpr, 0.0, 0.0, dpr, 0.0, 0.0)
-        ctx.scale(dpr, dpr)
+        ctx.scale(dprX, dprY)
+
 
         canvas.tabIndex = 1
-        canvas.style.border = "1px solid black"
+        canvas.style.border = "0"
         divHolder.draggable = false
         divHolder.contentEditable = "false"
-        divHolder.style.border = "1px solid red"
-        divScroll.style.border = "1px solid blue"
+        divHolder.style.border = "0"
+        divScroll.style.border = "0"
 
         createButton("buttonBold", "<b style='margin: 0;height: 23px;'>BOLD</b>") {
             if (currentDrawable != null && currentDoubleClick != null)
@@ -741,7 +743,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 
     private fun draw() {
         traceIndent("MainCanvas::draw")
-        canvas.width = divHolder.clientWidth
+//        canvas.width = divHolder.clientWidth
         CanvasText.num1 = 0
         CanvasText.num2 = 0
         CanvasText.figNum = 1
@@ -791,7 +793,6 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             }
         }
         divHolder.style.minHeight = "${posYGlobal + dy}px"
-
         traceDeIndent("MainCanvas::draw ${divHolder.clientWidth} $currentText")
     }
 }
