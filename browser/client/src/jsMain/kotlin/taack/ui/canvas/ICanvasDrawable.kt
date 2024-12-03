@@ -12,7 +12,9 @@ interface ICanvasDrawable : ICanvasSelectable {
     enum class AdocToken(val regex: Regex) {
         TITLE(Regex("^= ")),
         ATTR(Regex("^:([a-z-]+): ([^*`\n]*)")),
-        INDENT(Regex("^> ")),
+        INNER_BLOCK_DELIM(Regex("^____(__)+\n")),
+        //        INDENT(Regex("^> ")),
+        BLOCK_DELIM(Regex("^____\n")),
         H2(Regex("^== ")),
         H3(Regex("^=== ")),
         H4(Regex("^==== ")),
@@ -43,18 +45,42 @@ interface ICanvasDrawable : ICanvasSelectable {
     companion object {
         fun dumpAsciidoc(drawables: List<ICanvasDrawable>): String {
             val out = StringBuilder()
-            out.append("= Title\n")
-            out.append(":doctype: book\n")
-            out.append(":toc: left\n")
-            out.append(":toc-title: Table of Contents of {doctitle}\n")
-            out.append(":toclevels: 2\n")
-            out.append(":sectnums: 2\n")
-            out.append(":sectnumlevels: 2\n")
+//            out.append("= Title\n")
+//            out.append(":doctype: book\n")
+//            out.append(":toc: left\n")
+//            out.append(":toc-title: Table of Contents of {doctitle}\n")
+//            out.append(":toclevels: 2\n")
+//            out.append(":sectnums: 2\n")
+//            out.append(":sectnumlevels: 2\n")
             out.append("\n")
 
+            var previousCitationNumber = 0
             drawables.forEach {
                 out.append("\n")
+                if (it.citationNumber > previousCitationNumber) {
+                    if (previousCitationNumber == 0)
+                        out.append("\n____")
+
+                    for (m in 1..<it.citationNumber) {
+                        out.append("\n____")
+                        for (n in 1..m) {
+                            out.append("__")
+                        }
+                        out.append("\n")
+                    }
+                } else if (it.citationNumber < previousCitationNumber) {
+                    if (it.citationNumber == 0)
+                        out.append("\n____")
+                    for (m in 1..<previousCitationNumber) {
+                        out.append("\n____")
+                        for (n in 1..m) {
+                            out.append("__")
+                        }
+                        out.append("\n")
+                    }
+                }
                 out.append(it.dumpAsciidoc())
+                previousCitationNumber = it.citationNumber
             }
             out.append("\n")
             return out.toString()
@@ -103,12 +129,13 @@ interface ICanvasDrawable : ICanvasSelectable {
             val initHeaders: MutableList<TxtHeaderCanvas> = mutableListOf()
             var currentIndent = 0
             var wasIndent = false
+            var wasInBlock = false
             while (it.hasNext()) {
-                if (!wasIndent) {
-                    currentIndent = 0
-                } else {
-                    wasIndent = false
-                }
+//                if (!wasIndent) {
+////                    currentIndent = 0
+//                } else {
+//                    wasIndent = false
+//                }
                 val token = it.next()
                 trace("token: [$token]")
                 when (token.token) {
@@ -178,7 +205,9 @@ interface ICanvasDrawable : ICanvasSelectable {
                         currentTextPosition = token.end
                     }
 
-                    AdocToken.NEXT_LINE -> {}
+                    AdocToken.NEXT_LINE -> {
+                        currentText = null
+                    }
                     AdocToken.MONO_BOLD -> {
                         if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
                             canvasDrawables.add(currentText!!)
@@ -216,15 +245,15 @@ interface ICanvasDrawable : ICanvasSelectable {
                     }
 
                     AdocToken.NORMAL -> {
-                        if ((canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last()) && !tableStart)
+                        if (currentText != null && (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last()) && !tableStart)
                             canvasDrawables.add(currentText!!)
-                        else if (canvasDrawables.isEmpty()) {
+                        else if (canvasDrawables.isEmpty() || currentText == null) {
                             currentText = PCanvas("", currentIndent)
                             canvasDrawables.add(currentText)
                         }
 
-                        currentText?.addToTxtInit(token.sequence)
-                        currentText?.addStyle(
+                        currentText.addToTxtInit(token.sequence)
+                        currentText.addStyle(
                             CanvasStyle.Type.NORMAL,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
@@ -233,16 +262,32 @@ interface ICanvasDrawable : ICanvasSelectable {
 
                     AdocToken.ERROR -> TODO()
                     AdocToken.OTHER -> {}
-                    AdocToken.INDENT -> {
-                        wasIndent = true
-                        currentIndent ++
-                    }
+//                    AdocToken.INDENT -> {
+//                        wasIndent = true
+//                        currentIndent ++
+//                    }
 
                     AdocToken.IMAGE -> {
 
                     }
                     AdocToken.IMAGE_INLINE -> {
 
+                    }
+
+                    AdocToken.BLOCK_DELIM -> {
+                        if (!wasInBlock) {
+                            wasInBlock = true
+                            currentIndent = 1
+                        } else {
+                            wasInBlock = false
+                            currentIndent = 0
+                        }
+                    }
+                    AdocToken.INNER_BLOCK_DELIM -> {
+                        val indent = 1 + (token.sequence.length - 4) / 2
+                        if (currentIndent == indent) {
+                            currentIndent--
+                        } else currentIndent = indent
                     }
                 }
             }
