@@ -389,7 +389,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 commandDoList.add(
                     AddStyleCommand(
                         currentText!!,
-                        CanvasStyle.Type.BOLD,
+                        CanvasStyle.BOLD,
                         currentDoubleClick!!.second,
                         currentDoubleClick!!.third
                     )
@@ -401,7 +401,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 commandDoList.add(
                     AddStyleCommand(
                         currentText!!,
-                        CanvasStyle.Type.NORMAL,
+                        CanvasStyle.NORMAL,
                         currentDoubleClick!!.second,
                         currentDoubleClick!!.third
                     )
@@ -413,7 +413,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 commandDoList.add(
                     AddStyleCommand(
                         currentText!!,
-                        CanvasStyle.Type.MONOSPACED,
+                        CanvasStyle.MONOSPACED,
                         currentDoubleClick!!.second,
                         currentDoubleClick!!.third
                     )
@@ -425,7 +425,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 commandDoList.add(
                     AddStyleCommand(
                         currentText!!,
-                        CanvasStyle.Type.BOLD_MONOSPACED,
+                        CanvasStyle.BOLD_MONOSPACED,
                         currentDoubleClick!!.second,
                         currentDoubleClick!!.third
                     )
