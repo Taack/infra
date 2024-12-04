@@ -58,7 +58,7 @@ final class TableSpec {
         tableVisitor.visitRowEnd()
     }
 
-    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
+    final<T extends GormEntity> Long iterate(TaackFilter<T> taackFilter, boolean showPaginate = true, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
         if (taackFilter.getSortString()) {
             tableVisitor.setSortingOrder(new Pair<String, String>(taackFilter.sortString, taackFilter.orderString))
         }
@@ -69,7 +69,9 @@ final class TableSpec {
             c.call(t)
             tableVisitor.visitRowEnd()
         }
-        tableVisitor.visitPaginate(taackFilter.max, res.bValue)
+        if (showPaginate) {
+            tableVisitor.visitPaginate(taackFilter.max, res.bValue)
+        }
         res.bValue
     }
 
