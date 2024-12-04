@@ -5,8 +5,6 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
 import web.canvas.CanvasRenderingContext2D
-import kotlin.math.max
-import kotlin.math.min
 
 
 abstract class CanvasText(_txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
@@ -79,15 +77,15 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         return txtVar.length
     }
 
-    fun addStyle(style: CanvasStyle, p: Int, pEnd: Int) {
-        txtVar = txt.substring(0, p) + style.sepBegin + txt.substring(p, pEnd) + style.sepEnd + txt.substring(pEnd)
+    fun addStyle(style: TextStyle, p: Int, pEnd: Int) {
+        txtVar = style.applyStyle(txt, p, pEnd)
     }
 
-    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
-//        trace("CanvasText::measureText: $from, $to")
-        // TODO Style
-        return ctx.measureText(txt.substring(from, to)).width
-    }
+//    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
+////        trace("CanvasText::measureText: $from, $to")
+//        // TODO Style
+//        return ctx.measureText(txt.substring(from, to)).width
+//    }
 
     fun font(): String {
         return "$fontWeight $fontSize $fontFace"
@@ -134,7 +132,10 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         var posLetterLineEnd = 0
         lines = emptyList()
         val listTxt = tmpTxt.split(" ")
+        val previousTextWith = 0.0
+        val previousStyle = TextStyle.NORMAL
         for (i in listTxt.indices) {
+            listTxt[i]
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
             currentLetterPos += t.length
             val tWidth = measureText(ctx, posLetterLineEnd, currentLetterPos)
