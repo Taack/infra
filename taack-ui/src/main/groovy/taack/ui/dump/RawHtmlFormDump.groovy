@@ -201,7 +201,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String trI18n = i18n ?: parameter.trField(field)
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
-        formThemed.ajaxField(blockLog.topElement, trI18n, enumOptions, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled)
+        formThemed.ajaxField(blockLog.topElement, trI18n, enumOptions, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled)
     }
 
     @Override

@@ -2,6 +2,7 @@ package taack.ui.dump.html.form
 
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
@@ -164,18 +165,29 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     }
 
     @Override
-    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, Object val, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disable) {
+    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disable) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(choices, false, false, disable)
-        HTMLDiv d = new HTMLDiv()
-        if (!disable) {
-            d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.setId(qualifiedName).addClasses('deleteIconM2M').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).build())
-        }
-        d.addChildren(s)
-        el.addChildren(s)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, current?.value, null, null, disable, true).builder.setId(qualifiedName).putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+        el.addChildren(input)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(inputHidden)
         el.addChildren(divError(qualifiedName))
         topElement
+
+//        HTMLSelect s = new HTMLSelect(choices, false, false, disable)
+//        HTMLDiv d = new HTMLDiv()
+//        if (!disable) {
+//            d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.setId(qualifiedName).addClasses('deleteIconM2M').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).build())
+//        }
+//        d.addChildren(s)
+//        el.addChildren(s)
+//        el.addChildren(formLabelInput(qualifiedName, trI18n))
+//        el.addChildren(divError(qualifiedName))
+//        topElement
     }
 
     @Override
