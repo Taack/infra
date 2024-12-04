@@ -213,7 +213,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                             canvasDrawables.add(currentText!!)
                         currentText?.addToTxtInit(token.sequence.substring(3,token.sequence.length - 3))
                         currentText?.addStyle(
-                            CanvasStyle.Type.BOLD_MONOSPACED,
+                            CanvasStyle.BOLD_MONOSPACED,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
@@ -225,7 +225,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                             canvasDrawables.add(currentText!!)
                         currentText?.addToTxtInit(token.sequence.substring(2,token.sequence.length - 2))
                         currentText?.addStyle(
-                            CanvasStyle.Type.BOLD,
+                            CanvasStyle.BOLD,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
@@ -237,7 +237,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                             canvasDrawables.add(currentText!!)
                         currentText?.addToTxtInit(token.sequence.substring(1,token.sequence.length - 1))
                         currentText?.addStyle(
-                            CanvasStyle.Type.MONOSPACED,
+                            CanvasStyle.MONOSPACED,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
@@ -254,7 +254,7 @@ interface ICanvasDrawable : ICanvasSelectable {
 
                         currentText.addToTxtInit(token.sequence)
                         currentText.addStyle(
-                            CanvasStyle.Type.NORMAL,
+                            CanvasStyle.NORMAL,
                             token.start - currentTextPosition,
                             token.end - currentTextPosition
                         )
