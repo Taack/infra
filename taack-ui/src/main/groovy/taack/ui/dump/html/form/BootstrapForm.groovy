@@ -261,7 +261,6 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         container.addChildren(attachmentLinkInput)
 
         el.addChildren(container)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }

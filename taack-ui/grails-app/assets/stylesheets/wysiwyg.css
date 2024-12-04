@@ -10,12 +10,12 @@
 }
 
 .wysiwyg-content.markdown {
-    height: 300px;
+    height: 300px !important;
     width: 50%;
 }
 
 .wysiwyg-content.asciidoctor {
-    height: 500px;
+    height: 500px !important;
     width: 90%;
 }
 
@@ -184,4 +184,8 @@
     padding: .5em .6em;
     border: 1px solid black;
     border-radius: 4px;
+}
+
+img[alt="wysiwyg-image"] {
+    width: 240px;
 }
