@@ -3,6 +3,9 @@ package taack.ui
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+
 import static taack.render.TaackUiService.tr
 
 @CompileStatic
@@ -78,10 +81,39 @@ final class EnumOptions implements IEnumOptions {
 
     EnumOptions(IEnumOption[] options, FieldInfo info) {
         Object v = info.value
-        if (v)
-            this.currents = [new EnumOption(v instanceof Enum ? v.name() : v.toString(), v.toString())]
-        else
+        if (v) {
+            Class type = info.fieldConstraint.field.type
+            boolean isListOrSet = Collection.isAssignableFrom(type)
+            if (isListOrSet) {
+                final ParameterizedType parameterizedType = info.fieldConstraint.field.genericType as ParameterizedType
+                final Type actualType = parameterizedType.actualTypeArguments.first()
+                final Class actualClass = Class.forName(actualType.typeName)
+                final boolean isEnumListOrSet = actualClass.isEnum()
+
+                List currents = v as List
+                this.currents = new EnumOption[currents.size()]
+                for (int i = 0; i < currents.size(); i++) {
+                    if (isEnumListOrSet) {
+                        String name = currents[i].hasProperty(ST_NAME) ? currents[i].getAt(ST_NAME) : currents[i].toString()
+                        this.currents[i] = new EnumOption((currents[i] as Enum).name(), name)
+                    } else {
+                        this.currents[i] = new EnumOption(currents[i].toString(), currents[i].toString())
+                    }
+                }
+            } else {
+                boolean isEnum = info.fieldConstraint.field.type.isEnum()
+                if (isEnum) {
+                    String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : v.toString()
+                    this.currents = [new EnumOption((v as Enum).name(), name)]
+                } else {
+                    this.currents = [new EnumOption(v.toString(), v.toString())]
+
+                }
+            }
+        } else {
             this.currents = null
+        }
+
         this.options = options
         this.paramKey = info.fieldName
     }
