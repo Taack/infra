@@ -1,10 +1,9 @@
 package taack.ui.canvas.text
 
-import taack.ui.base.element.Block
 import web.canvas.CanvasRenderingContext2D
 
 
-data class WordStyle(val content: String, val italic: Boolean, val bold: Boolean, val monospace: Boolean) {
+data class StringStyle(var start: Int, var end: Int, var italic: Boolean = false, var bold: Boolean = false, var monospace: Boolean = false) {
     fun getTextStyle(): TextStyle {
         if (monospace && bold) {
             return TextStyle.BOLD_MONOSPACED
@@ -53,38 +52,38 @@ enum class TextStyle(private val sepBegin: String, private val sepEnd: String, p
         return Triple(text, p, ptEnd)
     }
 
-    fun chargeWordCtx(ctx: CanvasRenderingContext2D, canvasText: CanvasText, text: String, currentWordStyle: WordStyle): WordStyle {
-        entries.forEach { entry ->
-            if (entry.regex != null && text.startsWith(entry.sepBegin)) {
-                when (entry) {
-                    NORMAL -> {
-                        // Path-through
-                    }
-                    BOLD -> {
-                        val end = text.endsWith(BOLD.sepEnd)
-                        val ws = WordStyle(text, !currentWordStyle.bold && !end, currentWordStyle.italic, currentWordStyle.monospace)
-                        BOLD.initCtx(ctx, canvasText)
-                        return ws
-                    }
-                    MONOSPACED -> {
-                        val end = text.endsWith(MONOSPACED.sepEnd)
-                        val ws = WordStyle(text, !currentWordStyle.bold, currentWordStyle.italic, !currentWordStyle.monospace && !end)
-                        BOLD.initCtx(ctx, canvasText)
-                        return ws
-
-                    }
-                    BOLD_MONOSPACED -> {
-                        val end = text.endsWith(BOLD_MONOSPACED.sepEnd)
-                        val ws = WordStyle(text, !currentWordStyle.bold && !end, currentWordStyle.italic, currentWordStyle.monospace && !end)
-                        BOLD.initCtx(ctx, canvasText)
-                        return ws
-                    }
-                }
-            }
-        }
-        NORMAL.initCtx(ctx, canvasText)
-        return currentWordStyle
-    }
+//    fun chargeWordCtx(ctx: CanvasRenderingContext2D, canvasText: CanvasText, text: String, currentWordStyle: StringStyle): StringStyle {
+//        entries.forEach { entry ->
+//            if (entry.regex != null && text.startsWith(entry.sepBegin)) {
+//                when (entry) {
+//                    NORMAL -> {
+//                        // Path-through
+//                    }
+//                    BOLD -> {
+//                        val end = text.endsWith(BOLD.sepEnd)
+//                        val ws = StringStyle(text, !currentWordStyle.bold && !end, currentWordStyle.italic, currentWordStyle.monospace)
+//                        BOLD.initCtx(ctx, canvasText)
+//                        return ws
+//                    }
+//                    MONOSPACED -> {
+//                        val end = text.endsWith(MONOSPACED.sepEnd)
+//                        val ws = StringStyle(text, !currentWordStyle.bold, currentWordStyle.italic, !currentWordStyle.monospace && !end)
+//                        BOLD.initCtx(ctx, canvasText)
+//                        return ws
+//
+//                    }
+//                    BOLD_MONOSPACED -> {
+//                        val end = text.endsWith(BOLD_MONOSPACED.sepEnd)
+//                        val ws = StringStyle(text, !currentWordStyle.bold && !end, currentWordStyle.italic, currentWordStyle.monospace && !end)
+//                        BOLD.initCtx(ctx, canvasText)
+//                        return ws
+//                    }
+//                }
+//            }
+//        }
+//        NORMAL.initCtx(ctx, canvasText)
+//        return currentWordStyle
+//    }
 
     fun applyStyle(txt: String, p: Int, pEnd: Int): String {
         val t = clearFormating(txt, p, pEnd)
