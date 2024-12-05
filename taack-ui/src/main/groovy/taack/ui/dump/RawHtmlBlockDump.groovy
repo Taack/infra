@@ -193,7 +193,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitHtmlBlock(String html, Style style) {
         blockLog.stayBlock('visitHtmlBlock')
         blockLog.topElement.addChildren(
-                new HTMLDiv().builder.addClasses(style?.cssClassesString).addChildren(
+                new HTMLDiv().builder.addClasses(style?.cssClassesString).putAttribute("style", style?.cssStyleString).addChildren(
                         new HTMLTxtContent(html)
                 ).build()
         )
