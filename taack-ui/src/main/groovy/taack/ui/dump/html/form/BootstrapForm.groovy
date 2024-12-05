@@ -169,7 +169,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, current?.value, null, null, disable, true).builder.setId(qualifiedName).putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, choices?.options?.find { it.key == current?.key }?.value ?: current?.value, null, null, disable, true).builder.setId(qualifiedName).putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
