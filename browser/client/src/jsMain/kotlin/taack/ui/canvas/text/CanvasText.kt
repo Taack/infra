@@ -41,6 +41,46 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
 
     var txtPrefix = ""
     var lines: List<CanvasLine> = emptyList()
+    val textStyles: List<StringStyle>
+        get() {
+            val list = mutableListOf<StringStyle>()
+            var whileContinue = true
+            val currentStringStyle = StringStyle(0, txt.length)
+            while (whileContinue) {
+                var currentStringBold: StringStyle?
+                var currentStringMono: StringStyle?
+                var currentStringItalic: StringStyle?
+                val posBackslash = txt.indexOf("\\")
+                val posBold = txt.indexOf("*")
+                val posMono = txt.indexOf("`")
+                val posItalic = txt.indexOf("_")
+                if (posBold != -1 || posBackslash != posBold - 1) {
+                    val posBackslash2 = txt.substring(posBold).indexOf("\\")
+                    val posBold2 = txt.substring(posBold).indexOf("*")
+                    if (posBold2 != -1 || posBackslash2 != posBold2 - 1) {
+                        currentStringBold = StringStyle(posBold, posBold2, bold = true)
+                    }
+                }
+                if (posMono != -1 || posBackslash != posMono - 1) {
+                    val posBackslash2 = txt.substring(posBold).indexOf("\\")
+                    val posMono2 = txt.substring(posBold).indexOf("`")
+                    if (posMono2 != -1 || posBackslash2 != posMono2 - 1) {
+                        currentStringMono = StringStyle(posMono, posMono2, monospace = true)
+                    }
+                }
+                if (posItalic != -1 || posBackslash != posItalic - 1) {
+                    val posBackslash2 = txt.substring(posBold).indexOf("\\")
+                    val posItalic2 = txt.substring(posBold).indexOf("_")
+                    if (posItalic2 != -1 || posBackslash2 != posItalic2 - 1) {
+                        currentStringItalic = StringStyle(posItalic, posItalic2, italic = true)
+                    }
+                }
+
+//                list.add(StringStyle())
+            }
+            return list
+        }
+
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
     private var txtVar: String = _txtInit
@@ -81,11 +121,11 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         txtVar = style.applyStyle(txt, p, pEnd)
     }
 
-//    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
-////        trace("CanvasText::measureText: $from, $to")
-//        // TODO Style
-//        return ctx.measureText(txt.substring(from, to)).width
-//    }
+    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
+//        trace("CanvasText::measureText: $from, $to")
+
+        return ctx.measureText(txt.substring(from, to)).width
+    }
 
     fun font(): String {
         return "$fontWeight $fontSize $fontFace"
