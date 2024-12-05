@@ -210,7 +210,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
         HTMLSpan span2 = new HTMLSpan().builder.addClasses('M2MToDuplicate').build() as HTMLSpan
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, '', null).builder.putAttribute('attr-name', qualifiedName).setId(id).addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', id).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
         input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) span2.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
         span2.addChildren(input)
