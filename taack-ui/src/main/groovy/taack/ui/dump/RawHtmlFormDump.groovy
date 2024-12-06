@@ -181,14 +181,9 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isNullable = field.fieldConstraint.nullable
         if (isListOrSet)
             formThemed.ajaxField(blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
-        else {
-            if (GormEntity.isAssignableFrom(field.fieldConstraint.field.type)) {
-                GormEntity v = field.value as GormEntity
-                formThemed.ajaxField(blockLog.topElement, trI18n, v, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
-            } else {
-                formThemed.ajaxField(blockLog.topElement, trI18n, null as GormEntity, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
-            }
-        }
+        else
+            formThemed.ajaxField(blockLog.topElement, trI18n, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+
     }
 
     private static List<String> fieldInfoCollect(FieldInfo[] fieldInfos) {
