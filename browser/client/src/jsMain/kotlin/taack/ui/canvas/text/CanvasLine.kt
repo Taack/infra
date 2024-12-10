@@ -17,27 +17,51 @@ class CanvasLine(
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText) {
 //        trace("CanvasLine::drawLine: $this")
-        val posXStart = text.posXStart
+        var posXStart = text.posXStart
         text.drawCitation(ctx, textY, height)
-        trace("couocu")
-        trace("couocu")
-// TODO: Styles
         trace("text.textStyles: ${text.textStyles}")
         val lineStyles = text.textStyles//.filter {
 //            posBegin >= it.end && posEnd <= it.start
 //        }
         trace("lineStyles: $lineStyles between $posBegin and $posEnd")
         if (lineStyles.isNotEmpty()) {
+            var pe = posBegin
             lineStyles.forEach {
                 val s = if (it.start < posBegin) posBegin else it.start
                 val e = if (it.end > posEnd) posEnd else it.end
+                if (s > pe) {
+                    ctx.fillText(
+                        (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, s),
+                        (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
+                        textY
+                    )
+                    posXStart += ctx.measureText(
+                        (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, s)
+                    ).width
+                }
+                ctx.save()
                 it.getTextStyle().initCtx(ctx, text)
                 ctx.fillText(
                     (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e),
                     (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
                     textY
                 )
+                posXStart += ctx.measureText(
+                    (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e)
+                ).width
+
                 ctx.restore()
+                pe = e
+            }
+            if (pe < posEnd) {
+                ctx.fillText(
+                    (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd),
+                    (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
+                    textY
+                )
+                posXStart += ctx.measureText(
+                    (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd)
+                ).width
             }
         } else {
             ctx.fillText(
