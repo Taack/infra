@@ -44,7 +44,6 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
     private var internTextStyles: MutableList<StringStyle>? = null
     val textStyles: List<StringStyle>
         get() {
-            println("get $internTextStyles")
             if (internTextStyles == null) {
                 internTextStyles = mutableListOf()
 
@@ -57,11 +56,10 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
                         var c = true
                         var p = 0
                         while (c && p < txt.length) {
-                            println("p = $p")
                             var ps = txt.substring(p).indexOf(s.sepBegin)
                             if (ps != -1) {
-                                ps += p + s.sepBegin.length
-                                p = ps
+                                ps += p
+                                p = ps + s.sepBegin.length
                                 var pe = txt.substring(p).indexOf(s.sepEnd)
                                 if (pe != -1) {
                                     pe += p + s.sepEnd.length
@@ -71,11 +69,9 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
                             } else c = false
                         }
                     }
-                println("inlineStyles: $inlineStyles")
                 if (inlineStyles.isNotEmpty()) {
                     inlineStyles.sortWith(compareBy({ it.start }, { it.end }))
 
-                    println("inlineStyles2: $inlineStyles")
                     var currentStyle = inlineStyles.first()
                     if (inlineStyles.size == 1) internTextStyles!!.add(currentStyle)
                     else
@@ -85,7 +81,6 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
                                 currentStyle = it
                             }
                         }
-                    println("internTextStyles: $internTextStyles")
                 }
 
             }
