@@ -41,46 +41,43 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
 
     var txtPrefix = ""
     var lines: List<CanvasLine> = emptyList()
+    private val internTextStyles: List<StringStyle>? = null
     val textStyles: List<StringStyle>
         get() {
-            val list = mutableListOf<StringStyle>()
-            var whileContinue = true
-            val currentStringStyle = StringStyle(0, txt.length)
-            while (whileContinue) {
-                var currentStringBold: StringStyle?
-                var currentStringMono: StringStyle?
-                var currentStringItalic: StringStyle?
-                val posBackslash = txt.indexOf("\\")
-                val posBold = txt.indexOf("*")
-                val posMono = txt.indexOf("`")
-                val posItalic = txt.indexOf("_")
-                if (posBold != -1 || posBackslash != posBold - 1) {
-                    val posBackslash2 = txt.substring(posBold).indexOf("\\")
-                    val posBold2 = txt.substring(posBold).indexOf("*")
-                    if (posBold2 != -1 || posBackslash2 != posBold2 - 1) {
-                        currentStringBold = StringStyle(posBold, posBold2, bold = true)
-                    }
-                }
-                if (posMono != -1 || posBackslash != posMono - 1) {
-                    val posBackslash2 = txt.substring(posBold).indexOf("\\")
-                    val posMono2 = txt.substring(posBold).indexOf("`")
-                    if (posMono2 != -1 || posBackslash2 != posMono2 - 1) {
-                        currentStringMono = StringStyle(posMono, posMono2, monospace = true)
-                    }
-                }
-                if (posItalic != -1 || posBackslash != posItalic - 1) {
-                    val posBackslash2 = txt.substring(posBold).indexOf("\\")
-                    val posItalic2 = txt.substring(posBold).indexOf("_")
-                    if (posItalic2 != -1 || posBackslash2 != posItalic2 - 1) {
-                        currentStringItalic = StringStyle(posItalic, posItalic2, italic = true)
+            if (internTextStyles == null) {
+                val internTextStyles = mutableListOf<StringStyle>()
+
+                val inlineStyles = mutableListOf<StringStyle>()
+
+                for (s in TextStyle.entries) {
+                    var c = true
+                    var p = 0
+                    while (c) {
+                        val ps = txt.substring(p).indexOf(s.sepBegin)
+                        if (ps != -1) {
+                            val pe = txt.substring(ps).indexOf(s.sepEnd)
+                            if (pe != -1) {
+                                inlineStyles.add(StringStyle(ps, pe).from(s))
+                                p = pe
+                            }
+                        } else c = false
                     }
                 }
 
-//                list.add(StringStyle())
+                if (inlineStyles.isNotEmpty()) {
+                    inlineStyles.sortWith(compareBy({it.start}, {it.end}))
+
+                    var currentStyle = inlineStyles.first()
+                    inlineStyles.forEach {
+                        if (it != currentStyle) {
+                            internTextStyles.addAll(currentStyle.merge(it))
+                            currentStyle = it
+                        }
+                    }
+                }
             }
-            return list
+            return internTextStyles!!
         }
-
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
     private var txtVar: String = _txtInit
@@ -172,8 +169,6 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         var posLetterLineEnd = 0
         lines = emptyList()
         val listTxt = tmpTxt.split(" ")
-        val previousTextWith = 0.0
-        val previousStyle = TextStyle.NORMAL
         for (i in listTxt.indices) {
             listTxt[i]
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")

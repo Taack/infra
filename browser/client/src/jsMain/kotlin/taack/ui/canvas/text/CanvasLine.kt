@@ -17,15 +17,15 @@ class CanvasLine(
 
     fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText) {
 //        trace("CanvasLine::drawLine: $this")
-        var posXStart = text.posXStart
+        val posXStart = text.posXStart
         text.drawCitation(ctx, textY, height)
 
 // TODO: Styles
-            ctx.fillText(
-                (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
-                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,
-                textY
-            )
+        ctx.fillText(
+            (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
+            (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,
+            textY
+        )
     }
 
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {
