@@ -396,18 +396,18 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             draw()
         }
-        createButton("buttonNormal","<span style='margin: 0;height: 23px;'>Normal</span>") {
-            if (currentDrawable != null && currentDoubleClick != null)
-                commandDoList.add(
-                    AddStyleCommand(
-                        currentText!!,
-                        TextStyle.NORMAL,
-                        currentDoubleClick!!.second,
-                        currentDoubleClick!!.third
-                    )
-                )
-            draw()
-        }
+//        createButton("buttonNormal","<span style='margin: 0;height: 23px;'>Normal</span>") {
+//            if (currentDrawable != null && currentDoubleClick != null)
+//                commandDoList.add(
+//                    AddStyleCommand(
+//                        currentText!!,
+//                        TextStyle.NORMAL,
+//                        currentDoubleClick!!.second,
+//                        currentDoubleClick!!.third
+//                    )
+//                )
+//            draw()
+//        }
         createButton("buttonMono", "<code style='margin: 0;height: 23px;'>Mono</code>") {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(

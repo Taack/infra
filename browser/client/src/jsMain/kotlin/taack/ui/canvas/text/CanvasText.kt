@@ -41,11 +41,11 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
 
     var txtPrefix = ""
     var lines: List<CanvasLine> = emptyList()
-    private val internTextStyles: List<StringStyle>? = null
+    private var internTextStyles: MutableList<StringStyle>? = null
     val textStyles: List<StringStyle>
         get() {
             if (internTextStyles == null) {
-                val internTextStyles = mutableListOf<StringStyle>()
+                internTextStyles = mutableListOf<StringStyle>()
 
                 val inlineStyles = mutableListOf<StringStyle>()
 
@@ -70,7 +70,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
                     var currentStyle = inlineStyles.first()
                     inlineStyles.forEach {
                         if (it != currentStyle) {
-                            internTextStyles.addAll(currentStyle.merge(it))
+                            internTextStyles!!.addAll(currentStyle.merge(it))
                             currentStyle = it
                         }
                     }

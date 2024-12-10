@@ -19,13 +19,33 @@ class CanvasLine(
 //        trace("CanvasLine::drawLine: $this")
         val posXStart = text.posXStart
         text.drawCitation(ctx, textY, height)
-
+        trace("couocu")
+        trace("couocu")
 // TODO: Styles
-        ctx.fillText(
-            (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
-            (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,
-            textY
-        )
+        trace("text.textStyles: ${text.textStyles}")
+        val lineStyles = text.textStyles.filter {
+            posBegin > it.end && posEnd < it.start
+        }
+        trace("lineStyles: $lineStyles")
+        if (lineStyles.isNotEmpty()) {
+            lineStyles.forEach {
+                val s = if (it.start < posBegin) posBegin else it.start
+                val e = if (it.end > posEnd) posEnd else it.end
+                it.getTextStyle().initCtx(ctx, text)
+                ctx.fillText(
+                    (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e),
+                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
+                    textY
+                )
+                ctx.restore()
+            }
+        } else {
+            ctx.fillText(
+                (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
+                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,
+                textY
+            )
+        }
     }
 
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {
