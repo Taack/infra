@@ -220,3 +220,6 @@ td.firstCellInGroup-5 {
     padding-left: 7.5em !important;
 }
 
+form .form-floating .form-label {
+    color: grey;
+}
