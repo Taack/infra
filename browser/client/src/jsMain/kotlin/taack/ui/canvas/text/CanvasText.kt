@@ -126,10 +126,44 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         txtVar = style.applyStyle(txt, p, pEnd)
     }
 
-    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
-//        trace("CanvasText::measureText: $from, $to")
+    fun measureText(ctx: CanvasRenderingContext2D, posBegin: Int, posEnd: Int): Double {
+        traceIndent("CanvasText::measureText: $posBegin, $posEnd")
+        var textWidth = 0.0
+        if (textStyles.isNotEmpty()) {
+            var pe = posBegin
+            textStyles.forEach {
+                val s = if (it.start < posBegin) posBegin else it.start
+                val e = if (it.end > posEnd) posEnd else it.end
+                if (s > pe) {
+                    textWidth += ctx.measureText(
+                        /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, s)
+                    ).width
+                }
+                trace("measureText:before = ${txt.substring(pe, s)} => $textWidth")
+                ctx.save()
+                it.getTextStyle().initCtx(ctx, this)
+                textWidth += ctx.measureText(
+                    /*(if (s == 0) txtPrefix else "") + */txt.substring(s, e)
+                ).width
+                trace("measureText:inside = ${txt.substring(s, e)} => $textWidth")
 
-        return ctx.measureText(txt.substring(from, to)).width
+                ctx.restore()
+                pe = e
+            }
+            if (pe < posEnd) {
+
+                textWidth += ctx.measureText(
+                    /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, posEnd)
+                ).width
+                trace("measureText:ends = ${txt.substring(pe, posEnd)} => $textWidth")
+            }
+            traceDeIndent("CanvasText::measureText: $posBegin, $posEnd => $textWidth")
+            return textWidth
+        } else {
+            textWidth = ctx.measureText(txt.substring(posBegin, posEnd)).width
+            traceDeIndent("CanvasText::measureText: $posBegin, $posEnd => $textWidth")
+            return textWidth
+        }
     }
 
     fun font(): String {
