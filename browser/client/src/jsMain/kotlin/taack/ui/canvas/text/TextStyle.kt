@@ -12,10 +12,10 @@ data class StringStyle(
 ) {
     fun from(ts: TextStyle): StringStyle {
         return when (ts) {
-            TextStyle.BOLD -> StringStyle(0, 0, bold = true)
-            TextStyle.NORMAL -> StringStyle(0, 0)
-            TextStyle.MONOSPACED -> StringStyle(0, 0, monospace = true)
-            TextStyle.BOLD_MONOSPACED -> StringStyle(0, 0, monospace = true, bold = true)
+            TextStyle.BOLD -> StringStyle(this.start, this.end, bold = true)
+            TextStyle.NORMAL -> StringStyle(this.start, this.end)
+            TextStyle.MONOSPACED -> StringStyle(this.start, this.end, monospace = true)
+            TextStyle.BOLD_MONOSPACED -> StringStyle(this.start, this.end, monospace = true, bold = true)
         }
     }
 

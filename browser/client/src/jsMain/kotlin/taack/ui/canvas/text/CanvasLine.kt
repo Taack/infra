@@ -23,10 +23,10 @@ class CanvasLine(
         trace("couocu")
 // TODO: Styles
         trace("text.textStyles: ${text.textStyles}")
-        val lineStyles = text.textStyles.filter {
-            posBegin > it.end && posEnd < it.start
-        }
-        trace("lineStyles: $lineStyles")
+        val lineStyles = text.textStyles//.filter {
+//            posBegin >= it.end && posEnd <= it.start
+//        }
+        trace("lineStyles: $lineStyles between $posBegin and $posEnd")
         if (lineStyles.isNotEmpty()) {
             lineStyles.forEach {
                 val s = if (it.start < posBegin) posBegin else it.start

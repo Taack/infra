@@ -44,37 +44,50 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
     private var internTextStyles: MutableList<StringStyle>? = null
     val textStyles: List<StringStyle>
         get() {
+            println("get $internTextStyles")
             if (internTextStyles == null) {
-                internTextStyles = mutableListOf<StringStyle>()
+                internTextStyles = mutableListOf()
 
                 val inlineStyles = mutableListOf<StringStyle>()
 
-                for (s in TextStyle.entries) {
-                    var c = true
-                    var p = 0
-                    while (c) {
-                        val ps = txt.substring(p).indexOf(s.sepBegin)
-                        if (ps != -1) {
-                            val pe = txt.substring(ps).indexOf(s.sepEnd)
-                            if (pe != -1) {
-                                inlineStyles.add(StringStyle(ps, pe).from(s))
-                                p = pe
-                            }
-                        } else c = false
-                    }
-                }
-
-                if (inlineStyles.isNotEmpty()) {
-                    inlineStyles.sortWith(compareBy({it.start}, {it.end}))
-
-                    var currentStyle = inlineStyles.first()
-                    inlineStyles.forEach {
-                        if (it != currentStyle) {
-                            internTextStyles!!.addAll(currentStyle.merge(it))
-                            currentStyle = it
+                if (txt.isNotEmpty())
+                    for (s in TextStyle.entries) {
+                        if (s == TextStyle.NORMAL)
+                            continue
+                        var c = true
+                        var p = 0
+                        while (c && p < txt.length) {
+                            println("p = $p")
+                            var ps = txt.substring(p).indexOf(s.sepBegin)
+                            if (ps != -1) {
+                                ps += p + s.sepBegin.length
+                                p = ps
+                                var pe = txt.substring(p).indexOf(s.sepEnd)
+                                if (pe != -1) {
+                                    pe += p + s.sepEnd.length
+                                    p = pe
+                                    inlineStyles.add(StringStyle(ps, pe).from(s))
+                                } else c = false
+                            } else c = false
                         }
                     }
+                println("inlineStyles: $inlineStyles")
+                if (inlineStyles.isNotEmpty()) {
+                    inlineStyles.sortWith(compareBy({ it.start }, { it.end }))
+
+                    println("inlineStyles2: $inlineStyles")
+                    var currentStyle = inlineStyles.first()
+                    if (inlineStyles.size == 1) internTextStyles!!.add(currentStyle)
+                    else
+                        inlineStyles.forEach {
+                            if (it != currentStyle) {
+                                internTextStyles!!.addAll(currentStyle.merge(it))
+                                currentStyle = it
+                            }
+                        }
+                    println("internTextStyles: $internTextStyles")
                 }
+
             }
             return internTextStyles!!
         }
@@ -205,7 +218,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         }
 
 
-        trace("draw: $this: $txt")
+        trace("draw lines: $this: $txt")
         lines.forEach { l ->
             l.drawLine(ctx, this)
         }
@@ -292,6 +305,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
     }
 
     override fun reset() {
+        internTextStyles = null
         citationNumber = initCitationNumber
         txtVar = txtInit
 //        styles = emptyList()
