@@ -5,6 +5,7 @@ import taack.ui.canvas.text.CanvasText
 
 class AddTextCommand(private val drawables: MutableList<ICanvasDrawable>, val i: Int, val text: CanvasText) : ICanvasCommand {
     override fun doIt() {
-        drawables.add(i, text)
+        if (i == -1) drawables.add(text)
+        else drawables.add(i, text)
     }
 }

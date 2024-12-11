@@ -77,11 +77,11 @@ class CanvasImg(
     }
 
     override fun dumpAsciidoc(): String {
-        return if (src.length < 250)
-            "\n${text.dumpAsciidoc()}\nimage::${src}[]"
-        else {
-            "\n${text.dumpAsciidoc()}\nimage::${text.txt}[]"
+        //return //if (src.length < 250)
+        return "\n${text.dumpAsciidoc()}\nimage::${src}[]"
+//        else {
+//            "\n${text.dumpAsciidoc()}\nimage::${text.txt}[]"
 //            "\n+++<img src='$src'/>+++"
-        }
+//        }
     }
 }

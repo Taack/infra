@@ -851,6 +851,9 @@ class MainCanvas(
             }
         }
         divHolder.style.minHeight = "${posYGlobal + dy}px"
+        val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
+        textarea.textContent = asciidoc
+
         traceDeIndent("MainCanvas::draw ${divHolder.clientWidth} $currentText")
     }
 }
