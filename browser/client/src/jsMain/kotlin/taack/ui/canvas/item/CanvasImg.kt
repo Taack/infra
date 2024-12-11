@@ -51,6 +51,7 @@ class CanvasImg(
                 ratio = min(640.0 / h, width / w)
 //                ratio = width / w
                 trace("CanvasImg::draw.onLoad $image ${image.width}x${image.height}, r: $ratio")
+
             }
             image.src = src
         } else if (image.complete) {

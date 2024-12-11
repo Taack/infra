@@ -17,6 +17,7 @@ import web.dom.document
 import web.events.Event
 import web.events.EventHandler
 import web.events.addEventListener
+import web.file.File
 import web.file.FileReader
 import web.html.*
 import web.http.CrossOrigin
@@ -29,7 +30,11 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
-class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolder: HTMLDivElement, private val divScroll: HTMLDivElement) {
+class MainCanvas(
+    private val textarea: HTMLTextAreaElement,
+    private val divHolder: HTMLDivElement,
+    private val divScroll: HTMLDivElement
+) {
 
     inner class MyMutableList(val b: MutableList<ICanvasDrawable>) : MutableList<ICanvasDrawable> by b {
         override fun add(element: ICanvasDrawable): Boolean {
@@ -260,7 +265,12 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                                 if (currentText != null && caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
                                     initTxt = currentText!!.txt.substring(caretPosInCurrentText)
                                     commandDoList.add(
-                                        DeleteCharCommand(drawables, currentText!!, caretPosInCurrentText, currentText!!.txt.length)
+                                        DeleteCharCommand(
+                                            drawables,
+                                            currentText!!,
+                                            caretPosInCurrentText,
+                                            currentText!!.txt.length
+                                        )
                                     )
 
                                 }
@@ -448,7 +458,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
 //                )
 //            draw()
 //        }
-        createButton("bH2", "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>") {
+        createButton(
+            "bH2",
+            "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"
+        ) {
             if (currentDrawable != null) {
                 val cd = currentDrawable
                 currentDrawable = H2Canvas(currentText!!.txt)
@@ -458,7 +471,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             }
             draw()
         }
-        createButton("bH3", "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>") {
+        createButton(
+            "bH3",
+            "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>"
+        ) {
             if (currentDrawable != null) {
                 val cd = currentDrawable
                 currentDrawable = H3Canvas(currentText!!.txt)
@@ -468,7 +484,10 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             }
             draw()
         }
-        createButton("bH4", "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>") {
+        createButton(
+            "bH4",
+            "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>"
+        ) {
             if (currentDrawable != null) {
                 val cd = currentDrawable
                 currentDrawable = H4Canvas(currentText!!.txt)
@@ -514,13 +533,6 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             textarea.textContent = asciidoc
             prompt("Copy to clipboard: Ctrl+C, Enter", asciidoc)
         }
-
-        val icp = document.createElement("input") as HTMLInputElement
-        icp.placeholder = "Paste/drop image, text, file"
-        icp.id = "icp" + textarea.name
-        icp.size = 11
-        divHolder.appendChild(icp)
-
 
         divHolder.appendChild(canvas)
 
@@ -570,8 +582,8 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             if (!event.ctrlKey) isDoubleClick = false
 
             addDrawable()
-            event.preventDefault()
-            event.stopPropagation()
+//            event.preventDefault()
+//            event.stopPropagation()
 
         }
 
@@ -589,7 +601,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
             draw()
         }
 
-        icp.onpaste = EventHandler { event: ClipboardEvent ->
+        document.onpaste = EventHandler { event: ClipboardEvent ->
             trace("canvasEvent paste $currentText $currentMouseEvent")
             val txt = event.clipboardData!!.getData("text")
             event.preventDefault()
@@ -604,10 +616,24 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                 )
             }
             trace("canvasEvent paste: $txt")
+
+            if (event.clipboardData!!.items.length > 0) {
+                // Use DataTransferItemList interface to access the file(s)
+                for (item in event.clipboardData!!.items) {
+                    // If dropped items aren't files, reject them
+                    if (item.kind === "file") {
+                        val file = item.getAsFile()
+                        trace("canvasEvent1 file[].name = ${file?.name}")
+                        if (file != null) {
+                            placeFile(file)
+                        }
+                    }
+                }
+            }
             draw()
         }
 
-        icp.ondrop = EventHandler { event: DragEvent ->
+        document.ondrop = EventHandler { event: DragEvent ->
             trace("canvasEvent drop")
             event.preventDefault()
             event.stopPropagation()
@@ -619,33 +645,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                         val file = item.getAsFile()
                         trace("canvasEvent1 file[].name = ${file?.name}")
                         if (file != null) {
-                            val reader = FileReader()
-                            reader.onload = EventHandler {
-                                val img = document.createElement("img") as HTMLImageElement
-                                img.crossOrigin = CrossOrigin.anonymous
-                                img.onload = EventHandler {
-                                    val c = document.createElement("canvas") as HTMLCanvasElement
-                                    val rw = img.width / min(img.width, 1024)
-                                    val rh = img.height / min(img.height, 1024)
-                                    val r = max(rw, rh)
-                                    c.width = img.width / r
-                                    c.height = img.height / r
-                                    val ctx = c.getContext(CanvasRenderingContext2D.ID)
-                                    ctx!!.drawImage(img, 0.0, 0.0, img.width.toDouble(), img.height.toDouble(), 0.0, 0.0, c.width.toDouble(), c.height.toDouble())
-
-                                    val dataurl = c.toDataURL(file.type)
-                                    commandDoList.add(
-                                        AddImageCommand(
-                                            drawables,
-                                            drawables.indexOf(currentDrawable),
-                                            CanvasImg(dataurl, file.name, 0),
-                                        )
-                                    )
-                                }
-                                img.src = reader.result.toString()
-
-                            }
-                            reader.readAsDataURL(file)
+                            placeFile(file)
                         }
                     }
                 }
@@ -677,6 +677,55 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         addInitialTexts()
         currentDrawable = drawables.first()
         draw()
+    }
+
+    private fun placeFile(file: File) {
+        val reader = FileReader()
+        reader.onload = EventHandler {
+            val img = document.createElement("img") as HTMLImageElement
+            img.crossOrigin = CrossOrigin.anonymous
+            img.onload = EventHandler {
+                val c = document.createElement("canvas") as HTMLCanvasElement
+                val rw = img.width / min(img.width, 1024)
+                val rh = img.height / min(img.height, 1024)
+                val r = max(rw, rh)
+                c.width = img.width / r
+                c.height = img.height / r
+                val ctx = c.getContext(CanvasRenderingContext2D.ID)
+                ctx!!.drawImage(
+                    img,
+                    0.0,
+                    0.0,
+                    img.width.toDouble(),
+                    img.height.toDouble(),
+                    0.0,
+                    0.0,
+                    c.width.toDouble(),
+                    c.height.toDouble()
+                )
+
+                val dataurl = c.toDataURL(file.type)
+                var index = drawables.indexOf(currentDrawable)
+                if (index == -1) { index = 0}
+
+                commandDoList.add(
+                    AddImageCommand(
+                        drawables,
+                        index,
+                        CanvasImg(dataurl, file.name, 0),
+                    )
+                )
+                val d = PCanvas("")
+                currentDrawable = d
+                commandDoList.add(
+                    AddTextCommand(drawables, index + 1, d)
+                )
+
+            }
+            img.src = reader.result.toString()
+
+        }
+        reader.readAsDataURL(file)
     }
 
     private fun addInitialTexts() {
