@@ -256,7 +256,16 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
                             }
 
                             else -> {
-                                val d = PCanvas("")
+                                var initTxt = ""
+                                if (currentText != null && caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
+                                    initTxt = currentText!!.txt.substring(caretPosInCurrentText)
+                                    commandDoList.add(
+                                        DeleteCharCommand(drawables, currentText!!, caretPosInCurrentText, currentText!!.txt.length)
+                                    )
+
+                                }
+
+                                val d = PCanvas(initTxt)
                                 currentDrawable = d
                                 commandDoList.add(
                                     AddTextCommand(drawables, i, d)
