@@ -20,9 +20,9 @@ class CanvasLine(
         var posXStart = text.posXStart
         text.drawCitation(ctx, textY, height)
         trace("text.textStyles: ${text.textStyles}")
-        val lineStyles = text.textStyles//.filter {
-//            posBegin >= it.end && posEnd <= it.start
-//        }
+        val lineStyles = text.textStyles.filter {
+            posBegin <= it.end && posEnd >= it.start
+        }
         trace("lineStyles: $lineStyles between $posBegin and $posEnd")
         if (lineStyles.isNotEmpty()) {
             var pe = posBegin
@@ -43,7 +43,8 @@ class CanvasLine(
                 it.getTextStyle().initCtx(ctx, text)
                 ctx.fillText(
                     (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e),
-                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
+//                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
+                    posXStart,
                     textY
                 )
                 posXStart += ctx.measureText(
@@ -56,7 +57,8 @@ class CanvasLine(
             if (pe < posEnd) {
                 ctx.fillText(
                     (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd),
-                    (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
+//                    (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
+                    posXStart,
                     textY
                 )
                 posXStart += ctx.measureText(

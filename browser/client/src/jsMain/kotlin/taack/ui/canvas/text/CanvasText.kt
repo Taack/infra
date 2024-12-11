@@ -70,16 +70,18 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
                         }
                     }
                 if (inlineStyles.isNotEmpty()) {
-                    inlineStyles.sortWith(compareBy({ it.start }, { it.end }))
+                    inlineStyles.sortBy { it.start }
+//                    inlineStyles.sortWith(compareBy({ it.start }, { it.end }))
 
                     var currentStyle = inlineStyles.first()
                     if (inlineStyles.size == 1) internTextStyles!!.add(currentStyle)
                     else
                         inlineStyles.forEach {
-                            if (it != currentStyle) {
-                                internTextStyles!!.addAll(currentStyle.merge(it))
-                                currentStyle = it
-                            }
+//                            if (it.getTextStyle() != currentStyle.getTextStyle() && it.getTextStyle() != TextStyle.NORMAL) {
+//                                internTextStyles!!.addAll(currentStyle.merge(it))
+                                internTextStyles!!.add(it)
+//                            } else internTextStyles!!.add(it)
+                            currentStyle = it
                         }
                 }
 
@@ -132,6 +134,9 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         if (textStyles.isNotEmpty()) {
             var pe = posBegin
             textStyles.forEach {
+                if (it.start > posEnd || it.end < posBegin) {
+                    return@forEach
+                }
                 val s = if (it.start < posBegin) posBegin else it.start
                 val e = if (it.end > posEnd) posEnd else it.end
                 if (s > pe) {

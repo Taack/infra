@@ -769,7 +769,7 @@ class MainCanvas(private val textarea: HTMLTextAreaElement, private val divHolde
         trace("Draw all drawables +++")
         for (text in drawables) {
             try {
-                posYGlobal = text.draw(ctx, canvas.width.toDouble() - canvasInnerBorder, posYGlobal, canvasInnerBorder)
+                posYGlobal = text.draw(ctx, divHolder.clientWidth - canvasInnerBorder, posYGlobal, canvasInnerBorder)
             } catch (e: Throwable) {
                 trace(e.message ?: "")
             }

@@ -88,9 +88,9 @@ data class StringStyle(
                 return arrayListOf(mergeStyle(other, start, end))
             }
         } else if (start > other.start) {
-            return arrayListOf(other, this)
+            return arrayListOf(this)
         } else if (start < other.start) {
-            return arrayListOf(this, other)
+            return arrayListOf(other)
         }
         return emptyList()
     }
