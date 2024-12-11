@@ -239,6 +239,7 @@ class MainCanvas(
                             }
 
                             is TxtHeaderCanvas -> {
+                                trace("TxtHeaderCanvas")
                                 val table = currentDrawable as CanvasTable
                                 if (currentKeyboardEvent!!.shiftKey)
                                     commandDoList.add(
@@ -250,6 +251,7 @@ class MainCanvas(
                             }
 
                             is TxtRowCanvas -> {
+                                trace("TxtRowCanvas")
                                 val table = currentDrawable as CanvasTable
                                 if (currentKeyboardEvent!!.shiftKey)
                                     commandDoList.add(
@@ -415,18 +417,6 @@ class MainCanvas(
                 )
             draw()
         }
-//        createButton("buttonNormal","<span style='margin: 0;height: 23px;'>Normal</span>") {
-//            if (currentDrawable != null && currentDoubleClick != null)
-//                commandDoList.add(
-//                    AddStyleCommand(
-//                        currentText!!,
-//                        TextStyle.NORMAL,
-//                        currentDoubleClick!!.second,
-//                        currentDoubleClick!!.third
-//                    )
-//                )
-//            draw()
-//        }
         createButton("buttonMono", "<code style='margin: 0;height: 23px;'>Mono</code>") {
             if (currentDrawable != null && currentDoubleClick != null)
                 commandDoList.add(
@@ -458,6 +448,16 @@ class MainCanvas(
 //                )
 //            draw()
 //        }
+        createButton("buttonTable", "<span style='margin: 0;height: 23px;'>Table</span>") {
+            if (currentDrawable != null) {
+                commandDoList.add(
+                    AddTableCommand(drawables, drawables.indexOf(currentDrawable))
+                )
+            }
+            draw()
+
+        }
+
         createButton(
             "bH2",
             "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"

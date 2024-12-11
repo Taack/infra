@@ -193,7 +193,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                         }
                     }
                     AdocToken.TABLE_CELL -> {
-                        val t = TxtRowCanvas()
+                        val t = TxtRowCanvas("")
                         currentText = t
                         currentTextPosition = token.end
                         initCells.add(t)
