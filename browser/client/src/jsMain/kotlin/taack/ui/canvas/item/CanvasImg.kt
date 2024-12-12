@@ -2,6 +2,7 @@ package taack.ui.canvas.item
 
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.canvas.ICanvasDrawable
+import taack.ui.canvas.command.DeleteDrawableCommand
 import taack.ui.canvas.text.CanvasFigure
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
@@ -68,7 +69,7 @@ class CanvasImg(
     }
 
     override fun doubleClick(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Triple<CanvasLine, Int, Int>? {
-        TODO("Not yet implemented")
+        return null
     }
 
     override fun reset() {
@@ -83,5 +84,9 @@ class CanvasImg(
 //            "\n${text.dumpAsciidoc()}\nimage::${text.txt}[]"
 //            "\n+++<img src='$src'/>+++"
 //        }
+    }
+
+    override fun toString(): String {
+        return "CanvasImg(text=$text, citationNumber=$citationNumber, globalPosYEnd=$globalPosYEnd, globalPosYStart=$globalPosYStart)"
     }
 }

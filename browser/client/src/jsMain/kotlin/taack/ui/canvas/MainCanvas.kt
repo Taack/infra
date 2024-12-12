@@ -41,10 +41,10 @@ class MainCanvas(
             return b.add(element)
         }
 
-        fun addAndChangeCurrent(index: Int, element: ICanvasDrawable) {
-            currentDrawable = element
-            return b.add(index, element)
-        }
+//        fun addAndChangeCurrent(index: Int, element: ICanvasDrawable) {
+//            currentDrawable = element
+//            return b.add(index, element)
+//        }
 
         override fun remove(element: ICanvasDrawable): Boolean {
             val i = b.indexOf(element)
@@ -188,7 +188,7 @@ class MainCanvas(
                 trace("MainCanvas::addDrawable press Delete")
                 if (currentKeyboardEvent!!.ctrlKey && currentDrawable != null) {
                     commandDoList.add(
-                        DeleteTextCommand(drawables, currentDrawable!!.getSelectedText()!!)
+                        DeleteDrawableCommand(drawables, currentDrawable!!.getSelectedText()!!)
                     )
                 } else {
                     val pos1 = caretPosInCurrentText
@@ -593,8 +593,12 @@ class MainCanvas(
             isDoubleClick = true
             for (d in drawables) {
                 if (d.isClicked(event.offsetX, event.offsetY)) {
-                    currentDrawable = d
-                    currentDoubleClick = d.doubleClick(ctx, event.offsetX, event.offsetY)
+                    if (d is CanvasImg)
+                        commandDoList.add(DeleteDrawableCommand(drawables, d))
+                    else {
+                        currentDrawable = d
+                        currentDoubleClick = d.doubleClick(ctx, event.offsetX, event.offsetY)
+                    }
                 }
             }
             draw()
@@ -703,7 +707,7 @@ class MainCanvas(
                     c.height.toDouble()
                 )
 
-                val dataurl = c.toDataURL(file.type)
+                val dataUrl = c.toDataURL(file.type)
                 var index = drawables.indexOf(currentDrawable)
                 if (index == -1) { index = 0}
 
@@ -711,7 +715,7 @@ class MainCanvas(
                     AddImageCommand(
                         drawables,
                         index,
-                        CanvasImg(dataurl, file.name, 0),
+                        CanvasImg(dataUrl, file.name, 0),
                     )
                 )
                 val d = PCanvas("")
