@@ -3,9 +3,11 @@ package taack.ui.canvas
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
+import taack.ui.base.element.Form
 import taack.ui.canvas.command.*
 import taack.ui.canvas.item.CanvasCaret
 import taack.ui.canvas.item.CanvasImg
+import taack.ui.canvas.item.CanvasLink
 import taack.ui.canvas.script.CanvasKroki
 import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
@@ -30,6 +32,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class MainCanvas(
+    private val embeddingForm: Form,
     private val textarea: HTMLTextAreaElement,
     private val divHolder: HTMLDivElement,
     private val divScroll: HTMLDivElement
@@ -55,8 +58,6 @@ class MainCanvas(
             return false
         }
     }
-
-
     private val dprX = 2.0
     private val dprY = 2.0
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
@@ -205,7 +206,7 @@ class MainCanvas(
                 if (caretPosInCurrentText == 0) {
                     val d = PCanvas("")
                     commandDoList.add(
-                        AddTextCommand(drawables, i, d)
+                        AddDrawableCommand(drawables, i, d)
                     )
                 } else if (currentDrawable is CanvasKroki) {
                     commandDoList.add(
@@ -226,14 +227,14 @@ class MainCanvas(
                             is H2Canvas -> {
                                 val d = H3Canvas("")
                                 commandDoList.add(
-                                    AddTextCommand(drawables, i, d)
+                                    AddDrawableCommand(drawables, i, d)
                                 )
                             }
 
                             is H3Canvas -> {
                                 val d = H4Canvas("")
                                 commandDoList.add(
-                                    AddTextCommand(drawables, i, d)
+                                    AddDrawableCommand(drawables, i, d)
                                 )
                             }
 
@@ -279,7 +280,7 @@ class MainCanvas(
                                 val d = PCanvas(initTxt)
                                 currentDrawable = d
                                 commandDoList.add(
-                                    AddTextCommand(drawables, i, d)
+                                    AddDrawableCommand(drawables, i, d)
                                 )
                             }
                         }
@@ -374,7 +375,7 @@ class MainCanvas(
         b.classList.add("btn-light")
         b.style.margin = "2px"
         b.style.height = "29px"
-      //  b.style.width = "80px"
+        //  b.style.width = "80px"
         b.contentEditable = "false"
         b.onclick = EventHandler { e ->
             e.preventDefault()
@@ -593,7 +594,7 @@ class MainCanvas(
             isDoubleClick = true
             for (d in drawables) {
                 if (d.isClicked(event.offsetX, event.offsetY)) {
-                    if (d is CanvasImg)
+                    if (d is CanvasImg || d is CanvasLink)
                         commandDoList.add(DeleteDrawableCommand(drawables, d))
                     else {
                         currentDrawable = d
@@ -684,50 +685,79 @@ class MainCanvas(
 
     private fun placeFile(file: File) {
         val reader = FileReader()
-        reader.onload = EventHandler {
-            val img = document.createElement("img") as HTMLImageElement
-            img.crossOrigin = CrossOrigin.anonymous
-            img.onload = EventHandler {
-                val c = document.createElement("canvas") as HTMLCanvasElement
-                val rw = img.width / min(img.width, 1024)
-                val rh = img.height / min(img.height, 1024)
-                val r = max(rw, rh)
-                c.width = img.width / r
-                c.height = img.height / r
-                val ctx = c.getContext(CanvasRenderingContext2D.ID)
-                ctx!!.drawImage(
-                    img,
-                    0.0,
-                    0.0,
-                    img.width.toDouble(),
-                    img.height.toDouble(),
-                    0.0,
-                    0.0,
-                    c.width.toDouble(),
-                    c.height.toDouble()
-                )
+        if (file.type.startsWith("image/")) {
+            reader.onload = EventHandler {
+                val img = document.createElement("img") as HTMLImageElement
+                img.crossOrigin = CrossOrigin.anonymous
+                img.onload = EventHandler {
+                    val c = document.createElement("canvas") as HTMLCanvasElement
+                    val rw = img.width / min(img.width, 1024)
+                    val rh = img.height / min(img.height, 1024)
+                    val r = max(rw, rh)
+                    c.width = img.width / r
+                    c.height = img.height / r
+                    val ctx = c.getContext(CanvasRenderingContext2D.ID)
+                    ctx!!.drawImage(
+                        img,
+                        0.0,
+                        0.0,
+                        img.width.toDouble(),
+                        img.height.toDouble(),
+                        0.0,
+                        0.0,
+                        c.width.toDouble(),
+                        c.height.toDouble()
+                    )
 
-                val dataUrl = c.toDataURL(file.type)
+                    val dataUrl = c.toDataURL(file.type)
+                    var index = drawables.indexOf(currentDrawable)
+                    if (index == -1) {
+                        index = 0
+                    }
+
+                    commandDoList.add(
+                        AddImageCommand(
+                            drawables,
+                            index,
+                            CanvasImg(dataUrl, file.name, 0),
+                        )
+                    )
+                    val d = PCanvas("")
+                    currentDrawable = d
+                    commandDoList.add(
+                        AddDrawableCommand(drawables, index + 1, d)
+                    )
+                }
+                img.src = reader.result.toString()
+
+            }
+            reader.readAsDataURL(file)
+        } else {
+            reader.onload = EventHandler {
                 var index = drawables.indexOf(currentDrawable)
-                if (index == -1) { index = 0}
-
+                if (index == -1) {
+                    index = 0
+                }
                 commandDoList.add(
-                    AddImageCommand(
+                    AddDrawableCommand(
                         drawables,
                         index,
-                        CanvasImg(dataUrl, file.name, 0),
+                        CanvasLink(file.name, 0),
                     )
                 )
                 val d = PCanvas("")
                 currentDrawable = d
                 commandDoList.add(
-                    AddTextCommand(drawables, index + 1, d)
+                    AddDrawableCommand(drawables, index + 1, d)
                 )
             }
-            img.src = reader.result.toString()
-
+            reader.readAsDataURL(file)
         }
-        reader.readAsDataURL(file)
+
+        if (embeddingForm.mapFileToSend["${textarea.name}File"] == null) {
+            embeddingForm.mapFileToSend["${textarea.name}File"] = mutableListOf()
+        }
+        embeddingForm.mapFileToSend["${textarea.name}File"]!!.add(file)
     }
 
     private fun addInitialTexts() {
@@ -801,7 +831,7 @@ class MainCanvas(
         drawables.addAll(initialDrawables)
     }
 
-    private fun draw() {
+    fun draw() {
         traceIndent("MainCanvas::draw")
 //        canvas.width = divHolder.clientWidth
         CanvasText.num1 = 0
