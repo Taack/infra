@@ -21,7 +21,6 @@ import web.file.File
 import web.file.FileReader
 import web.html.*
 import web.http.CrossOrigin
-import web.prompts.prompt
 import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
@@ -375,7 +374,7 @@ class MainCanvas(
         b.classList.add("btn-light")
         b.style.margin = "2px"
         b.style.height = "29px"
-        b.style.width = "80px"
+      //  b.style.width = "80px"
         b.contentEditable = "false"
         b.onclick = EventHandler { e ->
             e.preventDefault()
@@ -527,12 +526,12 @@ class MainCanvas(
             }
             draw()
         }
-        createButton("bAsciidoc", "ADoc") {
-            draw()
-            val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
-            textarea.textContent = asciidoc
-            prompt("Copy to clipboard: Ctrl+C, Enter", asciidoc)
-        }
+//        createButton("bAsciidoc", "ADoc") {
+//            draw()
+//            val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
+//            textarea.textContent = asciidoc
+//            prompt("Copy to clipboard: Ctrl+C, Enter", asciidoc)
+//        }
 
         divHolder.appendChild(canvas)
 
@@ -582,7 +581,7 @@ class MainCanvas(
             if (!event.ctrlKey) isDoubleClick = false
 
             addDrawable()
-//            event.preventDefault()
+            event.preventDefault()
 //            event.stopPropagation()
 
         }
@@ -720,7 +719,6 @@ class MainCanvas(
                 commandDoList.add(
                     AddTextCommand(drawables, index + 1, d)
                 )
-
             }
             img.src = reader.result.toString()
 
