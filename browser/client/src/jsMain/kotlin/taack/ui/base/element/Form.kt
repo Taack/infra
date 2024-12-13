@@ -50,7 +50,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             it.fieldName
         }
 
-        val textareaList = document.querySelectorAll("textarea.asciidoctor")
+        val textareaList = f.querySelectorAll("textarea.asciidoctor")
 
         for (element in textareaList) {
             val textarea = element as HTMLTextAreaElement
