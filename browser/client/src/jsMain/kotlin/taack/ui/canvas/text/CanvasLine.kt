@@ -1,6 +1,8 @@
 package taack.ui.canvas.text
 
 import taack.ui.base.Helper.Companion.trace
+import taack.ui.base.Helper.Companion.traceDeIndent
+import taack.ui.base.Helper.Companion.traceIndent
 import web.canvas.CanvasRenderingContext2D
 
 
@@ -15,18 +17,56 @@ class CanvasLine(
     val length: Int
         get() = posEnd - posBegin
 
-    private var containedStyles: List<CanvasStyle>? = null
-
-    fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText, styles: List<CanvasStyle>?) {
-//        trace("CanvasLine::drawLine: $this")
+    fun drawLine(ctx: CanvasRenderingContext2D, text: CanvasText) {
+        traceIndent("CanvasLine::drawLine: $this")
         var posXStart = text.posXStart
         text.drawCitation(ctx, textY, height)
+        val lineStyles = text.textStyles.filter {
+            posBegin <= it.end && posEnd >= it.start
+        }
+        trace("CanvasLine::drawLine:lineStyles: $lineStyles between $posBegin and $posEnd")
+        if (lineStyles.isNotEmpty()) {
+            var pe = posBegin
+            lineStyles.forEach {
+                val s = if (it.start < posBegin) posBegin else it.start
+                val e = if (it.end > posEnd) posEnd else it.end
+                if (s > pe) {
+                    trace("CanvasLine::drawLine:s>pe: s: $s pe: $pe")
+                    ctx.fillText(
+                        (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, s),
+//                        (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
+                        posXStart,
+                        textY
+                    )
+                    posXStart += ctx.measureText(
+                        (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, s)
+                    ).width
+                }
+                ctx.save()
+                it.getTextStyle().initCtx(ctx, text)
+                ctx.fillText(
+                    (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e),
+//                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
+                    posXStart,
+                    textY
+                )
+                posXStart += ctx.measureText(
+                    (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e)
+                ).width
 
-        if (!styles.isNullOrEmpty()) {
-            containedStyles = styles
-            for (style in styles) {
-                val w = style.draw(ctx, text, this, posXStart)
-                posXStart += w
+                ctx.restore()
+                pe = e
+            }
+            if (pe < posEnd) {
+                ctx.fillText(
+                    (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd),
+//                    (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
+                    posXStart,
+                    textY
+                )
+                posXStart += ctx.measureText(
+                    (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd)
+                ).width
             }
         } else {
             ctx.fillText(
@@ -35,6 +75,7 @@ class CanvasLine(
                 textY
             )
         }
+        traceDeIndent("CanvasLine::drawLine: ---")
     }
 
     fun caretNCoords(ctx: CanvasRenderingContext2D, text: CanvasText, x: Double): Int {

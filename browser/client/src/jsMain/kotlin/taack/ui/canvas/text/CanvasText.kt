@@ -5,8 +5,6 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
 import web.canvas.CanvasRenderingContext2D
-import kotlin.math.max
-import kotlin.math.min
 
 
 abstract class CanvasText(_txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
@@ -42,8 +40,54 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         }
 
     var txtPrefix = ""
-    var styles: List<CanvasStyle> = emptyList()
     var lines: List<CanvasLine> = emptyList()
+    private var internTextStyles: MutableList<StringStyle>? = null
+    val textStyles: List<StringStyle>
+        get() {
+            if (internTextStyles == null) {
+                internTextStyles = mutableListOf()
+
+                val inlineStyles = mutableListOf<StringStyle>()
+
+                if (txt.isNotEmpty())
+                    for (s in TextStyle.entries) {
+                        if (s == TextStyle.NORMAL)
+                            continue
+                        var c = true
+                        var p = 0
+                        while (c && p < txt.length) {
+                            var ps = txt.substring(p).indexOf(s.sepBegin)
+                            if (ps != -1) {
+                                ps += p
+                                p = ps + s.sepBegin.length
+                                var pe = txt.substring(p).indexOf(s.sepEnd)
+                                if (pe != -1) {
+                                    pe += p + s.sepEnd.length
+                                    p = pe
+                                    inlineStyles.add(StringStyle(ps, pe).from(s))
+                                } else c = false
+                            } else c = false
+                        }
+                    }
+                if (inlineStyles.isNotEmpty()) {
+                    inlineStyles.sortBy { it.start }
+//                    inlineStyles.sortWith(compareBy({ it.start }, { it.end }))
+
+                    var currentStyle = inlineStyles.first()
+                    if (inlineStyles.size == 1) internTextStyles!!.add(currentStyle)
+                    else
+                        inlineStyles.forEach {
+//                            if (it.getTextStyle() != currentStyle.getTextStyle() && it.getTextStyle() != TextStyle.NORMAL) {
+//                                internTextStyles!!.addAll(currentStyle.merge(it))
+                                internTextStyles!!.add(it)
+//                            } else internTextStyles!!.add(it)
+                            currentStyle = it
+                        }
+                }
+
+            }
+            return internTextStyles!!
+        }
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
     private var txtVar: String = _txtInit
@@ -64,43 +108,11 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
             c
         else
             txtVar.substring(0, p) + c + txtVar.substring(p)
-
-        if (styles.isNotEmpty()) {
-            val stylesAfter = styles.filter {
-                it.posNStart > p
-            }
-            stylesAfter.forEach {
-                it.posNStart += c.length
-                it.posNEnd += c.length
-            }
-            val currentStyle = styles.find {
-                it.posNStart <= p && it.posNEnd >= p
-            }
-            if (currentStyle != null)
-                currentStyle.posNEnd += c.length
-        }
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {
         trace("CanvasText::delChar: $p, $pEnd")
         txtVar = txtVar.substring(0, p) + txtVar.substring(p + (pEnd ?: 1))
-        if (styles.isNotEmpty()) {
-            val stylesAfter = styles.filter {
-                it.posNStart > p
-            }
-            stylesAfter.forEach {
-                it.posNStart -= 1
-                it.posNEnd -= 1
-            }
-            val currentStyle = styles.find {
-                it.posNStart <= p && it.posNEnd >= p
-            }
-            if (currentStyle != null)
-                currentStyle.posNEnd -= 1
-            styles = styles.filterNot {
-                it.posNStart >= it.posNEnd
-            }
-        }
 
         return txtVar.length
     }
@@ -109,94 +121,53 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         trace("CanvasText::rmChar: $p")
         if (txtVar.isEmpty()) return 0
         txtVar = txtVar.substring(0, p - 1) + txtVar.substring(p)
-        if (styles.isNotEmpty()) {
-            val stylesAfter = styles.filter {
-                it.posNStart > p - 1
-            }
-            stylesAfter.forEach {
-                it.posNStart -= 1
-                it.posNEnd -= 1
-            }
-            val currentStyle = styles.find {
-                it.posNStart <= p - 1 && it.posNEnd >= p - 1
-            }
-            if (currentStyle != null)
-                currentStyle.posNEnd -= 1
-            styles = styles.filterNot {
-                it.posNStart >= it.posNEnd
-            }
-        }
-
         return txtVar.length
     }
 
-    fun addStyle(style: CanvasStyle.Type, p: Int, pEnd: Int) {
-        traceIndent("CanvasText::addStyle: $style, $p, $pEnd, ${txt.substring(p, pEnd)}")
-        val newStyle = CanvasStyle(style, p, pEnd)
-        if (styles.isEmpty())
-            styles += CanvasStyle(CanvasStyle.Type.NORMAL, 0, txt.length)
-        styles = styles.filterNot {
-            it.posNStart in p..pEnd && it.posNEnd >= p && it.posNEnd <= pEnd
-        }
-        val toSplit = styles.find {
-            p > it.posNStart && it.posNEnd > pEnd
-        }
-        if (toSplit != null) {
-            styles += CanvasStyle(toSplit.type, pEnd, toSplit.posNEnd)
-            toSplit.posNEnd = p
-        }
-
-        val changePosNStart = styles.filter {
-            it.posNStart in p..pEnd
-        }
-
-        changePosNStart.forEach {
-            it.posNStart = pEnd
-        }
-        val changePosNEnd = styles.filter {
-            it.posNEnd in p..pEnd
-        }
-        changePosNEnd.forEach {
-            it.posNEnd = p
-        }
-
-        styles += newStyle
-        styles = styles.sortedBy { it.posNStart }
-        traceDeIndent("CanvasText::addStyle: $styles on $this: $txt")
+    fun addStyle(style: TextStyle, p: Int, pEnd: Int) {
+        txtVar = style.applyStyle(txt, p, pEnd)
     }
 
-    fun measureText(ctx: CanvasRenderingContext2D, from: Int, to: Int): Double {
-//        trace("CanvasText::measureText: $from, $to")
-        if (styles.isEmpty()) {
-            return ctx.measureText(txt.substring(from, to)).width
-        } else {
-            val stylesInRangeInclusive = styles.filter {
-                it.posNStart >= from && it.posNEnd <= to                        // [...]
-            }
-            var remaining = styles - stylesInRangeInclusive.toSet()
-            val stylesInRangeIncluded = remaining.filter {
-                it.posNStart <= from && it.posNEnd >= to                        // ...[]...
-            }
-            remaining = remaining - stylesInRangeIncluded.toSet()
-            val stylesInRangeLeft = remaining.filter {
-                it.posNStart < from && it.posNEnd > from && it.posNEnd < to    // ..].]
-            }
-            remaining = remaining - stylesInRangeLeft.toSet()
-            val stylesInRangeRight = remaining.filter {
-                it.posNStart in (from + 1)..<to && it.posNEnd > to    // [.[..
-            }
-
-            var width = 0.0
-            (stylesInRangeInclusive + stylesInRangeIncluded + stylesInRangeLeft + stylesInRangeRight).forEach {
-                val begin = max(it.posNStart, from)
-                val end = min(it.posNEnd, to)
+    fun measureText(ctx: CanvasRenderingContext2D, posBegin: Int, posEnd: Int): Double {
+        traceIndent("CanvasText::measureText: $posBegin, $posEnd")
+        var textWidth = 0.0
+        if (textStyles.isNotEmpty()) {
+            var pe = posBegin
+            textStyles.forEach {
+                if (it.start > posEnd || it.end < posBegin) {
+                    return@forEach
+                }
+                val s = if (it.start < posBegin) posBegin else it.start
+                val e = if (it.end > posEnd) posEnd else it.end
+                if (s > pe) {
+                    textWidth += ctx.measureText(
+                        /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, s)
+                    ).width
+                }
+                trace("measureText:before = ${txt.substring(pe, s)} => $textWidth")
                 ctx.save()
-                it.initCtx(ctx, this)
-                width += ctx.measureText(txt.substring(begin, end)).width
-                ctx.restore()
-            }
+                it.getTextStyle().initCtx(ctx, this)
+                textWidth += ctx.measureText(
+                    /*(if (s == 0) txtPrefix else "") + */txt.substring(s, e)
+                ).width
+                trace("measureText:inside = ${txt.substring(s, e)} => $textWidth")
 
-            return width
+                ctx.restore()
+                pe = e
+            }
+            if (pe < posEnd) {
+
+                textWidth += ctx.measureText(
+                    /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, posEnd)
+                ).width
+                trace("measureText:ends = ${txt.substring(pe, posEnd)} => $textWidth")
+            }
+            traceDeIndent("CanvasText::measureText: $posBegin, $posEnd => $textWidth")
+            return textWidth
+        } else {
+            textWidth = ctx.measureText(txt.substring(posBegin, posEnd)).width
+            traceDeIndent("CanvasText::measureText: $posBegin, $posEnd => $textWidth")
+            return textWidth
         }
     }
 
@@ -214,14 +185,11 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
 
     fun initCtx(ctx: CanvasRenderingContext2D, posN: Int) {
         //trace("CanvasText::initCtx: $posN")
-        if (styles.isNotEmpty()) {
-            styles.find { it.posNStart <= posN && it.posNEnd >= posN }?.initCtx(ctx, this)
-        } else {
-            ctx.font = font()
-            ctx.fillStyle = fillStyle
-            ctx.letterSpacing = letterSpacing.toString() + "px"
-            ctx.wordSpacing = wordSpacing.toString() + "px"
-        }
+
+        ctx.font = font()
+        ctx.fillStyle = fillStyle
+        ctx.letterSpacing = letterSpacing.toString() + "px"
+        ctx.wordSpacing = wordSpacing.toString() + "px"
     }
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
@@ -249,6 +217,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         lines = emptyList()
         val listTxt = tmpTxt.split(" ")
         for (i in listTxt.indices) {
+            listTxt[i]
             val t = listTxt[i] + (if (i < listTxt.size - 1) " " else "")
             currentLetterPos += t.length
             val tWidth = measureText(ctx, posLetterLineEnd, currentLetterPos)
@@ -283,15 +252,9 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         }
 
 
-        trace("draw: $this: $txt")
+        trace("draw lines: $this: $txt")
         lines.forEach { l ->
-            val stylesInLine = styles.filter { s ->
-                s.posNStart >= l.posBegin && s.posNEnd <= l.posEnd || s.posNStart <= l.posBegin && s.posNEnd >= l.posBegin || s.posNStart >= l.posBegin && s.posNEnd >= l.posEnd
-            }
-            trace("line: $l")
-            trace(styles.toString())
-            trace(stylesInLine.toString())
-            l.drawLine(ctx, this, stylesInLine)
+            l.drawLine(ctx, this)
         }
 
         totalHeight += marginBottom
@@ -376,21 +339,13 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
     }
 
     override fun reset() {
+        internTextStyles = null
         citationNumber = initCitationNumber
         txtVar = txtInit
 //        styles = emptyList()
     }
 
     override fun dumpAsciidoc(): String {
-        if (styles.isNotEmpty()) {
-            val ret = StringBuilder()
-            for (s in styles) {
-                ret.append(s.dumpAsciidoc(this))
-            }
-            return ret.toString()
-        } else {
-            return txt
-        }
+        return txt
     }
-
 }

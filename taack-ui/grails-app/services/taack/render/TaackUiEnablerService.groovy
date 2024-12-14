@@ -56,14 +56,8 @@ class TaackUiEnablerService implements WebAttributes {
         policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS)
     }
 
-    void sanitizeParameters(GrailsParameterMap parameters) {
-        parameters.each { Map.Entry entry ->
-            if (entry.value instanceof String) {
-                entry.value = (policy as PolicyFactory).sanitize(entry.value as String)
-            } else if(entry.value instanceof GrailsParameterMap) {
-                sanitizeParameters(entry.value as GrailsParameterMap)
-            }
-        }
+    static String sanitizeString(String toSanitize) {
+        Sanitizers.FORMATTING.and(Sanitizers.LINKS).sanitize(toSanitize)
     }
 
     private final static Map<String, Closure> securityClosures = [:]

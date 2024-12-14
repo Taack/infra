@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ast.type.WidgetKind
+import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOption
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -76,7 +77,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         visitShowField(parameter.trField(methodReturn), methodReturn.value?.toString(), style)
     }
 
-    private static String showField(String i18n, String field, Style style) {
+    private static String showField(String i18n, String field, Style style, boolean sanitize = true) {
         if (i18n) {
             """
                 <li class="fieldcontain">
@@ -85,7 +86,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
                 </li> 
         """
         } else {
-            """<div class="${style ? style.cssClassesString : ''}" style="${style ? style.cssStyleString : ''}">${field}</div>  """
+            """<div class="${style ? style.cssClassesString : ''}" style="${style ? style.cssStyleString : ''}">${sanitize ? TaackUiEnablerService.sanitizeString(field) : field}</div>  """
         }
 //        """
 //                <li class="fieldcontain">
@@ -98,7 +99,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowField(final String i18n, final FieldInfo field, final Style style) {
         if (field?.value)
-            out << showField(i18n, RawHtmlTableDump.dataFormat(field.value, null), style)
+            out << showField(i18n, RawHtmlTableDump.dataFormat(field.value, null), style, false)
     }
 
     @Override

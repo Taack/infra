@@ -140,6 +140,7 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
     }
 
     override fun reset() {
+        trace("CanvasTable::reset before ${headers.size} ${rows.size}")
         headers.forEach { it.reset() }
         headers.clear()
         headers.addAll(initHeaders)
@@ -148,6 +149,7 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
         rows.addAll(initCells)
         text.reset()
         citationNumber = initCitationNumber
+        trace("CanvasTable::reset after ${headers.size} ${rows.size}")
     }
 
     override fun click(ctx: CanvasRenderingContext2D, posX: Double, posY: Double): Pair<CanvasLine, Int>? {
@@ -184,6 +186,7 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
     }
 
     fun addLine(currentText: TxtRowCanvas) {
+        traceIndent("CanvasTable::addLine: $currentText ${rows.size}")
         for (i in (rows.indices)) {
             if (rows[i] == currentText) {
                 for (j in (0 until columns)) {
@@ -192,6 +195,7 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
                 break
             }
         }
+        traceDeIndent("CanvasTable::addLine: ${rows.size}")
     }
 
     fun removeLine(currentText: TxtRowCanvas) {

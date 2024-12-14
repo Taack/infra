@@ -100,7 +100,7 @@ compress(str, "deflate");
         ctx.restore()
 
         lines.forEach { l ->
-            l.drawLine(ctx, this, null)
+            l.drawLine(ctx, this)
         }
 
         totalHeight += marginBottom

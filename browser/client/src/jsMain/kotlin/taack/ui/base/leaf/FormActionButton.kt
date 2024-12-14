@@ -52,6 +52,11 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         val f = parent.f
         val fd = FormData(f)
         fd.append("isAjax", "true")
+        parent.mapFileToSend.forEach { inputKey ->
+            inputKey.value.forEach { fileValue ->
+                fd.append(inputKey.key, fileValue)
+            }
+        }
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             b.disabled = false
