@@ -24,6 +24,10 @@ class RowColumnFieldSpec implements BranchingSpec {
         this.tableVisitor = tableVisitor
     }
 
+    void rowFieldRaw(final String value, final Style style = null) {
+        tableVisitor.visitRowFieldRaw(value, style)
+    }
+
     void rowField(final String value, final Style style = null) {
         tableVisitor.visitRowField(value, style)
     }
