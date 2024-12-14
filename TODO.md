@@ -68,31 +68,11 @@
 - ~~Port intranet apps~~
 - ~~PoC new Charts DSL~~
 
-# 0.5.7
-
-- ~~Asciidoc online editor (h2...h4, paragraph only, inline style)~~
-- upload attachment when dragging or pasting file to an Asciidoc area  
-- ~~Modern Graph DSL (groupBy, sortBy)~~
-  - ~~timeSeries~~
-  - ~~areaChart~~
-  - ~~bubbleChart~~
-- ~~Security~~
-  - ~~add sanitizer~~
-  - ~~Call for all cases `taackUiEnablerService.checkAccess()`~~
-- ~~bug fixes and dependency version bumps~~
-
-# 0.5.x
+# 0.5.7-y(y<5)
 
 - ~~Improve PDF rendering using bootstrap~~
 - ~~PoC inline DSL JS (IJavascriptDescriptor.groovy)~~
 - ~~PoC inline DSL CSS (with params)~~
-- improve history when browsing, allow seeing opened modals ...
-- Modern Graph DSL (groupBy, sortBy)
-  - boxPot
-  - calendar
-  - gantt
-  - countries
-  - webGl charts
 - ~~Remove Chart.js~~
   - ~~Need server side rendering (simpler)~~
   - ~~Why not JFreeCharts ? NO... but why ??~~
@@ -103,8 +83,35 @@
   - ~~Server side raster and SVG~~
   - ~~Low level first~~
 
+# 0.5.7
+
+- ~~Asciidoc online editor (h2...h4, paragraph only, inline style)~~
+- upload attachments when dragging or pasting files to an Asciidoc area  
+- Asciidoc show, like for md
+- ~~Modern Graph DSL (groupBy, sortBy)~~
+  - ~~timeSeries~~
+  - ~~areaChart~~
+  - ~~bubbleChart~~
+- ~~Security~~
+  - ~~add sanitizer~~
+  - ~~Call for all cases `taackUiEnablerService.checkAccess()`~~
+- ~~bug fixes and dependency version bumps~~
+
+# 0.5.x (x>7)
+
+- Allow asciidoc diagram
+- Allow asciidoc taack extensions
+- improve history when browsing, allow seeing opened modals ...
+- Modern Graph DSL (groupBy, sortBy)
+  - boxPot
+  - calendar
+  - gantt
+  - countries
+  - webGl charts
+
 
 0.6.x
+- PoC merge crew service into Infra
 - Grails 7.x
 - Improve/fix mail rendering using bootstrap
 - Add toast and websockets events (or not ...)
