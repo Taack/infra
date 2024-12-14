@@ -35,9 +35,6 @@ import taack.ui.dsl.show.ShowSpec
 @CompileStatic
 final class UiShowSpecifier<T> {
     Closure closure
-    T object
-    String controller
-    String action
 
     /**
      * Describes the block to show
@@ -48,11 +45,8 @@ final class UiShowSpecifier<T> {
      * @param closure description of what to show
      * @return itself
      */
-    public UiShowSpecifier ui(final T aObject = null, final String controller = null, final String action = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+    UiShowSpecifier ui(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
         this.closure = closure
-        this.object = aObject
-        this.controller = controller
-        this.action = action
         this
     }
 
@@ -64,11 +58,9 @@ final class UiShowSpecifier<T> {
      * @param closure description of what to show
      * @return itself
      */
-    UiShowSpecifier ui(final T aObject = null, final MethodClosure action, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+    @Deprecated
+    UiShowSpecifier ui(final T aObject, final MethodClosure action = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
         this.closure = closure
-        this.object = aObject
-        this.controller = Utils.getControllerName(action)
-        this.action = action.method
         this
     }
 
@@ -79,7 +71,7 @@ final class UiShowSpecifier<T> {
      */
     void visitShow(final IUiShowVisitor showVisitor) {
         if (showVisitor && closure) {
-            showVisitor.visitShow(object, controller, action)
+            showVisitor.visitShow()
             closure.delegate = new ShowSpec(showVisitor)
             closure.call()
             showVisitor.visitShowEnd()

@@ -10,7 +10,7 @@ import taack.ui.dsl.common.Style
 class UiShowVisitor implements IUiShowVisitor {
 
     @Override
-    void visitShow(Object currentObject, String controller, String action) {
+    void visitShow() {
 
     }
 
@@ -61,11 +61,6 @@ class UiShowVisitor implements IUiShowVisitor {
 
     @Override
     void visitShowField(String html) {
-
-    }
-
-    @Override
-    void visitShowInputField(String i18n, FieldInfo fieldInfo, boolean isAjax = false) {
 
     }
 

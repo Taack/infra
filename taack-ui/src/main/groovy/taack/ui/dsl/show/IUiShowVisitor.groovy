@@ -9,7 +9,7 @@ import taack.ui.dsl.common.Style
 @CompileStatic
 interface IUiShowVisitor {
 
-    void visitShow(Object currentObject, String controller, String action)
+    void visitShow()
 
     void visitShowEnd()
 
@@ -30,8 +30,6 @@ interface IUiShowVisitor {
     void visitShowField(final String i18n, final String field, final Style style)
 
     void visitShowField(final String html)
-
-    void visitShowInputField(String i18n, FieldInfo fieldInfo, boolean isAjax)
 
     void visitShowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax)
 

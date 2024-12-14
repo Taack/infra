@@ -13,7 +13,6 @@ import taack.ui.dump.RawHtmlTableDump
 final class RawHtmlShowDump implements IUiShowVisitor {
     final private ByteArrayOutputStream out
     final private Parameter parameter
-    private Object aObject
 
     RawHtmlShowDump(ByteArrayOutputStream out, Parameter parameter) {
         this.out = out
@@ -21,8 +20,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     }
 
     @Override
-    void visitShow(Object currentObject, String controller = null, String action = null) {
-        this.aObject = currentObject
+    void visitShow() {
         out << "<ul class='property-list taackShow pure-u-1'>"
     }
 
@@ -95,11 +93,6 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowField(String html) {
         out << html
-    }
-
-    @Override
-    void visitShowInputField(String i18n, FieldInfo field, boolean isAjax = false) {
-        visitShowField(i18n, field, null)
     }
 
     @Override

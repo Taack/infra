@@ -7,6 +7,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
 
@@ -116,6 +117,10 @@ class SectionSpec {
         showAction(i18n, icon, action, null, additionalParams)
     }
 
+    void showAction(final MethodClosure action, final Long id, final Map<String, ?> additionalParams = null) {
+        showAction(null, ActionIcon.SHOW * IconStyle.SCALE_DOWN, action, id, additionalParams)
+    }
+
     void showAction(final String i18n = null, final String linkText, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
         if (taackUiEnablerService.hasAccess(action, id)) {
             showVisitor.visitShowAction(i18n, linkText, Utils.getControllerName(action), action.method, id, additionalParams, true)
@@ -151,13 +156,4 @@ class SectionSpec {
         showVisitor.visitShowInlineHtml(html, additionalCSSClass)
     }
 
-    /**
-     * Editable field
-     *
-     * @param i18n label
-     * @param field target field (require action and object to be set in {@link taack.ui.dsl.UiShowSpecifier#ui(java.lang.Object, org.codehaus.groovy.runtime.MethodClosure, groovy.lang.Closure)}
-     */
-    void showInputField(final String i18n = null, final FieldInfo field) {
-        showVisitor.visitShowInputField(i18n, field, true)
-    }
 }
