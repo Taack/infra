@@ -68,30 +68,27 @@
 - ~~Port intranet apps~~
 - ~~PoC new Charts DSL~~
 
+# 0.5.7
+
+- ~~Asciidoc online editor (h2...h4, paragraph only, inline style)~~
+- upload attachment when dragging or pasting file to an Asciidoc area  
+- ~~Modern Graph DSL (groupBy, sortBy)~~
+  - ~~timeSeries~~
+  - ~~areaChart~~
+  - ~~bubbleChart~~
+- ~~Security~~
+  - ~~add sanitizer~~
+  - ~~Call for all cases `taackUiEnablerService.checkAccess()`~~
+- ~~bug fixes and dependency version bumps~~
 
 # 0.5.x
 
-- Improve/fix mail rendering using bootstrap
 - ~~Improve PDF rendering using bootstrap~~
-- Add toast and websockets events
-- SVG theme, use id
-- Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
-- Ajax scrollable tables
-- PDF / Docx / pptx / HTML from Asciidoc
 - ~~PoC inline DSL JS (IJavascriptDescriptor.groovy)~~
 - ~~PoC inline DSL CSS (with params)~~
-- Asciidoc online editor (paragraph only)
-- inlineForms custom in show and tables (row or cells)
 - improve history when browsing, allow seeing opened modals ...
-- Hook to register typical object filter (list, secure)
-- Secured Solr Search
-- More Secured TQL
-- PoC PDF forms ...
 - Modern Graph DSL (groupBy, sortBy)
-  - timeSeries
-  - ~~areaChart~~
   - boxPot
-  - bubbleChart
   - calendar
   - gantt
   - countries
@@ -105,3 +102,18 @@
 - ~~Remove PlantUML deps for Gantt / graphs~~
   - ~~Server side raster and SVG~~
   - ~~Low level first~~
+
+
+0.6.x
+- Grails 7.x
+- Improve/fix mail rendering using bootstrap
+- Add toast and websockets events (or not ...)
+- SVG theme, use id
+- Keyboard shortcut (+, CTRL + S, Enter, tab for nav ... between blocks / menu, and inside too)
+- Ajax scrollable tables
+- PDF / Docx / pptx / HTML from Asciidoc
+- Hook to register typical object filter (list, secure)
+- Secured Solr Search
+- More Secured TQL
+- inlineForms custom in show and tables (row or cells)
+- PoC PDF forms ...
