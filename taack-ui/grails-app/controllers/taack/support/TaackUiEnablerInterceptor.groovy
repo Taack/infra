@@ -33,7 +33,6 @@ class TaackUiEnablerInterceptor implements Interceptor {
         } else {
             log.warn "Unknown Controller or Action ${request.remoteHost}|${request.getHeader('user-agent')} $params"
         }
-        taackUiEnablerService.sanitizeParameters(params)
         return true
     }
 

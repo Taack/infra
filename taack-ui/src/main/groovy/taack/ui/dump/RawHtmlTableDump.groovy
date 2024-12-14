@@ -4,6 +4,7 @@ import grails.util.Pair
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.render.TaackUiEnablerService
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
@@ -62,7 +63,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             case [Boolean, boolean]:
                 return tr("default.boolean.${value.toString()}", null)
             default:
-                return value.toString()
+                return TaackUiEnablerService.sanitizeString(value.toString())
         }
     }
 
@@ -297,6 +298,14 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowField(final String value, final Style style) {
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
+        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null, firstInCol, isInCol))
+        if (addColumn) visitColumnEnd()
+    }
+
+    @Override
+    void visitRowFieldRaw(final String value, final Style style) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(displayCell(value, style, null, firstInCol, isInCol))

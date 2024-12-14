@@ -6,6 +6,7 @@ import taack.ui.base.Helper
 import taack.ui.base.leaf.*
 import taack.ui.canvas.MainCanvas
 import web.dom.document
+import web.file.File
 import web.html.HTMLDivElement
 import web.html.HTMLFormElement
 import web.html.HTMLTextAreaElement
@@ -22,6 +23,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     }
 
     private val formName = f.attributes.getNamedItem("name")?.value
+    val mapFileToSend: MutableMap<String, MutableList<File>> = mutableMapOf()
     private val actions: List<FormActionButton>
     private var m2oList: List<FormActionInputM2O>
     private val overrideFields: List<FormOverrideField>
@@ -48,13 +50,13 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             it.fieldName
         }
 
-        val textareaList = document.querySelectorAll("textarea.asciidoctor")
+        val textareaList = f.querySelectorAll("textarea.asciidoctor")
 
         for (element in textareaList) {
             val textarea = element as HTMLTextAreaElement
             textarea.style.display = "none"
             val scrollContainer = document.createElement("div") as HTMLDivElement
-            scrollContainer.style.height = "calc(max(30vh, 640px))"
+            scrollContainer.style.height = "calc(max(30vh, 320px))"
             scrollContainer.style.border = "1px solid grey"
             scrollContainer.style.overflow = "auto"
             val largeContainer = document.createElement("div") as HTMLDivElement
@@ -63,7 +65,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             largeContainer.append(canvasContainer)
             scrollContainer.append(largeContainer)
             textarea.parentElement?.append(scrollContainer)
-            MainCanvas(textarea, canvasContainer, scrollContainer)
+            MainCanvas(this, textarea, canvasContainer, scrollContainer)
         }
 
 
