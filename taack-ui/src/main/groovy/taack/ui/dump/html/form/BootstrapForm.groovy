@@ -32,7 +32,6 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         this.themeSize = blockLog.ts.themeSize
         this.floating = floating
         this.noLabel = noLabel
-        if (floating) addClasses 'form-floating', 'mb-1'
         constructorIFormThemed()
     }
 

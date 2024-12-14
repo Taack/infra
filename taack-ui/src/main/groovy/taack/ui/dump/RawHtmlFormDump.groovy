@@ -246,20 +246,22 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String trI18n = i18n ?: parameter.trField(field) ?: mapEntry
         final String qualifiedName = field.fieldName + '.' + mapEntry
         String value = (field.value as Map<String, String>)?.get(mapEntry)
-        value = value ? inputEscape(value) : ''
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
         if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
             formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-        } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-            formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-        } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
-            formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else {
-            if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
-                formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+            value = value ? inputEscape(value) : ''
+            if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
+                formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+            } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
+                formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             } else {
-                formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+                if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
+                    formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+                } else {
+                    formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+                }
             }
         }
     }
