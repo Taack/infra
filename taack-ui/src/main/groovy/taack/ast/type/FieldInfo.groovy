@@ -30,11 +30,6 @@ final class FieldInfo<T> {
     final FieldConstraint fieldConstraint
     /**
      * Name of the field or name of the field + key if the field is a map.
-     *
-     * In case the field is a map of object, can be used to
-     * access individual key, value pair of the map (see {@link #mapKey}
-     * and {@link #mapValue}). The Ui framework allow this way to treat map
-     * like regular objects.
      */
     final String fieldName
     /**
