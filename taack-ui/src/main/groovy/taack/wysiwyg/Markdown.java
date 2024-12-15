@@ -1,4 +1,4 @@
-package taack.ui.dump.markdown;
+package taack.wysiwyg;
 
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;

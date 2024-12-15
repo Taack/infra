@@ -6,7 +6,7 @@ import cms.dsl.parser.exception.TokenizerException
 import cms.dsl.parser.exception.WrongDataException
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
-import taack.ui.dump.markdown.Markdown
+import taack.wysiwyg.Markdown
 
 @Transactional
 @GrailsCompileStatic

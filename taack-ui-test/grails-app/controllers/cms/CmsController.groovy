@@ -1,9 +1,7 @@
 package cms
 
 import cms.config.CmsSubsidiary
-import crew.CrewUiService
 import crew.User
-import crew.config.Subsidiary
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
@@ -11,7 +9,6 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
 import org.codehaus.groovy.runtime.MethodClosure as MC
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackFilterService
 import taack.domain.TaackSaveService
@@ -22,9 +19,7 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
-import taack.ui.dsl.diagram.DiagramTypeSpec
-import taack.ui.dsl.diagram.UiDiagramVisitor
-import taack.ui.dump.markdown.Markdown
+import taack.wysiwyg.Markdown
 
 import javax.annotation.PostConstruct
 import static grails.async.Promises.task
