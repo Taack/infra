@@ -569,9 +569,7 @@ class CmsController implements WebAttributes {
                     """
         b.ui {
             modal {
-                ajaxBlock "renderedBody", {
-                    custom html
-                }
+                custom html
             }
         }
         taackUiService.show(b)

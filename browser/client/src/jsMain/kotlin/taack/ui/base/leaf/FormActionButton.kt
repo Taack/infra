@@ -48,7 +48,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         val innerText = b.innerText
         b.innerText = "Submitting ..."
         e.preventDefault()
-        trace("FormActionButton::onclick")
+        trace("FormActionButton::onclick: ${b.formAction}")
         val f = parent.f
         val fd = FormData(f)
         fd.append("isAjax", "true")

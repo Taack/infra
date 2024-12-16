@@ -237,7 +237,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitInnerFormAction(String i18n, String controller, String action, Long id, Map params, ButtonStyle style) {
         blockLog.topElement = formThemed.formActionBlock blockLog.topElement
         i18n ?= parameter.trField(controller, action, id != null || params?.containsKey('id'))
-        formThemed.addFormAction(blockLog.topElement, "/${controller}/${action}", i18n, style)
+        formThemed.addFormAction(blockLog.topElement, parameter.urlMapped(controller, action, id, params), i18n, style)
         blockLog.topElement = blockLog.topElement.parent
     }
 
