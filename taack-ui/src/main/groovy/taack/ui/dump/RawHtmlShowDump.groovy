@@ -128,7 +128,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
             additionalParams ?= [:]
             additionalParams['isAjax'] = isAjax
             String link = """<a class="taackShowAction" ${isAjax ? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${linkText}</a>"""
-            out << showField(i18n, link, null)
+            out << showField(i18n, link, null, false)
         }
     }
 
