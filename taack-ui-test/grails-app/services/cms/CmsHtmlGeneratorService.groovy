@@ -6,15 +6,16 @@ import cms.dsl.parser.exception.TokenizerException
 import cms.dsl.parser.exception.WrongDataException
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import taack.wysiwyg.Asciidoc
 import taack.wysiwyg.Markdown
 
 @Transactional
 @GrailsCompileStatic
 class CmsHtmlGeneratorService {
 
-    String translate(final String body, final String lang) {
+    String translate(final String body, final String lang, boolean asciidoc = false) {
 //        translateNoMatcher(translateExpression(body, lang))
-        translateExpression(translateNoMatcher(body), lang)
+        translateExpression(translateNoMatcher(body, asciidoc), lang)
     }
 
     static String translateExpression(String body, String lang) {
@@ -48,9 +49,9 @@ class CmsHtmlGeneratorService {
         res.toString()
     }
 
-    static String translateNoMatcher(String body) {
+    static String translateNoMatcher(String body, boolean asciidoc = false) {
         try {
-            return Markdown.getContentHtml(body)
+            return asciidoc ? Asciidoc.getContentHtml(body): Markdown.getContentHtml(body)
         } catch (ignored) {
             return "Grr ${ignored}"
         }

@@ -151,7 +151,7 @@ class CmsController implements WebAttributes {
                             fieldFromMap cmsPage.title_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.hatContent_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.bodyContent_, language.toString().toLowerCase()
-                            innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase()]
+                            innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
                     }
                 }
@@ -518,55 +518,12 @@ class CmsController implements WebAttributes {
         }
     }
 
-    def previewBody(String previewLanguage) {
+    def previewBody(String previewLanguage, boolean asciidoc) {
         UiBlockSpecifier b = new UiBlockSpecifier()
-        String html = """<div class="markdown-body">
-                            ${cmsHtmlGeneratorService.translate(params["bodyContent"][previewLanguage] as String, previewLanguage)}
-                    </div>
-                    <script>
-                    function youtubeVideo() {
-                        const ele = document.getElementsByClassName('popup');
-                        for (let i = 0; i < ele.length; i++) {
-                            const e = ele[i];
-                            e.onclick = function (ev) {
-                                const videoRatio = e.getAttribute("data-width") / e.getAttribute("data-height");
-                                const maximumWidth = document.body.offsetWidth;
-                                const iframe = document.createElement("iFrame");
-                                iframe.setAttribute("src", e.getAttribute("data-link"));
-                                iframe.style.width = "66%";
-                                iframe.style.height = "80%";
-                                iframe.style.position = "fixed";
-                                iframe.style.left = 0;
-                                iframe.style.right = 0;
-                                iframe.style.bottom = 0;
-                                iframe.style.top = 0;
-                                iframe.style.margin = 'auto';
-                                iframe.style.overflow = 'hidden';
-                                iframe.id = 'theIframe';
-                                const div = document.getElementById("video-view");
-                                const background = document.createElement("div");
-                                background.style.position = "fixed";
-                                background.style.width = "100%";
-                                background.style.height = "100%";
-                                background.style.top = 0;
-                                background.style.left = 0;
-                                background.style.right = 0;
-                                background.style.bottom = 0;
-                                background.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                                background.zIndex = 2;
-                                background.cursor = "pointer";
-                                background.onclick = function () {
-                                    background.remove();
-                                };
-                                background.append(iframe);
-                                div.append(background);
-                                //ifram.wrap("<div class='class-video'>");
-                            }
-                        }
-                    }
-                    youtubeVideo();
-                    </script>
-                    """
+        String html = """\
+            <div class="markdown-body">
+                ${cmsHtmlGeneratorService.translate(params["bodyContent"][previewLanguage] as String, previewLanguage, asciidoc)}
+            </div>""".stripIndent()
         b.ui {
             modal {
                 custom html

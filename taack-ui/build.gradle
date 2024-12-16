@@ -97,6 +97,8 @@ dependencies {
     } else {
         api project(':taack-jdbc-common')
     }
+
+    implementation "org.asciidoctor:asciidoctorj-api:${asciidoctorJ}"
 }
 
 if (rootProject.name != 'infra') {
