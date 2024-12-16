@@ -99,10 +99,11 @@ class MainCanvas(
                 }
             } else if (value < 0) {
                 val j = texts.indexOf(currentText)
-                trace("value < 0")
+                trace("value < 0 indexOfText = $j")
                 if (j > 0) {
                     currentDrawable = texts[j - 1]
-                    v = currentText!!.txt.length + value
+                    v = currentDrawable!!.getSelectedText()!!.txt.length + value
+                    trace("value < 0 v = $v")
                 } else {
                     v = 0
                 }
@@ -386,11 +387,16 @@ class MainCanvas(
     }
 
     init {
+
         canvas.id = "canvas" + textarea.name
-        canvas.width = floor(divHolder.clientWidth * dprX).toInt()
-        canvas.height = floor(divScroll.clientHeight * dprY).toInt()
-        canvas.style.width = "${divHolder.clientWidth}px"
-        canvas.style.height = "${divScroll.clientHeight}px"
+        if (divHolder.clientWidth > 0) {
+            canvas.width = floor(divHolder.clientWidth * dprX).toInt()
+            canvas.style.width = "${divHolder.clientWidth}px"
+        } else trace("divHolder.clientWidth == 0 !!!")
+        if (divScroll.clientHeight > 0) {
+            canvas.height = floor(divScroll.clientHeight * dprY).toInt()
+            canvas.style.height = "${divScroll.clientHeight}px"
+        } else trace("divScroll.clientHeight == 0 !!!")
 
         trace("Canvas width: ${canvas.width}, height: ${canvas.height}")
 
@@ -637,7 +643,7 @@ class MainCanvas(
             draw()
         }
 
-        document.ondrop = EventHandler { event: DragEvent ->
+        divScroll.ondrop = EventHandler { event: DragEvent ->
             trace("canvasEvent drop")
             event.preventDefault()
             event.stopPropagation()
@@ -661,7 +667,16 @@ class MainCanvas(
             }
 
             val txt = event.dataTransfer!!.getData("text")
-            trace("canvasEvent drop: $txt")
+
+            commandDoList.add(
+                AddCharCommand(
+                    currentText!!,
+                    txt,
+                    caretPosInCurrentText
+                )
+            )
+
+            trace("canvasEvent drop on ${textarea.name}: $txt")
         }
 
         divHolder.ondragover = EventHandler { event: DragEvent ->
@@ -833,6 +848,16 @@ class MainCanvas(
 
     fun draw() {
         traceIndent("MainCanvas::draw")
+        if (divHolder.clientWidth > 0) {
+            canvas.width = floor(divHolder.clientWidth * dprX).toInt()
+            canvas.style.width = "${divHolder.clientWidth}px"
+        } else trace("divHolder.clientWidth == 0 !!!")
+        if (divScroll.clientHeight > 0) {
+            canvas.height = floor(divScroll.clientHeight * dprY).toInt()
+            canvas.style.height = "${divScroll.clientHeight}px"
+        } else trace("divScroll.clientHeight == 0 !!!")
+        ctx.scale(dprX, dprY)
+
 //        canvas.width = divHolder.clientWidth
         CanvasText.num1 = 0
         CanvasText.num2 = 0
