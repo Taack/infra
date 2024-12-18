@@ -322,7 +322,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitPaginate(Number max, Number count) {
-        if (count > max) {
+        if (max != -1 && count > max) {
             blockLog.topElement.builder.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
                     .putAttribute('taackMax', max?.toString())
