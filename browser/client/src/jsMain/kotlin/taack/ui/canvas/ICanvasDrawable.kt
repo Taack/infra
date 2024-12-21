@@ -23,7 +23,7 @@ interface ICanvasDrawable : ICanvasSelectable {
         B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
         FIG(Regex("^\\.")),
-        IMAGE(Regex("^image::[^:|*`]+")),
+        IMAGE(Regex("^image::[^:|*`]+\\[\\]")),
 //        IMAGE(Regex("^image::[^:|*`\n\\[]+")),
         IMAGE_INLINE(Regex("image:[^:|*`]+")),
         TABLE_START(Regex("^\\|===")),
@@ -34,7 +34,7 @@ interface ICanvasDrawable : ICanvasSelectable {
         MONO(Regex("^`([^`\n]*)`")),
         NEXT_DRAWABLE(Regex("^ *\n *\n *")),
         NEXT_LINE(Regex("^\n")),
-        NORMAL(Regex("^[^*`\n]+")),
+        NORMAL(Regex("^[^\n]+")),
         OTHER(Regex("[ \t]*")),
         ERROR(Regex("ERRORRRORR"))
     }
@@ -246,7 +246,7 @@ interface ICanvasDrawable : ICanvasSelectable {
 
                     AdocToken.NORMAL -> {
                         if (currentText != null && (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last()) && !tableStart)
-                            canvasDrawables.add(currentText!!)
+                            canvasDrawables.add(currentText)
                         else if (canvasDrawables.isEmpty() || currentText == null) {
                             currentText = PCanvas("", currentIndent)
                             canvasDrawables.add(currentText)
@@ -260,7 +260,10 @@ interface ICanvasDrawable : ICanvasSelectable {
                         )
                     }
 
-                    AdocToken.ERROR -> TODO()
+                    AdocToken.ERROR -> {
+                        currentText = PCanvas("ERROR: $token", currentIndent)
+                        canvasDrawables.add(currentText)
+}
                     AdocToken.OTHER -> {}
 //                    AdocToken.INDENT -> {
 //                        wasIndent = true
@@ -273,7 +276,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                         var varName = mainCanvas.textarea.name
                         if (varName.contains('.'))
                             varName = varName.substring(0, varName.lastIndexOf('.'))
-                        val action = "downloadBin${varName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}"
+                        val action = "downloadBin${varName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Files"
                         val fileName = token.sequence.substring("image::".length, token.sequence.length - 2)
                         canvasDrawables.add(CanvasImg("/$controller/$action/$id?path=$fileName", fileName, 0))
                         currentTextPosition = token.end
@@ -301,7 +304,8 @@ interface ICanvasDrawable : ICanvasSelectable {
                     AdocToken.FIG -> {}
                 }
             }
-
+            currentText = PCanvas("", currentIndent)
+            canvasDrawables.add(currentText)
             return canvasDrawables
         }
 

@@ -522,7 +522,6 @@ class CmsController implements WebAttributes {
     }
 
     def downloadBinBodyContentFiles(CmsPage page, String path) {
-        path = path.substring(1)
         Attachment a = page.bodyContentAttachmentList.find {
             it.originalName == path
         }

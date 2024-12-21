@@ -907,7 +907,7 @@ class MainCanvas(
                 )
             }
         }
-        divHolder.style.minHeight = "${posYGlobal + dy}px"
+        divHolder.style.minHeight = "${posYGlobal + dy + 100}px"
         val asciidoc = ICanvasDrawable.dumpAsciidoc(this)
         textarea.textContent = asciidoc
 
