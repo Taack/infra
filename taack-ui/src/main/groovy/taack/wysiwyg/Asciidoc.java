@@ -2,6 +2,7 @@ package taack.wysiwyg;
 
 
 import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Attributes;
 import org.asciidoctor.Options;
 import org.asciidoctor.OptionsBuilder;
 import org.asciidoctor.ast.Document;
@@ -27,10 +28,12 @@ public class Asciidoc {
      * @param content The Markdown Text
      * @return The HTML results
      */
-    public static String getContentHtml(String content) {
+    public static String getContentHtml(String content, String urlFileRoot) {
         if (content != null) {
             initAsciidoctorJ();
-            OptionsBuilder optionHasToc = Options.builder().option("parse_header_only", false);
+            OptionsBuilder optionHasToc = Options.builder()
+                    .attributes(Attributes.builder().imagesDir(urlFileRoot + "?path=").build())
+                    .option("parse_header_only", false);
 
             Document document = asciidoctor.load(content, optionHasToc.build());
             String html = document.convert();

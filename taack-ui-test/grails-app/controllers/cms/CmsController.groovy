@@ -1,5 +1,6 @@
 package cms
 
+import attachment.Attachment
 import cms.config.CmsSubsidiary
 import crew.User
 import crew.config.SupportedLanguage
@@ -10,6 +11,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
+import taack.domain.TaackAttachmentService
 import taack.domain.TaackFilterService
 import taack.domain.TaackSaveService
 import taack.render.TaackUiProgressBarService
@@ -39,6 +41,7 @@ class CmsController implements WebAttributes {
     TaackUiService taackUiService
     TaackSaveService taackSaveService
     CmsHtmlGeneratorService cmsHtmlGeneratorService
+    TaackAttachmentService taackAttachmentService
     CmsUiService cmsUiService
     TaackFilterService taackFilterService
     CmsSearchService cmsSearchService
@@ -518,11 +521,22 @@ class CmsController implements WebAttributes {
         }
     }
 
+    def downloadBinBodyContentFiles(CmsPage page, String path) {
+        path = path.substring(1)
+        Attachment a = page.bodyContentAttachmentList.find {
+            it.originalName == path
+        }
+
+        if (a) {
+            taackAttachmentService.downloadAttachment(a)
+        }
+    }
+
     def previewBody(String previewLanguage, boolean asciidoc) {
         UiBlockSpecifier b = new UiBlockSpecifier()
         String html = """\
             <div class="markdown-body">
-                ${cmsHtmlGeneratorService.translate(params["bodyContent"][previewLanguage] as String, previewLanguage, asciidoc)}
+                ${cmsHtmlGeneratorService.translate(params["bodyContent"][previewLanguage] as String, previewLanguage, asciidoc, this.&downloadBinBodyContentFiles as MC, params.long('id'))}
             </div>""".stripIndent()
         b.ui {
             modal {

@@ -6,6 +6,8 @@ import cms.dsl.parser.exception.TokenizerException
 import cms.dsl.parser.exception.WrongDataException
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import org.codehaus.groovy.runtime.MethodClosure
+import taack.ui.dump.Parameter
 import taack.wysiwyg.Asciidoc
 import taack.wysiwyg.Markdown
 
@@ -13,9 +15,9 @@ import taack.wysiwyg.Markdown
 @GrailsCompileStatic
 class CmsHtmlGeneratorService {
 
-    String translate(final String body, final String lang, boolean asciidoc = false) {
+    String translate(final String body, final String lang, boolean asciidoc = false, MethodClosure fileRoot = null, Long id = null) {
 //        translateNoMatcher(translateExpression(body, lang))
-        translateExpression(translateNoMatcher(body, asciidoc), lang)
+        translateExpression(translateNoMatcher(body, asciidoc, fileRoot, id), lang)
     }
 
     static String translateExpression(String body, String lang) {
@@ -49,9 +51,10 @@ class CmsHtmlGeneratorService {
         res.toString()
     }
 
-    static String translateNoMatcher(String body, boolean asciidoc = false) {
+    static String translateNoMatcher(String body, boolean asciidoc = false, MethodClosure fileRoot = null, Long id = null) {
         try {
-            return asciidoc ? Asciidoc.getContentHtml(body): Markdown.getContentHtml(body)
+            String urlFileRoot = fileRoot && id ? Parameter.urlMapped(fileRoot, [id: id]) : null
+            return asciidoc ? Asciidoc.getContentHtml(body, urlFileRoot): Markdown.getContentHtml(body)
         } catch (ignored) {
             return "Grr ${ignored}"
         }
