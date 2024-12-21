@@ -1,5 +1,6 @@
 package cms
 
+import attachment.Attachment
 import cms.config.CmsSubsidiary
 import crew.User
 import grails.compiler.GrailsCompileStatic
@@ -59,6 +60,8 @@ class CmsPage {
     Set<CmsPdfFile> bodyPdfs
     Set<CmsVideoFile> bodyVideos
 
+    List<Attachment> bodyContentAttachmentList
+
     Integer width = 960
     Integer height = 480
     Boolean controls = true
@@ -66,6 +69,7 @@ class CmsPage {
     Integer autoSlide = 3000
 
     static hasMany = [
+            bodyContentAttachmentList: Attachment,
             bodyImages: CmsImage,
             bodyPdfs: CmsPdfFile,
             bodyVideos: CmsVideoFile
