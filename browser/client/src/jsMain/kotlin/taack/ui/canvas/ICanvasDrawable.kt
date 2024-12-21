@@ -1,11 +1,13 @@
 package taack.ui.canvas
 
 import taack.ui.base.Helper.Companion.trace
+import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
 import taack.ui.canvas.table.TxtRowCanvas
 import taack.ui.canvas.text.*
 import web.canvas.CanvasRenderingContext2D
+import web.html.HTMLInputElement
 
 interface ICanvasDrawable : ICanvasSelectable {
 
@@ -15,14 +17,15 @@ interface ICanvasDrawable : ICanvasSelectable {
         INNER_BLOCK_DELIM(Regex("^____(__)+\n")),
         //        INDENT(Regex("^> ")),
         BLOCK_DELIM(Regex("^____\n")),
-        H2(Regex("^== ")),
-        H3(Regex("^=== ")),
         H4(Regex("^==== ")),
+        H3(Regex("^=== ")),
+        H2(Regex("^== ")),
         B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
+        FIG(Regex("^\\.")),
         IMAGE(Regex("^image::[^:|*`]+")),
 //        IMAGE(Regex("^image::[^:|*`\n\\[]+")),
-        IMAGE_INLINE(Regex("^image:[^:|*`]+")),
+        IMAGE_INLINE(Regex("image:[^:|*`]+")),
         TABLE_START(Regex("^\\|===")),
         TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
         TABLE_CELL(Regex("^\\|")),
@@ -30,8 +33,8 @@ interface ICanvasDrawable : ICanvasSelectable {
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
         NEXT_DRAWABLE(Regex("^ *\n *\n *")),
-        NORMAL(Regex("(^[^*`\n]+)")),
-        NEXT_LINE(Regex("\n")),
+        NEXT_LINE(Regex("^\n")),
+        NORMAL(Regex("^[^*`\n]+")),
         OTHER(Regex("[ \t]*")),
         ERROR(Regex("ERRORRRORR"))
     }
@@ -43,7 +46,7 @@ interface ICanvasDrawable : ICanvasSelectable {
     }
 
     companion object {
-        fun dumpAsciidoc(drawables: List<ICanvasDrawable>): String {
+        fun dumpAsciidoc(mainCanvas: MainCanvas): String {
             val out = StringBuilder()
 //            out.append("= Title\n")
 //            out.append(":doctype: book\n")
@@ -53,7 +56,7 @@ interface ICanvasDrawable : ICanvasSelectable {
 //            out.append(":sectnums: 2\n")
 //            out.append(":sectnumlevels: 2\n")
             out.append("\n")
-
+            val drawables = mainCanvas.drawables
             var previousCitationNumber = 0
             drawables.forEach {
                 out.append("\n")
@@ -86,30 +89,31 @@ interface ICanvasDrawable : ICanvasSelectable {
             return out.toString()
         }
 
-        fun readAsciidoc(content: String): List<ICanvasDrawable> {
+        fun readAsciidoc(mainCanvas: MainCanvas): List<ICanvasDrawable> {
             val canvasDrawables = mutableListOf<ICanvasDrawable>()
             val tokens = mutableListOf<TokenInfo>()
             var start = 0
             var end = 0
 
-            var s = content.trim()
+            var s = mainCanvas.textarea.value.trim()
 
             var pt: AdocToken = AdocToken.TITLE
             while (s.isNotEmpty()) {
                 var match = false
                 for (t in AdocToken.entries) {
-                    if (t.regex.containsMatchIn(s)) {
-                        val m = t.regex.find(s)
-                        if (m!!.value.isNotEmpty()) {
+                    val m = t.regex.find(s)
+                    if (m != null) {
+                        trace("ICanvasDrawable::readAsciidoc ${m.groups} ${m.range} $t")
+                        if (m.value.isNotEmpty() && m.range.first == 0) {
                             match = true
                             end += m.value.length
                             tokens.add(TokenInfo(m.value, t, start, end))
                             start += m.value.length
-                            s = //if (pt in listOf(AdocToken.MONO, AdocToken.MONO_BOLD, AdocToken.NORMAL, AdocToken.BOLD)) {
+                            s = if (pt in listOf(AdocToken.MONO, AdocToken.MONO_BOLD, AdocToken.NORMAL, AdocToken.BOLD)) {
                                 s.substring(m.value.length)
-//                            } else {
-//                                s.substring(m.value.length).trimStart(' ', '\t', '\r')
-//                            }
+                            } else {
+                                s.substring(m.value.length).trimStart(' ', '\t', '\r')
+                            }
                         }
                         pt = t
                         break
@@ -120,6 +124,8 @@ interface ICanvasDrawable : ICanvasSelectable {
                     break
                 }
             }
+
+            trace("ICanvasDrawable::readAsciidoc $tokens")
 
             val it = tokens.iterator()
             var currentText: CanvasText? = null
@@ -176,12 +182,6 @@ interface ICanvasDrawable : ICanvasSelectable {
                             canvasDrawables.add(CanvasTable(initHeaders, initCells))
                             tableStart = false
                         } else tableStart = true
-//                        currentTable = if (currentTable == null) {
-//                            CanvasTable()
-//                        } else null
-//                        if (currentTable != null) {
-//                            canvasDrawables.add(currentTable)
-//                        }
                     }
                     AdocToken.TABLE_COL -> {
                         for (txt in token.sequence.split('|')) {
@@ -268,7 +268,15 @@ interface ICanvasDrawable : ICanvasSelectable {
 //                    }
 
                     AdocToken.IMAGE -> {
-
+                        val id = (mainCanvas.embeddingForm.f.elements.namedItem("id") as HTMLInputElement).value.toLong()
+                        val controller = (mainCanvas.embeddingForm.f.elements.namedItem("originController") as HTMLInputElement).value
+                        var varName = mainCanvas.textarea.name
+                        if (varName.contains('.'))
+                            varName = varName.substring(0, varName.lastIndexOf('.'))
+                        val action = "downloadBin${varName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}"
+                        val fileName = token.sequence.substring("image::".length, token.sequence.length - 2)
+                        canvasDrawables.add(CanvasImg("/$controller/$action/$id?path=$fileName", fileName, 0))
+                        currentTextPosition = token.end
                     }
                     AdocToken.IMAGE_INLINE -> {
 
@@ -289,6 +297,8 @@ interface ICanvasDrawable : ICanvasSelectable {
                             currentIndent--
                         } else currentIndent = indent
                     }
+
+                    AdocToken.FIG -> {}
                 }
             }
 

@@ -79,7 +79,7 @@ class CanvasImg(
         //return //if (src.length < 250)
 //        return "\n${text.dumpAsciidoc()}\nimage::${src}[]"
 //        else {
-           return "\n${text.dumpAsciidoc()}\nimage::${text.txt}[]"
+           return "\n" + text.dumpAsciidoc() + "\n" + "image::${text.txt}[]" + "\n"
 //            "\n+++<img src='$src'/>+++"
 //        }
     }

@@ -26,7 +26,7 @@ class CanvasFigure(txtInit: String, citationNumber: Int) : CanvasText(txtInit, c
     }
 
     override fun dumpAsciidoc(): String {
-        return "." + super.dumpAsciidoc()
+        return "\n." + super.dumpAsciidoc() + "\n"
     }
 
 }

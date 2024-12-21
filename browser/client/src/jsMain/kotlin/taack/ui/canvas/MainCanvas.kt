@@ -32,8 +32,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 class MainCanvas(
-    private val embeddingForm: Form,
-    private val textarea: HTMLTextAreaElement,
+    internal val embeddingForm: Form,
+    internal val textarea: HTMLTextAreaElement,
     private val divHolder: HTMLDivElement,
     private val divScroll: HTMLDivElement
 ) {
@@ -78,7 +78,7 @@ class MainCanvas(
     private val currentLine: CanvasLine
         get() = currentText!!.lines[currentText!!.indexOfLine(_caretPosInCurrentText)]
     private val _drawables: MutableList<ICanvasDrawable> = mutableListOf()
-    private val drawables = MyMutableList(_drawables)
+    internal val drawables = MyMutableList(_drawables)
     private val initialDrawables = mutableListOf<ICanvasDrawable>()
     private var dy: Double = 0.0
     private var _caretPosInCurrentText: Int = 0
@@ -778,7 +778,7 @@ class MainCanvas(
     private fun addInitialTexts() {
         if (textarea.innerText.isNotBlank()) {
             trace("addInitialTexts ${textarea.innerText}")
-            initialDrawables.addAll(ICanvasDrawable.readAsciidoc(textarea.innerText))
+            initialDrawables.addAll(ICanvasDrawable.readAsciidoc(this))
         } else {
             trace("addInitialTexts BLANK")
             initialDrawables.add(PCanvas(""))
@@ -908,7 +908,7 @@ class MainCanvas(
             }
         }
         divHolder.style.minHeight = "${posYGlobal + dy}px"
-        val asciidoc = ICanvasDrawable.dumpAsciidoc(drawables)
+        val asciidoc = ICanvasDrawable.dumpAsciidoc(this)
         textarea.textContent = asciidoc
 
         traceDeIndent("MainCanvas::draw ${divHolder.clientWidth} $currentText")
