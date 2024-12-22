@@ -2,6 +2,7 @@ package taack.ui.canvas
 
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.canvas.item.CanvasImg
+import taack.ui.canvas.item.CanvasLink
 import taack.ui.canvas.table.CanvasTable
 import taack.ui.canvas.table.TxtHeaderCanvas
 import taack.ui.canvas.table.TxtRowCanvas
@@ -24,10 +25,12 @@ interface ICanvasDrawable : ICanvasSelectable {
         B2(Regex("^\\*\\* ")),
         FIG(Regex("^\\.")),
         IMAGE(Regex("^image::[^:|*`]+\\[\\]")),
+        LINK(Regex("^link:[^:|*`]+\\[.+,download\\]")),
 //        IMAGE(Regex("^image::[^:|*`\n\\[]+")),
         IMAGE_INLINE(Regex("image:[^:|*`]+")),
         TABLE_START(Regex("^\\|===")),
-        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
+//        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
+        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+(\\|([^|*`\n])+)+")),
         TABLE_CELL(Regex("^\\|")),
         MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
@@ -144,6 +147,13 @@ interface ICanvasDrawable : ICanvasSelectable {
 //                }
                 val token = it.next()
                 trace("token: [$token]")
+                val id = (mainCanvas.embeddingForm.f.elements.namedItem("id") as HTMLInputElement).value.toLong()
+                val controller = (mainCanvas.embeddingForm.f.elements.namedItem("originController") as HTMLInputElement).value
+                var varName = mainCanvas.textarea.name
+                if (varName.contains('.'))
+                    varName = varName.substring(0, varName.lastIndexOf('.'))
+                val action = "downloadBin${varName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Files"
+
                 when (token.token) {
                     AdocToken.TITLE -> {}
                     AdocToken.ATTR -> {}
@@ -271,12 +281,6 @@ interface ICanvasDrawable : ICanvasSelectable {
 //                    }
 
                     AdocToken.IMAGE -> {
-                        val id = (mainCanvas.embeddingForm.f.elements.namedItem("id") as HTMLInputElement).value.toLong()
-                        val controller = (mainCanvas.embeddingForm.f.elements.namedItem("originController") as HTMLInputElement).value
-                        var varName = mainCanvas.textarea.name
-                        if (varName.contains('.'))
-                            varName = varName.substring(0, varName.lastIndexOf('.'))
-                        val action = "downloadBin${varName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Files"
                         val fileName = token.sequence.substring("image::".length, token.sequence.length - 2)
                         canvasDrawables.add(CanvasImg("/$controller/$action/$id?path=$fileName", fileName, 0))
                         currentTextPosition = token.end
@@ -302,6 +306,11 @@ interface ICanvasDrawable : ICanvasSelectable {
                     }
 
                     AdocToken.FIG -> {}
+                    AdocToken.LINK -> {
+                        val fileName = token.sequence.substring("link:".length, token.sequence.indexOf('['))
+                        canvasDrawables.add(CanvasLink("/$controller/$action/$id?path=$fileName", fileName, 0))
+                        currentTextPosition = token.end
+                    }
                 }
             }
             currentText = PCanvas("", currentIndent)

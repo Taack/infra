@@ -757,7 +757,7 @@ class MainCanvas(
                     AddDrawableCommand(
                         drawables,
                         index,
-                        CanvasLink(file.name, 0),
+                        CanvasLink(file.name, file.name, 0),
                     )
                 )
                 val d = PCanvas("")

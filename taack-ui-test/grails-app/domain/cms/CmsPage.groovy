@@ -95,6 +95,8 @@ class CmsPage {
 
     static mapping = {
         tablePerHierarchy true
+        // bodyContent type: 'text'
+        bodyContent size: 64000 // Does not seem to work with maps
     }
 
     @Override
