@@ -134,7 +134,7 @@ final class AttachmentUiService implements WebAttributes {
                     .build()) { Attachment att ->
                 String aPreview = this.preview(att.id)
                 rowColumn {
-                    rowField aPreview
+                    rowFieldRaw aPreview
                 }
                 rowColumn {
                     rowField att.originalName
@@ -215,7 +215,7 @@ final class AttachmentUiService implements WebAttributes {
         new UiTableSpecifier().ui {
             for (Attachment a : attachments.sort { a1, a2 -> a2.dateCreated <=> a1.dateCreated }) {
                 row {
-                    rowField this.preview(a.id)
+                    rowFieldRaw this.preview(a.id)
                     rowColumn {
                         rowField a.userCreated.username
                         rowField a.dateCreated_
