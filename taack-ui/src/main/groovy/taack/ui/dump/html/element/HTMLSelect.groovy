@@ -2,6 +2,7 @@ package taack.ui.dump.html.element
 
 
 import groovy.transform.CompileStatic
+import taack.ui.EnumOption
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 
@@ -28,9 +29,9 @@ final class HTMLOption implements IHTMLElement {
 @CompileStatic
 final class HTMLSelect implements IHTMLElement {
 
-    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean disabled = false, boolean nullable = false) {
+    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean disabled = false, String defaultOptionLabel = null) {
         tag = 'select'
-        if (nullable) addChildren(new HTMLOption())
+        if (defaultOptionLabel != null) addChildren(new HTMLOption(new EnumOption(null, defaultOptionLabel), false))
         addChildren(options.options.toList().collect {
             new HTMLOption(it, options.currents*.key?.contains(it.key))
         } as HTMLOption[])
