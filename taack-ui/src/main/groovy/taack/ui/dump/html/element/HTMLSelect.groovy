@@ -36,12 +36,10 @@ final class HTMLSelect implements IHTMLElement {
             new HTMLOption(it, options.currents*.key?.contains(it.key))
         } as HTMLOption[])
         attributes.put('name', options.paramKey)
-//        if (readOnly) attributes.put('readonly', null)
         if (disabled) attributes.put('disabled', null)
         if (multiple) {
             attributes.put('multiple', null)
-            attributes.put('size', '7')
-            attributes.put('aria-label', "multiple select")
+            attributes.put('style', 'height: 200px')
         }
     }
 }

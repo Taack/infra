@@ -43,13 +43,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
     }
 
-    private IHTMLElement themeStartInputs(IHTMLElement topElement, boolean isSelect = false) {
+    private IHTMLElement themeStartInputs(IHTMLElement topElement) {
         IHTMLElement ret = topElement
         if (floating) {
-            if (isSelect)
-                ret = new HTMLDiv() as IHTMLElement
-            else
-                ret = new HTMLDiv().builder.addClasses('form-floating', 'mb-1').build() as IHTMLElement
+            ret = new HTMLDiv().builder.addClasses('form-floating', 'mb-1').build() as IHTMLElement
             topElement.builder.addChildren(ret)
         }
         ret
@@ -155,7 +152,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
-        IHTMLElement el = themeStartInputs(topElement, multiple)
+        IHTMLElement el = themeStartInputs(topElement)
         HTMLSelect s = new HTMLSelect(options, multiple, disable, (multiple || !nullable ? null : floating ? "" : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
         el.addChildren(s)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
