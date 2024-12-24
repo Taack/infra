@@ -8,6 +8,7 @@ import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 import web.events.EventHandler
 import web.html.Image
+import kotlin.math.max
 import kotlin.math.min
 
 class CanvasImg(
@@ -48,8 +49,7 @@ class CanvasImg(
             image.onload = EventHandler {
                 val w = image.width
                 val h = image.height
-                ratio = min(640.0 / h, width / w)
-//                ratio = width / w
+                ratio = if (h < 480) 1.0 else min(480.0 / h, width / w)
                 trace("CanvasImg::draw.onLoad $image ${image.width}x${image.height}, r: $ratio")
             }
             image.src = src
