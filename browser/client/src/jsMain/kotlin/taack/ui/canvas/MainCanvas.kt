@@ -588,10 +588,15 @@ class MainCanvas(
             currentKeyboardEvent = event
             if (!event.ctrlKey) isDoubleClick = false
 
-            addDrawable()
-            event.preventDefault()
-//            event.stopPropagation()
+            val pasteEvent = event.ctrlKey && event.key[0] == 'v'
 
+            if (!pasteEvent) {
+                addDrawable()
+                event.preventDefault()
+            } else {
+                trace("paste event")
+
+            }
         }
 
         canvas.ondblclick = EventHandler { event: MouseEvent ->
@@ -613,11 +618,11 @@ class MainCanvas(
         }
 
         document.onpaste = EventHandler { event: ClipboardEvent ->
-            trace("canvasEvent paste $currentText $currentMouseEvent")
+            trace("canvasEvent paste $currentText $currentMouseEvent $caretPosInCurrentText")
             val txt = event.clipboardData!!.getData("text")
             event.preventDefault()
             event.stopPropagation()
-            if (currentText != null) {
+            if (currentText != null && txt.isNotEmpty()) {
                 commandDoList.add(
                     AddCharCommand(
                         currentText!!,
@@ -625,10 +630,8 @@ class MainCanvas(
                         caretPosInCurrentText
                     )
                 )
-            }
-            trace("canvasEvent paste: $txt")
-
-            if (event.clipboardData!!.items.length > 0) {
+                trace("canvasEvent paste: $txt")
+            } else if (event.clipboardData!!.items.length > 0) {
                 // Use DataTransferItemList interface to access the file(s)
                 for (item in event.clipboardData!!.items) {
                     // If dropped items aren't files, reject them
@@ -645,7 +648,7 @@ class MainCanvas(
         }
 
         divScroll.ondrop = EventHandler { event: DragEvent ->
-            trace("canvasEvent drop")
+            trace("canvasEvent drop $currentText $currentMouseEvent $caretPosInCurrentText")
             event.preventDefault()
             event.stopPropagation()
             if (event.dataTransfer?.items?.length!! > 0) {
