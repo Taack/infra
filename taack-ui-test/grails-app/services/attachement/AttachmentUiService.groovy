@@ -9,6 +9,7 @@ import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,8 +28,6 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
-
-import javax.annotation.PostConstruct
 
 import static taack.render.TaackUiService.tr
 

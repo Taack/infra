@@ -13,8 +13,6 @@ import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
-import taack.ui.dsl.filter.expression.FilterExpression
-import taack.ui.dsl.filter.expression.Operator
 
 import static taack.render.TaackUiService.tr
 
@@ -141,10 +139,10 @@ class CrewUiService implements WebAttributes {
                     .addFilter(f).build()
 
             iterate tf, { User ru ->
-                boolean hasActions = crewSecurityService.canEdit(ru)
+                boolean hasActions = this.crewSecurityService.canEdit(ru)
                 if (!hasSelect) {
                     rowColumn {
-                        rowFieldRaw attachmentUiService.preview(ru.mainPicture?.id)
+                        rowFieldRaw this.attachmentUiService.preview(ru.mainPicture?.id)
                     }
                 }
                 rowColumn {
@@ -192,8 +190,8 @@ class CrewUiService implements WebAttributes {
     }
 
     UiShowSpecifier buildUserShow(User u, boolean update = false) {
-        new UiShowSpecifier().ui(u, {
-            field "Picture", attachmentUiService.previewFull(u.mainPicture?.id, update ? "${System.currentTimeMillis()}" : null)
+        new UiShowSpecifier().ui {
+            field "Picture", this.attachmentUiService.previewFull(u.mainPicture?.id, update ? "${System.currentTimeMillis()}" : null)
             fieldLabeled u.username_
             fieldLabeled u.firstName_
             fieldLabeled u.lastName_
@@ -201,7 +199,7 @@ class CrewUiService implements WebAttributes {
             fieldLabeled u.subsidiary_
             fieldLabeled u.mail_
             fieldLabeled u.manager_
-        })
+        }
     }
 
 }

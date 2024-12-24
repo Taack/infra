@@ -22,7 +22,7 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
 
     dependencies {
         developmentOnly("org.springframework.boot:spring-boot-devtools")
-        compileOnly "io.micronaut:micronaut-inject-groovy"
+//        compileOnly "io.micronaut:micronaut-inject-groovy"
         implementation "org.grails:grails-core"
         implementation "org.grails:grails-web-boot"
         implementation "org.grails:grails-logging"

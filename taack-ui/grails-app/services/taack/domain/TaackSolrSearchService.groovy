@@ -3,6 +3,7 @@ package taack.domain
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import org.apache.solr.client.solrj.SolrClient
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrRequest
@@ -35,7 +36,6 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 
-import javax.annotation.PostConstruct
 
 
 @GrailsCompileStatic

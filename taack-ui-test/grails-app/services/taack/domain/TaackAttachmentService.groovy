@@ -5,18 +5,22 @@ import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
+import jakarta.annotation.PostConstruct
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import attachment.Attachment
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Configuration
 import org.taack.IAttachmentConverter
 import org.taack.IAttachmentPreviewConverter
 import org.taack.IAttachmentShowIFrame
 import taack.ui.TaackUiConfiguration
 
-import javax.annotation.PostConstruct
 
 @GrailsCompileStatic
+@Configuration
+@EnableConfigurationProperties(TaackUiConfiguration.class)
 class TaackAttachmentService implements WebAttributes, DataBinder {
     final Object imageConverter = new Object()
 

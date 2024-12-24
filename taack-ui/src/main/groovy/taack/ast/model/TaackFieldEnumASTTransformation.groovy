@@ -13,6 +13,7 @@ import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.syntax.Token
 import org.codehaus.groovy.syntax.Types
 import org.codehaus.groovy.transform.AbstractASTTransformation
+import org.codehaus.groovy.transform.FieldASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.codehaus.groovy.transform.stc.StaticTypesMarker
 
@@ -35,7 +36,7 @@ import static org.apache.groovy.ast.tools.ClassNodeUtils.addGeneratedMethod
 // see http://docs.groovy-lang.org/latest/html/documentation/index.html#developing-ast-xforms
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
-final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
+final class TaackFieldEnumASTTransformation extends FieldASTTransformation {
 
     @CompileStatic
     enum DebugEnum {
@@ -81,7 +82,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
     void visit(ASTNode[] nodes, SourceUnit source) {
 
         printOut "source ${source.name}"
-        init(nodes, source)
+//        init(nodes, source)
 
         AnnotationNode node = (AnnotationNode) nodes[0]
         AnnotatedNode parent = (AnnotatedNode) nodes[1]
@@ -90,7 +91,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
         if (parent instanceof ClassNode) {
             ClassNode cNode = (ClassNode) parent
-            if (!checkNotInterface(cNode, TFE_TYPE_NAME)) return
+//            if (!checkNotInterface(cNode, TFE_TYPE_NAME)) return
 
             final Set<String> avoidDuplicate = []
             final ClassNode classNode = (ClassNode) nodes[1]

@@ -2,12 +2,20 @@ package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
+import jakarta.persistence.metamodel.Attribute
+import jakarta.persistence.metamodel.CollectionAttribute
+import jakarta.persistence.metamodel.EntityType
+import jakarta.persistence.metamodel.ListAttribute
+import jakarta.persistence.metamodel.ManagedType
+import jakarta.persistence.metamodel.MapAttribute
+import jakarta.persistence.metamodel.Metamodel
+import jakarta.persistence.metamodel.SetAttribute
+import jakarta.persistence.metamodel.SingularAttribute
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.SessionFactory
 import org.hibernate.query.Query
 import org.springframework.beans.factory.annotation.Value
 
-import javax.persistence.metamodel.*
 import java.nio.file.Files
 
 /**

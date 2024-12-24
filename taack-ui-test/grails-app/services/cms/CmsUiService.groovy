@@ -5,6 +5,7 @@ import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import org.asciidoctor.*
 import org.asciidoctor.ast.Document
 import org.codehaus.groovy.runtime.MethodClosure as MC
@@ -19,8 +20,6 @@ import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
-
-import javax.annotation.PostConstruct
 
 @GrailsCompileStatic
 class CmsUiService implements WebAttributes {

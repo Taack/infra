@@ -18,11 +18,11 @@ final class TaackFilterService implements WebAttributes {
     SessionFactory sessionFactory
 
     final<T extends GormEntity<T>> TaackFilter.FilterBuilder<T> getBuilder(Class<T> cClass) {
-        new TaackFilter.FilterBuilder<T>(cClass, sessionFactory, params.toSorted())
+        new TaackFilter.FilterBuilder<T>(cClass, sessionFactory, params.toSorted() as Map<String, ?>)
     }
 
     final<T extends GormEntity<T>> TaackFilter.FilterBuilder<T> getBuilder(T oObject) {
-        new TaackFilter.FilterBuilder<T>(oObject, sessionFactory, params.toSorted())
+        new TaackFilter.FilterBuilder<T>(oObject, sessionFactory, params.toSorted() as Map<String, ?>)
     }
 
 }

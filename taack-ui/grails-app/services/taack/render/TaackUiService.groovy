@@ -7,6 +7,7 @@ import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
+import jakarta.annotation.PostConstruct
 import org.grails.core.io.ResourceLocator
 import org.grails.datastore.gorm.GormEntity
 import org.grails.web.servlet.mvc.GrailsWebRequest
@@ -30,7 +31,6 @@ import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.pdf.RawHtmlPrintableDump
 
-import javax.annotation.PostConstruct
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -464,7 +464,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         final String AJAX_PARAMS = 'ajaxParams'
         T anObject = aClass.getConstructor().newInstance()
         if (params.containsKey(AJAX_PARAMS)) {
-            GrailsParameterMap ajaxParams = params[AJAX_PARAMS]
+            GrailsParameterMap ajaxParams = params[AJAX_PARAMS] as GrailsParameterMap
             String stringKey = ajaxParams.keySet().find { it instanceof String }?.toString()
             if (ajaxParams.keySet().size() == 2 && stringKey.endsWith('id')) {
                 anObject = aClass.invokeMethod('get', ajaxParams[stringKey]) as T

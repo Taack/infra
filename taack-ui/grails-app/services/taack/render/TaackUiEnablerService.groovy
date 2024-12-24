@@ -4,6 +4,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
 import grails.web.api.WebAttributes
 import grails.web.servlet.mvc.GrailsParameterMap
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
 import org.owasp.html.Sanitizers
@@ -14,7 +15,6 @@ import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.helper.Utils
 
-import javax.annotation.PostConstruct
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.

@@ -9,6 +9,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackAttachmentService
@@ -23,7 +24,6 @@ import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.wysiwyg.Markdown
 
-import javax.annotation.PostConstruct
 import static grails.async.Promises.task
 
 /*
