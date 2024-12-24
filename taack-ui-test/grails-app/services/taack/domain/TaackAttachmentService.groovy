@@ -248,9 +248,14 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
     void downloadAttachment(Attachment attachment) {
         if (!attachment) return
         def response = webRequest.currentResponse
-        response.setContentType(attachment.contentType)
-        response.setHeader("Content-disposition", "attachment;filename=\"${URLEncoder.encode(attachment.getName(), "UTF-8")}\"")
-        response.outputStream << new File(attachmentPath(attachment)).bytes
+        File f = new File(attachmentPath(attachment))
+        if (f.exists()) {
+            response.setContentType(attachment.contentType)
+            response.setHeader("Content-disposition", "attachment;filename=\"${URLEncoder.encode(attachment.getName(), "UTF-8")}\"")
+            response.outputStream << f.bytes
+        } else {
+            log.error "No file: ${f.path}"
+        }
     }
 
     String attachmentContent(Attachment attachment) {

@@ -219,8 +219,9 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                         mfl.each { mf ->
                             final String sha1ContentSum = MessageDigest.getInstance("SHA1").digest(mf.bytes).encodeHex().toString()
                             final String p = sha1ContentSum + fileExtension(mf.originalFilename)
-                            final String d = (filePaths.get(controllerName) ?: attachmentStorePath)
+                            final String d = attachmentStorePath
                             File target = new File(d + "/" + p)
+                            log.info("create file ${target.path}")
                             mf.transferTo(target)
                             Attachment a = new Attachment()
                             if (gormEntity.hasProperty('documentAccess') && params['documentAccess'])

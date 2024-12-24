@@ -529,6 +529,7 @@ class CmsController implements WebAttributes {
         if (a) {
             taackAttachmentService.downloadAttachment(a)
         }
+        return false
     }
 
     def previewBody(String previewLanguage, boolean asciidoc) {
