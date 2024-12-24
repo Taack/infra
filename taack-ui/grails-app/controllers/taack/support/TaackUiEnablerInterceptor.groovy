@@ -10,9 +10,11 @@ import taack.render.TaackUiEnablerService
 class TaackUiEnablerInterceptor implements Interceptor {
 
     TaackUiEnablerInterceptor() {
-        matchAll()
-                .excludes(controller: 'assets')
-                .excludes(controller: 'errors')
+//        matchAll()
+//                .excludes(controller: 'assets')
+//                .excludes(controller: 'errors')
+//                .excludes(controller: 'login')
+        match(controller: ~/(assets|errors|login)/)
     }
 
     int order = HIGHEST_PRECEDENCE

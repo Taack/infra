@@ -99,6 +99,7 @@
 
 # 0.5.x (x>7)
 
+- Raw for show ...
 - Allow asciidoc diagram
 - Allow asciidoc taack extensions
 - improve history when browsing, allow seeing opened modals ...
