@@ -86,7 +86,7 @@
 # 0.5.7
 
 - ~~Asciidoc online editor (h2...h4, paragraph only, inline style)~~
-- upload attachments when dragging or pasting files to an Asciidoc area  
+- ~~upload attachments when dragging or pasting files to an Asciidoc area (Sample Code in taack-ui-test)~~ 
 - ~~Asciidoc show, like for md~~
 - ~~Modern Graph DSL (groupBy, sortBy)~~
   - ~~timeSeries~~
