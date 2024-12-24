@@ -6,7 +6,6 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
-import web.cssom.Width
 
 class CanvasCaret {
 
