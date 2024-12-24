@@ -218,25 +218,27 @@ class MainCanvas(
                         )
                     )
                 } else {
-                    val i = drawables.indexOf(currentText!!) + 1
+                    val i2 = i + 1
                     if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
                         commandDoList.add(
-                            AddTableCommand(drawables, i)
+                            AddTableCommand(drawables, i2)
                         )
                     } else
                         when (currentText) {
                             is H2Canvas -> {
                                 val d = H3Canvas("")
                                 commandDoList.add(
-                                    AddDrawableCommand(drawables, i, d)
+                                    AddDrawableCommand(drawables, i2, d)
                                 )
+                                currentDrawable = d
                             }
 
                             is H3Canvas -> {
                                 val d = H4Canvas("")
                                 commandDoList.add(
-                                    AddDrawableCommand(drawables, i, d)
+                                    AddDrawableCommand(drawables, i2, d)
                                 )
+                                currentDrawable = d
                             }
 
                             is TxtHeaderCanvas -> {
@@ -275,13 +277,12 @@ class MainCanvas(
                                             currentText!!.txt.length
                                         )
                                     )
-
                                 }
 
                                 val d = PCanvas(initTxt)
                                 currentDrawable = d
                                 commandDoList.add(
-                                    AddDrawableCommand(drawables, i, d)
+                                    AddDrawableCommand(drawables, i2, d)
                                 )
                             }
                         }
