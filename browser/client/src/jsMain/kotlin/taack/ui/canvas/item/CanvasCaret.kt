@@ -6,6 +6,7 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
+import web.cssom.Width
 
 class CanvasCaret {
 
@@ -13,7 +14,7 @@ class CanvasCaret {
         private var posX: Double = 0.0
         private var posY: Double = 0.0
         private const val HEIGHT: Double = 20.0
-        private const val WIDTH: Double = 5.0
+        private const val WIDTH: Double = 1.0
 
         fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int) {
             traceIndent("CanvasCaret::draw: $n line: $line")
@@ -22,7 +23,7 @@ class CanvasCaret {
             text.initCtx(ctx)
             posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin + text.posXStart
             ctx.restore()
-            draw(ctx, posX, posY)
+            draw(ctx, posX, posY, null, text.lineHeight)
             traceDeIndent("CanvasCaret::draw: $n")
         }
 
@@ -49,14 +50,14 @@ class CanvasCaret {
             traceDeIndent("CanvasCaret::drawDblClick: $n, $posNStart, $posNEnd")
         }
 
-        private fun draw(ctx: CanvasRenderingContext2D, x: Double, y: Double, posXEnd: Double? = null) {
+        private fun draw(ctx: CanvasRenderingContext2D, x: Double, y: Double, posXEnd: Double? = null, height: Double = HEIGHT) {
             trace("CanvasCaret::draw: $x, $y, $posXEnd")
             this.posX = x
             this.posY = y
             ctx.save()
             ctx.strokeStyle = if (posXEnd == null) "green" else "blue"
             ctx.beginPath()
-            ctx.rect(posX - if (posXEnd != null) 0.0 else WIDTH, posY - HEIGHT, if (posXEnd != null) posXEnd - posX else WIDTH, HEIGHT)
+            ctx.rect(posX - if (posXEnd != null) 0.0 else WIDTH, posY - height, if (posXEnd != null) posXEnd - posX else WIDTH, height)
             ctx.stroke()
             ctx.restore()
         }
