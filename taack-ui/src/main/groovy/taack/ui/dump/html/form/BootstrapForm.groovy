@@ -202,7 +202,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
             m2mParent.addChildren(input)
             if (!noLabel) m2mParent.addChildren(formLabelInput(inputLabelId, trI18n))
-            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it instanceof GormEntity ? it.ident() : it?.toString(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(hiddenInputId).addClasses(formControl).build() as HTMLInput
+            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it instanceof GormEntity ? it.ident() : it instanceof Enum ? it.name() : it?.toString(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(hiddenInputId).addClasses(formControl).build() as HTMLInput
             m2mParent.addChildren(inputHidden)
         }
         String hiddenInputId = idPrefix + "-${occ++}"
@@ -224,7 +224,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, Object val, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
 
-        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), null, null, disabled, true).builder.setId(qualifiedName).putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
