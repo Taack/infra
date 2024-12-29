@@ -21,56 +21,27 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
     }
 
     private val rowGroup: Int? = r.attributes.getNamedItem("taackTableRowGroup")?.value?.toInt()
-    private val rowGroupHasChildren: Boolean? =
-        r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
-    private var isExpended: Boolean = false
-    private val innerButt = document.createElement("button") as HTMLButtonElement
-
-    private fun spanInnerText(): String {
-        val output = StringBuilder()
-//        for (i in 1..rowGroup!!) {
-//            output.append("&nbsp&nbsp&nbsp&nbsp&nbsp")
-//        }
-        if (rowGroupHasChildren == true) {
-            if (!isExpended) {
-                output.append("""<b>+</b>&nbsp""")
-            } else {
-                output.append("""<b>-</b>&nbsp""")
-            }
-//        } else {
-//            output.append("""&nbsp&nbsp""")
-        }
-        return output.toString()
-    }
-
+    private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
 
     init {
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")
-        innerButt.type = ButtonType.button
-        if (rowGroup != null) {
-            val firstCell = r.firstElementChild!! as HTMLTableCellElement
-            firstCell.classList.add("firstCellInGroup")
-            firstCell.classList.add("firstCellInGroup-${rowGroup}")
-            firstCell.style.paddingLeft = "${rowGroup}em !important"
-            if (rowGroupHasChildren == true) {
-
-                innerButt.innerHTML = spanInnerText()
-                innerButt.onclick = EventHandler { onclick() }
-                firstCell.insertAdjacentElement(InsertPosition.afterbegin, innerButt)
-            } else {
-                val innerSpan = document.createElement("span") as HTMLSpanElement
-                innerSpan.innerHTML = spanInnerText()
-                firstCell.insertAdjacentElement(InsertPosition.afterbegin, innerSpan)
+        if (rowGroup != null && rowGroupHasChildren == true) {
+            (r.querySelector(".firstCellInGroup")!! as HTMLTableCellElement).onclick = EventHandler { e ->
+                if (e.target is HTMLTableCellElement) {
+                    val offsetX = e.clientX - (e.target as HTMLTableCellElement).getBoundingClientRect().left
+                    if (offsetX in (5.0 + 20.0 * rowGroup)..(15.0 + 20.0 * rowGroup)) {
+                        onclick()
+                    }
+                }
             }
         }
         traceDeIndent("TableRow::init ---")
     }
 
     private fun expends() {
-        isExpended = true
+        r.setAttribute("taackTableRowIsExpended", "true")
         var expends = false
         val rg = rowGroup!! + 1
-        innerButt.innerHTML = spanInnerText()
 
         for (r in parent.rows) {
             if (expends && r.rowGroup == rg) {
@@ -81,20 +52,20 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
             if (r === this) {
                 expends = true
             }
-
         }
     }
 
     private fun collapse() {
-        isExpended = false
+        r.setAttribute("taackTableRowIsExpended", "false")
         var collapse = false
         val rg = rowGroup!! + 1
-        innerButt.innerHTML = spanInnerText()
 
         for (r in parent.rows) {
             if (collapse && r.rowGroup!! >= rg) {
                 r.r.style.display = "none"
-//                if (r.rowGroupHasChildren!!) r.collapse()
+                if (rowGroupHasChildren == true) {
+                    r.r.setAttribute("taackTableRowIsExpended", "false")
+                }
             } else if (collapse && r.rowGroup!! == rowGroup) {
                 break
             }
@@ -102,12 +73,14 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
                 collapse = true
             }
         }
-
     }
 
     private fun onclick(): Boolean {
-        if (isExpended) collapse()
-        else expends()
+        if (r.attributes.getNamedItem("taackTableRowIsExpended")?.value?.toBoolean() == true) {
+            collapse()
+        } else {
+            expends()
+        }
         return false
     }
 

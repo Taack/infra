@@ -27,6 +27,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     final ThemableTable themableTable
 
     private int indent = -1
+    private boolean rowIndentIsExpended = false
     int colCount = 0
     boolean isInCol = false
     Style rowStyle = null
@@ -145,11 +146,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (style?.cssClassesString) tr.addClasses(style.cssClassesString)
         if (style?.cssStyleString) tr.attributes.put('style', style.cssStyleString)
         if (indent >= 0) {
-            //tr.styleDescriptor = new DisplayNone()
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
+            if (hasChildren) {
+                tr.attributes.put('taackTableRowIsExpended', rowIndentIsExpended.toString())
+            }
         }
-        if (indent > 0 && parameter.target == Parameter.RenderingTarget.WEB) {
+        if (indent > 0 && !rowIndentIsExpended && parameter.target == Parameter.RenderingTarget.WEB) {
             tr.setStyleDescriptor(new DisplayNone())
         }
         blockLog.topElement.builder.addChildren(tr)
@@ -165,9 +168,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowIndent() {
+    void visitRowIndent(Boolean isExpended = false) {
         blockLog.enterBlock('visitRowIndent')
         indent++
+        rowIndentIsExpended = isExpended
     }
 
     @Override

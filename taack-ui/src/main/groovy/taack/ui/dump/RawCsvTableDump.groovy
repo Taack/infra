@@ -129,7 +129,7 @@ final class RawCsvTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowIndent() {
+    void visitRowIndent(Boolean isExpended) {
 
     }
 

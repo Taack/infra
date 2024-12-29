@@ -147,7 +147,7 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowIndent() {
+    void visitRowIndent(Boolean isExpended) {
 
     }
 
