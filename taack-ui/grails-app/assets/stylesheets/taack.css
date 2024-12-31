@@ -306,5 +306,5 @@ td.firstCellInGroup-4:after {
 }
 
 td.firstCellInGroup-5:after {
-    left: calc(9px + 20px * 4);
+    left: calc(15px + 20px * 4);
 }
