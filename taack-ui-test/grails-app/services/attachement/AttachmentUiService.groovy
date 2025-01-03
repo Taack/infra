@@ -16,8 +16,6 @@ import taack.ast.type.FieldInfo
 import taack.domain.TaackAttachmentService
 import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
-import taack.render.IFormInputOverrider
-import taack.render.TaackUiOverriderService
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiShowSpecifier
@@ -40,30 +38,6 @@ final class AttachmentUiService implements WebAttributes {
 
     @Autowired
     ApplicationTagLib applicationTagLib
-
-    @PostConstruct
-    void init() {
-        Attachment a = new Attachment()
-        IFormInputOverrider formInputOverrider = new IFormInputOverrider<Attachment>() {
-            @Override
-            String getValue(Attachment attachment, FieldInfo fieldInfo) {
-                return attachment.filePath
-            }
-
-            @Override
-            String getImagePreview(Attachment attachment, FieldInfo fieldInfo) {
-                return applicationTagLib.createLink(controller: 'attachment', action: 'preview', id: attachment.id)
-            }
-
-            @Override
-            String getTextSnippet(Attachment attachment, FieldInfo fieldInfo) {
-                return attachment.originalName
-            }
-        }
-        TaackUiOverriderService.addInputToOverride(formInputOverrider, a.filePath_)
-        TaackUiOverriderService.addInputToOverride(formInputOverrider, Attachment)
-    }
-
 
     String preview(final Long id) {
         if (!id) return "<span/>"
