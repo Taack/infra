@@ -164,6 +164,11 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitIframe(String url, String cssHeight) {
+
+    }
+
+    @Override
     void visitPoll(int millis, MethodClosure polledMethod) {
 
     }

@@ -65,7 +65,7 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
                 outputStream.write(buffer, 0, decompressedSize)
             }
 
-             println(new String(outputStream.toByteArray()))
+            println(new String(outputStream.toByteArray()))
 
         }
     }
@@ -90,14 +90,15 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
         } else {
             InputStream resource = cl.getResourceAsStream(fileName)
 
-            if (!resource) return new UiBlockSpecifier().ui {
-                modal {
-                    show new UiShowSpecifier().ui {
-                        inlineHtml("""<p>No $fileName Resource</p>""")
+            if (!resource) {
+                return new UiBlockSpecifier().ui {
+                    modal {
+                        show new UiShowSpecifier().ui {
+                            inlineHtml("""<p>No $fileName Resource</p>""")
+                        }
                     }
                 }
             }
-
             File resourceFile = Path.of(asciidocCachePath.toString(), fileName).toFile()
             if (!resourceFile.exists()) {
                 resourceFile.getParentFile().mkdirs()
@@ -114,8 +115,7 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
                 out.append("</script>")
                 out.append('\n')
             }
-
-            new UiBlockSpecifier().ui {
+            Closure<BlockSpec> blockSpecClosure = BlockSpec.buildBlockSpec {
                 row {
                     col(BlockSpec.Width.QUARTER) {
                     }
@@ -125,6 +125,10 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
                         }
                     }
                 }
+            }
+
+            new UiBlockSpecifier().ui {
+                inline blockSpecClosure
             }
         }
     }

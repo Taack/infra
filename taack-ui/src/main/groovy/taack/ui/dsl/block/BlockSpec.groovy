@@ -315,6 +315,16 @@ final class BlockSpec {
             blockVisitor.visitAjaxBlockEnd()
         }
     }
+    /**
+     * Add custom HTML code in a block
+     *
+     * @param html code
+     * @param style the template style to use
+     * @param closure actions to display in the header
+     */
+    void iframe(final String url, String cssHeight) {
+        blockVisitor.visitIframe(url, cssHeight)
+    }
 
     /**
      * Close the topmost modal. Usually, it passes an ID and a label to a form in a many to many relationship, if you open a modal using

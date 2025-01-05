@@ -18,6 +18,7 @@ import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.*
 import taack.ui.dump.html.element.HTMLDiv
+import taack.ui.dump.html.element.HTMLIFrame
 import taack.ui.dump.html.element.HTMLTxtContent
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
@@ -196,6 +197,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                 new HTMLDiv().builder.addClasses(style?.cssClassesString).putAttribute("style", style?.cssStyleString).addChildren(
                         new HTMLTxtContent(html)
                 ).build()
+        )
+    }
+
+    @Override
+    void visitIframe(String url, String cssHeight) {
+        blockLog.stayBlock('visitIframe')
+        blockLog.topElement.addChildren(
+                new HTMLIFrame(url, cssHeight)
         )
     }
 

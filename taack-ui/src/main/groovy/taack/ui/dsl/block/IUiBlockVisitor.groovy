@@ -74,6 +74,8 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitHtmlBlock(String html, Style style)
 
+    void visitIframe(String url, String cssHeight)
+
     void visitPoll(int millis, MethodClosure polledMethod)
 
     void visitPollEnd()
