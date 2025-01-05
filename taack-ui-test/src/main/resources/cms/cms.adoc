@@ -1,0 +1,63 @@
+= CMS (Content Management System)
+Adrien Guichard<adrien.guichard@citel.fr>
+v0.1, 2024-02
+:doctype: book
+:toc:
+:toc-title: Table of Contents of {doctitle}
+:toclevels: 2
+:sectnums: 2
+:sectnumlevels: 2
+ifdef::webimagesdir[:imagesdir: {webimagesdir}/images]
+ifndef::webimagesdir[:imagesdir: images]
+ifdef::webrootpath[:imagesoutdir: {webrootpath}]
+//:imagesdir: images
+:xrefdir: .
+:icons: font
+
+include::md.adoc[level=0]
+
+== Additional Features specific to the CMS
+
+=== Insert an image
+
+[source,groovy]
+----
+${IMG#<image_id_from_the_cms>}
+----
+
+The *image* will be resized and converted to be quickly downloadable from the browser.
+
+=== Insert a link to a CMS page
+
+[source,groovy]
+----
+${LINK#<page_id_from_**the_cms**>}<some-text>${CLOSE_LINK}
+----
+
+=== Insert a link to a PDF
+
+[source,groovy]
+----
+${PDF#<pdf_id_from_**the_cms**>}
+----
+
+A preview of the *PDF* along with a link to *download* the PDF will be inserted.
+
+=== Insert a link to a Youtube video
+
+[source,groovy]
+----
+${VID_LINK#<pdf_id_from_**the_cms**>}
+----
+
+A preview of the *video* along with a link to see it in a popup will be inserted.
+
+=== Insert a non-youtube video viewer
+
+[source,groovy]
+----
+${VID#<pdf_id_from_**the_cms**>}
+----
+
+Same as above, but the video has been uploaded directly into the Intranet
+

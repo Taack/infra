@@ -1,0 +1,437 @@
+== Basic Syntax
+
+You can install https://typora.io/[typora] on your computer to edit content with basic formatting support.
+
+Typora allows you to copy / past HTML content and translate it into Markdown (*.md* file extension)
+
+=== Headings
+
+++++
+<h1>Heading level 1</h1>
+<h2>Heading level 2</h2>
+<h3>Heading level 3</h3>
+<h4>Heading level 4</h4>
+<h5>Heading level 5</h5>
+<h6>Heading level 6</h6>
+++++
+
+.Markdown code
+[source,markdown]
+----
+# Heading level 1
+## Heading level 2
+### Heading level 3
+#### Heading level 4
+##### Heading level 5
+###### Heading level 6
+----
+
+==== Headings Best Practices
+
+.Be careful to new lines and spaces...
+|===
+|✅ Do This |❌ Don't do this
+
+|# Here's a Heading
+|#Here's a Heading
+
+|Try to put a blank line before...
+
+# Heading
+
+ ...and after a heading.
+|Without blank lines, this might not look right. +
+# Heading +
+Don't do this!
+|===
+
+=== Paragraphs
+
+To create paragraphs, use a blank line to separate one or more lines of text.
+
+.Markdown code
+[source,markdown]
+----
+I really like using Markdown.
+
+I think I'll use it to format all of my documents from now on.
+----
+
+Gives:
+++++
+<p>I really like using Markdown.</p>
+
+<p>I think I'll use it to format all of my documents from now on.</p>
+++++
+
+==== Paragraph Best Practices
+
+|===
+|✅ Do This |❌ Don't do this
+
+|Don't put tabs or spaces in front of your paragraphs.
+
+Keep lines left-aligned like this.
+
+|{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}This can result in unexpected formatting problems.
+
+{nbsp}{nbsp}{nbsp}Don't add tabs or spaces in front of paragraphs.
+
+|===
+
+=== Line Breaks
+
+To create a line break or new line (<br>), end a line with two or more spaces, and then type return.
+
+.Markdown code
+[source,markdown]
+----
+This is the first line.
+And this is the second line.
+----
+
+Gives:
+++++
+<p>This is the first line.<br>
+And this is the second line.</p>
+++++
+
+=== Bold
+
+To bold text, add two asterisks or underscores before and after a word or phrase. To bold the middle of a word for emphasis, add two asterisks without spaces around the letters.
+
+.Bold Text
+[source,markdown]
+----
+I just love **bold text**.
+Love**is**bold
+----
+
+Gives:
+++++
+I just love <strong>bold text</strong>.<br>
+Love<strong>is</strong>bold
+++++
+
+=== Italic
+
+.Italic Text
+[source,markdown]
+----
+Italicized text is the *cat's meow*.
+----
+
+Gives:
+++++
+Italicized text is the <em>cat's meow</em>.
+++++
+
+=== Blockquotes
+
+To create a blockquote, add a > in front of a paragraph.
+
+.Markdown code
+
+[source,markdown]
+----
+> Dorothy followed her through many of the beautiful rooms in her castle.
+----
+
+The rendered output looks like this:
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+
+Blockquotes can contain multiple paragraphs. Add a > on the blank lines between the paragraphs.
+
+[source,markdown]
+----
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+----
+
+The rendered output looks like this:
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+
+Blockquotes can be nested. Add a >> in front of the paragraph you want to nest.
+
+[source,markdown]
+----
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+>> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+----
+
+The rendered output looks like this:
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+> > The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+
+=== Blockquotes with Other Elements
+
+[source,markdown]
+----
+> #### The quarterly results look great!
+>
+> - Revenue was off the chart.
+> - Profits were higher than ever.
+>
+>  *Everything* is going according to **plan**.
+----
+
+The rendered output looks like this:
+
+> The quarterly results look great!
+>
+> - Revenue was off the chart.
+- Profits were higher than ever. +
+>
+_Everything_ is going according to *plan*.
+
+==== Blockquotes Best Practices
+
+For compatibility, put blank lines before and after blockquotes.
+
+|===
+|✅ Do This |❌ Don't do this
+|Try to put a blank line before...
+
+> This is a blockquote
+
+...and after a blockquote.
+|Without blank lines, this might not look right. +
+> This is a blockquote +
+Don't do this!
+|===
+
+=== List
+
+You can organize items into ordered and unordered lists.
+
+==== Ordered Lists
+
+To create an ordered list, add line items with numbers followed by periods. The numbers don’t have to be in numerical order, but the list should start with the number one.
+
+.Markdown code
+[source,markdown]
+----
+1. First item
+2. Second item
+3. Third item
+4. Fourth item
+----
+
+.Markdown code
+[source,markdown]
+----
+1. First item
+1. Second item
+1. Third item
+1. Fourth item
+----
+
+Both gives:
+++++
+<ol>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>Third item</li>
+  <li>Fourth item</li>
+</ol>
+++++
+
+.Markdown code
+[source,markdown]
+----
+1. First item
+2. Second item
+3. Third item
+    1. Indented item
+    2. Indented item
+4. Fourth item
+----
+
+Gives:
+++++
+<ol>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>Third item
+    <ol>
+      <li>Indented item</li>
+      <li>Indented item</li>
+    </ol>
+  </li>
+  <li>Fourth item</li>
+</ol>
+++++
+
+==== Unordered Lists
+
+.Markdown code
+[source,markdown]
+----
+- First item
+- Second item
+- Third item
+    - Indented item
+    - Indented item
+- Fourth item
+----
+
+Gives:
+++++
+<ul>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>Third item
+    <ul>
+      <li>Indented item</li>
+      <li>Indented item</li>
+    </ul>
+  </li>
+  <li>Fourth item</li>
+</ul>
+++++
+
+==== Starting Unordered List Items With Numbers
+
+If you need to start an unordered list item with a number followed by a period, you can use a backslash (\) to escape the period.
+
+.Markdown code
+[source,markdown]
+----
+- 1968\. A great year!
+- I think 1969 was second best.
+----
+
+==== Adding Elements in Lists
+
+To add another element in a list while preserving the continuity of the list, indent the element four spaces or one tab, as shown in the following examples.
+
+TIP: If things don't appear the way you expect, double check that you've indented the elements in the list four spaces or one tab.
+
+===== Paragraphs
+
+.Markdown code
+[source,markdown]
+----
+* This is the first list item.
+* Here's the second list item.
+
+    I need to add another paragraph below the second list item.
+
+* And here's the third list item.
+----
+
+The rendered output looks like this:
+
+- This is the first list item.
+- Here’s the second list item. +
++
+I need to add another paragraph below the second list item.
+- And here’s the third list item.
+
+===== Blockquotes
+
+.Markdown code
+[source,markdown]
+----
+* This is the first list item.
+* Here's the second list item.
+
+    > A blockquote would look great below the second list item.
+
+* And here's the third list item.
+----
+
+The rendered output looks like this:
+
+- This is the first list item.
+- Here’s the second list item. +
++
+> A blockquote would look great below the second list item.
+
+- And here’s the third list item.
+
+===== Images
+
+.Markdown code
+[source,markdown]
+----
+1. Open the file containing the Linux mascot.
+2. Marvel at its beauty.
+
+[Tux, the Linux mascot](/assets/images/tux.png)
+
+3. Close the file.
+----
+
+The rendered output looks like this:
+
+1. Open the file containing the Linux mascot.
+2. Marvel at its beauty.
++
+image::images/cms-tux.png[]
+
+3. Close the file.
+
+=== Horizontal Rules
+
+To create a horizontal rule, use three or more asterisks (\***), dashes (---) on a line by themselves.
+
+
+.Markdown code
+[source,markdown]
+----
+***
+
+---
+----
+
+=== Links
+
+To create a link, enclose the link text in brackets (e.g., [Something]) and then follow it immediately with the URL in parentheses (e.g., (https://google.com)).
+
+.Markdown code
+[source,markdown]
+----
+My favorite search engine is [Something Go](https://google.com).
+----
+
+NOTE: To link to an element on the same page, see linking to heading IDs. To create a link that opens in a new tab or window, see the section on link targets.
+
+=== URLs and Email Addresses
+
+To quickly turn a URL or email address into a link, enclose it in angle brackets.
+
+.Markdown code
+[source,markdown]
+----
+<https://www.markdownguide.org>
+<fake@example.com>
+----
+
+=== Images
+
+To add an image, add an exclamation mark (!), followed by alt text in brackets, and the path or URL to the image asset in parentheses. You can optionally add a title in quotation marks after the path or URL.
+
+.Markdown code
+[source,markdown]
+----
+![The San Juan Mountains are beautiful!](/assets/images/san-juan-mountains.jpg "San Juan Mountains")
+----
+
+==== Linking Images
+
+To add a link to an image, enclose the Markdown for the image in brackets, and then add the link in parentheses.
+
+.Markdown code
+[source,markdown]
+----
+[![An old rock in the desert](/assets/images/shiprock.jpg "Shiprock, New Mexico by Beau Rogers")](https://www.flickr.com/photos/beaurogers/31833779864/in/photolist-Qv3rFw-34mt9F-a9Cmfy-5Ha3Zi-9msKdv-o3hgjr-hWpUte-4WMsJ1-KUQ8N-deshUb-vssBD-6CQci6-8AFCiD-zsJWT-nNfsgB-dPDwZJ-bn9JGn-5HtSXY-6CUhAL-a4UTXB-ugPum-KUPSo-fBLNm-6CUmpy-4WMsc9-8a7D3T-83KJev-6CQ2bK-nNusHJ-a78rQH-nw3NvT-7aq2qf-8wwBso-3nNceh-ugSKP-4mh4kh-bbeeqH-a7biME-q3PtTf-brFpgb-cg38zw-bXMZc-nJPELD-f58Lmo-bXMYG-bz8AAi-bxNtNT-bXMYi-bXMY6-bXMYv)
+----

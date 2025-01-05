@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackAttachmentService
 import taack.domain.TaackFilterService
 import taack.domain.TaackSaveService
+import taack.render.TaackEditorService
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
 import taack.ui.dsl.*
@@ -47,7 +48,7 @@ class CmsController implements WebAttributes {
     CmsSearchService cmsSearchService
     SpringSecurityService springSecurityService
     TaackUiProgressBarService taackUiProgressBarService
-
+    TaackEditorService taackEditorService
     @Value('${intranet.root}')
     String rootPath
     static String cmsFileRoot
@@ -662,117 +663,7 @@ class CmsController implements WebAttributes {
     }
 
     def index() {
-        UiBlockSpecifier b = new UiBlockSpecifier().ui {
-            ajaxBlock "indexHelp", {
-                show new UiShowSpecifier().ui {
-                    inlineHtml Markdown.getContentHtml("""\
-                        # Markdown
-                        
-                        Install [Typora](https://typora.io/)
-                        
-                        You will be able to redact **Markdown** content in a **WYSIWYG** environment, used inside the page content. Typora allows you to copy / past HTML content and translate it into Markdown (**.md** file extension)
-                        
-                        Inside **Typora**, you can see Markdown content clicking on `Presentation` > `Source code mode`. You can write some text in Drive, then copy / past the content in it.
-                        
-                        # Special Features
-                        
-                        ## Insert an image
-                        
-                        ```
-                        \${IMG#<image_id_from_the_cms>}
-                        ```
-                        
-                        The **image** will be resized and converted to be quickly downloadable from the browser.
-                        
-                        ## Insert a link to a CMS page
-                        
-                        ```
-                        \${LINK#<page_id_from_**the_cms**>}<some-text>\${CLOSE_LINK}
-                        ```
-                        
-                        `\${LINK#2190595}*voir page "Technologie VG"*\${CLOSE_LINK}` 
-                        See [comment-choisir-son-parafoudre](https://citel.fr/fr/comment-choisir-son-parafoudre)
-                        
-                        ## Insert a link to an Item
-                        
-                        ```
-                        \${ITEM_LINK#<item_id_from_**Product Database**>}<some-text>\${CLOSE_LINK}`
-                        ```
-                    
-                        `\${ITEM_LINK#2066424}***DAC50VGS***\${CLOSE_LINK} Type 2+3, Technologie VG`
-                        See: [gamme-parafoudres-dac-ddc](https://citel.fr/fr/gamme-parafoudres-dac-ddc)
-
-                        
-                        ## Insert a link to a PDF
-                        
-                        ```
-                        \${PDF#<pdf_id_from_**the_cms**>}
-                        ```
-                        
-                        A preview of the **PDF** along with a link to **download** the PDF will be inserted.
-                        
-                        ## Insert a link to a Youtube video
-                        
-                        ```
-                        \${VID_LINK#<pdf_id_from_**the_cms**>}
-                        ```
-                        
-                        A preview of the **video** along with a link to see it in a popup will be inserted.
-                        
-                        ## Insert a non-youtube video viewer
-                        
-                        ```
-                        \${VID#<pdf_id_from_**the_cms**>}
-                        ```
-                        
-                        Same as above, but the video has been uploaded directly into the Intranet
-                        
-                        ## <s>Link to Product database content (**Item**, **Range**, **Family**, **Sub-family**)</s>
-                        
-                        `DEPRECATED`
-                        ```
-                        \${INSERT_LINK#<insert_id_from_**the_cms**>}<some-text>\${CLOSE_LINK}
-                        ```
-                        
-                        # Asciidoc and Slideshows
-                        
-                        See current slideshows from the menu to understand the syntax. It is much more powerfull than Markdown, 
-                        but we just need a subset of its functionalities for the slides. 
-                        
-                        You can insert a slideshow into a page, invoking: 
-                        
-                        ```
-                        \${SLIDESHOW#<slideshow_id_from_**the_cms**>}
-                        ```
-
-                        You can change the main site slideshow via the admin menu (Conf Sites)
-                        
-                        ## Use image or video background in a slideshow
-                        
-                        ```
-                        image::\${IMG_LINK#id_of_the_image}[]
-                        ```
-                        OR
-                        ```
-                        image::\${IMG_LINK#id_of_the_image}[background, size=cover]
-                        ```
-
-                        Complete sample will be available soon.
-                        
-                        ```
-                        [.invertNight,transition=zoom]
-                        == Gamme DAC
-                        
-                        image::\${IMG_LINK#id_of_the_image}[background, size=cover]
-                        ```
-                        
-                        *Adrien Guichard*
-
-                        """.stripIndent()), "markdown-body"
-                }
-            }
-        }
-        taackUiService.show(b, buildMenu())
+        taackUiService.show(taackEditorService.asciidocBlockSpecifier(CmsController.class, '/cms/cms.adoc'), buildMenu())
     }
 
     def pages() {

@@ -1,0 +1,1668 @@
+@charset "UTF-8";
+/*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment the following line when using as a custom stylesheet */
+/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+.asciidocMain a {
+  background: none;
+}
+.asciidocMain a:focus {
+  outline: thin dotted;
+}
+.asciidocMain a:active, .asciidocMain a:hover {
+  outline: 0;
+}
+.asciidocMain h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+.asciidocMain b, .asciidocMain strong {
+  font-weight: bold;
+}
+.asciidocMain abbr {
+  font-size: 0.9em;
+}
+.asciidocMain abbr[title] {
+  cursor: help;
+  border-bottom: 1px dotted #dddddf;
+  text-decoration: none;
+}
+.asciidocMain dfn {
+  font-style: italic;
+}
+.asciidocMain hr {
+  height: 0;
+}
+.asciidocMain mark {
+  background: #ff0;
+  color: #000;
+}
+.asciidocMain code, .asciidocMain kbd, .asciidocMain pre, .asciidocMain samp {
+  font-family: monospace;
+  font-size: 1em;
+}
+.asciidocMain pre {
+  white-space: pre-wrap;
+}
+.asciidocMain q {
+  quotes: "“" "”" "‘" "’";
+}
+.asciidocMain small {
+  font-size: 80%;
+}
+.asciidocMain sub, .asciidocMain sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+.asciidocMain sup {
+  top: -0.5em;
+}
+.asciidocMain sub {
+  bottom: -0.25em;
+}
+.asciidocMain img {
+  border: 0;
+}
+.asciidocMain svg:not(:root) {
+  overflow: hidden;
+}
+.asciidocMain figure {
+  margin: 0;
+}
+.asciidocMain audio, .asciidocMain video {
+  display: inline-block;
+}
+.asciidocMain audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+.asciidocMain fieldset {
+  border: 1px solid silver;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+.asciidocMain legend {
+  border: 0;
+  padding: 0;
+}
+.asciidocMain button, .asciidocMain input, .asciidocMain select, .asciidocMain textarea {
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0;
+}
+.asciidocMain button, .asciidocMain input {
+  line-height: normal;
+}
+.asciidocMain button, .asciidocMain select {
+  text-transform: none;
+}
+.asciidocMain button, .asciidocMain html input[type=button], .asciidocMain input[type=reset], .asciidocMain input[type=submit] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+.asciidocMain button[disabled], .asciidocMain html input[disabled] {
+  cursor: default;
+}
+.asciidocMain input[type=checkbox], .asciidocMain input[type=radio] {
+  padding: 0;
+}
+.asciidocMain button::-moz-focus-inner, .asciidocMain input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+.asciidocMain textarea {
+  overflow: auto;
+  vertical-align: top;
+}
+.asciidocMain table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.asciidocMain *, .asciidocMain ::before, .asciidocMain ::after {
+  box-sizing: border-box;
+}
+.asciidocMain html, .asciidocMain body {
+  font-size: 100%;
+}
+.asciidocMain body {
+  background: #fff;
+  color: rgba(0, 0, 0, 0.8);
+  padding: 0;
+  margin: 0;
+  font-family: "Noto Serif", "DejaVu Serif", serif;
+  line-height: 1;
+  position: relative;
+  cursor: auto;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  word-wrap: anywhere;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+.asciidocMain a:hover {
+  cursor: pointer;
+}
+.asciidocMain img, .asciidocMain object, .asciidocMain embed {
+  max-width: 100%;
+  height: auto;
+}
+.asciidocMain object, .asciidocMain embed {
+  height: 100%;
+}
+.asciidocMain img {
+  -ms-interpolation-mode: bicubic;
+}
+.asciidocMain .left {
+  float: left !important;
+}
+.asciidocMain .right {
+  float: right !important;
+}
+.asciidocMain .text-left {
+  text-align: left !important;
+}
+.asciidocMain .text-right {
+  text-align: right !important;
+}
+.asciidocMain .text-center {
+  text-align: center !important;
+}
+.asciidocMain .text-justify {
+  text-align: justify !important;
+}
+.asciidocMain .hide {
+  display: none;
+}
+.asciidocMain img, .asciidocMain object, .asciidocMain svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+.asciidocMain textarea {
+  height: auto;
+  min-height: 50px;
+}
+.asciidocMain select {
+  width: 100%;
+}
+.asciidocMain .subheader, .asciidocMain .admonitionblock td.content > .title, .asciidocMain .audioblock > .title, .asciidocMain .exampleblock > .title, .asciidocMain .imageblock > .title, .asciidocMain .listingblock > .title, .asciidocMain .literalblock > .title, .asciidocMain .stemblock > .title, .asciidocMain .openblock > .title, .asciidocMain .paragraph > .title, .asciidocMain .quoteblock > .title, .asciidocMain table.tableblock > .title, .asciidocMain .verseblock > .title, .asciidocMain .videoblock > .title, .asciidocMain .dlist > .title, .asciidocMain .olist > .title, .asciidocMain .ulist > .title, .asciidocMain .qlist > .title, .asciidocMain .hdlist > .title {
+  line-height: 1.45;
+  color: #7a2518;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 0.25em;
+}
+.asciidocMain div, .asciidocMain dl, .asciidocMain dt, .asciidocMain dd, .asciidocMain ul, .asciidocMain ol, .asciidocMain li, .asciidocMain h1, .asciidocMain h2, .asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title, .asciidocMain h4, .asciidocMain h5, .asciidocMain h6, .asciidocMain pre, .asciidocMain form, .asciidocMain p, .asciidocMain blockquote, .asciidocMain th, .asciidocMain td {
+  margin: 0;
+  padding: 0;
+}
+.asciidocMain a {
+  color: #2156a5;
+  text-decoration: underline;
+  line-height: inherit;
+}
+.asciidocMain a:hover, .asciidocMain a:focus {
+  color: #1d4b8f;
+}
+.asciidocMain a img {
+  border: 0;
+}
+.asciidocMain p {
+  line-height: 1.6;
+  margin-bottom: 1.25em;
+  text-rendering: optimizeLegibility;
+}
+.asciidocMain p aside {
+  font-size: 0.875em;
+  line-height: 1.35;
+  font-style: italic;
+}
+.asciidocMain h1, .asciidocMain h2, .asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title, .asciidocMain h4, .asciidocMain h5, .asciidocMain h6 {
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  color: #ba3925;
+  text-rendering: optimizeLegibility;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  line-height: 1.0125em;
+}
+.asciidocMain h1 small, .asciidocMain h2 small, .asciidocMain h3 small, .asciidocMain #toctitle small, .asciidocMain .sidebarblock > .content > .title small, .asciidocMain h4 small, .asciidocMain h5 small, .asciidocMain h6 small {
+  font-size: 60%;
+  color: #e99b8f;
+  line-height: 0;
+}
+.asciidocMain h1 {
+  font-size: 2.125em;
+}
+.asciidocMain h2 {
+  font-size: 1.6875em;
+}
+.asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title {
+  font-size: 1.375em;
+}
+.asciidocMain h4, .asciidocMain h5 {
+  font-size: 1.125em;
+}
+.asciidocMain h6 {
+  font-size: 1em;
+}
+.asciidocMain hr {
+  border: solid #dddddf;
+  border-width: 1px 0 0;
+  clear: both;
+  margin: 1.25em 0 1.1875em;
+}
+.asciidocMain em, .asciidocMain i {
+  font-style: italic;
+  line-height: inherit;
+}
+.asciidocMain strong, .asciidocMain b {
+  font-weight: bold;
+  line-height: inherit;
+}
+.asciidocMain small {
+  font-size: 60%;
+  line-height: inherit;
+}
+.asciidocMain code {
+  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.9);
+}
+.asciidocMain ul, .asciidocMain ol, .asciidocMain dl {
+  line-height: 1.6;
+  margin-bottom: 1.25em;
+  list-style-position: outside;
+  font-family: inherit;
+}
+.asciidocMain ul, .asciidocMain ol {
+  margin-left: 1.5em;
+}
+.asciidocMain ul li ul, .asciidocMain ul li ol {
+  margin-left: 1.25em;
+  margin-bottom: 0;
+}
+.asciidocMain ul.circle {
+  list-style-type: circle;
+}
+.asciidocMain ul.disc {
+  list-style-type: disc;
+}
+.asciidocMain ul.square {
+  list-style-type: square;
+}
+.asciidocMain ul.circle ul:not([class]), .asciidocMain ul.disc ul:not([class]), .asciidocMain ul.square ul:not([class]) {
+  list-style: inherit;
+}
+.asciidocMain ol li ul, .asciidocMain ol li ol {
+  margin-left: 1.25em;
+  margin-bottom: 0;
+}
+.asciidocMain dl dt {
+  margin-bottom: 0.3125em;
+  font-weight: bold;
+}
+.asciidocMain dl dd {
+  margin-bottom: 1.25em;
+}
+.asciidocMain blockquote {
+  margin: 0 0 1.25em;
+  padding: 0.5625em 1.25em 0 1.1875em;
+  border-left: 1px solid #ddd;
+}
+.asciidocMain blockquote, .asciidocMain blockquote p {
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.85);
+}
+@media screen and (min-width: 768px) {
+  .asciidocMain h1, .asciidocMain h2, .asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title, .asciidocMain h4, .asciidocMain h5, .asciidocMain h6 {
+    line-height: 1.2;
+  }
+  .asciidocMain h1 {
+    font-size: 2.75em;
+  }
+  .asciidocMain h2 {
+    font-size: 2.3125em;
+  }
+  .asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title {
+    font-size: 1.6875em;
+  }
+  .asciidocMain h4 {
+    font-size: 1.4375em;
+  }
+}
+.asciidocMain table {
+  background: #fff;
+  margin-bottom: 1.25em;
+  border: 1px solid #dedede;
+  word-wrap: normal;
+}
+.asciidocMain table thead, .asciidocMain table tfoot {
+  background: #f7f8f7;
+}
+.asciidocMain table thead tr th, .asciidocMain table thead tr td, .asciidocMain table tfoot tr th, .asciidocMain table tfoot tr td {
+  padding: 0.5em 0.625em 0.625em;
+  font-size: inherit;
+  color: rgba(0, 0, 0, 0.8);
+  text-align: left;
+}
+.asciidocMain table tr th, .asciidocMain table tr td {
+  padding: 0.5625em 0.625em;
+  font-size: inherit;
+  color: rgba(0, 0, 0, 0.8);
+}
+.asciidocMain table tr.even, .asciidocMain table tr.alt {
+  background: #f8f8f7;
+}
+.asciidocMain table thead tr th, .asciidocMain table tfoot tr th, .asciidocMain table tbody tr td, .asciidocMain table tr td, .asciidocMain table tfoot tr td {
+  line-height: 1.6;
+}
+.asciidocMain h1, .asciidocMain h2, .asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title, .asciidocMain h4, .asciidocMain h5, .asciidocMain h6 {
+  line-height: 1.2;
+  word-spacing: -0.05em;
+}
+.asciidocMain h1 strong, .asciidocMain h2 strong, .asciidocMain h3 strong, .asciidocMain #toctitle strong, .asciidocMain .sidebarblock > .content > .title strong, .asciidocMain h4 strong, .asciidocMain h5 strong, .asciidocMain h6 strong {
+  font-weight: 400;
+}
+.asciidocMain .center {
+  margin-left: auto;
+  margin-right: auto;
+}
+.asciidocMain .stretch {
+  width: 100%;
+}
+.asciidocMain .clearfix::before, .asciidocMain .clearfix::after, .asciidocMain .float-group::before, .asciidocMain .float-group::after {
+  content: " ";
+  display: table;
+}
+.asciidocMain .clearfix::after, .asciidocMain .float-group::after {
+  clear: both;
+}
+.asciidocMain :not(pre).nobreak {
+  word-wrap: normal;
+}
+.asciidocMain :not(pre).nowrap {
+  white-space: nowrap;
+}
+.asciidocMain :not(pre).pre-wrap {
+  white-space: pre-wrap;
+}
+.asciidocMain :not(pre):not([class^=L]) > code {
+  font-size: 0.9375em;
+  font-style: normal !important;
+  letter-spacing: 0;
+  padding: 0.1em 0.5ex;
+  word-spacing: -0.15em;
+  background: #f7f7f8;
+  border-radius: 4px;
+  line-height: 1.45;
+  text-rendering: optimizeSpeed;
+}
+.asciidocMain pre {
+  color: rgba(0, 0, 0, 0.9);
+  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+  line-height: 1.45;
+  text-rendering: optimizeSpeed;
+}
+.asciidocMain pre code, .asciidocMain pre pre {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.asciidocMain pre > code {
+  display: block;
+}
+.asciidocMain pre.nowrap, .asciidocMain pre.nowrap pre {
+  white-space: pre;
+  word-wrap: normal;
+}
+.asciidocMain em em {
+  font-style: normal;
+}
+.asciidocMain strong strong {
+  font-weight: 400;
+}
+.asciidocMain .keyseq {
+  color: rgba(51, 51, 51, 0.8);
+}
+.asciidocMain kbd {
+  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 0.65em;
+  line-height: 1.45;
+  background: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), inset 0 0 0 0.1em #fff;
+  margin: 0 0.15em;
+  padding: 0.2em 0.5em;
+  vertical-align: middle;
+  position: relative;
+  top: -0.1em;
+  white-space: nowrap;
+}
+.asciidocMain .keyseq kbd:first-child {
+  margin-left: 0;
+}
+.asciidocMain .keyseq kbd:last-child {
+  margin-right: 0;
+}
+.asciidocMain .menuseq, .asciidocMain .menuref {
+  color: #000;
+}
+.asciidocMain .menuseq b:not(.caret), .asciidocMain .menuref {
+  font-weight: inherit;
+}
+.asciidocMain .menuseq {
+  word-spacing: -0.02em;
+}
+.asciidocMain .menuseq b.caret {
+  font-size: 1.25em;
+  line-height: 0.8;
+}
+.asciidocMain .menuseq i.caret {
+  font-weight: bold;
+  text-align: center;
+  width: 0.45em;
+}
+.asciidocMain b.button::before, .asciidocMain b.button::after {
+  position: relative;
+  top: -1px;
+  font-weight: 400;
+}
+.asciidocMain b.button::before {
+  content: "[";
+  padding: 0 3px 0 2px;
+}
+.asciidocMain b.button::after {
+  content: "]";
+  padding: 0 2px 0 3px;
+}
+.asciidocMain p a > code:hover {
+  color: rgba(0, 0, 0, 0.9);
+}
+.asciidocMain #header, .asciidocMain #content, .asciidocMain #footnotes, .asciidocMain #footer {
+  width: 100%;
+  margin: 0 auto;
+  max-width: 62.5em;
+  *zoom: 1;
+  position: relative;
+  padding-left: 0.9375em;
+  padding-right: 0.9375em;
+}
+.asciidocMain #header::before, .asciidocMain #header::after, .asciidocMain #content::before, .asciidocMain #content::after, .asciidocMain #footnotes::before, .asciidocMain #footnotes::after, .asciidocMain #footer::before, .asciidocMain #footer::after {
+  content: " ";
+  display: table;
+}
+.asciidocMain #header::after, .asciidocMain #content::after, .asciidocMain #footnotes::after, .asciidocMain #footer::after {
+  clear: both;
+}
+.asciidocMain #content {
+  margin-top: 1.25em;
+}
+.asciidocMain #content::before {
+  content: none;
+}
+.asciidocMain #header > h1:first-child {
+  color: rgba(0, 0, 0, 0.85);
+  margin-top: 2.25rem;
+  margin-bottom: 0;
+}
+.asciidocMain #header > h1:first-child + #toc {
+  margin-top: 8px;
+  border-top: 1px solid #dddddf;
+}
+.asciidocMain #header > h1:only-child {
+  border-bottom: 1px solid #dddddf;
+  padding-bottom: 8px;
+}
+.asciidocMain #header .details {
+  border-bottom: 1px solid #dddddf;
+  line-height: 1.45;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-left: 0.25em;
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-flow: row wrap;
+}
+.asciidocMain #header .details span:first-child {
+  margin-left: -0.125em;
+}
+.asciidocMain #header .details span.email a {
+  color: rgba(0, 0, 0, 0.85);
+}
+.asciidocMain #header .details br {
+  display: none;
+}
+.asciidocMain #header .details br + span::before {
+  content: " – ";
+}
+.asciidocMain #header .details br + span.author::before {
+  content: " ⋅ ";
+  color: rgba(0, 0, 0, 0.85);
+}
+.asciidocMain #header .details br + span#revremark::before {
+  content: " | ";
+}
+.asciidocMain #header #revnumber {
+  text-transform: capitalize;
+}
+.asciidocMain #header #revnumber::after {
+  content: " ";
+}
+.asciidocMain #content > h1:first-child:not([class]) {
+  color: rgba(0, 0, 0, 0.85);
+  border-bottom: 1px solid #dddddf;
+  padding-bottom: 8px;
+  margin-top: 0;
+  padding-top: 1rem;
+  margin-bottom: 1.25rem;
+}
+.asciidocMain #toc {
+  border-bottom: 1px solid #e7e7e9;
+  padding-bottom: 0.5em;
+}
+.asciidocMain #toc > ul {
+  margin-left: 0.125em;
+}
+.asciidocMain #toc ul.sectlevel0 > li > a {
+  font-style: italic;
+}
+.asciidocMain #toc ul.sectlevel0 ul.sectlevel1 {
+  margin: 0.5em 0;
+}
+.asciidocMain #toc ul {
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  list-style-type: none;
+}
+.asciidocMain #toc li {
+  line-height: 1.3334;
+  margin-top: 0.3334em;
+}
+.asciidocMain #toc a {
+  text-decoration: none;
+}
+.asciidocMain #toc a:active {
+  text-decoration: underline;
+}
+.asciidocMain #toctitle {
+  color: #7a2518;
+  font-size: 1.2em;
+}
+@media screen and (min-width: 768px) {
+  .asciidocMain #toctitle {
+    font-size: 1.375em;
+  }
+  .asciidocMain body.toc2 {
+    padding-left: 15em;
+    padding-right: 0;
+  }
+  .asciidocMain body.toc2 #header > h1:nth-last-child(2) {
+    border-bottom: 1px solid #dddddf;
+    padding-bottom: 8px;
+  }
+  .asciidocMain #toc.toc2 {
+    margin-top: 0 !important;
+    /*background: #f8f8f7;*/
+    position: fixed;
+    width: 15em;
+    left: 0;
+    /*top: 0;*/
+    /*border-right: 1px solid #e7e7e9;*/
+    border-top-width: 0 !important;
+    border-bottom-width: 0 !important;
+    z-index: 1000;
+    padding: 1.25em 1em;
+    height: 100%;
+    overflow: auto;
+  }
+  .asciidocMain #toc.toc2 #toctitle {
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    font-size: 1.2em;
+  }
+  .asciidocMain #toc.toc2 > ul {
+    font-size: 0.9em;
+    margin-bottom: 0;
+  }
+  .asciidocMain #toc.toc2 ul ul {
+    margin-left: 0;
+    padding-left: 1em;
+  }
+  .asciidocMain #toc.toc2 ul.sectlevel0 ul.sectlevel1 {
+    padding-left: 0;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .asciidocMain body.toc2.toc-right {
+    padding-left: 0;
+    padding-right: 15em;
+  }
+  .asciidocMain body.toc2.toc-right #toc.toc2 {
+    border-right-width: 0;
+    border-left: 1px solid #e7e7e9;
+    left: auto;
+    right: 0;
+  }
+}
+@media screen and (min-width: 1280px) {
+  .asciidocMain body.toc2 {
+    padding-left: 20em;
+    padding-right: 0;
+  }
+  .asciidocMain #toc.toc2 {
+    width: 20em;
+  }
+  .asciidocMain #toc.toc2 #toctitle {
+    font-size: 1.375em;
+  }
+  .asciidocMain #toc.toc2 > ul {
+    font-size: 0.95em;
+  }
+  .asciidocMain #toc.toc2 ul ul {
+    padding-left: 1.25em;
+  }
+  .asciidocMain body.toc2.toc-right {
+    padding-left: 0;
+    padding-right: 20em;
+  }
+}
+.asciidocMain #content #toc {
+  border: 1px solid #e0e0dc;
+  margin-bottom: 1.25em;
+  padding: 1.25em;
+  background: #f8f8f7;
+  border-radius: 4px;
+}
+.asciidocMain #content #toc > :first-child {
+  margin-top: 0;
+}
+.asciidocMain #content #toc > :last-child {
+  margin-bottom: 0;
+}
+.asciidocMain #footer {
+  max-width: none;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1.25em;
+}
+.asciidocMain #footer-text {
+  color: hsla(0, 0%, 100%, 0.8);
+  line-height: 1.44;
+}
+.asciidocMain #content {
+  margin-bottom: 0.625em;
+}
+.asciidocMain .sect1 {
+  padding-bottom: 0.625em;
+}
+@media screen and (min-width: 768px) {
+  .asciidocMain #content {
+    margin-bottom: 1.25em;
+  }
+  .asciidocMain .sect1 {
+    padding-bottom: 1.25em;
+  }
+}
+.asciidocMain .sect1:last-child {
+  padding-bottom: 0;
+}
+.asciidocMain .sect1 + .sect1 {
+  border-top: 1px solid #e7e7e9;
+}
+.asciidocMain #content h1 > a.anchor, .asciidocMain h2 > a.anchor, .asciidocMain h3 > a.anchor, .asciidocMain #toctitle > a.anchor, .asciidocMain .sidebarblock > .content > .title > a.anchor, .asciidocMain h4 > a.anchor, .asciidocMain h5 > a.anchor, .asciidocMain h6 > a.anchor {
+  position: absolute;
+  z-index: 1001;
+  width: 1.5ex;
+  margin-left: -1.5ex;
+  display: block;
+  text-decoration: none !important;
+  visibility: hidden;
+  text-align: center;
+  font-weight: 400;
+}
+.asciidocMain #content h1 > a.anchor::before, .asciidocMain h2 > a.anchor::before, .asciidocMain h3 > a.anchor::before, .asciidocMain #toctitle > a.anchor::before, .asciidocMain .sidebarblock > .content > .title > a.anchor::before, .asciidocMain h4 > a.anchor::before, .asciidocMain h5 > a.anchor::before, .asciidocMain h6 > a.anchor::before {
+  content: "§";
+  font-size: 0.85em;
+  display: block;
+  padding-top: 0.1em;
+}
+.asciidocMain #content h1:hover > a.anchor, .asciidocMain #content h1 > a.anchor:hover, .asciidocMain h2:hover > a.anchor, .asciidocMain h2 > a.anchor:hover, .asciidocMain h3:hover > a.anchor, .asciidocMain #toctitle:hover > a.anchor, .asciidocMain .sidebarblock > .content > .title:hover > a.anchor, .asciidocMain h3 > a.anchor:hover, .asciidocMain #toctitle > a.anchor:hover, .asciidocMain .sidebarblock > .content > .title > a.anchor:hover, .asciidocMain h4:hover > a.anchor, .asciidocMain h4 > a.anchor:hover, .asciidocMain h5:hover > a.anchor, .asciidocMain h5 > a.anchor:hover, .asciidocMain h6:hover > a.anchor, .asciidocMain h6 > a.anchor:hover {
+  visibility: visible;
+}
+.asciidocMain #content h1 > a.link, .asciidocMain h2 > a.link, .asciidocMain h3 > a.link, .asciidocMain #toctitle > a.link, .asciidocMain .sidebarblock > .content > .title > a.link, .asciidocMain h4 > a.link, .asciidocMain h5 > a.link, .asciidocMain h6 > a.link {
+  color: #ba3925;
+  text-decoration: none;
+}
+.asciidocMain #content h1 > a.link:hover, .asciidocMain h2 > a.link:hover, .asciidocMain h3 > a.link:hover, .asciidocMain #toctitle > a.link:hover, .asciidocMain .sidebarblock > .content > .title > a.link:hover, .asciidocMain h4 > a.link:hover, .asciidocMain h5 > a.link:hover, .asciidocMain h6 > a.link:hover {
+  color: #a53221;
+}
+.asciidocMain details, .asciidocMain .audioblock, .asciidocMain .imageblock, .asciidocMain .literalblock, .asciidocMain .listingblock, .asciidocMain .stemblock, .asciidocMain .videoblock {
+  margin-bottom: 1.25em;
+}
+.asciidocMain details {
+  margin-left: 1.25rem;
+}
+.asciidocMain details > summary {
+  cursor: pointer;
+  display: block;
+  position: relative;
+  line-height: 1.6;
+  margin-bottom: 0.625rem;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.asciidocMain details > summary::-webkit-details-marker {
+  display: none;
+}
+.asciidocMain details > summary::before {
+  content: "";
+  border: solid transparent;
+  border-left: solid;
+  border-width: 0.3em 0 0.3em 0.5em;
+  position: absolute;
+  top: 0.5em;
+  left: -1.25rem;
+  transform: translateX(15%);
+}
+.asciidocMain details[open] > summary::before {
+  border: solid transparent;
+  border-top: solid;
+  border-width: 0.5em 0.3em 0;
+  transform: translateY(15%);
+}
+.asciidocMain details > summary::after {
+  content: "";
+  width: 1.25rem;
+  height: 1em;
+  position: absolute;
+  top: 0.3em;
+  left: -1.25rem;
+}
+.asciidocMain .admonitionblock td.content > .title, .asciidocMain .audioblock > .title, .asciidocMain .exampleblock > .title, .asciidocMain .imageblock > .title, .asciidocMain .listingblock > .title, .asciidocMain .literalblock > .title, .asciidocMain .stemblock > .title, .asciidocMain .openblock > .title, .asciidocMain .paragraph > .title, .asciidocMain .quoteblock > .title, .asciidocMain table.tableblock > .title, .asciidocMain .verseblock > .title, .asciidocMain .videoblock > .title, .asciidocMain .dlist > .title, .asciidocMain .olist > .title, .asciidocMain .ulist > .title, .asciidocMain .qlist > .title, .asciidocMain .hdlist > .title {
+  text-rendering: optimizeLegibility;
+  text-align: left;
+  font-family: "Noto Serif", "DejaVu Serif", serif;
+  font-size: 1rem;
+  font-style: italic;
+}
+.asciidocMain table.tableblock.fit-content > caption.title {
+  white-space: nowrap;
+  width: 0;
+}
+.asciidocMain .paragraph.lead > p, .asciidocMain #preamble > .sectionbody > [class=paragraph]:first-of-type p {
+  font-size: 1.21875em;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.85);
+}
+.asciidocMain .admonitionblock > table {
+  border-collapse: separate;
+  border: 0;
+  background: none;
+  width: 100%;
+}
+.asciidocMain .admonitionblock > table td.icon {
+  text-align: center;
+  width: 80px;
+}
+.asciidocMain .admonitionblock > table td.icon img {
+  max-width: none;
+}
+.asciidocMain .admonitionblock > table td.icon .title {
+  font-weight: bold;
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  text-transform: uppercase;
+}
+.asciidocMain .admonitionblock > table td.content {
+  padding-left: 1.125em;
+  padding-right: 1.25em;
+  border-left: 1px solid #dddddf;
+  color: rgba(0, 0, 0, 0.6);
+  word-wrap: anywhere;
+}
+.asciidocMain .admonitionblock > table td.content > :last-child > :last-child {
+  margin-bottom: 0;
+}
+.asciidocMain .exampleblock > .content {
+  border: 1px solid #e6e6e6;
+  margin-bottom: 1.25em;
+  padding: 1.25em;
+  background: #fff;
+  border-radius: 4px;
+}
+.asciidocMain .sidebarblock {
+  border: 1px solid #dbdbd6;
+  margin-bottom: 1.25em;
+  padding: 1.25em;
+  background: #f3f3f2;
+  border-radius: 4px;
+}
+.asciidocMain .sidebarblock > .content > .title {
+  color: #7a2518;
+  margin-top: 0;
+  text-align: center;
+}
+.asciidocMain .exampleblock > .content > :first-child, .asciidocMain .sidebarblock > .content > :first-child {
+  margin-top: 0;
+}
+.asciidocMain .exampleblock > .content > :last-child, .asciidocMain .exampleblock > .content > :last-child > :last-child, .asciidocMain .exampleblock > .content .olist > ol > li:last-child > :last-child, .asciidocMain .exampleblock > .content .ulist > ul > li:last-child > :last-child, .asciidocMain .exampleblock > .content .qlist > ol > li:last-child > :last-child, .asciidocMain .sidebarblock > .content > :last-child, .asciidocMain .sidebarblock > .content > :last-child > :last-child, .asciidocMain .sidebarblock > .content .olist > ol > li:last-child > :last-child, .asciidocMain .sidebarblock > .content .ulist > ul > li:last-child > :last-child, .asciidocMain .sidebarblock > .content .qlist > ol > li:last-child > :last-child {
+  margin-bottom: 0;
+}
+.asciidocMain .literalblock pre, .asciidocMain .listingblock > .content > pre {
+  border-radius: 4px;
+  overflow-x: auto;
+  padding: 1em;
+  font-size: 0.8125em;
+}
+@media screen and (min-width: 768px) {
+  .asciidocMain .literalblock pre, .asciidocMain .listingblock > .content > pre {
+    font-size: 0.90625em;
+  }
+}
+@media screen and (min-width: 1280px) {
+  .asciidocMain .literalblock pre, .asciidocMain .listingblock > .content > pre {
+    font-size: 1em;
+  }
+}
+.asciidocMain .literalblock pre, .asciidocMain .listingblock > .content > pre:not(.highlight), .asciidocMain .listingblock > .content > pre[class=highlight], .asciidocMain .listingblock > .content > pre[class^="highlight "] {
+  background: #f7f7f8;
+}
+.asciidocMain .literalblock.output pre {
+  color: #f7f7f8;
+  background: rgba(0, 0, 0, 0.9);
+}
+.asciidocMain .listingblock > .content {
+  position: relative;
+}
+.asciidocMain .listingblock code[data-lang]::before {
+  display: none;
+  content: attr(data-lang);
+  position: absolute;
+  font-size: 0.75em;
+  top: 0.425rem;
+  right: 0.5rem;
+  line-height: 1;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.5;
+}
+.asciidocMain .listingblock:hover code[data-lang]::before {
+  display: block;
+}
+.asciidocMain .listingblock.terminal pre .command::before {
+  content: attr(data-prompt);
+  padding-right: 0.5em;
+  color: inherit;
+  opacity: 0.5;
+}
+.asciidocMain .listingblock.terminal pre .command:not([data-prompt])::before {
+  content: "$";
+}
+.asciidocMain .listingblock pre.highlightjs {
+  padding: 0;
+}
+.asciidocMain .listingblock pre.highlightjs > code {
+  padding: 1em;
+  border-radius: 4px;
+}
+.asciidocMain .listingblock pre.prettyprint {
+  border-width: 0;
+}
+.asciidocMain .prettyprint {
+  background: #f7f7f8;
+}
+.asciidocMain pre.prettyprint .linenums {
+  line-height: 1.45;
+  margin-left: 2em;
+}
+.asciidocMain pre.prettyprint li {
+  background: none;
+  list-style-type: inherit;
+  padding-left: 0;
+}
+.asciidocMain pre.prettyprint li code[data-lang]::before {
+  opacity: 1;
+}
+.asciidocMain pre.prettyprint li:not(:first-child) code[data-lang]::before {
+  display: none;
+}
+.asciidocMain table.linenotable {
+  border-collapse: separate;
+  border: 0;
+  margin-bottom: 0;
+  background: none;
+}
+.asciidocMain table.linenotable td[class] {
+  color: inherit;
+  vertical-align: top;
+  padding: 0;
+  line-height: inherit;
+  white-space: normal;
+}
+.asciidocMain table.linenotable td.code {
+  padding-left: 0.75em;
+}
+.asciidocMain table.linenotable td.linenos, .asciidocMain pre.pygments .linenos {
+  border-right: 1px solid;
+  opacity: 0.35;
+  padding-right: 0.5em;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.asciidocMain pre.pygments span.linenos {
+  display: inline-block;
+  margin-right: 0.75em;
+}
+.asciidocMain .quoteblock {
+  margin: 0 1em 1.25em 1.5em;
+  display: table;
+}
+.asciidocMain .quoteblock:not(.excerpt) > .title {
+  margin-left: -1.5em;
+  margin-bottom: 0.75em;
+}
+.asciidocMain .quoteblock blockquote, .asciidocMain .quoteblock p {
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 1.15rem;
+  line-height: 1.75;
+  word-spacing: 0.1em;
+  letter-spacing: 0;
+  font-style: italic;
+  text-align: justify;
+}
+.asciidocMain .quoteblock blockquote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.asciidocMain .quoteblock blockquote::before {
+  content: "“";
+  float: left;
+  font-size: 2.75em;
+  font-weight: bold;
+  line-height: 0.6em;
+  margin-left: -0.6em;
+  color: #7a2518;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.asciidocMain .quoteblock blockquote > .paragraph:last-child p {
+  margin-bottom: 0;
+}
+.asciidocMain .quoteblock .attribution {
+  margin-top: 0.75em;
+  margin-right: 0.5ex;
+  text-align: right;
+}
+.asciidocMain .verseblock {
+  margin: 0 1em 1.25em;
+}
+.asciidocMain .verseblock pre {
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-size: 1.15rem;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 300;
+  text-rendering: optimizeLegibility;
+}
+.asciidocMain .verseblock pre strong {
+  font-weight: 400;
+}
+.asciidocMain .verseblock .attribution {
+  margin-top: 1.25rem;
+  margin-left: 0.5ex;
+}
+.asciidocMain .quoteblock .attribution, .asciidocMain .verseblock .attribution {
+  font-size: 0.9375em;
+  line-height: 1.45;
+  font-style: italic;
+}
+.asciidocMain .quoteblock .attribution br, .asciidocMain .verseblock .attribution br {
+  display: none;
+}
+.asciidocMain .quoteblock .attribution cite, .asciidocMain .verseblock .attribution cite {
+  display: block;
+  letter-spacing: -0.025em;
+  color: rgba(0, 0, 0, 0.6);
+}
+.asciidocMain .quoteblock.abstract blockquote::before, .asciidocMain .quoteblock.excerpt blockquote::before, .asciidocMain .quoteblock .quoteblock blockquote::before {
+  display: none;
+}
+.asciidocMain .quoteblock.abstract blockquote, .asciidocMain .quoteblock.abstract p, .asciidocMain .quoteblock.excerpt blockquote, .asciidocMain .quoteblock.excerpt p, .asciidocMain .quoteblock .quoteblock blockquote, .asciidocMain .quoteblock .quoteblock p {
+  line-height: 1.6;
+  word-spacing: 0;
+}
+.asciidocMain .quoteblock.abstract {
+  margin: 0 1em 1.25em;
+  display: block;
+}
+.asciidocMain .quoteblock.abstract > .title {
+  margin: 0 0 0.375em;
+  font-size: 1.15em;
+  text-align: center;
+}
+.asciidocMain .quoteblock.excerpt > blockquote, .asciidocMain .quoteblock .quoteblock {
+  padding: 0 0 0.25em 1em;
+  border-left: 0.25em solid #dddddf;
+}
+.asciidocMain .quoteblock.excerpt, .asciidocMain .quoteblock .quoteblock {
+  margin-left: 0;
+}
+.asciidocMain .quoteblock.excerpt blockquote, .asciidocMain .quoteblock.excerpt p, .asciidocMain .quoteblock .quoteblock blockquote, .asciidocMain .quoteblock .quoteblock p {
+  color: inherit;
+  font-size: 1.0625rem;
+}
+.asciidocMain .quoteblock.excerpt .attribution, .asciidocMain .quoteblock .quoteblock .attribution {
+  color: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  margin-right: 0;
+}
+.asciidocMain p.tableblock:last-child {
+  margin-bottom: 0;
+}
+.asciidocMain td.tableblock > .content {
+  margin-bottom: 1.25em;
+  word-wrap: anywhere;
+}
+.asciidocMain td.tableblock > .content > :last-child {
+  margin-bottom: -1.25em;
+}
+.asciidocMain table.tableblock, .asciidocMain th.tableblock, .asciidocMain td.tableblock {
+  border: 0 solid #dedede;
+}
+.asciidocMain table.grid-all > * > tr > * {
+  border-width: 1px;
+}
+.asciidocMain table.grid-cols > * > tr > * {
+  border-width: 0 1px;
+}
+.asciidocMain table.grid-rows > * > tr > * {
+  border-width: 1px 0;
+}
+.asciidocMain table.frame-all {
+  border-width: 1px;
+}
+.asciidocMain table.frame-ends {
+  border-width: 1px 0;
+}
+.asciidocMain table.frame-sides {
+  border-width: 0 1px;
+}
+.asciidocMain table.frame-none > colgroup + * > :first-child > *, .asciidocMain table.frame-sides > colgroup + * > :first-child > * {
+  border-top-width: 0;
+}
+.asciidocMain table.frame-none > :last-child > :last-child > *, .asciidocMain table.frame-sides > :last-child > :last-child > * {
+  border-bottom-width: 0;
+}
+.asciidocMain table.frame-none > * > tr > :first-child, .asciidocMain table.frame-ends > * > tr > :first-child {
+  border-left-width: 0;
+}
+.asciidocMain table.frame-none > * > tr > :last-child, .asciidocMain table.frame-ends > * > tr > :last-child {
+  border-right-width: 0;
+}
+.asciidocMain table.stripes-all > * > tr, .asciidocMain table.stripes-odd > * > tr:nth-of-type(odd), .asciidocMain table.stripes-even > * > tr:nth-of-type(even), .asciidocMain table.stripes-hover > * > tr:hover {
+  background: #f8f8f7;
+}
+.asciidocMain th.halign-left, .asciidocMain td.halign-left {
+  text-align: left;
+}
+.asciidocMain th.halign-right, .asciidocMain td.halign-right {
+  text-align: right;
+}
+.asciidocMain th.halign-center, .asciidocMain td.halign-center {
+  text-align: center;
+}
+.asciidocMain th.valign-top, .asciidocMain td.valign-top {
+  vertical-align: top;
+}
+.asciidocMain th.valign-bottom, .asciidocMain td.valign-bottom {
+  vertical-align: bottom;
+}
+.asciidocMain th.valign-middle, .asciidocMain td.valign-middle {
+  vertical-align: middle;
+}
+.asciidocMain table thead th, .asciidocMain table tfoot th {
+  font-weight: bold;
+}
+.asciidocMain tbody tr th {
+  background: #f7f8f7;
+}
+.asciidocMain tbody tr th, .asciidocMain tbody tr th p, .asciidocMain tfoot tr th, .asciidocMain tfoot tr th p {
+  color: rgba(0, 0, 0, 0.8);
+  font-weight: bold;
+}
+.asciidocMain p.tableblock > code:only-child {
+  background: none;
+  padding: 0;
+}
+.asciidocMain p.tableblock {
+  font-size: 1em;
+}
+.asciidocMain ol {
+  margin-left: 1.75em;
+}
+.asciidocMain ul li ol {
+  margin-left: 1.5em;
+}
+.asciidocMain dl dd {
+  margin-left: 1.125em;
+}
+.asciidocMain dl dd:last-child, .asciidocMain dl dd:last-child > :last-child {
+  margin-bottom: 0;
+}
+.asciidocMain li p, .asciidocMain ul dd, .asciidocMain ol dd, .asciidocMain .olist .olist, .asciidocMain .ulist .ulist, .asciidocMain .ulist .olist, .asciidocMain .olist .ulist {
+  margin-bottom: 0.625em;
+}
+.asciidocMain ul.checklist, .asciidocMain ul.none, .asciidocMain ol.none, .asciidocMain ul.no-bullet, .asciidocMain ol.no-bullet, .asciidocMain ol.unnumbered, .asciidocMain ul.unstyled, .asciidocMain ol.unstyled {
+  list-style-type: none;
+}
+.asciidocMain ul.no-bullet, .asciidocMain ol.no-bullet, .asciidocMain ol.unnumbered {
+  margin-left: 0.625em;
+}
+.asciidocMain ul.unstyled, .asciidocMain ol.unstyled {
+  margin-left: 0;
+}
+.asciidocMain li > p:empty:only-child::before {
+  content: "";
+  display: inline-block;
+}
+.asciidocMain ul.checklist > li > p:first-child {
+  margin-left: -1em;
+}
+.asciidocMain ul.checklist > li > p:first-child > .fa-square-o:first-child, .asciidocMain ul.checklist > li > p:first-child > .fa-check-square-o:first-child {
+  width: 1.25em;
+  font-size: 0.8em;
+  position: relative;
+  bottom: 0.125em;
+}
+.asciidocMain ul.checklist > li > p:first-child > input[type=checkbox]:first-child {
+  margin-right: 0.25em;
+}
+.asciidocMain ul.inline {
+  display: flex;
+  flex-flow: row wrap;
+  list-style: none;
+  margin: 0 0 0.625em -1.25em;
+}
+.asciidocMain ul.inline > li {
+  margin-left: 1.25em;
+}
+.asciidocMain .unstyled dl dt {
+  font-weight: 400;
+  font-style: normal;
+}
+.asciidocMain ol.arabic {
+  list-style-type: decimal;
+}
+.asciidocMain ol.decimal {
+  list-style-type: decimal-leading-zero;
+}
+.asciidocMain ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+.asciidocMain ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+.asciidocMain ol.lowerroman {
+  list-style-type: lower-roman;
+}
+.asciidocMain ol.upperroman {
+  list-style-type: upper-roman;
+}
+.asciidocMain ol.lowergreek {
+  list-style-type: lower-greek;
+}
+.asciidocMain .hdlist > table, .asciidocMain .colist > table {
+  border: 0;
+  background: none;
+}
+.asciidocMain .hdlist > table > tbody > tr, .asciidocMain .colist > table > tbody > tr {
+  background: none;
+}
+.asciidocMain td.hdlist1, .asciidocMain td.hdlist2 {
+  vertical-align: top;
+  padding: 0 0.625em;
+}
+.asciidocMain td.hdlist1 {
+  font-weight: bold;
+  padding-bottom: 1.25em;
+}
+.asciidocMain td.hdlist2 {
+  word-wrap: anywhere;
+}
+.asciidocMain .literalblock + .colist, .asciidocMain .listingblock + .colist {
+  margin-top: -0.5em;
+}
+.asciidocMain .colist td:not([class]):first-child {
+  padding: 0.4em 0.75em 0;
+  line-height: 1;
+  vertical-align: top;
+}
+.asciidocMain .colist td:not([class]):first-child img {
+  max-width: none;
+}
+.asciidocMain .colist td:not([class]):last-child {
+  padding: 0.25em 0;
+}
+.asciidocMain .thumb, .asciidocMain .th {
+  line-height: 0;
+  display: inline-block;
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 1px #ddd;
+}
+.asciidocMain .imageblock.left {
+  margin: 0.25em 0.625em 1.25em 0;
+}
+.asciidocMain .imageblock.right {
+  margin: 0.25em 0 1.25em 0.625em;
+}
+.asciidocMain .imageblock > .title {
+  margin-bottom: 0;
+}
+.asciidocMain .imageblock.thumb, .asciidocMain .imageblock.th {
+  border-width: 6px;
+}
+.asciidocMain .imageblock.thumb > .title, .asciidocMain .imageblock.th > .title {
+  padding: 0 0.125em;
+}
+.asciidocMain .image.left, .asciidocMain .image.right {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  display: inline-block;
+  line-height: 0;
+}
+.asciidocMain .image.left {
+  margin-right: 0.625em;
+}
+.asciidocMain .image.right {
+  margin-left: 0.625em;
+}
+.asciidocMain a.image {
+  text-decoration: none;
+  display: inline-block;
+}
+.asciidocMain a.image object {
+  pointer-events: none;
+}
+.asciidocMain sup.footnote, .asciidocMain sup.footnoteref {
+  font-size: 0.875em;
+  position: static;
+  vertical-align: super;
+}
+.asciidocMain sup.footnote a, .asciidocMain sup.footnoteref a {
+  text-decoration: none;
+}
+.asciidocMain sup.footnote a:active, .asciidocMain sup.footnoteref a:active, .asciidocMain #footnotes .footnote a:first-of-type:active {
+  text-decoration: underline;
+}
+.asciidocMain #footnotes {
+  padding-top: 0.75em;
+  padding-bottom: 0.75em;
+  margin-bottom: 0.625em;
+}
+.asciidocMain #footnotes hr {
+  width: 20%;
+  min-width: 6.25em;
+  margin: -0.25em 0 0.75em;
+  border-width: 1px 0 0;
+}
+.asciidocMain #footnotes .footnote {
+  padding: 0 0.375em 0 0.225em;
+  line-height: 1.3334;
+  font-size: 0.875em;
+  margin-left: 1.2em;
+  margin-bottom: 0.2em;
+}
+.asciidocMain #footnotes .footnote a:first-of-type {
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: -1.05em;
+}
+.asciidocMain #footnotes .footnote:last-of-type {
+  margin-bottom: 0;
+}
+.asciidocMain #content #footnotes {
+  margin-top: -0.625em;
+  margin-bottom: 0;
+  padding: 0.75em 0;
+}
+.asciidocMain div.unbreakable {
+  page-break-inside: avoid;
+}
+.asciidocMain .big {
+  font-size: larger;
+}
+.asciidocMain .small {
+  font-size: smaller;
+}
+.asciidocMain .underline {
+  text-decoration: underline;
+}
+.asciidocMain .overline {
+  text-decoration: overline;
+}
+.asciidocMain .line-through {
+  text-decoration: line-through;
+}
+.asciidocMain .aqua {
+  color: #00bfbf;
+}
+.asciidocMain .aqua-background {
+  background: #00fafa;
+}
+.asciidocMain .black {
+  color: #000;
+}
+.asciidocMain .black-background {
+  background: #000;
+}
+.asciidocMain .blue {
+  color: #0000bf;
+}
+.asciidocMain .blue-background {
+  background: #0000fa;
+}
+.asciidocMain .fuchsia {
+  color: #bf00bf;
+}
+.asciidocMain .fuchsia-background {
+  background: #fa00fa;
+}
+.asciidocMain .gray {
+  color: #606060;
+}
+.asciidocMain .gray-background {
+  background: #7d7d7d;
+}
+.asciidocMain .green {
+  color: #006000;
+}
+.asciidocMain .green-background {
+  background: #007d00;
+}
+.asciidocMain .lime {
+  color: #00bf00;
+}
+.asciidocMain .lime-background {
+  background: #00fa00;
+}
+.asciidocMain .maroon {
+  color: #600000;
+}
+.asciidocMain .maroon-background {
+  background: #7d0000;
+}
+.asciidocMain .navy {
+  color: #000060;
+}
+.asciidocMain .navy-background {
+  background: #00007d;
+}
+.asciidocMain .olive {
+  color: #606000;
+}
+.asciidocMain .olive-background {
+  background: #7d7d00;
+}
+.asciidocMain .purple {
+  color: #600060;
+}
+.asciidocMain .purple-background {
+  background: #7d007d;
+}
+.asciidocMain .red {
+  color: #bf0000;
+}
+.asciidocMain .red-background {
+  background: #fa0000;
+}
+.asciidocMain .silver {
+  color: #909090;
+}
+.asciidocMain .silver-background {
+  background: #bcbcbc;
+}
+.asciidocMain .teal {
+  color: #006060;
+}
+.asciidocMain .teal-background {
+  background: #007d7d;
+}
+.asciidocMain .white {
+  color: #bfbfbf;
+}
+.asciidocMain .white-background {
+  background: #fafafa;
+}
+.asciidocMain .yellow {
+  color: #bfbf00;
+}
+.asciidocMain .yellow-background {
+  background: #fafa00;
+}
+.asciidocMain span.icon > .fa {
+  cursor: default;
+}
+.asciidocMain a span.icon > .fa {
+  cursor: inherit;
+}
+.asciidocMain .admonitionblock td.icon [class^="fa icon-"] {
+  font-size: 2.5em;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+.asciidocMain .admonitionblock td.icon .icon-note::before {
+  content: "\f05a";
+  color: #19407c;
+}
+.asciidocMain .admonitionblock td.icon .icon-tip::before {
+  content: "\f0eb";
+  text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8);
+  color: #111;
+}
+.asciidocMain .admonitionblock td.icon .icon-warning::before {
+  content: "\f071";
+  color: #bf6900;
+}
+.asciidocMain .admonitionblock td.icon .icon-caution::before {
+  content: "\f06d";
+  color: #bf3400;
+}
+.asciidocMain .admonitionblock td.icon .icon-important::before {
+  content: "\f06a";
+  color: #bf0000;
+}
+.asciidocMain .conum[data-value] {
+  display: inline-block;
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  text-align: center;
+  font-size: 0.75em;
+  width: 1.67em;
+  height: 1.67em;
+  line-height: 1.67em;
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+.asciidocMain .conum[data-value] * {
+  color: #fff !important;
+}
+.asciidocMain .conum[data-value] + b {
+  display: none;
+}
+.asciidocMain .conum[data-value]::after {
+  content: attr(data-value);
+}
+.asciidocMain pre .conum[data-value] {
+  position: relative;
+  top: -0.125em;
+}
+.asciidocMain b.conum * {
+  color: inherit !important;
+}
+.asciidocMain .conum:not([data-value]):empty {
+  display: none;
+}
+.asciidocMain dt, .asciidocMain th.tableblock, .asciidocMain td.content, .asciidocMain div.footnote {
+  text-rendering: optimizeLegibility;
+}
+.asciidocMain h1, .asciidocMain h2, .asciidocMain p, .asciidocMain td.content, .asciidocMain span.alt, .asciidocMain summary {
+  letter-spacing: -0.01em;
+}
+.asciidocMain p strong, .asciidocMain td.content strong, .asciidocMain div.footnote strong {
+  letter-spacing: -0.005em;
+}
+.asciidocMain p, .asciidocMain blockquote, .asciidocMain dt, .asciidocMain td.content, .asciidocMain td.hdlist1, .asciidocMain span.alt, .asciidocMain summary {
+  font-size: 1.0625rem;
+}
+.asciidocMain p {
+  margin-bottom: 1.25rem;
+}
+.asciidocMain .sidebarblock p, .asciidocMain .sidebarblock dt, .asciidocMain .sidebarblock td.content, .asciidocMain p.tableblock {
+  font-size: 1em;
+}
+.asciidocMain .exampleblock > .content {
+  background: #fffef7;
+  border-color: #e0e0dc;
+  box-shadow: 0 1px 4px #e0e0dc;
+}
+.asciidocMain .print-only {
+  display: none !important;
+}
+@page {
+  .asciidocMain {
+    margin: 1.25cm 0.75cm;
+  }
+}
+@media print {
+  .asciidocMain * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .asciidocMain html {
+    font-size: 80%;
+  }
+  .asciidocMain a {
+    color: inherit !important;
+    text-decoration: underline !important;
+  }
+  .asciidocMain a.bare, .asciidocMain a[href^="#"], .asciidocMain a[href^="mailto:"] {
+    text-decoration: none !important;
+  }
+  .asciidocMain a[href^="http:"]:not(.bare)::after, .asciidocMain a[href^="https:"]:not(.bare)::after {
+    content: "(" attr(href) ")";
+    display: inline-block;
+    font-size: 0.875em;
+    padding-left: 0.25em;
+  }
+  .asciidocMain abbr[title] {
+    border-bottom: 1px dotted;
+  }
+  .asciidocMain abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+  .asciidocMain pre, .asciidocMain blockquote, .asciidocMain tr, .asciidocMain img, .asciidocMain object, .asciidocMain svg {
+    page-break-inside: avoid;
+  }
+  .asciidocMain thead {
+    display: table-header-group;
+  }
+  .asciidocMain svg {
+    max-width: 100%;
+  }
+  .asciidocMain p, .asciidocMain blockquote, .asciidocMain dt, .asciidocMain td.content {
+    font-size: 1em;
+    orphans: 3;
+    widows: 3;
+  }
+  .asciidocMain h2, .asciidocMain h3, .asciidocMain #toctitle, .asciidocMain .sidebarblock > .content > .title {
+    page-break-after: avoid;
+  }
+  .asciidocMain #header, .asciidocMain #content, .asciidocMain #footnotes, .asciidocMain #footer {
+    max-width: none;
+  }
+  .asciidocMain #toc, .asciidocMain .sidebarblock, .asciidocMain .exampleblock > .content {
+    background: none !important;
+  }
+  .asciidocMain #toc {
+    border-bottom: 1px solid #dddddf !important;
+    padding-bottom: 0 !important;
+  }
+  .asciidocMain body.book #header {
+    text-align: center;
+  }
+  .asciidocMain body.book #header > h1:first-child {
+    border: 0 !important;
+    margin: 2.5em 0 1em;
+  }
+  .asciidocMain body.book #header .details {
+    border: 0 !important;
+    display: block;
+    padding: 0 !important;
+  }
+  .asciidocMain body.book #header .details span:first-child {
+    margin-left: 0 !important;
+  }
+  .asciidocMain body.book #header .details br {
+    display: block;
+  }
+  .asciidocMain body.book #header .details br + span::before {
+    content: none !important;
+  }
+  .asciidocMain body.book #toc {
+    border: 0 !important;
+    text-align: left !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .asciidocMain body.book #toc, .asciidocMain body.book #preamble, .asciidocMain body.book h1.sect0, .asciidocMain body.book .sect1 > h2 {
+    page-break-before: always;
+  }
+  .asciidocMain .listingblock code[data-lang]::before {
+    display: block;
+  }
+  .asciidocMain #footer {
+    padding: 0 0.9375em;
+  }
+  .asciidocMain .hide-on-print {
+    display: none !important;
+  }
+  .asciidocMain .print-only {
+    display: block !important;
+  }
+  .asciidocMain .hide-for-print {
+    display: none !important;
+  }
+  .asciidocMain .show-for-print {
+    display: inherit !important;
+  }
+}
+@media amzn-kf8, print {
+  .asciidocMain #header > h1:first-child {
+    margin-top: 1.25rem;
+  }
+  .asciidocMain .sect1 {
+    padding: 0 !important;
+  }
+  .asciidocMain .sect1 + .sect1 {
+    border: 0;
+  }
+  .asciidocMain #footer {
+    background: none;
+  }
+  .asciidocMain #footer-text {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.9em;
+  }
+}
+@media amzn-kf8 {
+  .asciidocMain #header, .asciidocMain #content, .asciidocMain #footnotes, .asciidocMain #footer {
+    padding: 0;
+  }
+}

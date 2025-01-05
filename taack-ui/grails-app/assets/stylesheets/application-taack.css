@@ -10,6 +10,7 @@
 *= require first
 *= require wysiwyg
 *= require taack.css
+*= require taack-asciidoc
 *= require custom.css
 *= require_self
 */

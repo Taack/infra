@@ -4,8 +4,14 @@ import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
+import org.grails.core.io.ResourceLocator
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
 import taack.ui.TaackUiConfiguration
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.block.BlockSpec
+import taack.wysiwyg.Asciidoc
 
 import java.nio.file.Path
 import java.util.zip.Inflater
@@ -18,13 +24,20 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
     @Autowired
     TaackUiConfiguration taackUiConfiguration
 
-    private Path getCachePath() {
-        Path.of(taackUiConfiguration.root, 'script', 'cache')
+    @Autowired
+    ResourceLocator assetResourceLocator
+
+    private Path getScriptCachePath() {
+        Path.of(taackUiConfiguration.root, 'cache', 'asciidoc', 'script')
+    }
+
+    private Path getAsciidocCachePath() {
+        Path.of(taackUiConfiguration.root, 'cache', 'asciidoc', 'content')
     }
 
     def asciidocRenderScript(String script) {
         script = script.replaceAll('-', '+').replaceAll('_', '/')
-        File cached = Path.of(cachePath.toString(), script).toFile()
+        File cached = Path.of(scriptCachePath.toString(), script).toFile()
         if (cached.exists()) {
             render cached.text
         } else {
@@ -45,5 +58,45 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
         }
     }
 
+    UiBlockSpecifier asciidocBlockSpecifier(Class cl, String fileName) {
+        InputStream resource = cl.getResourceAsStream(fileName)
 
+        if (!resource) return new UiBlockSpecifier().ui {
+            modal {
+                show new UiShowSpecifier().ui {
+                    inlineHtml("""<p>No $fileName Resource</p>""")
+                }
+            }
+        }
+
+        File resourceFile = Path.of(asciidocCachePath.toString(), fileName).toFile()
+        if (!resourceFile.exists()) {
+            resourceFile.getParentFile().mkdirs()
+            resourceFile.createNewFile()
+        }
+        resourceFile.text = resource.text
+
+        StringBuffer out = new StringBuffer()
+        out.append Asciidoc.getContentHtml(resourceFile, "")
+        Resource r = assetResourceLocator.findResourceForURI("asciidoc.js")
+        if (r?.exists()) {
+            out.append('\n')
+            out.append("""<script postexecute="true">""")
+            out.append(r.inputStream.text)
+            out.append("</script>")
+            out.append('\n')
+        }
+
+        new UiBlockSpecifier().ui {
+            row {
+                col(BlockSpec.Width.QUARTER) {
+                }
+                col(BlockSpec.Width.THREE_QUARTER) {
+                    show new UiShowSpecifier().ui {
+                        inlineHtml out.toString(), "asciidocMain"
+                    }
+                }
+            }
+        }
+    }
 }
