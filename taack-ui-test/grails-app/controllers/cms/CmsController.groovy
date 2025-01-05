@@ -64,7 +64,7 @@ class CmsController implements WebAttributes {
     static private UiMenuSpecifier buildMenu(String q = null) {
         UiMenuSpecifier m = new UiMenuSpecifier()
         m.ui {
-            label "CMS"
+            menu "CMS", this.&index as MC
             menu this.&pages as MC
             menu this.&images as MC
             menu this.&pdfs as MC

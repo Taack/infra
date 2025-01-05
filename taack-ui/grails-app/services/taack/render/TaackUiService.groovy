@@ -171,6 +171,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null, String... paramsToKeep) {
+        if (!block) return
         if (menu && !params.containsKey('refresh') && !params.containsKey('targetAjaxBlockId')) params.remove('isAjax')
 
         boolean isModal = false

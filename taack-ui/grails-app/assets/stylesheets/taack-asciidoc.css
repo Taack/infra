@@ -2,6 +2,15 @@
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment the following line when using as a custom stylesheet */
 /* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('/assets/fonts/fontawesome-webfont.eot');
+  src: url('/assets/fonts/fontawesome-webfont.eot') format('embedded-opentype'), url('/assets/fonts/fontawesome-webfont.woff2') format('woff2'), url('/assets/fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'), url('/assets/fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('/assets/fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .asciidocMain a {
   background: none;
 }
@@ -1444,6 +1453,16 @@
 .asciidocMain .yellow-background {
   background: #fafa00;
 }
+
+.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .asciidocMain span.icon > .fa {
   cursor: default;
 }

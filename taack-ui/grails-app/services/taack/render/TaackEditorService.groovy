@@ -5,6 +5,8 @@ import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import org.grails.core.io.ResourceLocator
+import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.web.util.WebUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import taack.ui.TaackUiConfiguration
@@ -20,6 +22,16 @@ import java.util.zip.Inflater
  */
 @GrailsCompileStatic
 final class TaackEditorService implements WebAttributes, ResponseRenderer, DataBinder {
+
+    enum ImageExtension {
+        png('png'), jpg('jpeg'), svg('svg+xml')
+
+        ImageExtension(String mimeImage) {
+            this.mimeImage = mimeImage
+        }
+
+        final String mimeImage
+    }
 
     @Autowired
     TaackUiConfiguration taackUiConfiguration
@@ -59,41 +71,58 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
     }
 
     UiBlockSpecifier asciidocBlockSpecifier(Class cl, String fileName) {
-        InputStream resource = cl.getResourceAsStream(fileName)
+        String path = params['path']
+        String fnPath = '/' + fileName.split('/')[1]
+        if (path) {
+            ImageExtension imageExtension = path[-3..-1] as ImageExtension
+            GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
+            webUtils.currentResponse.setContentType("image/${imageExtension.mimeImage}")
+            webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName.split('/')[-1]}")
+            webUtils.currentResponse.outputStream << cl.getResourceAsStream(fnPath + path)
+            try {
+                webUtils.currentResponse.outputStream.flush()
+                webUtils.currentResponse.outputStream.close()
+                webRequest.renderView = false
+            } catch (e) {
+                log.error "${e.message}"
+            }
+            return null
+        } else {
+            InputStream resource = cl.getResourceAsStream(fileName)
 
-        if (!resource) return new UiBlockSpecifier().ui {
-            modal {
-                show new UiShowSpecifier().ui {
-                    inlineHtml("""<p>No $fileName Resource</p>""")
+            if (!resource) return new UiBlockSpecifier().ui {
+                modal {
+                    show new UiShowSpecifier().ui {
+                        inlineHtml("""<p>No $fileName Resource</p>""")
+                    }
                 }
             }
-        }
 
-        File resourceFile = Path.of(asciidocCachePath.toString(), fileName).toFile()
-        if (!resourceFile.exists()) {
-            resourceFile.getParentFile().mkdirs()
-            resourceFile.createNewFile()
-        }
-        resourceFile.text = resource.text
+            File resourceFile = Path.of(asciidocCachePath.toString(), fileName).toFile()
+            if (!resourceFile.exists()) {
+                resourceFile.getParentFile().mkdirs()
+                resourceFile.createNewFile()
+            }
+            resourceFile.text = resource.text
+            StringBuffer out = new StringBuffer()
+            out.append Asciidoc.getContentHtml(resourceFile, "")
+            Resource r = assetResourceLocator.findResourceForURI("asciidoc.js")
+            if (r?.exists()) {
+                out.append('\n')
+                out.append("""<script postexecute="true">""")
+                out.append(r.inputStream.text)
+                out.append("</script>")
+                out.append('\n')
+            }
 
-        StringBuffer out = new StringBuffer()
-        out.append Asciidoc.getContentHtml(resourceFile, "")
-        Resource r = assetResourceLocator.findResourceForURI("asciidoc.js")
-        if (r?.exists()) {
-            out.append('\n')
-            out.append("""<script postexecute="true">""")
-            out.append(r.inputStream.text)
-            out.append("</script>")
-            out.append('\n')
-        }
-
-        new UiBlockSpecifier().ui {
-            row {
-                col(BlockSpec.Width.QUARTER) {
-                }
-                col(BlockSpec.Width.THREE_QUARTER) {
-                    show new UiShowSpecifier().ui {
-                        inlineHtml out.toString(), "asciidocMain"
+            new UiBlockSpecifier().ui {
+                row {
+                    col(BlockSpec.Width.QUARTER) {
+                    }
+                    col(BlockSpec.Width.THREE_QUARTER) {
+                        show new UiShowSpecifier().ui {
+                            inlineHtml out.toString(), "asciidocMain"
+                        }
                     }
                 }
             }

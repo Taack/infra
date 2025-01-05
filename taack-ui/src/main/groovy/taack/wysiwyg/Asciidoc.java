@@ -2,9 +2,15 @@ package taack.wysiwyg;
 
 
 import org.asciidoctor.*;
+import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.Document;
+import org.asciidoctor.ast.StructuralNode;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Translate Markdown to HTML using flexmark
@@ -25,7 +31,8 @@ public class Asciidoc {
 
     /**
      * Translate Asciidoctor string content to HTML, no inline
-     * @param content The Asciidoc Text
+     *
+     * @param content     The Asciidoc Text
      * @param urlFileRoot url prefix for external resources
      * @return The HTML results
      */
@@ -47,7 +54,8 @@ public class Asciidoc {
 
     /**
      * Translate Asciidoctor file content to HTML, can inline other content
-     * @param file The Asciidoc File
+     *
+     * @param file        The Asciidoc File
      * @param urlFileRoot url prefix for external resources
      * @return The HTML results
      */
@@ -59,10 +67,8 @@ public class Asciidoc {
                     .option("parse_header_only", false)
                     .safe(SafeMode.SERVER)
                     .toFile(false);
-            String html = asciidoctor.convertFile(file, option.build());
-//            asciidoctor.shutdown();
-            System.out.println(html);
-            return html;
+            //            asciidoctor.shutdown();
+            return asciidoctor.convertFile(file, option.build());
         }
         return "";
     }
