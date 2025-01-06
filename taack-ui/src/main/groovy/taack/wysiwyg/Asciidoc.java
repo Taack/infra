@@ -63,7 +63,12 @@ public class Asciidoc {
         if (file != null && file.exists()) {
             initAsciidoctorJ();
             OptionsBuilder option = Options.builder()
-                    .attributes(Attributes.builder().imagesDir(urlFileRoot + "?path=").build())
+                    .attributes(Attributes.builder()
+                            .imagesDir(urlFileRoot + "?path=")
+                            .attribute("source-highlighter", "rouge")
+                            .attribute("rouge-style", "monokai")
+                            .attribute("icons", "font")
+                            .build())
                     .option("parse_header_only", false)
                     .safe(SafeMode.SERVER)
                     .toFile(false);
