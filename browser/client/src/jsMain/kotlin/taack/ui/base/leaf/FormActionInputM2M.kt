@@ -27,11 +27,11 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
     private val inputId = i.attributes.getNamedItem("taackAjaxFormM2MInputId")!!.value
     private val input = i.parentElement!!.querySelector("#${inputId}") as HTMLInputElement
     private val inputName = input.attributes.getNamedItem("attr-name")!!.value
-    private val spanClassName: String = input.parentElement!!.className
+    private val m2mClassList = input.parentElement!!.classList
     init {
 
-        trace("FormActionInputM2M::init $inputName $spanClassName")
-        if (spanClassName == "M2MToDuplicate") input.name = ""
+        trace("FormActionInputM2M::init $inputName $m2mClassList")
+        if (m2mClassList.contains("M2MToDuplicate")) input.name = ""
         i.onclick = EventHandler { e ->
             onClick(e)
         }
@@ -66,15 +66,15 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
         trace("FormActionInputM2M::modalReturnSelect $key $value")
-        val span = i.parentElement!!
-        trace("AUO1 $span")
-        if (span.classList.contains("M2MToDuplicate")) {
-            val span2 = span.cloneNode(true) as HTMLElement
-            FormActionInputM2M(parent, span2.querySelector("input[taackAjaxFormM2MAction]") as HTMLInputElement)
-            span.parentElement!!.appendChild(span2)
+        val m2mDiv = i.parentElement!!
+        trace("AUO1 $m2mDiv")
+        if (m2mDiv.classList.contains("M2MToDuplicate")) {
+            val m2mDivCloned = m2mDiv.cloneNode(true) as HTMLElement
+            FormActionInputM2M(parent, m2mDivCloned.querySelector("input[taackAjaxFormM2MAction]") as HTMLInputElement)
+            m2mDiv.parentElement!!.appendChild(m2mDivCloned)
         }
-        span.classList.remove("M2MToDuplicate")
-        span.classList.add("M2MParent")
+        m2mDiv.classList.remove("M2MToDuplicate")
+        m2mDiv.classList.add("M2MParent")
         i.value = value
         val i2 = i.parentElement!!.querySelector("#${inputId}")!! as HTMLInputElement
         i2.name = inputName
