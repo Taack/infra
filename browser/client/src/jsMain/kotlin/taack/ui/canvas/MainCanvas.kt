@@ -422,6 +422,7 @@ class MainCanvas(
                         currentDoubleClick!!.third
                     )
                 )
+            currentDoubleClick = null
             draw()
         }
         createButton("buttonMono", "<code style='margin: 0;height: 23px;'>Mono</code>") {
@@ -434,6 +435,7 @@ class MainCanvas(
                         currentDoubleClick!!.third
                     )
                 )
+            currentDoubleClick = null
             draw()
         }
         createButton("buttonBoldMono", "<code style='margin: 0;height: 23px;'><b>Mono</b></code>") {
@@ -446,6 +448,7 @@ class MainCanvas(
                         currentDoubleClick!!.third
                     )
                 )
+            currentDoubleClick = null
             draw()
         }
 //        createButton("buttonScript", "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>") {
