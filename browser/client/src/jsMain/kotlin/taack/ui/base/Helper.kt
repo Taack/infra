@@ -184,7 +184,7 @@ class Helper {
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
                     val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
-                    processAjaxLink(innerText, base, process)
+                    processAjaxLink(innerText, block.parent ?: base, process)
                 }
 
                 text.startsWith(BLOCK_START) -> {
