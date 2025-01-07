@@ -10,8 +10,9 @@ class DeleteCharCommand(
     private val pos2: Int?
 ) : ICanvasCommand {
     override fun doIt() {
-        if (text.delChar(pos1, pos2) == 0) {
-            drawables.remove(text)
+        if (text.txt.isEmpty() || text.delChar(pos1, pos2) == 0) {
+            val index = drawables.indexOf(text)
+            if (index >= 0) drawables.removeAt(index)
         }
     }
 }

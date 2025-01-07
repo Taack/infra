@@ -900,7 +900,7 @@ class MainCanvas(
 
         trace("currentText == $currentText")
         if (currentText != null) {
-            trace("Draw caret currentLine != null caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine.length}")
+            trace("Draw caret currentText != null, caretPosInCurrentText = $caretPosInCurrentText, caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine.length}")
             CanvasCaret.draw(ctx, currentText!!, currentLine, caretPosInLine)
             if (isDoubleClick && currentDoubleClick != null) {
                 trace("Draw dblClick")
