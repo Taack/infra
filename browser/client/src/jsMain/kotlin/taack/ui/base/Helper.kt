@@ -113,18 +113,16 @@ class Helper {
             trace("Mapping Ajax Content ... ${text.substring(0, 10)}")
             val m = mutableMapOf<String, String>()
             if (text.startsWith(BLOCK_START)) {
-                var pos1 = BLOCK_START.length
-                var pos2 = text.indexOf(':')
+                var pos1 = 0
                 do {
+                    pos1 += BLOCK_START.length
+                    val pos2 = text.indexOf(':', pos1)
                     val abId = text.substring(pos1, pos2)
                     pos1 = text.indexOf(BLOCK_END, pos2)
-                    val content = text.substring(pos2 + 1, pos1)
-                    pos1 += BLOCK_END.length
-                    pos1 += BLOCK_START.length
-                    pos2 = text.indexOf(':', pos1)
+                    m[abId] = text.substring(pos2 + 1, pos1)
 
-                    m[abId] = content.substring(pos1, pos2)
-                } while (pos2 != -1)
+                    pos1 = text.indexOf(BLOCK_START, pos1)
+                } while (pos1 != -1)
             }
             return m
         }
@@ -190,14 +188,16 @@ class Helper {
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements[it.key]
-                        var pos1 = 0
-                        if (it.value.startsWith(BLOCK_START))
-                            pos1 += it.value.indexOf(':') + 1
-                        var pos2 = it.value.length - pos1
-                        if (it.value.endsWith(BLOCK_END))
-                            pos2 -= BLOCK_END.length
-                        target!!.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
-                        target.refresh()
+                        if (target != null) {
+                            var pos1 = 0
+                            if (it.value.startsWith(BLOCK_START))
+                                pos1 += it.value.indexOf(':') + 1
+                            var pos2 = it.value.length - pos1
+                            if (it.value.endsWith(BLOCK_END))
+                                pos2 -= BLOCK_END.length
+                            target.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                            target.refresh()
+                        }
                     }
                 }
 
