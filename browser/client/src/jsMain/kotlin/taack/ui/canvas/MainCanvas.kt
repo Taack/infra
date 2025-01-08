@@ -97,59 +97,61 @@ class MainCanvas(
         get() = _caretPosInCurrentText
         set(value) = run {
             var v = value
-            traceIndent("BEFORE _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: $currentText, currentLine: $currentLine")
-            val decrease = _caretPosInCurrentText - value
-            if (value > currentText!!.txt.length + 1) {
+            traceIndent("BEFORE _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: ${currentText?.txt?.length}, currentLine: $currentLine")
+            if (value > currentText!!.txt.length) { // Go to next line, below current line
                 val j = texts.indexOf(currentText)
                 trace("value > currentText!!.txt.length, j: $j, texts.size: ${texts.size}")
                 if (j >= 0 && j < texts.size - 1) {
                     currentDrawable = texts[j + 1]
-                    v = value - _caretPosInCurrentText
+                    v = _caretPosInCurrentText
                     if (v > currentText!!.txt.length) {
                         v = currentText!!.txt.length
                     }
                 } else {
                     v = currentText!!.txt.length + 1
                 }
-            } else if (value < 0) {
+            } else if (value < 0) { // Cursor goes up
                 val j = texts.indexOf(currentText)
                 trace("value < 0 indexOfText = $j")
-                if (j > 0) {
+                if (j > 0) { // Go to previous line, above current line
                     currentDrawable = texts[j - 1]
-                    v = currentDrawable!!.getSelectedText()!!.txt.length + value
+                    v = _caretPosInCurrentText
                     trace("value < 0 v = $v")
-                } else {
+                } else { // If first line, stay there
                     v = 0
                 }
-            } else {
+            } else if (value == 0) {
+                v = 0
+            } else { // Move inside the same line (EXCEPT if at the line edges)
                 val i = currentText!!.indexOfLine(currentLine)
-                trace("ELSE branch i: $i, caretPosInLine: $caretPosInLine, decrease: $decrease, currentLine.length: ${currentLine.length}")
-                if (caretPosInLine < decrease) {
-                    if (i <= 0) {
-                        val j = texts.indexOf(currentText) - 1
-                        trace("ELSE branch j: $j")
-                        if (j >= 0) {
-                            currentDrawable = texts[j]
-                            v = currentText!!.lines.last().posEnd
-                        } else {
-                            v = 0
-                        }
-                    }
-                } else if (caretPosInLine - decrease >= currentLine.length) {
-                    if (i < currentText!!.lines.size) {
-                        trace("ELSE branch: caretPosInLine - decrease >= currentLine.length => < value: $value, currentText!!.lines.size: ${currentText!!.lines.size}")
-                        v = value
-                    } else {
-                        val j = texts.indexOf(currentText) + 1
-                        trace("ELSE branch: caretPosInLine - decrease >= currentLine.length => j: $j, texts.size: ${texts.size}")
-                        if (j < texts.size) {
-                            currentDrawable = texts[j]
-                            v = 0
-                        }
-                    }
-                }
+                trace("ELSE branch i: $i, caretPosInLine: $caretPosInLine, currentLine.length: ${currentLine.length}")
+                v = value
+//                if (caretPosInLine < currentLine.length) {
+//                    if (i <= 0) {
+//                        val j = texts.indexOf(currentText)
+//                        trace("ELSE branch j: $j")
+//                        if (j >= 0) {
+//                            currentDrawable = texts[j]
+//                            v = currentText!!.lines.last().posEnd
+//                        } else {
+//                            v = 0
+//                        }
+//                    }
+//                } else if (caretPosInLine >= currentLine.length) {
+//                    if (i < currentText!!.lines.size) {
+//                        trace("ELSE branch: caretPosInLine - decrease >= currentLine.length => < value: $value, currentText!!.lines.size: ${currentText!!.lines.size}")
+//                        v = value
+//                    } else {
+//                        val j = texts.indexOf(currentText) + 1
+//                        trace("ELSE branch: caretPosInLine - decrease >= currentLine.length => j: $j, texts.size: ${texts.size}")
+//                        if (j < texts.size) {
+//                            currentDrawable = texts[j]
+//                            v = 0
+//                        }
+//                    }
+//                }
             }
-            _caretPosInCurrentText = v
+            _caretPosInCurrentText = if (v < 0) 0 else v
             traceDeIndent("AFTER  _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: $currentText, currentLine: $currentLine")
         }
     private var currentDrawable: ICanvasDrawable? = null
@@ -284,7 +286,7 @@ class MainCanvas(
 
                             else -> {
                                 var initTxt = ""
-                                if (currentText != null && caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
+                                if (caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
                                     initTxt = currentText!!.txt.substring(caretPosInCurrentText)
                                     commandDoList.add(
                                         DeleteCharCommand(
@@ -295,7 +297,7 @@ class MainCanvas(
                                         )
                                     )
                                 }
-
+                                _caretPosInCurrentText = 0
                                 val d = PCanvas(initTxt)
                                 currentDrawable = d
                                 commandDoList.add(
@@ -307,11 +309,13 @@ class MainCanvas(
             }
 
             "ArrowUp" -> {
-                caretPosInCurrentText -= (if (caretPosInCurrentText == currentText!!.txt.length) 1 else 0) + lineOverLine.length
+                trace("MainCanvas::addDrawable press ArrowUp value: ${-(1 + currentLine.length)}")
+                caretPosInCurrentText -= (1 + currentLine.length)
             }
 
             "ArrowDown" -> {
-                caretPosInCurrentText += (if (caretPosInCurrentText == 0) 1 else 0) + currentLine.length
+                trace("MainCanvas::addDrawable press ArrowDown currentLine.length: ${currentLine.length}")
+                caretPosInCurrentText += (1 + currentLine.length)
             }
 
             "ArrowLeft" -> {
@@ -598,7 +602,7 @@ class MainCanvas(
                     currentDrawable = d
                     val text = d.getSelectedText(event.offsetX, event.offsetY)!!
                     val currentClick = text.click(ctx, event.offsetX, event.offsetY)
-                    _caretPosInCurrentText = currentClick!!.second
+                    caretPosInCurrentText = currentClick!!.second
                 }
             }
             traceDeIndent("canvas click => $_caretPosInCurrentText, $currentDrawable, ${currentText?.txt}")
