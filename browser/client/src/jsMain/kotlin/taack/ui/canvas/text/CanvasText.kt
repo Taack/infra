@@ -7,7 +7,7 @@ import taack.ui.canvas.ICanvasDrawable
 import web.canvas.CanvasRenderingContext2D
 
 
-abstract class CanvasText(val _txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(private val _txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -107,7 +107,7 @@ abstract class CanvasText(val _txtInit: String = "", private var initCitationNum
         txtVar = if (txtVar.isEmpty())
             c
         else
-            txtVar.substring(0, p) + c + txtVar.substring(p + 1)
+            txtVar.substring(0, p) + c + txtVar.substring(p)
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {
@@ -183,17 +183,7 @@ abstract class CanvasText(val _txtInit: String = "", private var initCitationNum
         ctx.wordSpacing = wordSpacing.toString() + "px"
     }
 
-    fun initCtx(ctx: CanvasRenderingContext2D, posN: Int) {
-        //trace("CanvasText::initCtx: $posN")
-
-        ctx.font = font()
-        ctx.fillStyle = fillStyle
-        ctx.letterSpacing = letterSpacing.toString() + "px"
-        ctx.wordSpacing = wordSpacing.toString() + "px"
-    }
-
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText? {
-        //trace("CanvasText::getSelectedText $this, $posX, $posY")
         return this
     }
 
@@ -222,7 +212,7 @@ abstract class CanvasText(val _txtInit: String = "", private var initCitationNum
             currentLetterPos += t.length
             val tWidth = measureText(ctx, posLetterLineEnd, currentLetterPos)
             ctx.save()
-            initCtx(ctx, currentLetterPos)
+            initCtx(ctx)
             if (pX + ctx.measureText(txtPrefix).width + tWidth >= width - 30.0) {
                 pX = posX + ctx.measureText(txtPrefix).width
                 lines += CanvasLine(

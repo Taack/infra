@@ -7,17 +7,14 @@ import taack.ui.canvas.text.CanvasText
 
 class ChangeStyleCommand(
     private val drawables: MainCanvas.MyMutableList,
-    private val initialDrawables: MutableList<ICanvasDrawable>,
-    private val currentDrawable: ICanvasDrawable?,
+    private val currentDrawableIndex: Int,
     val text: CanvasText
 ) : ICanvasCommand {
     override fun doIt(): Boolean {
         trace("ChangeStyleCommand")
-        if (currentDrawable == null) return false
-        val i = drawables.indexOf(currentDrawable)
-        if (i == -1) return false
-        drawables.removeAt(i)
-        drawables.add(i, text)
+        if (currentDrawableIndex == 0 && drawables.size <= 1) return false
+        drawables.removeAt(currentDrawableIndex)
+        drawables.add(currentDrawableIndex, text)
         return true
     }
 }

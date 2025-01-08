@@ -75,7 +75,7 @@ compress(str, "deflate");
             val t = listTxt[i] + (if (i < listTxt.size - 1) "\n" else "")
             currentLetterPos += t.length
             ctx.save()
-            initCtx(ctx, currentLetterPos)
+            initCtx(ctx)
             pX = posX + ctx.measureText(txtPrefix).width
             lines += CanvasLine(
                 posLetterLineBegin,
