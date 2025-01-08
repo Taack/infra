@@ -1,17 +1,13 @@
 package taack.ui.canvas.script
 
 import js.buffer.ArrayBuffer
-import js.typedarrays.Uint8Array
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.canvas.ICanvasDrawable
-import taack.ui.canvas.item.CanvasImg
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
-import web.encoding.btoa
-import web.location.location
 import kotlin.js.Promise
 
 abstract class CanvasScriptCommon(txtInit: String) : CanvasText(txtInit, 0) {

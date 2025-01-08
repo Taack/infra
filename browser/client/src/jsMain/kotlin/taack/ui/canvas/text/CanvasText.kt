@@ -119,7 +119,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
 
     fun rmChar(p: Int): Int {
         trace("CanvasText::rmChar: $p")
-        if (txtVar.isEmpty()) return 0
+        if (txtVar.isEmpty() || p > txtVar.length) return 0
         txtVar = txtVar.substring(0, p - 1) + txtVar.substring(p)
         return txtVar.length
     }
