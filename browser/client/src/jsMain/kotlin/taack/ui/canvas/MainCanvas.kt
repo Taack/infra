@@ -182,13 +182,31 @@ class MainCanvas(
         when (currentKeyboardEvent!!.key) {
             "Backspace" -> {
                 trace("MainCanvas::addDrawable press Backspace")
-                commandDoList.add(
-                    RmCharCommand(
-                        drawables,
-                        currentDrawable!!.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)!!,
-                        caretPosInCurrentText--
+                if (caretPosInCurrentText == 0) {
+                    val txt = currentText!!.txt
+                    val i = drawables.indexOf(currentText as ICanvasDrawable)
+                    commandDoList.add(
+                        DeleteDrawableCommand(
+                            drawables, currentText!!
+                        )
                     )
-                )
+                    currentDrawable = drawables[i - 1]
+                    _caretPosInCurrentText = currentText!!.txt.length
+                    commandDoList.add(
+                        AddCharCommand(
+                            currentText!!,
+                            txt
+                        )
+                    )
+
+                } else
+                    commandDoList.add(
+                        RmCharCommand(
+                            drawables,
+                            currentDrawable!!.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)!!,
+                            caretPosInCurrentText--
+                        )
+                    )
             }
 
             "Tab" -> {

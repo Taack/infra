@@ -7,7 +7,7 @@ import taack.ui.canvas.ICanvasDrawable
 import web.canvas.CanvasRenderingContext2D
 
 
-abstract class CanvasText(_txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
+abstract class CanvasText(val _txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
     companion object {
         var num1: Int = 0
         var num2: Int = 0
@@ -107,7 +107,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
         txtVar = if (txtVar.isEmpty())
             c
         else
-            txtVar.substring(0, p) + c + txtVar.substring(p)
+            txtVar.substring(0, p) + c + txtVar.substring(p + 1)
     }
 
     fun delChar(p: Int, pEnd: Int? = null): Int {
@@ -341,7 +341,7 @@ abstract class CanvasText(_txtInit: String = "", private var initCitationNumber:
     override fun reset() {
         internTextStyles = null
         citationNumber = initCitationNumber
-        txtVar = txtInit
+        txtVar = _txtInit
 //        styles = emptyList()
     }
 
