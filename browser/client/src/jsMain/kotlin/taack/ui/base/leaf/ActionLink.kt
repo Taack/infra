@@ -3,7 +3,6 @@ package taack.ui.base.leaf
 import js.array.asList
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
-import web.dom.NodeList
 import web.dom.document
 import web.html.HTMLAnchorElement
 

@@ -1,5 +1,5 @@
 package taack.ui.canvas.command
 
 interface ICanvasCommand {
-    fun doIt()
+    fun doIt(): Boolean
 }

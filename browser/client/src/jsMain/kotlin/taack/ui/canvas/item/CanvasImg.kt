@@ -8,7 +8,6 @@ import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 import web.events.EventHandler
 import web.html.Image
-import kotlin.math.max
 import kotlin.math.min
 
 class CanvasImg(

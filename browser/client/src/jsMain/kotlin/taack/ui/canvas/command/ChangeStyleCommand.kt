@@ -11,12 +11,13 @@ class ChangeStyleCommand(
     private val currentDrawable: ICanvasDrawable?,
     val text: CanvasText
 ) : ICanvasCommand {
-    override fun doIt() {
+    override fun doIt(): Boolean {
         trace("ChangeStyleCommand")
-        if (currentDrawable == null) return
+        if (currentDrawable == null) return false
         val i = drawables.indexOf(currentDrawable)
-        if (i == -1) return
+        if (i == -1) return false
         drawables.removeAt(i)
         drawables.add(i, text)
+        return true
     }
 }

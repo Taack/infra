@@ -44,6 +44,10 @@ class MainCanvas(
             return b.add(element)
         }
 
+        override fun add(i: Int, element: ICanvasDrawable): Unit {
+            return b.add(i, element)
+        }
+
 //        fun addAndChangeCurrent(index: Int, element: ICanvasDrawable) {
 //            currentDrawable = element
 //            return b.add(index, element)
@@ -51,9 +55,16 @@ class MainCanvas(
 
         override fun remove(element: ICanvasDrawable): Boolean {
             val i = b.indexOf(element)
-            if (i > 1) {
+            trace("REMOVE $i")
+            if (i > 0) {
+                b.removeAt(i)
                 currentDrawable = b[i - 1]
-                return b.remove(element)
+                return true
+            } else if (i == 0 && b.size > 1) {
+                b.removeAt(0)
+                b.add(0, PCanvas(""))
+                currentDrawable = b.first()
+                return true
             }
             return false
         }
@@ -109,10 +120,11 @@ class MainCanvas(
                 }
             } else {
                 val i = currentText!!.indexOfLine(currentLine)
-                trace("ELSE branch i: $i")
+                trace("ELSE branch i: $i, caretPosInLine: $caretPosInLine, decrease: $decrease, currentLine.length: ${currentLine.length}")
                 if (caretPosInLine < decrease) {
                     if (i <= 0) {
                         val j = texts.indexOf(currentText) - 1
+                        trace("ELSE branch j: $j")
                         if (j >= 0) {
                             currentDrawable = texts[j]
                             v = currentText!!.lines.last().posEnd
@@ -122,9 +134,11 @@ class MainCanvas(
                     }
                 } else if (caretPosInLine - decrease >= currentLine.length) {
                     if (i < currentText!!.lines.size) {
+                        trace("ELSE branch: caretPosInLine - decrease >= currentLine.length => < value: $value, currentText!!.lines.size: ${currentText!!.lines.size}")
                         v = value
                     } else {
                         val j = texts.indexOf(currentText) + 1
+                        trace("ELSE branch: caretPosInLine - decrease >= currentLine.length => j: $j, texts.size: ${texts.size}")
                         if (j < texts.size) {
                             currentDrawable = texts[j]
                             v = 0
@@ -136,10 +150,10 @@ class MainCanvas(
             traceDeIndent("AFTER  _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: $currentText, currentLine: $currentLine")
         }
     private var currentDrawable: ICanvasDrawable? = null
-        set(value) {
-            _caretPosInCurrentText = 0
-            field = value
-        }
+//        set(value) {
+//            _caretPosInCurrentText = 0
+//            field = value
+//        }
     private val currentText: CanvasText?
         get() = currentDrawable?.getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
@@ -562,7 +576,7 @@ class MainCanvas(
             draw()
         }
         canvas.onclick = EventHandler { event: MouseEvent ->
-            trace("canvas click")
+            traceIndent("canvas click")
             isDoubleClick = false
             if (event.detail == 3) {
                 isDoubleClick = true
@@ -584,6 +598,7 @@ class MainCanvas(
                     _caretPosInCurrentText = currentClick!!.second
                 }
             }
+            traceDeIndent("canvas click => $_caretPosInCurrentText, $currentDrawable, ${currentText?.txt}")
             draw()
         }
 
@@ -853,7 +868,7 @@ class MainCanvas(
         drawables.addAll(initialDrawables)
     }
 
-    fun draw() {
+    private fun draw() {
         traceIndent("MainCanvas::draw")
         if (divHolder.clientWidth > 0) {
             canvas.width = floor(divHolder.clientWidth * dprX).toInt()
@@ -884,9 +899,13 @@ class MainCanvas(
         drawables.addAll(initialDrawables)
 
         trace("Execute commandList")
+        val executedCommands = mutableListOf<ICanvasCommand>()
         for (cmd in commandDoList) {
-            cmd.doIt()
+            if (cmd.doIt())
+                executedCommands.add(cmd)
         }
+        commandDoList.clear()
+        commandDoList.addAll(executedCommands)
 
         trace("Draw all drawables +++")
         for (text in drawables) {
@@ -898,7 +917,7 @@ class MainCanvas(
         }
         trace("Draw all drawables ---")
 
-        trace("currentText == $currentText")
+        trace("currentText == $currentText, ${currentText?.txt}")
         if (currentText != null) {
             trace("Draw caret currentText != null, caretPosInCurrentText = $caretPosInCurrentText, caretPosInLine = $caretPosInLine, currentLine!!.length = ${currentLine.length}")
             CanvasCaret.draw(ctx, currentText!!, currentLine, caretPosInLine)
