@@ -96,7 +96,7 @@ class MainCanvas(
     private var caretPosInCurrentText: Int
         get() = _caretPosInCurrentText
         set(value) = run {
-            var v = value
+            var v: Int
             traceIndent("BEFORE _caretPosInCurrentText: $_caretPosInCurrentText, value: $value, currentText: ${currentText?.txt?.length}, currentLine: $currentLine")
             if (value > currentText!!.txt.length) { // Go to next line, below current line
                 val j = texts.indexOf(currentText)
@@ -192,7 +192,7 @@ class MainCanvas(
             }
 
             "Tab" -> {
-                trace("MainCanvas::addDrawable press Delete")
+                trace("MainCanvas::addDrawable press Tab")
                 if (currentDrawable != null)
                     if (currentKeyboardEvent!!.shiftKey)
                         commandDoList.add(
