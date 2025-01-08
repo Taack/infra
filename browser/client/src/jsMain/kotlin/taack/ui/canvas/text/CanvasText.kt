@@ -329,6 +329,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
     }
 
     override fun reset() {
+        trace("CanvasText::reset")
         internTextStyles = null
         citationNumber = initCitationNumber
         txtVar = _txtInit

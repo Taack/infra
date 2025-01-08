@@ -508,7 +508,7 @@ class MainCanvas(
             "<span style='margin: 0;height: 23px;font-size: 18px; font-weight: bold; color: #ba3925'>H2</span>"
         ) {
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, currentDrawableIndex, H2Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, currentDrawableIndex, H2Canvas(""))
                 )
             draw()
         }
@@ -517,7 +517,7 @@ class MainCanvas(
             "<span style='margin: 0;height: 23px;font-size: 16px; font-weight: bold; color: #ba3925'>H3</span>"
         ) {
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, currentDrawableIndex, H3Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, currentDrawableIndex, H3Canvas(""))
                 )
             draw()
         }
@@ -526,25 +526,25 @@ class MainCanvas(
             "<span style='margin: 0;height: 23px;font-size: 14px; font-weight: bold; color: #ba3925'>H4</span>"
         ) {
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, currentDrawableIndex, H4Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, currentDrawableIndex, H4Canvas(""))
                 )
             draw()
         }
         createButton("bP", "<span style='margin: 0;height: 23px;'>P</span>") {
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, currentDrawableIndex, PCanvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, currentDrawableIndex, PCanvas(""))
                 )
             draw()
         }
         createButton("bBullet", " • ") {
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, currentDrawableIndex, LiCanvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, currentDrawableIndex, LiCanvas(""))
                 )
             draw()
         }
         createButton("bBullet2", "    ‧ ") {
                 commandDoList.add(
-                    ChangeStyleCommand(drawables, currentDrawableIndex, Li2Canvas(currentText!!.txt))
+                    ChangeStyleCommand(drawables, currentDrawableIndex, Li2Canvas(""))
                 )
             draw()
         }
