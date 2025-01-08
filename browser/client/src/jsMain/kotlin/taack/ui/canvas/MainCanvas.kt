@@ -105,6 +105,9 @@ class MainCanvas(
                 if (j >= 0 && j < texts.size - 1) {
                     currentDrawable = texts[j + 1]
                     v = value - _caretPosInCurrentText
+                    if (v > currentText!!.txt.length) {
+                        v = currentText!!.txt.length
+                    }
                 } else {
                     v = currentText!!.txt.length + 1
                 }
