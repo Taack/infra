@@ -618,7 +618,7 @@ class MainCanvas(
             event.preventDefault()
 //            event.stopPropagation()
             isDoubleClick = true
-            for (i in 0..drawables.size) {
+            for (i in 0..<drawables.size) {
                 if (drawables[i].isClicked(event.offsetX, event.offsetY)) {
                     if (currentDrawable is CanvasImg || currentDrawable is CanvasLink)
                         commandDoList.add(DeleteDrawableCommand(drawables, i))
