@@ -90,7 +90,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         }
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
-    private var txtVar: String = _txtInit
+    var txtVar: String = _txtInit
     val txt: String
         get() {
             return txtVar
@@ -329,7 +329,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
     }
 
     override fun reset() {
-        trace("CanvasText::reset")
+        trace("CanvasText::reset  |$txtInit|$__txtInit|$_txtInit|")
         internTextStyles = null
         citationNumber = initCitationNumber
         txtVar = _txtInit

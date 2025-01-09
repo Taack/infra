@@ -12,7 +12,6 @@ class ChangeStyleCommand(
 ) : ICanvasCommand {
     override fun doIt(): Boolean {
         trace("ChangeStyleCommand")
-        text.addToTxtInit(drawables[currentDrawableIndex].getSelectedText()!!.txt)
         drawables.add(currentDrawableIndex, text)
         drawables.removeAt(currentDrawableIndex + 1)
         return true
