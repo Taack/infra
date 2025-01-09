@@ -30,33 +30,34 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
         fun createTable() = CanvasTable(listOf(
             TxtHeaderCanvas("Header 1"),
             TxtHeaderCanvas("Header 2"),
-            TxtHeaderCanvas("Header 3"),
         ), listOf(
             TxtRowCanvas("Cell 1"),
             TxtRowCanvas("Cell 2"),
-            TxtRowCanvas("Cell 3"),
         ), "New Table", 0)
     }
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText {
-        trace("CanvasTable::getSelectedText")
+        trace("CanvasTable::getSelectedText +++ $posX, $posY, $currentRow")
         if (posX == null || posY == null) {
-            return this.rows.first()
+            return currentRow ?: this.rows.first()
         }
         for (r in headers + rows) {
             if (posY in r.globalPosYStart..r.globalPosYEnd && posX in r.posXStart..r.posXEnd) {
                 currentRow = r
+                trace("CanvasTable::getSelectedText --- $posX, $posY ${currentRow!!.txt}")
                 return r
             }
         }
         if (posY in text.globalPosYStart..text.globalPosYEnd && posX in text.posXStart..text.posXEnd) {
             currentRow = text
+            trace("CanvasTable::getSelectedText --- $posX, $posY ${currentRow!!.txt}")
             return text
         }
         currentRow = text
         if (posY < currentRow!!.globalPosYEnd) {
             currentRow = rows.first()
         }
+        trace("CanvasTable::getSelectedText --- $posX, $posY ${currentRow!!.txt}")
         return currentRow!!
     }
 

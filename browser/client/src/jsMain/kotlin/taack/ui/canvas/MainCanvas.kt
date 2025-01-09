@@ -39,13 +39,15 @@ class MainCanvas(
 
     inner class MyMutableList(private val b: MutableList<ICanvasDrawable>) : MutableList<ICanvasDrawable> by b {
         override fun add(element: ICanvasDrawable): Boolean {
-            currentDrawableIndex = b.size
             return b.add(element)
+        }
+
+        override fun add(index: Int, element: ICanvasDrawable): Unit {
+            return b.add(index, element)
         }
 
         override fun removeAt(index: Int): ICanvasDrawable {
             if (index > 0) {
-//                currentDrawableIndex = index - 1
                 return b.removeAt(index)
             } else if (index == 0 && b.size > 1) {
                 val ret = b.removeAt(0)
@@ -59,12 +61,10 @@ class MainCanvas(
             val i = b.indexOf(element)
             if (i > 0) {
                 b.removeAt(i)
-                currentDrawableIndex = i - 1
                 return true
             } else if (i == 0 && b.size > 1) {
                 b.removeAt(0)
                 b.add(0, PCanvas(""))
-                currentDrawableIndex = 0
                 return true
             }
             return false
@@ -112,8 +112,8 @@ class MainCanvas(
         var doNotDraw = false
         when (currentKeyboardEvent!!.key) {
             "Backspace" -> {
-                trace("MainCanvas::addDrawable press Backspace")
-                if (caretPosInCurrentText == 0) {
+                traceIndent("MainCanvas::addDrawable +++ press Backspace $caretPosInCurrentText, $currentDrawableIndex")
+                if (caretPosInCurrentText == 0 && currentDrawableIndex > 0) {
                     val txt = currentText!!.txt
                     val i = currentDrawableIndex
                     commandDoList.add(
@@ -129,7 +129,7 @@ class MainCanvas(
                             txt
                         )
                     )
-                } else
+                } else if (caretPosInCurrentText > 0)
                     commandDoList.add(
                         RmCharCommand(
                             drawables,
@@ -137,6 +137,7 @@ class MainCanvas(
                             caretPosInCurrentText--
                         )
                     )
+                traceDeIndent("MainCanvas::addDrawable --- press Backspace")
             }
 
             "Tab" -> {
@@ -190,7 +191,6 @@ class MainCanvas(
                             AddTableCommand(drawables, i2)
                         )
                     } else {
-                        caretPosInCurrentText = 0
                         var initTxt = ""
                         if (caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
                             initTxt = currentText!!.txt.substring(caretPosInCurrentText)
@@ -257,7 +257,7 @@ class MainCanvas(
             }
 
             "ArrowUp" -> {
-                trace("MainCanvas::addDrawable press ArrowUp value: ${-(1 + currentLine.length)}")
+                trace("MainCanvas::addDrawable press ArrowUp value: currentDrawableIndex: $currentDrawableIndex")
                 if (currentDrawableIndex > 0) {
                     currentDrawableIndex--
                     caretPosInCurrentText = min(currentLine.length, caretPosInCurrentText)
@@ -265,7 +265,7 @@ class MainCanvas(
             }
 
             "ArrowDown" -> {
-                trace("MainCanvas::addDrawable press ArrowDown currentLine.length: ${currentLine.length}")
+                trace("MainCanvas::addDrawable press ArrowDown currentDrawableIndex: $currentDrawableIndex")
                 if (currentDrawableIndex < drawables.size - 1) {
                     currentDrawableIndex++
                     caretPosInCurrentText = min(currentLine.length, caretPosInCurrentText)
@@ -791,7 +791,7 @@ class MainCanvas(
         val executedCommands = mutableListOf<ICanvasCommand>()
         for (cmd in commandDoList) {
             if (cmd.doIt()) {
-                trace("Execute command, currentDrawableIndex: $currentDrawableIndex")
+                trace("Command executed successfully, currentDrawableIndex: $currentDrawableIndex")
                 executedCommands.add(cmd)
             } else trace("$cmd does not do it !!")
         }

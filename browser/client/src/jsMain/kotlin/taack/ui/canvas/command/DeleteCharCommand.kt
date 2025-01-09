@@ -13,11 +13,8 @@ class DeleteCharCommand(
 ) : ICanvasCommand {
     override fun doIt(): Boolean {
         traceIndent("DeleteCharCommand +++ ${text.txt}")
-        var ret = true
-        if (text.delChar(pos1, pos2) == 0) {
-            ret = drawables.remove(text)
-        }
-        traceDeIndent("DeleteCharCommand --- ${text.txt}")
-        return ret
+        val ret = text.delChar(pos1, pos2) == 0
+        traceDeIndent("DeleteCharCommand --- ${text.txt}, ret = $ret")
+        return true
     }
 }

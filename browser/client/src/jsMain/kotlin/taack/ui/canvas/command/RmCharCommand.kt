@@ -8,11 +8,8 @@ class RmCharCommand(private val drawables: MutableList<ICanvasDrawable>, private
     override fun doIt(): Boolean {
         val text = drawables[textIndex].getSelectedText()!!
         traceIndent("RmCharCommand +++ ${text.txt}")
-        var ret = true
-        if (text.rmChar(pos) == 0) {
-            ret = drawables.remove(text)
-        }
-        traceDeIndent("RmCharCommand --- ${text.txt}")
-        return ret
+        val ret = text.rmChar(pos) == 0
+        traceDeIndent("RmCharCommand --- ${text.txt}, ret = $ret")
+        return true
     }
 }
