@@ -258,18 +258,26 @@ class MainCanvas(
 
             "ArrowUp" -> {
                 trace("MainCanvas::addDrawable press ArrowUp value: ${-(1 + currentLine.length)}")
-                if (currentDrawableIndex > 0) currentDrawableIndex--
-                caretPosInCurrentText = min(currentLine.length, caretPosInCurrentText)
+                if (currentDrawableIndex > 0) {
+                    currentDrawableIndex--
+                    caretPosInCurrentText = min(currentLine.length, caretPosInCurrentText)
+                }
             }
 
             "ArrowDown" -> {
                 trace("MainCanvas::addDrawable press ArrowDown currentLine.length: ${currentLine.length}")
-                if (currentDrawableIndex < drawables.size) currentDrawableIndex++
-                caretPosInCurrentText = min(currentLine.length, caretPosInCurrentText)
+                if (currentDrawableIndex < drawables.size - 1) {
+                    currentDrawableIndex++
+                    caretPosInCurrentText = min(currentLine.length, caretPosInCurrentText)
+                }
             }
 
             "ArrowLeft" -> {
-                caretPosInCurrentText--
+                if (caretPosInCurrentText > 0) caretPosInCurrentText--
+                else if (currentDrawableIndex > 0) {
+                    currentDrawableIndex--
+                    caretPosInCurrentText = currentText!!.txt.length
+                }
             }
 
             "ArrowRight" -> {
@@ -280,8 +288,11 @@ class MainCanvas(
                         charSelectEndNInText = currentText!!.txt.length
                     }
                     charSelectEndNInText = charSelectEndNInText?.plus(decay)
-                } else {
+                } else if (currentText!!.txt.length > caretPosInCurrentText) {
                     caretPosInCurrentText++
+                } else if (currentDrawableIndex < drawables.size - 1) {
+                    currentDrawableIndex++
+                    caretPosInCurrentText = 0
                 }
             }
 
