@@ -32,25 +32,27 @@ class Helper {
         private const val RELOAD = "__reload__"
         private const val REDIRECT = "__redirect__"
         private const val ERROR_START = "__ErrorKeyStart__"
-
+        var traceEnabled = true
         fun trace(level: Int, message: String) {
-            var s = ""
-            for (i in 0..level) {
-                s += "    "
+            if (traceEnabled) {
+                var s = ""
+                for (i in 0..level) {
+                    s += "    "
+                }
+                println(s + message)
             }
-            println(s + message)
         }
 
         fun trace(message: String) {
-            trace(level, message)
+            if (traceEnabled) trace(level, message)
         }
 
         fun traceIndent(message: String) {
-            trace(level++, message)
+            if (traceEnabled) trace(level++, message)
         }
 
         fun traceDeIndent(message: String) {
-            trace(--level, message)
+            if (traceEnabled) trace(--level, message)
         }
 
         private fun mapAjaxErrors(text: String): Map<String, String> {

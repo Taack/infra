@@ -2,6 +2,7 @@ package taack.ui.canvas
 
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
+import taack.ui.base.Helper.Companion.traceEnabled
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.element.Form
 import taack.ui.canvas.command.*
@@ -194,9 +195,65 @@ class MainCanvas(
             }
 
             "Enter" -> {
-                traceIndent("MainCanvas::addDrawable press Enter +++ $caretPosInCurrentText, $currentDrawableIndex")
+                traceIndent("MainCanvas::addDrawable press Enter +++ $caretPosInCurrentText, $currentDrawableIndex, ${currentKeyboardEvent!!.shiftKey}")
                 val i = currentDrawableIndex
-                if (caretPosInCurrentText == 0) {
+
+                if (currentDrawable is CanvasTable) {
+                    when (currentText) {
+                        is TxtHeaderCanvas -> {
+                            if (currentKeyboardEvent!!.shiftKey)
+                                commandDoList.add(
+                                    RemoveTableColumnCommand(
+                                        drawables,
+                                        currentDrawableIndex,
+                                        currentTableRowIndex,
+                                        currentMouseEvent
+                                    )
+                                )
+                            else
+                                commandDoList.add(
+                                    AddTableColumnCommand(
+                                        drawables,
+                                        currentDrawableIndex,
+                                        currentTableRowIndex,
+                                        currentMouseEvent
+                                    )
+                                )
+                        }
+
+                        is TxtRowCanvas -> {
+                            if (currentKeyboardEvent!!.shiftKey) {
+                                if ((currentDrawable as CanvasTable).rows.size == 2) {
+                                    commandDoList.add(
+                                        DeleteDrawableCommand(
+                                            drawables,
+                                            currentDrawableIndex,
+                                        )
+                                    )
+                                    currentTableRowIndex = 0
+                                } else
+                                    commandDoList.add(
+                                        RemoveTableRowCommand(
+                                            drawables,
+                                            currentDrawableIndex,
+                                            currentTableRowIndex,
+                                            currentMouseEvent
+                                        )
+                                    )
+                            } else {
+
+                                commandDoList.add(
+                                    AddTableRowCommand(
+                                        drawables,
+                                        currentDrawableIndex,
+                                        currentTableRowIndex,
+                                        currentMouseEvent
+                                    )
+                                )
+                            }
+                        }
+                    }
+                } else if (caretPosInCurrentText == 0) {
                     val d = PCanvas("")
                     commandDoList.add(
                         AddDrawableCommand(drawables, i, d)
@@ -211,7 +268,7 @@ class MainCanvas(
 //                    )
                 } else {
                     val i2 = i + 1
-                    if (currentKeyboardEvent!!.ctrlKey && currentDrawable !is CanvasTable) {
+                    if (currentKeyboardEvent!!.ctrlKey) {
                         commandDoList.add(
                             AddTableCommand(drawables, i2)
                         )
@@ -247,29 +304,6 @@ class MainCanvas(
                                 )
                             }
 
-                            is TxtHeaderCanvas -> {
-                                trace("TxtHeaderCanvas")
-                                val table = currentDrawable as CanvasTable
-                                if (currentKeyboardEvent!!.shiftKey)
-                                    commandDoList.add(
-                                        RemoveTableColumnCommand(table, currentText as TxtHeaderCanvas)
-                                    )
-                                else commandDoList.add(
-                                    AddTableColumnCommand(table, currentText as TxtHeaderCanvas)
-                                )
-                            }
-
-                            is TxtRowCanvas -> {
-                                trace("TxtRowCanvas")
-                                val table = currentDrawable as CanvasTable
-                                if (currentKeyboardEvent!!.shiftKey)
-                                    commandDoList.add(
-                                        RemoveTableRowCommand(table, currentText as TxtRowCanvas)
-                                    )
-                                else commandDoList.add(
-                                    AddTableRowCommand(table, currentText as TxtRowCanvas)
-                                )
-                            }
 
                             else -> {
                                 val d = PCanvas(initTxt)
@@ -279,9 +313,9 @@ class MainCanvas(
                             }
                         }
                         currentDrawableIndex = i2
-                        traceDeIndent("MainCanvas::addDrawable press Enter --- $caretPosInCurrentText, $currentDrawableIndex")
                     }
                 }
+                traceDeIndent("MainCanvas::addDrawable press Enter --- $caretPosInCurrentText, $currentDrawableIndex")
             }
 
             "ArrowUp" -> {
@@ -796,6 +830,7 @@ class MainCanvas(
     }
 
     private fun draw() {
+        traceEnabled = false
         traceIndent("MainCanvas::draw, currentDrawableIndex: $currentDrawableIndex")
         if (divHolder.clientWidth > 0) {
             canvas.width = floor(divHolder.clientWidth * dprX).toInt()
@@ -869,5 +904,6 @@ class MainCanvas(
         textarea.textContent = asciidoc
 
         traceDeIndent("MainCanvas::draw ${divHolder.clientWidth} $currentText")
+        traceEnabled = true
     }
 }

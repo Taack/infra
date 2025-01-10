@@ -8,6 +8,7 @@ import taack.ui.canvas.text.CanvasFigure
 import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
+import kotlin.math.sign
 
 class CanvasTable(
     private val initHeaders: List<TxtHeaderCanvas> = listOf(),
@@ -16,7 +17,7 @@ class CanvasTable(
     private val initCitationNumber: Int = 0
 ) : ICanvasDrawable {
 
-    private val rows = initCells.toMutableList()
+    val rows = initCells.toMutableList()
     private val headers = initHeaders.toMutableList()
     var currentRowIndex: Int = 0
     override var globalPosYStart: Double = 0.0
@@ -193,56 +194,37 @@ class CanvasTable(
 
     }
 
-    fun addLine(currentText: TxtRowCanvas) {
-        traceIndent("CanvasTable::addLine: $currentText ${rows.size}")
-        for (i in (rows.indices)) {
-            if (rows[i] == currentText) {
-                for (j in (0 until columns)) {
-                    rows.add((i - (i % columns) + columns), TxtRowCanvas(""))
-                }
-                break
-            }
+    fun addLine(currentTextIndex: Int) {
+        traceIndent("CanvasTable::addLine: $currentTextIndex ${rows.size}")
+        currentRowIndex = currentTextIndex
+        for (j in ((currentRowIndex - (currentRowIndex % columns)) until (columns + currentRowIndex - (currentRowIndex % columns)))) {
+            rows.add(j, TxtRowCanvas("New Cell $j"))
         }
         traceDeIndent("CanvasTable::addLine: ${rows.size}")
     }
 
-    fun removeLine(currentText: TxtRowCanvas) {
-        if (rows.size <= 2 * columns) return
-        for (i in (rows.indices)) {
-            if (rows[i] == currentText) {
-                for (j in (0 until columns)) {
-                    rows.removeAt(i - (i % columns) + columns)
-                }
-                break
-            }
+    fun removeLine(currentTextIndex: Int) {
+        traceIndent("CanvasTable::removeLine: $currentTextIndex ${rows.size}")
+        currentRowIndex = currentTextIndex
+        for (j in ((currentRowIndex - (currentRowIndex % columns)) until (columns + currentRowIndex - (currentRowIndex % columns)))) {
+            rows.removeAt(currentRowIndex - (currentRowIndex % columns))
+        }
+        traceDeIndent("CanvasTable::removeLine: ${rows.size}")
+    }
+
+    fun addColumn(currentTextIndex: Int) {
+        currentRowIndex = currentTextIndex + 1
+        headers.add(currentRowIndex, TxtHeaderCanvas("New Header ${currentRowIndex + 1}"))
+        for (j in ((currentRowIndex)..(rows).size step columns)) {
+            rows.add(j, TxtRowCanvas("New Cell ${j + 1}"))
         }
     }
 
-    fun addColumn(currentText: TxtHeaderCanvas) {
-        for (i in (headers.indices)) {
-            if (headers[i] == currentText) {
-                headers.add(i + 1, TxtHeaderCanvas(""))
-                for (j in ((i + 1) until rows.size step columns)) {
-                    rows.add(j, TxtRowCanvas(""))
-                }
-                break
-            }
+    fun removeColumn(currentTextIndex: Int) {
+        currentRowIndex = if (currentTextIndex > 0) currentTextIndex - 1 else currentTextIndex
+        headers.removeAt(currentRowIndex)
+        for (j in ((rows.size)..<currentRowIndex step columns)) {
+            rows.removeAt(j)
         }
     }
-
-    fun removeColumn(currentText: TxtHeaderCanvas) {
-        if (rows.size <= 4) return
-        for (i in (rows.indices)) {
-            if (headers[i] == currentText) {
-                rows.removeAt(i)
-                var n = 0
-                for (j in ((columns + i) until (rows.size) step columns)) {
-                    trace("CanvasTable::removeColumn: $j, on ${rows.size}")
-                    rows.removeAt(j - n++)
-                }
-                break
-            }
-        }
-    }
-
 }
