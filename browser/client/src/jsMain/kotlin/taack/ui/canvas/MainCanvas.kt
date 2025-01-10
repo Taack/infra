@@ -42,7 +42,7 @@ class MainCanvas(
             return b.add(element)
         }
 
-        override fun add(index: Int, element: ICanvasDrawable): Unit {
+        override fun add(index: Int, element: ICanvasDrawable) {
             return b.add(index, element)
         }
 
@@ -71,6 +71,8 @@ class MainCanvas(
         }
     }
 
+    private var currentTableRowIndex = 0
+
     private val dprX = 2.0
     private val dprY = 2.0
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
@@ -91,7 +93,17 @@ class MainCanvas(
     private val currentDrawable: ICanvasDrawable
         get() = drawables[currentDrawableIndex]
     private val currentText: CanvasText?
-        get() = drawables[currentDrawableIndex].getSelectedText(currentMouseEvent?.offsetX, currentMouseEvent?.offsetY)
+        get() {
+            if (drawables[currentDrawableIndex] is CanvasTable) {
+                (drawables[currentDrawableIndex] as CanvasTable).currentRowIndex = currentTableRowIndex
+            }
+
+            return drawables[currentDrawableIndex].getSelectedText(
+                currentMouseEvent?.offsetX,
+                currentMouseEvent?.offsetY
+            )
+
+        }
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
     private var currentMouseEvent: MouseEvent? = null
     private var currentKeyboardEvent: KeyboardEvent? = null
@@ -125,8 +137,12 @@ class MainCanvas(
                     currentDrawableIndex = i - 1
                     commandDoList.add(
                         AddCharCommand(
-                            currentText!!,
-                            txt
+                            drawables,
+                            currentDrawableIndex,
+                            currentTableRowIndex,
+                            null,
+                            txt,
+                            currentMouseEvent
                         )
                     )
                 } else if (caretPosInCurrentText > 0)
@@ -134,10 +150,12 @@ class MainCanvas(
                         RmCharCommand(
                             drawables,
                             currentDrawableIndex,
-                            caretPosInCurrentText--
+                            currentTableRowIndex,
+                            caretPosInCurrentText--,
+                            currentMouseEvent
                         )
                     )
-                traceDeIndent("MainCanvas::addDrawable --- press Backspace")
+                traceDeIndent("MainCanvas::addDrawable --- press Backspace $currentDrawableIndex ${currentMouseEvent?.offsetX} ${currentMouseEvent?.offsetY}")
             }
 
             "Tab" -> {
@@ -163,7 +181,14 @@ class MainCanvas(
                     val pos1 = caretPosInCurrentText
                     val pos2: Int? = null
                     commandDoList.add(
-                        DeleteCharCommand(drawables, currentDrawable.getSelectedText()!!, pos1, pos2)
+                        DeleteCharCommand(
+                            drawables,
+                            currentDrawableIndex,
+                            currentTableRowIndex,
+                            pos1,
+                            pos2,
+                            currentMouseEvent
+                        )
                     )
                 }
             }
@@ -192,17 +217,20 @@ class MainCanvas(
                         )
                     } else {
                         var initTxt = ""
-                        if (caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
-                            initTxt = currentText!!.txt.substring(caretPosInCurrentText)
-                            commandDoList.add(
-                                DeleteCharCommand(
-                                    drawables,
-                                    currentText!!,
-                                    caretPosInCurrentText,
-                                    currentText!!.txt.length
+                        if (currentDrawable !is CanvasTable)
+                            if (caretPosInCurrentText != 0 && caretPosInCurrentText != currentText!!.txt.length) {
+                                initTxt = currentText!!.txt.substring(caretPosInCurrentText)
+                                commandDoList.add(
+                                    DeleteCharCommand(
+                                        drawables,
+                                        currentDrawableIndex,
+                                        currentTableRowIndex,
+                                        caretPosInCurrentText,
+                                        currentText!!.txt.length,
+                                        currentMouseEvent
+                                    )
                                 )
-                            )
-                        }
+                            }
 
                         when (currentText) {
                             is H2Canvas -> {
@@ -337,9 +365,12 @@ class MainCanvas(
                         if (currentText != null) {
                             commandDoList.add(
                                 AddCharCommand(
-                                    currentText!!,
+                                    drawables,
+                                    currentDrawableIndex,
+                                    currentTableRowIndex,
+                                    caretPosInCurrentText++,
                                     currentKeyboardEvent!!.key[0].toString(),
-                                    caretPosInCurrentText++
+                                    currentMouseEvent
                                 )
                             )
                         }
@@ -548,7 +579,7 @@ class MainCanvas(
                     caretPosInCurrentText = currentClick!!.second
                 }
             }
-            traceDeIndent("canvas click => $caretPosInCurrentText, $currentDrawable, ${currentText?.txt}")
+            traceDeIndent("canvas click => $caretPosInCurrentText, $currentDrawableIndex, ${currentText?.txt}")
             draw()
         }
 
@@ -592,9 +623,12 @@ class MainCanvas(
             if (currentText != null && txt.isNotEmpty()) {
                 commandDoList.add(
                     AddCharCommand(
-                        currentText!!,
+                        drawables,
+                        currentDrawableIndex,
+                        currentTableRowIndex,
+                        caretPosInCurrentText,
                         txt,
-                        caretPosInCurrentText
+                        currentMouseEvent
                     )
                 )
                 trace("canvasEvent paste: $txt")
@@ -641,9 +675,12 @@ class MainCanvas(
 
             commandDoList.add(
                 AddCharCommand(
-                    currentText!!,
+                    drawables,
+                    currentDrawableIndex,
+                    currentTableRowIndex,
+                    caretPosInCurrentText,
                     txt,
-                    caretPosInCurrentText
+                    currentMouseEvent
                 )
             )
 
@@ -780,6 +817,10 @@ class MainCanvas(
 
         trace("Reset text")
         for (text in drawables) {
+            if (text is CanvasTable) {
+                if (text.currentRowIndex != 0)
+                    currentTableRowIndex = text.currentRowIndex
+            }
             text.reset()
         }
 

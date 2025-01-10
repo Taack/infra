@@ -9,13 +9,19 @@ import taack.ui.canvas.text.CanvasLine
 import taack.ui.canvas.text.CanvasText
 import web.canvas.CanvasRenderingContext2D
 
-class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), private val initCells: List<TxtRowCanvas> = listOf(), txt: String = "", private val initCitationNumber: Int = 0) : ICanvasDrawable {
+class CanvasTable(
+    private val initHeaders: List<TxtHeaderCanvas> = listOf(),
+    private val initCells: List<TxtRowCanvas> = listOf(),
+    txt: String = "",
+    private val initCitationNumber: Int = 0
+) : ICanvasDrawable {
 
     private val rows = initCells.toMutableList()
     private val headers = initHeaders.toMutableList()
-    private var currentRow: CanvasText? = null
+    var currentRowIndex: Int = 0
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0
+    private var isDrawn: Boolean = false
     private val columns
         get() = headers.size
     val text = CanvasFigure(txt, initCitationNumber)
@@ -27,41 +33,41 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
             return createTable()
         }
 
-        fun createTable() = CanvasTable(listOf(
-            TxtHeaderCanvas("Header 1"),
-            TxtHeaderCanvas("Header 2"),
-        ), listOf(
-            TxtRowCanvas("Cell 1"),
-            TxtRowCanvas("Cell 2"),
-        ), "New Table", 0)
+        fun createTable() = CanvasTable(
+            listOf(
+                TxtHeaderCanvas("Header 1"),
+                TxtHeaderCanvas("Header 2"),
+            ), listOf(
+                TxtRowCanvas("Cell 1"),
+                TxtRowCanvas("Cell 2"),
+            ), "New Table", 0
+        )
     }
 
     override fun getSelectedText(posX: Double?, posY: Double?): CanvasText {
-        trace("CanvasTable::getSelectedText +++ $posX, $posY, $currentRow")
         if (posX == null || posY == null) {
-            return currentRow ?: this.rows.first()
-        }
-        for (r in headers + rows) {
-            if (posY in r.globalPosYStart..r.globalPosYEnd && posX in r.posXStart..r.posXEnd) {
-                currentRow = r
-                trace("CanvasTable::getSelectedText --- $posX, $posY ${currentRow!!.txt}")
-                return r
+            return text
+        } else if (isDrawn) {
+            currentRowIndex = 0
+            for (r in headers + rows) {
+                if (posY in r.globalPosYStart..r.globalPosYEnd && posX in r.posXStart..r.posXEnd) {
+                    return r
+                }
+                currentRowIndex++
+            }
+            currentRowIndex++
+            return text
+        } else {
+            val t = (headers + rows)
+            if (t.size > currentRowIndex) {
+                return t[currentRowIndex]
             }
         }
-        if (posY in text.globalPosYStart..text.globalPosYEnd && posX in text.posXStart..text.posXEnd) {
-            currentRow = text
-            trace("CanvasTable::getSelectedText --- $posX, $posY ${currentRow!!.txt}")
-            return text
-        }
-        currentRow = text
-        if (posY < currentRow!!.globalPosYEnd) {
-            currentRow = rows.first()
-        }
-        trace("CanvasTable::getSelectedText --- $posX, $posY ${currentRow!!.txt}")
-        return currentRow!!
+        return text
     }
 
     override fun draw(ctx: CanvasRenderingContext2D, width: Double, posY: Double, posX: Double): Double {
+        isDrawn = false
         traceIndent("CanvasTable::draw: $posX, $posY, $width")
         ctx.save()
         globalPosYStart = posY
@@ -121,6 +127,7 @@ class CanvasTable(private val initHeaders: List<TxtHeaderCanvas> = listOf(), pri
         globalPosYEnd = y
         globalPosYEnd = text.draw(ctx, width, globalPosYEnd, posX)
         traceDeIndent("CanvasTable::draw: $globalPosYEnd")
+        isDrawn = true
         return globalPosYEnd
     }
 
