@@ -3,10 +3,11 @@ package taack.ui.dsl.table
 import groovy.transform.CompileStatic
 
 @CompileStatic
-final class RowIndentTreeSpec extends RowColumnSpec {
+final class RowIndentTreeSpec {
+    final IUiTableVisitor tableVisitor
 
     RowIndentTreeSpec(IUiTableVisitor tableVisitor) {
-        super(tableVisitor)
+        this.tableVisitor = tableVisitor
     }
 
     /**
@@ -20,5 +21,12 @@ final class RowIndentTreeSpec extends RowColumnSpec {
         closure.delegate = new RowColumnSpec(tableVisitor)
         closure.call()
         tableVisitor.visitRowEnd()
+    }
+
+    void rowIndent(final Boolean isExpended = false, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowIndentTreeSpec) Closure closure) {
+        tableVisitor.visitRowIndent(isExpended)
+        closure.delegate = this
+        closure.call()
+        tableVisitor.visitRowIndentEnd()
     }
 }
