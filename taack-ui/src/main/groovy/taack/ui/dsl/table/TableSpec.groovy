@@ -37,7 +37,6 @@ final class TableSpec {
      * @param Closure contain the list of {@link TableSpec#row(groovy.lang.Closure)}
      */
     void rowIndent(final Boolean isExpended = false, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowIndentTreeSpec) Closure closure) {
-
         tableVisitor.visitRowIndent(isExpended)
         closure.delegate = new RowIndentTreeSpec(tableVisitor)
         closure.call()
