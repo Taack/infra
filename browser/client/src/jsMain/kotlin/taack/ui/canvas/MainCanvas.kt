@@ -95,15 +95,17 @@ class MainCanvas(
         get() = drawables[currentDrawableIndex]
     private val currentText: CanvasText?
         get() {
-            if (drawables[currentDrawableIndex] is CanvasTable) {
-                (drawables[currentDrawableIndex] as CanvasTable).currentRowIndex = currentTableRowIndex
-            }
+            if (currentDrawableIndex < drawables.size) {
+                if (drawables[currentDrawableIndex] is CanvasTable) {
+                    (drawables[currentDrawableIndex] as CanvasTable).currentRowIndex = currentTableRowIndex
+                }
 
-            return drawables[currentDrawableIndex].getSelectedText(
-                currentMouseEvent?.offsetX,
-                currentMouseEvent?.offsetY
-            )
-
+                return drawables[currentDrawableIndex].getSelectedText(
+                    currentMouseEvent?.offsetX,
+                    currentMouseEvent?.offsetY
+                )
+            } else
+                return null
         }
     private var currentDoubleClick: Triple<CanvasLine, Int, Int>? = null
     private var currentMouseEvent: MouseEvent? = null
@@ -485,19 +487,19 @@ class MainCanvas(
             currentDoubleClick = null
             draw()
         }
-        createButton("buttonBoldMono", "<code style='margin: 0;height: 23px;'><b>Mono</b></code>") {
-            if (currentDoubleClick != null)
-                commandDoList.add(
-                    AddStyleCommand(
-                        currentText!!,
-                        TextStyle.BOLD_MONOSPACED,
-                        currentDoubleClick!!.second,
-                        currentDoubleClick!!.third
-                    )
-                )
-            currentDoubleClick = null
-            draw()
-        }
+//        createButton("buttonBoldMono", "<code style='margin: 0;height: 23px;'><b>Mono</b></code>") {
+//            if (currentDoubleClick != null)
+//                commandDoList.add(
+//                    AddStyleCommand(
+//                        currentText!!,
+//                        TextStyle.BOLD_MONOSPACED,
+//                        currentDoubleClick!!.second,
+//                        currentDoubleClick!!.third
+//                    )
+//                )
+//            currentDoubleClick = null
+//            draw()
+//        }
 //        createButton("buttonScript", "<code style='margin: 0;height: 23px;'><em>Kroki</em></code>") {
 //            if (currentDrawable != null)
 //                commandDoList.add(
@@ -830,7 +832,7 @@ class MainCanvas(
     }
 
     private fun draw() {
-        traceEnabled = false
+        traceEnabled = true
         traceIndent("MainCanvas::draw, currentDrawableIndex: $currentDrawableIndex")
         if (divHolder.clientWidth > 0) {
             canvas.width = floor(divHolder.clientWidth * dprX).toInt()

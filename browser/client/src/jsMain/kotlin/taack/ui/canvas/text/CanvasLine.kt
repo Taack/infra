@@ -27,7 +27,44 @@ class CanvasLine(
         trace("CanvasLine::drawLine:lineStyles: $lineStyles between $posBegin and $posEnd")
         if (lineStyles.isNotEmpty()) {
             var pe = posBegin
-            lineStyles.forEach {
+
+            val contextList = mutableListOf<StringStyle>()
+            var currentBackgroundStyle: StringStyle? = null
+            var currentEndPosition = 0
+            // merge at most 2 styles
+            lineStyles.sortedBy { it.start }.forEach {
+
+                if (currentBackgroundStyle == null) {
+                    println("AUO 0$it, $currentBackgroundStyle, $currentEndPosition")
+                    currentBackgroundStyle = it
+                    currentEndPosition = it.end
+                    contextList.add(it)
+                } else {
+                    if (currentEndPosition < it.start) {
+                        println("AUO 1$it, $currentBackgroundStyle, $currentEndPosition")
+                        currentBackgroundStyle = it
+                        currentEndPosition = it.end
+                        contextList.add(it)
+                    } else if (currentEndPosition > it.start && currentEndPosition > it.end) {
+                        println("AUO 2$it, $currentBackgroundStyle, $currentEndPosition")
+                        it.mergeStyle(currentBackgroundStyle!!)
+                        contextList.add(it)
+                        val currentPosition = it.end
+                        currentBackgroundStyle!!.end = it.start
+                        val ctc = currentBackgroundStyle!!.copy()
+                        ctc.start = currentPosition
+                        ctc.end = currentEndPosition
+                        contextList.add(ctc)
+                        currentBackgroundStyle = ctc//currentBackgroundStyle!!.copy()
+                         println("AUO 2 ===> $contextList, $currentBackgroundStyle")
+                    }
+                }
+            }
+//            if (currentStyle != null) {
+//                contextList.add(currentStyle!!)
+//            }
+            trace("CanvasLine::drawLine:contextList $contextList")
+            contextList.sortedBy { it.start }.forEach {
                 val s = if (it.start < posBegin) posBegin else it.start
                 val e = if (it.end > posEnd) posEnd else it.end
                 if (s > pe) {
@@ -44,6 +81,7 @@ class CanvasLine(
                 }
                 ctx.save()
                 it.getTextStyle().initCtx(ctx, text)
+                trace("CanvasLine::drawLine $s $e ${(if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e)}")
                 ctx.fillText(
                     (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e),
 //                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
@@ -58,6 +96,7 @@ class CanvasLine(
                 pe = e
             }
             if (pe < posEnd) {
+                trace("CanvasLine::drawLine:pe < posEnd: posEnd: $posEnd pe: $pe")
                 ctx.fillText(
                     (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd),
 //                    (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
@@ -69,6 +108,7 @@ class CanvasLine(
                 ).width
             }
         } else {
+            trace("CanvasLine::drawLine:else (empty...) ...")
             ctx.fillText(
                 (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
                 (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,

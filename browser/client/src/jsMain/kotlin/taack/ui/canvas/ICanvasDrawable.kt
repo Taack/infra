@@ -32,7 +32,7 @@ interface ICanvasDrawable : ICanvasSelectable {
 //        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
         TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+(\\|([^|*`\n])+)+")),
         TABLE_CELL(Regex("^\\|")),
-        MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
+//        MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
         NEXT_DRAWABLE(Regex("^ *\n *\n *")),
@@ -112,7 +112,7 @@ interface ICanvasDrawable : ICanvasSelectable {
                             end += m.value.length
                             tokens.add(TokenInfo(m.value, t, start, end))
                             start += m.value.length
-                            s = if (pt in listOf(AdocToken.MONO, AdocToken.MONO_BOLD, AdocToken.NORMAL, AdocToken.BOLD)) {
+                            s = if (pt in listOf(AdocToken.MONO, /*AdocToken.MONO_BOLD,*/ AdocToken.NORMAL, AdocToken.BOLD)) {
                                 s.substring(m.value.length)
                             } else {
                                 s.substring(m.value.length).trimStart(' ', '\t', '\r')
@@ -218,17 +218,17 @@ interface ICanvasDrawable : ICanvasSelectable {
                     AdocToken.NEXT_LINE -> {
                         currentText = null
                     }
-                    AdocToken.MONO_BOLD -> {
-                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
-                            canvasDrawables.add(currentText!!)
-                        currentText?.addToTxtInit(token.sequence.substring(3,token.sequence.length - 3))
-                        currentText?.addStyle(
-                            TextStyle.BOLD_MONOSPACED,
-                            token.start - currentTextPosition,
-                            token.end - currentTextPosition
-                        )
-                        currentTextPosition += 6
-                    }
+//                    AdocToken.MONO_BOLD -> {
+//                        if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())
+//                            canvasDrawables.add(currentText!!)
+//                        currentText?.addToTxtInit(token.sequence.substring(3,token.sequence.length - 3))
+//                        currentText?.addStyle(
+//                            TextStyle.BOLD_MONOSPACED,
+//                            token.start - currentTextPosition,
+//                            token.end - currentTextPosition
+//                        )
+//                        currentTextPosition += 6
+//                    }
 
                     AdocToken.BOLD -> {
                         if (canvasDrawables.isNotEmpty() && currentText != canvasDrawables.last())

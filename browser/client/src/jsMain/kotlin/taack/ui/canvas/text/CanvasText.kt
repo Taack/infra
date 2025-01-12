@@ -126,6 +126,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
 
     fun addStyle(style: TextStyle, p: Int, pEnd: Int) {
         txtVar = style.applyStyle(txt, p, pEnd)
+        trace("CanvasText::addStyle $txtVar")
     }
 
     fun measureText(ctx: CanvasRenderingContext2D, posBegin: Int, posEnd: Int): Double {
