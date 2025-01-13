@@ -35,18 +35,15 @@ class CanvasLine(
             lineStyles.sortedBy { it.start }.forEach {
 
                 if (currentBackgroundStyle == null) {
-                    println("AUO 0$it, $currentBackgroundStyle, $currentEndPosition")
                     currentBackgroundStyle = it
                     currentEndPosition = it.end
                     contextList.add(it)
                 } else {
                     if (currentEndPosition < it.start) {
-                        println("AUO 1$it, $currentBackgroundStyle, $currentEndPosition")
                         currentBackgroundStyle = it
                         currentEndPosition = it.end
                         contextList.add(it)
                     } else if (currentEndPosition > it.start && currentEndPosition > it.end) {
-                        println("AUO 2$it, $currentBackgroundStyle, $currentEndPosition")
                         it.mergeStyle(currentBackgroundStyle!!)
                         contextList.add(it)
                         val currentPosition = it.end
@@ -56,7 +53,6 @@ class CanvasLine(
                         ctc.end = currentEndPosition
                         contextList.add(ctc)
                         currentBackgroundStyle = ctc//currentBackgroundStyle!!.copy()
-                         println("AUO 2 ===> $contextList, $currentBackgroundStyle")
                     }
                 }
             }
