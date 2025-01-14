@@ -130,6 +130,40 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     /**
+     * Render a block.
+     *
+     * @param blockSpecifier block descriptor
+     */
+    def visitAndRender(UiMenuSpecifier menu, final UiBlockSpecifier blockSpecifier, String... paramsToKeep) {
+        if (!blockSpecifier) return ''
+        Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
+        blockSpecifier.visitBlock(htmlBlock)
+        if (p.isModal) {
+            params['isAjax'] = true
+            render htmlBlock.output
+        } else {
+            ThemeSelector themeSelector = themeService.themeSelector
+            ThemeSize themeSize = themeSelector.themeSize
+            ThemeMode themeMode = themeSelector.themeMode
+            ThemeMode themeAuto = themeSelector.themeAuto
+
+            return new ModelAndView("/taackUi/block", [
+                    themeSize      : themeSize,
+                    themeMode      : themeMode,
+                    themeAuto      : themeAuto,
+                    block          : htmlBlock.output,
+                    menu           : visitMenu(menu),
+                    conf           : taackUiPluginConfiguration,
+                    clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+                    bootstrapJsTag : bootstrapJsTag,
+                    bootstrapCssTag: bootstrapCssTag
+            ])
+        }
+
+    }
+
+    /**
      * Allows to retrieve the content of a menu without rendering it.
      *
      * @param menuSpecifier menu descriptor
@@ -174,39 +208,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (!block) return
         if (menu && !params.containsKey('refresh') && !params.containsKey('targetAjaxBlockId')) params.remove('isAjax')
 
-        boolean isModal = false
-        final UiBlockVisitor isModalVisitor = new UiBlockVisitor() {
-            @Override
-            void visitModal() {
-                isModal = true
-            }
-        }
-
         if (params.boolean('isAjax')) {
             render visit(block, paramsToKeep)
         } else {
-            block.visitBlock(isModalVisitor)
-            if (isModal) {
-                params['isAjax'] = true
-                render visit(block, paramsToKeep)
-            } else {
-                ThemeSelector themeSelector = themeService.themeSelector
-                ThemeSize themeSize = themeSelector.themeSize
-                ThemeMode themeMode = themeSelector.themeMode
-                ThemeMode themeAuto = themeSelector.themeAuto
-
-                return new ModelAndView("/taackUi/block", [
-                        themeSize      : themeSize,
-                        themeMode      : themeMode,
-                        themeAuto      : themeAuto,
-                        block          : visit(block, paramsToKeep),
-                        menu           : visitMenu(menu),
-                        conf           : taackUiPluginConfiguration,
-                        clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
-                        bootstrapJsTag : bootstrapJsTag,
-                        bootstrapCssTag: bootstrapCssTag
-                ])
-            }
+            return visitAndRender(menu, block, paramsToKeep)
         }
     }
 

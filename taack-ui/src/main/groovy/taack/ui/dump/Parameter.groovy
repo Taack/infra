@@ -53,6 +53,7 @@ final class Parameter implements WebAttributes {
     final boolean testI18n
     static ApplicationTagLib applicationTagLib = null
     static ThemeService uiThemeService = null
+    boolean isModal = false
 
 
     Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target, String... paramsToKeep) {
