@@ -325,7 +325,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         trace("CanvasText::reset  |$txtInit|$__txtInit|$_txtInit|")
         internTextStyles = null
         citationNumber = initCitationNumber
-        txtVar = _txtInit
+        txtVar = txtInit
 //        styles = emptyList()
     }
 
