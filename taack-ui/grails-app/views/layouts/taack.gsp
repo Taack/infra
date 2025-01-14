@@ -22,6 +22,7 @@
     <style>
     .navbar-nav > li > .dropdown-menu {
         background-color: ${conf.bgColor};
+        z-index: 9999;
     }
 
     body > nav .navbar-nav a.nav-link {
