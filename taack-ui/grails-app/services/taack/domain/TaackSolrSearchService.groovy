@@ -205,10 +205,18 @@ final class TaackSolrSearchService implements WebAttributes {
 
     private final void indexAllClass(Class<? extends GormEntity> aClass, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, TaackSearchService.IIndexService toIndex, SolrSpecifier solrSpecifier) {
         log.info "indexAll ${aClass}"
-        toIndex.indexThose(aClass).each {
-            SolrInputDocument d = new SolrInputDocument([:])
-            solrSpecifier.visitSolr(new SolrIndexerVisitor(d, it), it)
-            solrClient.add d
+        try {
+            toIndex.indexThose(aClass).each {
+                SolrInputDocument d = new SolrInputDocument([:])
+                try {
+                    solrSpecifier.visitSolr(new SolrIndexerVisitor(d, it), it)
+                } catch (e) {
+                    log.error("Cannot index object: ${e.message}")
+                }
+                solrClient.add d
+            }
+        } catch (e) {
+            log.error("Cannot index ${aClass}: ${e.message}")
         }
         log.info "indexAll ${aClass} ends"
         solrClient.commit()
