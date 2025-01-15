@@ -121,10 +121,48 @@ trait IHTMLElement {
     }
 
     String getOutput() {
+        StringBuffer childrenOutput = new StringBuffer()
+        if (tag) {
+            childrenOutput.append('<' + tag)
+            for (Map.Entry a : attributes) {
+                childrenOutput.append(' ' + a.key + '="' + a.value + '"')
+            }
+            if (id) {
+                childrenOutput.append(' id="' + id + '"')
+            }
+            if (taackTag) {
+                childrenOutput.append(' taackTag="' + taackTag + '"')
+            }
+            if (styleDescriptor) {
+                if (styleDescriptor.classes) classes += styleDescriptor.classes
+                childrenOutput.append(' style="' + styleDescriptor.styleOutput + '"')
+            }
+            if (classes) {
+                childrenOutput.append(' class="')
+                childrenOutput.append(classes.join(' ') + '"')
+            }
+            if (onClick) {
+                childrenOutput.append(' onclick="')
+                childrenOutput.append(onClick.output + '"')
+            }
+            childrenOutput.append('>')
+        }
+
+        for (IHTMLElement c : children) {
+            childrenOutput.append(c.output)
+            childrenOutput.append('\n')
+        }
+
         if (tag)
-            "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\"" : "${it.key}" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
-        else
-            children*.output.join("\n")
+            childrenOutput.append('</' + tag + '>')
+
+//        if (tag) {
+//            "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\"" : "${it.key}" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
+//        } else {
+//            children*.output.join("\n")
+//        }
+
+        childrenOutput.toString()
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {
