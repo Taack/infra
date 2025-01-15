@@ -125,7 +125,7 @@ trait IHTMLElement {
         if (tag) {
             childrenOutput.append('<' + tag)
             for (Map.Entry a : attributes) {
-                childrenOutput.append(' ' + a.key + '="' + a.value + '"')
+                childrenOutput.append(' ' + a.key + '="' + (a.value ?:'') + '"')
             }
             if (id) {
                 childrenOutput.append(' id="' + id + '"')
@@ -149,7 +149,7 @@ trait IHTMLElement {
         }
 
         for (IHTMLElement c : children) {
-            childrenOutput.append(c.output)
+            childrenOutput.append(c.output ?: '')
             childrenOutput.append('\n')
         }
 
