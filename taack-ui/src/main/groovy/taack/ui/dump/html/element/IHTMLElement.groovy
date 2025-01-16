@@ -149,7 +149,7 @@ trait IHTMLElement {
 
         for (IHTMLElement c : children) {
             c.getOutput(childrenOutput)
-            childrenOutput.append('\n')
+//            childrenOutput.append('\n')
         }
 
         if (tag)
