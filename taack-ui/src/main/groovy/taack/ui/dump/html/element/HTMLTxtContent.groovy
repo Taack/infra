@@ -13,8 +13,8 @@ final class HTMLTxtContent implements IHTMLElement {
     }
 
     @Override
-    String getOutput() {
-        content
+    void getOutput(StringBuffer res) {
+        res.append content
     }
 
     @Override

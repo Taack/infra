@@ -15,7 +15,8 @@ final class HTMLAjaxPoll implements IHTMLElement {
     }
 
     @Override
-    String getOutput() {
-        "__poll__:$millis:$url:" + children*.output.join("\n")
+    void getOutput(StringBuffer res) {
+        res.append "__poll__:$millis:$url:"
+        children*.getOutput(res)
     }
 }

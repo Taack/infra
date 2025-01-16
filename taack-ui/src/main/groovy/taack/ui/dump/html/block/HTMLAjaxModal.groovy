@@ -13,8 +13,8 @@ final class HTMLAjaxModal implements IHTMLElement {
     }
 
     @Override
-    String getOutput() {
-//        (refresh ? "__refreshModal__:" : "__openModal__:") + children*.output.join("\n")
-        (refresh ? "" : "__openModal__:") + children*.output.join("\n")
+    void getOutput(StringBuffer res) {
+        if (refresh) res.append("__openModal__:")
+        children*.getOutput(res)
     }
 }

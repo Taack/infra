@@ -10,7 +10,8 @@ final class HTMLAjaxCloseModal implements IHTMLElement {
     }
 
     @Override
-    String getOutput() {
-        "__closeLastModalAndUpdateBlock__:" + "${children*.output.join("\n")}"
+    void getOutput(StringBuffer res) {
+        res.append "__closeLastModalAndUpdateBlock__:"
+        children*.getOutput(res)
     }
 }

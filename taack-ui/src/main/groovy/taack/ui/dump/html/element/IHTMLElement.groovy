@@ -120,8 +120,7 @@ trait IHTMLElement {
         res
     }
 
-    String getOutput() {
-        StringBuffer childrenOutput = new StringBuffer()
+    void getOutput(StringBuffer childrenOutput = new StringBuffer(8128)) {
         if (tag) {
             childrenOutput.append('<' + tag)
             for (Map.Entry a : attributes) {
@@ -149,7 +148,7 @@ trait IHTMLElement {
         }
 
         for (IHTMLElement c : children) {
-            childrenOutput.append(c.output ?: '')
+            c.getOutput(childrenOutput)
             childrenOutput.append('\n')
         }
 
@@ -161,8 +160,6 @@ trait IHTMLElement {
 //        } else {
 //            children*.output.join("\n")
 //        }
-
-        childrenOutput.toString()
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {

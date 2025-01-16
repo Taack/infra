@@ -13,7 +13,7 @@ class HTMLOutput implements IHTMLElement {
     }
 
     @Override
-    String getOutput() {
-        return out.toString(Charset.defaultCharset())
+    void getOutput(StringBuffer res) {
+        res.append out.toString(Charset.defaultCharset())
     }
 }

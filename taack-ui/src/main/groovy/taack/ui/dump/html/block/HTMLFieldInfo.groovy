@@ -14,7 +14,7 @@ final class HTMLFieldInfo implements IHTMLElement {
     }
 
     @Override
-    String getOutput() {
-        ":__FieldInfo__:${id?:''}:${value?:''}:__FieldInfoEnd__"
+    void getOutput(StringBuffer res) {
+        res.append ":__FieldInfo__:${id?:''}:${value?:''}:__FieldInfoEnd__"
     }
 }

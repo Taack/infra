@@ -49,7 +49,9 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
         visitInnerBlock(width)
         this.blockLog.topElement = new HTMLEmpty() // TODO: Remove when no out
         uiTableSpecifier.visitTable(new RawHtmlTableDump(blockLog, "pdf", parameter))
-        out << blockLog.topElement.output
+        StringBuffer output = new StringBuffer(8128)
+        blockLog.topElement.getOutput(output)
+        out << output.toString()
         visitInnerBlockEnd()
 
     }
