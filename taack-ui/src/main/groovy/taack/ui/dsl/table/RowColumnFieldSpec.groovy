@@ -3,6 +3,7 @@ package taack.ui.dsl.table
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
@@ -10,6 +11,8 @@ import taack.ui.dsl.branching.BranchingSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
+
+import java.text.NumberFormat
 
 /**
  * Specify fields to be drawn in a row or a rowColumn.
@@ -30,6 +33,14 @@ class RowColumnFieldSpec implements BranchingSpec {
 
     void rowField(final String value, final Style style = null) {
         tableVisitor.visitRowField(value, style)
+    }
+
+    void rowField(final BigDecimal value, NumberFormat nf, final Style style = Style.ALIGN_RIGHT) {
+        tableVisitor.visitRowField(nf.format(value), style)
+    }
+
+    void rowField(final BigDecimal value, final Style style = Style.ALIGN_RIGHT) {
+        rowField(value, NumberFormat.getInstance(LocaleContextHolder.locale), style)
     }
 
     void rowField(final FieldInfo field, final String format = null, final Style style = null) {
