@@ -17,11 +17,7 @@ import taack.ui.dsl.menu.MenuSpec
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.*
-import taack.ui.dump.html.element.HTMLDiv
-import taack.ui.dump.html.element.HTMLIFrame
-import taack.ui.dump.html.element.HTMLTxtContent
-import taack.ui.dump.html.element.IHTMLElement
-import taack.ui.dump.html.element.TaackTag
+import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.menu.BootstrapMenu
 
@@ -73,6 +69,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
 
+        if (parameter.target == Parameter.RenderingTarget.MAIL) return true
         blockLog.simpleLog("doRenderElement0 :> $id")
         if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
             blockLog.simpleLog("doRenderElement1 return true, because NOT AJAX OR MODAL")
