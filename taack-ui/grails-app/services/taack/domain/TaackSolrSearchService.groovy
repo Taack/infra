@@ -127,7 +127,7 @@ final class TaackSolrSearchService implements WebAttributes {
                             for (def r in ranges) {
                                 if (i18nMap[r.name]) {
                                     header {
-                                        column(2) {
+                                        column {
                                             label(i18nMap[r.name] ?: 'Type')
                                         }
                                     }
@@ -135,11 +135,9 @@ final class TaackSolrSearchService implements WebAttributes {
                                         String currentRange = "${r.name};[${c.value} TO ${c.value}+6MONTHS]"
                                         row {
                                             rowColumn() {
-                                                rowField c.value + "(${c.count})"
-                                            }
-                                            rowColumn {
                                                 if (rangesClicked.contains(currentRange)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search as MC, [rangesClicked: rangesClicked - [currentRange], facetsClicked: facetsClicked, q: q]
                                                 else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [rangesClicked: rangesClicked + [currentRange], facetsClicked: facetsClicked, q: q] as Map<String, ?>
+                                                rowField c.value + "(${c.count})"
                                             }
                                         }
                                     }
@@ -159,11 +157,9 @@ final class TaackSolrSearchService implements WebAttributes {
                                     String currentFacet = "${f.name ?: "type_s"};${v.name}"
                                     row {
                                         rowColumn {
-                                            rowField v.name + "(${v.count})"
-                                        }
-                                        rowColumn {
                                             if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
                                             else rowAction ActionIcon.FILTER * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked + [currentFacet], rangesClicked: rangesClicked, q: q]
+                                            rowField v.name + "(${v.count})"
                                         }
                                     }
                                 }
