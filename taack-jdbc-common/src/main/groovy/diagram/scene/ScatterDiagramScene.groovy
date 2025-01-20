@@ -63,7 +63,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                 yDataListPerKey.put(key, dataPerKey[key].values() as List<BigDecimal>)
             }
 
-            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
+            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)
             for (int i = 0; i < xLabelList.size(); i++) {
                 BigDecimal xWidth = gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {

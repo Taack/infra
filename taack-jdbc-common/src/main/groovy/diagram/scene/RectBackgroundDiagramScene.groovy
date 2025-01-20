@@ -146,7 +146,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
     void drawVerticalBackground(boolean isXLabelInsideGap, int showGapEveryX = 1) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
-        BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? xLabelList.size() : xLabelList.size() - 1) * showGapEveryX
+        BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? xLabelList.size() : (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)) * showGapEveryX
         int showLabelEveryX = (render.measureText(xLabelList.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
         for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
