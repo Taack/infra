@@ -1,9 +1,11 @@
 package taack.ui.dump.html.form
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
+import taack.ui.dsl.common.Style
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.BootstrapLayout
@@ -238,10 +240,44 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value, boolean isInTime) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLInput input = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value) : null, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
-        if (floating) input.attributes.put('placeholder', inputEscape(trI18n))
+        HTMLInput input = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value) : null, qualifiedName, inputEscape(trI18n), disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         el.addChildren(input)
-        el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        el.addChildren(divError(qualifiedName))
+        topElement
+    }
+
+    @Override
+    IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime) {
+        IHTMLElement el = themeStartInputs(topElement)
+        HTMLDiv div = new HTMLDiv().builder.setStyle(new Style(null, "display: flex;")).build() as HTMLDiv
+
+        Date value1 = value.aValue
+        if (floating || !noLabel) {
+            HTMLInput dateInput1 = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value1 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value1) : null, qualifiedName, inputEscape(trI18n) + ' (Min)', disable).builder.setId(qualifiedName + '-min').addClasses(formControl).build() as HTMLInput
+            div.addChildren(dateInput1, formLabelInput(qualifiedName + '-min', trI18n))
+        } else {
+            HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value1 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value1) : null, qualifiedName, inputEscape(trI18n) + ' (Min)', disable).builder.setId(qualifiedName + '-min').addClasses(formControl).build() as HTMLInput
+            dateInput1.attributes.put('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
+            dateInput1.attributes.put('onblur', "this.type='${InputType.STRING.typeText}'" as String)
+            div.addChildren(dateInput1)
+        }
+
+        HTMLSpan dash = new HTMLSpan().builder.addChildren(new HTMLTxtContent('-')).setStyle(new Style(null, "padding: .375rem;")).build() as HTMLSpan
+        div.addChildren(dash)
+
+        Date value2 = value.bValue
+        if (floating || !noLabel) {
+            HTMLInput dateInput1 = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value2 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value2) : null, qualifiedName, inputEscape(trI18n) + ' (Max)', disable).builder.setId(qualifiedName + '-max').addClasses(formControl).build() as HTMLInput
+            div.addChildren(dateInput1, formLabelInput(qualifiedName + '-max', trI18n))
+        } else {
+            HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value2 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value2) : null, qualifiedName, inputEscape(trI18n) + ' (Max)', disable).builder.setId(qualifiedName + '-max').addClasses(formControl).build() as HTMLInput
+            dateInput1.attributes.put('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
+            dateInput1.attributes.put('onblur', "this.type='${InputType.STRING.typeText}'" as String)
+            div.addChildren(dateInput1)
+        }
+
+        el.addChildren(div)
         el.addChildren(divError(qualifiedName))
         topElement
     }

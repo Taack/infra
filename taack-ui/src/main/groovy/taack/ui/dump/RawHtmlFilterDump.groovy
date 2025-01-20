@@ -1,9 +1,12 @@
 package taack.ui.dump
 
+import grails.util.Pair
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
+import taack.ast.type.WidgetKind
+import taack.domain.TaackFilter
 import taack.ui.EnumOptions
 import taack.ui.IEnumOption
 import taack.ui.dsl.filter.IUiFilterVisitor
@@ -97,7 +100,6 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final Class type = fieldInfo?.fieldConstraint?.field?.type
-        final boolean isBoolean = type == boolean || type == Boolean
         final boolean isEnum = type?.isEnum()
         if (enumOptions) {
             EnumOptions eos = value != null ? new EnumOptions(enumOptions, qualifiedName, value) : isEnum ? new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value as Enum) : new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value?.toString())
@@ -105,9 +107,11 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         } else if (isEnum) {
             EnumOptions eos = value != null ? new EnumOptions(type as Class<Enum>, qualifiedName, value) : new EnumOptions(type as Class<Enum>, qualifiedName, fieldInfo?.value as Enum)
             blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, eos, false, false, true)
-        } else if (isBoolean) {
+        } else if (type == boolean || type == Boolean) {
             Boolean isChecked = value != null ? (value == "1" ? true : value == "0" ? false : null) : (fieldInfo?.value as Boolean)
             blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, i18n, false, true, isChecked)
+        } else if (type == Date) {
+            blockLog.topElement = formThemed.datePairInputs(blockLog.topElement, qualifiedName, i18n, false, true, value != null ? TaackFilter.parseDate(value) : new Pair(fieldInfo?.value, null), fieldInfo?.fieldConstraint?.widget == WidgetKind.DATETIME.name)
         } else {
             blockLog.topElement = formThemed.normalInput(blockLog.topElement, qualifiedName, i18n, false, true, value)
         }

@@ -1,5 +1,6 @@
 package taack.ui.dump.html.form
 
+import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
@@ -59,6 +60,8 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, Object vals, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable)
 
     abstract IHTMLElement dateInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Date value, boolean isInTime)
+
+    abstract IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime)
 
     abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
 
