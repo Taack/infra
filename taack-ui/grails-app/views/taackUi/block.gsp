@@ -22,6 +22,9 @@
 </head>
 
 <body>
-${raw(block)}
+<div id="taack-main-block">
+    ${raw(block)}
+    <div id="taack-load-spinner" class="tck-hidden"></div>
+</div>
 </body>
 </html>

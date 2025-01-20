@@ -48,6 +48,9 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
         e.preventDefault()
         val targetUrl = createUrl(!isHref, action).toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
+        //Display load spinner
+        val loader = document.getElementById("taack-load-spinner")
+        loader?.classList?.remove("tck-hidden")
         val xhr = XMLHttpRequest()
         if (action?.contains("downloadBin") == true) {
             trace("Binary Action ... $action")
@@ -57,6 +60,7 @@ open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : Lea
         xhr.onloadend = EventHandler { ev ->
             ev.preventDefault()
             trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}'")
+            loader?.classList?.add("tck-hidden")
             if (xhr.responseType == XMLHttpRequestResponseType.blob) {
                 val contentDispo = xhr.getResponseHeader("Content-Disposition")
                 if (contentDispo != null) {
