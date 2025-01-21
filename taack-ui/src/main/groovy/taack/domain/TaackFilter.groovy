@@ -475,6 +475,9 @@ final class TaackFilter<T extends GormEntity<T>> {
                         } else if (!entryValue.contains(',')) {
                             if (f && f.type.isEnum()) {
                                 where << (" $aliasKey = '$entryValue' " as String)
+                            } else if (f && GormEntity.isAssignableFrom(f.type)) {
+                                where << (" ${aliasKey}.id = :np$occ " as String)
+                                namedParams.put('np' + occ, Long.parseLong(entry.value as String))
                             } else if (f) {
                                 where << (" upper($aliasKey) like :np$occ " as String)
                                 namedParams.put('np' + occ, entry.value.toString().toUpperCase())
