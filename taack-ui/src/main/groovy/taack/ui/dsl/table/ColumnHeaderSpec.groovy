@@ -39,4 +39,17 @@ final class ColumnHeaderSpec extends ColumnHeaderFieldSpec {
         closure.call()
         tableVisitor.visitColumnEnd()
     }
+
+    /**
+     * build a column with checkbox to select all wanted rows and to transfer them to specific actions
+     *
+     * @param paramsKey: the parameter name which will stock the values from all selected rows
+     * @param closure: clarify actions that receive the transferred values
+     */
+    void columnSelect(String paramsKey, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ColumnHeaderSelectSpec) Closure closure) {
+        tableVisitor.visitColumnSelect(paramsKey)
+        closure.delegate = new ColumnHeaderSelectSpec(tableVisitor)
+        closure.call()
+        tableVisitor.visitColumnSelectEnd()
+    }
 }

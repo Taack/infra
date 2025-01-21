@@ -172,6 +172,31 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
+    void visitColumnSelect(String paramsKey) {
+
+    }
+
+    @Override
+    void visitColumnSelectButton(String buttonText, String controller, String action, Map<String, ?> params, Boolean isAjax) {
+
+    }
+
+    @Override
+    void visitColumnSelectEnd() {
+
+    }
+
+    @Override
+    void visitRowSelect(String value, boolean isSelectable) {
+
+    }
+
+    @Override
+    String getSelectColumnParamsKey() {
+        return null
+    }
+
+    @Override
     void visitTable() {
 
     }

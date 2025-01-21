@@ -60,4 +60,14 @@ interface IUiTableVisitor {
     void setSortingOrder(Pair<String, String>sortingOrder)
 
     Pair<String, String> getSortingOrder()
+
+    void visitColumnSelect(String paramsKey)
+
+    void visitColumnSelectButton(String buttonText, String controller, String action, Map<String, ?> params, Boolean isAjax)
+
+    void visitColumnSelectEnd()
+
+    void visitRowSelect(String value, boolean isSelectable)
+
+    String getSelectColumnParamsKey()
 }

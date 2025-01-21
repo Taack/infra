@@ -38,6 +38,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private final IHTMLElement initialForm
     private Pair<String, String> initalSortingOrder
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
+    private String selectColumnParamsKey
 
     protected final BlockLog blockLog
 
@@ -353,5 +354,77 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, sort, 'sort')
             mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, order, 'order')
         }
+    }
+
+    @Override
+    void visitColumnSelect(String paramsKey) {
+        blockLog.enterBlock('visitColumnSelect')
+        isInCol = true
+        selectColumnParamsKey = paramsKey ?: 'selectedItems'
+        HTMLForm f = new HTMLForm('').builder.putAttribute('onsubmit', "return this.querySelector('input[type=\\'hidden\\']').value !== ''").addChildren(
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params[selectColumnParamsKey]?.toString(), selectColumnParamsKey)
+        ).build() as HTMLForm
+        HTMLTh th = new HTMLTh().builder.setTaackTag(TaackTag.TABLE_COL).addChildren(
+                new HTMLDiv().builder.setStyle(Style.NOWRAP).addChildren(
+                        new HTMLInput(InputType.CHECK, null, null).builder.putAttribute('paramsKey', selectColumnParamsKey).putAttribute('selectAll', 'true').build(),
+                        new HTMLButton(null).builder
+                                .addClasses('dropdown-toggle', 'btn')
+                                .setStyle(new Style(null, 'margin-left: .25em;padding: 0 .1em;background: lightgrey;'))
+                                .putAttribute('data-bs-toggle', 'dropdown')
+                                .putAttribute('aria-expanded', 'false')
+                                .putAttribute('data-bs-auto-close', 'outside')
+                                .build(),
+                        new HTMLDiv().builder.addClasses('dropdown-menu').addChildren(
+                                f
+                        ).build()
+                ).build()
+        ).build() as HTMLTh
+        blockLog.topElement.builder.addChildren(th)
+        blockLog.topElement = f
+
+        // keep paramsKey in case of tableWithNoFilter
+        mapAdditionalHiddenParams.put(selectColumnParamsKey, new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params[selectColumnParamsKey]?.toString(), selectColumnParamsKey))
+    }
+
+    @Override
+    void visitColumnSelectButton(final String buttonText, final String controller, final String action, Map<String, ?> params, final Boolean isAjax) {
+        HTMLButton b
+        if (controller && action) {
+            b = new HTMLButton(buttonText).builder
+                    .addClasses('btn')
+                    .setStyle(new Style(null, 'display: block; width: 100%;'))
+                    .putAttribute('type', 'submit')
+                    .putAttribute('formaction', parameter.urlMapped(controller, action, null, params, isAjax))
+                    .build() as HTMLButton
+        } else {
+            b = new HTMLButton(buttonText).builder
+                    .addClasses('btn')
+                    .setStyle(new Style(null, 'display: block; width: 100%; color: lightgrey; cursor: default;'))
+                    .build() as HTMLButton
+        }
+        blockLog.topElement.addChildren(b)
+    }
+
+    @Override
+    void visitColumnSelectEnd() {
+        blockLog.exitBlock('visitColumnSelectEnd')
+        isInCol = false
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL)
+    }
+
+    @Override
+    void visitRowSelect(final String value, final boolean isSelectable) {
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
+        blockLog.topElement.builder.addChildren(
+                HTMLInput.inputCheck(value, null, (parameter.applicationTagLib.params[selectColumnParamsKey]?.toString() ?: '').split(",").contains(value), !isSelectable)
+                        .builder.putAttribute('paramsKey', selectColumnParamsKey).build()
+        )
+        if (addColumn) visitColumnEnd()
+    }
+
+    @Override
+    String getSelectColumnParamsKey() {
+        return selectColumnParamsKey
     }
 }

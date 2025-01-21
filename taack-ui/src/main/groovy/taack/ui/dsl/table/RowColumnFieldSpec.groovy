@@ -85,7 +85,11 @@ class RowColumnFieldSpec implements BranchingSpec {
             p.put('id', id)
             tableVisitor.visitRowAction(linkText, Utils.getControllerName(action), action.method, null, p, true)
         } else {
-            tableVisitor.visitRowField(linkText, null)
+            tableVisitor.visitRowFieldRaw(linkText, null)
         }
+    }
+
+    void rowSelect(final String value, final boolean isSelectable = true) {
+        tableVisitor.visitRowSelect(value, isSelectable)
     }
 }
