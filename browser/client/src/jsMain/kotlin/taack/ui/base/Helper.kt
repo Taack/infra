@@ -146,20 +146,20 @@ class Helper {
                         ) == FIELD_INFO_END
                     ) {
                         var posField = text.indexOf(FIELD_INFO)
+                        val id = text.substring(CLOSE_LAST_MODAL.length, pos)
+                        val value =
+                            if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
+                        var otherField = emptyMap<String, String>()
+                        while (posField != -1) {
+                            val endFieldNameIndex = text.indexOf(':', posField + FIELD_INFO.length)
+                            val fieldName = text.substring(posField + FIELD_INFO.length, endFieldNameIndex)
+                            val endFieldValueIndex = text.indexOf(FIELD_INFO_END, endFieldNameIndex)
+                            val fieldValue = text.substring(endFieldNameIndex + 1, endFieldValueIndex)
+                            otherField = otherField.plus(Pair(fieldName, fieldValue))
+                            posField = text.indexOf(FIELD_INFO, endFieldValueIndex)
+                        }
                         if (processingStack.isNotEmpty()) {
                             trace("Helper::process")
-                            val id = text.substring(CLOSE_LAST_MODAL.length, pos)
-                            val value =
-                                if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
-                            var otherField = emptyMap<String, String>()
-                            while (posField != -1) {
-                                val endFieldNameIndex = text.indexOf(':', posField + FIELD_INFO.length)
-                                val fieldName = text.substring(posField + FIELD_INFO.length, endFieldNameIndex)
-                                val endFieldValueIndex = text.indexOf(FIELD_INFO_END, endFieldNameIndex)
-                                val fieldValue = text.substring(endFieldNameIndex + 1, endFieldValueIndex)
-                                otherField = otherField.plus(Pair(fieldName, fieldValue))
-                                posField = text.indexOf(FIELD_INFO, endFieldValueIndex)
-                            }
                             val f = processingStack.removeLast()
                             f(id, value, otherField)
                         }
