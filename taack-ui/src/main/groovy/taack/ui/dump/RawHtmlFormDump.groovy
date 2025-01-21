@@ -103,7 +103,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormSectionEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION).parent
     }
 
     @Override

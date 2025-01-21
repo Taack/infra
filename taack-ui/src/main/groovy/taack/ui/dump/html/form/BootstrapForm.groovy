@@ -112,10 +112,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
                 new HTMLLegend().builder.addChildren(new HTMLTxtContent(trI18n)).build()
         ).build() as HTMLFieldset
 
-        topElement.addChildren(
-                new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
-                        .addChildren(fs).build()
-        )
+        HTMLDiv sectionDiv = new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
+                .addChildren(fs).build() as HTMLDiv
+        topElement.builder.addChildren(sectionDiv).build()
         fs
     }
 
