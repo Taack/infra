@@ -333,3 +333,7 @@ td[taacktag] em {
 #taack-load-spinner.tck-hidden {
     display: none;
 }
+
+svg text {
+    fill: var(--bs-body-color);
+}
