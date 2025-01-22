@@ -15,8 +15,9 @@ final class HTMLTextarea implements IHTMLElement {
                     new HTMLTxtContent(value.toString())
             )
         }
-        attributes.put('value', value?.toString())
-        attributes.put('rows', '6')
+        addClasses('form-control')
+//        attributes.put('value', value?.toString())
+        attributes.put('rows', '8')
         styleDescriptor = new Height240()
         if (name) attributes.put('name', name)
         if (placeHolder) attributes.put('placeHolder', placeHolder)
