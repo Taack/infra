@@ -69,7 +69,7 @@ final class BlockSpec {
     }
 
     enum Width {
-        FLEX("pure-u-1", "pure-u-1", 'col-xs-auto col-lg'),
+        FLEX("pure-u-1", "pure-u-1", 'col'),
         MAX("pure-u-1", "pure-u-1", 'col-12'),
         THREE_QUARTER("pure-u-1 pure-u-md-3-4", "pure-u-3-4", 'col-12 col-md-9'),
         TWO_THIRD("pure-u-1 pure-u-md-2-3", "pure-u-2-3", 'col-12 col-md-8'),
