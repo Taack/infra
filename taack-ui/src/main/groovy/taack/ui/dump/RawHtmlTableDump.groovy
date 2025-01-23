@@ -10,6 +10,7 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
+import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
@@ -361,9 +362,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.enterBlock('visitColumnSelect')
         isInCol = true
         selectColumnParamsKey = paramsKey ?: 'selectedItems'
-        HTMLForm f = new HTMLForm('').builder.putAttribute('onsubmit', "return this.querySelector('input[type=\\'hidden\\']').value !== ''").addChildren(
+        BootstrapForm f = new BootstrapForm(blockLog).builder.putAttribute('onsubmit', "return this.querySelector('input[type=\\'hidden\\']').value !== ''").addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params[selectColumnParamsKey]?.toString(), selectColumnParamsKey)
-        ).build() as HTMLForm
+        ).build() as BootstrapForm
         HTMLTh th = new HTMLTh().builder.setTaackTag(TaackTag.TABLE_COL).setStyle(Style.LABEL_WIDTH_AUTO_MIN).addChildren(
                 new HTMLDiv().builder.addChildren(
                         new HTMLInput(InputType.CHECK, null, null).builder.putAttribute('paramsKey', selectColumnParamsKey).putAttribute('selectAll', 'true').build(),
