@@ -3,7 +3,7 @@ package taack.ui.diagram
 import js.array.asList
 import web.svg.SVGGElement
 
-class DiagramDataGroup(private val parent: Diagram, val g: SVGGElement) {
+class DiagramDataGroup(val parent: Diagram, val g: SVGGElement) {
     companion object {
         fun getSiblingDiagramDataGroup(d: Diagram): List<DiagramDataGroup> {
             val elements: List<*> = d.s.querySelectorAll("g[element-type='DATA_GROUP']").asList()
@@ -16,12 +16,12 @@ class DiagramDataGroup(private val parent: Diagram, val g: SVGGElement) {
     private val dataList: List<DiagramData> = DiagramData.getSiblingDiagramData(this)
 
     // non-stacked bar, whiskers
-    private val startX: Double? = g.attributes.getNamedItem("startx")?.value?.toDouble()
-    private val gapWidth: Double? = g.attributes.getNamedItem("gapwidth")?.value?.toDouble()
-    private val maxShapeWidth: Double? = g.attributes.getNamedItem("maxshapewidth")?.value?.toDouble()
+    private val startX: Double? = g.attributes.getNamedItem("start-x")?.value?.toDouble()
+    private val gapWidth: Double? = g.attributes.getNamedItem("gap-width")?.value?.toDouble()
+    private val maxShapeWidth: Double? = g.attributes.getNamedItem("max-shape-width")?.value?.toDouble()
 
     // stacked bar
-    private val startY: Double? = g.attributes.getNamedItem("starty")?.value?.toDouble()
+    private val startY: Double? = g.attributes.getNamedItem("start-y")?.value?.toDouble()
 
     fun hideOrShowDataset(toShow: Boolean, dataset: String) {
         dataList.filter { it.dataset == dataset }.forEach {

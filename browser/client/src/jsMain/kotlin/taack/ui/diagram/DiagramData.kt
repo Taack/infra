@@ -2,8 +2,9 @@ package taack.ui.diagram
 
 import js.array.asList
 import taack.ui.base.LeafElement
-import web.svg.SVGElement
-import web.svg.SVGGElement
+import web.dom.document
+import web.events.EventHandler
+import web.svg.*
 
 class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) : LeafElement {
     companion object {
@@ -16,7 +17,25 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) : Le
     }
 
     val dataset: String = g.attributes.getNamedItem("dataset")!!.value
+    private val dataLabel: String? = g.attributes.getNamedItem("data-label")?.value
     private val shapes: List<SVGElement> = g.children.asList().filter { it.tagName != "text" }.unsafeCast<List<SVGElement>>()
+
+    init {
+        if (dataLabel != null) {
+            val dataLabelElement: SVGTextElement = document.createElement(SvgTagName("text"))
+            dataLabelElement.setAttribute("text-rendering", "optimizeLegibility")
+            dataLabelElement.setAttribute("style", "font-size: 13px; font-family: sans-serif;")
+            dataLabelElement.innerHTML = dataLabel
+            g.onmouseenter = EventHandler {
+                parent.parent.s.appendChild(dataLabelElement)
+                dataLabelElement.setAttribute("x", (g.getBBox().x + g.getBBox().width / 2 - dataLabelElement.getBBox().width / 2).toString())
+                dataLabelElement.setAttribute("y", (g.getBBox().y - 5).toString())
+            }
+            g.onmouseleave = EventHandler {
+                parent.parent.s.removeChild(dataLabelElement)
+            }
+        }
+    }
 
     fun hideOrShow(toShow: Boolean) {
         g.style.display = if (toShow) "" else "none"
