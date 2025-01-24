@@ -1,10 +1,9 @@
 package taack.ui.dump.html.menu
 
 import groovy.transform.CompileStatic
+import taack.render.TaackUiService
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
-import taack.ui.dump.html.theme.ThemeMode
-import taack.ui.dump.html.theme.ThemeSize
 
 @CompileStatic
 final class BootstrapMenu implements IHTMLElement {
@@ -93,7 +92,7 @@ final class BootstrapMenu implements IHTMLElement {
         topElement.addChildren(
                 new HTMLForm(action).builder.addClasses('solrSearch-input', 'py-1').addChildren(
                         new HTMLDiv().builder.addClasses('input-group', 'rounded').addChildren(
-                                new HTMLInput(InputType.STRING, query, 'q', 'Search').builder.putAttribute('aria-label', 'Search').addClasses('form-control', 'rounded', 'bg-white').build()
+                                new HTMLInput(InputType.STRING, query, 'q', TaackUiService.tr('action.search.label')).builder.putAttribute('aria-label', 'Search').addClasses('form-control', 'rounded', 'bg-white').build()
                         ).build()
                 ).build()
         )
