@@ -223,6 +223,16 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderGroup(Map attributes) {
+
+    }
+
+    @Override
+    void renderGroupEnd() {
+
+    }
+
+    @Override
     BigDecimal getFontSize() {
         return fontSize
     }

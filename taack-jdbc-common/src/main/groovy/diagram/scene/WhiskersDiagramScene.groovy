@@ -66,7 +66,9 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         // data whiskers box
         for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
             BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
+            render.renderGroup(["element-type": ElementType.DATA_GROUP, startX: xWidth - gapHorizontalPadding, gapWidth: gapWidth, maxShapeWidth: MAX_BOX_WIDTH])
             for (int j = 0; j < keys.size(); j++) {
+                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j]])
                 List<List<BigDecimal>> yDataList = yDataListPerKey[keys[j]]
                 List<BigDecimal> boxData = i * showGapEveryX < yDataList.size() ? yDataList[i * showGapEveryX].sort() : []
                 int size = boxData.size()
@@ -107,8 +109,10 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                         render.renderLine(boxWidth, 0.0)
                     }
                 }
+                render.renderGroupEnd()
                 xWidth += boxWidth + boxMargin
             }
+            render.renderGroupEnd()
         }
     }
 

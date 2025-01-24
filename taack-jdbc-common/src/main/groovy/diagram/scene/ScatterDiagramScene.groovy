@@ -21,16 +21,17 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
             Integer maxX = xLabelList.last() as Integer
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = 0; i < keys.size(); i++) {
+                render.renderGroup(["element-type": ElementType.DATA_GROUP])
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
                 List<Number> xList = pointList.keySet().sort() as List<Number>
                 for (int j = 0; j < xList.size(); j++) {
+                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
                     Number x = xList[j]
                     Number y = pointList[x]
                     BigDecimal xWidth = (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     KeyColor circleColor = KeyColor.colorFrom(i)
                     render.fillStyle(circleColor.color)
-
                     // data point
                     if (dataPointRadius > 0) {
                         if (i < pointImageHref.size()) {
@@ -41,7 +42,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                     }
-
                     // data label
                     if (y > startLabelY) {
                         String xLabel = x.toDouble() % 1 == 0 ? "${x.toInteger()}" : "$x"
@@ -54,7 +54,9 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         }
                         render.renderLabel(dataLabel)
                     }
+                    render.renderGroupEnd()
                 }
+                render.renderGroupEnd()
             }
         } else { // discrete
             Map<String, List<BigDecimal>> yDataListPerKey = [:]
@@ -65,12 +67,13 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)
             for (int i = 0; i < xLabelList.size(); i++) {
+                render.renderGroup(["element-type": ElementType.DATA_GROUP])
                 BigDecimal xWidth = gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {
+                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j]])
                     List<BigDecimal> yList = yDataListPerKey[keys[j]]
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
-
                     // data point
                     if (dataPointRadius > 0) {
                         if (j < pointImageHref.size()) {
@@ -83,7 +86,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                     }
-
                     // data label
                     if (y > startLabelY) {
                         String yDataLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
@@ -94,7 +96,9 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         }
                         render.renderLabel(yDataLabel)
                     }
+                    render.renderGroupEnd()
                 }
+                render.renderGroupEnd()
             }
         }
     }

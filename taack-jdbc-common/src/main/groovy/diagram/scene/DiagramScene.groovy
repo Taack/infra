@@ -6,6 +6,15 @@ import diagram.IDiagramRender
 import java.awt.*
 
 @CompileStatic
+enum ElementType {
+    LEGEND,
+    HORIZONTAL_BACKGROUND,
+    VERTICAL_BACKGROUND,
+    DATA,
+    DATA_GROUP
+}
+
+@CompileStatic
 enum KeyColor {
     RED(new Color(255, 99, 132)),
     ORANGE(new Color(255, 159, 64)),
