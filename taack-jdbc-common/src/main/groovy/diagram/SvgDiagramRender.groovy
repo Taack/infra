@@ -235,6 +235,22 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderGroup(Map attributes) {
+        outStr.append("""
+                <g ${attributes.collect { "${it.key}=\"${it.value}\"" }.join(" ")}>
+        """.stripIndent()
+        )
+    }
+
+    @Override
+    void renderGroupEnd() {
+        outStr.append("""
+                </g>
+        """.stripIndent()
+        )
+    }
+
+    @Override
     BigDecimal getFontSize() {
         return fontSize
     }
@@ -257,7 +273,7 @@ class SvgDiagramRender implements IDiagramRender {
     String getRendered() {
         return """<?xml version="1.0" encoding="utf-8"?>
             <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
+            <svg class="taackDiagram" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
             """.stripIndent() + outStr.toString() + "</svg>"
     }
 }

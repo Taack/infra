@@ -73,21 +73,27 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
             BigDecimal barX = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
+            if (isStacked) {
+                render.renderGroup(["element-type": ElementType.DATA_GROUP, "start-y": barY])
+            } else {
+                render.renderGroup(["element-type": ElementType.DATA_GROUP, "start-x": barX - gapHorizontalPadding, "gap-width": gapWidth, "max-shape-width": MAX_BAR_WIDTH])
+            }
             for (int j = 0; j < keys.size(); j++) {
                 BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
+                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
                     KeyColor rectColor = KeyColor.colorFrom(j)
                     render.fillStyle(rectColor.color)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
-
-                    // label
-                    String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
-                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
-                    render.renderLabel(yDataLabel)
+//                    // label
+//                    String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
+//                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
+//                    render.renderLabel(yDataLabel)
                 }
+                render.renderGroupEnd()
 
                 if (isStacked) {
                     barY -= barHeight
@@ -95,6 +101,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     barX += barWidth + barMargin
                 }
             }
+            render.renderGroupEnd()
         }
     }
 

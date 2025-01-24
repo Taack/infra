@@ -83,6 +83,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
             keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
                 // image or rect, with text
+                render.renderGroup(["element-type": ElementType.LEGEND, "dataset": keyEntry.key])
                 if (legendIndex < pointImageHref.size()) {
                     render.translateTo(startX, startY - (LEGEND_IMAGE_WIDTH - fontSize))
                     render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
@@ -99,6 +100,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                     render.translateTo(startX + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
                     render.renderLabel(keyEntry.key)
                 }
+                render.renderGroupEnd()
 
                 startX += keyEntry.value + LEGEND_MARGIN
                 legendIndex++
@@ -108,6 +110,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void drawHorizontalBackground(BigDecimal minY = null, BigDecimal maxY = null) {
+        render.renderGroup(["element-type": ElementType.HORIZONTAL_BACKGROUND])
         if (minY == null || maxY == null) {
             Set<BigDecimal> values = dataPerKey.collect { it.value.values() }.flatten().sort() as Set<BigDecimal>
             minY ?= values.first() >= 0 ? 0.0 : Math.floor(values.first().toDouble()).toBigDecimal()
@@ -142,9 +145,11 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
             render.renderLabel(yLabel)
         }
+        render.renderGroupEnd()
     }
 
     void drawVerticalBackground(boolean isXLabelInsideGap, int showGapEveryX = 1) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
+        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND])
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? xLabelList.size() : (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)) * showGapEveryX
         int showLabelEveryX = (render.measureText(xLabelList.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
@@ -169,5 +174,6 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                 render.renderLabel(xLabel)
             }
         }
+        render.renderGroupEnd()
     }
 }

@@ -5,6 +5,7 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
+import taack.ui.diagram.Diagram
 import web.events.EventHandler
 import web.html.HTMLDivElement
 import web.http.RequestMethod
@@ -30,6 +31,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     private var tables: Map<String, Table> = mutableMapOf()
     private var forms: List<Form> = mutableListOf()
     private var shows: List<Show> = mutableListOf()
+    private var diagrams: List<Diagram> = mutableListOf()
     private var progressId: String = ""
     private val onPoll: TimerHandler = { onPoll() }
 
@@ -69,6 +71,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         tables = Table.getSiblingTable(this).associateBy { it.tableId + blockId }
         forms = Form.getSiblingForm(this)
         shows = Show.getSiblingShow(this)
+        diagrams = Diagram.getSiblingDiagram(this)
         for (i in 0 until innerScripts.length) {
             eval(innerScripts[i].innerHTML)
         }

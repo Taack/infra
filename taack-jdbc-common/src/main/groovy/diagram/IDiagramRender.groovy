@@ -44,6 +44,10 @@ interface IDiagramRender {
 
     void renderImage(String filepath, BigDecimal width, BigDecimal height)
 
+    void renderGroup(Map attributes)
+
+    void renderGroupEnd()
+
     BigDecimal getFontSize()
 
     BigDecimal getDiagramWidth()
