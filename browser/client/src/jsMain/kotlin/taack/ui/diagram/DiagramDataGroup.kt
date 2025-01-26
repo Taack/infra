@@ -29,7 +29,7 @@ class DiagramDataGroup(val parent: Diagram, val g: SVGGElement) {
         }
 
         // manage dataShape position/width/height
-        val displayedData: List<DiagramData> = dataList.filter { it.g.style.display != "none" }
+        val displayedData: Map<String, List<DiagramData>> = dataList.filter { it.g.style.display != "none" }.groupBy { it.dataset }
         if (displayedData.isNotEmpty()) {
             if (gapWidth != null && startX != null) { // non-stacked bar, whiskers
                 val dataNumber = displayedData.size
@@ -40,13 +40,18 @@ class DiagramDataGroup(val parent: Diagram, val g: SVGGElement) {
                     shapeWidth = maxShapeWidth
                     gapHorizontalPadding = (gapWidth - shapeWidth * dataNumber - shapeMargin * (dataNumber - 1)) / 2
                 }
-                for (i in displayedData.indices) {
-                    displayedData[i].moveShapeHorizontally(startX + gapHorizontalPadding + (shapeWidth + shapeMargin) * i, shapeWidth)
+                for (key in displayedData.keys) {
+                    val index = displayedData.keys.indexOf(key)
+                    displayedData[key]!!.forEach {
+                        it.moveShapeHorizontally(startX + gapHorizontalPadding + (shapeWidth + shapeMargin) * index, shapeWidth)
+                    }
                 }
             } else if (startY != null) { // stacked bar
                 var bottomY: Double = startY
-                for (i in displayedData.indices) {
-                    bottomY = displayedData[i].moveShapeVertically(bottomY)
+                for (key in displayedData.keys) {
+                    displayedData[key]!!.forEach {
+                        bottomY = it.moveShapeVertically(bottomY)
+                    }
                 }
             }
         }

@@ -47,7 +47,7 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
                     val contentWidth = tooltip.getBBox().width
                     background.setAttribute("points", "${-contentWidth / 2 - 20},0 ${-contentWidth / 2 - 10},10 ${-contentWidth / 2 - 10},25 ${contentWidth / 2 + 10},25 ${contentWidth / 2 + 10},-25 ${-contentWidth / 2 - 10},-25 ${-contentWidth / 2 - 10},-10")
                 }
-                if (g.getBBox().x < getDiagramRoot().s.viewBox.baseVal.width / 2) {
+                if (g.getBBox().x + g.getBBox().width + background.getBBox().width < getDiagramRoot().s.viewBox.baseVal.x + getDiagramRoot().s.viewBox.baseVal.width) {
                     background.setAttribute("transform", "translate(${(background.getBBox().width - 30) / 2},0)")
                     tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
                 } else {

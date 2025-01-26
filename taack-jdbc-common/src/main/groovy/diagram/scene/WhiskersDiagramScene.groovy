@@ -64,11 +64,11 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         }
 
         // data whiskers box
+        render.lineWidth(BOX_LINE_WIDTH)
         for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
             BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
             render.renderGroup(["element-type": ElementType.DATA_GROUP, "start-x": xWidth - gapHorizontalPadding, "gap-width": gapWidth, "max-shape-width": MAX_BOX_WIDTH])
             for (int j = 0; j < keys.size(); j++) {
-                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j]])
                 List<List<BigDecimal>> yDataList = yDataListPerKey[keys[j]]
                 List<BigDecimal> boxData = i * showGapEveryX < yDataList.size() ? yDataList[i * showGapEveryX].sort() : []
                 int size = boxData.size()
@@ -79,37 +79,50 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal upperQuartile = findMedian(boxData, (size / 2).toInteger() + size % 2, size)
                     BigDecimal upperExtreme = boxData.last()
                     if (lowerExtreme > startLabelY) {
-                        // lowerExtreme line
-                        render.fillStyle(BLACK_COLOR)
-                        render.lineWidth(BOX_LINE_WIDTH)
-                        render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
-                        render.renderLine(boxWidth, 0.0)
-
-                        // line from lowerExtreme to lowerQuartile
-                        render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
-                        render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
-
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${upperExtreme}"])
                         // upperExtreme line
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
+                        render.fillStyle(BLACK_COLOR)
                         render.renderLine(boxWidth, 0.0)
-
                         // line from upperExtreme to upperQuartile
                         render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
                         render.renderLine(0.0, (upperExtreme - upperQuartile) / gapY * gapHeight)
+                        render.renderGroupEnd()
 
-                        // rect from lowerQuartile to upperQuartile
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${upperQuartile}"])
+                        // rect from upperQuartile to median
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
                         render.fillStyle(KeyColor.colorFrom(j).color)
-                        render.renderRect(boxWidth, (upperQuartile - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
+                        render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
                         render.fillStyle(BLACK_COLOR)
-                        render.renderRect(boxWidth, (upperQuartile - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
+                        render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
+                        render.renderGroupEnd()
 
-                        // median line
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${median}"])
+                        // rect from median to lowerQuartile
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (median - startLabelY) / gapY * gapHeight)
+                        render.fillStyle(KeyColor.colorFrom(j).color)
+                        render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
+                        render.fillStyle(BLACK_COLOR)
+                        render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
+                        render.renderGroupEnd()
+
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${lowerQuartile}"])
+                        // line from lowerQuartile to lowerExtreme
+                        render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
+                        render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
+                        render.renderGroupEnd()
+
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${lowerExtreme}"])
+                        // lowerExtreme line
+                        render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
                         render.renderLine(boxWidth, 0.0)
+                        render.renderGroupEnd()
                     }
+                } else {
+                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j]])
+                    render.renderGroupEnd()
                 }
-                render.renderGroupEnd()
                 xWidth += boxWidth + boxMargin
             }
             render.renderGroupEnd()
