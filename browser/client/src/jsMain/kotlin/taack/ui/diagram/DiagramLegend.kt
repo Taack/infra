@@ -1,13 +1,12 @@
 package taack.ui.diagram
 
 import js.array.asList
-import taack.ui.base.LeafElement
 import web.events.EventHandler
 import web.svg.SVGGElement
 import web.svg.SVGTextElement
 
 
-class DiagramLegend(private val parent: Diagram, private val g: SVGGElement) : LeafElement {
+class DiagramLegend(private val parent: Diagram, val g: SVGGElement) {
     companion object {
         fun getSiblingDiagramLegend(d: Diagram): List<DiagramLegend> {
             val elements: List<*> = d.s.querySelectorAll("g[element-type='LEGEND']").asList()
@@ -17,7 +16,7 @@ class DiagramLegend(private val parent: Diagram, private val g: SVGGElement) : L
         }
     }
 
-    private val dataset: String = g.attributes.getNamedItem("dataset")!!.value
+    val dataset: String = g.attributes.getNamedItem("dataset")!!.value
     private val text: SVGTextElement = g.querySelector("text") as SVGTextElement
     private var isHidden: Boolean = false
 

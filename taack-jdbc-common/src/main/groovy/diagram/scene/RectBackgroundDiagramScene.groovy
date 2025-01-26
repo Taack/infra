@@ -83,21 +83,21 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
             keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
                 // image or rect, with text
-                render.renderGroup(["element-type": ElementType.LEGEND, "dataset": keyEntry.key])
+                render.renderGroup(["element-type": ElementType.LEGEND, "dataset": keyEntry.key, "transform": "translate(${startX},${startY})"])
                 if (legendIndex < pointImageHref.size()) {
-                    render.translateTo(startX, startY - (LEGEND_IMAGE_WIDTH - fontSize))
+                    render.translateTo(0.0, 0.0 - (LEGEND_IMAGE_WIDTH - fontSize))
                     render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
 
-                    render.translateTo(startX + LEGEND_IMAGE_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
+                    render.translateTo(0.0 + LEGEND_IMAGE_WIDTH + LEGEND_RECT_TEXT_SPACING, 0.0)
                     render.renderLabel(keyEntry.key)
                 } else {
-                    render.translateTo(startX, startY)
+                    render.translateTo(0.0, 0.0)
                     KeyColor rectColor = KeyColor.colorFrom(legendIndex)
                     render.fillStyle(rectColor.color)
                     render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
 
                     // text
-                    render.translateTo(startX + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, startY)
+                    render.translateTo(0.0 + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, 0.0)
                     render.renderLabel(keyEntry.key)
                 }
                 render.renderGroupEnd()

@@ -2,14 +2,15 @@ package taack.ui.diagram
 
 import js.array.asList
 import taack.ui.base.element.AjaxBlock
-import web.svg.SVGElement
+import web.dom.document
+import web.svg.*
 
-class Diagram(val parent: AjaxBlock, val s: SVGElement) {
+class Diagram(val parent: AjaxBlock, val s: SVGSVGElement) {
     companion object {
         fun getSiblingDiagram(p: AjaxBlock): List<Diagram> {
             val elements: List<*> = p.d.querySelectorAll("svg.taackDiagram").asList()
             return elements.map {
-                Diagram(p, it as SVGElement)
+                Diagram(p, it as SVGSVGElement)
             }
         }
     }
@@ -25,5 +26,15 @@ class Diagram(val parent: AjaxBlock, val s: SVGElement) {
         dataGroups.forEach {
             it.hideOrShowDataset(toShow, dataset)
         }
+    }
+
+    fun getDiagramRoot(): Diagram {
+        return this
+    }
+
+    fun cloneLegendShape(dataset: String): SVGGElement {
+        val cloned = document.createElement(SvgTagName("g")) as SVGGElement
+        cloned.innerHTML = legends.find { it.dataset == dataset }?.g?.innerHTML ?: ""
+        return cloned
     }
 }

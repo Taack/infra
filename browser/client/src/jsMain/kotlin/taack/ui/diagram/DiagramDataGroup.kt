@@ -51,4 +51,8 @@ class DiagramDataGroup(val parent: Diagram, val g: SVGGElement) {
             }
         }
     }
+
+    fun getDiagramRoot(): Diagram {
+        return parent.getDiagramRoot()
+    }
 }

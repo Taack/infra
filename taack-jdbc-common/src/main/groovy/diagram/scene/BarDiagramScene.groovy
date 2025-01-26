@@ -81,7 +81,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
             for (int j = 0; j < keys.size(); j++) {
                 BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
-                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"])
+                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"}"])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)

@@ -1,12 +1,11 @@
 package taack.ui.diagram
 
 import js.array.asList
-import taack.ui.base.LeafElement
 import web.dom.document
 import web.events.EventHandler
 import web.svg.*
 
-class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) : LeafElement {
+class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
     companion object {
         fun getSiblingDiagramData(dataGroup: DiagramDataGroup): List<DiagramData> {
             val elements: List<*> = dataGroup.g.querySelectorAll("g[element-type='DATA']").asList()
@@ -17,23 +16,50 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) : Le
     }
 
     val dataset: String = g.attributes.getNamedItem("dataset")!!.value
-    private val dataLabel: String? = g.attributes.getNamedItem("data-label")?.value
     private val shapes: List<SVGElement> = g.children.asList().filter { it.tagName != "text" }.unsafeCast<List<SVGElement>>()
+    private val tooltip: SVGGElement?
 
     init {
-        if (dataLabel != null) {
-            val dataLabelElement: SVGTextElement = document.createElement(SvgTagName("text"))
-            dataLabelElement.setAttribute("text-rendering", "optimizeLegibility")
-            dataLabelElement.setAttribute("style", "font-size: 13px; font-family: sans-serif;")
-            dataLabelElement.innerHTML = dataLabel
+        val tooltipLabel = g.getAttribute("data-label")
+        if (tooltipLabel != null) {
+            tooltip = document.createElement(SvgTagName("g"))
+
+            val background: SVGPolygonElement = document.createElement(SvgTagName("polygon"))
+            background.style.fill = "#00000090"
+            tooltip.appendChild(background)
+
+            val legend: SVGGElement = getDiagramRoot().cloneLegendShape(dataset)
+            legend.querySelectorAll("text").forEach { (it as SVGTextElement).style.fill = "white" }
+            legend.setAttribute("transform", "translate(0,-15)")
+            tooltip.appendChild(legend)
+
+            val value: SVGTextElement = document.createElement(SvgTagName("text"))
+            value.setAttribute("text-rendering", "optimizeLegibility")
+            value.setAttribute("style", "font-size: 13px; font-family: sans-serif; fill: white")
+            value.innerHTML = tooltipLabel
+            value.setAttribute("transform", "translate(0,15)")
+            tooltip.appendChild(value)
+
             g.onmouseenter = EventHandler {
-                parent.parent.s.appendChild(dataLabelElement)
-                dataLabelElement.setAttribute("x", (g.getBBox().x + g.getBBox().width / 2 - dataLabelElement.getBBox().width / 2).toString())
-                dataLabelElement.setAttribute("y", (g.getBBox().y - 5).toString())
+                getDiagramRoot().s.appendChild(tooltip)
+
+                if (background.getAttribute("points") == null) {
+                    val contentWidth = tooltip.getBBox().width
+                    background.setAttribute("points", "${-contentWidth / 2 - 20},0 ${-contentWidth / 2 - 10},10 ${-contentWidth / 2 - 10},25 ${contentWidth / 2 + 10},25 ${contentWidth / 2 + 10},-25 ${-contentWidth / 2 - 10},-25 ${-contentWidth / 2 - 10},-10")
+                }
+                if (g.getBBox().x < getDiagramRoot().s.viewBox.baseVal.width / 2) {
+                    background.setAttribute("transform", "translate(${(background.getBBox().width - 30) / 2},0)")
+                    tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+                } else {
+                    background.setAttribute("transform", "scale(-1,1) translate(${-(background.getBBox().width - 30) / 2},0)")
+                    tooltip.setAttribute("transform", "translate(${g.getBBox().x - (tooltip.getBBox().width - 10)},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+                }
             }
             g.onmouseleave = EventHandler {
-                parent.parent.s.removeChild(dataLabelElement)
+                getDiagramRoot().s.removeChild(tooltip)
             }
+        } else {
+            tooltip = null
         }
     }
 
@@ -73,5 +99,9 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) : Le
         } else {
             return bottomY
         }
+    }
+
+    private fun getDiagramRoot(): Diagram {
+        return parent.getDiagramRoot()
     }
 }
