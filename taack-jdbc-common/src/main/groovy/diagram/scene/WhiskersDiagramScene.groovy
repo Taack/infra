@@ -108,6 +108,9 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                         render.renderGroupEnd()
 
                         render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${lowerQuartile}"])
+                        // lowerQuartile line
+                        render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
+                        render.renderLine(boxWidth, 0.0)
                         // line from lowerQuartile to lowerExtreme
                         render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
                         render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)

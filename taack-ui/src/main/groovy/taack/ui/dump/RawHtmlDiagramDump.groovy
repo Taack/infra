@@ -45,6 +45,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitDiagramDataInitialization() {
         this.out.reset()
+        this.xDataList = []
         this.dataPerKey = [:]
         this.whiskersYDataListPerKey = [:]
     }
