@@ -79,7 +79,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal upperQuartile = findMedian(boxData, (size / 2).toInteger() + size % 2, size)
                     BigDecimal upperExtreme = boxData.last()
                     if (lowerExtreme > startLabelY) {
-                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${upperExtreme}"])
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${upperExtreme}", style: "pointer-events: bounding-box;"])
                         // upperExtreme line
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
                         render.fillStyle(BLACK_COLOR)
@@ -107,7 +107,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                         render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
                         render.renderGroupEnd()
 
-                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${lowerQuartile}"])
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${lowerQuartile}", style: "pointer-events: bounding-box;"])
                         // lowerQuartile line
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
                         render.renderLine(boxWidth, 0.0)

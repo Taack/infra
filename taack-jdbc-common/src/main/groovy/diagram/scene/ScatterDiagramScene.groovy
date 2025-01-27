@@ -29,7 +29,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     Number y = pointList[x]
                     String xLabel = x.toDouble() % 1 == 0 ? "${x.toInteger()}" : "$x"
                     String yLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
-                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-label": "($xLabel, $yLabel)"])
+                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-label": "($xLabel, $yLabel)", style: "pointer-events: bounding-box;"])
 
                     BigDecimal xWidth = (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
@@ -75,7 +75,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                 for (int j = 0; j < keys.size(); j++) {
                     List<BigDecimal> yList = yDataListPerKey[keys[j]]
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
-                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"}"])
+                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"}", style: "pointer-events: bounding-box;"])
 
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     // data point
