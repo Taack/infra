@@ -184,6 +184,11 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void setRenderTab(boolean isRender) {
+
+    }
+
+    @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
 
     }

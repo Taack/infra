@@ -212,7 +212,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitDiagramTabsEnd() {
         if (blockLog) {
             IHTMLElement tabsContent = blockLog.topElement
-            blockLog.topElement = layout.tabs(oldParent, currentTabNames)
+            blockLog.topElement = layout.tabs(oldParent, currentTabNames, null, true)
             blockLog.topElement.addChildren(tabsContent)
             blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
         }

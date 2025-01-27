@@ -30,6 +30,7 @@ final class BlockSpec {
 
     int counter = 0
     int ajaxCounter = 0
+    int tabCounter = 0
 
     BlockSpec(final IUiBlockVisitor blockVisitor) {
         this.blockVisitor = blockVisitor
@@ -108,11 +109,18 @@ final class BlockSpec {
      * @param closure content of the tabulation.
      */
     void tab(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        String tabIndex = blockVisitor.parameterMap?['tabIndex']
+        String ajaxBlockId = blockVisitor.parameterMap?['ajaxBlockId']
+        if (tabIndex != null && ajaxBlockId == null) blockVisitor.setRenderTab(true)
         if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTab(i18n)
-        closure.delegate = this
-        closure.call()
+        if ((tabIndex == null && tabCounter == 0) || (tabIndex != null && tabCounter.toString() == tabIndex)) {
+            closure.delegate = this
+            closure.call()
+        }
         counter++
+        tabCounter ++
         if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabEnd()
+        blockVisitor.setRenderTab(false)
     }
 
     /**

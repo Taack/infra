@@ -3,6 +3,7 @@ package taack.ui.dump.html.block
 import groovy.transform.CompileStatic
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.form.FormSpec
+import taack.ui.dump.Parameter
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.HTMLButton
 import taack.ui.dump.html.element.HTMLDiv
@@ -17,8 +18,8 @@ import taack.ui.dump.html.theme.ThemeSize
 final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
     static int blockCounter = 0
 
-    BootstrapBlock(BlockLog blockLog) {
-        super(blockLog)
+    BootstrapBlock(BlockLog blockLog, Parameter parameter) {
+        super(blockLog, parameter)
         blockCounter++
         if (blockCounter > 1000) blockCounter = 0
     }

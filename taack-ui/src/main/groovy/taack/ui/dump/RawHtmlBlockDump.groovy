@@ -30,6 +30,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     boolean isModal = false
     boolean isRefreshing = false
+    boolean renderTab = false
     int poll = 0
 
     private int tabOccurrence = 0
@@ -45,7 +46,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (parameter.params.boolean('refresh'))
             isRefreshing = true
         blockLog = new BlockLog(parameter.uiThemeService.themeSelector)
-        block = new BootstrapBlock(blockLog)
+        block = new BootstrapBlock(blockLog, this.parameter)
 //        menu = new BootstrapMenu(blockLog)
         blockLog.topElement = new HTMLEmpty()
         blockLog.topElement.setTaackTag(TaackTag.BLOCK)
@@ -71,6 +72,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         if (parameter.target == Parameter.RenderingTarget.MAIL) return true
         blockLog.simpleLog("doRenderElement0 :> $id")
+
+        if (renderTab && parameter.isAjaxRendering) return true
+
         if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
             blockLog.simpleLog("doRenderElement1 return true, because NOT AJAX OR MODAL")
             return true
@@ -92,6 +96,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal && !parameter.isRefresh) || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
         blockLog.simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
+    }
+
+    @Override
+    void setRenderTab(boolean isRender) {
+        renderTab = isRender
     }
 
     @Override
@@ -146,7 +155,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-        boolean doAjaxRendering = (parameter.isRefresh && isModal || !isModal) && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
+        boolean doAjaxRendering = (parameter.tabIndex == null || parameter.ajaxBlockId) && (parameter.isRefresh && isModal || !isModal) && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
         if (!doAjaxRendering && parameter.targetAjaxBlockId) {
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true
@@ -326,7 +335,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTabsEnd() {
         blockLog.exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
-        blockLog.topElement = block.tabs(oldParent, currentTabNames)
+        blockLog.topElement = block.tabs(oldParent, currentTabNames, "/$parameter.applicationTagLib.controllerName/$parameter.applicationTagLib.actionName${parameter.beanId ? "/" + parameter.beanId : ''}")
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }

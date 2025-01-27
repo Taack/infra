@@ -81,4 +81,6 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitPollEnd()
 
     Map getParameterMap()
+
+    void setRenderTab(boolean isRender)
 }
