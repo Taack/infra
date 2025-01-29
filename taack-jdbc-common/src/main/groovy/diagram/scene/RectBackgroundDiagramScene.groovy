@@ -178,7 +178,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void innerSvgStart() {
-        render.renderInnerSvg(DIAGRAM_MARGIN_LEFT, 0.0, width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT, height)
+//        render.renderInnerSvg(DIAGRAM_MARGIN_LEFT, 0.0, width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT, height)
     }
 
     void innerSvgEnd() {
