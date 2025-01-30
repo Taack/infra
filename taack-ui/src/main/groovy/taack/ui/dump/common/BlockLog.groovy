@@ -15,26 +15,32 @@ final class BlockLog {
     }
 
     void enterBlock(String method) {
-        if (debug) println(indent*occ++ + method + ' +++ ' + topElement)
+        if (debug) {
+            if (occ < 0) println "OCC < 0 !!! occ == $occ " + method + ' +++ ' + topElement
+            else println(indent*occ++ + method + ' +++ ' + topElement)
+        }
     }
 
     void stayBlock(String method) {
         if (debug) {
-//            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
-            println(indent*occ + method + ' === ' + topElement)
+            if (occ < 0) println "OCC < 0 !!! occ == $occ " + method + ' === ' + topElement
+            else println(indent*occ + method + ' === ' + topElement)
         }
     }
     void simpleLog(String method) {
         if (debug) {
-//            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
-            println(indent*occ + method)
+            if (occ < 0) println "OCC < 0 !!! occ == $occ " + method
+            else println(indent*occ + method)
         }
     }
 
     void exitBlock(String method) {
         if (debug) {
-//            if (occ <= 0) println "OCC <= 0 !!! occ == $occ"
-            println(indent*--occ + method + ' --- ' + topElement)
+            if (occ < 0) {
+                println "OCC < 0 !!! occ == $occ " + method + ' --- ' + topElement
+            } else {
+                println(indent*--occ + method + ' --- ' + topElement)
+            }
         }
     }
 

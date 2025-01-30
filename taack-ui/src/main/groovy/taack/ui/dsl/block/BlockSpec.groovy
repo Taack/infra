@@ -96,11 +96,11 @@ final class BlockSpec {
      * @param closure description of the tabulations
      */
     void tabs(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabs()
+        if (blockVisitor.doRenderElement()) blockVisitor.visitBlockTabs()
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabsEnd()
+        if (blockVisitor.doRenderElement()) blockVisitor.visitBlockTabsEnd()
     }
 
     /**
@@ -112,14 +112,14 @@ final class BlockSpec {
         String tabIndex = blockVisitor.parameterMap?['tabIndex']
         String ajaxBlockId = blockVisitor.parameterMap?['ajaxBlockId']
         if (tabIndex != null && ajaxBlockId == null) blockVisitor.setRenderTab(true)
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTab(i18n)
+        if (blockVisitor.doRenderElement()) blockVisitor.visitBlockTab(i18n)
         if ((tabIndex == null && tabCounter == 0) || (tabIndex != null && tabCounter.toString() == tabIndex)) {
             closure.delegate = this
             closure.call()
         }
         counter++
         tabCounter ++
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockTabEnd()
+        if (blockVisitor.doRenderElement()) blockVisitor.visitBlockTabEnd()
         blockVisitor.setRenderTab(false)
     }
 
@@ -130,11 +130,11 @@ final class BlockSpec {
      * @param closure
      */
     void col(final Width width = Width.HALF, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitCol(width)
+        if (blockVisitor.doRenderElement()) blockVisitor.visitCol(width)
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitColEnd()
+        if (blockVisitor.doRenderElement()) blockVisitor.visitColEnd()
     }
 
     /**
@@ -144,11 +144,11 @@ final class BlockSpec {
      * @param closure
      */
     void row(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitRow()
+        if (blockVisitor.doRenderElement()) blockVisitor.visitRow()
         closure.delegate = this
         closure.call()
         counter++
-        if (blockVisitor.doRenderElement(null)) blockVisitor.visitRowEnd()
+        if (blockVisitor.doRenderElement()) blockVisitor.visitRowEnd()
     }
 
     /**

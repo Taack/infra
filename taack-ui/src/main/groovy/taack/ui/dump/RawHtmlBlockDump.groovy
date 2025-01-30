@@ -76,8 +76,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (renderTab && parameter.isAjaxRendering) return true
 
         if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
-            blockLog.simpleLog("doRenderElement1 return true, because NOT AJAX OR MODAL")
-            return true
+            blockLog.simpleLog("doRenderElement1 return ${!parameter.tabId}, because NOT AJAX OR MODAL")
+            return !parameter.tabId
         } else if (!id && !parameter.ajaxBlockId) {
             blockLog.simpleLog("doRenderElement2 return isModal($isModal)")
             return isModal

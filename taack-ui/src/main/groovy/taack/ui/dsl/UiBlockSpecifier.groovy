@@ -46,10 +46,10 @@ final class UiBlockSpecifier {
      */
     void visitBlock(final IUiBlockVisitor blockVisitor) {
         if (blockVisitor && closure) {
-            if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlock()
+            if (blockVisitor.doRenderElement()) blockVisitor.visitBlock()
             closure.delegate = new BlockSpec(blockVisitor)
             closure.call()
-            if (blockVisitor.doRenderElement(null)) blockVisitor.visitBlockEnd()
+            if (blockVisitor.doRenderElement()) blockVisitor.visitBlockEnd()
         }
     }
 }
