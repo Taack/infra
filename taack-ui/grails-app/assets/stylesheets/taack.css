@@ -334,6 +334,14 @@ td[taacktag] em {
     display: none;
 }
 
+.taack-tab-load {
+    height: 400px;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: url(/assets/taack/spinner_load.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 svg text {
     fill: var(--bs-body-color);
 }
