@@ -8,6 +8,7 @@ import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
+import taack.ui.base.element.Tab
 import web.dom.Element
 import web.dom.document
 import web.events.EventHandler
@@ -17,9 +18,9 @@ import web.html.*
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 
-class TabButton(val parent: Block, val b: HTMLButtonElement) : BaseElement  {
+class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
     companion object {
-        fun getSiblingTabButton(p: Block): List<TabButton> {
+        fun getSiblingTabButton(p: Tab): List<TabButton> {
             val elements: List<*> = p.d.querySelectorAll("button[role='tab']:not(form button)").asList()
             return elements.map {
                 TabButton(p, it as HTMLButtonElement)
@@ -39,9 +40,10 @@ class TabButton(val parent: Block, val b: HTMLButtonElement) : BaseElement  {
             val xhr = XMLHttpRequest()
             xhr.onloadend = EventHandler {
                 val div: Element? = parent.d.querySelector(".tab-content")
+                println("div: ${div?.id}")
                 if (div != null) {
                     div.innerHTML = xhr.responseText
-                    AjaxBlock.getSiblingAjaxBlock(parent)
+                    AjaxBlock.getSiblingAjaxBlock(parent.parent)
                 }
             }
             xhr.open(RequestMethod.POST, b.getAttribute("action")!!)
@@ -49,6 +51,6 @@ class TabButton(val parent: Block, val b: HTMLButtonElement) : BaseElement  {
         }
     }
     override fun getParentBlock(): Block {
-        return parent
+        return parent.parent
     }
 }

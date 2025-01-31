@@ -5,7 +5,6 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.ActionLink
-import taack.ui.base.leaf.AjaxBlockInputTab
 import taack.ui.base.leaf.AnchorHref
 import taack.ui.base.leaf.TabButton
 import web.dom.document
@@ -23,8 +22,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
 
     val ajaxBlockElements = mutableMapOf<String, AjaxBlock>()
     val modal: Modal
-    private var tabs: List<AjaxBlockInputTab>
-    private var tabButtons: List<TabButton>
+    private var tabs: List<Tab>
     val blockId: String
     private var modalNumber = 0
 
@@ -39,8 +37,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         } else {
             blockId = "modal${modalNumber++}"
         }
-        tabs = AjaxBlockInputTab.getSiblingBlockInputTab(this)
-        tabButtons = TabButton.getSiblingTabButton(this)
+        tabs = Tab.getSiblingTab(this)
         AjaxBlock.getSiblingAjaxBlock(this)
         modal = Modal.buildModal(this)
 
