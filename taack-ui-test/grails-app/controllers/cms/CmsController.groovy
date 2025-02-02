@@ -18,15 +18,15 @@ import taack.render.TaackEditorService
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
 import taack.ui.dsl.*
+import taack.ui.dsl.block.BlockLayoutSpec
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
-import taack.wysiwyg.Markdown
 
 import javax.annotation.PostConstruct
-import static grails.async.Promises.task
 
+import static grails.async.Promises.task
 /*
 * TODO: Menu grouped by default
 * TODO: Menu add submenu and menu
@@ -84,20 +84,18 @@ class CmsController implements WebAttributes {
         m
     }
 
-    private Closure<BlockSpec> buildImagesTab(CmsPage cmsPage) {
-        BlockSpec.buildBlockSpec {
-            ajaxBlock() {
-                table cmsUiService.buildCmsImageTable(cmsPage), {
-                    menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
-                    menu this.&selectM2mCmsImage as MC, cmsPage.id
-                    menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
-                }
+    private Closure<BlockLayoutSpec> buildImagesTab(CmsPage cmsPage) {
+        BlockLayoutSpec.buildBlockLayoutSpec {
+            table cmsUiService.buildCmsImageTable(cmsPage), {
+                menu this.&refreshCmsPageCmsImages as MC, cmsPage.id
+                menu this.&selectM2mCmsImage as MC, cmsPage.id
+                menu this.&editCmsImage as MC, [cmsPageId: cmsPage.id]
             }
         }
     }
 
-    private Closure<BlockSpec> buildVideosTab(CmsPage cmsPage) {
-        BlockSpec.buildBlockSpec {
+    private Closure<BlockLayoutSpec> buildVideosTab(CmsPage cmsPage) {
+        BlockLayoutSpec.buildBlockLayoutSpec {
             table cmsUiService.buildCmsVideoTable(cmsPage), {
                 menu this.&refreshCmsPageCmsVideos as MC, cmsPage.id
                 menu this.&selectM2mCmsVideo as MC, cmsPage.id
@@ -106,8 +104,8 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private Closure<BlockSpec> buildPdfsTab(CmsPage cmsPage) {
-        BlockSpec.buildBlockSpec {
+    private Closure<BlockLayoutSpec> buildPdfsTab(CmsPage cmsPage) {
+        BlockLayoutSpec.buildBlockLayoutSpec {
             table cmsUiService.buildCmsPdfTable(cmsPage), {
                 menu this.&refreshCmsPageCmsPdfs as MC, [id: cmsPage.id]
                 menu this.&selectM2mCmsPdf as MC, [id: cmsPage.id]
@@ -332,10 +330,8 @@ class CmsController implements WebAttributes {
     def images() {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
-            ajaxBlock "imagesBlockAction", {
-                tableFilter CmsUiService.buildCmsImageFilter(), cmsUiService.buildCmsImageTable(), {
-                    menu this.&editCmsImage as MC
-                }
+            tableFilter CmsUiService.buildCmsImageFilter(), cmsUiService.buildCmsImageTable(), {
+                menu this.&editCmsImage as MC
             }
         }
         taackUiService.show(b, buildMenu())
@@ -344,9 +340,7 @@ class CmsController implements WebAttributes {
     def pdfs() {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
-            ajaxBlock "pdfsBlock", {
-                table cmsUiService.buildCmsPdfTable()
-            }
+            table cmsUiService.buildCmsPdfTable()
         }
         taackUiService.show(b, buildMenu())
     }
@@ -354,9 +348,7 @@ class CmsController implements WebAttributes {
     def videos() {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
-            ajaxBlock "videosBlock", {
-                table cmsUiService.buildCmsVideoTable()
-            }
+            table cmsUiService.buildCmsVideoTable()
         }
         taackUiService.show(b, buildMenu())
     }
@@ -380,15 +372,11 @@ class CmsController implements WebAttributes {
         b.ui {
             if (createNew)
                 modal {
-                    ajaxBlock "createNew", {
-                        form buildCmsSlideshowForm(slideshow)
-                    }
+                    form buildCmsSlideshowForm(slideshow)
                 }
             else {
                 col {
-                    ajaxBlock "cmsSlideshowForm", {
-                        form buildCmsSlideshowForm(slideshow)
-                    }
+                    form buildCmsSlideshowForm(slideshow)
                 }
                 col {
                     tabs {
@@ -412,9 +400,7 @@ class CmsController implements WebAttributes {
         if (!cmsInsert) cmsInsert = new CmsInsert()
         b.ui {
             modal {
-                ajaxBlock "imagesForm", {
-                    form buildCmsInsertForm(cmsInsert)
-                }
+                form buildCmsInsertForm(cmsInsert)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -451,9 +437,7 @@ class CmsController implements WebAttributes {
         if (!videoFile) videoFile = new CmsVideoFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
         b.ui {
             modal {
-                ajaxBlock "videoForm", {
-                    form buildCmsVideoForm(videoFile)
-                }
+                form buildCmsVideoForm(videoFile)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -464,9 +448,7 @@ class CmsController implements WebAttributes {
         if (!pdfFile) pdfFile = new CmsPdfFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
         b.ui {
             modal {
-                ajaxBlock "pdfsForm", {
-                    form buildCmsPdfForm(pdfFile)
-                }
+                form buildCmsPdfForm(pdfFile)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -554,9 +536,7 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         b.ui {
             modal {
-                ajaxBlock "renderedBody", {
-                    custom html
-                }
+                custom html
             }
         }
         taackUiService.show(b)
@@ -569,9 +549,7 @@ class CmsController implements WebAttributes {
                     </div>""" : """No Preview"""
         b.ui {
             modal {
-                ajaxBlock "renderedBody", {
-                    custom html
-                }
+                custom html
             }
         }
         taackUiService.show(b)
@@ -585,9 +563,7 @@ class CmsController implements WebAttributes {
                     </div>""" : """ No Preview"""
         b.ui {
             modal {
-                ajaxBlock "renderedBody", {
-                    custom html
-                }
+                custom html
             }
         }
         taackUiService.show(b)
@@ -598,10 +574,8 @@ class CmsController implements WebAttributes {
         def filter = CmsUiService.buildCmsImageFilter(null, ImageType.PAGE_PREVIEW)
         b.ui {
             modal {
-                ajaxBlock "selectPageImage", {
-                    tableFilter filter, cmsUiService.buildCmsImageTable(null, CmsUiService.CmsTableMode.MANY_2_MANY, filter), {
-                        menu this.&editCmsImage as MC
-                    }
+                tableFilter filter, cmsUiService.buildCmsImageTable(null, CmsUiService.CmsTableMode.MANY_2_MANY, filter), {
+                    menu this.&editCmsImage as MC
                 }
             }
         }
@@ -709,19 +683,17 @@ class CmsController implements WebAttributes {
         block ?= new CmsBlock(subsidiary: cmsSub)
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
-                ajaxBlock "editBlock", {
-                    form new UiFormSpecifier().ui(block, {
-                        section('Block Position') {
-                            field block.position_
-                            field block.subsidiary_
-                        }
-                        section("Block Content") {
-                            ajaxField block.cmsMenuEntry_, this.&selectM2oMenu as MC, ['subsidiary': block.subsidiary, 'theId': block.id]
-                            ajaxField block.cmsPage_, this.&selectM2oPage as MC, ['subsidiary': block.subsidiary]
-                        }
-                        formAction this.&saveCmsBlock as MC
-                    })
-                }
+                form new UiFormSpecifier().ui(block, {
+                    section('Block Position') {
+                        field block.position_
+                        field block.subsidiary_
+                    }
+                    section("Block Content") {
+                        ajaxField block.cmsMenuEntry_, this.&selectM2oMenu as MC, ['subsidiary': block.subsidiary, 'theId': block.id]
+                        ajaxField block.cmsPage_, this.&selectM2oPage as MC, ['subsidiary': block.subsidiary]
+                    }
+                    formAction this.&saveCmsBlock as MC
+                })
             }
         })
     }
@@ -731,9 +703,7 @@ class CmsController implements WebAttributes {
         def s = params['subsidiary'] as CmsSubsidiary
         b.ui {
             modal {
-                ajaxBlock "menuEntries", {
-                    table buildCmsMenuEntryTable(s, params.long('theId'))
-                }
+                table buildCmsMenuEntryTable(s, params.long('theId'))
             }
         }
         taackUiService.show(b)
@@ -746,9 +716,7 @@ class CmsController implements WebAttributes {
 
         b.ui {
             modal {
-                ajaxBlock "selectM2oPage", {
-                    tableFilter filter, cmsUiService.buildCmsPageTable(filter)
-                }
+                tableFilter filter, cmsUiService.buildCmsPageTable(filter)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -825,9 +793,7 @@ class CmsController implements WebAttributes {
 
         b.ui {
             modal {
-                ajaxBlock "selectM2mCmsVideoBlock", {
-                    tableFilter filter, cmsUiService.buildCmsVideoTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
-                }
+                tableFilter filter, cmsUiService.buildCmsVideoTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -839,9 +805,7 @@ class CmsController implements WebAttributes {
 
         b.ui {
             modal {
-                ajaxBlock "selectM2mCmsPdfBlock", {
-                    tableFilter filter, cmsUiService.buildCmsPdfTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
-                }
+                tableFilter filter, cmsUiService.buildCmsPdfTable(cmsPage, CmsUiService.CmsTableMode.MANY_2_MANY, filter)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -855,9 +819,7 @@ class CmsController implements WebAttributes {
         def filter = CmsUiService.buildCmsSlideshowFilter(cmsPage)
         b.ui {
             modal {
-                ajaxBlock "selectM2mCmsSlideshow", {
-                    tableFilter filter, cmsUiService.buildCmsSlideshowTable(filter)
-                }
+                tableFilter filter, cmsUiService.buildCmsSlideshowTable(filter)
             }
         }
         taackUiService.show(b, buildMenu())
@@ -1010,32 +972,30 @@ class CmsController implements WebAttributes {
         menuEntry ?= new CmsMenuEntry(parent: p, subsidiary: p?.subsidiary)
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
-                ajaxBlock "editMenu", {
-                    form new UiFormSpecifier().ui(menuEntry, {
-                        if (p || menuEntry.id) {
-                            hiddenField menuEntry.parent_
-                            hiddenField menuEntry.subsidiary_
-                        }
-                        section "Menu Entry", {
-                            field menuEntry.code_
-                            field menuEntry.suffixLink_
-                            field menuEntry.position_
-                            field menuEntry.published_
-                            field menuEntry.isSideMenu_
-                            field menuEntry.svgRefId_
-                            field menuEntry.includeInFooter_
-                            if (!(p || menuEntry.id)) field menuEntry.subsidiary_
-                            ajaxField menuEntry.page_, this.&selectM2oPage as MC, menuEntry.subsidiary_
+                form new UiFormSpecifier().ui(menuEntry, {
+                    if (p || menuEntry.id) {
+                        hiddenField menuEntry.parent_
+                        hiddenField menuEntry.subsidiary_
+                    }
+                    section "Menu Entry", {
+                        field menuEntry.code_
+                        field menuEntry.suffixLink_
+                        field menuEntry.position_
+                        field menuEntry.published_
+                        field menuEntry.isSideMenu_
+                        field menuEntry.svgRefId_
+                        field menuEntry.includeInFooter_
+                        if (!(p || menuEntry.id)) field menuEntry.subsidiary_
+                        ajaxField menuEntry.page_, this.&selectM2oPage as MC, menuEntry.subsidiary_
 
+                    }
+                    section "Menu Entry Translation", {
+                        for (def l in SupportedLanguage.values()) {
+                            fieldFromMap "Title ${l.label}", menuEntry.title_, l.toString().toLowerCase()
                         }
-                        section "Menu Entry Translation", {
-                            for (def l in SupportedLanguage.values()) {
-                                fieldFromMap "Title ${l.label}", menuEntry.title_, l.toString().toLowerCase()
-                            }
-                        }
-                        formAction this.&saveCmsMenuEntry as MC
-                    })
-                }
+                    }
+                    formAction this.&saveCmsMenuEntry as MC
+                })
             }
         })
     }
@@ -1044,10 +1004,8 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
 
         b.ui {
-            ajaxBlock "menuEntries", {
-                table buildCmsMenuEntryTable(), {
-                    menu this.&editMenu as MC
-                }
+            table buildCmsMenuEntryTable(), {
+                menu this.&editMenu as MC
             }
         }
         taackUiService.show(b, buildMenu())
@@ -1055,10 +1013,8 @@ class CmsController implements WebAttributes {
 
     def blocks() {
         taackUiService.show(new UiBlockSpecifier().ui({
-            ajaxBlock 'blocks', {
-                table(buildBlockTable()) {
-                    menu this.&editBlock as MC
-                }
+            table(buildBlockTable()) {
+                menu this.&editBlock as MC
             }
         }), buildMenu())
     }
@@ -1070,26 +1026,24 @@ class CmsController implements WebAttributes {
     def confSites() {
         def cs = new CmsConfSite()
         taackUiService.show(new UiBlockSpecifier().ui {
-            ajaxBlock 'confSites', {
-                table(new UiTableSpecifier().ui({
-                    header {
-                        sortableFieldHeader cs.subsidiary_
-                        sortableFieldHeader cs.cmsSiteType_
-                        sortableFieldHeader cs.mainSlideShow_
+            table(new UiTableSpecifier().ui({
+                header {
+                    sortableFieldHeader cs.subsidiary_
+                    sortableFieldHeader cs.cmsSiteType_
+                    sortableFieldHeader cs.mainSlideShow_
+                }
+                iterate taackFilterService.getBuilder(CmsConfSite).build(), { CmsConfSite o ->
+                    rowColumn {
+                        rowAction 'Edit', ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&editCmsConfSite as MC, o.id
+                        rowField o.subsidiary.toString()
                     }
-                    iterate taackFilterService.getBuilder(CmsConfSite).build(), { CmsConfSite o ->
-                        rowColumn {
-                            rowAction 'Edit', ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&editCmsConfSite as MC, o.id
-                            rowField o.subsidiary.toString()
-                        }
-                        rowField o.cmsSiteType.toString()
-                        if (o.mainSlideShow) rowField o.mainSlideShow.name + "(${o.mainSlideShow.id})"
-                        else rowField 'Default slideshow'
-                    }
-                }), {
-                    menu this.&editCmsConfSite as MC
-                })
-            }
+                    rowField o.cmsSiteType.toString()
+                    if (o.mainSlideShow) rowField o.mainSlideShow.name + "(${o.mainSlideShow.id})"
+                    else rowField 'Default slideshow'
+                }
+            }), {
+                menu this.&editCmsConfSite as MC
+            })
         }, buildMenu())
     }
 
@@ -1097,14 +1051,12 @@ class CmsController implements WebAttributes {
         confSite ?= new CmsConfSite()
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
-                ajaxBlock 'editCmsConfSite', {
-                    form new UiFormSpecifier().ui(confSite, {
-                        field confSite.subsidiary_
-                        field confSite.cmsSiteType_
-                        ajaxField confSite.mainSlideShow_, this.&selectM2mCmsSlideshow as MC, confSite.subsidiary_
-                        formAction this.&saveCmsConfSite as MC
-                    })
-                }
+                form new UiFormSpecifier().ui(confSite, {
+                    field confSite.subsidiary_
+                    field confSite.cmsSiteType_
+                    ajaxField confSite.mainSlideShow_, this.&selectM2mCmsSlideshow as MC, confSite.subsidiary_
+                    formAction this.&saveCmsConfSite as MC
+                })
             }
         })
     }

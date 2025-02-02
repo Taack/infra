@@ -17,52 +17,92 @@ class StatsController {
 
     static UiMenuSpecifier buildMenu() {
         new UiMenuSpecifier().ui {
-            menu StatsController.&topCustomerSales as MethodClosure
+            menu StatsController.&topCustomerSales2 as MethodClosure
         }
     }
 
     def index() {
         redirect(action: 'topCustomerSales')
     }
+//
+//    def topCustomerSales() {
+//        taackUiService.show(new UiBlockSpecifier().ui {
+//            boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
+//            boolean groupPerMonth = params.boolean('groupPerMonth')
+//            row {
+//                col BlockSpec.Width.HALF, {
+//                    ajaxBlock 'theChart', {
+//                        println 'coucou'
+//                        diagram buildChart(showMonthlyGraph, groupPerMonth), {
+//                            label "Sales1"
+//                            if (showMonthlyGraph) {
+//                                menu "Yearly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'false'] + [ajaxBlockId: 'theChart'] + [targetAjaxBlockId: 'theChart'] + [isAjax: 'true']
+//                                if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true'] + [targetAjaxBlockId: 'theChart'] + [ajaxBlockId: 'theChart'] + [isAjax: 'true']
+//                                else menu "Ungroup", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false'] + [targetAjaxBlockId: 'theChart'] + [ajaxBlockId: 'theChart'] + [isAjax: 'true']
+//                            } else {
+//                                menu "Monthly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [targetAjaxBlockId: 'theChart'] + [ajaxBlockId: 'theChart'] + [isAjax: 'true']
+//                            }
+//                        }
+//                    }
+//
+//                }
+//                col BlockSpec.Width.HALF, {
+//                    ajaxBlock 'theChart2', {
+//                        println 'coucou2'
+//                        diagram buildChart(showMonthlyGraph, groupPerMonth), {
+//                            label "Sales2"
+//                            if (showMonthlyGraph) {
+//                                menu "Yearly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'false'] + [ajaxBlockId: 'theChart2'] + [targetAjaxBlockId: 'theChart2'] + [isAjax: 'true']
+//                                if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true'] + [targetAjaxBlockId: 'theChart2'] + [ajaxBlockId: 'theChart2'] + [isAjax: 'true']
+//                                else menu "Ungroup", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false'] + [ajaxBlockId: 'theChart2'] + [targetAjaxBlockId: 'theChart2'] + [isAjax: 'true']
+//                            } else {
+//                                menu "Monthly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [ajaxBlockId: 'theChart2'] + [targetAjaxBlockId: 'theChart2'] + [isAjax: 'true']
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+////        }, (params.boolean('isAjax') ? null :  buildMenu()))
+//        })
+//    }
 
-    def topCustomerSales() {
-        taackUiService.show new UiBlockSpecifier().ui {
-            boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
-            boolean groupPerMonth = params.boolean('groupPerMonth')
+    def topCustomerSales2() {
+        taackUiService.show(new UiBlockSpecifier().ui {
             row {
                 col BlockSpec.Width.HALF, {
-                    ajaxBlock 'theChart', {
-                        println 'coucou'
-                        diagram buildChart(showMonthlyGraph, groupPerMonth), {
-                            label "Sales1"
-                            if (showMonthlyGraph) {
-                                menu "Yearly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'false'] + [ajaxBlockId: 'theChart'] + [targetAjaxBlockId: 'theChart'] + [isAjax: 'true']
-                                if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true'] + [targetAjaxBlockId: 'theChart'] + [ajaxBlockId: 'theChart'] + [isAjax: 'true']
-                                else menu "Ungroup", StatsController.&topCustomerSales as MethodClosure,[showMonthlyGraph: 'true'] + [groupPerMonth: 'false'] + [targetAjaxBlockId: 'theChart'] + [ajaxBlockId: 'theChart'] + [isAjax: 'true']
-                            } else {
-                                menu "Monthly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [targetAjaxBlockId: 'theChart'] + [ajaxBlockId: 'theChart'] + [isAjax: 'true']
-                            }
+                    println 'coucou'
+                    boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
+                    boolean groupPerMonth = params.boolean('groupPerMonth')
+                    diagram buildChart(showMonthlyGraph, groupPerMonth), {
+                        label "Sales1"
+                        if (showMonthlyGraph) {
+                            menu "Yearly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
+                            if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true']
+                            else menu "Ungroup", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false']
+                        } else {
+                            menu "Monthly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true']
                         }
                     }
 
                 }
                 col BlockSpec.Width.HALF, {
-                    ajaxBlock 'theChart2', {
-                        println 'coucou2'
-                        diagram buildChart(showMonthlyGraph, groupPerMonth), {
-                            label "Sales2"
-                            if (showMonthlyGraph) {
-                                menu "Yearly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'false'] + [ajaxBlockId: 'theChart2'] + [targetAjaxBlockId: 'theChart2'] + [isAjax: 'true']
-                                if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true'] + [targetAjaxBlockId: 'theChart2'] + [ajaxBlockId: 'theChart2'] + [isAjax: 'true']
-                                else menu "Ungroup", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false'] + [ajaxBlockId: 'theChart2'] + [targetAjaxBlockId: 'theChart2'] + [isAjax: 'true']
-                            } else {
-                                menu "Monthly", StatsController.&topCustomerSales as MethodClosure, [showMonthlyGraph: 'true'] + [ajaxBlockId: 'theChart2'] + [targetAjaxBlockId: 'theChart2'] + [isAjax: 'true']
-                            }
+                    println 'coucou2'
+                    boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
+                    boolean groupPerMonth = params.boolean('groupPerMonth')
+                    diagram buildChart(showMonthlyGraph, groupPerMonth), {
+                        label "Sales2"
+                        if (showMonthlyGraph) {
+                            menu "Yearly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
+                            if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true']
+                            else menu "Ungroup", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false']
+                        } else {
+                            menu "Monthly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true']
                         }
                     }
                 }
             }
-        }, params.boolean('isAjax') ? buildMenu() : null
+//        }, (params.boolean('isAjax') ? null :  buildMenu()))
+        })
     }
 
     private static UiDiagramSpecifier buildChart(boolean showMonthlyGraph, boolean groupPerMonth) {
@@ -101,9 +141,9 @@ class StatsController {
                             }
                         } else {
                             years.each { yIt ->
-                                    months.each { m ->
-                                        yDataList.add(Math.random().toBigDecimal() * 20)
-                                    }
+                                months.each { m ->
+                                    yDataList.add(Math.random().toBigDecimal() * 20)
+                                }
                             }
                         }
                         dataset o, yDataList as BigDecimal[]

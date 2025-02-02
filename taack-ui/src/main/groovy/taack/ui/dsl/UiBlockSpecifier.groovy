@@ -1,6 +1,7 @@
 package taack.ui.dsl
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.block.BlockLeafSpec
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 
@@ -28,6 +29,10 @@ import taack.ui.dsl.block.IUiBlockVisitor
 final class UiBlockSpecifier {
     Closure closure
 
+    static void simpleLog(String toPrint) {
+        if (BlockLeafSpec.debug) println(UiBlockSpecifier.simpleName + '::' + toPrint)
+    }
+
     /**
      * Describe the block to display (see {@link BlockSpec})
      *
@@ -46,10 +51,12 @@ final class UiBlockSpecifier {
      */
     void visitBlock(final IUiBlockVisitor blockVisitor) {
         if (blockVisitor && closure) {
-            if (blockVisitor.doRenderElement()) blockVisitor.visitBlock()
+            boolean doRender = blockVisitor.doRenderElement()
+            simpleLog("visitBlock $doRender")
+            if (doRender) blockVisitor.visitBlock()
             closure.delegate = new BlockSpec(blockVisitor)
             closure.call()
-            if (blockVisitor.doRenderElement()) blockVisitor.visitBlockEnd()
+            if (doRender) blockVisitor.visitBlockEnd()
         }
     }
 }

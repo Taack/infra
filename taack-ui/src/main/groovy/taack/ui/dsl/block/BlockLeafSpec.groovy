@@ -19,20 +19,14 @@ import taack.ui.dsl.menu.MenuSpec
  * element (show, form, table, tableFilter ...) per block (modal, ajaxBlock ...)
  */
 @CompileStatic
-class BlockLeafSpec {
-    final IUiBlockVisitor blockVisitor
-    final String filterTableId
+class BlockLeafSpec extends BlockBase {
 
-    int counter = 0
-    int ajaxCounter = 0
-
-    BlockLeafSpec(final IUiBlockVisitor blockVisitor) {
-        this.blockVisitor = blockVisitor
-        this.filterTableId = blockVisitor.parameterMap?['filterTableId']
+    static void simpleLog(String toPrint) {
+        if (debug) println(BlockLeafSpec.simpleName + '::' + toPrint)
     }
-
+    
     void processMenuBlock(String ajaxBlockId, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure) {
-//        if (blockVisitor.doRenderElement(null)) {
+        simpleLog('processMenuBlock')
         if (closure) {
             blockVisitor.visitBlockHeader()
             blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL, ajaxBlockId)
@@ -42,7 +36,6 @@ class BlockLeafSpec {
             blockVisitor.visitMenuStartEnd()
             blockVisitor.visitBlockHeaderEnd()
         }
-//        }
     }
 
 
@@ -66,7 +59,9 @@ class BlockLeafSpec {
     void form(final UiFormSpecifier formSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('form')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("form $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitForm(formSpecifier)
@@ -86,7 +81,9 @@ class BlockLeafSpec {
     void show(final UiShowSpecifier showSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('show')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("show $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitShow(showSpecifier)
@@ -97,7 +94,9 @@ class BlockLeafSpec {
     void table(final UiTableSpecifier tableSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('table')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("table $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitTable(aId, tableSpecifier)
@@ -118,7 +117,9 @@ class BlockLeafSpec {
                      final UiTableSpecifier tableSpecifier,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('tableFilter')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("tableFilter $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitRow()
@@ -138,20 +139,23 @@ class BlockLeafSpec {
     void diagram(final UiDiagramSpecifier diagramSpecifier,
                  @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("diagram $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitDiagram(diagramSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
-
     }
 
     void diagramFilter(final UiFilterSpecifier filterSpecifier,
                        final UiDiagramSpecifier diagramSpecifier,
                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chartFilter')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("diagramFilter $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitRow()
@@ -171,7 +175,9 @@ class BlockLeafSpec {
     void custom(final String html, final Style style = null,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('custom')
-        if (blockVisitor.doRenderElement(aId)) {
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("custom $aId $doRender")
+        if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitCustom(html, style)

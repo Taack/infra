@@ -19,6 +19,11 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    boolean doRenderLayoutElement() {
+        return false
+    }
+
+    @Override
     boolean doRenderElement(String id) {
         return false
     }

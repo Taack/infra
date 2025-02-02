@@ -2,12 +2,6 @@ package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
-import taack.ui.dsl.UiDiagramSpecifier
-import taack.ui.dsl.UiFilterSpecifier
-import taack.ui.dsl.UiFormSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.UiTableSpecifier
-import taack.ui.dsl.common.Style
 import taack.ui.dsl.menu.MenuSpec
 
 // TODO: try to remove ajaxBlock
@@ -23,15 +17,14 @@ import taack.ui.dsl.menu.MenuSpec
  * element (show, form, table, tableFilter ...) per block (modal, ajaxBlock ...)
  */
 @CompileStatic
-final class BlockSpec extends BlockLayoutSpec {
+final class BlockSpec extends BlockTabSpec {
     final MenuSpec menuSpec
 
     int counter = 0
     int ajaxCounter = 0
-    int tabCounter = 0
 
     BlockSpec(final IUiBlockVisitor blockVisitor) {
-        super(blockVisitor)
+        this.blockVisitor = blockVisitor
         this.menuSpec = new MenuSpec(blockVisitor)
     }
 
@@ -77,15 +70,6 @@ final class BlockSpec extends BlockLayoutSpec {
         final String bootstrapCss
     }
 
-    void tabs(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockTabSpec) final Closure closure) {
-        boolean doRender = blockVisitor.doRenderElement()
-        if (doRender) blockVisitor.visitBlockTabs()
-        closure.delegate = this
-        closure.call()
-        counter++
-        if (doRender) blockVisitor.visitBlockTabsEnd()
-    }
-
     /**
      * Ajax block must be children of ajaxBlock.
      *
@@ -97,12 +81,12 @@ final class BlockSpec extends BlockLayoutSpec {
      */
     void ajaxBlock(final String id = null, Boolean visitAjax = true, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
         if (visitAjax && id) blockVisitor.setExplicitAjaxBlockId(id)
-        if (!id || blockVisitor.doRenderElement(id)) {
-//            if (visitAjax) blockVisitor.visitAjaxBlock(id)
+        boolean doRender = blockVisitor.doRenderElement(id)
+        simpleLog("ajaxBlock $id $doRender")
+        if (!id || doRender) {
             closure.delegate = this
             closure.call()
             counter++
-//            if (visitAjax) blockVisitor.visitAjaxBlockEnd()
         }
         if (visitAjax && id) blockVisitor.setExplicitAjaxBlockId(null)
     }

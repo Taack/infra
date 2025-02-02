@@ -193,6 +193,11 @@ trait IHTMLElement {
             this
         }
 
+        HTMLElementBuilder<T> putAttributeIfNotNull(String key, String value) {
+            if (value && key) element.attributes.put key, value
+            this
+        }
+
         HTMLElementBuilder<T> setOnclick(IJavascriptDescriptor onClick) {
             element.onClick = onClick
             this

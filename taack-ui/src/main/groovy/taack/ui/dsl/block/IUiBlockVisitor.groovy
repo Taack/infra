@@ -16,6 +16,8 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     boolean doRenderElement()
 
+    boolean doRenderLayoutElement()
+
     boolean doRenderElement(String id)
 
     void visitBlock()

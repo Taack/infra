@@ -39,6 +39,18 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     final Parameter parameter
 
     private final BlockLog blockLog
+    
+    void simpleLog(String toPrint) {
+        blockLog.simpleLog(RawHtmlBlockDump.simpleName + '::' + toPrint)
+    }
+
+    void enterBlock(String toPrint) {
+        blockLog.enterBlock(RawHtmlBlockDump.simpleName + '::' + toPrint)
+    }
+
+    void exitBlock(String toPrint) {
+        blockLog.exitBlock(RawHtmlBlockDump.simpleName + '::' + toPrint)
+    }
 
     RawHtmlBlockDump(final Parameter parameter) {
         this.parameter = parameter
@@ -69,24 +81,26 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean doRenderElement(String id = null) {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
-
         if (parameter.target == Parameter.RenderingTarget.MAIL) return true
-        blockLog.simpleLog("doRenderElement0 :> renderTab: $renderTab, id: $id, theCurrentExplicitAjaxBlockId: ${theCurrentExplicitAjaxBlockId}, isModal: ${isModal}")
+        simpleLog("doRenderElement0 :> renderTab: $renderTab, id: $id, theCurrentExplicitAjaxBlockId: ${theCurrentExplicitAjaxBlockId}, isModal: ${isModal}, params: ${parameter.params}")
         if (!parameter.isAjaxRendering) {
-            blockLog.simpleLog("doRenderElement01: true")
+            simpleLog("doRenderElement01: true")
             return true
         }
         if (renderTab && parameter.isAjaxRendering) {
-            blockLog.simpleLog("doRenderElement02: true")
-            return true
+            simpleLog("doRenderElement02: true")
+           return true
         }
+
+//        if (parameter.isAjaxRendering && theCurrentExplicitAjaxBlockId == parameter.ajaxBlockId) return true
+//        else if (parameter.isAjaxRendering && parameter.ajaxBlockId && theCurrentExplicitAjaxBlockId != parameter.ajaxBlockId) return false
 
         if ((!id && (!parameter.isAjaxRendering && !isModal) || theCurrentExplicitAjaxBlockId != null)) {
             boolean ret = !parameter.tabId && !parameter.ajaxBlockId || parameter.ajaxBlockId == theCurrentExplicitAjaxBlockId
-            blockLog.simpleLog("doRenderElement1 return ${ret}, because NOT (AJAX OR MODAL) OR AJAX BUT ANOTHER id")
+            simpleLog("doRenderElement1 return ${ret}, because NOT (AJAX OR MODAL) OR AJAX BUT ANOTHER id")
             return ret
         } else if (!id && !parameter.ajaxBlockId) {
-            blockLog.simpleLog("doRenderElement2 return isModal($isModal)")
+            simpleLog("doRenderElement2 return isModal($isModal)")
             return isModal
         }
 
@@ -98,11 +112,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             currentAjaxBlockId = parameter.targetAjaxBlockId
         }
 
-        blockLog.simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
+        simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
         boolean doRender = !parameter.isAjaxRendering || (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal && !parameter.isRefresh) || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
-        blockLog.simpleLog("doRenderElement4 => doRender = $doRender")
+        simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
+    }
+
+    @Override
+    boolean doRenderLayoutElement() {
+        simpleLog("doRenderLayoutElement ${parameter.isAjaxRendering}, ${parameter.ajaxBlockId} $currentAjaxBlockId ${parameter.targetAjaxBlockId}")
+        return !parameter.isAjaxRendering
     }
 
     @Override
@@ -112,39 +132,39 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlock() {
-        blockLog.enterBlock('visitBlock')
+        enterBlock('visitBlock')
         blockLog.topElement = block.block(blockLog.topElement, "${parameter.applicationTagLib.controllerName}-${parameter.applicationTagLib.actionName}")
     }
 
     @Override
     void visitBlockEnd() {
-        blockLog.exitBlock('visitBlockEnd')
+        exitBlock('visitBlockEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.BLOCK)
     }
 
     @Override
     void visitBlockHeader() {
-        blockLog.enterBlock('visitBlockHeader')
+        enterBlock('visitBlockHeader')
         blockLog.topElement.setTaackTag(TaackTag.MENU_BLOCK)
         blockLog.topElement = block.blockHeader(blockLog.topElement)
     }
 
     @Override
     void visitBlockHeaderEnd() {
-        blockLog.exitBlock('visitBlockHeaderEnd')
+        exitBlock('visitBlockHeaderEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_BLOCK)
     }
 
     @Override
     void visitCol(final BlockSpec.Width width) {
-        blockLog.enterBlock('visitCol')
+        enterBlock('visitCol')
         blockLog.topElement.setTaackTag(TaackTag.COL)
         blockLog.topElement = block.col(blockLog.topElement, width)
     }
 
     @Override
     void visitColEnd() {
-        blockLog.exitBlock('visitColEnd')
+        exitBlock('visitColEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.COL)
     }
 
@@ -157,7 +177,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
      */
     @Override
     void visitAjaxBlock(String id) {
-        blockLog.enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering + " parameter.ajaxBlockId: " + parameter.ajaxBlockId)
+        enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering + " parameter.ajaxBlockId: " + parameter.ajaxBlockId)
         if (!id) id = parameter.ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
         // if many blocks in the same response, only redraw current block
@@ -172,7 +192,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitAjaxBlockEnd() {
-        blockLog.exitBlock('visitAjaxBlockEnd')
+        exitBlock('visitAjaxBlockEnd')
         currentAjaxBlockId = null
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.AJAX_BLOCK)
     }
@@ -194,13 +214,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitCloseModalAndUpdateBlock() {
-        blockLog.enterBlock('visitCloseModalAndUpdateBlock')
+        enterBlock('visitCloseModalAndUpdateBlock')
         blockLog.topElement = new HTMLAjaxCloseModal()
     }
 
     @Override
     void visitCloseModalAndUpdateBlockEnd() {
-        blockLog.exitBlock('visitCloseModalAndUpdateBlockEnd')
+        exitBlock('visitCloseModalAndUpdateBlockEnd')
     }
 
     @Override
@@ -223,7 +243,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitPoll(int millis, MethodClosure polledAction) {
-        blockLog.enterBlock('visitPoll ' + millis + ' ms ' + polledAction.toString())
+        enterBlock('visitPoll ' + millis + ' ms ' + polledAction.toString())
         poll = millis
         HTMLAjaxPoll poll = new HTMLAjaxPoll(millis, parameter.urlMapped(polledAction))
         blockLog.topElement.addChildren(poll)
@@ -233,7 +253,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitPollEnd() {
-        blockLog.enterBlock('visitPollEnd')
+        enterBlock('visitPollEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
         poll = 0
     }
@@ -315,7 +335,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTab(final String i18n) {
-        blockLog.enterBlock('visitBlockTab')
+        enterBlock('visitBlockTab')
         currentTabNames << i18n
         blockLog.topElement.setTaackTag(TaackTag.TAB)
         blockLog.topElement = block.tab(blockLog.topElement, tabOccurrence++)
@@ -323,7 +343,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTabEnd() {
-        blockLog.exitBlock('visitBlockTabEnd')
+        exitBlock('visitBlockTabEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TAB)
     }
 
@@ -332,7 +352,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTabs() {
-        blockLog.enterBlock('visitBlockTabs')
+        enterBlock('visitBlockTabs')
         oldParent = blockLog.topElement
         oldParent.setTaackTag(TaackTag.TABS)
         blockLog.topElement = new HTMLEmpty()
@@ -340,7 +360,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockTabsEnd() {
-        blockLog.exitBlock('visitBlockTabsEnd')
+        exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
         blockLog.topElement = block.tabs(oldParent, currentTabNames, "/$parameter.applicationTagLib.controllerName/$parameter.applicationTagLib.actionName${parameter.beanId ? "/" + parameter.beanId : ''}")
         blockLog.topElement.addChildren(tabsContent)
@@ -355,7 +375,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitModal() {
-        blockLog.enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isRefreshing)
+        enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isRefreshing)
         isModal = true
         parameter.isModal = true
         HTMLAjaxModal modal = new HTMLAjaxModal(isRefreshing)
@@ -366,7 +386,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitModalEnd() {
-        blockLog.exitBlock('visitModalEnd')
+        exitBlock('visitModalEnd')
         isModal = false
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MODAL)
     }
@@ -394,14 +414,14 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitRow() {
-        blockLog.enterBlock('visitRow')
+        enterBlock('visitRow')
         blockLog.topElement.setTaackTag(TaackTag.ROW)
         blockLog.topElement = block.row(blockLog.topElement)
     }
 
     @Override
     void visitRowEnd() {
-        blockLog.exitBlock('visitRowEnd')
+        exitBlock('visitRowEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ROW)
     }
 
@@ -409,7 +429,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
-        if (hasClosure) blockLog.enterBlock('visitMenuLabel ' + i18n)
+        if (hasClosure) enterBlock('visitMenuLabel ' + i18n)
         else blockLog.stayBlock('visitMenuLabel ' + i18n)
         blockLog.topElement.setTaackTag(TaackTag.LABEL)
 
@@ -418,13 +438,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuLabelEnd() {
-        blockLog.exitBlock('visitMenuLabelEnd')
+        exitBlock('visitMenuLabelEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.LABEL)
     }
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
-        blockLog.enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
+        enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
         futurCurrentAjaxBlockId = ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.MENU)
         menu = new BootstrapMenu(blockLog)
@@ -433,7 +453,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuStartEnd() {
-        blockLog.exitBlock('visitMenuStartEnd')
+        exitBlock('visitMenuStartEnd')
+        futurCurrentAjaxBlockId = null
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU)
     }
 
@@ -484,19 +505,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
             if (cp.containsKey('action')) cp.remove('action')
             if (cp.containsKey('controller')) cp.remove('controller')
+            if (futurCurrentAjaxBlockId) {
+                params.put('ajaxBlockId', futurCurrentAjaxBlockId)
+                params.put('refresh', 'true')
+            }
         }
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
     }
 
     @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
-        blockLog.enterBlock('visitMenuSection ' + i18n)
+        enterBlock('visitMenuSection ' + i18n)
         menu.section(blockLog.topElement, i18n)
     }
 
     @Override
     void visitMenuSectionEnd() {
-        blockLog.exitBlock('visitMenuSectionEnd')
+        exitBlock('visitMenuSectionEnd')
 
     }
 
@@ -512,7 +537,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
-        blockLog.enterBlock('visitMenuSelect')
+        enterBlock('visitMenuSelect')
         String valueSelected = params[paramName]
         IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
         String controller = params['controller'] as String
@@ -526,16 +551,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
-        blockLog.enterBlock('visitMenuSearch')
+        enterBlock('visitMenuSearch')
         splitMenu()
         menu.menuSearch(blockLog.topElement, q?.replace('"', "&quot;"), parameter.urlMapped(Utils.getControllerName(action), action.method))
         splitMenuEnd()
-        blockLog.exitBlock('visitMenuSearch')
+        exitBlock('visitMenuSearch')
     }
 
     @Override
     void visitMenuOptions(IEnumOptions enumOptions) {
-        blockLog.enterBlock('visitMenuOptions')
+        enterBlock('visitMenuOptions')
         splitMenu()
         String selectedOptionKey = parameter.params[enumOptions.paramKey]
 
@@ -566,11 +591,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         }
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_OPTION)
         splitMenuEnd()
-        blockLog.exitBlock('visitMenuOptions')
+        exitBlock('visitMenuOptions')
     }
 
     @Override
     void getOutput(StringBuffer res) {
         blockLog.topElement.getOutput(res)
     }
+
 }

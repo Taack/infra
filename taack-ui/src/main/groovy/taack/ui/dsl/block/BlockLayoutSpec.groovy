@@ -1,8 +1,6 @@
 package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
-import taack.ast.type.FieldInfo
-import taack.ui.dsl.menu.MenuSpec
 
 // TODO: try to remove ajaxBlock
 // TODO: try to remove modal first param
@@ -19,8 +17,12 @@ import taack.ui.dsl.menu.MenuSpec
 @CompileStatic
 class BlockLayoutSpec extends BlockLeafSpec {
 
-    BlockLayoutSpec(final IUiBlockVisitor blockVisitor) {
-        super(blockVisitor)
+    static void simpleLog(String toPrint) {
+        if (debug) println(BlockLayoutSpec.simpleName + '::' + toPrint)
+    }
+
+    static Closure<BlockLayoutSpec> buildBlockLayoutSpec(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
+        closure
     }
 
     /**
@@ -30,7 +32,8 @@ class BlockLayoutSpec extends BlockLeafSpec {
      * @param closure
      */
     void col(final BlockSpec.Width width = BlockSpec.Width.HALF, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
-        boolean doRender = blockVisitor.doRenderElement()
+        boolean doRender = blockVisitor.doRenderLayoutElement()
+        simpleLog("col $doRender")
         if (doRender) blockVisitor.visitCol(width)
         closure.delegate = this
         closure.call()
@@ -45,11 +48,23 @@ class BlockLayoutSpec extends BlockLeafSpec {
      * @param closure
      */
     void row(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
-        boolean doRender = blockVisitor.doRenderElement()
+        boolean doRender = blockVisitor.doRenderLayoutElement()
+        simpleLog("row $doRender")
         if (doRender) blockVisitor.visitRow()
         closure.delegate = this
         closure.call()
         counter++
         if (doRender) blockVisitor.visitRowEnd()
     }
+
+    void tabs(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockTabSpec) final Closure closure) {
+        boolean doRender = blockVisitor.doRenderElement()
+        simpleLog("tabs $doRender")
+        if (doRender) blockVisitor.visitBlockTabs()
+        closure.delegate = this
+        closure.call()
+        counter++
+        if (doRender) blockVisitor.visitBlockTabsEnd()
+    }
+
 }
