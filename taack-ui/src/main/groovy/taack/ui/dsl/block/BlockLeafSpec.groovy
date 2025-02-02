@@ -155,7 +155,7 @@ class BlockLeafSpec extends BlockBase {
      * @param action describing the Chart. Must return a {@link UiDiagramSpecifier}
      * @param closure menu
      */
-    void diagramMc(final MethodClosure action,
+    void diagram(final MethodClosure action,
                  @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
         boolean doRender = blockVisitor.doRenderElement(aId)

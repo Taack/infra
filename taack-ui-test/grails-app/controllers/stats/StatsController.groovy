@@ -33,7 +33,7 @@ class StatsController {
             row {
                 col BlockSpec.Width.HALF, {
                     println 'coucou'
-                    diagramMc(statsService.&buildChart as MethodClosure) {
+                    diagram(statsService.&buildChart as MethodClosure) {
                         label "Sales1"
                         if (showMonthlyGraph) {
                             menu "Yearly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
@@ -47,7 +47,7 @@ class StatsController {
                 }
                 col BlockSpec.Width.HALF, {
                     println 'coucou2'
-                    diagramMc(statsService::buildChart as MethodClosure) {
+                    diagram(statsService::buildChart as MethodClosure) {
                         label "Sales2"
                         if (showMonthlyGraph) {
                             menu "Yearly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
