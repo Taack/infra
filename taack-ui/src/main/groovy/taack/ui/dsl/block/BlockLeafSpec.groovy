@@ -1,6 +1,7 @@
 package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.dsl.*
 import taack.ui.dsl.common.Style
@@ -136,8 +137,7 @@ class BlockLeafSpec extends BlockBase {
      * @param diagramSpecifier description of the Chart. See {@link UiDiagramSpecifier}
      * @param closure menu
      */
-    void diagram(final UiDiagramSpecifier diagramSpecifier,
-                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+    void diagram(final UiDiagramSpecifier diagramSpecifier, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
         boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("diagram $aId $doRender")
@@ -145,6 +145,25 @@ class BlockLeafSpec extends BlockBase {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitDiagram(diagramSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
+        }
+    }
+
+    /**
+     * Add a chart to the block, Method Closure version, **more efficient**, the method is not called if no redraw
+     *
+     * @param action describing the Chart. Must return a {@link UiDiagramSpecifier}
+     * @param closure menu
+     */
+    void diagramMc(final MethodClosure action,
+                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+        String aId = theAjaxBlockId('chart')
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("diagramMc $aId $doRender")
+        if (doRender) {
+            blockVisitor.visitAjaxBlock(aId)
+            processMenuBlock(aId, closure)
+            blockVisitor.visitDiagram(action.call() as UiDiagramSpecifier)
             blockVisitor.visitAjaxBlockEnd()
         }
     }

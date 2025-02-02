@@ -27,8 +27,8 @@ final class BlockLog {
             else println(indent*occ + method + ' === ' + topElement)
         }
     }
-    void simpleLog(String method) {
-        if (debug) {
+    void simpleLog(String method, boolean force = false) {
+        if (debug || force) {
             if (occ < 0) println "OCC < 0 !!! occ == $occ " + method
             else println(indent*occ + method)
         }
