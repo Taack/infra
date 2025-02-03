@@ -6,8 +6,11 @@ import taack.ui.base.LeafElement
 import taack.ui.base.element.Table
 import web.dom.document
 import web.events.EventHandler
+import web.history.history
 import web.html.*
+import web.location.location
 import web.uievents.MouseEvent
+import web.url.URL
 import kotlin.math.max
 import kotlin.math.min
 
@@ -123,5 +126,8 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
         e.preventDefault()
         val offset = (a.attributes.getNamedItem("taackPageOffset")!!.value.toDouble() * max.toDouble()).toInt()
         Helper.filterForm(parent.filter, offset, null)
+        val offsetUrl = URL(location.href)
+        offsetUrl.searchParams["offset"] = offset.toString()
+        history.pushState(null, "", offsetUrl)
     }
 }
