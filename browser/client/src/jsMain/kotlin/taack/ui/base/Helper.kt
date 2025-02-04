@@ -1,5 +1,6 @@
 package taack.ui.base
 
+import js.iterable.asSequence
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
 import taack.ui.base.element.Form
@@ -8,6 +9,8 @@ import web.dom.document
 import web.events.EventHandler
 import web.events.EventType
 import web.form.FormData
+import web.form.FormDataEntryValue
+import web.history.history
 import web.html.HTMLAnchorElement
 import web.html.HTMLButtonElement
 import web.http.RequestMethod
@@ -32,6 +35,7 @@ class Helper {
         private const val RELOAD = "__reload__"
         private const val REDIRECT = "__redirect__"
         private const val ERROR_START = "__ErrorKeyStart__"
+        var historyState = HashMap<String, FormDataEntryValue>()
         var traceEnabled = true
         fun trace(level: Int, message: String) {
             if (traceEnabled) {
@@ -89,6 +93,7 @@ class Helper {
             b?.innerText = "Submitting ..."
             val f = filter.f
             val fd = FormData(f)
+            val formUrl = URL(f.action)
             fd["isAjax"] = "true"
             fd["refresh"] = "true"
             fd["filterTableId"] = filter.filterId
@@ -102,6 +107,12 @@ class Helper {
 
             val xhr = XMLHttpRequest()
             xhr.onloadend = EventHandler {
+                //Filter used saved to historyState
+                historyState = fd.entries().asSequence().map {
+                    it.component1() to it.component2()
+                }.toMap() as HashMap<String, FormDataEntryValue>
+                hydrateStateToUrl(formUrl)
+                history.pushState("{}", document.title, formUrl)
                 processAjaxLink(xhr.responseText, filter)
                 b?.disabled = false
                 if (innerText != null) b.innerText = innerText
@@ -262,6 +273,14 @@ class Helper {
             a.href = URL.createObjectURL(blob)
             a.download = fileName
             a.dispatchEvent(MouseEvent(EventType("click")))
+        }
+
+        fun hydrateStateToUrl(targetUrl: URL) {
+            historyState.forEach { entry: Map.Entry<String, FormDataEntryValue> ->
+                if (entry.key != "refresh" && entry.value.toString().isNotEmpty()) {
+                    targetUrl.searchParams[entry.key] = entry.value.toString()
+                }
+            }
         }
 
     }
