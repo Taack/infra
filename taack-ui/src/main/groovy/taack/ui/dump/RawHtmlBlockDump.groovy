@@ -509,6 +509,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                 params.put('ajaxBlockId', futurCurrentAjaxBlockId)
                 params.put('refresh', 'true')
             }
+            if (parameter.tabId && parameter.tabIndex) {
+                params.put('tabId', parameter.tabId)
+                params.put('tabIndex', parameter.tabIndex)
+            }
         }
         blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
     }
