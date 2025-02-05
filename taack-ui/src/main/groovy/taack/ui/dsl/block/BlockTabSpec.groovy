@@ -31,6 +31,7 @@ class BlockTabSpec extends BlockLayoutSpec {
         }
         counter++
         tabCounter ++
+        ajaxCounter++
         if (doRender) blockVisitor.visitBlockTabEnd()
         blockVisitor.setRenderTab(false)
     }
