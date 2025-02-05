@@ -233,6 +233,11 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderClipSection(String id, List<BigDecimal> coords) {
+
+    }
+
+    @Override
     BigDecimal getFontSize() {
         return fontSize
     }

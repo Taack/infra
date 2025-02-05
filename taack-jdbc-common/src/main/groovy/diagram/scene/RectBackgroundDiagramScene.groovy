@@ -8,7 +8,7 @@ import java.util.List
 
 @CompileStatic
 abstract class RectBackgroundDiagramScene extends DiagramScene {
-    final protected BigDecimal LEGEND_IMAGE_WIDTH = 20.0
+    final protected BigDecimal LEGEND_IMAGE_WIDTH = 19.0
     final private BigDecimal LEGEND_RECT_WIDTH = 40.0
     final private BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
     final private BigDecimal LEGEND_MARGIN = 10.0
@@ -134,7 +134,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         }
         BigDecimal endLabelY = startLabelY + gapY * gapNumberY
         gapHeight = (height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / gapNumberY
-        render.fillStyle(new Color(231, 231, 231))
+        render.fillStyle(GREY_COLOR)
         for (int i = 0; i <= gapNumberY; i++) {
             // background horizontal line
             render.translateTo(DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM, diagramMarginTop + gapHeight * i)
@@ -153,35 +153,50 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? xLabelList.size() : (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)) * showGapEveryX
         int showLabelEveryX = (render.measureText(xLabelList.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
-        for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
+        for (int i = 0; i <= xLabelList.size() / showGapEveryX; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
             // background vertical line
             render.translateTo(startX, diagramMarginTop)
-            render.fillStyle(new Color(231, 231, 231))
+            render.fillStyle(GREY_COLOR)
             render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
 
             // x axis label
-            BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
-            String xLabel = xLabelList[i * showGapEveryX]
-            if (showLabelEveryX > 0) {
-                if (i % showLabelEveryX == 0) {
-                    render.translateTo(startX - render.measureText(xLabel) + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
-                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+            if (i * showGapEveryX < xLabelList.size()) {
+                BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
+                String xLabel = xLabelList[i * showGapEveryX]
+                if (showLabelEveryX > 0) {
+                    if (i % showLabelEveryX == 0) {
+                        render.translateTo(startX - render.measureText(xLabel) + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                        render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    }
+                } else {
+                    render.translateTo(startX - render.measureText(xLabel) / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderLabel(xLabel)
                 }
-            } else {
-                render.translateTo(startX - render.measureText(xLabel) / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
-                render.renderLabel(xLabel)
             }
         }
         render.renderGroupEnd()
     }
 
-    void innerSvgStart() {
-//        render.renderInnerSvg(DIAGRAM_MARGIN_LEFT, 0.0, width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT, height)
+    void buildScrollStart() {
+        String id = "clipSection"
+        render.translateTo(0.0, 0.0)
+        render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
+                                  width - DIAGRAM_MARGIN_RIGHT + 1, 0.0,
+                                  width - DIAGRAM_MARGIN_RIGHT + 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
+                                  width, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
+                                  width, height,
+                                  DIAGRAM_MARGIN_LEFT / 2, height,
+                                  DIAGRAM_MARGIN_LEFT / 2, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
+                                  DIAGRAM_MARGIN_LEFT - 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
+
+        render.renderGroup(["clip-path": "url(#${id})"])
+        render.renderGroup([class: "taackDiagramScroll"])
     }
 
-    void innerSvgEnd() {
-
+    void buildScrollEnd() {
+        render.renderGroupEnd()
+        render.renderGroupEnd()
     }
 }
