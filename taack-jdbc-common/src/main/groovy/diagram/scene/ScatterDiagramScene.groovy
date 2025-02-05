@@ -113,7 +113,9 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend(pointImageHref)
         drawHorizontalBackground()
+        buildScrollStart()
         drawVerticalBackground(false)
         drawDataPoint()
+        buildScrollEnd()
     }
 }

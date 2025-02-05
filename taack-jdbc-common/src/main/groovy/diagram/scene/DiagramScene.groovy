@@ -48,4 +48,5 @@ abstract class DiagramScene {
     protected IDiagramRender render
 
     final protected Color BLACK_COLOR = new Color(64, 64, 64)
+    final protected Color GREY_COLOR = new Color(231, 231, 231)
 }

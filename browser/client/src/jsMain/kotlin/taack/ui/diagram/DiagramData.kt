@@ -22,13 +22,14 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
     init {
         val tooltipLabel = g.getAttribute("data-label")
         if (tooltipLabel != null) {
+            val diagramRoot = getDiagramRoot()
             tooltip = document.createElement(SvgTagName("g"))
 
             val background: SVGPolygonElement = document.createElement(SvgTagName("polygon"))
             background.style.fill = "#00000090"
             tooltip.appendChild(background)
 
-            val legend: SVGGElement = getDiagramRoot().cloneLegendShape(dataset)
+            val legend: SVGGElement = diagramRoot.cloneLegendShape(dataset)
             legend.querySelectorAll("text").forEach { (it as SVGTextElement).style.fill = "white" }
             legend.setAttribute("transform", "translate(0,-15)")
             tooltip.appendChild(legend)
@@ -41,22 +42,24 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
             tooltip.appendChild(value)
 
             g.onmouseenter = EventHandler {
-                getDiagramRoot().s.appendChild(tooltip)
+                diagramRoot.s.appendChild(tooltip)
 
                 if (background.getAttribute("points") == null) {
                     val contentWidth = tooltip.getBBox().width
                     background.setAttribute("points", "${-contentWidth / 2 - 20},0 ${-contentWidth / 2 - 10},10 ${-contentWidth / 2 - 10},25 ${contentWidth / 2 + 10},25 ${contentWidth / 2 + 10},-25 ${-contentWidth / 2 - 10},-25 ${-contentWidth / 2 - 10},-10")
                 }
-                if (g.getBBox().x + g.getBBox().width + background.getBBox().width < getDiagramRoot().s.viewBox.baseVal.x + getDiagramRoot().s.viewBox.baseVal.width) {
+
+                val diagramScrollX = diagramRoot.getDiagramScrollX()
+                if (g.getBBox().x + g.getBBox().width + background.getBBox().width + diagramScrollX < diagramRoot.s.viewBox.baseVal.x + diagramRoot.s.viewBox.baseVal.width) {
                     background.setAttribute("transform", "translate(${(background.getBBox().width - 30) / 2},0)")
-                    tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+                    tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20 + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
                 } else {
                     background.setAttribute("transform", "scale(-1,1) translate(${-(background.getBBox().width - 30) / 2},0)")
-                    tooltip.setAttribute("transform", "translate(${g.getBBox().x - (tooltip.getBBox().width - 10)},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+                    tooltip.setAttribute("transform", "translate(${g.getBBox().x - (tooltip.getBBox().width - 10) + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
                 }
             }
             g.onmouseleave = EventHandler {
-                getDiagramRoot().s.removeChild(tooltip)
+                diagramRoot.s.removeChild(tooltip)
             }
         } else {
             tooltip = null

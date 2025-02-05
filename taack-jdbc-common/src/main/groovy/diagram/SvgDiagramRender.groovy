@@ -251,6 +251,13 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderClipSection(String id, List<BigDecimal> coords) {
+        outStr.append("""<clipPath id="${id}">""")
+        renderPoly(coords)
+        outStr.append("""</clipPath>""")
+    }
+
+    @Override
     BigDecimal getFontSize() {
         return fontSize
     }

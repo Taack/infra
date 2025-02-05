@@ -138,6 +138,8 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
+        buildScrollStart()
         drawVerticalBackgroundAndDataWhiskersBox()
+        buildScrollEnd()
     }
 }

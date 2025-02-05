@@ -111,6 +111,8 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
+        buildScrollStart()
         drawVerticalBackgroundAndDataBar()
+        buildScrollEnd()
     }
 }

@@ -48,6 +48,8 @@ interface IDiagramRender {
 
     void renderGroupEnd()
 
+    void renderClipSection(String id, List<BigDecimal> coords)
+
     BigDecimal getFontSize()
 
     BigDecimal getDiagramWidth()
