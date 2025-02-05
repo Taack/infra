@@ -14,3 +14,6 @@
 * edit pane (mono)
 * viewer pane (asynchrone, rendered on server)
 * add refresh attachment list action (see CMS code sample)
+* Turn monospaced only
+  * Move save info from CanvasText to ICanvasDump (Asciidoc and Md version)
+  * Modify CanvasText with static val that swith from mono to WYSIWYG
