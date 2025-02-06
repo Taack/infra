@@ -14,7 +14,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
     }
 
-    void drawDataPoint() {
+    void drawDataPoint(Boolean hasLineBetweenPoints) {
         Set<String> keys = dataPerKey.keySet()
         if (xLabelList.every { it instanceof Number }) { // continuous
             Integer minX = xLabelList.first() as Integer
@@ -29,21 +29,22 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     Number y = pointList[x]
                     String xLabel = x.toDouble() % 1 == 0 ? "${x.toInteger()}" : "$x"
                     String yLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
-                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-label": "($xLabel, $yLabel)", style: "pointer-events: bounding-box;"])
-
-                    BigDecimal xWidth = (x - minX) / (maxX - minX) * totalWidth
+                    BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     KeyColor circleColor = KeyColor.colorFrom(i)
                     render.fillStyle(circleColor.color)
+
                     // data point
                     if (dataPointRadius > 0) {
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-label": "($xLabel, $yLabel)", style: "pointer-events: bounding-box;"])
                         if (i < pointImageHref.size()) {
-                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
+                            render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
                         } else {
-                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                            render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
+                        render.renderGroupEnd()
                     }
 //                    // data label
 //                    if (y > startLabelY) {
@@ -57,7 +58,18 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 //                        }
 //                        render.renderLabel(dataLabel)
 //                    }
-                    render.renderGroupEnd()
+                    // line to next circle
+                    if (hasLineBetweenPoints && j < xList.size() - 1) {
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
+                        Number nextX = xList[j + 1]
+                        Number nextY = pointList[nextX]
+                        BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
+                        BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
+                        render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                        render.fillStyle(circleColor.color)
+                        render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
+                        render.renderGroupEnd()
+                    }
                 }
                 render.renderGroupEnd()
             }
@@ -71,24 +83,25 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)
             for (int i = 0; i < xLabelList.size(); i++) {
                 render.renderGroup(["element-type": ElementType.DATA_GROUP])
-                BigDecimal xWidth = gapWidth * i
+                BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {
                     List<BigDecimal> yList = yDataListPerKey[keys[j]]
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
-                    render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"}", style: "pointer-events: bounding-box;"])
-
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
+
                     // data point
                     if (dataPointRadius > 0) {
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"}", style: "pointer-events: bounding-box;"])
                         if (j < pointImageHref.size()) {
-                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
+                            render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
                         } else {
                             KeyColor circleColor = KeyColor.colorFrom(j)
-                            render.translateTo(DIAGRAM_MARGIN_LEFT + xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                            render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
                             render.fillStyle(circleColor.color)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
+                        render.renderGroupEnd()
                     }
 //                    // data label
 //                    if (y > startLabelY) {
@@ -100,7 +113,16 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 //                        }
 //                        render.renderLabel(yDataLabel)
 //                    }
-                    render.renderGroupEnd()
+                    // line to next circle
+                    if (hasLineBetweenPoints && i < xLabelList.size() - 1) {
+                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j]])
+                        BigDecimal nextYHeight = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
+                        BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + gapWidth * (i + 1)
+                        render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                        render.fillStyle(KeyColor.colorFrom(j).color)
+                        render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
+                        render.renderGroupEnd()
+                    }
                 }
                 render.renderGroupEnd()
             }
@@ -115,7 +137,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         drawHorizontalBackground()
         buildScrollStart()
         drawVerticalBackground(false)
-        drawDataPoint()
+        drawDataPoint(false)
         buildScrollEnd()
     }
 }
