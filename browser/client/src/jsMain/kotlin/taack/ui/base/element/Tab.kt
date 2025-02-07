@@ -6,15 +6,15 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.*
-import web.html.HTMLDivElement
+import web.html.HTMLUListElement
 
-class Tab(val parent: Block, val d: HTMLDivElement) :
+class Tab(val parent: Block, val d: HTMLUListElement) :
     BaseElement {
     companion object {
         fun getSiblingTab(p: Block): List<Tab> {
-            val elements: List<*> = p.d.querySelectorAll("div[taacktag='TABS']").asList()
+            val elements: List<*> = p.d.querySelectorAll("ul[role='tablist']").asList()
             return elements.map {
-                Tab(p, it as HTMLDivElement)
+                Tab(p, it as HTMLUListElement)
             }
         }
 

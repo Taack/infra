@@ -47,7 +47,7 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
                 val responseDoc = parser.parseFromString(xhr.responseText, DOMParserSupportedType.textHtml)
                 // Get the clicked tab from the response
                 val tabResponseEl = responseDoc.querySelector("#tab-${tabId}-${tabIndex}-pane")
-                val div: Element? = parent.d.querySelector(".tab-content")
+                val div: Element? = parent.parent.d.querySelector(".tab-content")
                 println("div: ${div?.id}")
                 if (div != null && tabResponseEl != null) {
                     // Get the clicked tab content pane and fill it with the previously parsed response's inner html
