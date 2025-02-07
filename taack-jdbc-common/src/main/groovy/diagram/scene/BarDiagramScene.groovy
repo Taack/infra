@@ -73,15 +73,10 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
             BigDecimal barX = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
-            if (isStacked) {
-                render.renderGroup(["element-type": ElementType.DATA_GROUP, "start-y": barY])
-            } else {
-                render.renderGroup(["element-type": ElementType.DATA_GROUP, "start-x": barX - gapHorizontalPadding, "gap-width": gapWidth, "max-shape-width": MAX_BAR_WIDTH])
-            }
             for (int j = 0; j < keys.size(); j++) {
                 BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
-                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"}"])
+                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "gap-index": i, "data-label": "${xLabelList[i]}: ${yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"}"])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
@@ -101,7 +96,6 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     barX += barWidth + barMargin
                 }
             }
-            render.renderGroupEnd()
         }
     }
 
@@ -111,8 +105,8 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
-        buildScrollStart()
+        buildTransformAreaStart(isStacked ? "stackedBar" : "bar", MAX_BAR_WIDTH)
         drawVerticalBackgroundAndDataBar()
-        buildScrollEnd()
+        buildTransformAreaEnd()
     }
 }

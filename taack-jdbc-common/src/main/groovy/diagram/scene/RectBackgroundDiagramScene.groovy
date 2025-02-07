@@ -3,9 +3,6 @@ package diagram.scene
 import groovy.transform.CompileStatic
 import diagram.IDiagramRender
 
-import java.awt.*
-import java.util.List
-
 @CompileStatic
 abstract class RectBackgroundDiagramScene extends DiagramScene {
     final protected BigDecimal LEGEND_IMAGE_WIDTH = 19.0
@@ -153,33 +150,36 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? xLabelList.size() : (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)) * showGapEveryX
         int showLabelEveryX = (render.measureText(xLabelList.join("")) / showGapEveryX / (diagramWidth * 0.8)).toInteger()
-        for (int i = 0; i <= xLabelList.size() / showGapEveryX; i++) {
+        render.fillStyle(GREY_COLOR)
+        for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
 
             // background vertical line
             render.translateTo(startX, diagramMarginTop)
-            render.fillStyle(GREY_COLOR)
             render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
 
             // x axis label
-            if (i * showGapEveryX < xLabelList.size()) {
-                BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
-                String xLabel = xLabelList[i * showGapEveryX]
-                if (showLabelEveryX > 0) {
-                    if (i % showLabelEveryX == 0) {
-                        render.translateTo(startX - render.measureText(xLabel) + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
-                        render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
-                    }
-                } else {
-                    render.translateTo(startX - render.measureText(xLabel) / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
-                    render.renderLabel(xLabel)
+            BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
+            String xLabel = xLabelList[i * showGapEveryX]
+            if (showLabelEveryX > 0) {
+                if (i % showLabelEveryX == 0) {
+                    render.translateTo(startX - render.measureText(xLabel) + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 }
+            } else {
+                render.translateTo(startX - render.measureText(xLabel) / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                render.renderLabel(xLabel)
             }
+        }
+        // add last background vertical line
+        if (isXLabelInsideGap) {
+            render.translateTo(DIAGRAM_MARGIN_LEFT + gapWidth * (xLabelList.size() / showGapEveryX).toInteger(), diagramMarginTop)
+            render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
         }
         render.renderGroupEnd()
     }
 
-    void buildScrollStart() {
+    void buildTransformAreaStart(String shapeType, BigDecimal shapeMaxWidth = 0.0) {
         String id = "clipSection"
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
@@ -192,10 +192,10 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                                   DIAGRAM_MARGIN_LEFT - 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
 
         render.renderGroup(["clip-path": "url(#${id})"])
-        render.renderGroup([class: "taackDiagramScroll"])
+        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "shape-type": shapeType, "shape-max-width": shapeMaxWidth, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
     }
 
-    void buildScrollEnd() {
+    void buildTransformAreaEnd() {
         render.renderGroupEnd()
         render.renderGroupEnd()
     }

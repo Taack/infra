@@ -5,9 +5,9 @@ import web.dom.document
 import web.events.EventHandler
 import web.svg.*
 
-class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
+class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) {
     companion object {
-        fun getSiblingDiagramData(dataGroup: DiagramDataGroup): List<DiagramData> {
+        fun getSiblingDiagramData(dataGroup: DiagramTransformArea): List<DiagramData> {
             val elements: List<*> = dataGroup.g.querySelectorAll("g[element-type='DATA']").asList()
             return elements.map {
                 DiagramData(dataGroup, it as SVGGElement)
@@ -16,6 +16,7 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
     }
 
     val dataset: String = g.attributes.getNamedItem("dataset")!!.value
+    val gapIndex = g.attributes.getNamedItem("gap-index")?.value?.toInt()
     private val shapes: List<SVGElement> = g.children.asList().filter { it.tagName != "text" }.unsafeCast<List<SVGElement>>()
     private val tooltip: SVGGElement?
 
@@ -49,7 +50,7 @@ class DiagramData(private val parent: DiagramDataGroup, val g: SVGGElement) {
                     background.setAttribute("points", "${-contentWidth / 2 - 20},0 ${-contentWidth / 2 - 10},10 ${-contentWidth / 2 - 10},25 ${contentWidth / 2 + 10},25 ${contentWidth / 2 + 10},-25 ${-contentWidth / 2 - 10},-25 ${-contentWidth / 2 - 10},-10")
                 }
 
-                val diagramScrollX = diagramRoot.getDiagramScrollX()
+                val diagramScrollX = diagramRoot.transformArea?.g?.getAttribute("scroll-x")?.toDouble() ?: 0.0
                 if (g.getBBox().x + g.getBBox().width + background.getBBox().width + diagramScrollX < diagramRoot.s.viewBox.baseVal.x + diagramRoot.s.viewBox.baseVal.width) {
                     background.setAttribute("transform", "translate(${(background.getBBox().width - 30) / 2},0)")
                     tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20 + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")

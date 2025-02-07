@@ -55,7 +55,6 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             Integer maxX = xLabelList.last() as Integer
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = keys.size() - 1; i >= 0; i--) {
-                render.renderGroup(["element-type": ElementType.DATA_GROUP])
                 render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
 
                 Map<Number, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
@@ -78,7 +77,6 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()
-                render.renderGroupEnd()
             }
         } else { // discrete
             // rebuild data to be stacked
@@ -99,7 +97,6 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             // draw data area one by one
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
             for (int i = 0; i < keys.size(); i++) {
-                render.renderGroup(["element-type": ElementType.DATA_GROUP])
                 render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
 
                 List<BigDecimal> y1List = i > 0 ? stackedYDataListPerKey[keys[i - 1]] : [minY] * xLabelList.size()
@@ -122,7 +119,6 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()
-                render.renderGroupEnd()
             }
         }
     }
@@ -133,6 +129,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend()
         drawVerticalBackground(false)
+        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "shape-type": "area", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
         drawHorizontalBackgroundAndDataArea()
+        render.renderGroupEnd()
     }
 }

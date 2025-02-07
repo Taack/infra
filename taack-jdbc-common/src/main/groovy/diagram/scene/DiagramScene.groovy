@@ -9,9 +9,9 @@ import java.awt.*
 enum ElementType {
     LEGEND,
     HORIZONTAL_BACKGROUND,
+    TRANSFORM_AREA,
     VERTICAL_BACKGROUND,
-    DATA,
-    DATA_GROUP
+    DATA
 }
 
 @CompileStatic

@@ -21,7 +21,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
             Integer maxX = xLabelList.last() as Integer
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = 0; i < keys.size(); i++) {
-                render.renderGroup(["element-type": ElementType.DATA_GROUP])
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
                 List<Number> xList = pointList.keySet().sort() as List<Number>
                 for (int j = 0; j < xList.size(); j++) {
@@ -71,7 +70,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderGroupEnd()
                     }
                 }
-                render.renderGroupEnd()
             }
         } else { // discrete
             Map<String, List<BigDecimal>> yDataListPerKey = [:]
@@ -82,7 +80,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)
             for (int i = 0; i < xLabelList.size(); i++) {
-                render.renderGroup(["element-type": ElementType.DATA_GROUP])
                 BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {
                     List<BigDecimal> yList = yDataListPerKey[keys[j]]
@@ -124,7 +121,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderGroupEnd()
                     }
                 }
-                render.renderGroupEnd()
             }
         }
     }
@@ -135,9 +131,9 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend(pointImageHref)
         drawHorizontalBackground()
-        buildScrollStart()
+        buildTransformAreaStart("scatter")
         drawVerticalBackground(false)
         drawDataPoint(false)
-        buildScrollEnd()
+        buildTransformAreaEnd()
     }
 }

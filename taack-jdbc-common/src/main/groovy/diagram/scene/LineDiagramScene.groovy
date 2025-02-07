@@ -16,9 +16,9 @@ class LineDiagramScene extends ScatterDiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
-        buildScrollStart()
+        buildTransformAreaStart("line")
         drawVerticalBackground(false)
         drawDataPoint(true)
-        buildScrollEnd()
+        buildTransformAreaEnd()
     }
 }
