@@ -23,7 +23,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) 
     init {
         val tooltipLabel = g.getAttribute("data-label")
         if (tooltipLabel != null) {
-            val diagramRoot = getDiagramRoot()
+            val diagramRoot = parent.parent
             tooltip = document.createElement(SvgTagName("g"))
 
             val background: SVGPolygonElement = document.createElement(SvgTagName("polygon"))
@@ -73,39 +73,65 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) 
 
     fun moveShapeHorizontally(startX: Double, shapeWidth: Double) {
         shapes.forEach { shape ->
-            if (shape.tagName == "rect") {
-                shape.setAttribute("x", startX.toString())
-                shape.setAttribute("width", shapeWidth.toString())
-            } else if (shape.tagName == "line") {
-                val x1 = shape.getAttribute("x1")
-                val x2 = shape.getAttribute("x2")
-                val y1 = shape.getAttribute("y1")
-                val y2 = shape.getAttribute("y2")
-
-                // just for the lines from whiskers shape, but not a generic solution...
-                if (x1 == x2) { // vertical line
-                    shape.setAttribute("x1", (startX + shapeWidth / 2).toString())
-                    shape.setAttribute("x2", (startX + shapeWidth / 2).toString())
-                } else if (y1 == y2) { // horizontal line
-                    shape.setAttribute("x1", startX.toString())
-                    shape.setAttribute("x2", (startX + shapeWidth).toString())
+            when (shape.tagName) {
+                "rect" -> {
+                    shape.setAttribute("x", startX.toString())
+                    shape.setAttribute("width", shapeWidth.toString())
+                }
+                "circle" -> {
+                    shape.setAttribute("cx", startX.toString())
+                }
+                "line" -> {
+                    val x1 = shape.getAttribute("x1")
+                    val x2 = shape.getAttribute("x2")
+                    if (x1 == x2) { // vertical line
+                        shape.setAttribute("x1", (startX + shapeWidth / 2).toString()) // for whiskers: move to center point
+                        shape.setAttribute("x2", (startX + shapeWidth / 2).toString())
+                    } else {
+                        shape.setAttribute("x1", startX.toString())
+                        shape.setAttribute("x2", (startX + shapeWidth).toString())
+                    }
                 }
             }
         }
     }
 
-    fun moveShapeVertically(bottomY: Double): Double {
-        val barHeight = shapes.firstOrNull()?.getAttribute("height")?.toDouble()
-        if (barHeight != null) {
-            val y = bottomY - barHeight
-            shapes.first().setAttribute("y", y.toString())
-            return y
-        } else {
-            return bottomY
+    fun moveShapeVertically(startY: Double, shapeHeight: Double? = null): Double { // return startY of next shape which should be stacked
+        var y: Double = startY
+        var height: Double? = shapeHeight
+        shapes.forEach { shape ->
+            when (shape.tagName) {
+                "rect" -> {
+                    if (height != null) {
+                        shape.setAttribute("height", height.toString())
+                    }
+                    y = startY - shape.getAttribute("height")!!.toDouble()
+                    shape.setAttribute("y", y.toString())
+                }
+                "circle" -> {
+                    shape.setAttribute("cy", startY.toString())
+                }
+                "line" -> {
+                    val y1 = shape.getAttribute("y1")
+                    val y2 = shape.getAttribute("y2")
+                    if (y1 != y2) {
+                        if (height == null) {
+                            height = shape.getAttribute("y1")!!.toDouble() - shape.getAttribute("y2")!!.toDouble()
+                        }
+                        shape.setAttribute("y1", startY.toString())
+                        shape.setAttribute("y2", (startY - height!!).toString())
+                    } else { // horizontal line
+                        shape.setAttribute("y1", (startY - (height ?: 0.0)).toString()) // for whiskers: move to top point
+                        shape.setAttribute("y2", (startY - (height ?: 0.0)).toString())
+                    }
+                    y = shape.getAttribute("y2")!!.toDouble()
+                }
+            }
         }
+        return y
     }
 
-    private fun getDiagramRoot(): Diagram {
-        return parent.getDiagramRoot()
+    fun getShapeAttribute(name: String): String? {
+        return shapes.firstOrNull()?.getAttribute(name)
     }
 }

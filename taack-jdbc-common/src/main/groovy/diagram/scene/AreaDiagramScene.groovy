@@ -128,8 +128,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             return
         }
         drawLegend()
-        drawVerticalBackground(false)
         render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "shape-type": "area", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
+        drawVerticalBackground(false)
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()
     }

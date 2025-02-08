@@ -92,7 +92,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
-              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" rotated-label-offset-x="${rotatePointX - trX}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
