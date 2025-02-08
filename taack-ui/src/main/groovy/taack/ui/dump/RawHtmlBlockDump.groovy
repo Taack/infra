@@ -496,22 +496,18 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
         blockLog.stayBlock('visitLabeledSubMenu ' + i18n)
-//        if (futurCurrentAjaxBlockId) {
-//            params ?= [:]
-//            params.put('targetAjaxBlockId', futurCurrentAjaxBlockId)
-//        }
         Map cp = parameter.params
         if (params) {
             if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
             if (cp.containsKey('action')) cp.remove('action')
             if (cp.containsKey('controller')) cp.remove('controller')
-            if (futurCurrentAjaxBlockId) {
+            if (futurCurrentAjaxBlockId && parameter.controllerName == controller && parameter.actionName == action) {
                 params.put('ajaxBlockId', futurCurrentAjaxBlockId)
                 params.put('refresh', 'true')
-            }
-            if (parameter.tabId && parameter.tabIndex) {
-                params.put('tabId', parameter.tabId)
-                params.put('tabIndex', parameter.tabIndex)
+                if (parameter.tabId && parameter.tabIndex) {
+                    params.put('tabId', parameter.tabId)
+                    params.put('tabIndex', parameter.tabIndex)
+                }
             }
         }
         blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
@@ -536,6 +532,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
             splitMenu()
         }
+
         menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
     }
 
