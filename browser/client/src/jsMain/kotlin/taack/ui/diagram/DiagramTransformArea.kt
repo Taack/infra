@@ -56,7 +56,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
             val changeGap = max(1, (currentMaxLineIndex - currentMinLineIndex) / 10)
             val newMinLineIndex = max(0, if (isUp) currentMinLineIndex + changeGap else currentMinLineIndex - changeGap)  // will move this line as new first background vertical line
             val newMaxLineIndex = min(backgroundVerticalLines.size - 1, if (isUp) currentMaxLineIndex - changeGap else currentMaxLineIndex + changeGap) // will move this line as new last background vertical line
-            if (newMinLineIndex < newMaxLineIndex && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
+            if (newMaxLineIndex - newMinLineIndex > 1 && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
                 val newMinLine = backgroundVerticalLines[newMinLineIndex] as SVGLineElement
                 val newMaxLine = backgroundVerticalLines[newMaxLineIndex] as SVGLineElement
                 val zoomRadio = (areaMaxX - areaMinX) / (newMaxLine.x1.baseVal.value - newMinLine.x1.baseVal.value)
