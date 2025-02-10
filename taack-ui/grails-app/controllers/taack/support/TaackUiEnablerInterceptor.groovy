@@ -31,7 +31,7 @@ class TaackUiEnablerInterceptor implements Interceptor {
                 return false
             }
         } else {
-            log.warn "Unknown Controller or Action ${request.remoteHost}|${request.getHeader('user-agent')} $params"
+            log.warn "Unknown Controller or Action ${request.remoteHost}|${request.getHeader('user-agent')} $params ${request.requestURL} ${request.forwardURI}"
         }
         return true
     }

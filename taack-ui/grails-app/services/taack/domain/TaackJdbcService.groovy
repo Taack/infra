@@ -16,13 +16,13 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.jdbc.TaackANTLRErrorListener
 import taack.jdbc.TaackJdbcError
-import taack.jdbc.common.TaackResultSetOuterClass
-import taack.jdbc.common.TaackResultSetOuterClass.TaackResultSet
 import taack.jdbc.common.tql.gen.TQLLexer
 import taack.jdbc.common.tql.gen.TQLParser
 import taack.jdbc.common.tql.listener.TQLTranslator
 
 import java.sql.DatabaseMetaData
+
+import static taack.jdbc.common.TaackResultSetOuterClass.*
 /**
  * Service managing JDBC connection. Queries support TQL. It can be viewed as a subset of the HQL.
  * <p>Target supported features:
@@ -241,7 +241,7 @@ final class TaackJdbcService {
         b.counter = r.bValue
 
         for (def columnDesc : columnDescs) {
-            def c = TaackResultSetOuterClass.Column.newBuilder()
+            def c = Column.newBuilder()
             c.name = columnDesc.alias ?: columnDesc.colName
             c.colNumber = colNumber++
             c.setIsNullable(columnDesc.fieldInfo?.fieldConstraint?.nullable ?: false)
@@ -249,7 +249,7 @@ final class TaackJdbcService {
 
             switch (columnDesc.fieldType) { // todo [ccn]: when "count(object.field)/sum()/...", javaType should be INT, instead of object.field.fieldType
                 case String:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.STRING
+                    c.javaType = Column.JavaType.STRING
                     c.sqlType = 12
                     c.sqlTypeName = 'varchar'
                     c.displaySize = 255
@@ -257,7 +257,7 @@ final class TaackJdbcService {
                     c.javaTypeName = String.name
                     break
                 case Date:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.DATE
+                    c.javaType = Column.JavaType.DATE
                     c.sqlType = 93
                     c.sqlTypeName = 'timestamp'
                     c.displaySize = 29
@@ -265,7 +265,7 @@ final class TaackJdbcService {
                     c.javaTypeName = Date.name
                     break
                 case Long:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.LONG
+                    c.javaType = Column.JavaType.LONG
                     c.sqlType = -5
                     c.sqlTypeName = 'int8'
                     c.displaySize = 19
@@ -273,7 +273,7 @@ final class TaackJdbcService {
                     c.javaTypeName = Long.name
                     break
                 case BigDecimal:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.BIG_DECIMAL
+                    c.javaType = Column.JavaType.BIG_DECIMAL
                     c.sqlType = 2
                     c.sqlTypeName = 'numeric'
                     c.displaySize = 19
@@ -281,7 +281,7 @@ final class TaackJdbcService {
                     c.javaTypeName = BigDecimal.name
                     break
                 case Boolean:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.BOOL
+                    c.javaType = Column.JavaType.BOOL
                     c.sqlType = -7
                     c.sqlTypeName = 'bool'
                     c.displaySize = 1
@@ -289,7 +289,7 @@ final class TaackJdbcService {
                     c.javaTypeName = Boolean.name
                     break
                 case Byte:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.BYTE
+                    c.javaType = Column.JavaType.BYTE
                     c.sqlType = 4
                     c.sqlTypeName = 'int4'
                     c.displaySize = 10
@@ -297,7 +297,7 @@ final class TaackJdbcService {
                     c.javaTypeName = Integer.name
                     break
                 case Short:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.SHORT
+                    c.javaType = Column.JavaType.SHORT
                     c.sqlType = 4
                     c.sqlTypeName = 'int4'
                     c.displaySize = 10
@@ -305,7 +305,7 @@ final class TaackJdbcService {
                     c.javaTypeName = Integer.name
                     break
                 case Integer:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.INT
+                    c.javaType = Column.JavaType.INT
                     c.sqlType = 4
                     c.sqlTypeName = 'int4'
                     c.displaySize = 10
@@ -313,10 +313,10 @@ final class TaackJdbcService {
                     c.javaTypeName = Integer.name
                     break
                 case Byte[]:
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.BYTES
+                    c.javaType = Column.JavaType.BYTES
                     break
                 default: // Default to String
-                    c.javaType = TaackResultSetOuterClass.Column.JavaType.STRING
+                    c.javaType = Column.JavaType.STRING
                     c.sqlType = 12
                     c.sqlTypeName = 'varchar'
                     c.displaySize = 255
@@ -335,41 +335,41 @@ final class TaackJdbcService {
         for (def row in itRow) {
             def itColList = b.columnsList.iterator()
             if (row instanceof String) { // only 1 column
-                def c = TaackResultSetOuterClass.Cell.newBuilder()
+                def c = Cell.newBuilder()
                 c.setStringValue(row as String)
                 b.addCells(c)
             } else
                 for (def cell : row) {
                     if (!itColList.hasNext()) itColList = b.columnsList.iterator()
-                    def c = TaackResultSetOuterClass.Cell.newBuilder()
+                    def c = Cell.newBuilder()
                     def col = itColList.next()
 
                     switch (col.javaType) {
-                        case TaackResultSetOuterClass.Column.JavaType.DATE:
+                        case Column.JavaType.DATE:
                             if (cell) c.dateValue = (cell as Date).time
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.LONG:
+                        case Column.JavaType.LONG:
                             if (cell) c.longValue = cell as Long
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.BIG_DECIMAL:
+                        case Column.JavaType.BIG_DECIMAL:
                             if (cell) c.setBigDecimal(cell as String)
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.STRING:
+                        case Column.JavaType.STRING:
                             if (cell) c.setStringValue(cell as String)
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.BOOL:
+                        case Column.JavaType.BOOL:
                             if (cell) c.boolValue = cell as Boolean
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.BYTE:
+                        case Column.JavaType.BYTE:
                             if (cell) c.byteValue = cell as Byte
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.SHORT:
+                        case Column.JavaType.SHORT:
                             if (cell) c.shortValue = cell as Short
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.INT:
+                        case Column.JavaType.INT:
                             if (cell) c.intValue = cell as Integer
                             break
-                        case TaackResultSetOuterClass.Column.JavaType.BYTES:
+                        case Column.JavaType.BYTES:
 //                        c.setBytesValue()
                             break
                         default:
@@ -420,31 +420,31 @@ final class TaackJdbcService {
 
     final private static void addTableToResultSet(TaackResultSet.Builder b, String name) {
         if (gormClassesMap.containsKey(name)) {
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('default'))
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('public'))
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(name))
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('TABLE'))
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-            b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
+            b.addCells(Cell.newBuilder().setStringValue('default'))
+            b.addCells(Cell.newBuilder().setStringValue('public'))
+            b.addCells(Cell.newBuilder().setStringValue(name))
+            b.addCells(Cell.newBuilder().setStringValue('TABLE'))
+            b.addCells(Cell.newBuilder())
+            b.addCells(Cell.newBuilder())
+            b.addCells(Cell.newBuilder())
+            b.addCells(Cell.newBuilder())
+            b.addCells(Cell.newBuilder())
+            b.addCells(Cell.newBuilder())
         }
     }
     final private static TaackResultSet getTables(String schemasPattern, String tableNamePattern) {
         if (!schemasPattern || schemasPattern.trim().empty || schemasPattern == 'public') {
             TaackResultSet.Builder b = TaackResultSet.newBuilder()
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("REMARKS"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_CAT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_SCHEM"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SELF_REFERENCING_COL_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("REF_GENERATION"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_CAT"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_SCHEM"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_NAME"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_TYPE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("REMARKS"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TYPE_CAT"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TYPE_SCHEM"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TYPE_NAME"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("SELF_REFERENCING_COL_NAME"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("REF_GENERATION"))
 
             if (!tableNamePattern || tableNamePattern == '%') {
                 int i = 0;
@@ -466,112 +466,112 @@ final class TaackJdbcService {
     }
 
     final private static void addColumnToResultSet(TaackResultSet.Builder b, String name, FieldInfo col, int ordinal) {
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('default'))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('public'))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(name))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(col.fieldName))
+        b.addCells(Cell.newBuilder().setStringValue('default'))
+        b.addCells(Cell.newBuilder().setStringValue('public'))
+        b.addCells(Cell.newBuilder().setStringValue(name))
+        b.addCells(Cell.newBuilder().setStringValue(col.fieldName))
         int charOctetLength = 1
         switch (col.fieldConstraint.field.type) {
             case String:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(12)) // DATA_TYPE
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("varchar")) // TYPE_NAME
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(255)) // COLUMN_SIZE
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder()) // BUFFER_LENGTH
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0)) // DECIMAL_DIGITS
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10)) // NUM_PREC_RADIX
+                b.addCells(Cell.newBuilder().setIntValue(12)) // DATA_TYPE
+                b.addCells(Cell.newBuilder().setStringValue("varchar")) // TYPE_NAME
+                b.addCells(Cell.newBuilder().setIntValue(255)) // COLUMN_SIZE
+                b.addCells(Cell.newBuilder()) // BUFFER_LENGTH
+                b.addCells(Cell.newBuilder().setIntValue(0)) // DECIMAL_DIGITS
+                b.addCells(Cell.newBuilder().setIntValue(10)) // NUM_PREC_RADIX
                 charOctetLength = 255
                 break
             case Date:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(93))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("timestamp"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(29))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(6))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(93))
+                b.addCells(Cell.newBuilder().setStringValue("timestamp"))
+                b.addCells(Cell.newBuilder().setIntValue(29))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(6))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 charOctetLength = 29
                 break
             case Long:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(-5))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int8"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(19))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(-5))
+                b.addCells(Cell.newBuilder().setStringValue("int8"))
+                b.addCells(Cell.newBuilder().setIntValue(19))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(0))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 charOctetLength = 19
                 break
             case BigDecimal:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(2))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("numeric"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(19))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(6))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(2))
+                b.addCells(Cell.newBuilder().setStringValue("numeric"))
+                b.addCells(Cell.newBuilder().setIntValue(19))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(6))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 charOctetLength = 19
                 break
             case Boolean:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(-7))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("bool"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(1))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(-7))
+                b.addCells(Cell.newBuilder().setStringValue("bool"))
+                b.addCells(Cell.newBuilder().setIntValue(1))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(0))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 break
             case Byte:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(4))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int4"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(4))
+                b.addCells(Cell.newBuilder().setStringValue("int4"))
+                b.addCells(Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(0))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 break
             case Short:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(4))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int4"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(4))
+                b.addCells(Cell.newBuilder().setStringValue("int4"))
+                b.addCells(Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(0))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 break
             case Integer:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(4))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int4"))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder().setIntValue(4))
+                b.addCells(Cell.newBuilder().setStringValue("int4"))
+                b.addCells(Cell.newBuilder().setIntValue(10))
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder().setIntValue(0))
+                b.addCells(Cell.newBuilder().setIntValue(10))
                 charOctetLength = 19
                 break
             case Byte[]:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder())
+                b.addCells(Cell.newBuilder())
                 break
             default:
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(12)) // DATA_TYPE
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("varchar")) // TYPE_NAME
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(255)) // COLUMN_SIZE
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder()) // BUFFER_LENGTH
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0)) // DECIMAL_DIGITS
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10)) // NUM_PREC_RADIX
+                b.addCells(Cell.newBuilder().setIntValue(12)) // DATA_TYPE
+                b.addCells(Cell.newBuilder().setStringValue("varchar")) // TYPE_NAME
+                b.addCells(Cell.newBuilder().setIntValue(255)) // COLUMN_SIZE
+                b.addCells(Cell.newBuilder()) // BUFFER_LENGTH
+                b.addCells(Cell.newBuilder().setIntValue(0)) // DECIMAL_DIGITS
+                b.addCells(Cell.newBuilder().setIntValue(10)) // NUM_PREC_RADIX
                 charOctetLength = 255
         }
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(col.fieldConstraint.nullable ? 1 : 0))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(charOctetLength))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(ordinal))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(col.fieldConstraint.nullable ? "YES" : "NO"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("NO"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("NO"))
+        b.addCells(Cell.newBuilder().setIntValue(col.fieldConstraint.nullable ? 1 : 0))
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder().setIntValue(charOctetLength))
+        b.addCells(Cell.newBuilder().setIntValue(ordinal))
+        b.addCells(Cell.newBuilder().setStringValue(col.fieldConstraint.nullable ? "YES" : "NO"))
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder().setStringValue("NO"))
+        b.addCells(Cell.newBuilder().setStringValue("NO"))
     }
 
     final private static int addTableColumnsToResultSet(TaackResultSet.Builder b, String name, String columnPattern) {
@@ -590,30 +590,30 @@ final class TaackJdbcService {
     final private static TaackResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) {
         if (schemaPattern == null || schemaPattern.isEmpty() || schemaPattern == 'public' || schemaPattern == '%') {
             TaackResultSet.Builder b = TaackResultSet.newBuilder()
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("DATA_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("COLUMN_SIZE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("BUFFER_LENGTH"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("DECIMAL_DIGITS"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("NUM_PREC_RADIX"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("NULLABLE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("REMARKS"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_DEF"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("SQL_DATA_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("SQL_DATETIME_SUB"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("CHAR_OCTET_LENGTH"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("ORDINAL_POSITION"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("IS_NULLABLE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SCOPE_CATALOG"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SCOPE_SCHEMA"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SCOPE_TABLE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("SOURCE_DATA_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("IS_AUTOINCREMENT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("IS_GENERATEDCOLUMN"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_CAT"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_SCHEM"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_NAME"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("COLUMN_NAME"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("DATA_TYPE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TYPE_NAME"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("COLUMN_SIZE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("BUFFER_LENGTH"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("DECIMAL_DIGITS"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("NUM_PREC_RADIX"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("NULLABLE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("REMARKS"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("COLUMN_DEF"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("SQL_DATA_TYPE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("SQL_DATETIME_SUB"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("CHAR_OCTET_LENGTH"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("ORDINAL_POSITION"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("IS_NULLABLE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("SCOPE_CATALOG"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("SCOPE_SCHEMA"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("SCOPE_TABLE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.INT).setName("SOURCE_DATA_TYPE"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("IS_AUTOINCREMENT"))
+            b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("IS_GENERATEDCOLUMN"))
             int counter = 0
             if (tableNamePattern == null || tableNamePattern.isEmpty() || tableNamePattern == '%') {
                 gormClassesMap.keySet().each {
@@ -646,7 +646,7 @@ final class TaackJdbcService {
             p.toByteArray()
         } catch(TaackJdbcError taackJdbcError) {
             def b = TaackResultSet.newBuilder()
-            def e = TaackResultSetOuterClass.ProcessingError.newBuilder()
+            def e = ProcessingError.newBuilder()
             e.processingStep = taackJdbcError.errorStep
             e.errorMessage = taackJdbcError.msg
             b.setProcessingError(e)
@@ -664,19 +664,19 @@ final class TaackJdbcService {
 
     final byte[] getPrimaryKey(String table) {
         TaackResultSet.Builder b = TaackResultSet.newBuilder()
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName("KEY_SEQ"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("PK_NAME"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_CAT"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_SCHEM"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_NAME"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("COLUMN_NAME"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.SHORT).setName("KEY_SEQ"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("PK_NAME"))
 
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("default"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("public"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(table))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("id"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(1))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
+        b.addCells(Cell.newBuilder().setStringValue("default"))
+        b.addCells(Cell.newBuilder().setStringValue("public"))
+        b.addCells(Cell.newBuilder().setStringValue(table))
+        b.addCells(Cell.newBuilder().setStringValue("id"))
+        b.addCells(Cell.newBuilder().setShortValue(1))
+        b.addCells(Cell.newBuilder())
 
         b.offset = 0
         b.max = 1
@@ -686,36 +686,36 @@ final class TaackJdbcService {
 
     final byte[] getIndexInfo(String table) {
         TaackResultSet.Builder b = TaackResultSet.newBuilder()
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.BOOL).setName("NON_UNIQUE"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("INDEX_QUALIFIER"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("INDEX_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName("TYPE"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName("ORDINAL_POSITION"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("ASC_OR_DESC"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName("CARDINALITY"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName("PAGES"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("FILTER_CONDITION"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_CAT"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_SCHEM"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("TABLE_NAME"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.BOOL).setName("NON_UNIQUE"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("INDEX_QUALIFIER"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("INDEX_NAME"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.SHORT).setName("TYPE"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.SHORT).setName("ORDINAL_POSITION"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("COLUMN_NAME"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("ASC_OR_DESC"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.LONG).setName("CARDINALITY"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.LONG).setName("PAGES"))
+        b.addColumns(Column.newBuilder().setJavaType(Column.JavaType.STRING).setName("FILTER_CONDITION"))
 
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("default"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("public"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(table))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setBoolValue(false))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(DatabaseMetaData.tableIndexStatistic))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(0))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("id"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
+        b.addCells(Cell.newBuilder().setStringValue("default"))
+        b.addCells(Cell.newBuilder().setStringValue("public"))
+        b.addCells(Cell.newBuilder().setStringValue(table))
+        b.addCells(Cell.newBuilder().setBoolValue(false))
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder())
+        b.addCells(Cell.newBuilder().setShortValue(DatabaseMetaData.tableIndexStatistic))
+        b.addCells(Cell.newBuilder().setShortValue(0))
+        b.addCells(Cell.newBuilder().setStringValue("id"))
+        b.addCells(Cell.newBuilder())
 
         TaackFilter tf = new TaackFilter.FilterBuilder<>(GormEntity, sessionFactory, null).build()
         def count = tf.executeQueryUniqueResult(Long, [:], "select count(id) from ${table}") as Long
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setLongValue(count)) // number of rows in the table
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setLongValue(10)) // number of pages in the table
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
+        b.addCells(Cell.newBuilder().setLongValue(count)) // number of rows in the table
+        b.addCells(Cell.newBuilder().setLongValue(10)) // number of pages in the table
+        b.addCells(Cell.newBuilder())
         b.offset = 0
         b.max = 1
         b.counter = 1
@@ -724,7 +724,7 @@ final class TaackJdbcService {
 
     final byte[] getIndexInfoRSMetaData(String table) {
         TaackResultSet.Builder b = TaackResultSet.newBuilder()
-        TaackResultSetOuterClass.Column.Builder cId = TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName('id')
+        Column.Builder cId = Column.newBuilder().setJavaType(Column.JavaType.LONG).setName('id')
         cId.setColNumber(1)
         cId.setSqlType(-5)
         cId.setSqlTypeName("int8")
