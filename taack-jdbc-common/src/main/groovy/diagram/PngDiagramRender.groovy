@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 
 import javax.imageio.ImageIO
 import java.awt.*
+import java.awt.geom.AffineTransform
 import java.awt.geom.Arc2D
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
@@ -18,6 +19,7 @@ class PngDiagramRender implements IDiagramRender {
     private final BigDecimal pngWidth
     private final BigDecimal pngHeight
     private final FontMetrics fm
+    private final AffineTransform initialTransform
     private final Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
@@ -33,6 +35,7 @@ class PngDiagramRender implements IDiagramRender {
         Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
         ig2.setFont(f)
         fm = ig2.getFontMetrics(f)
+        initialTransform = ig2.getTransform()
     }
 
     @Override
@@ -224,12 +227,20 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderGroup(Map attributes) {
-
+        String t = attributes.get("transform")
+        if (t?.startsWith("translate")) {
+            int i1 = "translate(".length()
+            int i2 = t.indexOf(",", i1)
+            int i3 = t.indexOf(")", i2)
+            Double x = t.substring(i1, i2).toDouble()
+            Double y = t.substring(i2 + ",".length(), i3).toDouble()
+            ig2.translate(x, y)
+        }
     }
 
     @Override
     void renderGroupEnd() {
-
+        ig2.setTransform(initialTransform)
     }
 
     @Override
