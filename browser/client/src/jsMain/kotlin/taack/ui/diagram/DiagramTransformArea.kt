@@ -4,6 +4,7 @@ import js.array.asList
 import web.svg.SVGGElement
 import web.svg.SVGLineElement
 import web.svg.SVGTextElement
+import web.uievents.MouseEvent
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
@@ -35,22 +36,23 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
     }
 
     fun scrollBy(movingDistance: Double) {
-        if (shapeType != "area") {
-            scrollTo((g.getAttribute("scroll-x")?.toDouble() ?: 0.0) + movingDistance)
-        }
+        scrollTo((g.getAttribute("scroll-x")?.toDouble() ?: 0.0) + movingDistance)
     }
 
-    private fun scrollTo(x: Double) { // todo: limit max scroll
-        if (shapeType != "area") {
-            g.setAttribute("scroll-x", x.toString())
-            g.setAttribute("transform", "translate(${x},0.0)")
+    private fun scrollTo(x: Double) {
+        if (backgroundVerticalLines.isNotEmpty()) {
+            val minX = areaMaxX - round(backgroundVerticalLines.last().getAttribute("x1")!!.toDouble())
+            val maxX = areaMinX - round(backgroundVerticalLines.first().getAttribute("x1")!!.toDouble())
+            val adjustedX = min(maxX, max(minX, x))
+            g.setAttribute("scroll-x", adjustedX.toString())
+            g.setAttribute("transform", "translate(${adjustedX},0.0)")
         }
     }
 
     fun zoom(isUp: Boolean) {
-        if (shapeType != "area" && backgroundVerticalLines.isNotEmpty()) {
-            val currentMinLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x) * 100) / 100.0 >= areaMinX } ?: backgroundVerticalLines.first())
-            val currentMaxLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.findLast { line -> round(parent.translateX(line.getBoundingClientRect().x) * 100) / 100.0 <= areaMaxX } ?: backgroundVerticalLines.last())
+        if (backgroundVerticalLines.isNotEmpty()) {
+            val currentMinLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= areaMinX } ?: backgroundVerticalLines.first())
+            val currentMaxLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.findLast { line -> round(parent.translateX(line.getBoundingClientRect().x)) <= areaMaxX } ?: backgroundVerticalLines.last())
             val changeGap = max(1, (currentMaxLineIndex - currentMinLineIndex) / 10)
             val newMinLineIndex = max(0, if (isUp) currentMinLineIndex + changeGap else currentMinLineIndex - changeGap)  // will move this line as new first background vertical line
             val newMaxLineIndex = min(backgroundVerticalLines.size - 1, if (isUp) currentMaxLineIndex - changeGap else currentMaxLineIndex + changeGap) // will move this line as new last background vertical line
@@ -163,5 +165,9 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
             }
             else -> {}
         }
+    }
+
+    fun isClientMouseInTransformArea(e: MouseEvent): Boolean {
+        return parent.translateX(e.clientX.toDouble()) in areaMinX..areaMaxX
     }
 }

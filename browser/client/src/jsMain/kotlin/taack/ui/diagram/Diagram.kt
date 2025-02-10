@@ -25,11 +25,13 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement) {
     init {
         s.style.userSelect = "none"
 
-        if (transformArea != null) {
+        if (transformArea != null && s.querySelector("clipPath#clipSection") != null) {
             // Scroll
             s.onmousedown = EventHandler { e ->
-                isScrolling = true
-                previousMouseX = translateX(e.clientX.toDouble())
+                if (transformArea.isClientMouseInTransformArea(e)) {
+                    isScrolling = true
+                    previousMouseX = translateX(e.clientX.toDouble())
+                }
             }
             s.onmousemove = EventHandler { e ->
                 if (isScrolling && previousMouseX != null) {
@@ -47,8 +49,10 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement) {
 
             // Zoom
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
-                e.preventDefault()
-                transformArea.zoom(e.deltaY < 0)
+                if (transformArea.isClientMouseInTransformArea(e)) {
+                    e.preventDefault()
+                    transformArea.zoom(e.deltaY < 0)
+                }
             }
         }
     }
