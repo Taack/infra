@@ -51,7 +51,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement) {
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
                 if (transformArea.isClientMouseInTransformArea(e)) {
                     e.preventDefault()
-                    transformArea.zoom(e.deltaY < 0)
+                    transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)
                 }
             }
         }

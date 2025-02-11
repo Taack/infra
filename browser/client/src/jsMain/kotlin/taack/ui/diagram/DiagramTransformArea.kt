@@ -1,13 +1,12 @@
 package taack.ui.diagram
 
 import js.array.asList
+import kotlinx.browser.window
 import web.svg.SVGGElement
 import web.svg.SVGLineElement
 import web.svg.SVGTextElement
 import web.uievents.MouseEvent
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.round
+import kotlin.math.*
 
 class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
     companion object {
@@ -49,13 +48,65 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
         }
     }
 
-    fun zoom(isUp: Boolean) {
+    private var zoomUpTimer: Int? = null
+    private var isZoomingUp = false
+    private var zoomUpTargetCenterLineIndex: Int = backgroundVerticalLines.size / 2
+    fun zoom(mouseX: Double, isUp: Boolean) {
         if (backgroundVerticalLines.isNotEmpty()) {
             val currentMinLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= areaMinX } ?: backgroundVerticalLines.first())
             val currentMaxLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.findLast { line -> round(parent.translateX(line.getBoundingClientRect().x)) <= areaMaxX } ?: backgroundVerticalLines.last())
             val changeGap = max(1, (currentMaxLineIndex - currentMinLineIndex) / 10)
-            val newMinLineIndex = max(0, if (isUp) currentMinLineIndex + changeGap else currentMinLineIndex - changeGap)  // will move this line as new first background vertical line
-            val newMaxLineIndex = min(backgroundVerticalLines.size - 1, if (isUp) currentMaxLineIndex - changeGap else currentMaxLineIndex + changeGap) // will move this line as new last background vertical line
+
+            val newMinLineIndex: Int // will move this line as new first background vertical line
+            val newMaxLineIndex: Int // will move this line as new last background vertical line
+            if (isUp) { // zoom-up to a target area
+                // the whole process will work around the only line which is chosen at first
+                if (!isZoomingUp) {
+                    zoomUpTargetCenterLineIndex = if (isUp) {
+                        backgroundVerticalLines.indexOf(backgroundVerticalLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= mouseX } ?: backgroundVerticalLines.last())
+                    } else {
+                        (currentMinLineIndex + currentMaxLineIndex) / 2
+                    }
+                    isZoomingUp = true
+                }
+                if (zoomUpTimer != null) {
+                    window.clearTimeout(zoomUpTimer!!)
+                }
+                zoomUpTimer = window.setTimeout({
+                    isZoomingUp = false
+                }, 500)
+
+                val leftGapNumber = zoomUpTargetCenterLineIndex - currentMinLineIndex
+                val rightGapNumber = currentMaxLineIndex - zoomUpTargetCenterLineIndex
+                if (leftGapNumber != rightGapNumber) { // the line is not centered, so only zoom-up the bigger side
+                    if (abs(leftGapNumber - rightGapNumber) - changeGap >= 0) { // changeGap is not enough to make the line centered, so zoom-up the side fully
+                        if (leftGapNumber > rightGapNumber) {
+                            newMinLineIndex = currentMinLineIndex + changeGap
+                            newMaxLineIndex = currentMaxLineIndex
+                        } else {
+                            newMinLineIndex = currentMinLineIndex
+                            newMaxLineIndex = currentMaxLineIndex - changeGap
+                        }
+                    } else { // changeGap is larger than the distance to make the line centered
+                        val extraChangeGap = max(1, (changeGap - abs(leftGapNumber - rightGapNumber)) / 2)
+                        if (leftGapNumber > rightGapNumber) {
+                            newMaxLineIndex = currentMaxLineIndex - extraChangeGap
+                            newMinLineIndex = max(0, zoomUpTargetCenterLineIndex * 2 - newMaxLineIndex)
+                        } else {
+                            newMinLineIndex = currentMinLineIndex + extraChangeGap
+                            newMaxLineIndex = min(backgroundVerticalLines.size - 1, zoomUpTargetCenterLineIndex * 2 - currentMinLineIndex)
+                        }
+                    }
+                } else { // the line is already centered, so zoom-up averagely
+                    newMinLineIndex = currentMinLineIndex + changeGap
+                    newMaxLineIndex = currentMaxLineIndex - changeGap
+                }
+            } else { // zoom-down averagely
+                newMinLineIndex = max(0, currentMinLineIndex - changeGap)
+                newMaxLineIndex = min(backgroundVerticalLines.size - 1, currentMaxLineIndex + changeGap)
+                isZoomingUp = false
+            }
+
             if (newMaxLineIndex - newMinLineIndex > 1 && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
                 val newMinLine = backgroundVerticalLines[newMinLineIndex] as SVGLineElement
                 val newMaxLine = backgroundVerticalLines[newMaxLineIndex] as SVGLineElement

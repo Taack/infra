@@ -60,7 +60,9 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) 
                 }
             }
             g.onmouseleave = EventHandler {
-                diagramRoot.s.removeChild(tooltip)
+                if (diagramRoot.s.contains(tooltip)) {
+                    tooltip.remove()
+                }
             }
         } else {
             tooltip = null
