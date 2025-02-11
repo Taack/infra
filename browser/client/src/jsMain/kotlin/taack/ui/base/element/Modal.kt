@@ -1,10 +1,12 @@
 package taack.ui.base.element
 
+import kotlinx.browser.document
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.KeyboardEvent
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
-import web.dom.document
 import web.events.EventHandler
 import web.html.ButtonType
 import web.html.HTMLButtonElement
@@ -23,6 +25,13 @@ class Modal(val parent: Block) : BaseElement {
     private var dModalDialog: HTMLDivElement
     var dModalBody: HTMLDivElement
     private val dModalContent: HTMLDivElement
+    private val escModalCallback = { event: Event ->
+        val e = event as KeyboardEvent
+        if (e.key == "Escape") {
+            e.preventDefault()
+            close()
+        }
+    }
 
     val mId = id++
 
@@ -45,6 +54,7 @@ class Modal(val parent: Block) : BaseElement {
             e.preventDefault()
             close()
         }
+        document.addEventListener("keydown", escModalCallback)
 
         dClose.classList.add("taack-close")
         dClose.classList.add("modal-header")
@@ -61,9 +71,9 @@ class Modal(val parent: Block) : BaseElement {
         dModalBody.innerHTML = htmlContent
         dModal.style.display = "block"
         Block.getSiblingBlock(this)
-        document.body.classList.add("modal-open")
-        document.body.style.paddingRight = "15px"
-        document.body.style.overflowY = "hidden"
+        document.body!!.classList.add("modal-open")
+        document.body!!.style.paddingRight = "15px"
+        document.body!!.style.overflowY = "hidden"
         val modalBackdrop = document.createElement("div") as HTMLDivElement
         modalBackdrop.id = "modal-backdrop-$mId"
         modalBackdrop.classList.add("modal-backdrop", "fade", "show")
@@ -74,9 +84,10 @@ class Modal(val parent: Block) : BaseElement {
         traceDeIndent("Modal::close $mId")
         dModal.style.display = "none"
         dModalBody.innerHTML = ""
-        document.body.classList.remove("modal-open")
-        document.body.style.removeProperty("padding-right")
-        document.body.style.removeProperty("overflow-y")
+        document.removeEventListener("keydown", escModalCallback)
+        document.body!!.classList.remove("modal-open")
+        document.body!!.style.removeProperty("padding-right")
+        document.body!!.style.removeProperty("overflow-y")
         document.getElementById("modal-backdrop-$mId")?.remove()
     }
 
