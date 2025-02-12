@@ -47,6 +47,13 @@ class Modal(val parent: Block) : BaseElement {
         dModalContent.classList.add("modal-content")
         dModalContent.classList.add("taackModal")
         val dClose = document.createElement("div") as HTMLDivElement
+        val fullscreenButton = document.createElement("button") as HTMLButtonElement
+        fullscreenButton.type = ButtonType.button
+        fullscreenButton.className = "btn-fullscreen"
+        fullscreenButton.onclick = EventHandler { e ->
+            e.preventDefault()
+            toggleFullscreen()
+        }
         val closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
         closeButton.className = "btn-close"
@@ -58,6 +65,7 @@ class Modal(val parent: Block) : BaseElement {
 
         dClose.classList.add("taack-close")
         dClose.classList.add("modal-header")
+        dClose.appendChild(fullscreenButton)
         dClose.appendChild(closeButton)
         dModalContent.appendChild(dClose)
         dModalContent.appendChild(dModalBody)
@@ -89,6 +97,15 @@ class Modal(val parent: Block) : BaseElement {
         document.body!!.style.removeProperty("padding-right")
         document.body!!.style.removeProperty("overflow-y")
         document.getElementById("modal-backdrop-$mId")?.remove()
+    }
+
+    private fun toggleFullscreen() {
+        trace("Modal::fullscreen $mId")
+        if (dModalDialog.classList.contains("modal-fullscreen")) {
+            dModalDialog.classList.remove("modal-fullscreen")
+        } else {
+            dModalDialog.classList.add("modal-fullscreen")
+        }
     }
 
     override fun getParentBlock(): Block {
