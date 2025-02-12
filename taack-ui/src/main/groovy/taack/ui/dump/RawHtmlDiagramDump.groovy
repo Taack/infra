@@ -23,12 +23,10 @@ import taack.ui.dump.html.layout.HTMLEmpty
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
     final private ByteArrayOutputStream out
     private final BlockLog blockLog
-    final BootstrapLayout layout
 
     RawHtmlDiagramDump(final ByteArrayOutputStream out, final BlockLog blockLog = null) {
         this.out = out
         this.blockLog = blockLog
-        layout = new BootstrapLayout(blockLog)
     }
 
     UiDiagramSpecifier.DiagramBase diagramBase
@@ -176,45 +174,6 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             ByteArrayOutputStream clone = new ByteArrayOutputStream()
             out.writeTo(clone)
             blockLog.topElement.addChildren(new HTMLOutput(clone))
-        }
-    }
-
-    private List<String> currentTabNames = []
-    private IHTMLElement oldParent = null
-    private int tabOccurrence = 0
-
-    @Override
-    void visitDiagramTabs() {
-        if (blockLog) {
-            oldParent = blockLog.topElement
-            oldParent.setTaackTag(TaackTag.TABS)
-            blockLog.topElement = new HTMLEmpty()
-        }
-    }
-
-    @Override
-    void visitDiagramTab(final String i18n) {
-        if (blockLog) {
-            currentTabNames << i18n
-            blockLog.topElement.setTaackTag(TaackTag.TAB)
-            blockLog.topElement = layout.tab(blockLog.topElement, tabOccurrence++)
-        }
-    }
-
-    @Override
-    void visitDiagramTabEnd() {
-        if (blockLog) {
-            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TAB)
-        }
-    }
-
-    @Override
-    void visitDiagramTabsEnd() {
-        if (blockLog) {
-            IHTMLElement tabsContent = blockLog.topElement
-            blockLog.topElement = layout.tabs(oldParent, currentTabNames, null, true)
-            blockLog.topElement.addChildren(tabsContent)
-            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
         }
     }
 }

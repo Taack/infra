@@ -21,20 +21,6 @@ final class DiagramTypeSpec {
         diagramTypeClosure.call()
     }
 
-    void tabs(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramTypeSpec) final Closure closure) {
-        diagramVisitor.visitDiagramTabs()
-        closure.delegate = this
-        closure.call()
-        diagramVisitor.visitDiagramTabsEnd()
-    }
-
-    void tab(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramTypeSpec) final Closure closure) {
-        diagramVisitor.visitDiagramTab(i18n)
-        closure.delegate = this
-        closure.call()
-        diagramVisitor.visitDiagramTabEnd()
-    }
-
     void bar(boolean isStacked = true,
              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
         diagramVisitor.visitDiagramDataInitialization()

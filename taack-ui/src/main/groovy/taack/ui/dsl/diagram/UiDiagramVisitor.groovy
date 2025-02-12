@@ -79,24 +79,4 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     void visitCustom(String html) {
 
     }
-
-    @Override
-    void visitDiagramTabs() {
-
-    }
-
-    @Override
-    void visitDiagramTab(String i18n) {
-
-    }
-
-    @Override
-    void visitDiagramTabEnd() {
-
-    }
-
-    @Override
-    void visitDiagramTabsEnd() {
-
-    }
 }

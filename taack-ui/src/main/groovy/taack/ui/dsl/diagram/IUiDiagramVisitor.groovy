@@ -34,12 +34,4 @@ interface IUiDiagramVisitor {
     void visitDiagramEnd()
 
     void visitCustom(String html)
-
-    void visitDiagramTabs()
-
-    void visitDiagramTab(String i18n)
-
-    void visitDiagramTabEnd()
-
-    void visitDiagramTabsEnd()
 }
