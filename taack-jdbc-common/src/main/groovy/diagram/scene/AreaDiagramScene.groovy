@@ -5,8 +5,9 @@ import diagram.IDiagramRender
 
 @CompileStatic
 class AreaDiagramScene extends RectBackgroundDiagramScene {
-    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
+    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean alwaysShowFullInfo = false) {
         super(render, dataPerKey, true)
+        this.alwaysShowFullInfo = alwaysShowFullInfo
     }
 
     void drawHorizontalBackgroundAndDataArea() {

@@ -23,8 +23,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
     private val areaMaxX: Double = g.attributes.getNamedItem("area-max-x")!!.value.toDouble()
     private val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
 
-    private val backgroundVerticalLines = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND']>line").asList()
-    private val backgroundXLabels = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND']>text").asList()
+    private val backgroundVerticalLines = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND_LINE']>line").asList()
+    private val backgroundXLabels = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND_TEXT']>text").asList()
     private var gapWidth: Double = (areaMaxX - areaMinX) / (backgroundVerticalLines.size - 1)
 
     fun hideOrShowDataset(toShow: Boolean, dataset: String) {
@@ -107,7 +107,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
                 isZoomingUp = false
             }
 
-            if (newMaxLineIndex - newMinLineIndex > 1 && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
+            if (newMaxLineIndex - newMinLineIndex > 2 && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
                 val newMinLine = backgroundVerticalLines[newMinLineIndex] as SVGLineElement
                 val newMaxLine = backgroundVerticalLines[newMaxLineIndex] as SVGLineElement
                 val zoomRadio = (areaMaxX - areaMinX) / (newMaxLine.x1.baseVal.value - newMinLine.x1.baseVal.value)

@@ -11,9 +11,10 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
     final private boolean isStacked
     final private Map<String, List<BigDecimal>> yDataListPerKey
 
-    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked) {
+    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked, boolean alwaysShowFullInfo = false) {
         super(render, dataPerKey, false)
         this.isStacked = isStacked
+        this.alwaysShowFullInfo = alwaysShowFullInfo
 
         Map<String, List<BigDecimal>> yDataListPerKey = [:]
         Set<String> keys = dataPerKey.keySet()
@@ -48,20 +49,21 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         Set<String> keys = yDataListPerKey.keySet()
         int showGapEveryX = 1
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / xLabelList.size()
-
-        // bar width should be bigger than a min value (In the case of "smaller", we will combine several gaps to get enough space and only draw bars of the first gap. It means "showGapEveryX".)
-        int barNumber = isStacked ? 1 : keys.size()
-        BigDecimal singleBarWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
-        if (singleBarWidth < MIN_BAR_WIDTH) {
-            BigDecimal minGapWidth = barNumber > 1 ? MIN_BAR_WIDTH * barNumber / 0.8 / 0.8 : MIN_BAR_WIDTH / 0.8
-            showGapEveryX = Math.ceil((minGapWidth / gapWidth).toDouble()).toInteger()
-            gapWidth = gapWidth * showGapEveryX
+        if (!alwaysShowFullInfo) {
+            // bar width should be bigger than a min value (In the case of "smaller", we will combine several gaps to get enough space and only draw bars of the first gap. It means "showGapEveryX".)
+            int barNumber = isStacked ? 1 : keys.size()
+            BigDecimal singleBarWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
+            if (singleBarWidth < MIN_BAR_WIDTH) {
+                BigDecimal minGapWidth = barNumber > 1 ? MIN_BAR_WIDTH * barNumber / 0.8 / 0.8 : MIN_BAR_WIDTH / 0.8
+                showGapEveryX = Math.ceil((minGapWidth / gapWidth).toDouble()).toInteger()
+                gapWidth = gapWidth * showGapEveryX
+            }
         }
-
         super.drawVerticalBackground(true, showGapEveryX)
 
         // calculate true value of bar width
         BigDecimal gapHorizontalPadding = gapWidth * 0.2 / 2
+        int barNumber = isStacked ? 1 : keys.size()
         BigDecimal barWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
         BigDecimal barMargin = barNumber > 1 ? (gapWidth * 0.8) * 0.2 / (barNumber - 1) : 0.0
         if (barWidth > MAX_BAR_WIDTH) {
@@ -70,7 +72,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
 
         // data bar
-        for (int i = 0; i < xLabelList.size() / showGapEveryX; i++) {
+        for (int i = 0; i < (xLabelList.size() / showGapEveryX).toInteger(); i++) {
             BigDecimal barX = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
@@ -83,10 +85,13 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     KeyColor rectColor = KeyColor.colorFrom(j)
                     render.fillStyle(rectColor.color)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
-//                    // label
-//                    String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
-//                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
-//                    render.renderLabel(yDataLabel)
+
+                    if (!alwaysShowFullInfo) {
+                        // label
+                        String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
+                        render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
+                        render.renderLabel(yDataLabel)
+                    }
                 }
                 render.renderGroupEnd()
 
