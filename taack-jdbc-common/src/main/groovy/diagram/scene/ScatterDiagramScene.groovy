@@ -59,7 +59,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
                     }
-                    if (!alwaysShowFullInfo) {
+                    if (!alwaysShowFullInfo && gapWidth >= MIN_GAP_WIDTH) {
                         // data label
                         String dataLabel = "($xLabel, $yLabel)"
                         if (dataPointRadius > 5) { // put label at right
@@ -109,7 +109,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
                     }
-                    if (!alwaysShowFullInfo) {
+                    if (!alwaysShowFullInfo && gapWidth >= MIN_GAP_WIDTH) {
                         // data label
                         if (y > startLabelY) {
                             String yDataLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
