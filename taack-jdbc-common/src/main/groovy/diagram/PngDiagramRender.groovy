@@ -91,6 +91,11 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderHiddenLabel(String label) {
+
+    }
+
+    @Override
     void renderSmallLabel(String label) {
         ig2.setPaint(Color.BLACK)
         ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * 0.8).intValue()))
@@ -105,6 +110,11 @@ class PngDiagramRender implements IDiagramRender {
         ig2.rotate(radians, rotatePointX.toDouble(), rotatePointY.toDouble())
         renderLabel(label)
         ig2.rotate(-radians, rotatePointX.toDouble(), rotatePointY.toDouble())
+    }
+
+    @Override
+    void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
+
     }
 
     @Override

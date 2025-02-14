@@ -166,19 +166,25 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
 
         // x axis label
-        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_TEXT])
+        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_TEXT, "show-label-every-x": showLabelEveryX])
         for (int i = 0; i < displayedXLabelListNumber; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
             BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
             String xLabel = xLabelList[i * showGapEveryX]
-            if (i % showLabelEveryX == 0) {
-                BigDecimal labelLength = render.measureText(xLabel)
-                if (gapWidth >= labelLength) {
-                    render.translateTo(startX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+            BigDecimal labelLength = render.measureText(xLabel)
+            if (gapWidth >= labelLength) {
+                render.translateTo(startX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                if (i % showLabelEveryX == 0) {
                     render.renderLabel(xLabel)
-                } else {
-                    render.translateTo(startX - labelLength + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                } else if (alwaysShowFullInfo) {
+                    render.renderHiddenLabel(xLabel)
+                }
+            } else {
+                render.translateTo(startX - labelLength + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                if (i % showLabelEveryX == 0) {
                     render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                } else if (alwaysShowFullInfo) {
+                    render.renderHiddenRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 }
             }
         }

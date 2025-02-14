@@ -26,9 +26,13 @@ interface IDiagramRender {
 
     void renderLabel(String label)
 
+    void renderHiddenLabel(String label)
+
     void renderSmallLabel(String label)
 
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY)
+
+    void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY)
 
     void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle)
 
