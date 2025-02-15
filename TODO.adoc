@@ -1,0 +1,122 @@
+= TODO Infra
+
+== 0.3.9
+
+* [line-through]#Grails 6.2.0#
+* [line-through]#Cleaner deps#
+
+== 0.4.0
+
+* [line-through]#Improve Table / Filter#
+* [line-through]#add `loop` (a `for` merged with `list`)#
+** [line-through]#builders for additional filters#
+* [line-through]#auto-paginate#
+* [line-through]#Auto-labeling for menus#
+* [line-through]#Remove isAjax parameter#
+* [line-through]#rowLink# and buttons without i18n
+* [line-through]#remove rowField direct value (to force ability to mask results)#
+* [line-through]#Avoid ajaxBlock when possible#
+* [line-through]#optional form i18n params#
+* [line-through]#optional formAction i18n#
+
+== 0.4.1
+
+* [line-through]#Move supported Language into menus#
+* [line-through]#Merge search menu, icon menu, and language Menu#
+* _[line-through]#More DSL level for tables#_ (not needed)
+* [line-through]#Keep some params … (lang, subsidiary, stock, others …) via menu DSL#
+* [line-through]#fix style for tableRow, add class list#
+* [line-through]#Allow debugging Kotlin JS code#
+* [line-through]#Test mac runtime and devel cold auto-restart#
+* [line-through]#Solr indexField auto-labeling#
+
+== 0.5.0
+
+* [line-through]#Improve DSL hierarchy#
+* [line-through]#hidden fields on top only for readability#
+* [line-through]#filterField only under section only#
+* [line-through]#clean up form / table / filter DSLs#
+* [line-through]#Hook to register form field (view, update, remove, secure)#
+* [line-through]#Improve restore state#
+* [line-through]#Reduce CSS and JS#
+* [line-through]#rework grouping to be trees#
+* [line-through]#Improve form layout, add row in DSL#
+* [line-through]#More coherent button style in forms#
+* [line-through]#More restrictive DSL#
+* [line-through]#Simplify i18n, default action with naming convention starting with save, select, preview … should be auto-translated#
+* [line-through]#Bump CSS, improve theming#
+* [line-through]#improve block caption#
+* [line-through]#Bootstrap#
+* [line-through]#Add menus to Blocks#
+* [line-through]#Improve Table / Filter#
+* [line-through]#add top level `condition` (`if`, branch on 2 closures)#
+** [line-through]#Test, debug, offline capabilities#
+* [line-through]#Add title to modal / menu / size#
+* [line-through]#For GormEntity, propose a default M2O or M2M in forms (field) / shows#
+* [line-through]#remove Width from form … layout managed from elsewhere..#
+* [line-through]#add col and row#
+* [line-through]#remove close title#
+* [line-through]#remove visit*End when possible#
+* [line-through]#add refresh current block (see refresh in cms/editPage)#
+* [line-through]#use different translations for `create` or `edit`, if ID is present#
+* [line-through]#Use bootstrap progress#
+* [line-through]#Choose bootstrap from jDeliver or custom#
+* [line-through]#Add *horizontal scrollbar on tables* when needed#
+
+== 0.5.1
+
+* [line-through]#TaackPluginConfiguration, replace mainController by methodClosure#
+* [line-through]#TaackApps must not be a grails plugin#
+* [line-through]#Port intranet apps#
+* [line-through]#PoC new Charts DSL#
+
+== 0.5.7-y(y&lt;5)
+
+* [line-through]#Improve PDF rendering using bootstrap#
+* [line-through]#PoC inline DSL JS (IJavascriptDescriptor.groovy)#
+* [line-through]#PoC inline DSL CSS (with params)#
+* [line-through]#Remove Chart.js#
+* [line-through]#Need server side rendering (simpler)#
+* [line-through]#Why not JFreeCharts ? NO… but why ??#
+* [line-through]#AsciidoctorJ#
+* [line-through]#support offline plugins#
+* [line-through]#allow code on TQL like language#
+* [line-through]#Remove PlantUML deps for Gantt / graphs#
+* [line-through]#Server side raster and SVG#
+* [line-through]#Low level first#
+
+== 0.5.7
+
+* [line-through]#Asciidoc online editor (h2…h4, paragraph only, inline style)#
+* [line-through]#upload attachments when dragging or pasting files to an Asciidoc area (Sample Code in taack-ui-test)#
+* [line-through]#Asciidoc show, like for md#
+* [line-through]#Modern Graph DSL (groupBy, sortBy)#
+* [line-through]#timeSeries#
+* [line-through]#areaChart#
+* [line-through]#bubbleChart#
+* [line-through]#Security#
+* [line-through]#add sanitizer#
+* [line-through]#Call for all cases `taackUiEnablerService.checkAccess()`#
+* [line-through]#bug fixes and dependency version bumps#
+
+== 0.6.1
+* Extension Points for:
+** Menus (Either create UiExtMenu or re-use UiMenu...)
+** Forms (idem)
+** Filter and Tables
+
+== 0.6.x (x > 2)
+
+* PoC merge crew service into Infra
+* Grails 7.x
+* Improve/fix mail rendering using bootstrap
+* Add toast and websockets events (or not …)
+* SVG theme, use id
+* Keyboard shortcut (+, CTRL + S, Enter, tab for nav … between blocks / menu, and inside too)
+* Ajax scrollable tables
+* PDF / Docx / pptx / HTML from Asciidoc
+* Hook to register typical object filter (list, secure)
+* Secured Solr Search
+* More Secured TQL
+* inlineForms custom in show and tables (row or cells)
+* PoC PDF forms …
