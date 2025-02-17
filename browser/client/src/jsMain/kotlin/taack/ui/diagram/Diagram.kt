@@ -1,13 +1,15 @@
 package taack.ui.diagram
 
 import js.array.asList
+import taack.ui.base.BaseElement
 import taack.ui.base.element.AjaxBlock
+import taack.ui.base.element.Block
 import web.dom.document
 import web.events.EventHandler
 import web.svg.*
 import web.uievents.WheelEvent
 
-class Diagram(val parent: AjaxBlock, val s: SVGSVGElement) {
+class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     companion object {
         fun getSiblingDiagram(p: AjaxBlock): List<Diagram> {
             val elements: List<*> = p.d.querySelectorAll("svg.taackDiagram").asList()
@@ -67,5 +69,9 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement) {
         val cloned = document.createElement(SvgTagName("g")) as SVGGElement
         cloned.innerHTML = legends.find { it.dataset == dataset }?.g?.innerHTML ?: ""
         return cloned
+    }
+
+    override fun getParentBlock(): Block {
+        return parent.getParentBlock()
     }
 }

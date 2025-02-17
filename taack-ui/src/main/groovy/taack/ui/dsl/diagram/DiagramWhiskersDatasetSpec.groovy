@@ -3,8 +3,7 @@ package taack.ui.dsl.diagram
 import groovy.transform.CompileStatic
 
 @CompileStatic
-final class DiagramWhiskersDatasetSpec {
-    final IUiDiagramVisitor diagramVisitor
+class DiagramWhiskersDatasetSpec extends DiagramActionSpec {
 
     DiagramWhiskersDatasetSpec(final IUiDiagramVisitor diagramVisitor) {
         this.diagramVisitor = diagramVisitor

@@ -13,12 +13,13 @@ class PieDiagramScene extends DiagramScene {
     final private Map<String, BigDecimal> pieDataPerKey
     final private BigDecimal slicePositionRate
 
-    PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice) {
+    PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice, String diagramActionUrl = null) {
         this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
         this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
+        this.diagramActionUrl = diagramActionUrl
 
         Map<String, BigDecimal> pieDataPerKey = [:]
         Set<String> keys = dataPerKey.keySet()
@@ -33,6 +34,7 @@ class PieDiagramScene extends DiagramScene {
     }
 
     void draw() {
+        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "diagram-action-url": diagramActionUrl ?: "", "shape-type": "pie", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height])
         BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - DIAGRAM_MARGIN_TOP - 5.0) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = width / 2
         BigDecimal centerY = DIAGRAM_MARGIN_TOP + radius * (1 + slicePositionRate)
@@ -42,6 +44,7 @@ class PieDiagramScene extends DiagramScene {
             // sector
             BigDecimal angle1 = 0.0
             pieDataPerKey.eachWithIndex { Map.Entry<String, BigDecimal> it, int i ->
+                render.renderGroup(["element-type": ElementType.DATA, dataset: it.key, "data-x": it.key, "data-y": it.value])
                 BigDecimal value = it.value
                 BigDecimal percent = value / total
                 BigDecimal angle2 = angle1 + 360.0 * percent
@@ -55,6 +58,7 @@ class PieDiagramScene extends DiagramScene {
                 }
                 render.fillStyle(KeyColor.colorFrom(i).color)
                 render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
+                render.renderGroupEnd()
 
                 angle1 = angle2
             }
@@ -189,5 +193,6 @@ class PieDiagramScene extends DiagramScene {
             render.translateTo(centerX - render.measureText(label) / 2, centerY - fontSize / 2)
             render.renderLabel(label)
         }
+        render.renderGroupEnd()
     }
 }

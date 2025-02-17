@@ -1,12 +1,13 @@
 package taack.ui.diagram
 
 import js.array.asList
+import taack.ui.base.LeafElement
 import web.events.EventHandler
 import web.svg.SVGGElement
 import web.svg.SVGTextElement
 
 
-class DiagramLegend(private val parent: Diagram, val g: SVGGElement) {
+class DiagramLegend(private val parent: Diagram, val g: SVGGElement): LeafElement {
     companion object {
         fun getSiblingDiagramLegend(d: Diagram): List<DiagramLegend> {
             val elements: List<*> = d.s.querySelectorAll("g[element-type='LEGEND']").asList()

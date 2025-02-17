@@ -11,9 +11,10 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
     final private boolean isStacked
     final private Map<String, List<BigDecimal>> yDataListPerKey
 
-    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked, boolean alwaysShowFullInfo = false) {
+    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked, String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
         super(render, dataPerKey, false)
         this.isStacked = isStacked
+        this.diagramActionUrl = diagramActionUrl
         this.alwaysShowFullInfo = alwaysShowFullInfo
 
         Map<String, List<BigDecimal>> yDataListPerKey = [:]
@@ -77,8 +78,14 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
                 BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
+                String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
-                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "gap-index": i, "data-label": "${xLabelList[i]}: ${yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"}"])
+                render.renderGroup(["element-type": ElementType.DATA,
+                                    dataset: keys[j],
+                                    "gap-index": i,
+                                    "data-x": xLabelList[i],
+                                    "data-y": yDataLabel,
+                                    "data-label": "${xLabelList[i]}: ${yDataLabel}"])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
@@ -88,7 +95,6 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
 
                     if (!alwaysShowFullInfo) {
                         // label
-                        String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
                         render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
                         render.renderLabel(yDataLabel)
                     }

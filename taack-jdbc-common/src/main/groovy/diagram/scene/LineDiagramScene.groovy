@@ -5,8 +5,8 @@ import diagram.IDiagramRender
 
 @CompileStatic
 class LineDiagramScene extends ScatterDiagramScene {
-    LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean alwaysShowFullInfo = false) {
-        super(render, dataPerKey, [], alwaysShowFullInfo)
+    LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
+        super(render, dataPerKey, [], diagramActionUrl, alwaysShowFullInfo)
         this.dataPointRadius = 2.5
     }
 

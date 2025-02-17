@@ -1,11 +1,20 @@
 package taack.ui.diagram
 
 import js.array.asList
+import taack.ui.base.Helper.Companion.processAjaxLink
+import taack.ui.base.Helper.Companion.trace
+import taack.ui.base.LeafElement
 import web.dom.document
 import web.events.EventHandler
+import web.history.history
+import web.http.RequestMethod
+import web.location.location
 import web.svg.*
+import web.url.URL
+import web.xhr.XMLHttpRequest
+import kotlin.math.min
 
-class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) {
+class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement): LeafElement {
     companion object {
         fun getSiblingDiagramData(dataGroup: DiagramTransformArea): List<DiagramData> {
             val elements: List<*> = dataGroup.g.querySelectorAll("g[element-type='DATA']").asList()
@@ -22,7 +31,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) 
 
     init {
         val tooltipLabel = g.getAttribute("data-label")
-        if (tooltipLabel != null) {
+        if (!tooltipLabel.isNullOrBlank()) {
             val diagramRoot = parent.parent
             tooltip = document.createElement(SvgTagName("g"))
 
@@ -66,6 +75,27 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) 
             }
         } else {
             tooltip = null
+        }
+
+        val action = parent.g.getAttribute("diagram-action-url")
+        val dataX = g.getAttribute("data-x")
+        val dataY = g.getAttribute("data-y")
+        if (!action.isNullOrBlank() && (dataX != null || dataY != null)) {
+            g.style.cursor = "pointer"
+
+            var isClicked = false
+            g.onmousedown = EventHandler {
+                isClicked = true
+            }
+            g.onmousemove = EventHandler { // avoid conflict with Scroll
+                isClicked = false
+            }
+            g.onmouseup = EventHandler {
+                if (isClicked) {
+                    onClickShape(action, dataset, dataX ?: "", dataY ?: "")
+                    isClicked = false
+                }
+            }
         }
     }
 
@@ -135,5 +165,35 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement) 
 
     fun getShapeAttribute(name: String): String? {
         return shapes.firstOrNull()?.getAttribute(name)
+    }
+
+    private fun onClickShape(action: String, dataset: String, x: String, y: String) {
+        val targetUrl = URL(action + (if (action.contains("?")) "&" else "?") + "dataset=${dataset}&x=${x}&y=${y}&isAjax=true", "${location.protocol}//${location.host}").toString()
+
+        //Display load spinner
+        val loader = document.getElementById("taack-load-spinner")
+        loader?.classList?.remove("tck-hidden")
+        val xhr = XMLHttpRequest()
+
+        xhr.onloadend = EventHandler { ev ->
+            ev.preventDefault()
+            trace("DiagramData::onClickShape: Load End, action: $action responseType: '${xhr.responseType}'")
+            loader?.classList?.add("tck-hidden")
+
+            val text = xhr.responseText
+            if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
+                trace("Full webpage ...|$action|${document.title}|${document.documentURI}")
+                history.pushState("{}", document.title, targetUrl)
+                trace("Setting location.href: $targetUrl")
+                location.href = targetUrl
+                document.write(text)
+                document.close()
+            } else {
+                trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
+                processAjaxLink(text, parent)
+            }
+        }
+        xhr.open(RequestMethod.GET, targetUrl)
+        xhr.send()
     }
 }

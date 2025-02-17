@@ -34,6 +34,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Object[] xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
+    private String diagramActionUrl
 
     @Override
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
@@ -46,6 +47,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         this.xDataList = []
         this.dataPerKey = [:]
         this.whiskersYDataListPerKey = [:]
+        this.diagramActionUrl = null
     }
 
     @Override
@@ -103,35 +105,35 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitBarDiagram(boolean isStacked) {
         createDiagramRender(0.5)
-        BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, isStacked, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
+        BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, isStacked, diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         scene.draw()
     }
 
     @Override
     void visitScatterDiagram(String... pointImageHref) {
         createDiagramRender(0.5)
-        ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, pointImageHref.toList(), diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
+        ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, pointImageHref.toList(), diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         scene.draw()
     }
 
     @Override
     void visitLineDiagram() {
         createDiagramRender(0.5)
-        LineDiagramScene scene = new LineDiagramScene(render, dataPerKey, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
+        LineDiagramScene scene = new LineDiagramScene(render, dataPerKey, diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         scene.draw()
     }
 
     @Override
     void visitAreaDiagram() {
         createDiagramRender(0.5)
-        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey, false)
+        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey, diagramActionUrl, false)
         scene.draw()
     }
 
     @Override
     void visitPieDiagram(boolean hasSlice) {
         createDiagramRender(1.0)
-        PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice)
+        PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice, diagramActionUrl)
         scene.draw()
     }
 
@@ -148,7 +150,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitWhiskersDiagram() {
         if (xDataList) {
             createDiagramRender(0.5)
-            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
+            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
             scene.draw()
         }
     }
@@ -175,5 +177,10 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             out.writeTo(clone)
             blockLog.topElement.addChildren(new HTMLOutput(clone))
         }
+    }
+
+    @Override
+    void visitDiagramAction(String controller, String action, Long id, Map<String, ?> params) {
+        diagramActionUrl = Parameter.urlMapped(controller, action, id, params)
     }
 }

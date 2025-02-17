@@ -47,6 +47,7 @@ abstract class DiagramScene {
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
+    protected String diagramActionUrl
 
     final protected Color BLACK_COLOR = new Color(64, 64, 64)
     final protected Color GREY_COLOR = new Color(231, 231, 231)

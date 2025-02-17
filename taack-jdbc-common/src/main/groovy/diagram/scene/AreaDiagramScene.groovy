@@ -5,8 +5,9 @@ import diagram.IDiagramRender
 
 @CompileStatic
 class AreaDiagramScene extends RectBackgroundDiagramScene {
-    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean alwaysShowFullInfo = false) {
+    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
         super(render, dataPerKey, true)
+        this.diagramActionUrl = diagramActionUrl
         this.alwaysShowFullInfo = alwaysShowFullInfo
     }
 
@@ -56,11 +57,9 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             Integer maxX = xLabelList.last() as Integer
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = keys.size() - 1; i >= 0; i--) {
-                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
-
                 Map<Number, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
                 Set<Number> xDataSet = dataMap.keySet()
-
+                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-x": "", "data-y": ""])
                 List<BigDecimal> coordsToDraw = [] // x1, y1, x2, y2, ...
                 for (int j = 0; j < xDataSet.size(); j++) {
                     BigDecimal xWidth = (xDataSet[j] - minX) / (maxX - minX) * totalWidth
@@ -98,7 +97,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             // draw data area one by one
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
             for (int i = 0; i < keys.size(); i++) {
-                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
+                render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-x": "", "data-y": ""])
 
                 List<BigDecimal> y1List = i > 0 ? stackedYDataListPerKey[keys[i - 1]] : [minY] * xLabelList.size()
                 List<BigDecimal> y2List = stackedYDataListPerKey[keys[i]]
@@ -129,7 +128,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             return
         }
         drawLegend()
-        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "shape-type": "area", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "diagram-action-url": diagramActionUrl ?: "", "shape-type": "area", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
         drawVerticalBackground(false)
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()

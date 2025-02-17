@@ -2,13 +2,15 @@ package taack.ui.diagram
 
 import js.array.asList
 import kotlinx.browser.window
+import taack.ui.base.BaseElement
+import taack.ui.base.element.Block
 import web.svg.SVGGElement
 import web.svg.SVGLineElement
 import web.svg.SVGTextElement
 import web.uievents.MouseEvent
 import kotlin.math.*
 
-class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
+class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement {
     companion object {
         fun getSiblingDiagramTransformArea(d: Diagram): DiagramTransformArea? {
             val g = d.s.querySelector("g[element-type='TRANSFORM_AREA']")
@@ -24,11 +26,11 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
     private val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
 
     private val backgroundVerticalLines = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND_LINE']>line").asList()
-    private val backgroundXLabelGroup = g.querySelector("g[element-type='VERTICAL_BACKGROUND_TEXT']")!!
+    private val backgroundXLabelGroup = g.querySelector("g[element-type='VERTICAL_BACKGROUND_TEXT']")
     private var gapWidth: Double = (areaMaxX - areaMinX) / (backgroundVerticalLines.size - 1)
 
     init {
-        if ((backgroundXLabelGroup.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
+        if ((backgroundXLabelGroup?.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
             refreshBackgroundXLabelsDisplay()
         }
     }
@@ -128,7 +130,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
 
     private var zoomTimer: Int? = null
     private fun refreshBackgroundXLabelsDisplay(zoomRadio: Double = 1.0) {
-        val showLabelEveryX = (backgroundXLabelGroup.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) / zoomRadio
+        val showLabelEveryX = (backgroundXLabelGroup!!.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) / zoomRadio
         backgroundXLabelGroup.setAttribute("show-label-every-x", showLabelEveryX.toString())
 
         // refresh the display only after stopping Zoom
@@ -143,7 +145,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
     }
 
     private fun refreshBackgroundXLabelsPosition(zoomRadio: Double) {
-        backgroundXLabelGroup.querySelectorAll("text").asList().forEach { text ->
+        backgroundXLabelGroup!!.querySelectorAll("text").asList().forEach { text ->
             if (text.hasAttribute("rotated-label-offset-x")) {
                 val offset = text.getAttribute("rotated-label-offset-x")!!.toDouble()
 
@@ -242,5 +244,9 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement) {
 
     fun isClientMouseInTransformArea(e: MouseEvent): Boolean {
         return parent.translateX(e.clientX.toDouble()) in areaMinX..areaMaxX
+    }
+
+    override fun getParentBlock(): Block {
+        return parent.getParentBlock()
     }
 }

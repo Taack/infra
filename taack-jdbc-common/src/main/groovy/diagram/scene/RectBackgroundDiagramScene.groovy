@@ -204,7 +204,13 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                                   DIAGRAM_MARGIN_LEFT - 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
 
         render.renderGroup(["clip-path": "url(#${id})"])
-        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "shape-type": shapeType, "shape-max-width": shapeMaxWidth, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA,
+                            "diagram-action-url": diagramActionUrl ?: "",
+                            "shape-type": shapeType,
+                            "shape-max-width": shapeMaxWidth,
+                            "area-min-x": DIAGRAM_MARGIN_LEFT,
+                            "area-max-x": width - DIAGRAM_MARGIN_RIGHT,
+                            "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
     }
 
     void buildTransformAreaEnd() {

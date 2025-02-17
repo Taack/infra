@@ -79,4 +79,9 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     void visitCustom(String html) {
 
     }
+
+    @Override
+    void visitDiagramAction(String controller, String action, Long id, Map<String, ?> params) {
+
+    }
 }

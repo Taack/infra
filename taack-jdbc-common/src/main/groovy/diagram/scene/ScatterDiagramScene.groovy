@@ -8,9 +8,10 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
     final private List<String> pointImageHref
     protected BigDecimal dataPointRadius
 
-    ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, List<String> pointImageHref = [], boolean alwaysShowFullInfo = false) {
+    ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, List<String> pointImageHref = [], String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
         super(render, dataPerKey, true)
         this.pointImageHref = pointImageHref
+        this.diagramActionUrl = diagramActionUrl
         this.alwaysShowFullInfo = alwaysShowFullInfo
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
     }
@@ -37,7 +38,12 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
-                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-label": "($xLabel, $yLabel)", style: "pointer-events: bounding-box;"])
+                        render.renderGroup(["element-type": ElementType.DATA,
+                                            dataset: keys[i],
+                                            "data-x": xLabel,
+                                            "data-y": yLabel,
+                                            "data-label": "($xLabel, $yLabel)",
+                                            style: "pointer-events: bounding-box;"])
                         if (i < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
@@ -83,11 +89,17 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                 for (int j = 0; j < keys.size(); j++) {
                     List<BigDecimal> yList = yDataListPerKey[keys[j]]
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
+                    String yDataLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
-                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j], "data-label": "${xLabelList[i]}: ${y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"}", style: "pointer-events: bounding-box;"])
+                        render.renderGroup(["element-type": ElementType.DATA,
+                                            dataset: keys[j],
+                                            "data-x": xLabelList[i],
+                                            "data-y": yDataLabel,
+                                            "data-label": "${xLabelList[i]}: ${yDataLabel}",
+                                            style: "pointer-events: bounding-box;"])
                         if (j < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
@@ -112,7 +124,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     if (!alwaysShowFullInfo && gapWidth >= MIN_GAP_WIDTH) {
                         // data label
                         if (y > startLabelY) {
-                            String yDataLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
                             if (dataPointRadius > 5) { // put label at right
                                 render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
                             } else { // put label at top
