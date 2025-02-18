@@ -18,8 +18,10 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
 import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
+import taack.ui.TaackUi
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
+import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.UiBlockVisitor
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawCsvTableDump
@@ -534,6 +536,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 root : taackUiPluginConfiguration.root
         ]
         html
+    }
+
+    final void createModal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        show(TaackUi.createModal(closure))
     }
 
 }
