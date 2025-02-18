@@ -100,10 +100,12 @@
 * [line-through]#bug fixes and dependency version bumps#
 
 == 0.6.1
+* Diagram Action
 * Extension Points for:
 ** Menus (Either create UiExtMenu or re-use UiMenu...)
 ** Forms (idem)
 ** Filter and Tables
+* Helper factory (Helper.createModal, createBlock, create*) that can be statically imported
 
 == 0.6.x (x > 2)
 
