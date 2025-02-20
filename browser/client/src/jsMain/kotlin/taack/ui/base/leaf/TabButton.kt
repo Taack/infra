@@ -56,7 +56,7 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
                 }
             }
             //Show loading spinner while loading
-            parent.d.querySelector("#tab-${tabId}-${tabIndex}-pane")?.innerHTML = "<div class='taack-tab-load'></div>"
+            parent.parent.d.querySelector("#tab-${tabId}-${tabIndex}-pane")?.innerHTML = "<div class='taack-tab-load'></div>"
             xhr.open(RequestMethod.POST, b.getAttribute("action")!!)
             xhr.send(fd)
         }

@@ -34,6 +34,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         if (!tooltipLabel.isNullOrBlank()) {
             val diagramRoot = parent.parent
             tooltip = document.createElement(SvgTagName("g"))
+            tooltip.classList.add("diagram-tooltip")
 
             val background: SVGPolygonElement = document.createElement(SvgTagName("polygon"))
             background.style.fill = "#00000090"
@@ -51,26 +52,14 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             value.setAttribute("transform", "translate(0,15)")
             tooltip.appendChild(value)
 
-            g.onmouseenter = EventHandler {
-                diagramRoot.s.appendChild(tooltip)
-
-                if (background.getAttribute("points") == null) {
-                    val contentWidth = tooltip.getBBox().width
-                    background.setAttribute("points", "${-contentWidth / 2 - 20},0 ${-contentWidth / 2 - 10},10 ${-contentWidth / 2 - 10},25 ${contentWidth / 2 + 10},25 ${contentWidth / 2 + 10},-25 ${-contentWidth / 2 - 10},-25 ${-contentWidth / 2 - 10},-10")
+            if (parent.currentHoverLine == null) {
+                g.onmouseenter = EventHandler {
+                    showTooltip()
                 }
-
-                val diagramScrollX = diagramRoot.transformArea?.g?.getAttribute("scroll-x")?.toDouble() ?: 0.0
-                if (g.getBBox().x + g.getBBox().width + background.getBBox().width + diagramScrollX < diagramRoot.s.viewBox.baseVal.x + diagramRoot.s.viewBox.baseVal.width) {
-                    background.setAttribute("transform", "translate(${(background.getBBox().width - 30) / 2},0)")
-                    tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20 + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
-                } else {
-                    background.setAttribute("transform", "scale(-1,1) translate(${-(background.getBBox().width - 30) / 2},0)")
-                    tooltip.setAttribute("transform", "translate(${g.getBBox().x - (tooltip.getBBox().width - 10) + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
-                }
-            }
-            g.onmouseleave = EventHandler {
-                if (diagramRoot.s.contains(tooltip)) {
-                    tooltip.remove()
+                g.onmouseleave = EventHandler {
+                    if (diagramRoot.s.contains(tooltip)) {
+                        tooltip.remove()
+                    }
                 }
             }
         } else {
@@ -195,5 +184,27 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         }
         xhr.open(RequestMethod.GET, targetUrl)
         xhr.send()
+    }
+
+    fun showTooltip() {
+        if (tooltip != null) {
+            val diagramRoot = parent.parent
+            diagramRoot.s.appendChild(tooltip)
+
+            val background = tooltip.querySelector("polygon")!! as SVGPolygonElement
+            if (background.getAttribute("points") == null) {
+                val contentWidth = tooltip.getBBox().width
+                background.setAttribute("points", "${-contentWidth / 2 - 20},0 ${-contentWidth / 2 - 10},10 ${-contentWidth / 2 - 10},25 ${contentWidth / 2 + 10},25 ${contentWidth / 2 + 10},-25 ${-contentWidth / 2 - 10},-25 ${-contentWidth / 2 - 10},-10")
+            }
+
+            val diagramScrollX = diagramRoot.transformArea?.g?.getAttribute("scroll-x")?.toDouble() ?: 0.0
+            if (g.getBBox().x + g.getBBox().width + background.getBBox().width + diagramScrollX < diagramRoot.s.viewBox.baseVal.x + diagramRoot.s.viewBox.baseVal.width) {
+                background.setAttribute("transform", "translate(${(background.getBBox().width - 30) / 2},0)")
+                tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + 20 + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+            } else {
+                background.setAttribute("transform", "scale(-1,1) translate(${-(background.getBBox().width - 30) / 2},0)")
+                tooltip.setAttribute("transform", "translate(${g.getBBox().x - (tooltip.getBBox().width - 10) + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+            }
+        }
     }
 }

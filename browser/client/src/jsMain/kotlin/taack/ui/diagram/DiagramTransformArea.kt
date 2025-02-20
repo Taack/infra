@@ -4,10 +4,8 @@ import js.array.asList
 import kotlinx.browser.window
 import taack.ui.base.BaseElement
 import taack.ui.base.element.Block
-import web.svg.SVGGElement
-import web.svg.SVGLineElement
-import web.svg.SVGTextElement
-import web.uievents.MouseEvent
+import web.dom.document
+import web.svg.*
 import kotlin.math.*
 
 class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement {
@@ -28,10 +26,65 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     private val backgroundVerticalLines = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND_LINE']>line").asList()
     private val backgroundXLabelGroup = g.querySelector("g[element-type='VERTICAL_BACKGROUND_TEXT']")
     private var gapWidth: Double = (areaMaxX - areaMinX) / (backgroundVerticalLines.size - 1)
+    var currentHoverLine: SVGLineElement? = null
 
     init {
+        if (shapeType == "line" && dataList.any { it.g.hasAttribute("data-label") }) {
+            currentHoverLine = document.createElement(SvgTagName("line")) as SVGLineElement
+            currentHoverLine!!.setAttribute("y1", backgroundVerticalLines.firstOrNull()?.getAttribute("y1") ?: "43.0")
+            currentHoverLine!!.setAttribute("y2", backgroundVerticalLines.firstOrNull()?.getAttribute("y2") ?: "425.0")
+            currentHoverLine!!.setAttribute("style", "stroke:rgb(180, 180, 180);stroke-width:1.3")
+        }
+
         if ((backgroundXLabelGroup?.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
             refreshBackgroundXLabelsDisplay()
+        }
+    }
+
+    fun refreshCurrentHoverLineAndDataToolTip(mouseClientX: Double, mouseClientY: Double) {
+        if (currentHoverLine != null) {
+            var showToolTipData: DiagramData? = null
+            if (isClientMouseInTransformArea(mouseClientX)) {
+                var minGapX: Double = Double.MAX_VALUE
+                val datasetMap = dataList.filter { it.g.hasAttribute("data-label") && it.g.style.display != "none" }.groupBy { it.dataset }
+                datasetMap.forEach {
+                    val dataList = it.value.filter { data -> parent.translateX(data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2) in areaMinX..areaMaxX }
+                    val diagramDataIndex = dataList.indexOf(dataList.findLast { data -> data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2 <= mouseClientX })
+                    if (diagramDataIndex != -1) {
+                        val gap1 = abs(dataList[diagramDataIndex].g.getBoundingClientRect().x + dataList[diagramDataIndex].g.getBoundingClientRect().width / 2 - mouseClientX)
+                        val gap2 = if (diagramDataIndex != dataList.size - 1) abs(dataList[diagramDataIndex + 1].g.getBoundingClientRect().x + dataList[diagramDataIndex + 1].g.getBoundingClientRect().width / 2 - mouseClientX) else Double.MAX_VALUE
+                        val closestDiagramData = if (min(gap1, gap2) == gap1) dataList[diagramDataIndex] else dataList[diagramDataIndex + 1]
+                        showToolTipData = if (min(minGapX, min(gap1, gap2)) == minGapX) showToolTipData else closestDiagramData
+                        minGapX = min(minGapX, min(gap1, gap2))
+                    }
+                }
+                if (showToolTipData != null) {
+                    currentHoverLine!!.setAttribute("x1", showToolTipData!!.getShapeAttribute("cx")!!)
+                    currentHoverLine!!.setAttribute("x2", showToolTipData!!.getShapeAttribute("cx")!!)
+                    if (!g.contains(currentHoverLine)) {
+                        g.appendChild(currentHoverLine!!)
+                    }
+
+                    var minGapY: Double = Double.MAX_VALUE
+                    datasetMap.values.forEach {
+                        val dataWithSameX = it.find { data -> data.getShapeAttribute("cx") == showToolTipData!!.getShapeAttribute("cx") }
+                        if (dataWithSameX != null) {
+                            val dataClientY = dataWithSameX.g.getBoundingClientRect().y + dataWithSameX.g.getBoundingClientRect().height / 2
+                            val gapY = abs(dataClientY - mouseClientY)
+                            if (min(minGapY, gapY) == gapY) {
+                                showToolTipData = dataWithSameX
+                                minGapY = gapY
+                            }
+                        }
+                    }
+                } else {
+                    currentHoverLine!!.remove()
+                }
+            } else {
+                currentHoverLine!!.remove()
+            }
+            parent.s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
+            showToolTipData?.showTooltip()
         }
     }
 
@@ -242,8 +295,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    fun isClientMouseInTransformArea(e: MouseEvent): Boolean {
-        return parent.translateX(e.clientX.toDouble()) in areaMinX..areaMaxX
+    fun isClientMouseInTransformArea(mouseClientX: Double): Boolean {
+        return parent.translateX(mouseClientX) in areaMinX..(parent.s.viewBox.baseVal.x + parent.s.viewBox.baseVal.width)
     }
 
     override fun getParentBlock(): Block {

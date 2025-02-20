@@ -6,7 +6,10 @@ import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
 import web.dom.document
 import web.events.EventHandler
+import web.events.EventType
+import web.events.addEventListener
 import web.svg.*
+import web.uievents.MouseEvent
 import web.uievents.WheelEvent
 
 class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
@@ -30,7 +33,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
         if (transformArea != null && s.querySelector("clipPath#clipSection") != null) {
             // Scroll
             s.onmousedown = EventHandler { e ->
-                if (transformArea.isClientMouseInTransformArea(e)) {
+                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
                     isScrolling = true
                     previousMouseX = translateX(e.clientX.toDouble())
                 }
@@ -47,15 +50,23 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             }
             s.onmouseleave = EventHandler {
                 isScrolling = false
+
+                transformArea.currentHoverLine?.remove()
+                s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
             }
 
             // Zoom
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
-                if (transformArea.isClientMouseInTransformArea(e)) {
+                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
                     e.preventDefault()
                     transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)
                 }
             }
+
+            // HoverLine and tooltip for LINE diagram
+            s.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
+                transformArea.refreshCurrentHoverLineAndDataToolTip(e.clientX.toDouble(), e.clientY.toDouble())
+            })
         }
     }
 
