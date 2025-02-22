@@ -106,6 +106,7 @@
 
 == 0.6.x (x > 2)
 
+* Inner Filter: pass many filters at once, allowing many list of independent objects, useful for listing Addresses from Geographical Area (2 independent classes).
 * PoC merge crew service into Infra
 * Grails 7.x
 * Improve/fix mail rendering using bootstrap
