@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
+import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dump.html.element.ButtonStyle
 
@@ -17,7 +18,7 @@ interface IUiFilterVisitor  {
 
     void visitFilterEnd()
 
-    void visitSection(final String i18n)
+    void visitSection(final String i18n, boolean initiallyCollapsed)
 
     void visitSectionEnd()
 
@@ -34,4 +35,6 @@ interface IUiFilterVisitor  {
     void setAdditionalParams(String key, String value)
 
     void addHiddenInputs()
+
+    void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos)
 }

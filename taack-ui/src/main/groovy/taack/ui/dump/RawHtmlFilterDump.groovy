@@ -9,6 +9,7 @@ import taack.ast.type.WidgetKind
 import taack.domain.TaackFilter
 import taack.ui.EnumOptions
 import taack.ui.IEnumOption
+import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dump.common.BlockLog
@@ -25,6 +26,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     BootstrapForm formThemed
     final BlockLog blockLog
+    boolean uncollapseSection
 
     RawHtmlFilterDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -90,17 +92,24 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
-    void visitSection(final String i18n) {
-        blockLog.topElement = formThemed.section(blockLog.topElement, i18n)
+    void visitSection(final String i18n, boolean initiallyCollapsed = false) {
+        uncollapseSection = false
+        blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
     }
 
     @Override
     void visitSectionEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION)
+        HTMLDiv d = blockLog.topElement.toParentTaackTag(TaackTag.SECTION) as HTMLDiv
+        if (uncollapseSection) {
+            d.classes = []
+            uncollapseSection = false
+        }
+        blockLog.topElement = d.parent
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final Class type = fieldInfo?.fieldConstraint?.field?.type
+        if (value != null && !value.empty) uncollapseSection = true
         final boolean isEnum = type?.isEnum()
         if (enumOptions) {
             EnumOptions eos = value != null ? new EnumOptions(enumOptions, qualifiedName, value) : isEnum ? new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value as Enum) : new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value?.toString())
@@ -156,5 +165,10 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void addHiddenInputs() {
         formThemed.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
+    }
+
+    @Override
+    void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos) {
+
     }
 }

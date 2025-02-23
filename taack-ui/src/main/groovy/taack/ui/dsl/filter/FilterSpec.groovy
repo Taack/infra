@@ -15,14 +15,6 @@ final class FilterSpec extends FilterCommon {
         filterVisitor.visitHiddenId(id)
     }
 
-    void section(final String i18n = null,
-                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
-        if (i18n) filterVisitor.visitSection(i18n)
-        closure.delegate = new SectionSpec(filterVisitor)
-        closure.call()
-        if (i18n) filterVisitor.visitSectionEnd()
-    }
-
     void filterAction(final String i18n = null, final MethodClosure action) {
         filterVisitor.visitFilterAction(i18n, action, ButtonStyle.SECONDARY)
     }

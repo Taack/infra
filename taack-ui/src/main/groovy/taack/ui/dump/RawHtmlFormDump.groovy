@@ -98,7 +98,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     @Override
     void visitFormSection(String i18n) {
         i18n ?= parameter.trField(parameter.controllerName, parameter.actionName, false)
-        blockLog.topElement = formThemed.section(blockLog.topElement, i18n)
+        blockLog.topElement = formThemed.section(blockLog.topElement, i18n, false)
     }
 
     @Override
