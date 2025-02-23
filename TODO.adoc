@@ -106,6 +106,8 @@
 
 == 0.6.x (x > 2)
 
+* Embedded Sections on filters
+* Mask filter section if inputs are empty
 * Inner Filter OR Filter extension: pass many filters at once, allowing many list of independent objects, useful for listing Addresses from Geographical Area (2 independent classes).
 * for large filters, allow scrolling OR partition filters and edit parts into modals
 * PoC merge crew service into Infra
