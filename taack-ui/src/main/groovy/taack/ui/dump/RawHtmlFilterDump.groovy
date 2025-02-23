@@ -158,4 +158,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void addHiddenInputs() {
         formThemed.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
     }
+
+    @Override
+    void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos) {
+
+    }
 }
