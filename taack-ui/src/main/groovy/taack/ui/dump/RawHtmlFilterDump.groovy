@@ -9,6 +9,7 @@ import taack.ast.type.WidgetKind
 import taack.domain.TaackFilter
 import taack.ui.EnumOptions
 import taack.ui.IEnumOption
+import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dump.common.BlockLog
@@ -96,7 +97,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitSectionEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION).parent
     }
 
     private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
