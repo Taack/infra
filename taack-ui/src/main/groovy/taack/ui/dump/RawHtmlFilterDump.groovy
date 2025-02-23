@@ -91,8 +91,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
-    void visitSection(final String i18n) {
-        blockLog.topElement = formThemed.section(blockLog.topElement, i18n)
+    void visitSection(final String i18n, boolean initiallyCollapsed = false) {
+        blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
     }
 
     @Override

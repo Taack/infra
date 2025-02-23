@@ -27,6 +27,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     final ThemeSize themeSize
     final boolean floating
     final boolean noLabel
+    int sectionCounter = 0
 
     BootstrapForm(final BlockLog blockLog, boolean floating = true, boolean noLabel = false) {
         super(blockLog)
@@ -107,12 +108,19 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     }
 
     @Override
-    IHTMLElement section(IHTMLElement topElement, String trI18n, String... classes) {
+    IHTMLElement section(IHTMLElement topElement, String trI18n, boolean collapse, String... classes) {
+        sectionCounter++
+        String[] allClasses = classes
         HTMLFieldset fs = new HTMLFieldset().builder.addChildren(
                 new HTMLLegend().builder.addChildren(new HTMLTxtContent(trI18n)).build()
         ).build() as HTMLFieldset
-
-        HTMLDiv sectionDiv = new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).addClasses(classes)
+        if (collapse) {
+            fs = new HTMLFieldset()
+            HTMLAnchor unCollapse = new HTMLAnchor().builder.addChildren(new HTMLTxtContent(trI18n)).addClasses('btn', 'btn-collapse').putAttribute('data-bs-toggle', 'collapse').putAttribute('data-bs-target', '#section' + sectionCounter).build() as HTMLAnchor
+            topElement.builder.addChildren(unCollapse).build()
+            allClasses = classes + 'collapse'
+        }
+        HTMLDiv sectionDiv = new HTMLDiv().builder.setTaackTag(TaackTag.SECTION).setId('section' + sectionCounter).addClasses(allClasses)
                 .addChildren(fs).build() as HTMLDiv
         topElement.builder.addChildren(sectionDiv).build()
         fs

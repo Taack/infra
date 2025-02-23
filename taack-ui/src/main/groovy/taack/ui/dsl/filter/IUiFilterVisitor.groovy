@@ -18,7 +18,7 @@ interface IUiFilterVisitor  {
 
     void visitFilterEnd()
 
-    void visitSection(final String i18n)
+    void visitSection(final String i18n, boolean initiallyCollapsed)
 
     void visitSectionEnd()
 

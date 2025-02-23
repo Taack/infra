@@ -62,7 +62,7 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
-    void visitSection(final String i18n) {
+    void visitSection(final String i18n, boolean initiallyCollapsed) {
 
     }
 
