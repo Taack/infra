@@ -20,7 +20,10 @@ final class TaackMetaModelService {
     @Value('${exe.dot.path}')
     String exeDotPath
 
+    static Map<Class<? extends GormEntity>, List<Pair<ManagedType<?>, Set<Attribute<?, ?>>>>> cachedData = [:]
+
     private List<Pair<ManagedType<?>, Set<Attribute<?, ?>>>> listClassPointingTo(final Class<? extends GormEntity> toClass, final boolean includeSelf = false) {
+        if (cachedData.containsKey(toClass)) return cachedData[toClass]
         Metamodel metamodel = sessionFactory.metamodel
         def types = metamodel.managedTypes.find { it.javaType == toClass }
         def allButSelfType = metamodel.managedTypes.findAll {
@@ -44,6 +47,8 @@ final class TaackMetaModelService {
         }.findAll {
             (it.bValue as List).size() > 0
         }
+
+        cachedData.put(toClass, allButSelfTypeAtt)
         allButSelfTypeAtt
     }
 
