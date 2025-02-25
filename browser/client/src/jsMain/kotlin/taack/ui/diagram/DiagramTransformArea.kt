@@ -101,8 +101,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     private fun scrollTo(x: Double) {
         if (backgroundVerticalLines.isNotEmpty()) {
-            val minX = areaMaxX - round(backgroundVerticalLines.last().getAttribute("x1")!!.toDouble())
-            val maxX = areaMinX - round(backgroundVerticalLines.first().getAttribute("x1")!!.toDouble())
+            val minX = areaMaxX - gapWidth - round(backgroundVerticalLines.last().getAttribute("x1")!!.toDouble())
+            val maxX = areaMinX + gapWidth - round(backgroundVerticalLines.first().getAttribute("x1")!!.toDouble())
             val adjustedX = min(maxX, max(minX, x))
             g.setAttribute("scroll-x", adjustedX.toString())
             g.setAttribute("transform", "translate(${adjustedX},0.0)")
@@ -163,7 +163,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 zoomUpTargetCenterLineIndex = null
             }
 
-            if (newMaxLineIndex - newMinLineIndex > 2 && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
+            if ((!isUp || newMaxLineIndex - newMinLineIndex > 2) && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
                 val newMinLine = backgroundVerticalLines[newMinLineIndex] as SVGLineElement
                 val newMaxLine = backgroundVerticalLines[newMaxLineIndex] as SVGLineElement
                 val zoomRadio = (areaMaxX - areaMinX) / (newMaxLine.x1.baseVal.value - newMinLine.x1.baseVal.value)
