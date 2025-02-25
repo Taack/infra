@@ -9,7 +9,6 @@ class FilterCommon {
 
     void section(boolean collapse,
                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
-        println "HELLO"
         section(null, collapse, closure)
     }
 
@@ -30,7 +29,6 @@ class FilterCommon {
     }
 
     void innerFilter(UiFilterSpecifier filterSpecifier, final FieldInfo... fields = null) {
-        println "innerFilter, $fields"
         filterVisitor.visitInnerFilter(filterSpecifier, fields)
     }
 

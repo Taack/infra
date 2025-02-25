@@ -99,10 +99,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     @Override
     void visitSection(String i18n, boolean initiallyCollapsed = false) {
 
-        println "section +++$i18n $innerFieldInfos"
         uncollapseSection = false
         if (innerFieldInfos) i18n = i18n ?: parameter.trField(innerFieldInfos)
-        println "section ---$i18n ${blockLog.topElement}"
         blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
     }
 
@@ -180,12 +178,10 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos) {
-        println "visitInnerFilter +++ $fieldInfos"
         visitInner = true
         innerFieldInfos = fieldInfos
         uiFilterSpecifier.visitFilter(this)
         innerFieldInfos = null
         visitInner = false
-        println "visitInnerFilter ---"
     }
 }
