@@ -393,12 +393,15 @@ final class TaackFilter<T extends GormEntity<T>> {
             String key = 'visitInnerFilterAnonymous' + innerDomain.name.replace('.', '_') + '.'
 
             Map<String, Object> innerFilter = filter.findAll {
-                it.key.startsWith(key)
+                if (it.value) it.key.startsWith(key)
             }
-
-            filter.removeAll { true }
-            innerFilter.each {
-                filter.put(it.key - key, it.value)
+            if (innerFilter.size() > 0) {
+                filter.removeAll { true }
+                innerFilter.each {
+                    filter.put(it.key - key, it.value)
+                }
+            } else {
+                return new Pair([], 0)
             }
         } else
             filter = filter.findAll {
@@ -559,6 +562,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
 
         List<T> res
+
         try {
             Integer offset = (theParams["offset"] ?: "0") as Integer
             if (simpleSort && simpleOrder) {
