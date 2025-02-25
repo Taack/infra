@@ -5,23 +5,25 @@ import diagram.IDiagramRender
 
 @CompileStatic
 class AreaDiagramScene extends RectBackgroundDiagramScene {
-    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
-        super(render, dataPerKey, true)
-        this.diagramActionUrl = diagramActionUrl
-        this.alwaysShowFullInfo = alwaysShowFullInfo
+    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
+        super(render, dataPerKey)
+    }
+
+    static Number objectToNumber(Object o) {
+        return o instanceof Date ? o.getTime() : o instanceof Number ? o : 0.0
     }
 
     void drawHorizontalBackgroundAndDataArea() {
         Set<String> keys = dataPerKey.keySet()
-        if (xLabelList.every { it instanceof Number }) { // continuous
+        if (xLabelList.every { it instanceof Number } || (xLabelList.every { it instanceof Date } && xLabelDateFormat)) { // continuous
             // rebuild data to be stacked
             Map<String, Map<Number, BigDecimal>> stackedDataPerKey = [:]
-            Set<Number> totalXDataSet = dataPerKey.collect { it.value.keySet() }.flatten().unique().sort() as Set<Number>
+            Set<Number> totalXDataSet = dataPerKey.collect { it.value.keySet() }.flatten().unique().sort().collect { objectToNumber(it) } as Set<Number>
             List<BigDecimal> stackedYDataTmpList = [0.0] * totalXDataSet.size()
             BigDecimal minY = 0.0
             BigDecimal maxY = 0.0
             for (int i = 0; i < keys.size(); i++) {
-                Map<Number, BigDecimal> dataMap = dataPerKey[keys[i]] as Map<Number, BigDecimal>
+                Map<Number, BigDecimal> dataMap = dataPerKey[keys[i]].collectEntries { [(objectToNumber(it.key)): it.value] } as Map<Number, BigDecimal>
                 Set<Number> xDataSet = dataMap.keySet().sort() as Set<Number>
 
                 Map<Number, BigDecimal> stackedDataMap = [:]
@@ -53,8 +55,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             super.drawHorizontalBackground(minY, maxY)
 
             // draw data area from top to lowest, and next one will cover the previous one
-            Integer minX = xLabelList.first() as Integer
-            Integer maxX = xLabelList.last() as Integer
+            Number minX = objectToNumber(xLabelList.first())
+            Number maxX = objectToNumber(xLabelList.last())
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = keys.size() - 1; i >= 0; i--) {
                 Map<Number, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
@@ -123,13 +125,14 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw() {
-        if (xLabelList.isEmpty()) {
+    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+        if (!buildXLabelList()) {
             return
         }
+        this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
         render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "diagram-action-url": diagramActionUrl ?: "", "shape-type": "area", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
-        drawVerticalBackground(false)
+        drawVerticalBackground()
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()
     }

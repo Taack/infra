@@ -98,7 +98,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     @Override
     void visitFormSection(String i18n) {
         i18n ?= parameter.trField(parameter.controllerName, parameter.actionName, false)
-        blockLog.topElement = formThemed.section(blockLog.topElement, i18n)
+        blockLog.topElement = formThemed.section(blockLog.topElement, i18n, false)
     }
 
     @Override
@@ -127,7 +127,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isFieldDisabled = isDisabled(field)
 
         if (isBoolean) {
-            blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as boolean)
+            blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, false, field.value as boolean)
         } else if (eos) {
             blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {

@@ -164,7 +164,6 @@ final class TaackJdbcService {
         else out.append(translator.fromClause)
         if (translator.whereClause) out.append(translator.whereClause)
         if (!count && translator.groupByClause) out.append(translator.groupByClause)
-        println "HQL: ${out.toString()}"
         out.toString()
     }
 

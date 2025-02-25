@@ -5,6 +5,7 @@ import diagram.PngDiagramRender
 import diagram.SvgDiagramRender
 import diagram.scene.AreaDiagramScene
 import diagram.scene.BarDiagramScene
+import diagram.scene.DiagramXLabelDateFormat
 import diagram.scene.LineDiagramScene
 import diagram.scene.PieDiagramScene
 import diagram.scene.ScatterDiagramScene
@@ -14,10 +15,6 @@ import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.HTMLOutput
-import taack.ui.dump.html.element.IHTMLElement
-import taack.ui.dump.html.element.TaackTag
-import taack.ui.dump.html.layout.BootstrapLayout
-import taack.ui.dump.html.layout.HTMLEmpty
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
@@ -35,6 +32,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
     private String diagramActionUrl
+    private DiagramXLabelDateFormat xLabelDateFormat
 
     @Override
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
@@ -61,6 +59,12 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
+    void visitLabels(DiagramXLabelDateFormat dateFormat, Date... dates) {
+        this.xLabelDateFormat = dateFormat
+        this.xDataList = dates
+    }
+
+    @Override
     void dataset(String key, BigDecimal... yDataList) {
         if (xDataList) {
             Map<Object, BigDecimal> dataMap = [:]
@@ -80,7 +84,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         if (!dataMap.isEmpty()) {
             if (!xDataList) {
                 xDataList = dataMap.keySet().toArray()
-            } else if (!xDataList.every { it instanceof Number }) {
+            } else if (!xDataList.every { it instanceof Number || it instanceof Date }) {
                 for (int i = dataMap.size(); i < xDataList.size(); i++) {
                     dataMap.put(xDataList[i], 0.0)
                 }
@@ -105,36 +109,40 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitBarDiagram(boolean isStacked) {
         createDiagramRender(0.5)
-        BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, isStacked, diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-        scene.draw()
+        BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, isStacked)
+        if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
     }
 
     @Override
     void visitScatterDiagram(String... pointImageHref) {
         createDiagramRender(0.5)
-        ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, pointImageHref.toList(), diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-        scene.draw()
+        ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, pointImageHref.toList())
+        if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
     }
 
     @Override
     void visitLineDiagram() {
         createDiagramRender(0.5)
-        LineDiagramScene scene = new LineDiagramScene(render, dataPerKey, diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-        scene.draw()
+        LineDiagramScene scene = new LineDiagramScene(render, dataPerKey)
+        if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
     }
 
     @Override
     void visitAreaDiagram() {
         createDiagramRender(0.5)
-        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey, diagramActionUrl, false)
-        scene.draw()
+        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey)
+        if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
+        scene.draw(false, diagramActionUrl)
     }
 
     @Override
     void visitPieDiagram(boolean hasSlice) {
         createDiagramRender(1.0)
-        PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice, diagramActionUrl)
-        scene.draw()
+        PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice)
+        scene.draw(diagramActionUrl)
     }
 
     @Override
@@ -150,8 +158,9 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitWhiskersDiagram() {
         if (xDataList) {
             createDiagramRender(0.5)
-            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramActionUrl, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-            scene.draw()
+            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey)
+            if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
+            scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
         }
     }
 

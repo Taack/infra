@@ -32,7 +32,6 @@ class StatsController {
         taackUiService.show(new UiBlockSpecifier().ui {
             row {
                 col BlockSpec.Width.HALF, {
-                    println 'coucou'
                     diagram(statsService.&buildChart as MethodClosure) {
                         label "Sales1"
                         if (showMonthlyGraph) {
@@ -46,7 +45,6 @@ class StatsController {
 
                 }
                 col BlockSpec.Width.HALF, {
-                    println 'coucou2'
                     diagram(statsService::buildChart as MethodClosure) {
                         label "Sales2"
                         if (showMonthlyGraph) {

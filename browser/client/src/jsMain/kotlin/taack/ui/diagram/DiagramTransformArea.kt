@@ -48,7 +48,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 var minGapX: Double = Double.MAX_VALUE
                 val datasetMap = dataList.filter { it.g.hasAttribute("data-label") && it.g.style.display != "none" }.groupBy { it.dataset }
                 datasetMap.forEach {
-                    val dataList = it.value.filter { data -> parent.translateX(data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2) in areaMinX..areaMaxX }
+                    val dataList = it.value.filter { data -> round(parent.translateX(data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2) * 100) / 100 in areaMinX..areaMaxX }
                     val diagramDataIndex = dataList.indexOf(dataList.findLast { data -> data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2 <= mouseClientX })
                     if (diagramDataIndex != -1) {
                         val gap1 = abs(dataList[diagramDataIndex].g.getBoundingClientRect().x + dataList[diagramDataIndex].g.getBoundingClientRect().width / 2 - mouseClientX)
@@ -101,8 +101,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     private fun scrollTo(x: Double) {
         if (backgroundVerticalLines.isNotEmpty()) {
-            val minX = areaMaxX - round(backgroundVerticalLines.last().getAttribute("x1")!!.toDouble())
-            val maxX = areaMinX - round(backgroundVerticalLines.first().getAttribute("x1")!!.toDouble())
+            val minX = areaMaxX - gapWidth - round(backgroundVerticalLines.last().getAttribute("x1")!!.toDouble())
+            val maxX = areaMinX + gapWidth - round(backgroundVerticalLines.first().getAttribute("x1")!!.toDouble())
             val adjustedX = min(maxX, max(minX, x))
             g.setAttribute("scroll-x", adjustedX.toString())
             g.setAttribute("transform", "translate(${adjustedX},0.0)")
@@ -163,7 +163,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 zoomUpTargetCenterLineIndex = null
             }
 
-            if (newMaxLineIndex - newMinLineIndex > 2 && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
+            if ((!isUp || newMaxLineIndex - newMinLineIndex > 2) && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
                 val newMinLine = backgroundVerticalLines[newMinLineIndex] as SVGLineElement
                 val newMaxLine = backgroundVerticalLines[newMaxLineIndex] as SVGLineElement
                 val zoomRadio = (areaMaxX - areaMinX) / (newMaxLine.x1.baseVal.value - newMinLine.x1.baseVal.value)
@@ -199,18 +199,16 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     private fun refreshBackgroundXLabelsPosition(zoomRadio: Double) {
         backgroundXLabelGroup!!.querySelectorAll("text").asList().forEach { text ->
-            if (text.hasAttribute("rotated-label-offset-x")) {
-                val offset = text.getAttribute("rotated-label-offset-x")!!.toDouble()
-
-                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - offset)) + offset - areaMinX) * zoomRadio + areaMinX - offset
+            val labelWidth = text.getAttribute("label-width")?.toDouble() ?: 0.0
+            if (text.getAttribute("transform")?.startsWith("rotate") == true) {
+                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - labelWidth)) + labelWidth - areaMinX) * zoomRadio + areaMinX - labelWidth
                 text.setAttribute("x", targetX.toString())
 
                 val s = text.getAttribute("transform")!!.split(",").toMutableList()
-                s[1] = (targetX + offset).toString()
+                s[1] = (targetX + labelWidth).toString()
                 text.setAttribute("transform", s.joinToString(","))
             } else {
-                val width = (text as SVGTextElement).getBBox().width
-                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - width / 2)) + width / 2 - areaMinX) * zoomRadio + areaMinX - width / 2
+                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - labelWidth / 2)) + labelWidth / 2 - areaMinX) * zoomRadio + areaMinX - labelWidth / 2
                 text.setAttribute("x", targetX.toString())
             }
         }

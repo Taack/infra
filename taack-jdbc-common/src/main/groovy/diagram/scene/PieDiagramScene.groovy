@@ -13,13 +13,12 @@ class PieDiagramScene extends DiagramScene {
     final private Map<String, BigDecimal> pieDataPerKey
     final private BigDecimal slicePositionRate
 
-    PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice, String diagramActionUrl = null) {
+    PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice) {
         this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
         this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
-        this.diagramActionUrl = diagramActionUrl
 
         Map<String, BigDecimal> pieDataPerKey = [:]
         Set<String> keys = dataPerKey.keySet()
@@ -33,7 +32,7 @@ class PieDiagramScene extends DiagramScene {
         this.pieDataPerKey = pieDataPerKey
     }
 
-    void draw() {
+    void draw(String diagramActionUrl = null) {
         render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "diagram-action-url": diagramActionUrl ?: "", "shape-type": "pie", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height])
         BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - DIAGRAM_MARGIN_TOP - 5.0) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = width / 2
@@ -72,7 +71,7 @@ class PieDiagramScene extends DiagramScene {
             while (!keys.isEmpty()) {
                 String key = drawByClockwise ? keys.first() : keys.last()
                 BigDecimal value = pieDataPerKey[key]
-                String valueLabel = "${key}: ${value.toDouble() % 1 == 0 ? "${value.toInteger()}" : "$value"}"
+                String valueLabel = "${key}: ${numberToString(value)}"
                 BigDecimal valueLabelLength = render.measureText(valueLabel)
                 BigDecimal percent = value / total
                 String percentLabel = "(${(percent * 100).round(2)}%)"

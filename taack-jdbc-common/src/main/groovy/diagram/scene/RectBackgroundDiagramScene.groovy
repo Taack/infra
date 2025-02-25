@@ -3,6 +3,30 @@ package diagram.scene
 import groovy.transform.CompileStatic
 import diagram.IDiagramRender
 
+import java.text.SimpleDateFormat
+
+@CompileStatic
+enum DiagramXLabelDateFormat {
+    YEAR(Calendar.YEAR, Calendar.MONTH, "yyyy"),
+    MONTH(Calendar.MONTH, Calendar.DAY_OF_MONTH, "yyyy-MM"),
+    DAY(Calendar.DAY_OF_MONTH, Calendar.HOUR_OF_DAY, "yyyy-MM-dd"),
+    HOUR(Calendar.HOUR_OF_DAY, Calendar.MINUTE, "dd HH")
+
+    DiagramXLabelDateFormat(int unit, int subUnit, String formatToDisplay) {
+        this.unit = unit
+        this.subUnit = subUnit
+        this.formatToDisplay = formatToDisplay
+    }
+
+    final int unit
+    final int subUnit
+    final String formatToDisplay
+
+    String format(Date date) {
+        return new SimpleDateFormat(formatToDisplay).format(date) + (this == HOUR ? "h" : "")
+    }
+}
+
 @CompileStatic
 abstract class RectBackgroundDiagramScene extends DiagramScene {
     final protected BigDecimal LEGEND_IMAGE_WIDTH = 19.0
@@ -12,45 +36,99 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
     final private BigDecimal AXIS_LABEL_MARGIN = 10.0
     final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
-    final private Integer GAP_NUMBER_WHEN_CONTINUOUS_X_AXIS = 5
     final protected BigDecimal MIN_GAP_WIDTH = 5.0
 
     private BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP // will be increased by legend height
-    protected Set<Object> xLabelList
+    protected Set<Object> xLabelList = []
     protected BigDecimal startLabelY
     protected BigDecimal gapY
     protected BigDecimal gapHeight
     protected Map<String, Map<Object, BigDecimal>> dataPerKey
     protected boolean alwaysShowFullInfo = false
+    protected boolean isXLabelInsideGap = false
+    protected DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
-    RectBackgroundDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean canXAxisBeNumeralContinuous) {
+    BigDecimal getGreatestCommonDivisor(BigDecimal a, BigDecimal b) {
+        if (a < b) {
+            return getGreatestCommonDivisor(b, a)
+        }
+        if (b < 0.001) {
+            return a
+        } else {
+            return getGreatestCommonDivisor(b, a - (a / b).toInteger() * b)
+        }
+    }
+
+    RectBackgroundDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
         this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
         this.dataPerKey = dataPerKey
+    }
 
-        this.xLabelList = []
-        Set xDataList = dataPerKey.collect { it.value.keySet() }.flatten() as Set
-        if (!xDataList.isEmpty()) {
-            if (canXAxisBeNumeralContinuous && xDataList.every { it instanceof Number }) {
-                if (xDataList.size() == 1) {
-                    Integer value = xDataList.first() as Integer
-                    this.xLabelList.add(value - 1)
-                    this.xLabelList.add(value)
-                    this.xLabelList.add(value + 1)
-                } else {
-                    Double min = Math.floor(xDataList.sort().first() as Double)
-                    Double max = Math.ceil(xDataList.sort().last() as Double)
-                    Double gap = Math.ceil(((max - min) / GAP_NUMBER_WHEN_CONTINUOUS_X_AXIS) as Double)
-                    for (int i = 0; i <= GAP_NUMBER_WHEN_CONTINUOUS_X_AXIS; i++) {
-                        this.xLabelList.add((min + gap * i).toInteger())
-                    }
-                }
-            } else {
-                this.xLabelList.addAll(dataPerKey[dataPerKey.keySet().first()].keySet().collect { it.toString() })
-            }
+    boolean buildXLabelList() {
+        Set<Object> xDataList = dataPerKey.collect { it.value.keySet() }.flatten().unique() as Set<Object>
+        if (xDataList.isEmpty()) {
+            return false
         }
+        if (xDataList.every { it instanceof Number }) { // continuous X axis (Numeral)
+            xDataList = xDataList.sort() as Set<Object>
+            if (isXLabelInsideGap) { // bar/whiskers: should exactly have related gap for every X data
+                if (xDataList.size() > 1) {
+                    BigDecimal gap = (xDataList[1] as BigDecimal) - (xDataList[0] as BigDecimal)
+                    for (int i = 2; i < xDataList.size(); i++) {
+                        gap = getGreatestCommonDivisor(gap, (xDataList[i] as BigDecimal) - (xDataList[i - 1] as BigDecimal))
+                    }
+                    BigDecimal min = Math.floor(xDataList.first() as Double).toBigDecimal()
+                    BigDecimal max = Math.ceil(xDataList.last() as Double).toBigDecimal()
+                    BigDecimal label = min
+                    while (label <= max) {
+                        this.xLabelList.add(label)
+                        label += gap
+                    }
+                } else {
+                    this.xLabelList = xDataList
+                }
+            } else { // scatter/line/area: no matter how X axis looks
+                if (xDataList.size() > 1) {
+                    int gapNumber = 5
+                    Double min = Math.floor(xDataList.first() as Double)
+                    Double max = Math.ceil(xDataList.last() as Double)
+                    Double gap = Math.ceil(((max - min) / gapNumber) as Double)
+                    Set labels = []
+                    for (int i = 0; i <= gapNumber; i++) {
+                        labels.add((min + gap * i).toInteger())
+                    }
+                    this.xLabelList = labels
+                } else {
+                    Integer value = xDataList.first() as Integer
+                    this.xLabelList = (value > 0 ? [value - 1, value, value + 1] : [0, 1, 2]) as Set<Object>
+                }
+            }
+        } else if (xDataList.every { it instanceof Date } && xLabelDateFormat) { // continuous X axis (Date)
+            xDataList = xDataList.sort() as Set<Object>
+            Calendar cal = Calendar.getInstance()
+            cal.setTime(xDataList.last() as Date)
+            cal.set(xLabelDateFormat.subUnit, cal.getActualMaximum(xLabelDateFormat.subUnit))
+            if (!isXLabelInsideGap) {
+                cal.add(xLabelDateFormat.unit, 1)
+            }
+            Date dateMax = cal.getTime()
+
+            cal.setTime(xDataList.first() as Date)
+            cal.set(xLabelDateFormat.subUnit, cal.getActualMinimum(xLabelDateFormat.subUnit))
+            Date dateMin = cal.getTime()
+
+            while (dateMin.before(dateMax)) {
+                this.xLabelList.add(dateMin)
+                cal.add(xLabelDateFormat.unit, 1)
+                dateMin = cal.getTime()
+            }
+        } else {  // discrete X axis
+            this.xLabelList = xDataList.collect { it.toString() } as Set<Object>
+        }
+        return true
     }
 
     void drawLegend(List<String> pointImageHref = []) {
@@ -147,11 +225,13 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
     }
 
-    void drawVerticalBackground(boolean isXLabelInsideGap, int showGapEveryX = 1) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
+    void drawVerticalBackground(int showGapEveryX = 1) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
         int displayedXLabelListNumber = (xLabelList.size() / showGapEveryX).toInteger()
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
-        int showLabelEveryX = Math.ceil((render.measureText(xLabelList.join("")) / showGapEveryX / (diagramWidth * 0.8)).toDouble()).toInteger()
+        boolean isDate = xLabelList.every { it instanceof Date } && xLabelDateFormat
+        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? xLabelDateFormat.format(it as Date) : it.toString() }.join(""))
+        int showLabelEveryX = Math.ceil((xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)).toDouble()).toInteger()
 
         // background vertical line
         render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_LINE])
@@ -166,11 +246,11 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
 
         // x axis label
-        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_TEXT, "show-label-every-x": showLabelEveryX])
+        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_TEXT, "show-label-every-x": xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)])
         for (int i = 0; i < displayedXLabelListNumber; i++) {
             BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
             BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
-            String xLabel = xLabelList[i * showGapEveryX]
+            String xLabel = isDate ? xLabelDateFormat.format(xLabelList[i * showGapEveryX] as Date) : xLabelList[i * showGapEveryX].toString()
             BigDecimal labelLength = render.measureText(xLabel)
             if (gapWidth >= labelLength) {
                 render.translateTo(startX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
@@ -191,7 +271,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
     }
 
-    void buildTransformAreaStart(String shapeType, BigDecimal shapeMaxWidth = 0.0) {
+    void buildTransformAreaStart(String shapeType, String diagramActionUrl = null, BigDecimal shapeMaxWidth = 0.0) {
         String id = "clipSection"
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
@@ -216,5 +296,9 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     void buildTransformAreaEnd() {
         render.renderGroupEnd()
         render.renderGroupEnd()
+    }
+
+    void setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
+        this.xLabelDateFormat = xLabelDateFormat
     }
 }

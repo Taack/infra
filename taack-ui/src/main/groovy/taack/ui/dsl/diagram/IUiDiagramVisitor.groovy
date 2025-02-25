@@ -1,5 +1,7 @@
 package taack.ui.dsl.diagram
 
+import diagram.scene.DiagramXLabelDateFormat
+import diagram.scene.RectBackgroundDiagramScene
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
 
@@ -12,6 +14,8 @@ interface IUiDiagramVisitor {
     void visitLabels(Number... labels)
 
     void visitLabels(String... labels)
+
+    void visitLabels(DiagramXLabelDateFormat dateFormat, Date... dates)
 
     void dataset(String key, BigDecimal[] yDataList)
 

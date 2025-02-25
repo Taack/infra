@@ -17,6 +17,7 @@ import taack.utils.DateFormat
 
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
+
 /**
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
@@ -35,6 +36,7 @@ final class TaackFilter<T extends GormEntity<T>> {
     private int joinEntityOrder = 0
 
     private final Class<T> cClass
+    private final Class innerDomain
     private final T oObject
     int max
     private List<UiFilterSpecifier> additionalFilters
@@ -46,6 +48,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         this.theParams = theParams
         this.sessionFactory = sessionFactory
         this.cClass = filterBuilder.cClass
+        this.innerDomain = filterBuilder.innerDomain
         this.oObject = (filterBuilder.oObject ?: null) as T
         this.max = filterBuilder.maxNumberOfLine ?: 0 as int
         this.additionalFilters = filterBuilder.additionalFilters.empty ? null : filterBuilder.additionalFilters
@@ -166,6 +169,7 @@ final class TaackFilter<T extends GormEntity<T>> {
     String getSortString() {
         sortFields*.fieldName?.join('.')
     }
+
     String getOrderString() {
         if (order == Order.ASC) "asc"
         else if (order == Order.DESC) "desc"
@@ -381,11 +385,31 @@ final class TaackFilter<T extends GormEntity<T>> {
         if (superClass) {
             fieldNames.addAll superClass.declaredFields*.name.findAll { it != "id" }
         }
-        Map<String, Object> filter = theParams.findAll {
-            (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) ||
-                    (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains("Default")) ||
-                    (it.key.startsWith('_reverse') || it.key.startsWith('_extension_'))
-        }
+
+        Map<String, Object> filter = [:]
+        filter.putAll(theParams)
+
+        if (innerDomain) {
+            String key = 'visitInnerFilterAnonymous' + innerDomain.name.replace('.', '_') + '.'
+
+            Map<String, Object> innerFilter = filter.findAll {
+                if (it.value) it.key.startsWith(key)
+            }
+            if (innerFilter.size() > 0) {
+                filter.removeAll { true }
+                innerFilter.each {
+                    filter.put(it.key - key, it.value)
+                }
+            } else {
+                return new Pair([], 0)
+            }
+        } else
+            filter = filter.findAll {
+                (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) ||
+                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous')) ||
+                        (it.key.startsWith('_reverse') || it.key.startsWith('_extension_'))
+            }
+
         if (tInstance) {
             tInstance.class.getDeclaredFields().eachWithIndex { Field entry, int i ->
                 if (tInstance[entry.name] != null && [String, Boolean, aClass].contains(entry.type)) filter.put(entry.name, tInstance[entry.name])
@@ -538,6 +562,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
 
         List<T> res
+
         try {
             Integer offset = (theParams["offset"] ?: "0") as Integer
             if (simpleSort && simpleOrder) {
@@ -624,6 +649,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         private int maxNumberOfLine = 8
         private List<UiFilterSpecifier> additionalFilters = []
         private List<Long> restrictedIds = null
+        private Class innerDomain = null
         private FieldInfo[] sortFields
         private Order order
 
@@ -654,6 +680,11 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         FilterBuilder addFilter(UiFilterSpecifier securityClosure) {
             this.additionalFilters.add securityClosure
+            this
+        }
+
+        FilterBuilder setInnerDomain(Class<? extends GormEntity> bClass) {
+            this.innerDomain = bClass
             this
         }
 

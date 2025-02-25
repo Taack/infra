@@ -67,11 +67,9 @@ final class TaackMetaModelService {
     private Integer updateObjectPointing(final ManagedType<?> mt, final Attribute<?, ?> attribute, final Serializable idFrom, final Serializable idTo) {
         if (!attribute.collection) {
             def qSingle = "update ${mt} c set c.${attribute.name}=${idTo} where ${"c.${attribute.name}=${idFrom}"}"
-            println "update: $qSingle"
             def q = qSingle
             sessionFactory.currentSession.createQuery(q).executeUpdate()
         } else {
-            println "cannot udpate collection $mt $attribute $idFrom $idTo"
             0
         }
     }

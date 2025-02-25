@@ -3,36 +3,45 @@ package diagram.scene
 import groovy.transform.CompileStatic
 import diagram.IDiagramRender
 
+import java.text.SimpleDateFormat
+
 @CompileStatic
 class ScatterDiagramScene extends RectBackgroundDiagramScene {
     final private List<String> pointImageHref
     protected BigDecimal dataPointRadius
 
-    ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, List<String> pointImageHref = [], String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
-        super(render, dataPerKey, true)
+    ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, List<String> pointImageHref = []) {
+        super(render, dataPerKey)
         this.pointImageHref = pointImageHref
-        this.diagramActionUrl = diagramActionUrl
-        this.alwaysShowFullInfo = alwaysShowFullInfo
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
+    }
+
+    static Number objectToNumber(Object o) {
+        return o instanceof Date ? o.getTime() : o instanceof Number ? o : 0.0
+    }
+
+    static String objectToString(Object o) {
+        return o instanceof Date ? new SimpleDateFormat("yyyy-MM-dd HH:mm").format(o) : o instanceof Number ? numberToString(o) : o.toString()
     }
 
     void drawDataPoint(Boolean hasLineBetweenPoints) {
         Set<String> keys = dataPerKey.keySet()
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)
-        if (xLabelList.every { it instanceof Number }) { // continuous
-            Integer minX = xLabelList.first() as Integer
-            Integer maxX = xLabelList.last() as Integer
+        if (xLabelList.every { it instanceof Number } || (xLabelList.every { it instanceof Date } && xLabelDateFormat)) { // continuous
+            Number minX = objectToNumber(xLabelList.first())
+            Number maxX = objectToNumber(xLabelList.last())
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = 0; i < keys.size(); i++) {
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
-                List<Number> xList = pointList.keySet().sort() as List<Number>
+                List<Object> xList = pointList.keySet().sort() as List<Object>
                 for (int j = 0; j < xList.size(); j++) {
-                    Number x = xList[j]
-                    Number y = pointList[x]
-                    String xLabel = x.toDouble() % 1 == 0 ? "${x.toInteger()}" : "$x"
-                    String yLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
+                    Number x = objectToNumber(xList[j])
+                    Number y = pointList[xList[j]]
                     BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
+                    String xLabel = objectToString(xList[j])
+                    String yLabel = numberToString(y)
+                    String dataLabel = xList[j] instanceof Date ? "${xLabel}: ${yLabel}" : "($xLabel, $yLabel)"
                     KeyColor circleColor = KeyColor.colorFrom(i)
                     render.fillStyle(circleColor.color)
 
@@ -42,7 +51,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                                             dataset: keys[i],
                                             "data-x": xLabel,
                                             "data-y": yLabel,
-                                            "data-label": "($xLabel, $yLabel)",
+                                            "data-label": dataLabel,
                                             style: "pointer-events: bounding-box;"])
                         if (i < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
@@ -56,10 +65,10 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     // line to next circle
                     if (hasLineBetweenPoints && j < xList.size() - 1) {
                         render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
-                        Number nextX = xList[j + 1]
-                        Number nextY = pointList[nextX]
-                        BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
+                        Number nextX = objectToNumber(xList[j + 1])
+                        Number nextY = pointList[xList[j + 1]]
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
+                        BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
                         render.fillStyle(circleColor.color)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
@@ -67,7 +76,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     }
                     if (!alwaysShowFullInfo && gapWidth >= MIN_GAP_WIDTH) {
                         // data label
-                        String dataLabel = "($xLabel, $yLabel)"
                         if (dataPointRadius > 5) { // put label at right
                             render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
                         } else { // put label at top
@@ -78,18 +86,12 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                 }
             }
         } else { // discrete
-            Map<String, List<BigDecimal>> yDataListPerKey = [:]
-            for (int i = 0; i < keys.size(); i++) {
-                String key = keys[i]
-                yDataListPerKey.put(key, dataPerKey[key].values() as List<BigDecimal>)
-            }
-
             for (int i = 0; i < xLabelList.size(); i++) {
                 BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + gapWidth * i
                 for (int j = 0; j < keys.size(); j++) {
-                    List<BigDecimal> yList = yDataListPerKey[keys[j]]
+                    List<BigDecimal> yList = dataPerKey[keys[j]].values() as List<BigDecimal>
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
-                    String yDataLabel = y.toDouble() % 1 == 0 ? "${y.toInteger()}" : "$y"
+                    String yDataLabel = numberToString(y)
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
 
                     // data point
@@ -137,14 +139,15 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw() {
-        if (xLabelList.isEmpty()) {
+    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+        if (!buildXLabelList()) {
             return
         }
+        this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend(pointImageHref)
         drawHorizontalBackground()
-        buildTransformAreaStart("scatter")
-        drawVerticalBackground(false)
+        buildTransformAreaStart("scatter", diagramActionUrl)
+        drawVerticalBackground()
         drawDataPoint(false)
         buildTransformAreaEnd()
     }
