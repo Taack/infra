@@ -28,6 +28,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     final BlockLog blockLog
     boolean uncollapseSection
     private boolean visitInner = false
+    private String innerFilterName = null
     private FieldInfo[] innerFieldInfos = null
 
     RawHtmlFilterDump(final BlockLog blockLog, final String id, final Parameter parameter) {
@@ -38,8 +39,11 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     }
 
-    static String getQualifiedName(final FieldInfo fieldInfo) {
-        fieldInfo.fieldName
+    String filterQualifiedName(final FieldInfo... fieldInfoList) {
+        FieldInfo[] fields = fieldInfoList
+        if (innerFilterName)
+            return innerFilterName + '.' + getQualifiedName(fields)
+        getQualifiedName(fields)
     }
 
     static String getQualifiedName(final FieldInfo... fieldInfoList) {
@@ -100,7 +104,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitSection(String i18n, boolean initiallyCollapsed = false) {
 
         uncollapseSection = false
-        if (innerFieldInfos) i18n = i18n ?: parameter.trField(innerFieldInfos)
+        if (innerFilterName) i18n = i18n ?: parameter.trField(innerFieldInfos)
         blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
     }
 
@@ -136,14 +140,12 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo[] fields) {
-        if (innerFieldInfos) fields = innerFieldInfos + fields
-        final String qualifiedName = getQualifiedName(fields)
+        final String qualifiedName = filterQualifiedName(fields)
         filterField(i18n ?: parameter.trField(fields), qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString(), fields?.last(), enumOptions)
     }
 
     @Override
     void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
-        if (innerFieldInfos) fields = innerFieldInfos + fields
         final String qualifiedName = getQualifiedName(reverseClass, reverseField, fields)
         filterField(i18n, qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString())
     }
@@ -180,7 +182,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos) {
         visitInner = true
         innerFieldInfos = fieldInfos
+        innerFilterName = fieldInfos ? getQualifiedName(fieldInfos) : 'visitInnerFilterAnonymous' + uiFilterSpecifier.aClass.name.replace('.', '_')
         uiFilterSpecifier.visitFilter(this)
+        innerFilterName = null
         innerFieldInfos = null
         visitInner = false
     }

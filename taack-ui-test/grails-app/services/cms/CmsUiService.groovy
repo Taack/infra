@@ -66,13 +66,18 @@ class CmsUiService implements WebAttributes {
                 filterField p.name_
                 filterField p.subsidiary_
                 filterField p.pageType_
-                println p.userCreated_
                 innerFilter(new UiFilterSpecifier().ui(User, {
                     section true, {
                         filterField u.username_
                         filterField u.dateCreated_
                     }
                 }), p.userCreated_)
+                innerFilter(new UiFilterSpecifier().ui(User, {
+                    section 'test', true, {
+                        filterField u.username_
+                        filterField u.dateCreated_
+                    }
+                })/*, p.userCreated_*/)
             }
         }
         f
@@ -184,6 +189,9 @@ class CmsUiService implements WebAttributes {
                 filterFieldExpressionBool new FilterExpression(CmsPageType.SLIDESHOW, Operator.NE, p.pageType_)
             }
             f2.join(filter)
+
+            println taackFilterService.getBuilder(User).setInnerDomain(User).build().list()
+
 
             iterate(taackFilterService.getBuilder(CmsPage)
                     .setMaxNumberOfLine(20)
