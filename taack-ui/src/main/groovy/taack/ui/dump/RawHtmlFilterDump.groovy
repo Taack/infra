@@ -27,6 +27,9 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     BootstrapForm formThemed
     final BlockLog blockLog
     boolean uncollapseSection
+    private boolean visitInner = false
+    private String innerFilterName = null
+    private FieldInfo[] innerFieldInfos = null
 
     RawHtmlFilterDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -36,8 +39,11 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     }
 
-    static String getQualifiedName(final FieldInfo fieldInfo) {
-        fieldInfo.fieldName
+    String filterQualifiedName(final FieldInfo... fieldInfoList) {
+        FieldInfo[] fields = fieldInfoList
+        if (innerFilterName)
+            return innerFilterName + '.' + getQualifiedName(fields)
+        getQualifiedName(fields)
     }
 
     static String getQualifiedName(final FieldInfo... fieldInfoList) {
@@ -50,29 +56,30 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
-        formThemed = new BootstrapForm(blockLog, false, true)
-        formThemed.attributes.put('action', parameter.urlMapped())
-        blockLog.topElement.setTaackTag(TaackTag.FILTER)
+        if (!visitInner) {
+            formThemed = new BootstrapForm(blockLog, false, true)
+            formThemed.attributes.put('action', parameter.urlMapped())
+            blockLog.topElement.setTaackTag(TaackTag.FILTER)
 
-        if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
-        if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
-        if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
-        if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
-        if (parameter.additionalId) mapAdditionalHiddenParams.put 'additionalId', new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId')
-        if (parameter.brand) mapAdditionalHiddenParams.put 'brand', new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand')
-        if (aClass.name) mapAdditionalHiddenParams.put 'className', new HTMLInput(InputType.HIDDEN, aClass.name, 'className')
-        if (parameter.fieldName) mapAdditionalHiddenParams.put 'fieldName', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
-        if (parameter.tabIndex != null) mapAdditionalHiddenParams.put 'tabIndex', new HTMLInput(InputType.HIDDEN, parameter.tabIndex, 'tabIndex')
+            if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+            if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+            if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
+            if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
+            if (parameter.additionalId) mapAdditionalHiddenParams.put 'additionalId', new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId')
+            if (parameter.brand) mapAdditionalHiddenParams.put 'brand', new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand')
+            if (aClass.name) mapAdditionalHiddenParams.put 'className', new HTMLInput(InputType.HIDDEN, aClass.name, 'className')
+            if (parameter.fieldName) mapAdditionalHiddenParams.put 'fieldName', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
+            if (parameter.tabIndex != null) mapAdditionalHiddenParams.put 'tabIndex', new HTMLInput(InputType.HIDDEN, parameter.tabIndex, 'tabIndex')
 
-        additionalParams?.each {
-            mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key)
+            additionalParams?.each {
+                mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key)
+            }
+            blockLog.topElement.addChildren(
+                    formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()
+            )
+            blockLog.topElement = formThemed
         }
 
-        blockLog.topElement.addChildren(
-                formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()
-        )
-
-        blockLog.topElement = formThemed
     }
 
     @Override
@@ -84,16 +91,20 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterEnd() {
-        blockLog.topElement = formThemed.formActionBlock(blockLog.topElement)
-        filterActions.each {
-            formThemed.addFormAction(blockLog.topElement, it.cValue, it.aValue, it.bValue)
+        if (!visitInner) {
+            blockLog.topElement = formThemed.formActionBlock(blockLog.topElement)
+            filterActions.each {
+                formThemed.addFormAction(blockLog.topElement, it.cValue, it.aValue, it.bValue)
+            }
+            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.FILTER)
         }
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.FILTER)
     }
 
     @Override
-    void visitSection(final String i18n, boolean initiallyCollapsed = false) {
+    void visitSection(String i18n, boolean initiallyCollapsed = false) {
+
         uncollapseSection = false
+        if (innerFilterName) i18n = i18n ?: parameter.trField(innerFieldInfos)
         blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
     }
 
@@ -107,7 +118,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         blockLog.topElement = d.parent
     }
 
-    private filterField(final String i18n, final String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
+    private filterField(final String i18n, String qualifiedName, final String value, final FieldInfo fieldInfo = null, final IEnumOption[] enumOptions = null) {
         final Class type = fieldInfo?.fieldConstraint?.field?.type
         if (value != null && !value.empty) uncollapseSection = true
         final boolean isEnum = type?.isEnum()
@@ -129,7 +140,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo[] fields) {
-        final String qualifiedName = getQualifiedName(fields)
+        final String qualifiedName = filterQualifiedName(fields)
         filterField(i18n ?: parameter.trField(fields), qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString(), fields?.last(), enumOptions)
     }
 
@@ -169,6 +180,12 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos) {
-
+        visitInner = true
+        innerFieldInfos = fieldInfos
+        innerFilterName = fieldInfos ? getQualifiedName(fieldInfos) : 'visitInnerFilterAnonymous' + uiFilterSpecifier.aClass.name.replace('.', '_')
+        uiFilterSpecifier.visitFilter(this)
+        innerFilterName = null
+        innerFieldInfos = null
+        visitInner = false
     }
 }

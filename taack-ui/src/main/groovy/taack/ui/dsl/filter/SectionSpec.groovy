@@ -39,7 +39,4 @@ final class SectionSpec extends FilterCommon {
         filterVisitor.visitFilterFieldReverse(i18n, reverseClass, field, fields)
     }
 
-    final <T> void innerFilter(UiFilterSpecifier filterSpecifier, final FieldInfo... fields = null) {
-        filterVisitor.visitInnerFilter(filterSpecifier, fields)
-    }
 }
