@@ -48,7 +48,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 var minGapX: Double = Double.MAX_VALUE
                 val datasetMap = dataList.filter { it.g.hasAttribute("data-label") && it.g.style.display != "none" }.groupBy { it.dataset }
                 datasetMap.forEach {
-                    val dataList = it.value.filter { data -> parent.translateX(data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2) in areaMinX..areaMaxX }
+                    val dataList = it.value.filter { data -> round(parent.translateX(data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2) * 100) / 100 in areaMinX..areaMaxX }
                     val diagramDataIndex = dataList.indexOf(dataList.findLast { data -> data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2 <= mouseClientX })
                     if (diagramDataIndex != -1) {
                         val gap1 = abs(dataList[diagramDataIndex].g.getBoundingClientRect().x + dataList[diagramDataIndex].g.getBoundingClientRect().width / 2 - mouseClientX)
