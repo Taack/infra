@@ -104,11 +104,14 @@
 * [.line-through]#Extension Points for Menus (Either create UiExtMenu or re-use UiMenu...)#
 * [.line-through]#Helper factory (Helper.createModal, createBlock, create*) that can be statically imported#
 
+== 0.6.2
+
+* [.line-through]#Collapsable filter section#
+* [.line-through]#Inner Filter#
+* Multi Filters
+
 == 0.6.x (x > 2)
 
-* Embedded Sections on filters
-* Mask filter section if inputs are empty
-* Inner Filter OR Filter extension: pass many filters at once, allowing many list of independent objects, useful for listing Addresses from Geographical Area (2 independent classes).
 * for large filters, allow scrolling OR partition filters and edit parts into modals
 * PoC merge crew service into Infra
 * Grails 7.x

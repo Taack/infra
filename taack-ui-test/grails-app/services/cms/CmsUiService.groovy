@@ -66,8 +66,15 @@ class CmsUiService implements WebAttributes {
                 filterField p.name_
                 filterField p.subsidiary_
                 filterField p.pageType_
-                filterField p.userCreated_, u.username_
-                filterField p.userUpdated_, u.username_
+//                filterField p.userCreated_, u.username_
+//                filterField p.userUpdated_, u.username_
+                println p.userCreated_
+                innerFilter(new UiFilterSpecifier().ui(User, {
+                    section true, {
+                        filterField u.username_
+                        filterField u.dateCreated_
+                    }
+                }), p.userCreated_)
             }
         }
         f

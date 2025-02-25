@@ -1,17 +1,24 @@
 package taack.ui.dsl.filter
 
-
+import taack.ast.type.FieldInfo
+import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.filter.expression.FilterExpression
 
 class FilterCommon {
     final IUiFilterVisitor filterVisitor
 
+    void section(boolean collapse,
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
+        println "HELLO"
+        section(null, collapse, closure)
+    }
+
     void section(final String i18n = null, boolean collapse = false,
                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
-        if (i18n) filterVisitor.visitSection(i18n, collapse)
+        filterVisitor.visitSection(i18n, collapse)
         closure.delegate = new SectionSpec(filterVisitor)
         closure.call()
-        if (i18n) filterVisitor.visitSectionEnd()
+        filterVisitor.visitSectionEnd()
     }
 
     FilterCommon(IUiFilterVisitor filterVisitor) {
@@ -20,6 +27,11 @@ class FilterCommon {
 
     void filterFieldExpressionBool(final FilterExpression filterExpression) {
         filterVisitor.visitFilterFieldExpressionBool(filterExpression)
+    }
+
+    void innerFilter(UiFilterSpecifier filterSpecifier, final FieldInfo... fields = null) {
+        println "innerFilter, $fields"
+        filterVisitor.visitInnerFilter(filterSpecifier, fields)
     }
 
 }
