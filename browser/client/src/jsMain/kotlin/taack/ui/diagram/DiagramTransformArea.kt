@@ -199,18 +199,16 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     private fun refreshBackgroundXLabelsPosition(zoomRadio: Double) {
         backgroundXLabelGroup!!.querySelectorAll("text").asList().forEach { text ->
-            if (text.hasAttribute("rotated-label-offset-x")) {
-                val offset = text.getAttribute("rotated-label-offset-x")!!.toDouble()
-
-                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - offset)) + offset - areaMinX) * zoomRadio + areaMinX - offset
+            val labelWidth = text.getAttribute("label-width")?.toDouble() ?: 0.0
+            if (text.getAttribute("transform")?.startsWith("rotate") == true) {
+                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - labelWidth)) + labelWidth - areaMinX) * zoomRadio + areaMinX - labelWidth
                 text.setAttribute("x", targetX.toString())
 
                 val s = text.getAttribute("transform")!!.split(",").toMutableList()
-                s[1] = (targetX + offset).toString()
+                s[1] = (targetX + labelWidth).toString()
                 text.setAttribute("transform", s.joinToString(","))
             } else {
-                val width = (text as SVGTextElement).getBBox().width
-                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - width / 2)) + width / 2 - areaMinX) * zoomRadio + areaMinX - width / 2
+                val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - labelWidth / 2)) + labelWidth / 2 - areaMinX) * zoomRadio + areaMinX - labelWidth / 2
                 text.setAttribute("x", targetX.toString())
             }
         }
