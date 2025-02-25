@@ -9,31 +9,21 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
     final private BigDecimal MAX_BAR_WIDTH = 200.0
 
     final private boolean isStacked
-    final private Map<String, List<BigDecimal>> yDataListPerKey
 
-    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked, String diagramActionUrl = null, boolean alwaysShowFullInfo = false) {
-        super(render, dataPerKey, false)
+    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked) {
+        super(render, dataPerKey)
+        this.isXLabelInsideGap = true
         this.isStacked = isStacked
-        this.diagramActionUrl = diagramActionUrl
-        this.alwaysShowFullInfo = alwaysShowFullInfo
-
-        Map<String, List<BigDecimal>> yDataListPerKey = [:]
-        Set<String> keys = dataPerKey.keySet()
-        for (int i = 0; i < keys.size(); i++) {
-            String key = keys[i]
-            yDataListPerKey.put(key, dataPerKey[key].values() as List<BigDecimal>)
-        }
-        this.yDataListPerKey = yDataListPerKey
     }
 
     void drawHorizontalBackground() {
         if (isStacked) {
             Set<BigDecimal> values = []
-            Set<String> keys = yDataListPerKey.keySet()
-            for (int i = 0; i < xLabelList.size(); i++) {
+            Set<String> keys = dataPerKey.keySet()
+            xLabelList.forEach { x ->
                 BigDecimal value = 0.0
                 for (int j = 0; j < keys.size(); j++) {
-                    value += yDataListPerKey[keys[j]][i]
+                    value += dataPerKey[keys[j]].get(x) ?: 0.0
                 }
                 values.add(value)
             }
@@ -46,8 +36,12 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
+    String objectToString(Object o) {
+        return o instanceof Date ? xLabelDateFormat.format(o) : o.toString()
+    }
+
     void drawVerticalBackgroundAndDataBar() {
-        Set<String> keys = yDataListPerKey.keySet()
+        Set<String> keys = dataPerKey.keySet()
         int showGapEveryX = 1
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / xLabelList.size()
         if (!alwaysShowFullInfo) {
@@ -60,7 +54,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 gapWidth = gapWidth * showGapEveryX
             }
         }
-        super.drawVerticalBackground(true, showGapEveryX)
+        super.drawVerticalBackground(showGapEveryX)
 
         // calculate true value of bar width
         BigDecimal gapHorizontalPadding = gapWidth * 0.2 / 2
@@ -73,19 +67,22 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
 
         // data bar
+        dataPerKey = dataPerKey.collectEntries { [(it.key): it.value.collectEntries { [(objectToString(it.key)): it.value] }] }
         for (int i = 0; i < (xLabelList.size() / showGapEveryX).toInteger(); i++) {
             BigDecimal barX = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
-                BigDecimal yData = yDataListPerKey[keys[j]][i * showGapEveryX]
-                String yDataLabel = yData.toDouble() % 1 == 0 ? "${yData.toInteger()}" : "$yData"
+                Map<String, BigDecimal> data = dataPerKey[keys[j]] as Map<String, BigDecimal>
+                String xLabel = objectToString(xLabelList[i * showGapEveryX])
+                BigDecimal yData = data.get(xLabel) ?: 0.0
+                String yDataLabel = numberToString(yData)
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 render.renderGroup(["element-type": ElementType.DATA,
                                     dataset: keys[j],
                                     "gap-index": i,
-                                    "data-x": xLabelList[i],
+                                    "data-x": xLabel,
                                     "data-y": yDataLabel,
-                                    "data-label": "${xLabelList[i]}: ${yDataLabel}"])
+                                    "data-label": "${xLabel}: ${yDataLabel}"])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
@@ -110,13 +107,14 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw() {
-        if (xLabelList.isEmpty() || yDataListPerKey.isEmpty()) {
+    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+        if (!buildXLabelList()) {
             return
         }
+        this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart(isStacked ? "stackedBar" : "bar", MAX_BAR_WIDTH)
+        buildTransformAreaStart(isStacked ? "stackedBar" : "bar", diagramActionUrl, MAX_BAR_WIDTH)
         drawVerticalBackgroundAndDataBar()
         buildTransformAreaEnd()
     }

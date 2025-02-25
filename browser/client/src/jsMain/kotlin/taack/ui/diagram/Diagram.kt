@@ -50,9 +50,6 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             }
             s.onmouseleave = EventHandler {
                 isScrolling = false
-
-                transformArea.currentHoverLine?.remove()
-                s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
             }
 
             // Zoom
@@ -66,6 +63,10 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             // HoverLine and tooltip for LINE diagram
             s.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
                 transformArea.refreshCurrentHoverLineAndDataToolTip(e.clientX.toDouble(), e.clientY.toDouble())
+            })
+            s.addEventListener(EventType("mouseleave"), EventHandler {
+                transformArea.currentHoverLine?.remove()
+                s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
             })
         }
     }

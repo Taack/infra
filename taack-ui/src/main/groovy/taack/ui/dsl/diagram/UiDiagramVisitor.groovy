@@ -1,5 +1,7 @@
 package taack.ui.dsl.diagram
 
+import diagram.scene.DiagramXLabelDateFormat
+import diagram.scene.RectBackgroundDiagramScene
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
 
@@ -22,6 +24,11 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
 
     @Override
     void visitLabels(String... labels) {
+
+    }
+
+    @Override
+    void visitLabels(DiagramXLabelDateFormat dateFormat, Date... dates) {
 
     }
 
