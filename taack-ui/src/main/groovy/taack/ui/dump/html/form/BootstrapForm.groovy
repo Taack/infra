@@ -116,7 +116,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         ).build() as HTMLFieldset
         if (collapse) {
             fs = new HTMLFieldset()
-            HTMLAnchor unCollapse = new HTMLAnchor().builder.addChildren(new HTMLTxtContent(trI18n)).addClasses('btn', 'btn-collapse').putAttribute('data-bs-toggle', 'collapse').putAttribute('data-bs-target', '#section' + sectionCounter).build() as HTMLAnchor
+            HTMLAnchor unCollapse = new HTMLAnchor().builder.addChildren(new HTMLTxtContent(trI18n)).addClasses('btn', "btn-collapse${collapse ? ' collapsed': ''}").putAttribute('data-bs-toggle', 'collapse').putAttribute('data-bs-target', '#section' + sectionCounter).build() as HTMLAnchor
             topElement.builder.addChildren(unCollapse).build()
             allClasses = classes + 'collapse'
         }
