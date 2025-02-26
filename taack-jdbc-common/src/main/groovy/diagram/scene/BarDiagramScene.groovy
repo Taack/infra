@@ -16,14 +16,19 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         this.isStacked = isStacked
     }
 
+    String objectToString(Object o) {
+        return o instanceof Date ? xLabelDateFormat.format(o) : o.toString()
+    }
+
     void drawHorizontalBackground() {
         if (isStacked) {
             Set<BigDecimal> values = []
             Set<String> keys = dataPerKey.keySet()
             xLabelList.forEach { x ->
+                String xLabel = objectToString(x)
                 BigDecimal value = 0.0
                 for (int j = 0; j < keys.size(); j++) {
-                    value += dataPerKey[keys[j]].get(x) ?: 0.0
+                    value += dataPerKey[keys[j]].get(xLabel) ?: 0.0
                 }
                 values.add(value)
             }
@@ -34,10 +39,6 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         } else {
             super.drawHorizontalBackground()
         }
-    }
-
-    String objectToString(Object o) {
-        return o instanceof Date ? xLabelDateFormat.format(o) : o.toString()
     }
 
     void drawVerticalBackgroundAndDataBar() {
@@ -67,7 +68,6 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
 
         // data bar
-        dataPerKey = dataPerKey.collectEntries { [(it.key): it.value.collectEntries { [(objectToString(it.key)): it.value] }] }
         for (int i = 0; i < (xLabelList.size() / showGapEveryX).toInteger(); i++) {
             BigDecimal barX = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
             BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
@@ -112,6 +112,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
+        dataPerKey = dataPerKey.collectEntries { [(it.key): it.value.collectEntries { [(objectToString(it.key)): it.value] }] }
         drawLegend()
         drawHorizontalBackground()
         buildTransformAreaStart(isStacked ? "stackedBar" : "bar", diagramActionUrl, MAX_BAR_WIDTH)
