@@ -43,6 +43,11 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
+    void dataset(String key, Date... dates) {
+
+    }
+
+    @Override
     void visitBarDiagram(boolean isStacked) {
 
     }

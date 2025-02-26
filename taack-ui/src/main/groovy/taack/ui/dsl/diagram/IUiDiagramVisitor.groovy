@@ -21,6 +21,8 @@ interface IUiDiagramVisitor {
 
     void dataset(String key, Map<Object, BigDecimal> dataMap)
 
+    void dataset(String key, Date... dates)
+
     void visitBarDiagram(boolean isStacked)
 
     void visitScatterDiagram(String... pointImageHref)

@@ -16,6 +16,8 @@ import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.block.HTMLOutput
 
+import java.text.SimpleDateFormat
+
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
     final private ByteArrayOutputStream out
@@ -32,7 +34,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
     private String diagramActionUrl
-    private DiagramXLabelDateFormat xLabelDateFormat
+    private DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
     @Override
     void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
@@ -91,6 +93,13 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             }
             dataPerKey.put(key, dataMap)
         }
+    }
+
+    @Override
+    void dataset(String key, Date... dates) {
+        SimpleDateFormat sdf = new SimpleDateFormat((xLabelDateFormat ?: DiagramXLabelDateFormat.DAY).dateFormat)
+        Map<Object, BigDecimal> dataMap = dates.toList().groupBy { sdf.format(it) }.collectEntries { [(sdf.parse(it.key)): it.value.size()] }
+        dataPerKey.put(key, dataMap)
     }
 
     void createDiagramRender(BigDecimal heightWidthRadio) {
