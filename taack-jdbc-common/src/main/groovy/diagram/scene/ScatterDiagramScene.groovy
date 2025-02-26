@@ -16,27 +16,23 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
     }
 
-    static Number objectToNumber(Object o) {
-        return o instanceof Date ? o.getTime() : o instanceof Number ? o : 0.0
-    }
-
     static String objectToString(Object o) {
-        return o instanceof Date ? new SimpleDateFormat("yyyy-MM-dd HH:mm").format(o) : o instanceof Number ? numberToString(o) : o.toString()
+        return o instanceof Date ? new SimpleDateFormat("yyyy-MM-dd HH:mm").format(o) : o instanceof Number ? numberToString(o.toBigDecimal()) : o.toString()
     }
 
     void drawDataPoint(Boolean hasLineBetweenPoints) {
         Set<String> keys = dataPerKey.keySet()
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() > 1 ? xLabelList.size() - 1 : 1)
-        if (xLabelList.every { it instanceof Number } || (xLabelList.every { it instanceof Date } && xLabelDateFormat)) { // continuous
-            Number minX = objectToNumber(xLabelList.first())
-            Number maxX = objectToNumber(xLabelList.last())
+        if (xLabelList.every { it instanceof Number } || xLabelList.every { it instanceof Date }) { // continuous
+            BigDecimal minX = objectToNumber(xLabelList.first())
+            BigDecimal maxX = objectToNumber(xLabelList.last())
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = 0; i < keys.size(); i++) {
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
                 List<Object> xList = pointList.keySet().sort() as List<Object>
                 for (int j = 0; j < xList.size(); j++) {
-                    Number x = objectToNumber(xList[j])
-                    Number y = pointList[xList[j]]
+                    BigDecimal x = objectToNumber(xList[j])
+                    BigDecimal y = pointList[xList[j]]
                     BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     String xLabel = objectToString(xList[j])
@@ -65,8 +61,8 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     // line to next circle
                     if (hasLineBetweenPoints && j < xList.size() - 1) {
                         render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
-                        Number nextX = objectToNumber(xList[j + 1])
-                        Number nextY = pointList[xList[j + 1]]
+                        BigDecimal nextX = objectToNumber(xList[j + 1])
+                        BigDecimal nextY = pointList[xList[j + 1]]
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
                         BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)

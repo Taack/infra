@@ -23,20 +23,22 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     private val areaMaxX: Double = g.attributes.getNamedItem("area-max-x")!!.value.toDouble()
     private val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
 
-    private val backgroundVerticalLines = g.querySelectorAll("g[element-type='VERTICAL_BACKGROUND_LINE']>line").asList()
-    private val backgroundXLabelGroup = g.querySelector("g[element-type='VERTICAL_BACKGROUND_TEXT']")
-    private var gapWidth: Double = (areaMaxX - areaMinX) / (backgroundVerticalLines.size - 1)
+    private val verticalBackground = g.querySelector("g[element-type='VERTICAL_BACKGROUND']")
+    private val verticalBackgroundLines = verticalBackground?.querySelectorAll("line")?.asList() ?: listOf()
+    private val verticalBackgroundTexts = verticalBackground?.querySelectorAll("text")?.asList() ?: listOf()
+
+    private var gapWidth: Double = (areaMaxX - areaMinX) / (verticalBackgroundLines.size - 1)
     var currentHoverLine: SVGLineElement? = null
 
     init {
         if (shapeType == "line" && dataList.any { it.g.hasAttribute("data-label") }) {
             currentHoverLine = document.createElement(SvgTagName("line")) as SVGLineElement
-            currentHoverLine!!.setAttribute("y1", backgroundVerticalLines.firstOrNull()?.getAttribute("y1") ?: "43.0")
-            currentHoverLine!!.setAttribute("y2", backgroundVerticalLines.firstOrNull()?.getAttribute("y2") ?: "425.0")
+            currentHoverLine!!.setAttribute("y1", verticalBackgroundLines.firstOrNull()?.getAttribute("y1") ?: "43.0")
+            currentHoverLine!!.setAttribute("y2", verticalBackgroundLines.firstOrNull()?.getAttribute("y2") ?: "425.0")
             currentHoverLine!!.setAttribute("style", "stroke:rgb(180, 180, 180);stroke-width:1.3")
         }
 
-        if ((backgroundXLabelGroup?.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
+        if ((verticalBackground?.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
             refreshBackgroundXLabelsDisplay()
         }
     }
@@ -100,9 +102,9 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     }
 
     private fun scrollTo(x: Double) {
-        if (backgroundVerticalLines.isNotEmpty()) {
-            val minX = areaMaxX - gapWidth - round(backgroundVerticalLines.last().getAttribute("x1")!!.toDouble())
-            val maxX = areaMinX + gapWidth - round(backgroundVerticalLines.first().getAttribute("x1")!!.toDouble())
+        if (verticalBackgroundLines.isNotEmpty()) {
+            val minX = areaMaxX - gapWidth - round(verticalBackgroundLines.last().getAttribute("x1")!!.toDouble())
+            val maxX = areaMinX + gapWidth - round(verticalBackgroundLines.first().getAttribute("x1")!!.toDouble())
             val adjustedX = min(maxX, max(minX, x))
             g.setAttribute("scroll-x", adjustedX.toString())
             g.setAttribute("transform", "translate(${adjustedX},0.0)")
@@ -112,9 +114,9 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     private var zoomUpTimer: Int? = null
     private var zoomUpTargetCenterLineIndex: Int? = null
     fun zoom(mouseX: Double, isUp: Boolean) {
-        if (backgroundVerticalLines.isNotEmpty()) {
-            val currentMinLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= areaMinX } ?: backgroundVerticalLines.first())
-            val currentMaxLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.findLast { line -> round(parent.translateX(line.getBoundingClientRect().x)) <= areaMaxX } ?: backgroundVerticalLines.last())
+        if (verticalBackgroundLines.isNotEmpty()) {
+            val currentMinLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= areaMinX } ?: verticalBackgroundLines.first())
+            val currentMaxLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.findLast { line -> round(parent.translateX(line.getBoundingClientRect().x)) <= areaMaxX } ?: verticalBackgroundLines.last())
             val changeGap = max(1, (currentMaxLineIndex - currentMinLineIndex) / 10)
 
             val newMinLineIndex: Int // will move this line as new first background vertical line
@@ -122,7 +124,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
             if (isUp) { // zoom-up to a target area
                 // the target area should always keep same (Around the line which is chosen at first)
                 if (zoomUpTargetCenterLineIndex == null) {
-                    zoomUpTargetCenterLineIndex = backgroundVerticalLines.indexOf(backgroundVerticalLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= mouseX } ?: backgroundVerticalLines.last())
+                    zoomUpTargetCenterLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= mouseX } ?: verticalBackgroundLines.last())
                 }
                 if (zoomUpTimer != null) {
                     window.clearTimeout(zoomUpTimer!!)
@@ -150,7 +152,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                             newMinLineIndex = max(0, targetCenterLineIndex * 2 - newMaxLineIndex)
                         } else {
                             newMinLineIndex = currentMinLineIndex + extraChangeGap
-                            newMaxLineIndex = min(backgroundVerticalLines.size - 1, targetCenterLineIndex * 2 - currentMinLineIndex)
+                            newMaxLineIndex = min(verticalBackgroundLines.size - 1, targetCenterLineIndex * 2 - currentMinLineIndex)
                         }
                     }
                 } else { // the line is already centered, so zoom-up averagely
@@ -159,16 +161,16 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 }
             } else { // zoom-down averagely
                 newMinLineIndex = max(0, currentMinLineIndex - changeGap)
-                newMaxLineIndex = min(backgroundVerticalLines.size - 1, currentMaxLineIndex + changeGap)
+                newMaxLineIndex = min(verticalBackgroundLines.size - 1, currentMaxLineIndex + changeGap)
                 zoomUpTargetCenterLineIndex = null
             }
 
             if ((!isUp || newMaxLineIndex - newMinLineIndex > 2) && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
-                val newMinLine = backgroundVerticalLines[newMinLineIndex] as SVGLineElement
-                val newMaxLine = backgroundVerticalLines[newMaxLineIndex] as SVGLineElement
+                val newMinLine = verticalBackgroundLines[newMinLineIndex] as SVGLineElement
+                val newMaxLine = verticalBackgroundLines[newMaxLineIndex] as SVGLineElement
                 val zoomRadio = (areaMaxX - areaMinX) / (newMaxLine.x1.baseVal.value - newMinLine.x1.baseVal.value)
 
-                backgroundVerticalLines.forEach { line ->
+                verticalBackgroundLines.forEach { line ->
                     val targetX = ((line.getAttribute("x1")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
                     line.setAttribute("x1", targetX.toString())
                     line.setAttribute("x2", targetX.toString())
@@ -183,22 +185,22 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     private var zoomTimer: Int? = null
     private fun refreshBackgroundXLabelsDisplay(zoomRadio: Double = 1.0) {
-        val showLabelEveryX = (backgroundXLabelGroup!!.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) / zoomRadio
-        backgroundXLabelGroup.setAttribute("show-label-every-x", showLabelEveryX.toString())
+        val showLabelEveryX = (verticalBackground!!.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) / zoomRadio
+        verticalBackground.setAttribute("show-label-every-x", showLabelEveryX.toString())
 
         // refresh the display only after stopping Zoom
         if (zoomTimer != null) {
             window.clearTimeout(zoomTimer!!)
         }
         zoomTimer = window.setTimeout({
-            backgroundXLabelGroup.querySelectorAll("text").asList().forEachIndexed { index, text ->
+            verticalBackgroundTexts.forEachIndexed { index, text ->
                 (text as SVGTextElement).style.display = if (index % ceil(round(showLabelEveryX * 100) / 100).toInt() == 0) "" else "none"
             }
         }, if (zoomRadio == 1.0) 0 else 500)
     }
 
     private fun refreshBackgroundXLabelsPosition(zoomRadio: Double) {
-        backgroundXLabelGroup!!.querySelectorAll("text").asList().forEach { text ->
+        verticalBackgroundTexts.forEach { text ->
             val labelWidth = text.getAttribute("label-width")?.toDouble() ?: 0.0
             if (text.getAttribute("transform")?.startsWith("rotate") == true) {
                 val targetX = ((text.getAttribute("x")?.toDouble() ?: (areaMinX - labelWidth)) + labelWidth - areaMinX) * zoomRadio + areaMinX - labelWidth

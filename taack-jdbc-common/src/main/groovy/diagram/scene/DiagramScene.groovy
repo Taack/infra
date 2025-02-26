@@ -9,9 +9,8 @@ import java.awt.*
 enum ElementType {
     LEGEND,
     HORIZONTAL_BACKGROUND,
+    VERTICAL_BACKGROUND,
     TRANSFORM_AREA,
-    VERTICAL_BACKGROUND_LINE,
-    VERTICAL_BACKGROUND_TEXT,
     DATA
 }
 
@@ -51,7 +50,7 @@ abstract class DiagramScene {
     final protected Color BLACK_COLOR = new Color(64, 64, 64)
     final protected Color GREY_COLOR = new Color(231, 231, 231)
 
-    static String numberToString(Number n) {
+    static String numberToString(BigDecimal n) {
         return n.toDouble() % 1 == 0 ? "${n.toInteger()}" : "$n"
     }
 }

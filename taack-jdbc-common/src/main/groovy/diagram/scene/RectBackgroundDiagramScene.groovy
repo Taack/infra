@@ -106,7 +106,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                     this.xLabelList = (value > 0 ? [value - 1, value, value + 1] : [0, 1, 2]) as Set<Object>
                 }
             }
-        } else if (xDataList.every { it instanceof Date } && xLabelDateFormat) { // continuous X axis (Date)
+        } else if (xDataList.every { it instanceof Date }) { // continuous X axis (Date)
             xDataList = xDataList.sort() as Set<Object>
             Calendar cal = Calendar.getInstance()
             cal.setTime(xDataList.last() as Date)
@@ -225,48 +225,60 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
     }
 
+    static BigDecimal objectToNumber(Object o) {
+        return o instanceof Date ? o.getTime() : o instanceof Number ? o : 0.0
+    }
+
     void drawVerticalBackground(int showGapEveryX = 1) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
         int displayedXLabelListNumber = (xLabelList.size() / showGapEveryX).toInteger()
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
-        boolean isDate = xLabelList.every { it instanceof Date } && xLabelDateFormat
+        boolean isDate = xLabelList.every { it instanceof Date }
         BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? xLabelDateFormat.format(it as Date) : it.toString() }.join(""))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)).toDouble()).toInteger()
 
-        // background vertical line
-        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_LINE])
+        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND, "show-label-every-x": xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)])
         render.fillStyle(GREY_COLOR)
-        for (int i = 0; i < (displayedXLabelListNumber + (isXLabelInsideGap ? 1 : 0)); i++) {
+        BigDecimal minX = objectToNumber(xLabelList.first())
+        BigDecimal maxX = objectToNumber(xLabelList.last())
+        for (int i = 0; i < displayedXLabelListNumber; i++) {
+            BigDecimal coordX
+            if (isDate && !isXLabelInsideGap) { // X axis is of type Date, so each gap may have different width (For example, each month has different dayNumber)
+                BigDecimal x = objectToNumber(xLabelList[i])
+                coordX = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * diagramWidth
+            } else {
+                coordX = DIAGRAM_MARGIN_LEFT + gapWidth * i
+            }
+
+            // background vertical line
             if (alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH || i % showLabelEveryX == 0) {
-                BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
-                render.translateTo(startX, diagramMarginTop)
+                render.translateTo(coordX, diagramMarginTop)
                 render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
             }
-        }
-        render.renderGroupEnd()
 
-        // x axis label
-        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND_TEXT, "show-label-every-x": xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)])
-        for (int i = 0; i < displayedXLabelListNumber; i++) {
-            BigDecimal startX = DIAGRAM_MARGIN_LEFT + gapWidth * i
+            // x axis label
             BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
             String xLabel = isDate ? xLabelDateFormat.format(xLabelList[i * showGapEveryX] as Date) : xLabelList[i * showGapEveryX].toString()
             BigDecimal labelLength = render.measureText(xLabel)
             if (gapWidth >= labelLength) {
-                render.translateTo(startX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                render.translateTo(coordX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 if (i % showLabelEveryX == 0) {
                     render.renderLabel(xLabel)
                 } else if (alwaysShowFullInfo) {
                     render.renderHiddenLabel(xLabel)
                 }
             } else {
-                render.translateTo(startX - labelLength + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                render.translateTo(coordX - labelLength + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 if (i % showLabelEveryX == 0) {
-                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, coordX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 } else if (alwaysShowFullInfo) {
-                    render.renderHiddenRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, startX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderHiddenRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, coordX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 }
             }
+        }
+        if (isXLabelInsideGap) {
+            render.translateTo(width - DIAGRAM_MARGIN_RIGHT, diagramMarginTop)
+            render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
         }
         render.renderGroupEnd()
     }

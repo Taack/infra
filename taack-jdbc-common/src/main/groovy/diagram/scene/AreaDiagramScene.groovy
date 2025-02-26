@@ -9,35 +9,31 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         super(render, dataPerKey)
     }
 
-    static Number objectToNumber(Object o) {
-        return o instanceof Date ? o.getTime() : o instanceof Number ? o : 0.0
-    }
-
     void drawHorizontalBackgroundAndDataArea() {
         Set<String> keys = dataPerKey.keySet()
-        if (xLabelList.every { it instanceof Number } || (xLabelList.every { it instanceof Date } && xLabelDateFormat)) { // continuous
+        if (xLabelList.every { it instanceof Number } || xLabelList.every { it instanceof Date }) { // continuous
             // rebuild data to be stacked
-            Map<String, Map<Number, BigDecimal>> stackedDataPerKey = [:]
-            Set<Number> totalXDataSet = dataPerKey.collect { it.value.keySet() }.flatten().unique().sort().collect { objectToNumber(it) } as Set<Number>
+            Map<String, Map<BigDecimal, BigDecimal>> stackedDataPerKey = [:]
+            Set<BigDecimal> totalXDataSet = dataPerKey.collect { it.value.keySet() }.flatten().unique().sort().collect { objectToNumber(it) } as Set<BigDecimal>
             List<BigDecimal> stackedYDataTmpList = [0.0] * totalXDataSet.size()
             BigDecimal minY = 0.0
             BigDecimal maxY = 0.0
             for (int i = 0; i < keys.size(); i++) {
-                Map<Number, BigDecimal> dataMap = dataPerKey[keys[i]].collectEntries { [(objectToNumber(it.key)): it.value] } as Map<Number, BigDecimal>
-                Set<Number> xDataSet = dataMap.keySet().sort() as Set<Number>
+                Map<BigDecimal, BigDecimal> dataMap = dataPerKey[keys[i]].collectEntries { [(objectToNumber(it.key)): it.value] } as Map<BigDecimal, BigDecimal>
+                Set<BigDecimal> xDataSet = dataMap.keySet().sort() as Set<BigDecimal>
 
-                Map<Number, BigDecimal> stackedDataMap = [:]
+                Map<BigDecimal, BigDecimal> stackedDataMap = [:]
                 for (int j = 0; j < totalXDataSet.size(); j++) {
-                    Number x = totalXDataSet[j]
+                    BigDecimal x = totalXDataSet[j]
                     BigDecimal stackedY = stackedYDataTmpList[j]
                     if (x >= xDataSet.first() && x <= xDataSet.last()) {
                         if (xDataSet.contains(x)) {
                             stackedY += dataMap[x]
                         } else {
                             int index = xDataSet.findIndexOf { it > x }
-                            Number x1 = xDataSet[index - 1]
+                            BigDecimal x1 = xDataSet[index - 1]
                             BigDecimal y1 = dataMap[x1]
-                            Number x2 = xDataSet[index]
+                            BigDecimal x2 = xDataSet[index]
                             BigDecimal y2 = dataMap[x2]
                             stackedY += (y2 - y1) / (x2 - x1) * (x - x1) + y1
                         }
@@ -55,12 +51,12 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             super.drawHorizontalBackground(minY, maxY)
 
             // draw data area from top to lowest, and next one will cover the previous one
-            Number minX = objectToNumber(xLabelList.first())
-            Number maxX = objectToNumber(xLabelList.last())
+            BigDecimal minX = objectToNumber(xLabelList.first())
+            BigDecimal maxX = objectToNumber(xLabelList.last())
             BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = keys.size() - 1; i >= 0; i--) {
-                Map<Number, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
-                Set<Number> xDataSet = dataMap.keySet()
+                Map<BigDecimal, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
+                Set<BigDecimal> xDataSet = dataMap.keySet()
                 render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i], "data-x": "", "data-y": ""])
                 List<BigDecimal> coordsToDraw = [] // x1, y1, x2, y2, ...
                 for (int j = 0; j < xDataSet.size(); j++) {
