@@ -1,0 +1,11 @@
+= ARCH
+
+== Contextual menus
+
+=== Goals
+
+* Lazy load this menu
+* Have menu depending on object or field on tables and shows
+* Have a central definition of target actions
+* Have the ability to extend the contextual menu on a field, on a table or show
+* No specific security rules should be needed, keep regular ones.
