@@ -7,6 +7,7 @@ import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
+import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.core.io.ResourceLocator
 import org.grails.datastore.gorm.GormEntity
 import org.grails.web.servlet.mvc.GrailsWebRequest
@@ -23,6 +24,7 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.UiBlockVisitor
+import taack.ui.dsl.helper.Utils
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawCsvTableDump
 import taack.ui.dump.RawHtmlBlockDump
@@ -87,6 +89,23 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     MessageSource messageSource
 
     private static MessageSource staticMs
+    protected final static Map<Class, UiMenuSpecifier> contextualMenuClosures = [:]
+
+    static void contextualMenuClosure(Class domain, final UiMenuSpecifier menu) {
+        contextualMenuClosures.put(domain, menu)
+    }
+
+    static void contextualMenuClosureFromField(FieldInfo fieldInfo) {
+        contextualMenuClosureFromField(fieldInfo.fieldConstraint.field.type)
+    }
+
+    static void contextualMenuClosureFromField(Object value) {
+        contextualMenuClosureFromField(value?.class)
+    }
+
+    static void contextualMenuClosureFromField(Class aClass) {
+        contextualMenuClosures.get(aClass)
+    }
 
     @PostConstruct
     void init() {
