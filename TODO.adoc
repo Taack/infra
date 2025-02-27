@@ -108,10 +108,13 @@
 
 * [.line-through]#Collapsable filter section#
 * [.line-through]#Inner Filter#
-* Multi Filters
+* [.line-through]#Multi Filters#
+* [.line-through]#Diagrams: Date Based X Axe#
+* [.line-through]#Line Chart now support Hoovering, and click#
 
 == 0.6.x (x > 2)
 
+* Contextual menus for objects on tables and show. Defined from objects pov
 * for large filters, allow scrolling OR partition filters and edit parts into modals
 * PoC merge crew service into Infra
 * Grails 7.x
