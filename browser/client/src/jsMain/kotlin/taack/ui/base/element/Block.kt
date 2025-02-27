@@ -56,6 +56,9 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     fun updateContent(newContent: String) {
         Helper.trace("Block::updateContent ...")
         d.children[0].innerHTML = newContent
+        for (i in 1 until d.children.length) {
+            d.children[i].remove()
+        }
         AjaxBlock.getSiblingAjaxBlock(this)
     }
 }
