@@ -8,4 +8,81 @@
 * Have menu depending on object or field on tables and shows
 * Have a central definition of target actions
 * Have the ability to extend the contextual menu on a field, on a table or show
-* No specific security rules should be needed, keep regular ones.
+* No specific security rules should be needed, keep regular ones
+* Have default expected actions
+
+=== Adding Contextual Menu
+
+==== DSL Defining the Menu
+
+Reuse menu DSL
+
+.Menu Definition
+[source,groovy]
+----
+def partnerMenu = new UiMenuSpecifier().ui {
+    nenu CrmController.&copyName as MC
+    menu CrmController.&editPartner as MC
+    menu CrmController.&showPartner as MC
+}
+
+def partnerTypeCrmMenu = new UiMenuSpecifier().ui {
+    menu CrmController.&setPartnerType1 as MC
+    menu CrmController.&setPartnerType2 as MC
+    menu CrmController.&setPartnerType3 as MC
+}
+
+----
+
+==== Defining Contextual Menus
+
+If we want to define default actions on partner:
+
+.Define contextual menu for object
+[source,groovy]
+----
+TaackUiService.registerContextualMenu(Partner, partnerMenu)
+TaackUiService.registerContextualMenu(  Partner,
+                                        new Partner().typeCRM_,
+                                        partnerTypeCrmMenu)
+// OR set globally
+TaackUiService.registerContextualMenu(TypeCRM, partnerTypeCrmMenu)
+
+// Where
+enum TypeCRM {
+    Type1,
+    Type2,
+    // ...
+}
+----
+
+==== Where it takes place
+
+
+
+.In a table
+[source,groovy]
+----
+iterate(taackFilterService.getBuilder(Partner).build()) { Partner p ->      <1>
+    rowColumn {
+        rowField p.name
+        rowField p.currentRepresentant_                                     <2>
+        rowField p.dateCreated_
+    }
+    rowColumn {
+        rowField p.businessDomain_
+        rowField p.kindCRM                                                  <3>
+        rowField p.typeCRM_                                                 <4>
+    }
+    rowColumn {
+        rowField p.address?.city
+        rowField((p.address?.zip ?: '') + ' ' + p.address?.country)
+    }
+}
+----
+
+<1> By default, show contextual actions on partner
+<2> By default, show contextual actions on rep
+<3> Do not show contextual actions on direct values
+<4> Here, if exists, show contextual actions linked to partner.typeCRM field
+
