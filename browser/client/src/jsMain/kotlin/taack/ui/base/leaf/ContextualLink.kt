@@ -103,7 +103,6 @@ class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, classN
             closeContextMenu() // Close context if already opened
             val xhr = XMLHttpRequest()
             xhr.open(RequestMethod.GET, "/contextMenu/index?className=$className&fieldName=$fieldName&id=$id", true)
-            xhr.setRequestHeader("Content-Type", "application/json")
             xhr.onload = EventHandler {
                 if (xhr.status == 200.toShort()) {
                     val parser = DOMParser()
@@ -143,6 +142,5 @@ class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, classN
                 }
             }
         }
-
     }
 }

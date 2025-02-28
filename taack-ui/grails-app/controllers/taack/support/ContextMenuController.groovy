@@ -3,7 +3,6 @@ package taack.support
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
-import taack.render.TaackUiContextMenuService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiMenuSpecifier
 
