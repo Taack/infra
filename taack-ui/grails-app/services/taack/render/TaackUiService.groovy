@@ -102,7 +102,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     static UiMenuSpecifier contextualMenuClosureFromField(FieldInfo fieldInfo) {
-        contextualMenuClosures.get(fieldInfo.fieldConstraint.field.type.simpleName + '::' + fieldInfo.fieldName) ?: contextualMenuClosureFromField(fieldInfo?.fieldConstraint?.field?.type)
+        if (fieldInfo)
+            contextualMenuClosures.get(fieldInfo.fieldConstraint.field.type.simpleName + '::' + fieldInfo.fieldName) ?: contextualMenuClosureFromField(fieldInfo.fieldConstraint.field.type)
+        else null
     }
 
     static UiMenuSpecifier contextualMenuClosureFromField(Object value) {

@@ -92,6 +92,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
                 String ident = fieldInfo.value.toString()
                 if (GormEntity.isAssignableFrom(fieldInfo.value?.class))
                     ident = (fieldInfo.value as GormEntity).ident()
+                else if (parameter.params.containsKey('id')) ident = parameter.params.long('id')
                 v = """<span taackContextualMenu="${fieldInfo.fieldConstraint.field.type.simpleName + ';' + fieldInfo.fieldName + ';' + ident}">${v}</span>"""
 
             }

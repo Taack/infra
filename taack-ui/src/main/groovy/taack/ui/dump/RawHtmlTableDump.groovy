@@ -85,7 +85,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         return new HTMLAnchor(true, url).builder.addChildren(cellHTML).build()
     }
 
-    static final IHTMLElement displayCell(final FieldInfo fieldInfo, final Style style) {
+    static final IHTMLElement displayCell(final FieldInfo fieldInfo, final Style style, Long id = null) {
         Style displayBlock = new Style(null, 'display: block;')
         if (fieldInfo && style) {
             displayBlock += style
@@ -98,6 +98,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             String ident = fieldInfo.value.toString()
             if (GormEntity.isAssignableFrom(fieldInfo.value?.class))
                 ident = (fieldInfo.value as GormEntity).ident()
+            else if (id) ident = id
             return htmlBuilder.putAttribute('taackContextualMenu', fieldInfo.fieldConstraint.field.type.simpleName + ';' + fieldInfo.fieldName + ';' + ident)
                         .build()
         }
@@ -320,7 +321,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (TaackUiService.contextualMenuClosureFromField(fieldInfo) && fieldInfo.value) {
             boolean addColumn = !isInCol
             if (addColumn) visitColumn(null, null)
-            blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style))//, firstInCol, isInCol))
+            blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, parameter.params.long('id')))//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
         } else {
             visitRowField(dataFormat(fieldInfo?.value, format), style)
