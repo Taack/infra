@@ -18,7 +18,7 @@ import web.xhr.XMLHttpRequest
 import web.xhr.XMLHttpRequestResponseType
 import kotlin.math.min
 
-open class BaseAjaxAction(private val parent: BaseElement, a: HTMLElement) : LeafElement {
+open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : LeafElement {
 
     companion object {
         fun createUrl(isAjax: Boolean, action: String?, additionalParams: Map<String, String>? = null): URL {

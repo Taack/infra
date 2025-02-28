@@ -2,7 +2,6 @@ package taack.ui.base.leaf
 
 import js.array.asList
 import kotlinx.browser.window
-import taack.ui.base.BaseElement
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
@@ -19,7 +18,7 @@ import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
 
-class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, className: String, fieldName: String, id: Long) : LeafElement {
+class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: String, fieldName: String, id: Long) : LeafElement {
     companion object {
         fun getContextualLinks(p: AjaxBlock): List<ContextualLink>? {
             val elements: List<*> = p.d.querySelectorAll("span[taackcontextualmenu]").asList()
@@ -27,7 +26,7 @@ class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, classN
             return elements.map {
                 (it as HTMLSpanElement).getAttribute("taackcontextualmenu")?.let { attribute ->
                     val (className, fieldName, idValue) = attribute.split(";")
-                    ContextualLink(p, it, className, fieldName, idValue.toLong())
+                    ContextualLink(p.parent, it, className, fieldName, idValue.toLong())
                 }!!
             }
         }
@@ -102,7 +101,7 @@ class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, classN
             e.preventDefault() //Block default context menu
             closeContextMenu() // Close context if already opened
             val xhr = XMLHttpRequest()
-            xhr.open(RequestMethod.GET, "/contextMenu/index?className=$className&fieldName=$fieldName&id=$id", true)
+            xhr.open(RequestMethod.GET, "/taackContextMenu/index?className=$className&fieldName=$fieldName&id=$id", true)
             xhr.onload = EventHandler {
                 if (xhr.status == 200.toShort()) {
                     val parser = DOMParser()
@@ -124,11 +123,16 @@ class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, classN
                     activeContextMenu = contextMenu
                     document.body.appendChild(activeContextMenu!!)
                     (document.asDynamic()).addEventListener("click", contextCloseCallback)
+                    activeContextMenu?.onmouseleave = EventHandler {
+                        closeContextMenu()
+                    }
+                    ContextualLinkEntry.getDropdownMenu(parent)
                 }
             }
             xhr.send()
         }
     }
+
 
     private fun addIdToAnchors(doc: Document, id: Long) {
         doc.querySelectorAll("a").asList().forEach { anchor ->
@@ -136,9 +140,9 @@ class ContextualLink(private val parent: BaseElement, a: HTMLSpanElement, classN
             val currentHref = anchorElement.href
             if (currentHref.isNotEmpty()) {
                 anchorElement.href = if (currentHref.contains("?")) {
-                    "${currentHref}&id=$id"
+                    "${currentHref}&id=$id&isAjax=true"
                 } else {
-                    "${currentHref}?id=$id"
+                    "${currentHref}?id=$id&isAjax=true"
                 }
             }
         }

@@ -142,8 +142,8 @@ class Helper {
 
         private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
 
-        fun processAjaxLink(text: String, base: BaseElement, process: CloseModalPostProcessing? = null) {
-            val block = base.getParentBlock()
+        fun processAjaxLink(text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
+            val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
                 text.contains(RELOAD) -> {
                     location.href = (Block.href ?: "")
@@ -259,8 +259,8 @@ class Helper {
 
                 else -> {
                     if (text.isNotEmpty()) {
-                        trace("Helper::update current block")
-                        base.getParentBlock().updateContent(text)
+                        trace("Helper::update current block $text")
+                        block.updateContent(text)
                     }
                 }
 
