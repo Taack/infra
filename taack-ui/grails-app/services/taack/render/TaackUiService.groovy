@@ -35,6 +35,7 @@ import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.pdf.RawHtmlPrintableDump
 
 import javax.annotation.PostConstruct
+
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -89,22 +90,22 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     MessageSource messageSource
 
     private static MessageSource staticMs
-    protected final static Map<Class, UiMenuSpecifier> contextualMenuClosures = [:]
+    protected final static Map<String, UiMenuSpecifier> contextualMenuClosures = [:]
 
     static void contextualMenuClosure(Class domain, final UiMenuSpecifier menu) {
-        contextualMenuClosures.put(domain, menu)
+        contextualMenuClosures.put(domain.simpleName, menu)
     }
 
-    static void contextualMenuClosureFromField(FieldInfo fieldInfo) {
-        contextualMenuClosureFromField(fieldInfo.fieldConstraint.field.type)
+    static UiMenuSpecifier contextualMenuClosureFromField(FieldInfo fieldInfo) {
+        contextualMenuClosureFromField(fieldInfo?.fieldConstraint?.field?.type)
     }
 
-    static void contextualMenuClosureFromField(Object value) {
+    static UiMenuSpecifier contextualMenuClosureFromField(Object value) {
         contextualMenuClosureFromField(value?.class)
     }
 
-    static void contextualMenuClosureFromField(Class aClass) {
-        contextualMenuClosures.get(aClass)
+    static UiMenuSpecifier contextualMenuClosureFromField(Class aClass) {
+        contextualMenuClosures.get(aClass?.simpleName)
     }
 
     @PostConstruct

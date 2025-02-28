@@ -7,6 +7,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
+import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
@@ -85,17 +86,22 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final FieldInfo fieldInfo, final Style style) {
-        def ident = (fieldInfo.value as GormEntity).ident()
-        """<span taackContextualMenu="${fieldInfo.value.class.name + ';' + ident}">${ident}</span>"""
-
         Style displayBlock = new Style(null, 'display: block;')
         if (fieldInfo && style) {
             displayBlock += style
         }
         HTMLTxtContent cellHTML = new HTMLTxtContent(TaackUiEnablerService.sanitizeString(fieldInfo.value.toString()) ?: "<br>")
-        return new HTMLSpan().builder
-                .setStyle(displayBlock).putAttribute('taackContextualMenu', fieldInfo.value.class.name + ';' + fieldInfo.fieldName + ';' + ident)
-                .addChildren(cellHTML).build()
+
+        UiMenuSpecifier menu = TaackUiService.contextualMenuClosureFromField(fieldInfo)
+        IHTMLElement.HTMLElementBuilder htmlBuilder = new HTMLSpan().builder.setStyle(displayBlock).addChildren(cellHTML)
+        if (menu && fieldInfo.value) {
+            String ident = fieldInfo.value.toString()
+            if (GormEntity.isAssignableFrom(fieldInfo.value?.class))
+                ident = (fieldInfo.value as GormEntity).ident()
+            return htmlBuilder.putAttribute('taackContextualMenu', fieldInfo.fieldConstraint.field.type.simpleName + ';' + fieldInfo.fieldName + ';' + ident)
+                        .build()
+        }
+        return htmlBuilder.build()
     }
 
     @Override
@@ -317,7 +323,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style))//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
         }
-        visitRowField(dataFormat(fieldInfo?.value, format), style)
     }
 
     @Override
@@ -329,7 +334,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowField(final String value, final Style style) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))//, firstInCol, isInCol))
+        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
+//, firstInCol, isInCol))
         if (addColumn) visitColumnEnd()
     }
 
