@@ -8,6 +8,8 @@ import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.app.TaackApp
 import taack.app.TaackAppRegisterService
 import taack.render.TaackUiEnablerService
+import taack.render.TaackUiService
+import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.test.Application
 
 import javax.annotation.PostConstruct
@@ -32,6 +34,10 @@ class CrewSecurityService {
                 CrewController.&editUser as MC,
                 CrewController.&saveUser as MC)
         TaackAppRegisterService.register(new TaackApp(CrewController.&index as MC, new String(Application.getResourceAsStream("/crew/crew.svg").readAllBytes())))
+        TaackUiService.registerContextualMenuClosure(User, new UiMenuSpecifier().ui {
+            menu CrewController.&showUser as MC
+            menu CrewController.&editUser as MC
+        })
     }
 
     User authenticatedRolesUser() {

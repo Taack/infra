@@ -8,7 +8,7 @@ import taack.ui.dsl.UiMenuSpecifier
 
 @GrailsCompileStatic
 @Secured(["permitAll"])
-class ContextMenuController implements WebAttributes {
+class TaackContextMenuController implements WebAttributes {
 
     TaackUiService taackUiService
 

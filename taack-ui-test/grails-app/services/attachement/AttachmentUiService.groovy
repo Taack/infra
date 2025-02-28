@@ -119,7 +119,7 @@ final class AttachmentUiService implements WebAttributes {
                     rowField att.contentType
                 }
                 rowColumn {
-                    rowField att.userCreated.username
+                    rowField att.userCreated_
                     rowField att.userCreated.subsidiary?.toString()
                 }
                 rowColumn {
