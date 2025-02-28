@@ -92,12 +92,16 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     private static MessageSource staticMs
     protected final static Map<String, UiMenuSpecifier> contextualMenuClosures = [:]
 
-    static void contextualMenuClosure(Class domain, final UiMenuSpecifier menu) {
+    static void registerContextualMenuClosure(Class domain, final UiMenuSpecifier menu) {
         contextualMenuClosures.put(domain.simpleName, menu)
     }
 
+    static void registerContextualMenuClosure(FieldInfo fieldInfo, final UiMenuSpecifier menu) {
+        contextualMenuClosures.put(fieldInfo.fieldConstraint.field.type.simpleName + '::' + fieldInfo.fieldName, menu)
+    }
+
     static UiMenuSpecifier contextualMenuClosureFromField(FieldInfo fieldInfo) {
-        contextualMenuClosureFromField(fieldInfo?.fieldConstraint?.field?.type)
+        contextualMenuClosures.get(fieldInfo.fieldConstraint.field.type.simpleName + '::' + fieldInfo.fieldName) ?: contextualMenuClosureFromField(fieldInfo?.fieldConstraint?.field?.type)
     }
 
     static UiMenuSpecifier contextualMenuClosureFromField(Object value) {

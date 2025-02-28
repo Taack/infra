@@ -1,9 +1,11 @@
 package taack.ui.dump
 
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
+import taack.render.TaackUiService
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.show.IUiShowVisitor
@@ -83,9 +85,18 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     }
 
     @Override
-    void visitShowField(final String i18n, final FieldInfo field, final Style style) {
-        if (field?.value != null)
-            out << showField(i18n, RawHtmlTableDump.dataFormat(field.value, null), style, false)
+    void visitShowField(final String i18n, final FieldInfo fieldInfo, final Style style) {
+        if (fieldInfo?.value != null) {
+            String v = TaackUiEnablerService.sanitizeString(fieldInfo.value?.toString())
+            if (TaackUiService.contextualMenuClosureFromField(fieldInfo)) {
+                String ident = fieldInfo.value.toString()
+                if (GormEntity.isAssignableFrom(fieldInfo.value?.class))
+                    ident = (fieldInfo.value as GormEntity).ident()
+                v = """<span taackContextualMenu="${fieldInfo.fieldConstraint.field.type.simpleName + ';' + fieldInfo.fieldName + ';' + ident}">${v}</span>"""
+
+            }
+            out << showField(i18n, v, style, false)
+        }
     }
 
     @Override
