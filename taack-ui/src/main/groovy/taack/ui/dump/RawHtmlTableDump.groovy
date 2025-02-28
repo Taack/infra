@@ -322,6 +322,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             if (addColumn) visitColumn(null, null)
             blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style))//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
+        } else {
+            visitRowField(dataFormat(fieldInfo?.value, format), style)
         }
     }
 
