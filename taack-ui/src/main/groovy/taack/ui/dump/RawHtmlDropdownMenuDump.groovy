@@ -18,6 +18,7 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     private final BlockLog blockLog
     final Parameter parameter
     DropdownMenu menu
+    String futurCurrentAjaxBlockId
 
     RawHtmlDropdownMenuDump(final Parameter parameter) {
         this.parameter = parameter
@@ -25,6 +26,15 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
         blockLog.topElement = new HTMLEmpty()
         blockLog.topElement.setTaackTag(TaackTag.MENU_BLOCK)
     }
+
+    void enterBlock(String toPrint) {
+        blockLog.enterBlock(RawHtmlDropdownMenuDump.simpleName + '::' + toPrint)
+    }
+
+    void exitBlock(String toPrint) {
+        blockLog.exitBlock(RawHtmlDropdownMenuDump.simpleName + '::' + toPrint)
+    }
+
     @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
     }
@@ -35,17 +45,24 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
-// TODO
+        enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
+        futurCurrentAjaxBlockId = ajaxBlockId
+        blockLog.topElement.setTaackTag(TaackTag.MENU_CONTEXTUAL)
+        menu = new DropdownMenu(blockLog)
+        blockLog.topElement = menu.menuStart(blockLog.topElement)
     }
 
     @Override
     void visitMenuStartEnd() {
-// TODO
+        exitBlock('visitMenuStartEnd')
+        futurCurrentAjaxBlockId = null
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_CONTEXTUAL)
     }
 
     @Override
     void visitMenu(String controller, String action, Map<String, ?> params) {
-// TODO
+        blockLog.stayBlock('visitMenu')
+        visitLabeledSubMenu(null, controller, action, params)
     }
 
     @Override
@@ -55,7 +72,24 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+        i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
+        blockLog.stayBlock('visitLabeledSubContextualMenu ' + i18n)
+        Map cp = parameter.params
+        if (params) {
+            if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
+            if (cp.containsKey('action')) cp.remove('action')
+            if (cp.containsKey('controller')) cp.remove('controller')
+            if (futurCurrentAjaxBlockId && parameter.controllerName == controller && parameter.actionName == action) {
+                params.put('ajaxBlockId', futurCurrentAjaxBlockId)
+                params.put('refresh', 'true')
+                if (parameter.tabId && parameter.tabIndex) {
+                    params.put('tabId', parameter.tabId)
+                    params.put('tabIndex', parameter.tabIndex)
+                }
+            }
+        }
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
     }
 
     @Override
@@ -70,7 +104,10 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal) {
+        i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
+        blockLog.stayBlock('visitSubMenuIcon ' + i18n)
 
+        menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
     }
 
     @Override

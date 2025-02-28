@@ -13,6 +13,7 @@ enum TaackTag {
     MENU_OPTION,
     MENU_COL,
     MENU_BLOCK,
+    MENU_CONTEXTUAL,
     INNER_BLOCK,
     POLL,
     TABLE,

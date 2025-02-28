@@ -5,6 +5,7 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
+import taack.ui.base.leaf.ContextualLink
 import taack.ui.diagram.Diagram
 import web.events.EventHandler
 import web.html.HTMLDivElement
@@ -77,6 +78,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         }
         ActionLink.getActionLinks(this)
         AnchorHref.getAnchorHref(this)
+        ContextualLink.getContextualLinks(this)
         Helper.traceDeIndent("AjaxBlock::refresh --- ")
     }
 

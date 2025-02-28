@@ -20,7 +20,7 @@ final class DropdownMenu implements IHTMLElement {
         children = []
         topElement.addChildren(
                 bootstrapMenu.builder.addChildren(
-                        new HTMLUl().builder.addClasses('dropdown-menu').build()
+                        new HTMLUl().builder.build()
                 ).build()
         )
         return bootstrapMenu.children.first()

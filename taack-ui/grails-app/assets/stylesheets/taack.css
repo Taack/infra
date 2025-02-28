@@ -378,3 +378,99 @@ svg text {
     padding: .25em .25em;
     margin: 0;
 }
+
+
+/*CONTEXT MENU*/
+.custom-context-menu {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12),
+    0 3px 6px rgba(0, 0, 0, 0.08);
+    min-width: 180px;
+    padding: 8px 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.custom-context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.custom-context-menu li {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+.custom-context-menu li:hover {
+    background-color: #f5f5f5;
+    color: #2196F3;
+}
+
+.custom-context-menu li::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+.custom-context-menu li:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.custom-context-menu {
+    animation: fadeIn 0.1s ease-out;
+}
+
+.nested-dropdown {
+    display: none;
+    position: absolute;
+    left: 100%;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+.nested-dropdown.flip-left {
+    left: auto;
+    right: 100%;
+}
+
+li:hover > .nested-dropdown{
+    display: block !important;
+}
+
+.context-has-dropdown {
+    position: relative;
+}
+
+.context-has-dropdown::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid #333;
+}
+

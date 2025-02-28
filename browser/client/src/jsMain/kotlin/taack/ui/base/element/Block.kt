@@ -6,7 +6,7 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
-import taack.ui.base.leaf.TabButton
+import taack.ui.base.leaf.ContextualLink
 import web.dom.document
 import web.html.HTMLDivElement
 
@@ -33,6 +33,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
             blockId = tmpBlockId
             ActionLink.getActionLinks(this)
             AnchorHref.getAnchorHref(this)
+            ContextualLink.getContextualLinks(this)
 
         } else {
             blockId = "modal${modalNumber++}"

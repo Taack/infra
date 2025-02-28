@@ -29,6 +29,7 @@ import taack.ui.dump.Parameter
 import taack.ui.dump.RawCsvTableDump
 import taack.ui.dump.RawHtmlBlockDump
 import taack.ui.dump.RawHtmlDiagramDump
+import taack.ui.dump.RawHtmlDropdownMenuDump
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
@@ -110,6 +111,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     static UiMenuSpecifier contextualMenuClosureFromField(Class aClass) {
         contextualMenuClosures.get(aClass?.simpleName)
+    }
+
+    static UiMenuSpecifier contextualMenuClosureFromClassName(String className) {
+        contextualMenuClosures.get(className)
     }
 
     @PostConstruct
@@ -203,6 +208,22 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      */
     static String visitMenu(final UiMenuSpecifier menuSpecifier) {
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
+        if (menuSpecifier) {
+            menuSpecifier.visitMenu(htmlBlock)
+            StringBuffer res = new StringBuffer(4096)
+            htmlBlock.menu.getOutput(res)
+            res.toString()
+        } else ""
+    }
+
+    /**
+     * Allows to retrieve the content of a menu without rendering it.
+     *
+     * @param menuSpecifier menu descriptor
+     * @return String the contains the HTML snippet
+     */
+    static String visitContextualMenu(final UiMenuSpecifier menuSpecifier) {
+        RawHtmlDropdownMenuDump htmlBlock = new RawHtmlDropdownMenuDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
             StringBuffer res = new StringBuffer(4096)
