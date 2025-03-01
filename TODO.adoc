@@ -111,7 +111,7 @@
 * [.line-through]#Multi Filters#
 * [.line-through]#Diagrams: Date Based X Axe#
 * [.line-through]#Line Chart now support Hoovering, and click#
-* Contextual menus for objects on tables and show (see link:ARCH.adoc#_contextual_menus[arch]). Defined for GormEntities.
+* [.line-through]#Contextual menus for objects on tables and show (see link:ARCH.adoc#_contextual_menus[arch]). Defined for GormEntities.#
 
 == 0.6.x (x > 2)
 
