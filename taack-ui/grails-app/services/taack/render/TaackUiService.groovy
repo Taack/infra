@@ -224,10 +224,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menuSpecifier menu descriptor
      * @return String the contains the HTML snippet
      */
-    static String visitContextualMenu(final UiMenuSpecifier menuSpecifier) {
+    static String visitContextualMenu(final UiMenuSpecifier menuSpecifier, Long id) {
         RawHtmlDropdownMenuDump htmlBlock = new RawHtmlDropdownMenuDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
         if (menuSpecifier) {
-            menuSpecifier.visitMenu(htmlBlock)
+            menuSpecifier.visitMenu(htmlBlock, id)
             StringBuffer res = new StringBuffer(4096)
             htmlBlock.menu.getOutput(res)
             res.toString()

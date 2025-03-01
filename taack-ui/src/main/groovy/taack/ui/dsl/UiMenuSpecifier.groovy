@@ -33,11 +33,12 @@ final class UiMenuSpecifier {
         this
     }
 
-    void visitMenu(final IUiMenuVisitor menuVisitor) {
+    void visitMenu(final IUiMenuVisitor menuVisitor, Long id = null) {
         if (menuVisitor && closure) {
             menuVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL, null)
             closure.delegate = new MenuSpec(menuVisitor)
-            closure.call()
+            if (id) closure.call(id)
+            else closure.call()
             menuVisitor.visitMenuStartEnd()
         }
     }
