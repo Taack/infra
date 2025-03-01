@@ -98,12 +98,12 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     static void registerContextualMenuClosure(FieldInfo fieldInfo, final UiMenuSpecifier menu) {
-        contextualMenuClosures.put(fieldInfo.fieldConstraint.field.type.simpleName + '::' + fieldInfo.fieldName, menu)
+        contextualMenuClosures.put(fieldInfo.fieldConstraint.field.declaringClass.simpleName + '::' + fieldInfo.fieldName, menu)
     }
 
     static UiMenuSpecifier contextualMenuClosureFromField(FieldInfo fieldInfo) {
         if (fieldInfo)
-            contextualMenuClosures.get(fieldInfo.fieldConstraint.field.type.simpleName + '::' + fieldInfo.fieldName) ?: contextualMenuClosureFromField(fieldInfo.fieldConstraint.field.type)
+            contextualMenuClosures.get(fieldInfo.fieldConstraint.field.declaringClass.simpleName + '::' + fieldInfo.fieldName) ?: contextualMenuClosureFromField(fieldInfo.fieldConstraint.field.type)
         else null
     }
 
@@ -115,8 +115,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         contextualMenuClosures.get(aClass?.simpleName)
     }
 
-    static UiMenuSpecifier contextualMenuClosureFromClassName(String className) {
-        contextualMenuClosures.get(className)
+    static UiMenuSpecifier contextualMenuClosureFromClassName(String className, String fieldName) {
+        contextualMenuClosures.get(className + '::' + fieldName) ?: contextualMenuClosures.get(className)
     }
 
     @PostConstruct

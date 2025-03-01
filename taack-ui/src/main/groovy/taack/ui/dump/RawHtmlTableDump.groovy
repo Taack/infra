@@ -96,10 +96,14 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         IHTMLElement.HTMLElementBuilder htmlBuilder = new HTMLSpan().builder.setStyle(displayBlock).addChildren(cellHTML)
         if (menu && fieldInfo.value) {
             String ident = fieldInfo.value.toString()
+            String className = fieldInfo.fieldConstraint.field.type.simpleName
             if (GormEntity.isAssignableFrom(fieldInfo.value?.class))
                 ident = (fieldInfo.value as GormEntity).ident()
-            else if (id) ident = id
-            return htmlBuilder.putAttribute('taackContextualMenu', fieldInfo.fieldConstraint.field.type.simpleName + ';' + fieldInfo.fieldName + ';' + ident)
+            else if (id) {
+                ident = id
+                className = fieldInfo.fieldConstraint.field.declaringClass.simpleName
+            }
+            return htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
                         .build()
         }
         return htmlBuilder.build()

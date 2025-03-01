@@ -90,10 +90,14 @@ final class RawHtmlShowDump implements IUiShowVisitor {
             String v = TaackUiEnablerService.sanitizeString(fieldInfo.value?.toString())
             if (TaackUiService.contextualMenuClosureFromField(fieldInfo)) {
                 String ident = fieldInfo.value.toString()
+                String className = fieldInfo.fieldConstraint.field.type.simpleName
                 if (GormEntity.isAssignableFrom(fieldInfo.value?.class))
                     ident = (fieldInfo.value as GormEntity).ident()
-                else if (parameter.params.containsKey('id')) ident = parameter.params.long('id')
-                v = """<span taackContextualMenu="${fieldInfo.fieldConstraint.field.type.simpleName + ';' + fieldInfo.fieldName + ';' + ident}">${v}</span>"""
+                else if (parameter.params.containsKey('id')) {
+                    ident = parameter.params.long('id')
+                    className = fieldInfo.fieldConstraint.field.declaringClass.simpleName
+                }
+                v = """<span taackContextualMenu="${className + ';' + fieldInfo.fieldName + ';' + ident}">${v}</span>"""
 
             }
             out << showField(i18n, v, style, false)

@@ -10,10 +10,8 @@ import taack.ui.dsl.UiMenuSpecifier
 @Secured(["permitAll"])
 class TaackContextMenuController implements WebAttributes {
 
-    TaackUiService taackUiService
-
     def index() {
-        UiMenuSpecifier m = taackUiService.contextualMenuClosureFromClassName(params.get('className') as String)
+        UiMenuSpecifier m = TaackUiService.contextualMenuClosureFromClassName(params.get('className') as String, params.get('fieldName') as String)
         render(contentType: 'text/html', text: m ? TaackUiService.visitContextualMenu(m) : '')
     }
 }
