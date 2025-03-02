@@ -86,7 +86,7 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(FieldInfo fieldInfo, String format, Style style) {
+    void visitRowField(FieldInfo fieldInfo, Long id = null, String format, Style style) {
 
     }
 

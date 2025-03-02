@@ -321,11 +321,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(final FieldInfo fieldInfo, final String format, final Style style) {
+    void visitRowField(final FieldInfo fieldInfo,Long id = null, final String format, final Style style) {
         if (TaackUiService.contextualMenuClosureFromField(fieldInfo) && fieldInfo.value) {
             boolean addColumn = !isInCol
             if (addColumn) visitColumn(null, null)
-            blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, parameter.params.long('id')))//, firstInCol, isInCol))
+            blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, id ?: parameter.params.long('id')))//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
         } else {
             visitRowField(dataFormat(fieldInfo?.value, format), style)

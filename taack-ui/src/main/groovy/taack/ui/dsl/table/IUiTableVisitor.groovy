@@ -37,6 +37,8 @@ interface IUiTableVisitor {
 
     void visitRowColumnEnd()
 
+    void visitRowField(FieldInfo fieldInfo, Long rowId, String format, final Style style)
+
     void visitRowField(FieldInfo fieldInfo, String format, final Style style)
 
     void visitRowField(GetMethodReturn fieldInfo, String format, final Style style)

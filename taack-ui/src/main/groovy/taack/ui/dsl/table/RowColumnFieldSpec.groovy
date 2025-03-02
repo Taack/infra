@@ -43,6 +43,10 @@ class RowColumnFieldSpec implements BranchingSpec {
         rowField(value, NumberFormat.getInstance(LocaleContextHolder.locale), style)
     }
 
+    void rowField(final FieldInfo field, Long id, final String format = null, final Style style = null) {
+        tableVisitor.visitRowField(field, id, format, style)
+    }
+
     void rowField(final FieldInfo field, final String format = null, final Style style = null) {
         tableVisitor.visitRowField(field, format, style)
     }

@@ -90,7 +90,7 @@ final class RawCsvTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(final FieldInfo fieldInfo, final String format, final Style style) {
+    void visitRowField(final FieldInfo fieldInfo, Long id = null, final String format, final Style style) {
         visitRowField(fieldInfo.value?.toString(), null)
     }
 
