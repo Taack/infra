@@ -444,7 +444,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         String fileName = fileNamePrefix + "-${dateFileName}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
-        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}${isHtml ? ".html" : ""}")
+        webUtils.currentResponse.setHeader("Content-disposition", "${params.boolean('inline') ? "inline;" : ''}attachment;filename=${fileName}${isHtml ? ".html" : ""}")
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
         try {
@@ -453,6 +453,19 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             webRequest.renderView = false
         } catch (e) {
             log.error "${e.message}"
+        }
+    }
+
+    static UiBlockSpecifier downloadPdfIFrame(MethodClosure action, Long id = null) {
+        new UiBlockSpecifier().ui {
+            modal {
+                custom """\
+                    <iframe src="${Parameter.urlMapped(action, [id: id])}?inline=true"
+                            width="100%"
+                            height="800px">
+                    </iframe>
+                """.stripIndent()
+            }
         }
     }
 
