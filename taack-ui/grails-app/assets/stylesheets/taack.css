@@ -400,7 +400,6 @@ svg text {
 }
 
 .custom-context-menu li {
-    padding: 10px 16px;
     cursor: pointer;
     font-size: 14px;
     color: #333;
@@ -415,12 +414,13 @@ svg text {
     color: #2196F3;
 }
 
+/*For icons, not implemented atm
 .custom-context-menu li::before {
     content: '';
     width: 16px;
     height: 16px;
     margin-right: 8px;
-}
+}*/
 
 .custom-context-menu li:not(:last-child) {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -441,6 +441,10 @@ svg text {
     animation: fadeIn 0.1s ease-out;
 }
 
+.dropdown-item {
+    padding: 10px 16px;
+}
+
 .nested-dropdown {
     display: none;
     position: absolute;
@@ -453,12 +457,17 @@ svg text {
     right: 100%;
 }
 
+.nested-dropdown li {
+    padding: 10px 16px;
+}
+
 li:hover > .nested-dropdown{
     display: block !important;
 }
 
 .context-has-dropdown {
     position: relative;
+    padding: 10px 16px;
 }
 
 .context-has-dropdown::after {
