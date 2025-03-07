@@ -76,7 +76,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderLabel(String label) { // FONT_SIZE = 13.0
         outStr.append("""
-              <text x="${trX}" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="${trX}" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -84,7 +84,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderHiddenLabel(String label) {
         outStr.append("""
-              <text x="${trX}" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="${trX}" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -92,7 +92,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         outStr.append("""
-              <text x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize * 0.8}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize * 0.8}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -100,7 +100,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
-              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -108,7 +108,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
-              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
