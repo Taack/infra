@@ -2,11 +2,10 @@ package taack.ui.dump.html.theme
 
 import grails.validation.Validateable
 import groovy.transform.CompileStatic
+import jakarta.servlet.http.HttpSession
 import taack.ast.type.FieldConstraint
 import taack.ast.type.FieldInfo
-import taack.ui.dump.html.theme.ThemeSize
 
-import javax.servlet.http.HttpSession
 
 @CompileStatic
 final class ThemeSelector implements Validateable {

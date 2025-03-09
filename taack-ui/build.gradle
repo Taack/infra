@@ -21,8 +21,8 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
     }
 
     dependencies {
+        implementation platform("org.grails:grails-bom:$grailsVersion")
         developmentOnly("org.springframework.boot:spring-boot-devtools")
-        compileOnly "io.micronaut:micronaut-inject-groovy"
         implementation "org.grails:grails-core"
         implementation "org.grails:grails-web-boot"
         implementation "org.grails:grails-logging"
@@ -31,9 +31,7 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
         implementation "org.grails:grails-plugin-services"
         implementation "org.grails.plugins:gsp"
         profile "org.grails.profiles:web-plugin"
-        runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
-        assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipeline}"
-        assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipeline}"
+        runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
 
         implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
     }
@@ -100,6 +98,8 @@ dependencies {
 
     implementation "org.asciidoctor:asciidoctorj-api:${asciidoctorJ}"
 }
+
+compileJava.options.release = 17
 
 if (rootProject.name != 'infra') {
     grails {

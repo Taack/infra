@@ -12,7 +12,7 @@ dependencies {
     api "com.google.protobuf:protobuf-java:${protobufVersion}"
     antlr "org.antlr:antlr4:${antlr4}"
     implementation "org.antlr:antlr4-runtime:${antlr4}"
-    implementation "org.codehaus.groovy:groovy:${groovyVersion}"
+    implementation 'org.apache.groovy:groovy:4.0.24'
 }
 
 protobuf {
@@ -35,8 +35,10 @@ protobuf {
 
 generateGrammarSource {
     File outputDir = new File(projectDir.path + "/src/main/java/taack/jdbc/common/tql/gen")
-    println outputDir.path
     outputDirectory outputDir
 }
 
+sourcesJar {
+    dependsOn(generateGrammarSource)
+}
 assemble.dependsOn generateGrammarSource

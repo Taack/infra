@@ -1,10 +1,12 @@
 package taack.ui
 
 import groovy.transform.CompileStatic
-import io.micronaut.context.annotation.ConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 
 @CompileStatic
-@ConfigurationProperties("taack-ui")
+@ConfigurationPropertiesScan
+@ConfigurationProperties(prefix = "taack-ui")
 class TaackUiConfiguration {
     String defaultTitle
     String logoFileName
