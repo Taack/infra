@@ -43,7 +43,7 @@ class TaackUiEnablerService implements WebAttributes {
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
-    @Autowired
+    @Autowired(required = true)
     TaackUiConfiguration taackUiConfiguration
 
     def policy

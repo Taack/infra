@@ -9,7 +9,7 @@ import taack.solr.SolrSpecifier
 import taack.solr.SolrFieldType
 import taack.ui.dsl.UiBlockSpecifier
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class CrewSearchService implements TaackSearchService.IIndexService {

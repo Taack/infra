@@ -9,6 +9,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackAttachmentService
@@ -23,8 +24,6 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
-
-import javax.annotation.PostConstruct
 
 import static grails.async.Promises.task
 /*
@@ -637,7 +636,7 @@ class CmsController implements WebAttributes {
     }
 
     def index() {
-        taackUiService.show(taackEditorService.asciidocBlockSpecifier(CmsController.class, '/cms/cms.adoc'), buildMenu())
+        render taackUiService.show(taackEditorService.asciidocBlockSpecifier(CmsController.class, '/cms/cms.adoc'), buildMenu())
     }
 
     def pages() {

@@ -8,6 +8,7 @@ import org.grails.core.io.ResourceLocator
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.UiBlockSpecifier
@@ -15,6 +16,7 @@ import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.wysiwyg.Asciidoc
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.Inflater
 /**
@@ -33,42 +35,42 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
         final String mimeImage
     }
 
-    @Autowired
-    TaackUiConfiguration taackUiConfiguration
+    @Value('${intranet.root}')
+    String rootPath
 
     @Autowired
     ResourceLocator assetResourceLocator
 
-    private Path getScriptCachePath() {
-        Path.of(taackUiConfiguration.root, 'cache', 'asciidoc', 'script')
-    }
+//    private Path getScriptCachePath() {
+//        Path.of(TaackUiConfiguration.root, 'cache', 'asciidoc', 'script')
+//    }
 
     private Path getAsciidocCachePath() {
-        Path.of(taackUiConfiguration.root, 'cache', 'asciidoc', 'content')
+        Path.of(rootPath, 'cache', 'asciidoc', 'content')
     }
 
-    def asciidocRenderScript(String script) {
-        script = script.replaceAll('-', '+').replaceAll('_', '/')
-        File cached = Path.of(scriptCachePath.toString(), script).toFile()
-        if (cached.exists()) {
-            render cached.text
-        } else {
-            byte[] b64 = Base64.getDecoder().decode(script)
-            Inflater inflater = new Inflater()
-            inflater.setInput(b64)
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-            byte[] buffer = new byte[1024]
-
-            while (!inflater.finished()) {
-                int decompressedSize = inflater.inflate(buffer)
-                outputStream.write(buffer, 0, decompressedSize)
-            }
-
-            println(new String(outputStream.toByteArray()))
-
-        }
-    }
+//    def asciidocRenderScript(String script) {
+//        script = script.replaceAll('-', '+').replaceAll('_', '/')
+//        File cached = Path.of(scriptCachePath.toString(), script).toFile()
+//        if (cached.exists()) {
+//            render cached.text
+//        } else {
+//            byte[] b64 = Base64.getDecoder().decode(script)
+//            Inflater inflater = new Inflater()
+//            inflater.setInput(b64)
+//
+//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+//            byte[] buffer = new byte[1024]
+//
+//            while (!inflater.finished()) {
+//                int decompressedSize = inflater.inflate(buffer)
+//                outputStream.write(buffer, 0, decompressedSize)
+//            }
+//
+//            println(new String(outputStream.toByteArray()))
+//
+//        }
+//    }
 
     UiBlockSpecifier asciidocBlockSpecifier(Class cl, String fileName) {
         String path = params['path']

@@ -135,23 +135,23 @@ grails:
 intranet.noSsh: true
 intranet.root: ${HOME}/intranetFilesGH
 ---
-taack-ui:
-  defaultTitle: Taack Framework
-  root: ${HOME}/taack
-  resources: ${HOME}/taack/resources
-  #  logoFileName: logo-colored.webp
-  logoFileName: logo-taack-web.svg
-  logoWidth: 70
-  logoHeight: 60
-  hasMenuLogin: true
-  outlineContainer: false
-  bgColor: '#05294c'
-  fgColor: '#eeeeee'
-  bodyBgColor: '#fff'
-  javaPath: /usr/bin/java
-  plantUmlPath: ${HOME}/plantuml-1.2022.7.jar
-  solrUrl: 'http://localhost:8983/solr/taack'
----
+#taack-ui:
+#  defaultTitle: Taack Framework
+#  root: ${HOME}/taack
+#  resources: ${HOME}/taack/resources
+#  #  logoFileName: logo-colored.webp
+#  logoFileName: logo-taack-web.svg
+#  logoWidth: 70
+#  logoHeight: 60
+#  hasMenuLogin: true
+#  outlineContainer: false
+#  bgColor: '#05294c'
+#  fgColor: '#eeeeee'
+#  bodyBgColor: '#fff'
+#  javaPath: /usr/bin/java
+#  plantUmlPath: ${HOME}/plantuml-1.2022.7.jar
+#  solrUrl: 'http://localhost:8983/solr/taack'
+#---
 intercom:
   vegaPath: ${HOME}/dev/yarn/vega/packages/vega-cli/bin/
 ---

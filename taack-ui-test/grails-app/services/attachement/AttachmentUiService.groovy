@@ -26,8 +26,6 @@ import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
 
-import javax.annotation.PostConstruct
-
 import static taack.render.TaackUiService.tr
 
 @GrailsCompileStatic

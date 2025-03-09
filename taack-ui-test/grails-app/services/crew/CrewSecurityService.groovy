@@ -12,7 +12,7 @@ import taack.render.TaackUiService
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.test.Application
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class CrewSecurityService {

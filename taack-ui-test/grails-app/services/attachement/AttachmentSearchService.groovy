@@ -12,7 +12,7 @@ import taack.solr.SolrFieldType
 import taack.solr.SolrSpecifier
 import taack.ui.dsl.UiBlockSpecifier
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class AttachmentSearchService implements TaackSearchService.IIndexService {

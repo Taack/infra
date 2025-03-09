@@ -10,7 +10,7 @@ import taack.app.TaackApp
 import taack.app.TaackAppRegisterService
 import taack.render.TaackUiEnablerService
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class AttachmentSecurityService {

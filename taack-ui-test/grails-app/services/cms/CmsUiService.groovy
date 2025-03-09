@@ -20,7 +20,7 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class CmsUiService implements WebAttributes {

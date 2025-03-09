@@ -401,7 +401,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         String html = g.render template: "/taackUi/block-pdf", model: [
                 block          : blockStream.toString(),
                 css            : css.toString(),
-                root           : taackUiPluginConfiguration.root,
+//                root           : taackUiPluginConfiguration.root,
                 headerHeight   : htmlPdf.headerHeight,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
@@ -585,7 +585,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         htmlPdf.getOutput(output)
         String html = g.render template: "/taackUi/block-mail", model: [
                 block: output.toString(),
-                root : taackUiPluginConfiguration.root
+//                root : taackUiPluginConfiguration.root
         ]
         html
     }

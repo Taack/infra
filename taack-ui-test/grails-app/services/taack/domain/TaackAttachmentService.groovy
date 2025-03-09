@@ -14,7 +14,7 @@ import org.taack.IAttachmentPreviewConverter
 import org.taack.IAttachmentShowIFrame
 import taack.ui.TaackUiConfiguration
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class TaackAttachmentService implements WebAttributes, DataBinder {
@@ -166,7 +166,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
     }
 
     File attachmentPreview(final Attachment attachment, PreviewFormat previewFormat = PreviewFormat.DEFAULT) {
-        if (!attachment) return new File("${taackUiConfiguration.resources}/noPreview.${previewFormat.previewExtension}")
+        if (!attachment) return null
         final File preview = new File(attachmentPreviewPath(previewFormat, attachment))
         if (preview.exists()) {
             return preview
@@ -207,7 +207,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
                 log.error "attachmentPreview killed before finishing for ${attachment.name} ${eio}"
             }
         }
-        return new File("${taackUiConfiguration.resources}/noPreview.${previewFormat.previewExtension}")
+        return null
     }
 
     static void registerPreviewConverter(IAttachmentPreviewConverter previewConverter) {
