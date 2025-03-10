@@ -29,7 +29,7 @@ import taack.ui.dsl.UiMenuSpecifier
 
 @GrailsCompileStatic
 @Secured('permitAll')
-class TaackLoginController extends LoginController implements GrailsConfigurationAware {
+class LoginController extends LoginController implements GrailsConfigurationAware {
 
 	TaackUiService taackUiService
 

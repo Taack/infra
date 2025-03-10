@@ -176,7 +176,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
-            return new ModelAndView("/taackUi/block", [
+            return new ModelAndView("/taackUi/blockNoLayout", [
                     themeSize      : themeSize,
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
@@ -275,7 +275,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        return new ModelAndView("/taackUi/block", [
+        return new ModelAndView("/taackUi/blockNoLayout", [
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,

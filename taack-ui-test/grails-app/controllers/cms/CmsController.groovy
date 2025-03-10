@@ -636,7 +636,7 @@ class CmsController implements WebAttributes {
     }
 
     def index() {
-        render taackUiService.show(taackEditorService.asciidocBlockSpecifier(CmsController.class, '/cms/cms.adoc'), buildMenu())
+        taackUiService.show(taackEditorService.asciidocBlockSpecifier(CmsController.class, '/cms/cms.adoc'), buildMenu())
     }
 
     def pages() {
