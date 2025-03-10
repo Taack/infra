@@ -1,28 +1,23 @@
 package taack.domain
 
+import attachment.Attachment
 import attachment.config.AttachmentContentTypeCategory
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
+import jakarta.annotation.PostConstruct
 import org.apache.commons.io.FileUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import attachment.Attachment
 import org.taack.IAttachmentConverter
 import org.taack.IAttachmentPreviewConverter
 import org.taack.IAttachmentShowIFrame
-import taack.ui.TaackUiConfiguration
-
-import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class TaackAttachmentService implements WebAttributes, DataBinder {
     final Object imageConverter = new Object()
 
     TaackSearchService taackSearchService
-    @Autowired
-    TaackUiConfiguration taackUiConfiguration
 
     @Value('${intranet.root}')
     String intranetRoot

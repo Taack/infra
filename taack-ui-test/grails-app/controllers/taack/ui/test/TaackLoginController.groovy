@@ -19,6 +19,7 @@ import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
+import grails.plugin.springsecurity.LoginController
 import grails.plugin.springsecurity.SpringSecurityService
 import org.springframework.security.access.annotation.Secured
 import taack.render.TaackUiService
@@ -28,7 +29,7 @@ import taack.ui.dsl.UiMenuSpecifier
 
 @GrailsCompileStatic
 @Secured('permitAll')
-class LoginController extends grails.plugin.springsecurity.LoginController implements GrailsConfigurationAware {
+class TaackLoginController extends LoginController implements GrailsConfigurationAware {
 
 	TaackUiService taackUiService
 

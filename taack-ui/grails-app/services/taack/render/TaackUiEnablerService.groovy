@@ -43,9 +43,6 @@ class TaackUiEnablerService implements WebAttributes {
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
-    @Autowired(required = true)
-    TaackUiConfiguration taackUiConfiguration
-
     def policy
 
     @PostConstruct
@@ -91,7 +88,7 @@ class TaackUiEnablerService implements WebAttributes {
         boolean isAllowed = true
         switch (Environment.current) {
             case Environment.DEVELOPMENT:
-                if (!taackUiConfiguration.disableSecurity)
+                if (!TaackUiConfiguration.disableSecurity)
                     isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
                 break
             case Environment.PRODUCTION:

@@ -7,7 +7,7 @@ import grails.compiler.GrailsCompileStatic
 class ActionDefaultLogInterceptor implements Interceptor {
 
     ActionDefaultLogInterceptor() {
-        matchAll().excludes(controller:"login")
+        matchAll().excludes(controller:"taackLogin")
     }
 
     boolean before() {

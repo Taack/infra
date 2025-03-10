@@ -42,16 +42,13 @@ import taack.ui.dsl.common.IconStyle
 final class TaackSolrSearchService implements WebAttributes {
 
     @Autowired
-    TaackUiConfiguration taackUiConfiguration
-
-    @Autowired
     MessageSource messageSource
 
     private SolrClient solrClient
 
     @PostConstruct
     void init() {
-        solrClient = new Http2SolrClient.Builder(taackUiConfiguration.solrUrl).build()
+        solrClient = new Http2SolrClient.Builder(TaackUiConfiguration.solrUrl).build()
     }
 
     final UiBlockSpecifier search(String q, MC search, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, Class<? extends GormEntity>... classes) {

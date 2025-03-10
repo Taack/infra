@@ -61,9 +61,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     ThemeService themeService
 
     @Autowired
-    TaackUiConfiguration taackUiPluginConfiguration
-
-    @Autowired
     PageRenderer g
 
     @Value('${client.js.path}')
@@ -185,7 +182,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     themeAuto      : themeAuto,
                     block          : output.toString(),
                     menu           : visitMenu(menu),
-                    conf           : taackUiPluginConfiguration,
+                    conf           : TaackUiConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                     bootstrapJsTag : bootstrapJsTag,
                     bootstrapCssTag: bootstrapCssTag
@@ -284,7 +281,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 themeAuto      : themeAuto,
                 block          : html,
                 menu           : visitMenu(menu),
-                conf           : taackUiPluginConfiguration,
+                conf           : TaackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
@@ -311,7 +308,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 themeAuto      : themeAuto,
                 block          : "",
                 menu           : visitMenu(menu),
-                conf           : taackUiPluginConfiguration,
+                conf           : TaackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag

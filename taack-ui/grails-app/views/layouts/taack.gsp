@@ -100,7 +100,7 @@
                                     <a class="nav-link" ajaxaction="/theme?isAjax=true"><g:message code="theme.label"/></a>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link" href="/login">Login</a>
+                                    <a class="nav-link" href="/taackLogin">Login</a>
                                 </li>
 
                             </ul>
