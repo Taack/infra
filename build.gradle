@@ -11,6 +11,7 @@ import java.time.Duration
 
 buildscript {
     repositories {
+        mavenLocal()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.grails.org/grails/core" }
     }
@@ -71,6 +72,7 @@ subprojects {
         apply plugin: 'java-library'
 
         repositories {
+            mavenLocal()
             mavenCentral()
             maven { url "https://repo.grails.org/grails/core" }
         }

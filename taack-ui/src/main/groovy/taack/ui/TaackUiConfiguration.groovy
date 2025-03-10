@@ -16,6 +16,7 @@ class TaackUiConfiguration {
 
     static boolean hasMenuLogin = true
     static boolean outlineContainer = false
+    static boolean fixedTop = false
     static String bgColor = '#05294c'
     static String fgColor = '#eeeeee'
     static String bodyBgColor = '#fff'

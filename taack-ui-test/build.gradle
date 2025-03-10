@@ -2,6 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url "https://repo.grails.org/grails/core/" }
         maven { url "https://plugins.gradle.org/m2/" }
@@ -27,6 +28,7 @@ plugins {
 group = "taack.ui.test"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core/" }
 }
