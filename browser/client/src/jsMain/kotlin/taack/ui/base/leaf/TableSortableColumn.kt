@@ -46,7 +46,12 @@ class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafE
     private fun onClick(e: MouseEvent) {
         e.preventDefault()
         trace("SortableColumn::onClick")
-        val dir = if (direction == "neutral") "desc" else if (direction == "desc") "asc" else if (direction == "asc") "neutral" else null
+        val dir = when (direction) {
+            "neutral" -> "desc"
+            "desc" -> "asc"
+            "asc" -> if (property == parent.initialSortField) "desc" else "neutral"
+            else -> null
+        }
         Helper.filterForm(parent.filter, null, property, dir)
     }
 }
