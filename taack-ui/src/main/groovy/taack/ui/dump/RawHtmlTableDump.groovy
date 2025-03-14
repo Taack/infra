@@ -294,7 +294,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
                 new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
-                        new HTMLTxtContent("<a>${i18n}</a>")
+                        new HTMLTxtContent(i18n)
                 ).build()
         )
         if (addColumn) visitColumnEnd()

@@ -37,8 +37,7 @@ class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafE
         }
         trace("SortableColumn::init $property $direction")
         s.classList.add(direction)
-        val a = s.childNodes[0] as HTMLAnchorElement
-        a.onclick = EventHandler{ e ->
+        s.onclick = EventHandler{ e ->
             onClick(e)
         }
     }
