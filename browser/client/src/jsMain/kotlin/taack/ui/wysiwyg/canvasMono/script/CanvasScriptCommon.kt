@@ -12,24 +12,8 @@ import kotlin.js.Promise
 
 abstract class CanvasScriptCommon(txtInit: String) : CanvasText(txtInit, 0) {
 
-    override val fontWeight: String
-        get() = "400"
-    override val fontSize: String
-        get() = "12px"
-    override val fontFace: String
-        get() = "Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace"
     override val fillStyle: String
         get() = "rgb(54, 54, 54)"
-    override val letterSpacing: Double
-        get() = 1.0
-    override val lineHeight: Double
-        get() = 24.0
-    override val wordSpacing: Double
-        get() = 0.0
-    override val marginTop: Double
-        get() = 0.0
-    override val marginBottom: Double
-        get() = 0.0
 
     abstract val txtScript: String
 

@@ -14,16 +14,16 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         var figNum: Int = 0
     }
 
-    abstract val fontWeight: String
-    abstract val fontSize: String
-    abstract val fontFace: String
+    val fontWeight: String = "normal"
+    val fontSize: String = "14px"
+    val fontFace: String =  "sans-serif"
     abstract val fillStyle: String
-    abstract val letterSpacing: Double
-    abstract val lineHeight: Double
-    abstract val wordSpacing: Double
+    val letterSpacing: Double = 0.0
+    val lineHeight: Double = 27.2
+    val wordSpacing: Double = 0.0
     var totalHeight: Double = 0.0
-    abstract val marginTop: Double
-    abstract val marginBottom: Double
+    val marginTop: Double = 10.0
+    val marginBottom: Double = 10.0
 
     override var globalPosYStart: Double = 0.0
     override var globalPosYEnd: Double = 0.0

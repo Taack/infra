@@ -49,11 +49,11 @@ enum class TextStyle(val sepBegin: String, val sepEnd: String, private val regex
         text.initCtx(ctx)
         ctx.font = when (this) {
             NORMAL -> {
-                text.font()
+                "${text.font()} monospace"
             }
 
             BOLD -> {
-                "bold ${text.fontSize} ${text.fontFace}"
+                "bold ${text.fontSize} ${text.fontFace} monospace"
             }
 
             MONOSPACED -> {
@@ -78,39 +78,6 @@ enum class TextStyle(val sepBegin: String, val sepEnd: String, private val regex
         }
         return Triple(text, p, ptEnd)
     }
-
-//    fun chargeWordCtx(ctx: CanvasRenderingContext2D, canvasText: CanvasText, text: String, currentWordStyle: StringStyle): StringStyle {
-//        entries.forEach { entry ->
-//            if (entry.regex != null && text.startsWith(entry.sepBegin)) {
-//                when (entry) {
-//                    NORMAL -> {
-//                        // Path-through
-//                    }
-//                    BOLD -> {
-//                        val end = text.endsWith(BOLD.sepEnd)
-//                        val ws = StringStyle(text, !currentWordStyle.bold && !end, currentWordStyle.italic, currentWordStyle.monospace)
-//                        BOLD.initCtx(ctx, canvasText)
-//                        return ws
-//                    }
-//                    MONOSPACED -> {
-//                        val end = text.endsWith(MONOSPACED.sepEnd)
-//                        val ws = StringStyle(text, !currentWordStyle.bold, currentWordStyle.italic, !currentWordStyle.monospace && !end)
-//                        BOLD.initCtx(ctx, canvasText)
-//                        return ws
-//
-//                    }
-//                    BOLD_MONOSPACED -> {
-//                        val end = text.endsWith(BOLD_MONOSPACED.sepEnd)
-//                        val ws = StringStyle(text, !currentWordStyle.bold && !end, currentWordStyle.italic, currentWordStyle.monospace && !end)
-//                        BOLD.initCtx(ctx, canvasText)
-//                        return ws
-//                    }
-//                }
-//            }
-//        }
-//        NORMAL.initCtx(ctx, canvasText)
-//        return currentWordStyle
-//    }
 
     fun applyStyle(txt: String, p: Int, pEnd: Int): String {
         traceIndent("TextStyle::applyStyle +++ $txt, $p, $pEnd")
