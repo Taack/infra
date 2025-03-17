@@ -1,11 +1,6 @@
 package taack.ui.wysiwyg.canvasMono
 
 import taack.ui.base.Helper.Companion.trace
-import taack.ui.wysiwyg.canvasMono.item.CanvasImg
-import taack.ui.wysiwyg.canvasMono.item.CanvasLink
-import taack.ui.wysiwyg.canvasMono.table.CanvasTable
-import taack.ui.wysiwyg.canvasMono.table.TxtHeaderCanvas
-import taack.ui.wysiwyg.canvasMono.table.TxtRowCanvas
 import taack.ui.wysiwyg.canvasMono.text.*
 import web.canvas.CanvasRenderingContext2D
 import web.html.HTMLInputElement
@@ -24,15 +19,6 @@ interface ICanvasDrawable : ICanvasSelectable {
         B1(Regex("^\\* ")),
         B2(Regex("^\\*\\* ")),
         FIG(Regex("^\\.")),
-        IMAGE(Regex("^image::[^:|*`]+\\[\\]")),
-        LINK(Regex("^link:[^:|*`]+\\[.+,download\\]")),
-//        IMAGE(Regex("^image::[^:|*`\n\\[]+")),
-        IMAGE_INLINE(Regex("image:[^:|*`]+")),
-        TABLE_START(Regex("^\\|===")),
-//        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+\\|([^|*`\n])+")),
-        TABLE_COL(Regex("^\\|[^*`=\n][^|*`\n]+(\\|([^|*`\n])+)+")),
-        TABLE_CELL(Regex("^\\|")),
-//        MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
         NEXT_DRAWABLE(Regex("^ *\n *\n *")),
@@ -51,13 +37,6 @@ interface ICanvasDrawable : ICanvasSelectable {
     companion object {
         fun dumpAsciidoc(mainCanvas: MainCanvas): String {
             val out = StringBuilder()
-//            out.append("= Title\n")
-//            out.append(":doctype: book\n")
-//            out.append(":toc: left\n")
-//            out.append(":toc-title: Table of Contents of {doctitle}\n")
-//            out.append(":toclevels: 2\n")
-//            out.append(":sectnums: 2\n")
-//            out.append(":sectnumlevels: 2\n")
             out.append("\n")
             val drawables = mainCanvas.drawables
             var previousCitationNumber = 0
@@ -134,10 +113,7 @@ interface ICanvasDrawable : ICanvasSelectable {
             var currentText: CanvasText? = null
             var currentTextPosition = 0
             var tableStart = false
-            val initCells: MutableList<TxtRowCanvas> = mutableListOf()
-            val initHeaders: MutableList<TxtHeaderCanvas> = mutableListOf()
             var currentIndent = 0
-            var wasIndent = false
             var wasInBlock = false
             while (it.hasNext()) {
 //                if (!wasIndent) {
@@ -187,27 +163,6 @@ interface ICanvasDrawable : ICanvasSelectable {
                         canvasDrawables.add(currentText)
                     }
 
-                    AdocToken.TABLE_START -> {
-                        if (tableStart) {
-                            canvasDrawables.add(CanvasTable(initHeaders, initCells))
-                            tableStart = false
-                        } else tableStart = true
-                    }
-                    AdocToken.TABLE_COL -> {
-                        for (txt in token.sequence.split('|')) {
-                            if (txt.isNotEmpty()) {
-                                val h = TxtHeaderCanvas(txt)
-                                currentTextPosition = token.end
-                                initHeaders.add(h)
-                            }
-                        }
-                    }
-                    AdocToken.TABLE_CELL -> {
-                        val t = TxtRowCanvas("")
-                        currentText = t
-                        currentTextPosition = token.end
-                        initCells.add(t)
-                    }
                     AdocToken.NEXT_DRAWABLE -> {
                         if (!tableStart) {
                             currentText = PCanvas("", currentIndent)
@@ -269,15 +224,6 @@ interface ICanvasDrawable : ICanvasSelectable {
 //                        currentIndent ++
 //                    }
 
-                    AdocToken.IMAGE -> {
-                        val fileName = token.sequence.substring("image::".length, token.sequence.length - 2)
-                        canvasDrawables.add(CanvasImg("/$controller/$action/$id?path=$fileName", fileName, 0))
-                        currentTextPosition = token.end
-                    }
-                    AdocToken.IMAGE_INLINE -> {
-
-                    }
-
                     AdocToken.BLOCK_DELIM -> {
                         if (!wasInBlock) {
                             wasInBlock = true
@@ -295,11 +241,6 @@ interface ICanvasDrawable : ICanvasSelectable {
                     }
 
                     AdocToken.FIG -> {}
-                    AdocToken.LINK -> {
-                        val fileName = token.sequence.substring("link:".length, token.sequence.indexOf('['))
-                        canvasDrawables.add(CanvasLink("/$controller/$action/$id?path=$fileName", fileName, 0))
-                        currentTextPosition = token.end
-                    }
                 }
             }
             currentText = PCanvas("", currentIndent)

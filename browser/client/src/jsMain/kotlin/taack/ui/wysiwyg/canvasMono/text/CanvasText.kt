@@ -131,37 +131,37 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
 
     fun measureText(ctx: CanvasRenderingContext2D, posBegin: Int, posEnd: Int): Double {
         var textWidth = 0.0
-        if (textStyles.isNotEmpty()) {
-            var pe = posBegin
-            textStyles.forEach {
-                if (it.start > posEnd || it.end < posBegin) {
-                    return@forEach
-                }
-                val s = if (it.start < posBegin) posBegin else it.start
-                val e = if (it.end > posEnd) posEnd else it.end
-                if (s > pe) {
-                    textWidth += ctx.measureText(
-                        /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, s)
-                    ).width
-                }
-                ctx.save()
-                it.getTextStyle().initCtx(ctx, this)
-                textWidth += ctx.measureText(
-                    /*(if (s == 0) txtPrefix else "") + */txt.substring(s, e)
-                ).width
-                ctx.restore()
-                pe = e
-            }
-            if (pe < posEnd) {
-                textWidth += ctx.measureText(
-                    /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, posEnd)
-                ).width
-            }
-            return textWidth
-        } else {
+//        if (textStyles.isNotEmpty()) {
+//            var pe = posBegin
+//            textStyles.forEach {
+//                if (it.start > posEnd || it.end < posBegin) {
+//                    return@forEach
+//                }
+//                val s = if (it.start < posBegin) posBegin else it.start
+//                val e = if (it.end > posEnd) posEnd else it.end
+//                if (s > pe) {
+//                    textWidth += ctx.measureText(
+//                        /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, s)
+//                    ).width
+//                }
+//                ctx.save()
+//                it.getTextStyle().initCtx(ctx, this)
+//                textWidth += ctx.measureText(
+//                    /*(if (s == 0) txtPrefix else "") + */txt.substring(s, e)
+//                ).width
+//                ctx.restore()
+//                pe = e
+//            }
+//            if (pe < posEnd) {
+//                textWidth += ctx.measureText(
+//                    /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, posEnd)
+//                ).width
+//            }
+//            return textWidth
+//        } else {
             textWidth = ctx.measureText(txt.substring(posBegin, posEnd)).width
             return textWidth
-        }
+//        }
     }
 
     fun font(): String {
