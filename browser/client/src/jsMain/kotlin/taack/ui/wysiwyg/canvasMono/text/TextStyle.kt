@@ -53,7 +53,7 @@ enum class TextStyle(val sepBegin: String, val sepEnd: String, private val regex
             }
 
             BOLD -> {
-                "bold ${text.fontSize} ${text.fontFace} monospace"
+                "bold ${text.fontSize} monospace"
             }
 
             MONOSPACED -> {
