@@ -8,12 +8,15 @@ import web.canvas.CanvasRenderingContext2D
 
 
 abstract class CanvasText(private val _txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
+    companion object {
+        val lineHeight: Double = 17.2
+    }
     val fontWeight: String = "normal"
     val fontSize: String = "14px"
     val fontFace: String =  "monospace"
     abstract val fillStyle: String
     val letterSpacing: Double = 0.0
-    val lineHeight: Double = 17.2
+//    val lineHeight: Double = 17.2
     val wordSpacing: Double = 0.0
     var totalHeight: Double = 0.0
     val marginTop: Double = 5.0

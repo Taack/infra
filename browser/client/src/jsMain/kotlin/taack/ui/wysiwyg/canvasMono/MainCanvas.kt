@@ -66,7 +66,14 @@ class MainCanvas(
         }
     }
 
-    var posInTextarea = 0
+    val posInTextarea: Int
+        get() {
+            var res = caretPosInCurrentText
+            for (i in 0..<currentDrawableIndex) {
+                res += drawables[i].getSelectedText()!!.txtVar.length + 1
+            }
+            return res
+        }
     private val dprX = 2.0
     private val dprY = 2.0
     val canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement
@@ -81,7 +88,7 @@ class MainCanvas(
     private val _drawables: MutableList<ICanvasDrawable> = mutableListOf()
     internal val drawables = MyMutableList(_drawables)
     private var dy: Double = 0.0
-    private var caretPosInCurrentText: Int = 0
+    var caretPosInCurrentText: Int = 0
     private var currentDrawableIndex: Int = 0
     private val currentDrawable: ICanvasDrawable
         get() = drawables[currentDrawableIndex]
@@ -121,8 +128,10 @@ class MainCanvas(
                 commandDoList.add(
                     DeleteCharMonoCommand(
                         this,
+                        posInTextarea
                     )
                 )
+                caretPosInCurrentText--
                 traceDeIndent("MainCanvas::addDrawable --- press Backspace $currentDrawableIndex ${currentMouseEvent?.offsetX} ${currentMouseEvent?.offsetY}")
             }
 
@@ -142,8 +151,9 @@ class MainCanvas(
             "Delete" -> {
                 trace("MainCanvas::addDrawable press Delete")
                 commandDoList.add(
-                    DeleteCharMonoCommand(this)
+                    DeleteCharMonoCommand(this, posInTextarea)
                 )
+                caretPosInCurrentText--
             }
 
             "Enter" -> {
@@ -151,10 +161,11 @@ class MainCanvas(
                 commandDoList.add(
                     AddCharMonoCommand(
                         this,
+                        posInTextarea,
                         "\n"
-                    ),
-
                     )
+                )
+                currentDrawableIndex++
                 caretPosInCurrentText = 0
             }
 
@@ -235,13 +246,16 @@ class MainCanvas(
                             trace("MainCanvas::addDrawable redo commandDoList: ${commandDoList.size}, commandUndoList: ${commandUndoList.size}")
                             commandDoList.add(commandUndoList.removeLast())
                         }
-                    } else
+                    } else {
                         commandDoList.add(
                             AddCharMonoCommand(
                                 this,
+                                posInTextarea,
                                 currentKeyboardEvent!!.key[0].toString()
                             )
                         )
+                        caretPosInCurrentText += 1
+                    }
                 }
             }
         }
@@ -305,15 +319,18 @@ class MainCanvas(
             currentMouseEvent = event
             event.preventDefault()
             event.stopPropagation()
+            var sum = 0
             for (i in 0..<drawables.size) {
                 if (drawables[i].isClicked(event.offsetX, event.offsetY)) {
                     currentDrawableIndex = i
                     val text = currentDrawable.getSelectedText(event.offsetX, event.offsetY)!!
                     val currentClick = text.click(ctx, event.offsetX, event.offsetY)
                     caretPosInCurrentText = currentClick!!.second
+                    break
                 }
+                sum += drawables[i].getSelectedText()!!.txtVar.length
             }
-            traceDeIndent("canvas click => $caretPosInCurrentText, $currentDrawableIndex, ${currentText?.txt}")
+            traceDeIndent("canvas click => posInTextarea $posInTextarea $caretPosInCurrentText, $currentDrawableIndex, ${currentText?.txt}")
             draw()
         }
 
@@ -354,9 +371,11 @@ class MainCanvas(
                 commandDoList.add(
                     AddCharMonoCommand(
                         this,
+                        posInTextarea,
                         txt
                     )
                 )
+                caretPosInCurrentText += txt.length
                 trace("canvasEvent paste: $txt")
             } else if (event.clipboardData!!.items.length > 0) {
                 // Use DataTransferItemList interface to access the file(s)
@@ -402,10 +421,11 @@ class MainCanvas(
             commandDoList.add(
                 AddCharMonoCommand(
                     this,
+                    posInTextarea,
                     txt
                 )
             )
-
+            caretPosInCurrentText += txt.length
             trace("canvasEvent drop on ${textarea.name}: $txt")
         }
 
@@ -508,6 +528,8 @@ class MainCanvas(
                     currentDoubleClick!!.third
                 )
             }
+        } else if (caretPosInCurrentText == 0) {
+            CanvasCaret.draw(ctx, null, null, 0)
         }
         divHolder.style.minHeight = "${posYGlobal + dy + 100}px"
 

@@ -50,7 +50,7 @@ class AsciidocParser {
         var start = 0
         var end = 0
 
-        var s = html.trim()
+        var s = html
 
         var pt: AdocToken = AdocToken.TITLE
         while (s.isNotEmpty()) {

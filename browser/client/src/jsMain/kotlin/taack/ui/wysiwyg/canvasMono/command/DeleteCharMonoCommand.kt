@@ -8,12 +8,12 @@ import taack.ui.wysiwyg.canvasMono.MainCanvas
 import web.uievents.MouseEvent
 
 class DeleteCharMonoCommand(
-    val canvas: MainCanvas,
+    private val canvas: MainCanvas,
+    private val posInTextarea: Int
 ) : ICanvasCommand {
     override fun doIt(): Boolean {
-        trace("DeleteCharMonoCommand::doIt")
-        canvas.textarea.value = canvas.textarea.value.substring(0, canvas.posInTextarea) + canvas.textarea.value.substring(0, canvas.posInTextarea + 1)
-        canvas.posInTextarea--
+        trace("DeleteCharMonoCommand::doIt $posInTextarea")
+        canvas.textarea.value = canvas.textarea.value.substring(0, posInTextarea) + canvas.textarea.value.substring(0, posInTextarea + 1)
         return true
     }
 }

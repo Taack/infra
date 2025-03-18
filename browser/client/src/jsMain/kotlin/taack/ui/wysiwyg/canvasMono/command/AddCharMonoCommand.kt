@@ -3,13 +3,12 @@ package taack.ui.wysiwyg.canvasMono.command
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.wysiwyg.canvasMono.MainCanvas
 
-class AddCharMonoCommand(private val canvas: MainCanvas, private val ch: String) :
+class AddCharMonoCommand(private val canvas: MainCanvas, private val posInTextArea: Int, private val ch: String) :
     ICanvasCommand {
     override fun doIt(): Boolean {
-        trace("AddCharMonoCommand $ch")
+        trace("AddCharMonoCommand $ch posInTextarea: ${posInTextArea} caretPosInCurrentText: ${canvas.caretPosInCurrentText}")
         canvas.textarea.value =
-            canvas.textarea.value.substring(0, canvas.posInTextarea) + ch + canvas.textarea.value.substring(canvas.posInTextarea)
-        canvas.posInTextarea += ch.length
+            canvas.textarea.value.substring(0, posInTextArea) + ch + canvas.textarea.value.substring(posInTextArea)
         return true
     }
 }

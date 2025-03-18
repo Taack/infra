@@ -15,14 +15,16 @@ class CanvasCaret {
         private const val HEIGHT: Double = 20.0
         private const val WIDTH: Double = 1.0
 
-        fun draw(ctx: CanvasRenderingContext2D, text: CanvasText, line: CanvasLine, n: Int) {
+        fun draw(ctx: CanvasRenderingContext2D, text: CanvasText?, line: CanvasLine?, n: Int) {
             traceIndent("CanvasCaret::draw: $n line: $line")
-            posY = line.textY
-            ctx.save()
-            text.initCtx(ctx)
-            posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin + text.posXStart
-            ctx.restore()
-            draw(ctx, posX, posY, null, text.lineHeight)
+            if (text != null && line != null) {
+                posY = line.textY
+                ctx.save()
+                text.initCtx(ctx)
+                posX = text.measureText(ctx, line.posBegin,line.posBegin + n) + line.leftMargin + text.posXStart
+                ctx.restore()
+            }
+            draw(ctx, posX, posY, null, CanvasText.lineHeight)
             traceDeIndent("CanvasCaret::draw: $n")
         }
 
