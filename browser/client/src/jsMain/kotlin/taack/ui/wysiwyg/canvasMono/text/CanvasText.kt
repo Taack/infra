@@ -8,12 +8,6 @@ import web.canvas.CanvasRenderingContext2D
 
 
 abstract class CanvasText(private val _txtInit: String = "", private var initCitationNumber: Int = 0) : ICanvasDrawable {
-    companion object {
-        var num1: Int = 0
-        var num2: Int = 0
-        var figNum: Int = 0
-    }
-
     val fontWeight: String = "normal"
     val fontSize: String = "14px"
     val fontFace: String =  "monospace"
@@ -39,7 +33,6 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
             __txtInit = value
         }
 
-    var txtPrefix = ""
     var lines: List<CanvasLine> = emptyList()
     private var internTextStyles: MutableList<StringStyle>? = null
     val textStyles: List<StringStyle>
@@ -131,37 +124,8 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
 
     fun measureText(ctx: CanvasRenderingContext2D, posBegin: Int, posEnd: Int): Double {
         var textWidth = 0.0
-//        if (textStyles.isNotEmpty()) {
-//            var pe = posBegin
-//            textStyles.forEach {
-//                if (it.start > posEnd || it.end < posBegin) {
-//                    return@forEach
-//                }
-//                val s = if (it.start < posBegin) posBegin else it.start
-//                val e = if (it.end > posEnd) posEnd else it.end
-//                if (s > pe) {
-//                    textWidth += ctx.measureText(
-//                        /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, s)
-//                    ).width
-//                }
-//                ctx.save()
-//                it.getTextStyle().initCtx(ctx, this)
-//                textWidth += ctx.measureText(
-//                    /*(if (s == 0) txtPrefix else "") + */txt.substring(s, e)
-//                ).width
-//                ctx.restore()
-//                pe = e
-//            }
-//            if (pe < posEnd) {
-//                textWidth += ctx.measureText(
-//                    /*(if (pe == 0) txtPrefix else "") + */txt.substring(pe, posEnd)
-//                ).width
-//            }
-//            return textWidth
-//        } else {
             textWidth = ctx.measureText(txt.substring(posBegin, posEnd)).width
             return textWidth
-//        }
     }
 
     fun font(): String {
@@ -186,8 +150,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         this.posXEnd = width
         ctx.save()
         initCtx(ctx)
-        txtPrefix = computeNum()
-        val tmpTxt = txtPrefix + txt
+        val tmpTxt = txt
         //val txtMetrics = ctx.measureText(tmpTxt.ifEmpty { "|" })
         val height = lineHeight//txtMetrics.actualBoundingBoxAscent// + txtMetrics.actualBoundingBoxDescent//lineHeight
         globalPosYStart = posY
@@ -206,14 +169,14 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
             val tWidth = measureText(ctx, posLetterLineEnd, currentLetterPos)
             ctx.save()
             initCtx(ctx)
-            if (pX + ctx.measureText(txtPrefix).width + tWidth >= width - 30.0) {
-                pX = posX + ctx.measureText(txtPrefix).width
+            if (pX + tWidth >= width - 30.0) {
+                pX = posX
                 lines += CanvasLine(
                     posLetterLineBegin,
                     posLetterLineEnd,
                     posY + totalHeight,
                     height,
-                    ctx.measureText(txtPrefix).width
+                    0.0
                 )
                 pY += height
                 totalHeight = pY
@@ -229,8 +192,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
                 posLetterLineBegin,
                 txt.length,
                 posY + totalHeight,
-                height,
-                ctx.measureText(txtPrefix).width
+                height, 0.0
             )
         }
 
@@ -247,9 +209,6 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         traceDeIndent("CanvasText::draw: $globalPosYEnd")
         return ret
     }
-
-
-    abstract fun computeNum(): String
 
     fun indexOfLine(line: CanvasLine): Int {
         var i = 0
@@ -329,7 +288,4 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
 //        styles = emptyList()
     }
 
-    override fun dumpAsciidoc(): String {
-        return txt
-    }
 }

@@ -66,26 +66,22 @@ class CanvasLine(
                 if (s > pe) {
                     trace("CanvasLine::drawLine:s>pe: s: $s pe: $pe")
                     ctx.fillText(
-                        (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, s),
+                        text.txt.substring(pe, s),
 //                        (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
                         posXStart,
                         textY
                     )
-                    posXStart += ctx.measureText(
-                        (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, s)
-                    ).width
+                    posXStart += ctx.measureText(text.txt.substring(pe, s)).width
                 }
                 ctx.save()
                 it.getTextStyle().initCtx(ctx, text)
-                trace("CanvasLine::drawLine $s $e ${(if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e)}")
-                ctx.fillText(
-                    (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e),
+                trace("CanvasLine::drawLine $s $e ${text.txt.substring(s, e)}")
+                ctx.fillText(text.txt.substring(s, e),
 //                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
                     posXStart,
                     textY
                 )
-                posXStart += ctx.measureText(
-                    (if (s == 0) text.txtPrefix else "") + text.txt.substring(s, e)
+                posXStart += ctx.measureText(text.txt.substring(s, e)
                 ).width
 
                 ctx.restore()
@@ -94,20 +90,20 @@ class CanvasLine(
             if (pe < posEnd) {
                 trace("CanvasLine::drawLine:pe < posEnd: posEnd: $posEnd pe: $pe")
                 ctx.fillText(
-                    (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd),
+                    text.txt.substring(pe, posEnd),
 //                    (if (text.txtPrefix.isEmpty() || pe > 0) leftMargin else 0.0) + posXStart,
                     posXStart,
                     textY
                 )
                 posXStart += ctx.measureText(
-                    (if (pe == 0) text.txtPrefix else "") + text.txt.substring(pe, posEnd)
+                    text.txt.substring(pe, posEnd)
                 ).width
             }
         } else {
             trace("CanvasLine::drawLine:else (empty...) ...")
             ctx.fillText(
-                (if (posBegin == 0) text.txtPrefix else "") + text.txt.substring(posBegin, posEnd),
-                (if (text.txtPrefix.isEmpty() || posBegin > 0) leftMargin else 0.0) + posXStart,
+                text.txt.substring(posBegin, posEnd),
+                (if (posBegin > 0) leftMargin else 0.0) + posXStart,
                 textY
             )
         }

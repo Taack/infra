@@ -634,7 +634,7 @@ class MainCanvas(
     private fun addInitialTexts() {
         if (textarea.innerText.isNotBlank()) {
             trace("addInitialTexts ${textarea.innerText}")
-            initialDrawables.addAll(ICanvasDrawable.readAsciidoc(this))
+          //TODO  initialDrawables.addAll(ICanvasDrawable.readAsciidoc(this))
         } else {
             trace("addInitialTexts BLANK")
             initialDrawables.add(PCanvas(""))
@@ -656,9 +656,6 @@ class MainCanvas(
         } else trace("divScroll.clientHeight == 0 !!!")
         ctx.scale(dprX, dprY)
 
-        CanvasText.num1 = 0
-        CanvasText.num2 = 0
-        CanvasText.figNum = 1
         posYGlobal = -dy
 
         trace("Clear ${canvas.width.toDouble()} x ${canvas.height.toDouble()}")
@@ -710,7 +707,8 @@ class MainCanvas(
             }
         }
         divHolder.style.minHeight = "${posYGlobal + dy + 100}px"
-        val asciidoc = ICanvasDrawable.dumpAsciidoc(this)
+        val asciidoc = "ICanvasDrawable.dumpAsciidoc(this)"
+//TODO        val asciidoc = ICanvasDrawable.dumpAsciidoc(this)
         textarea.textContent = asciidoc
 
         traceDeIndent("MainCanvas::draw ${divHolder.clientWidth} $currentText")
