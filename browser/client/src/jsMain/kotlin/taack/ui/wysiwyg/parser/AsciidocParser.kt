@@ -1,8 +1,14 @@
 package taack.ui.wysiwyg.parser
 
-import taack.ui.wysiwyg.structure.*
+import taack.ui.wysiwyg.canvasMono.text.CanvasText
+import taack.ui.wysiwyg.canvasMono.text.H2Canvas
+import taack.ui.wysiwyg.canvasMono.text.H3Canvas
+import taack.ui.wysiwyg.canvasMono.text.H4Canvas
+import taack.ui.wysiwyg.canvasMono.text.Li2Canvas
+import taack.ui.wysiwyg.canvasMono.text.LiCanvas
+import taack.ui.wysiwyg.canvasMono.text.PCanvas
 
-class AsciidocParser : IParser {
+class AsciidocParser {
     enum class AdocToken(val regex: Regex) {
         TITLE(Regex("^= ")),
         ATTR(Regex("^:([a-z-]+): ([^*`\n]*)")),
@@ -43,8 +49,8 @@ class AsciidocParser : IParser {
         }
     }
 
-    override fun parse(html: String, factory: IFactory): List<TextOutline> {
-        val textOutlines = mutableListOf<TextOutline>()
+    fun parse(html: String): List<CanvasText> {
+        val textOutlines = mutableListOf<CanvasText>()
         val tokens = mutableListOf<TokenInfo>()
         var start = 0
         var end = 0
@@ -84,8 +90,7 @@ class AsciidocParser : IParser {
         }
 
         val it = tokens.iterator()
-        var textOutline: TextOutline? = null
-        var inlineFaces = mutableListOf<InlineFace>()
+        var textOutline: TokenInfo? = null
         var textOutlineContent: String? = null
 
         while (it.hasNext()) {
@@ -96,19 +101,19 @@ class AsciidocParser : IParser {
                 AdocToken.INNER_BLOCK_DELIM -> TODO()
                 AdocToken.BLOCK_DELIM -> TODO()
                 AdocToken.H4 -> {
-                    textOutline = H4Text()
+                    textOutline = token
                 }
                 AdocToken.H3 ->  {
-                    textOutline = H3Text()
+                    textOutline = token
                 }
                 AdocToken.H2 ->  {
-                    textOutline = H2Text()
+                    textOutline = token
                 }
                 AdocToken.B1 ->  {
-                    textOutline = B1Text()
+                    textOutline = token
                 }
                 AdocToken.B2 ->  {
-                    textOutline = B2Text()
+                    textOutline = token
                 }
                 AdocToken.FIG -> TODO()
                 AdocToken.IMAGE -> TODO()
@@ -119,21 +124,16 @@ class AsciidocParser : IParser {
                 AdocToken.TABLE_CELL -> TODO()
                 AdocToken.BOLD -> {
                     textOutlineContent += token.sequence
-                    inlineFaces.add(factory.createInline(BoldFace(token.start, token.end)))
                 }
                 AdocToken.MONO -> {
                     textOutlineContent += token.sequence
-                    inlineFaces.add(factory.createInline(MonoFace(token.start, token.end)))
                 }
                 AdocToken.NEXT_DRAWABLE -> TODO()
                 AdocToken.NEXT_LINE -> {
                     if (!textOutlineContent.isNullOrBlank()) {
                         if (textOutline != null) {
-                            textOutlines.add(factory.createOutline(textOutline, textOutlineContent, inlineFaces))
-                        } else {
-                            textOutlines.add(factory.createOutline(PText(), textOutlineContent, inlineFaces))
+                            textOutlines.add(createOutline(textOutline, textOutlineContent))
                         }
-                        inlineFaces = mutableListOf()
                         textOutlineContent = null
                         textOutline = null
                     }
@@ -146,5 +146,32 @@ class AsciidocParser : IParser {
             }
         }
         return textOutlines
+    }
+
+    fun createOutline(
+        textOutline: TokenInfo,
+        initText: String
+    ): CanvasText {
+        val text = textOutline.sequence + ' ' + initText
+        when (textOutline.token) {
+            AdocToken.H4 -> {
+                return H4Canvas(text)
+            }
+            AdocToken.H3 ->  {
+                return H3Canvas(text)
+            }
+            AdocToken.H2 ->  {
+                return H2Canvas(text)
+            }
+            AdocToken.B1 ->  {
+                return LiCanvas(text)
+            }
+            AdocToken.B2 ->  {
+                return Li2Canvas(text)
+            }
+
+            else -> {}
+        }
+        return PCanvas(text)
     }
 }
