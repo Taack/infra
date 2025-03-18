@@ -276,16 +276,16 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         return null
     }
 
-    override fun toString(): String {
-        return "CanvasText(posXStart=$posXStart, posXEnd=$posXEnd, globalPosYStart=$globalPosYStart, globalPosYEnd=$globalPosYEnd, lines.size=${lines.size})"
-    }
-
     override fun reset() {
         trace("CanvasText::reset  |$txtInit|$__txtInit|$_txtInit|")
         internTextStyles = null
         citationNumber = initCitationNumber
         txtVar = txtInit
 //        styles = emptyList()
+    }
+
+    override fun toString(): String {
+        return "CanvasText(txt='$txt')"
     }
 
 }
