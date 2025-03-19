@@ -13,7 +13,7 @@ class DeleteCharMonoCommand(
 ) : ICanvasCommand {
     override fun doIt(): Boolean {
         trace("DeleteCharMonoCommand::doIt $posInTextarea")
-        canvas.textarea.value = canvas.textarea.value.substring(0, posInTextarea) + canvas.textarea.value.substring(0, posInTextarea + 1)
+        canvas.textarea.value = canvas.textarea.value.substring(0, posInTextarea - 1) + canvas.textarea.value.substring(posInTextarea)
         return true
     }
 }

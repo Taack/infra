@@ -151,9 +151,8 @@ class MainCanvas(
             "Delete" -> {
                 trace("MainCanvas::addDrawable press Delete")
                 commandDoList.add(
-                    DeleteCharMonoCommand(this, posInTextarea)
+                    DeleteCharMonoCommand(this, posInTextarea + 1)
                 )
-                caretPosInCurrentText--
             }
 
             "Enter" -> {

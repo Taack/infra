@@ -31,8 +31,8 @@ class AsciidocParser {
         //        MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
-        NEXT_DRAWABLE(Regex("^ *\n *\n *")),
-        NEXT_LINE(Regex("^\n")),
+//        NEXT_DRAWABLE(Regex("^ *\n *\n *")),
+        NEXT_LINE(Regex("^ *\n")),
         NORMAL(Regex("^[^\n]+")),
         OTHER(Regex("[ \t]*")),
         ERROR(Regex("ERRORRRORR"))
@@ -133,11 +133,11 @@ class AsciidocParser {
                     txt += token.sequence
                 }
 
-                AdocToken.NEXT_DRAWABLE -> {
-                    textOutlines.add(createOutline(textOutline, txt))
-                    textOutline = null
-                    txt = ""
-                }
+//                AdocToken.NEXT_DRAWABLE -> {
+//                    textOutlines.add(createOutline(textOutline, txt))
+//                    textOutline = null
+//                    txt = ""
+//                }
 
                 AdocToken.NEXT_LINE -> {
                     textOutlines.add(createOutline(textOutline, txt))
@@ -161,7 +161,7 @@ class AsciidocParser {
         textOutline: TokenInfo?,
         initText: String
     ): CanvasText {
-        val text = if (textOutline == null) initText else textOutline.sequence + ' ' + initText
+        val text = if (textOutline == null) initText else textOutline.sequence + initText
         trace("AsciidocParser::createOutline $text")
         when (textOutline?.token) {
             AdocToken.TITLE -> {
@@ -192,6 +192,5 @@ class AsciidocParser {
                 return PCanvas(text)
             }
         }
-        return PCanvas(text)
     }
 }
