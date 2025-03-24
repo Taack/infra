@@ -59,7 +59,7 @@ class BootstrapLayout {
 
         Integer tabIndex = this.parameter?.tabIndex ?: 0
         if (occ == tabIndex)
-            tabContent.addClasses('show', 'active')
+            tabContent.addClasses('show', 'active', 'loaded')
 
         topElement.builder.addChildren(
                 tabContent
