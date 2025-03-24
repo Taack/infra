@@ -307,9 +307,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     )
             }
         } else {
-            value = fieldInfo.value ?: ''
             formThemed.addChildren(
-                    new HTMLInput(InputType.HIDDEN, value, qualifiedName)
+                    new HTMLInput(InputType.HIDDEN, fieldInfo.value, qualifiedName)
             )
         }
     }

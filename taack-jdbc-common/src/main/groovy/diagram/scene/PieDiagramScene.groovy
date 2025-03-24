@@ -76,111 +76,118 @@ class PieDiagramScene extends DiagramScene {
                 BigDecimal percent = value / total
                 String percentLabel = "(${(percent * 100).round(2)}%)"
                 BigDecimal percentLabelLength = render.measureText(percentLabel)
-                BigDecimal maxLabelLength = Math.max(valueLabelLength.toDouble(), percentLabelLength.toDouble()).toBigDecimal()
 
-                // get the label position (It is at the 3/4 of radius of the sector)
-                Double startAngle = Math.toRadians(angle1.toDouble())
-                BigDecimal angle2 = angle1 + (drawByClockwise ? 360.0 * percent : -360.0 * percent)
-                Double endAngle = Math.toRadians(angle2.toDouble())
-                Double labelAngle = ((startAngle + endAngle) / 2) as Double
-                if (drawByClockwise && labelAngle > Math.PI) {
-                    drawByClockwise = false
-                    angle1 = 360.0
-                    lastOutsideLabelX = 100000.0
-                    lastOutsideLabelY = -1000.0
-                    continue
-                }
-                BigDecimal labelX = centerX + radius * Math.cos(labelAngle - Math.PI / 2) * (3 / 4 + (angle1 == 0.0 ? slicePositionRate : 0))
-                BigDecimal labelY = centerY + radius * Math.sin(labelAngle - Math.PI / 2) * (3 / 4 + (angle1 == 0.0 ? slicePositionRate : 0))
-                // get width (horizontal) and height (vertical) of the sector, calculated from the point of label position
-                BigDecimal startX = centerX + (centerY - labelY) * Math.tan(startAngle)
-                BigDecimal endX = centerX + (centerY - labelY) * Math.tan(endAngle)
-                BigDecimal startY = centerY - (labelX - centerX) * Math.tan(Math.PI / 2 - startAngle)
-                BigDecimal endY = centerY - (labelX - centerX) * Math.tan(Math.PI / 2 - endAngle)
-                // judge if the label could be completely included in the sector
-                if ((slicePositionRate > 0.0 && angle1 == 0.0)
-                        || (Math.abs((endAngle - startAngle).toDouble()) < Math.PI
-                        && (Math.abs((labelX - startX).toDouble()) < maxLabelLength / 2
-                        || Math.abs((endX - labelX).toDouble()) < maxLabelLength / 2
-                        || Math.abs((endY - startY).toDouble()) < fontSize * 2))) { // draw label outside
-                    // but only when no slice mode or target label is of the slice
-                    if (slicePositionRate == 0 || angle1 == 0.0) {
-                        BigDecimal pointX = labelX + (radius / 4 + OUTSIDE_LABEL_MARGIN) * Math.cos(labelAngle - Math.PI / 2)
-                        BigDecimal pointY = labelY + (radius / 4 + OUTSIDE_LABEL_MARGIN) * Math.sin(labelAngle - Math.PI / 2)
-                        render.translateTo(labelX, labelY)
-                        render.fillStyle(Color.BLACK)
-                        render.renderLine(pointX - labelX, pointY - labelY)
+                if (percent.toInteger() == 1) { // only one sector: draw label at center point
+                    render.translateTo(centerX - valueLabelLength / 2, centerY - fontSize)
+                    render.renderLabel(valueLabel)
+                    render.translateTo(centerX - percentLabelLength / 2, centerY)
+                    render.renderLabel(percentLabel)
+                } else { // draw label at the 3/4 of radius of the sector
+                    // get the label position
+                    Double startAngle = Math.toRadians(angle1.toDouble())
+                    BigDecimal angle2 = angle1 + (drawByClockwise ? 360.0 * percent : -360.0 * percent)
+                    Double endAngle = Math.toRadians(angle2.toDouble())
+                    Double labelAngle = ((startAngle + endAngle) / 2) as Double
+                    if (drawByClockwise && labelAngle > Math.PI) {
+                        drawByClockwise = false
+                        angle1 = 360.0
+                        lastOutsideLabelX = 100000.0
+                        lastOutsideLabelY = -1000.0
+                        continue
+                    }
+                    BigDecimal labelX = centerX + radius * Math.cos(labelAngle - Math.PI / 2) * (3 / 4 + (angle1 == 0.0 ? slicePositionRate : 0))
+                    BigDecimal labelY = centerY + radius * Math.sin(labelAngle - Math.PI / 2) * (3 / 4 + (angle1 == 0.0 ? slicePositionRate : 0))
+                    // get width (horizontal) and height (vertical) of the sector, calculated from the point of label position
+                    BigDecimal startX = centerX + (centerY - labelY) * Math.tan(startAngle)
+                    BigDecimal endX = centerX + (centerY - labelY) * Math.tan(endAngle)
+                    BigDecimal startY = centerY - (labelX - centerX) * Math.tan(Math.PI / 2 - startAngle)
+                    BigDecimal endY = centerY - (labelX - centerX) * Math.tan(Math.PI / 2 - endAngle)
+                    // judge if the label could be completely included in the sector
+                    BigDecimal maxLabelLength = Math.max(valueLabelLength.toDouble(), percentLabelLength.toDouble()).toBigDecimal()
+                    if ((slicePositionRate > 0.0 && angle1 == 0.0)
+                            || (Math.abs((endAngle - startAngle).toDouble()) < Math.PI
+                            && (Math.abs((labelX - startX).toDouble()) < maxLabelLength / 2
+                            || Math.abs((endX - labelX).toDouble()) < maxLabelLength / 2
+                            || Math.abs((endY - startY).toDouble()) < fontSize * 2))) { // draw label outside
+                        // but only when no slice mode or target label is of the slice
+                        if (slicePositionRate == 0 || angle1 == 0.0) {
+                            BigDecimal pointX = labelX + (radius / 4 + OUTSIDE_LABEL_MARGIN) * Math.cos(labelAngle - Math.PI / 2)
+                            BigDecimal pointY = labelY + (radius / 4 + OUTSIDE_LABEL_MARGIN) * Math.sin(labelAngle - Math.PI / 2)
+                            render.translateTo(labelX, labelY)
+                            render.fillStyle(Color.BLACK)
+                            render.renderLine(pointX - labelX, pointY - labelY)
 
-                        BigDecimal outsideLineLength = OUTSIDE_LABEL_MARGIN + valueLabelLength + render.measureText(" ") + percentLabelLength + OUTSIDE_LABEL_MARGIN
-                        if (drawByClockwise) {
-                            if (pointX > lastOutsideLabelX + OUTSIDE_LABEL_MARGIN || pointY - OUTSIDE_LABEL_MARGIN - fontSize - OUTSIDE_LABEL_MARGIN > lastOutsideLabelY) { // normal
-                                render.translateTo(pointX, pointY)
-                                render.renderLine(outsideLineLength, 0.0)
-                                render.translateTo(pointX + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                render.renderLabel(valueLabel + " " + percentLabel)
-                                lastOutsideLabelX = pointX + outsideLineLength
-                                lastOutsideLabelY = pointY
-                            } else { // prolong line
-                                BigDecimal marginBetweenLabels = OUTSIDE_LABEL_MARGIN * 5
-                                if (lastOutsideLabelX + marginBetweenLabels + outsideLineLength <= width) { // prolong line at horizontal direction
+                            BigDecimal outsideLineLength = OUTSIDE_LABEL_MARGIN + valueLabelLength + render.measureText(" ") + percentLabelLength + OUTSIDE_LABEL_MARGIN
+                            if (drawByClockwise) {
+                                if (pointX > lastOutsideLabelX + OUTSIDE_LABEL_MARGIN || pointY - OUTSIDE_LABEL_MARGIN - fontSize - OUTSIDE_LABEL_MARGIN > lastOutsideLabelY) { // normal
                                     render.translateTo(pointX, pointY)
-                                    render.renderLine(lastOutsideLabelX - pointX + marginBetweenLabels + outsideLineLength, 0.0)
-                                    render.translateTo(lastOutsideLabelX + marginBetweenLabels + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                    render.renderLabel(valueLabel + " " + percentLabel)
-                                    lastOutsideLabelX = lastOutsideLabelX + marginBetweenLabels + outsideLineLength
-                                    lastOutsideLabelY = pointY
-                                } else { // prolong line at vertical direction
-                                    BigDecimal point2X = centerX + radius * 5 / 4
-                                    BigDecimal point2Y = lastOutsideLabelY + OUTSIDE_LABEL_MARGIN + fontSize + OUTSIDE_LABEL_MARGIN
-                                    render.translateTo(pointX, pointY)
-                                    render.renderLine(point2X - pointX, point2Y - pointY)
-                                    render.translateTo(point2X, point2Y)
                                     render.renderLine(outsideLineLength, 0.0)
-                                    render.translateTo(point2X + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
+                                    render.translateTo(pointX + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
                                     render.renderLabel(valueLabel + " " + percentLabel)
-                                    lastOutsideLabelX = width
-                                    lastOutsideLabelY = point2Y
-                                }
-                            }
-                        } else {
-                            if (pointX < lastOutsideLabelX - OUTSIDE_LABEL_MARGIN || pointY - OUTSIDE_LABEL_MARGIN - fontSize - OUTSIDE_LABEL_MARGIN > lastOutsideLabelY) { // normal
-                                render.translateTo(pointX, pointY)
-                                render.renderLine(-outsideLineLength, 0.0)
-                                render.translateTo(pointX - outsideLineLength + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                render.renderLabel(valueLabel + " " + percentLabel)
-                                lastOutsideLabelX = pointX - outsideLineLength
-                                lastOutsideLabelY = pointY
-                            } else { // prolong line
-                                BigDecimal labelDrawingStartX = lastOutsideLabelX - OUTSIDE_LABEL_MARGIN * 5 - outsideLineLength
-                                if (labelDrawingStartX >= 0.0) { // prolong line at horizontal direction
-                                    render.translateTo(pointX, pointY)
-                                    render.renderLine(-(pointX - labelDrawingStartX), 0.0)
-                                    render.translateTo(labelDrawingStartX + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                    render.renderLabel(valueLabel + " " + percentLabel)
-                                    lastOutsideLabelX = labelDrawingStartX
+                                    lastOutsideLabelX = pointX + outsideLineLength
                                     lastOutsideLabelY = pointY
-                                } else { // prolong line at vertical direction
-                                    BigDecimal point2X = centerX - radius * 5 / 4
-                                    BigDecimal point2Y = lastOutsideLabelY + OUTSIDE_LABEL_MARGIN + fontSize + OUTSIDE_LABEL_MARGIN
+                                } else { // prolong line
+                                    BigDecimal marginBetweenLabels = OUTSIDE_LABEL_MARGIN * 5
+                                    if (lastOutsideLabelX + marginBetweenLabels + outsideLineLength <= width) { // prolong line at horizontal direction
+                                        render.translateTo(pointX, pointY)
+                                        render.renderLine(lastOutsideLabelX - pointX + marginBetweenLabels + outsideLineLength, 0.0)
+                                        render.translateTo(lastOutsideLabelX + marginBetweenLabels + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
+                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        lastOutsideLabelX = lastOutsideLabelX + marginBetweenLabels + outsideLineLength
+                                        lastOutsideLabelY = pointY
+                                    } else { // prolong line at vertical direction
+                                        BigDecimal point2X = centerX + radius * 5 / 4
+                                        BigDecimal point2Y = lastOutsideLabelY + OUTSIDE_LABEL_MARGIN + fontSize + OUTSIDE_LABEL_MARGIN
+                                        render.translateTo(pointX, pointY)
+                                        render.renderLine(point2X - pointX, point2Y - pointY)
+                                        render.translateTo(point2X, point2Y)
+                                        render.renderLine(outsideLineLength, 0.0)
+                                        render.translateTo(point2X + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
+                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        lastOutsideLabelX = width
+                                        lastOutsideLabelY = point2Y
+                                    }
+                                }
+                            } else {
+                                if (pointX < lastOutsideLabelX - OUTSIDE_LABEL_MARGIN || pointY - OUTSIDE_LABEL_MARGIN - fontSize - OUTSIDE_LABEL_MARGIN > lastOutsideLabelY) { // normal
                                     render.translateTo(pointX, pointY)
-                                    render.renderLine(point2X - pointX, point2Y - pointY)
-                                    render.translateTo(point2X, point2Y)
                                     render.renderLine(-outsideLineLength, 0.0)
-                                    render.translateTo(point2X - outsideLineLength + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
+                                    render.translateTo(pointX - outsideLineLength + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
                                     render.renderLabel(valueLabel + " " + percentLabel)
-                                    lastOutsideLabelX = 0.0
-                                    lastOutsideLabelY = point2Y
+                                    lastOutsideLabelX = pointX - outsideLineLength
+                                    lastOutsideLabelY = pointY
+                                } else { // prolong line
+                                    BigDecimal labelDrawingStartX = lastOutsideLabelX - OUTSIDE_LABEL_MARGIN * 5 - outsideLineLength
+                                    if (labelDrawingStartX >= 0.0) { // prolong line at horizontal direction
+                                        render.translateTo(pointX, pointY)
+                                        render.renderLine(-(pointX - labelDrawingStartX), 0.0)
+                                        render.translateTo(labelDrawingStartX + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
+                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        lastOutsideLabelX = labelDrawingStartX
+                                        lastOutsideLabelY = pointY
+                                    } else { // prolong line at vertical direction
+                                        BigDecimal point2X = centerX - radius * 5 / 4
+                                        BigDecimal point2Y = lastOutsideLabelY + OUTSIDE_LABEL_MARGIN + fontSize + OUTSIDE_LABEL_MARGIN
+                                        render.translateTo(pointX, pointY)
+                                        render.renderLine(point2X - pointX, point2Y - pointY)
+                                        render.translateTo(point2X, point2Y)
+                                        render.renderLine(-outsideLineLength, 0.0)
+                                        render.translateTo(point2X - outsideLineLength + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
+                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        lastOutsideLabelX = 0.0
+                                        lastOutsideLabelY = point2Y
+                                    }
                                 }
                             }
                         }
+                    } else { // draw label inside
+                        render.translateTo(labelX - valueLabelLength / 2, labelY - fontSize)
+                        render.renderLabel(valueLabel)
+                        render.translateTo(labelX - percentLabelLength / 2, labelY)
+                        render.renderLabel(percentLabel)
                     }
-                } else { // draw label inside
-                    render.translateTo(labelX - valueLabelLength / 2, labelY - fontSize)
-                    render.renderLabel(valueLabel)
-                    render.translateTo(labelX - percentLabelLength / 2, labelY)
-                    render.renderLabel(percentLabel)
+                    angle1 = angle2
                 }
-                angle1 = angle2
                 keys.remove(key)
             }
         } else {

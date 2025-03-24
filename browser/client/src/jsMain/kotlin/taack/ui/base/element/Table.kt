@@ -25,6 +25,7 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
     private val tableGroupableColumns: List<TableGroupableColumn>?
     val rows: List<TableRow>
     val tableId = t.attributes.getNamedItem("taackTableId")!!.value
+    val initialSortField = t.attributes.getNamedItem("initialSortField")?.value ?: ""
     val filter: Filter
     private val paginate: TablePaginate?
     val tableSelectCheckboxes: Pair<TableSelectCheckbox, List<TableSelectCheckbox>>?

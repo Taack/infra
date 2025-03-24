@@ -3,7 +3,7 @@
 *= require custom-gantt
 */
 
-a[ajaxaction], .nav-link, .table-link, .page-link, .sortColumn > a, input[taackajaxformm2maction], input[taackajaxformm2oaction] {
+a[ajaxaction], .nav-link, .table-link, .page-link, .sortColumn, input[taackajaxformm2maction], input[taackajaxformm2oaction] {
     cursor: pointer;
 }
 

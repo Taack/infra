@@ -87,7 +87,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowField(final String i18n, final FieldInfo fieldInfo, final Style style) {
         if (fieldInfo?.value != null) {
-            String v = TaackUiEnablerService.sanitizeString(fieldInfo.value?.toString())
+            String v = TaackUiEnablerService.sanitizeString(RawHtmlTableDump.dataFormat(fieldInfo.value, null))
             if (TaackUiService.contextualMenuClosureFromField(fieldInfo)) {
                 String ident = fieldInfo.value.toString()
                 String className = fieldInfo.fieldConstraint.field.type.simpleName
