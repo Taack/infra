@@ -11,6 +11,8 @@ import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dump.html.theme.ThemeSize
 
+import javax.servlet.http.Cookie
+
 // TODO: Develop the UI
 @GrailsCompileStatic
 @Secured(["permitAll"])
@@ -20,7 +22,7 @@ class ThemeController {
     ThemeService themeService
 
     def index() {
-        ThemeSelector themeSelector = ThemeSelector.fromSession(session)
+        ThemeSelector themeSelector = ThemeSelector.fromCookie(request)
         taackUiService.show(new UiBlockSpecifier().ui({
             modal {
                 form new UiFormSpecifier().ui(themeSelector, {
@@ -38,14 +40,28 @@ class ThemeController {
         def tm = params['themeMode'] as ThemeMode
         def ts = params['themeSize'] as ThemeSize
 
-        session[ThemeSelector.SESSION_THEME_MODE] = tm.toString()
-        session[ThemeSelector.SESSION_THEME_SIZE] = ts.toString()
+        def modeCookie = new Cookie(ThemeSelector.SESSION_THEME_MODE, tm.toString())
+        def sizeCookie = new Cookie(ThemeSelector.SESSION_THEME_SIZE, ts.toString())
+
+        // Set cookie expiration to 1 year
+        modeCookie.maxAge = 365 * 24 * 60 * 60
+        sizeCookie.maxAge = 365 * 24 * 60 * 60
+
+        // Set path to root to make cookies available across the site
+        modeCookie.path = '/'
+        sizeCookie.path = '/'
+
+        response.addCookie(modeCookie)
+        response.addCookie(sizeCookie)
 
         taackUiService.ajaxReload()
     }
 
     def autoTheme(String themeModeAuto) {
-        session[ThemeSelector.SESSION_THEME_AUTO] = themeModeAuto
+        def autoCookie = new Cookie(ThemeSelector.SESSION_THEME_AUTO, themeModeAuto)
+        autoCookie.maxAge = 365 * 24 * 60 * 60
+        autoCookie.path = '/'
+        response.addCookie(autoCookie)
 
         ThemeSelector themeSelector = themeService.themeSelector
         ThemeSize themeSize = themeSelector.themeSize
