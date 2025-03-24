@@ -460,7 +460,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         new UiBlockSpecifier().ui {
             modal {
                 custom """\
-                    <iframe src="${Parameter.urlMapped(action, [id: id])}?inline=true"
+                    <iframe src="${(new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(action, [id: id])}?inline=true"
                             width="100%"
                             height="800px">
                     </iframe>
