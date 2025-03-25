@@ -31,7 +31,7 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
             e.preventDefault()
             val tabIndex = b.getAttribute("id")!!.split("-").last()
             val tabId = b.getAttribute("id")!!.split("-")[1]
-            val div: Element? = parent.parent.d.querySelector(".tab-content")
+            val div: Element? = parent.d.parentElement?.querySelector(".tab-content")
             var divTab: Element? = null
             val fd = FormData()
             fd["isAjax"] = "true"
