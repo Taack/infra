@@ -54,7 +54,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         this.initialForm = new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}")
     }
 
-    static final <T> String dataFormat(T value, String format) {
+    static final <T> String dataFormat(T value, String format, Locale locale = null) {
         if (value == null) return ''
         switch (value.class) {
             case BigDecimal:
@@ -64,10 +64,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
                 return sdf.format(value)
             case Enum:
-                String i18n = tr("enum.value.${value.toString()}", null)
+                String i18n = tr("enum.value.${value.toString()}", locale)
                 return i18n != "enum.value.${value.toString()}" ? i18n : value.toString()
             case [Boolean, boolean]:
-                return tr("default.boolean.${value.toString()}", null)
+                return tr("default.boolean.${value.toString()}", locale)
             default:
                 return TaackUiEnablerService.sanitizeString(value.toString())
         }
@@ -332,13 +332,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, id ?: parameter.params.long('id')))//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
         } else {
-            visitRowField(dataFormat(fieldInfo?.value, format), style)
+            visitRowField(dataFormat(fieldInfo?.value, format, parameter.lcl), style)
         }
     }
 
     @Override
     void visitRowField(final GetMethodReturn fieldInfo, final String format, final Style style) {
-        visitRowField(dataFormat(fieldInfo?.value, format), style)
+        visitRowField(dataFormat(fieldInfo?.value, format, parameter.lcl), style)
     }
 
     @Override
