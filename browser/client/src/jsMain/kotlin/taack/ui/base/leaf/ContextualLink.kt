@@ -112,10 +112,10 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                     contextMenu.style.apply {
                         position = "absolute"
                         document.body.appendChild(contextMenu)
-                        val maxX = window.innerWidth - contextMenu.offsetWidth
-                        val maxY = window.innerHeight - contextMenu.offsetHeight
-                        left = "${min(e.clientX, maxX)}px"
-                        top = "${min(e.clientY, maxY)}px"
+                        val maxX = window.innerWidth + window.scrollX - contextMenu.offsetWidth
+                        val maxY = window.innerHeight + window.scrollY - contextMenu.offsetHeight
+                        left = "${min(e.pageX, maxX)}px"
+                        top = "${min(e.pageY, maxY)}px"
                         zIndex = "9999"
                     }
                     addIdToAnchors(response, id)

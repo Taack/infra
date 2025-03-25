@@ -59,7 +59,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
     }
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionInputM2O::modalReturnSelect $key $value")
+        trace("FormActionInputM2O::modalReturnSelect $key $value $otherField")
         i.value = value
         val i2 = i.parentElement!!.querySelector("input[type=hidden]")!! as HTMLInputElement
         i2.value = key
