@@ -15,6 +15,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
     val fontSize: String = "14px"
     val fontFace: String =  "monospace"
     abstract val fillStyle: String
+    open val fontStyle: String = "normal"
     val letterSpacing: Double = 0.0
 //    val lineHeight: Double = 17.2
     val wordSpacing: Double = 0.0
@@ -132,7 +133,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
     }
 
     fun font(): String {
-        return "$fontWeight $fontSize $fontFace"
+        return "$fontWeight $fontStyle $fontSize $fontFace"
     }
 
     fun initCtx(ctx: CanvasRenderingContext2D) {
