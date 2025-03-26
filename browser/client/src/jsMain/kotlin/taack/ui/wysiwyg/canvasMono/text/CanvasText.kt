@@ -17,7 +17,6 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
     abstract val fillStyle: String
     open val fontStyle: String = "normal"
     val letterSpacing: Double = 0.0
-//    val lineHeight: Double = 17.2
     val wordSpacing: Double = 0.0
     var totalHeight: Double = 0.0
     val marginTop: Double = 5.0
@@ -38,53 +37,48 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         }
 
     var lines: List<CanvasLine> = emptyList()
-    private var internTextStyles: MutableList<StringStyle>? = null
-    val textStyles: List<StringStyle>
-        get() {
-            if (internTextStyles == null) {
-                internTextStyles = mutableListOf()
-
-                val inlineStyles = mutableListOf<StringStyle>()
-
-                if (txt.isNotEmpty())
-                    for (s in TextStyle.entries) {
-                        if (s == TextStyle.NORMAL)
-                            continue
-                        var c = true
-                        var p = 0
-                        while (c && p < txt.length) {
-                            var ps = txt.substring(p).indexOf(s.sepBegin)
-                            if (ps != -1) {
-                                ps += p
-                                p = ps + s.sepBegin.length
-                                var pe = txt.substring(p).indexOf(s.sepEnd)
-                                if (pe != -1) {
-                                    pe += p + s.sepEnd.length
-                                    p = pe
-                                    inlineStyles.add(StringStyle(ps, pe).from(s))
-                                } else c = false
-                            } else c = false
-                        }
-                    }
-                if (inlineStyles.isNotEmpty()) {
-                    inlineStyles.sortBy { it.start }
-//                    inlineStyles.sortWith(compareBy({ it.start }, { it.end }))
-
-                    var currentStyle = inlineStyles.first()
-                    if (inlineStyles.size == 1) internTextStyles!!.add(currentStyle)
-                    else
-                        inlineStyles.forEach {
-//                            if (it.getTextStyle() != currentStyle.getTextStyle() && it.getTextStyle() != TextStyle.NORMAL) {
-//                                internTextStyles!!.addAll(currentStyle.merge(it))
-                                internTextStyles!!.add(it)
-//                            } else internTextStyles!!.add(it)
-                            currentStyle = it
-                        }
-                }
-
-            }
-            return internTextStyles!!
-        }
+    val textStyles: MutableList<StringStyle> = emptyList<StringStyle>().toMutableList()
+//        get() {
+//            if (internTextStyles == null) {
+//                internTextStyles = mutableListOf()
+//
+//                val inlineStyles = mutableListOf<StringStyle>()
+//
+//                if (txt.isNotEmpty())
+//                    for (s in TextStyle.entries) {
+//                        if (s == TextStyle.NORMAL)
+//                            continue
+//                        var c = true
+//                        var p = 0
+//                        while (c && p < txt.length) {
+//                            var ps = txt.substring(p).indexOf(s.sepBegin)
+//                            if (ps != -1) {
+//                                ps += p
+//                                p = ps + s.sepBegin.length
+//                                var pe = txt.substring(p).indexOf(s.sepEnd)
+//                                if (pe != -1) {
+//                                    pe += p + s.sepEnd.length
+//                                    p = pe
+//                                    inlineStyles.add(StringStyle(ps, pe).from(s))
+//                                } else c = false
+//                            } else c = false
+//                        }
+//                    }
+//                if (inlineStyles.isNotEmpty()) {
+//                    inlineStyles.sortBy { it.start }
+//
+//                    var currentStyle = inlineStyles.first()
+//                    if (inlineStyles.size == 1) internTextStyles!!.add(currentStyle)
+//                    else
+//                        inlineStyles.forEach {
+//                                internTextStyles!!.add(it)
+//                            currentStyle = it
+//                        }
+//                }
+//
+//            }
+//            return internTextStyles!!
+//        }
     var posXEnd: Double = 0.0
     var posXStart: Double = 0.0
     var txtVar: String = _txtInit
@@ -92,39 +86,6 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
         get() {
             return txtVar
         }
-
-
-    fun addToTxtInit(txt: String) {
-        txtInit += txt
-    }
-
-    fun addChar(c: String, pos: Int? = null) {
-        val p = pos ?: txtVar.length
-        trace("CanvasText::addChar: $c, $p")
-        txtVar = if (txtVar.isEmpty())
-            c
-        else
-            txtVar.substring(0, p) + c + txtVar.substring(p)
-    }
-
-    fun delChar(p: Int, pEnd: Int? = null): Int {
-        trace("CanvasText::delChar: $p, $pEnd")
-        txtVar = txtVar.substring(0, p) + txtVar.substring(p + (pEnd ?: 1))
-
-        return txtVar.length
-    }
-
-    fun rmChar(p: Int): Int {
-        trace("CanvasText::rmChar: $p")
-        if (txtVar.isEmpty() || p > txtVar.length) return 0
-        txtVar = txtVar.substring(0, p - 1) + txtVar.substring(p)
-        return txtVar.length
-    }
-
-    fun addStyle(style: TextStyle, p: Int, pEnd: Int) {
-        txtVar = style.applyStyle(txt, p, pEnd)
-        trace("CanvasText::addStyle $txtVar")
-    }
 
     fun measureText(ctx: CanvasRenderingContext2D, posBegin: Int, posEnd: Int): Double {
         var textWidth = 0.0
@@ -282,7 +243,7 @@ abstract class CanvasText(private val _txtInit: String = "", private var initCit
 
     override fun reset() {
         trace("CanvasText::reset  |$txtInit|$__txtInit|$_txtInit|")
-        internTextStyles = null
+        textStyles.removeAll(textStyles)
         citationNumber = initCitationNumber
         txtVar = txtInit
 //        styles = emptyList()

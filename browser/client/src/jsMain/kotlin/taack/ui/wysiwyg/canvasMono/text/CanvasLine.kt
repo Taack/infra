@@ -74,10 +74,9 @@ class CanvasLine(
                     posXStart += ctx.measureText(text.txt.substring(pe, s)).width
                 }
                 ctx.save()
-                it.getTextStyle().initCtx(ctx, text)
+                it.initCtx(ctx, text)
                 trace("CanvasLine::drawLine $s $e ${text.txt.substring(s, e)}")
                 ctx.fillText(text.txt.substring(s, e),
-//                    (if (text.txtPrefix.isEmpty() || s > 0) leftMargin else 0.0) + posXStart,
                     posXStart,
                     textY
                 )

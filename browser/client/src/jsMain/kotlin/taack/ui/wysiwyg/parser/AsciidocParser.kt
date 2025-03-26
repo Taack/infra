@@ -31,6 +31,7 @@ class AsciidocParser {
         //        MONO_BOLD(Regex("^`\\*\\*([^*`\n]*)\\*\\*`")),
         BOLD(Regex("^\\*\\*([^*`\n]*)\\*\\*")),
         MONO(Regex("^`([^`\n]*)`")),
+        LINE_THROUGH(Regex("^line-through#([^#]*)#")),
 //        NEXT_DRAWABLE(Regex("^ *\n *\n *")),
         NEXT_LINE(Regex("^ *\n")),
         NORMAL(Regex("^[^\n]+")),
@@ -66,6 +67,7 @@ class AsciidocParser {
                         s = if (pt in listOf(
                                 AdocToken.MONO, /*AdocToken.MONO_BOLD,*/
                                 AdocToken.NORMAL,
+                                AdocToken.LINE_THROUGH,
                                 AdocToken.BOLD
                             )
                         ) {
@@ -87,6 +89,8 @@ class AsciidocParser {
         val it = tokens.iterator()
         var textOutline: TokenInfo? = null
         var txt = ""
+        var textStyles: MutableList<StringStyle> = emptyList<StringStyle>().toMutableList()
+        var pos = 0
         while (it.hasNext()) {
             val token = it.next()
             trace("AsciidocParser::parse $token")
@@ -126,7 +130,9 @@ class AsciidocParser {
                 AdocToken.TABLE_COL -> TODO()
                 AdocToken.TABLE_CELL -> TODO()
                 AdocToken.BOLD -> {
+                    pos = txt.length
                     txt += token.sequence
+                    textStyles += StringStyle(pos, pos + token.sequence.length, false, true, true, false, false)
                 }
 
                 AdocToken.MONO -> {
@@ -140,7 +146,8 @@ class AsciidocParser {
 //                }
 
                 AdocToken.NEXT_LINE -> {
-                    textOutlines.add(createOutline(textOutline, txt))
+                    textOutlines.add(createOutline(textOutline, textStyles, txt))
+                    textStyles.removeAll(textStyles)
                     textOutline = null
                     txt = ""
                 }
@@ -151,46 +158,55 @@ class AsciidocParser {
 
                 AdocToken.OTHER -> TODO()
                 AdocToken.ERROR -> TODO()
+                AdocToken.LINE_THROUGH -> {
+                    pos = txt.length
+                    txt += token.sequence
+                    textStyles += StringStyle(pos, pos + token.sequence.length, false, false, true, true, false)
+                }
             }
         }
-        textOutlines.add(createOutline(textOutline, txt))
+        textOutlines.add(createOutline(textOutline, textStyles, txt))
         return textOutlines
     }
 
     private fun createOutline(
         textOutline: TokenInfo?,
+        stringStyles: List<StringStyle>,
         initText: String
     ): CanvasText {
         val text = if (textOutline == null) initText else textOutline.sequence + initText
         trace("AsciidocParser::createOutline $text")
+        var result: CanvasText
         when (textOutline?.token) {
             AdocToken.TITLE -> {
-                return TitleCanvas(text)
+                result = TitleCanvas(text)
             }
 
             AdocToken.H4 -> {
-                return H4Canvas(text)
+                result = H4Canvas(text)
             }
 
             AdocToken.H3 -> {
-                return H3Canvas(text)
+                result = H3Canvas(text)
             }
 
             AdocToken.H2 -> {
-                return H2Canvas(text)
+                result = H2Canvas(text)
             }
 
             AdocToken.B1 -> {
-                return LiCanvas(text)
+                result = LiCanvas(text)
             }
 
             AdocToken.B2 -> {
-                return Li2Canvas(text)
+                result = Li2Canvas(text)
             }
 
             else -> {
-                return PCanvas(text)
+                result = PCanvas(text)
             }
         }
+        result.textStyles.addAll(stringStyles)
+        return result
     }
 }
