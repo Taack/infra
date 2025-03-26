@@ -199,6 +199,6 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitDiagramAction(String controller, String action, Long id, Map<String, ?> params) {
-        diagramActionUrl = Parameter.urlMapped(controller, action, id, params)
+        diagramActionUrl = (new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(controller, action, id, params)
     }
 }

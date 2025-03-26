@@ -60,7 +60,7 @@ class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectE
     }
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionSelectM2O::modalReturnSelect $key $value")
+        trace("FormActionSelectM2O::modalReturnSelect $key $value $otherField")
         val opt = document.createElement("option") as HTMLOptionElement
         opt.value = key
         opt.text = value

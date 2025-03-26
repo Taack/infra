@@ -57,7 +57,15 @@ class TaackUiEnablerService implements WebAttributes {
     }
 
     static String sanitizeString(String toSanitize) {
-        Sanitizers.FORMATTING.and(Sanitizers.LINKS).sanitize(toSanitize)
+        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
+    }
+
+    static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
+        PolicyFactory pf = Sanitizers.FORMATTING
+        allowing?.each {
+            pf = pf.and(it)
+        }
+        return pf.sanitize(toSanitize)
     }
 
     private final static Map<String, Closure> securityClosures = [:]

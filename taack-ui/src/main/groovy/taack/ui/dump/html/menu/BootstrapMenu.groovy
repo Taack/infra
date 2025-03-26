@@ -9,9 +9,11 @@ import taack.ui.dump.html.element.*
 final class BootstrapMenu implements IHTMLElement {
 
     final BlockLog blockLog
+    final boolean isMail
 
-    BootstrapMenu(BlockLog blockLog) {
+    BootstrapMenu(boolean isMail, BlockLog blockLog) {
         this.blockLog = blockLog
+        this.isMail = isMail
     }
 
 
@@ -33,7 +35,7 @@ final class BootstrapMenu implements IHTMLElement {
         topElement.children.last()
     }
 
-    static IHTMLElement label(IHTMLElement topElement, String i18n, boolean hasClosure) {
+    IHTMLElement label(IHTMLElement topElement, String i18n, boolean hasClosure) {
         if (hasClosure) {
             HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build() as HTMLUl
             topElement.addChildren(
@@ -51,6 +53,7 @@ final class BootstrapMenu implements IHTMLElement {
             )
             return ul
         } else {
+            if (!isMail)
             topElement.addChildren(
                     new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
                             new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
@@ -58,14 +61,16 @@ final class BootstrapMenu implements IHTMLElement {
                             ).build()
                     ).build()
             )
+            else topElement.addChildren(new HTMLH2Content(i18n))
+
             return topElement
         }
     }
 
-    static IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
+    IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
         topElement.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                        new HTMLAnchor(isAjax, url).builder.addClasses("nav-link${active?' active':''}", 'taackMenu').putAttributeIfNotNull('ajaxBlockId', ajaxBlockId).addChildren(new HTMLTxtContent(i18n)).build()
+                        new HTMLAnchor(isAjax && !isMail, url).builder.addClasses("nav-link${active ? ' active' : ''}", 'taackMenu').putAttributeIfNotNull('ajaxBlockId', ajaxBlockId).addChildren(new HTMLTxtContent(i18n)).build()
                 ).build()
         )
         topElement
@@ -79,35 +84,37 @@ final class BootstrapMenu implements IHTMLElement {
         ).build()
     }
 
-    static IHTMLElement menuIcon(IHTMLElement topElement, String iconHtml, String url, boolean isAjax) {
+    IHTMLElement menuIcon(IHTMLElement topElement, String iconHtml, String url, boolean isAjax) {
         topElement.addChildren(
                 new HTMLLi().builder.addClasses().addChildren(
-                        new HTMLAnchor(isAjax, url).builder.addClasses('nav-link').addChildren(new HTMLTxtContent(iconHtml)).build()
+                        new HTMLAnchor(isAjax && !isMail, url).builder.addClasses('nav-link').addChildren(new HTMLTxtContent(iconHtml)).build()
                 ).build()
         )
         topElement
     }
 
-    static IHTMLElement menuSearch(IHTMLElement topElement, String query, String action) {
-        topElement.addChildren(
-                new HTMLForm(action).builder.addClasses('solrSearch-input', 'py-1').addChildren(
-                        new HTMLDiv().builder.addClasses('input-group', 'rounded').addChildren(
-                                new HTMLInput(InputType.STRING, query, 'q', TaackUiService.tr('action.search.label')).builder.putAttribute('aria-label', 'Search').addClasses('form-control', 'rounded', 'bg-white').build()
-                        ).build()
-                ).build()
-        )
+    IHTMLElement menuSearch(IHTMLElement topElement, String query, String action) {
+        if (!isMail)
+            topElement.addChildren(
+                    new HTMLForm(action).builder.addClasses('solrSearch-input', 'py-1').addChildren(
+                            new HTMLDiv().builder.addClasses('input-group', 'rounded').addChildren(
+                                    new HTMLInput(InputType.STRING, query, 'q', TaackUiService.tr('action.search.label')).builder.putAttribute('aria-label', 'Search').addClasses('form-control', 'rounded', 'bg-white').build()
+                            ).build()
+                    ).build()
+            )
         topElement
     }
 
-    static IHTMLElement menuOption(IHTMLElement topElement, String img, String value, String url) {
-        topElement.addChildren(
-                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                        new HTMLAnchor(false, url).builder.addClasses('nav-link').addChildren(
-                                new HTMLTxtContent(img),
-                                new HTMLTxtContent(value)
-                        ).build()
-                ).build()
-        )
+    IHTMLElement menuOption(IHTMLElement topElement, String img, String value, String url) {
+        if (!isMail)
+            topElement.addChildren(
+                    new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                            new HTMLAnchor(false, url).builder.addClasses('nav-link').addChildren(
+                                    new HTMLTxtContent(img),
+                                    new HTMLTxtContent(value)
+                            ).build()
+                    ).build()
+            )
         topElement
     }
 

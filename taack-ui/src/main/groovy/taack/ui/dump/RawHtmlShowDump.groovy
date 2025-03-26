@@ -87,7 +87,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowField(final String i18n, final FieldInfo fieldInfo, final Style style) {
         if (fieldInfo?.value != null) {
-            String v = TaackUiEnablerService.sanitizeString(fieldInfo.value?.toString())
+            String v = TaackUiEnablerService.sanitizeString(RawHtmlTableDump.dataFormat(fieldInfo.value, null, parameter.lcl))
             if (TaackUiService.contextualMenuClosureFromField(fieldInfo)) {
                 String ident = fieldInfo.value.toString()
                 String className = fieldInfo.fieldConstraint.field.type.simpleName
@@ -119,7 +119,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
         i18n ?= parameter.trField(controller, action, id != null)
-        if (isAjax) {
+        if (isAjax && parameter.target != Parameter.RenderingTarget.MAIL) {
             out << """
                      <div class='icon'>
                         <a class='ajaxLink taackShowAction' ajaxAction='${parameter.urlMapped(controller, action, id, additionalParams)}'>
@@ -131,7 +131,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
             out << """
                  <div class='icon'>
                     <a class='link' href="${parameter.urlMapped(controller, action, id, additionalParams)}">
-                        ${actionIcon.getHtml(i18n)}
+                        ${i18n}
                     </a>
                  </div>
                 """
@@ -143,7 +143,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (linkText) {
             additionalParams ?= [:]
             additionalParams['isAjax'] = isAjax
-            String link = """<a class="taackShowAction" ${isAjax ? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${linkText}</a>"""
+            String link = """<a class="taackShowAction" ${isAjax && parameter.target != Parameter.RenderingTarget.MAIL? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${linkText}</a>"""
             out << showField(i18n, link, null, false)
         }
     }

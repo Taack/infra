@@ -65,7 +65,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
             boolean isDiv = style?.isDiv
             final String htmlElement = "${isDiv?"div":"span"}"
             String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n}</span>""" : ""
-            String value = !field.value.toString().trim().empty ? """<${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${RawHtmlTableDump.dataFormat(field.value, null)}</${htmlElement}>""" : ""
+            String value = !field.value.toString().trim().empty ? """<${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${RawHtmlTableDump.dataFormat(field.value, null, parameter.lcl)}</${htmlElement}>""" : ""
             out << """
                 <li class="fieldcontain">
                     $label

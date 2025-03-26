@@ -443,8 +443,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final def downloadPdf(final UiPrintableSpecifier printableSpecifier, final String fileNamePrefix, final Boolean isHtml = false) {
         String fileName = fileNamePrefix + "-${dateFileName}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
-        webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
-        webUtils.currentResponse.setHeader("Content-disposition", "${params.boolean('inline') ? "inline;" : ''}attachment;filename=${fileName}${isHtml ? ".html" : ""}")
+        webUtils.currentResponse.setContentType(isHtml ? 'text/html' : 'application/pdf')
+        webUtils.currentResponse.setHeader('Content-disposition', "${params.boolean('inline') ? 'inline' : 'attachment'};filename=${URLEncoder.encode(fileName, 'UTF-8')}${isHtml ? '.html' : ''}")
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
         try {
@@ -460,7 +460,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         new UiBlockSpecifier().ui {
             modal {
                 custom """\
-                    <iframe src="${Parameter.urlMapped(action, [id: id])}?inline=true"
+                    <iframe src="${(new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(action, [id: id])}?inline=true"
                             width="100%"
                             height="800px">
                     </iframe>

@@ -9,6 +9,6 @@ import taack.ui.dump.html.theme.ThemeSelector
 class ThemeService {
     ThemeSelector getThemeSelector() {
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
-        ThemeSelector.fromSession(webUtils.request.session)
+        ThemeSelector.fromCookie(webUtils.request)
     }
 }

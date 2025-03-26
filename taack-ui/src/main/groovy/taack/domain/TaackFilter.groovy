@@ -283,11 +283,11 @@ final class TaackFilter<T extends GormEntity<T>> {
                     }
                     break
                 case Operator.NE:
-                    if (filterExpression.value) {
-                        where << ("sc.${filterExpression.fieldName} != '${filterExpression.value.toString()}'" as String)
-                        occ++
-                    } else if (filterExpression.value == null) {
+                    if (filterExpression.value == null) {
                         where << ("sc.${filterExpression.fieldName} IS NOT NULL" as String)
+                        occ++
+                    } else {
+                        where << ("(sc.${filterExpression.fieldName} != '${filterExpression.value.toString()}' OR sc.${filterExpression.fieldName} IS NULL)" as String)
                         occ++
                     }
                     break

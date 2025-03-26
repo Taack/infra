@@ -127,7 +127,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void setRenderTab(boolean isRender) {
-        renderTab = isRender
+        renderTab = isRender || parameter.target == Parameter.RenderingTarget.MAIL
     }
 
     @Override
@@ -327,6 +327,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                     blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
                     if (GormEntity.isAssignableFrom(fi.fieldConstraint.field.type)) {
                         blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', (fi.value as GormEntity).ident().toString()))
+                        blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'String', (fi.value as GormEntity).toString()))
                     }
                 }
             }
@@ -362,7 +363,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTabsEnd() {
         exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
-        blockLog.topElement = block.tabs(oldParent, currentTabNames, "/$parameter.applicationTagLib.controllerName/$parameter.applicationTagLib.actionName${parameter.beanId ? "/" + parameter.beanId : ''}")
+        blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId))
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }
@@ -447,7 +448,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
         futurCurrentAjaxBlockId = ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.MENU)
-        menu = new BootstrapMenu(blockLog)
+        menu = new BootstrapMenu(parameter.target == Parameter.RenderingTarget.MAIL, blockLog)
         blockLog.topElement = menu.menuStart(blockLog.topElement)
     }
 
@@ -533,7 +534,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             splitMenu()
         }
 
-        menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        if (parameter.target != Parameter.RenderingTarget.MAIL)
+            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        else
+            menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
     }
 
     @Override
