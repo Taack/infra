@@ -57,22 +57,6 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
             for (i in 0..numberOfPage) {
                 createAnchor(i)
             }
-        } else if (numberOfPage in 10..19) {
-            createAnchor(0)
-            for (i in 1..(if (currentPage < 5) 5 else 3)) {
-                createAnchor(i)
-            }
-            appendSpan()
-            if (currentPage >= 5 && currentPage <= numberOfPage - 5) {
-                for (i in (currentPage - 2)..(currentPage + 2)) {
-                    createAnchor(i)
-                }
-                appendSpan()
-            }
-            for (i in (numberOfPage - (if (currentPage <= numberOfPage - 5) 5 else 3))..numberOfPage) {
-                createAnchor(i)
-            }
-            createAnchor(numberOfPage)
         } else {
             createAnchor(0)
             val minInterval = 20
