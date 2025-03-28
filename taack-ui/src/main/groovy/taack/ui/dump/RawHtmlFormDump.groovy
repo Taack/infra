@@ -62,7 +62,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         } else if (lockedFields.size() > 0 && lockedFields[0] == null) {
             return !lockedFields*.fieldName.contains(field.fieldName)
         } else {
-            return aObject.hasProperty(ST_ID) && (lockedFields*.fieldName.contains(field.fieldName) || lockedFields.length == 0)
+            return lockedFields*.fieldName.contains(field.fieldName)
         }
     }
 
@@ -243,26 +243,26 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry) {
+    void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry, final String controller, final String action, final FieldInfo<?>... fieldInfos) {
         final String trI18n = i18n ?: parameter.trField(field) ?: mapEntry
         final String qualifiedName = field.fieldName + '.' + mapEntry
         String value = (field.value as Map<String, String>)?.get(mapEntry)
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
-        if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
+        if (controller && action) {
+            formThemed.ajaxField(blockLog.topElement, trI18n, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+        } else if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
             formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+        } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
+            formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+        } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
+            formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else {
-            if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-            } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
-                formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+            value = value ? inputEscape(value) : ''
+            if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
+                formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             } else {
-                value = value ? inputEscape(value) : ''
-                if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
-                    formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-                } else {
-                    formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-                }
+                formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             }
         }
     }

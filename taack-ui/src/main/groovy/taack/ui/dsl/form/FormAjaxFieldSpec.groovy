@@ -93,7 +93,10 @@ class FormAjaxFieldSpec extends FormVisitable {
     }
 
     void fieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry) {
-        formVisitor.visitFormFieldFromMap(i18n, field, mapEntry)
+        formVisitor.visitFormFieldFromMap(i18n, field, mapEntry, null, null)
     }
 
+    void ajaxFieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry, final MethodClosure action, final FieldInfo<?>... fieldInfos) {
+        formVisitor.visitFormFieldFromMap(i18n, field, mapEntry, Utils.getControllerName(action), action?.method, fieldInfos)
+    }
 }

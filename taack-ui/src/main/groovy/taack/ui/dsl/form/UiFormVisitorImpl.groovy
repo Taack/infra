@@ -39,7 +39,7 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormFieldFromMap(String i18n, FieldInfo fieldInfo, String mapEntry) {
+    void visitFormFieldFromMap(String i18n, FieldInfo fieldInfo, String mapEntry, String controller, String action, FieldInfo<?>... fieldInfos) {
 
     }
 
