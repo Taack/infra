@@ -145,7 +145,7 @@ class Helper {
         fun processAjaxLink(text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
-                text.contains(RELOAD) -> {
+                text.startsWith(RELOAD) -> {
                     location.href = (Block.href ?: "")
                 }
 
