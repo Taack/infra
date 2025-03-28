@@ -320,15 +320,15 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.stayBlock('visitCloseModal')
         blockLog.topElement.addChildren(new HTMLAjaxCloseLastModal(id, value))
         for (FieldInfo fi : fields) {
-            if (fi.value) {
-                if (parameter.nf && fi.value instanceof Number)
-                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
-                else {
-                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
-                    if (fi.value instanceof GormEntity) {
-                        blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', (fi.value as GormEntity).ident().toString()))
-                        blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'String', (fi.value as GormEntity).toString()))
-                    }
+            if (fi.value == null) {
+                blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, ""))
+            } else if (parameter.nf && fi.value instanceof Number)
+                blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
+            else {
+                blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
+                if (fi.value instanceof GormEntity) {
+                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', (fi.value as GormEntity).ident().toString()))
+                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'String', (fi.value as GormEntity).toString()))
                 }
             }
         }
