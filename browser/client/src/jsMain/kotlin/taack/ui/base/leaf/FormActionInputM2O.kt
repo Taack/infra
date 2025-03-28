@@ -64,7 +64,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         val i2 = i.parentElement!!.querySelector("input[type=hidden]")!! as HTMLInputElement
         i2.value = key
         for (field in otherField) {
-            val taOrI = parent.f.querySelector("#${field.key}")
+            val taOrI = parent.f.querySelector("[id='${field.key}']")
             if (taOrI is HTMLInputElement) taOrI.value = field.value
             else if (taOrI is HTMLTextAreaElement) taOrI.value = field.value
         }
