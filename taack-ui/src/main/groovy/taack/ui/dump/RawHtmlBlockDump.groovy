@@ -330,7 +330,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             }
             blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, label)) // for normal field
             blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'String', label)) // for ajaxField whose first input is to display object label
-            blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', fi.value?.getAt('id')?.toString() ?: label)) // for ajaxField whose second input is hidden to transfer object key value
+            blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', fi.value && fi.value instanceof GormEntity ? (fi.value as GormEntity).ident().toString() : label)) // for ajaxField whose second input is hidden to transfer object key value
         }
     }
 
