@@ -359,10 +359,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+    void visitRowAction(String i18n, ActionIcon actionIcon, String key, String label) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        visitRowAction(i18n, actionIcon, 'progress', 'echoSelect', id, [label: label], isAjax)
+        visitRowAction(i18n, actionIcon, 'progress', 'echoSelect', null, [key: key, label: label], true)
         if (addColumn) visitColumnEnd()
     }
 

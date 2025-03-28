@@ -53,11 +53,11 @@ class ProgressController {
         }
     }
 
-    def echoSelect(Long id, String label) {
-        if (id && label)
+    def echoSelect(String key, String label) {
+        if (key && label)
             taackUiService.show(
                     new UiBlockSpecifier().ui {
-                        closeModal id, label
+                        closeModal key, label
                     }
             )
         else return true

@@ -56,7 +56,11 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowAction(final String i18n = null, final ActionIcon icon, final Long id, String label) {
-        tableVisitor.visitRowAction(i18n, icon, id, label, null, true)
+        rowAction(i18n, icon, id?.toString(), label)
+    }
+
+    void rowAction(final String i18n = null, final ActionIcon icon, final String key, String label) {
+        tableVisitor.visitRowAction(i18n, icon, key, label)
     }
 
     void rowAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map params) {

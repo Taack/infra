@@ -325,7 +325,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                     blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
                 else {
                     blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
-                    if (GormEntity.isAssignableFrom(fi.fieldConstraint.field.type)) {
+                    if (fi.value instanceof GormEntity) {
                         blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', (fi.value as GormEntity).ident().toString()))
                         blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'String', (fi.value as GormEntity).toString()))
                     }
