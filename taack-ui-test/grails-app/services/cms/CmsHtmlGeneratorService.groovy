@@ -53,7 +53,7 @@ class CmsHtmlGeneratorService {
 
     static String translateNoMatcher(String body, boolean asciidoc = false, MethodClosure fileRoot = null, Long id = null) {
         try {
-            String urlFileRoot = fileRoot && id ? Parameter.urlMapped(fileRoot, [id: id]) : null
+            String urlFileRoot = fileRoot && id ? new Parameter().urlMapped(fileRoot, [id: id]) : null
             return asciidoc ? Asciidoc.getContentHtml(body, urlFileRoot): Markdown.getContentHtml(body)
         } catch (ignored) {
             return "Grr ${ignored}"

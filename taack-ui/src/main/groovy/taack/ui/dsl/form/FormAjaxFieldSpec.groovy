@@ -50,7 +50,6 @@ class FormAjaxFieldSpec extends FormVisitable {
      * @param action methodClosure pointing to the action
      * @param id id param
      * @param params additional params
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
      */
     void innerFormAction(final MethodClosure action, final Long id = null, final Map params = null) {
         if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitInnerFormAction(null, Utils.getControllerName(action), action.method, id, params, ButtonStyle.SECONDARY)

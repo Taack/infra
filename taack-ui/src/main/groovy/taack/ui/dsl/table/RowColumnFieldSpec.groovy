@@ -87,6 +87,10 @@ class RowColumnFieldSpec implements BranchingSpec {
         rowAction(linkText, action, id, null)
     }
 
+    void rowHref(final String linkText, final MethodClosure action, final Long id) {
+        rowAction(linkText, action, id, null, false)
+    }
+
     void rowAction(final String linkText, final MethodClosure action, final Long id, final Map params, boolean isAjax = true) {
         if (linkText && taackUiEnablerService.hasAccess(action, id, params)) {
             Map<String, ?> p = params ?: [:]
