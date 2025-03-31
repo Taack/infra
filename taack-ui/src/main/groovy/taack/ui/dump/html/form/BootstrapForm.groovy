@@ -307,7 +307,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
         HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses("wysiwyg-content", "markdown").setId(qualifiedName).build() as HTMLTextarea
         container.addChildren(textareaInput)
-        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses("wysiwyg-markdown-preview").build() as HTMLDiv
+        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses("wysiwyg-markdown-preview markdown-body").build() as HTMLDiv
         container.addChildren(preview)
         HTMLInput attachmentSelectInput = new HTMLInput(InputType.STRING, null, null, null, false, true).builder.setId("${qualifiedName}-attachment-select").addClasses(formControl).putAttribute('taackajaxformm2oaction', '/markdown/selectAttachment').build() as HTMLInput
         container.addChildren(attachmentSelectInput)
