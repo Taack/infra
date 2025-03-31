@@ -38,17 +38,18 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
 
     private val action: String? =
         a.attributes.getNamedItem("ajaxAction")?.value ?: a.attributes.getNamedItem("href")?.value
-    private val isHref = a.hasAttribute("href")
+    private val isHref = !a.hasAttribute("ajaxaction")
 
     init {
         trace("BaseAjaxAction::init $action $isHref")
         if (!(action != null && action.contains("#"))) {
-            a.onclick = EventHandler { e -> onclickBaseAjaxAction(e) }
-            a.onauxclick = EventHandler { e ->
-                if (e.button == MouseButton.AUXILIARY && action?.contains("isAjax=true") == false) {
+            a.onclick = EventHandler { e ->
+                if (e.button == MouseButton.AUXILIARY || e.ctrlKey || e.shiftKey || e.metaKey) {
                     e.preventDefault()
                     val targetUrl = createUrl(!isHref, action).toString()
                     window.open(targetUrl, WindowTarget._blank)
+                } else {
+                    onclickBaseAjaxAction(e)
                 }
             }
         }

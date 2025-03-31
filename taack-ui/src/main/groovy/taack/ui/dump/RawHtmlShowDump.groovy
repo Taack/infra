@@ -119,10 +119,11 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, Object> additionalParams, boolean isAjax) {
         i18n ?= parameter.trField(controller, action, id != null)
+        String url = parameter.urlMapped(controller, action, id, additionalParams)
         if (isAjax && parameter.target != Parameter.RenderingTarget.MAIL) {
             out << """
                      <div class='icon'>
-                        <a class='ajaxLink taackShowAction' ajaxAction='${parameter.urlMapped(controller, action, id, additionalParams)}'>
+                        <a class='ajaxLink taackShowAction' href="${url}" ajaxAction='${url}'>
                             ${actionIcon.getHtml(i18n)}
                         </a>
                      </div>
@@ -130,7 +131,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         } else {
             out << """
                  <div class='icon'>
-                    <a class='link' href="${parameter.urlMapped(controller, action, id, additionalParams)}">
+                    <a class='link' href="${url}">
                         ${i18n}
                     </a>
                  </div>
@@ -143,7 +144,8 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         if (linkText) {
             additionalParams ?= [:]
             additionalParams['isAjax'] = isAjax
-            String link = """<a class="taackShowAction" ${isAjax && parameter.target != Parameter.RenderingTarget.MAIL? "ajaxAction" : "href"}="${parameter.urlMapped(controller, action, id, additionalParams)}">${linkText}</a>"""
+            String url = parameter.urlMapped(controller, action, id, additionalParams)
+            String link = """<a class="taackShowAction" href="${url}" ${isAjax && parameter.target != Parameter.RenderingTarget.MAIL? """ajaxAction="${url}\"""" : ""}>${linkText}</a>"""
             out << showField(i18n, link, null, false)
         }
     }
