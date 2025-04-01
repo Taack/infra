@@ -19,7 +19,6 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         fun getSiblingFormTriggerUpdate(f: Form): List<FormTriggerUpdate> {
             val elements: List<*> = f.f.querySelectorAll("input[type=hidden][name=__triggerUpdate__]").asList()
             return elements.map {
-                println("Found hidden input __triggerUpdate__")
                 FormTriggerUpdate(f, it as HTMLInputElement)
             }
         }
@@ -50,7 +49,9 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         trace("FormTriggerUpdate::onclick: ${inputElement.formAction}")
         val f = parent.f
         val fd = FormData(f)
-        fd.append("isAjax", "true")
+//        fd.append("isAjax", "true")
+        fd["refresh"] = "true"
+
         parent.mapFileToSend.forEach { inputKey ->
             inputKey.value.forEach { fileValue ->
                 fd.append(inputKey.key, fileValue)
@@ -58,10 +59,11 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         }
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
-            inputElement.disabled = false
-            inputElement.innerText = innerText
             val t = xhr.responseText
-            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
+            println(t)
+            parent.parent.d.innerHTML = t
+            parent.parent.refresh()
+//            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.POST, BaseAjaxAction.lastUrlClicked!!)
         xhr.send(fd)

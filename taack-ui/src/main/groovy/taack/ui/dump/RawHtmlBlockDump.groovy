@@ -114,7 +114,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
-        boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal && !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
+        boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal) //&& !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
         simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
     }
