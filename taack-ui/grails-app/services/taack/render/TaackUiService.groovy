@@ -174,7 +174,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
         blockSpecifier.visitBlock(htmlBlock)
-        if (p.isModal) {
+        if (p.isModal && params.boolean("isAjax") != false) {
             params['isAjax'] = true
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)

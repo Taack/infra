@@ -15,8 +15,6 @@ import web.location.location
 import web.uievents.MouseButton
 import web.uievents.MouseEvent
 import web.url.URL
-import web.window.WindowTarget
-import web.window.window
 import web.xhr.XMLHttpRequest
 import web.xhr.XMLHttpRequestResponseType
 import kotlin.math.min
@@ -44,11 +42,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
         trace("BaseAjaxAction::init $action $isHref")
         if (!(action != null && action.contains("#"))) {
             a.onclick = EventHandler { e ->
-                if (e.button == MouseButton.AUXILIARY || e.ctrlKey || e.shiftKey || e.metaKey) {
-                    e.preventDefault()
-                    val targetUrl = createUrl(!isHref, action).toString()
-                    window.open(targetUrl, WindowTarget._blank)
-                } else {
+                if (e.button != MouseButton.AUXILIARY && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
                     onclickBaseAjaxAction(e)
                 }
             }
