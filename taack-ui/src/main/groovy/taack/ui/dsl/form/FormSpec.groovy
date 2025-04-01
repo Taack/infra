@@ -3,6 +3,7 @@ package taack.ui.dsl.form
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.ast.type.FieldInfo
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.html.element.ButtonStyle
@@ -27,6 +28,15 @@ final class FormSpec extends FormRowSpec {
 
     FormSpec(IUiFormVisitor formVisitor) {
         super(formVisitor)
+    }
+
+    /**
+     * When one of the field is updated, the form is refreshed
+     *
+     * @param fields
+     */
+    void triggerUpdate(FieldInfo... fields) {
+        formVisitor.visitTriggerUpdate(fields)
     }
 
     /**

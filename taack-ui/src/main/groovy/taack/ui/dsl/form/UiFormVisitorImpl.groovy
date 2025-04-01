@@ -118,4 +118,8 @@ class UiFormVisitorImpl implements IUiFormVisitor {
 
     }
 
+    @Override
+    void visitTriggerUpdate(FieldInfo<?>... fieldInfos) {
+
+    }
 }

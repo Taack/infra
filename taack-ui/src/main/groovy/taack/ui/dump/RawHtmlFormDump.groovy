@@ -313,4 +313,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             )
         }
     }
+
+    @Override
+    void visitTriggerUpdate(FieldInfo<?>... fieldInfos) {
+        for (FieldInfo f : fieldInfos) {
+            formThemed.addChildren(
+                    new HTMLInput(InputType.HIDDEN, f.fieldName, '__triggerUpdate__')
+            )
+        }
+    }
+
 }

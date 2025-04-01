@@ -12,6 +12,8 @@ import java.text.NumberFormat
 @CompileStatic
 interface IUiFormVisitor {
 
+    void visitTriggerUpdate(FieldInfo<?>... fieldInfos)
+
     void visitForm(Object aObject, FieldInfo[] lockedFields)
 
     void visitFormEnd()

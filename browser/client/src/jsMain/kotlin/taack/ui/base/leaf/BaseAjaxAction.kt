@@ -34,6 +34,8 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                 return url
             } else return URL("${location.protocol}//${location.host}")
         }
+
+        var lastUrlClicked: URL? = null
     }
 
     private val action: String? =
@@ -58,7 +60,8 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
 
     private fun onclickBaseAjaxAction(e: MouseEvent) {
         e.preventDefault()
-        val targetUrl = createUrl(!isHref, action).toString()
+        lastUrlClicked = createUrl(!isHref, action)
+        val targetUrl = lastUrlClicked.toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
         //Display load spinner
         val loader = document.getElementById("taack-load-spinner")
