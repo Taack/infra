@@ -113,7 +113,7 @@ class Helper {
                 }.toMap() as HashMap<String, FormDataEntryValue>
                 hydrateStateToUrl(formUrl)
                 history.pushState("{}", document.title, formUrl)
-                processAjaxLink(xhr.responseText, filter)
+                processAjaxLink(null, xhr.responseText, filter)
                 b?.disabled = false
                 if (innerText != null) b.innerText = innerText
 
@@ -141,8 +141,9 @@ class Helper {
         }
 
         private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
+        val urlStack: ArrayDeque<URL> = ArrayDeque()
 
-        fun processAjaxLink(text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
+        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
                 text.startsWith(RELOAD) -> {
@@ -150,6 +151,7 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL) -> {
+                    if (url != null) urlStack.removeLast()
                     val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
                     if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
                             text.length - FIELD_INFO_END.length,
@@ -191,11 +193,15 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK) -> {
+                    if (url != null) {
+                        urlStack.removeLast()
+                        urlStack.addLast(url)
+                    }
                     trace("Helper::CLOSE_LAST_MODAL_AND_UPDATE_BLOCK ${block.modal.mId}")
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
                     val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
-                    processAjaxLink(innerText, block.parent ?: base, process)
+                    processAjaxLink(url, innerText, block.parent ?: base, process)
                 }
 
                 text.startsWith(BLOCK_START) -> {
@@ -216,6 +222,9 @@ class Helper {
 
                 text.startsWith(OPEN_MODAL) -> {
                     trace("Helper::opening modal ...")
+                    if (url != null)
+                        urlStack.addLast(url)
+
                     if (process != null) {
                         processingStack.add(process)
                     }
@@ -226,6 +235,11 @@ class Helper {
 
                 text.startsWith(REFRESH_MODAL) -> {
                     trace("Helper::refresh modal $text")
+                    if (url != null) {
+                        urlStack.removeLast()
+                        urlStack.addLast(url)
+                    }
+
                     if (process != null) {
                         processingStack.add(process)
                     }

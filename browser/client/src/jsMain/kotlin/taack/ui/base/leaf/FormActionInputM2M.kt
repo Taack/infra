@@ -58,7 +58,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()

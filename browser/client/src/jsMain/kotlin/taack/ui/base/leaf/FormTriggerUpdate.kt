@@ -12,22 +12,26 @@ import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
 import web.html.HTMLTextAreaElement
 import web.http.RequestMethod
+import web.url.URL
 import web.xhr.XMLHttpRequest
 
-class FormTriggerUpdate(private val parent: Form, private val inputElement: HTMLInputElement) : LeafElement {
+class FormTriggerUpdate(private val parent: Form, private val inputElement: HTMLInputElement, private val currentURL: URL?) : LeafElement {
     companion object {
         fun getSiblingFormTriggerUpdate(f: Form): List<FormTriggerUpdate> {
             val elements: List<*> = f.f.querySelectorAll("input[type=hidden][name=__triggerUpdate__]").asList()
             return elements.map {
-                FormTriggerUpdate(f, it as HTMLInputElement)
+                FormTriggerUpdate(f, it as HTMLInputElement, BaseAjaxAction.lastUrlClicked)
             }
         }
     }
 
     init {
-        trace("FormTriggerUpdate::init ${inputElement.formAction} ${inputElement.value}")
+        trace("FormTriggerUpdate::init ${inputElement.formAction} ${inputElement.value} ${currentURL} ${currentURL?.searchParams?.has("originController")}")
 
-        (parent.f.querySelector("select[name=${inputElement.value}]") as HTMLSelectElement).onchange = EventHandler { e ->
+        (parent.f.querySelector("select[name=${inputElement.value}]") as HTMLSelectElement?)?.onchange = EventHandler { e ->
+            onChange(e)
+        }
+        (parent.f.querySelector("input[name=${inputElement.value}]") as HTMLInputElement?)?.onchange = EventHandler { e ->
             onChange(e)
         }
     }
@@ -65,7 +69,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
             parent.parent.refresh()
 //            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
         }
-        xhr.open(RequestMethod.POST, BaseAjaxAction.lastUrlClicked!!)
+        xhr.open(RequestMethod.POST, Helper.urlStack.last())
         xhr.send(fd)
     }
 }

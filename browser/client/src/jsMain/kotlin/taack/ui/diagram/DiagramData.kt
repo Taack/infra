@@ -179,7 +179,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                 document.close()
             } else {
                 trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
-                processAjaxLink(text, parent)
+                processAjaxLink(null, text, parent)
             }
         }
         xhr.open(RequestMethod.GET, targetUrl)

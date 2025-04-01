@@ -91,7 +91,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                     document.close()
                 } else {
                     trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
-                    processAjaxLink(text, parent)
+                    processAjaxLink(lastUrlClicked, text, parent)
                 }
             }
         }

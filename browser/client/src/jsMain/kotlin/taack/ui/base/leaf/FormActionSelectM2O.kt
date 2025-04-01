@@ -53,7 +53,7 @@ class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectE
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
