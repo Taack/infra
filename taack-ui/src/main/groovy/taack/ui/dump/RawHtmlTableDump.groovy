@@ -31,7 +31,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     final ThemableTable themableTable
 
     private int indent = -1
-    private boolean rowIndentIsExpended = false
+    private Map<Integer, Boolean> rowIndentIsExpended = [:]
     int colCount = 0
     boolean isInCol = false
     Style rowStyle = null
@@ -182,11 +182,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
             if (hasChildren) {
-                tr.attributes.put('taackTableRowIsExpended', rowIndentIsExpended.toString())
+                tr.attributes.put('taackTableRowIsExpended', rowIndentIsExpended[indent].toString())
             }
-        }
-        if (indent > 0 && !rowIndentIsExpended && parameter.target == Parameter.RenderingTarget.WEB) {
-            tr.setStyleDescriptor(new DisplayNone())
+            if (rowIndentIsExpended[indent - 1] == false && parameter.target == Parameter.RenderingTarget.WEB) {
+                tr.setStyleDescriptor(new DisplayNone())
+            }
         }
         blockLog.topElement.builder.addChildren(tr)
         blockLog.topElement = tr
@@ -204,7 +204,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowIndent(Boolean isExpended = false) {
         blockLog.enterBlock('visitRowIndent')
         indent++
-        rowIndentIsExpended = isExpended
+        rowIndentIsExpended[indent] = rowIndentIsExpended[indent - 1] == false ? false : isExpended
     }
 
     @Override
