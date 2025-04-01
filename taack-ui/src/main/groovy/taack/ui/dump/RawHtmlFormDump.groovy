@@ -315,6 +315,11 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
+    void visitReadOnly(String i18n, String value) {
+        blockLog.topElement = formThemed.normalInput(blockLog.topElement, "", i18n, true, true, value)
+    }
+
+    @Override
     void visitTriggerUpdate(FieldInfo<?>... fieldInfos) {
         for (FieldInfo f : fieldInfos) {
             formThemed.addChildren(
