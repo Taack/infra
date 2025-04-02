@@ -412,7 +412,7 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         if (tInstance) {
             tInstance.class.getDeclaredFields().eachWithIndex { Field entry, int i ->
-                if (tInstance[entry.name] != null && [String, Boolean, aClass].contains(entry.type)) filter.put(entry.name, tInstance[entry.name])
+                if (tInstance[entry.name] != null && ([String, Boolean, aClass].contains(entry.type) || entry.type.isEnum())) filter.put(entry.name, tInstance[entry.name])
             }
         }
 
