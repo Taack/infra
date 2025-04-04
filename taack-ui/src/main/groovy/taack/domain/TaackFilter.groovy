@@ -560,7 +560,10 @@ final class TaackFilter<T extends GormEntity<T>> {
         String whereClause = where.empty ? " " : " where ${where.join(' and ')} "
         String query = "select distinct sc ${selectOrder}" + from.toString() + join.toString() + removeBrackets(whereClause) + sortOrder
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
-
+        if (Environment.current == Environment.DEVELOPMENT) {
+            println query
+            println count
+        }
         List<T> res
 
         try {
