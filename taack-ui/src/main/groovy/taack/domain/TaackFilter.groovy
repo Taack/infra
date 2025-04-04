@@ -459,6 +459,11 @@ final class TaackFilter<T extends GormEntity<T>> {
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
                         boolean entryValue = entry.value instanceof String ? entry.value == "1" : entry.value as Boolean
                         where << ("$aliasKey = $entryValue" as String)
+                    } else if (f && f.type == Map) {
+                        if (entry.value instanceof String) {
+                            join.append(" join ${aliasKey} as j${occ}")
+                            where << ("lower(j${occ}) like lower('${entry.value}')" as String)
+                        }
                     } else if (f && f.type == Set) {
                         if (entry.value instanceof String) {
                             join.append(" inner join ${aliasKey} j${occ}")
