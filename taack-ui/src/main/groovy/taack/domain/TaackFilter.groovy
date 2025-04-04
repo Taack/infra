@@ -412,7 +412,7 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         if (tInstance) {
             tInstance.class.getDeclaredFields().eachWithIndex { Field entry, int i ->
-                if (tInstance[entry.name] != null && [String, Boolean, aClass].contains(entry.type)) filter.put(entry.name, tInstance[entry.name])
+                if (tInstance[entry.name] != null && ([String, Boolean, aClass].contains(entry.type) || entry.type.isEnum())) filter.put(entry.name, tInstance[entry.name])
             }
         }
 
@@ -565,7 +565,10 @@ final class TaackFilter<T extends GormEntity<T>> {
         String whereClause = where.empty ? " " : " where ${where.join(' and ')} "
         String query = "select distinct sc ${selectOrder}" + from.toString() + join.toString() + removeBrackets(whereClause) + sortOrder
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
-
+        if (Environment.current == Environment.DEVELOPMENT) {
+            println query
+            println count
+        }
         List<T> res
 
         try {
