@@ -11,7 +11,7 @@ class BootstrapLayout {
 
     final BlockLog blockLog
     static int tabIdsConter = 0
-    final int tabIds
+    int tabIds
     final Parameter parameter
 
     BootstrapLayout(final BlockLog blockLog, Parameter parameter = null) {
@@ -84,4 +84,8 @@ class BootstrapLayout {
         topElement.children.last()
     }
 
+    void setTabIdAndCounter(int i) {
+        tabIds = i
+        tabIdsConter = tabIds
+    }
 }

@@ -35,7 +35,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private Object aObject
 
     private int tabOccurrence = 0
-    private int tabIds = 0
     private FieldInfo[] lockedFields
 
     final IFormTheme formThemed
@@ -92,7 +91,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         }
 
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.FORM)
-        tabIds = 0
     }
 
     @Override
@@ -204,12 +202,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitFormTabs(List<String> names, Width width = Width.QUARTER) {
         blockLog.topElement.setTaackTag(TaackTag.TABS)
         blockLog.topElement = layout.tabs(blockLog.topElement, names)
-        tabIds++
+        tabOccurrence = 0
     }
 
     @Override
     void visitFormTabsEnd() {
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
+        layout.setTabIdAndCounter(layout.tabIds + 1)
     }
 
     @Override
