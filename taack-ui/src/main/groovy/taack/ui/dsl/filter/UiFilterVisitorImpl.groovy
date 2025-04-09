@@ -47,6 +47,26 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
+    void visitOrOp() {
+
+    }
+
+    @Override
+    void visitOrOpEnd() {
+
+    }
+
+    @Override
+    void visitAndOp() {
+
+    }
+
+    @Override
+    void visitAndOpEnd() {
+
+    }
+
+    @Override
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
 
     }

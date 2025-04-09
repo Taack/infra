@@ -188,4 +188,24 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
         innerFieldInfos = null
         visitInner = false
     }
+
+    @Override
+    void visitOrOp() {
+
+    }
+
+    @Override
+    void visitOrOpEnd() {
+
+    }
+
+    @Override
+    void visitAndOp() {
+
+    }
+
+    @Override
+    void visitAndOpEnd() {
+
+    }
 }

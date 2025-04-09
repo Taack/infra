@@ -46,6 +46,8 @@ final class TaackFilter<T extends GormEntity<T>> {
 
     TaackFilter(FilterBuilder filterBuilder, SessionFactory sessionFactory, Map<String, ? extends Object> theParams) {
         this.theParams = theParams
+        if (filterBuilder.innerDomain)
+            this.theParams.remove('offset')
         this.sessionFactory = sessionFactory
         this.cClass = filterBuilder.cClass
         this.innerDomain = filterBuilder.innerDomain
@@ -288,6 +290,15 @@ final class TaackFilter<T extends GormEntity<T>> {
                         occ++
                     } else {
                         where << ("(sc.${filterExpression.fieldName} != '${filterExpression.value.toString()}' OR sc.${filterExpression.fieldName} IS NULL)" as String)
+                        occ++
+                    }
+                    break
+                case Operator.IL:
+                    if (filterExpression.value == null) {
+                        where << ("sc.${filterExpression.fieldName} IS NOT NULL" as String)
+                        occ++
+                    } else {
+                        where << ("(sc.${filterExpression.fieldName} like upper('${filterExpression.value.toString()}') OR sc.${filterExpression.fieldName} IS NULL)" as String)
                         occ++
                     }
                     break
@@ -536,6 +547,9 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         if (filterSpecifier) {
             filterSpecifier.visitFilter(new UiFilterVisitorImpl() {
+
+                List<List<String>> opOps = []
+
                 @Override
                 void visitFilterFieldExpressionBool(FilterExpression... filterExpression) {
                     filterExpression.each {
@@ -552,6 +566,38 @@ final class TaackFilter<T extends GormEntity<T>> {
                     filterExpressions.each {
                         occ = visitFilterFieldExpressionBool(it, occ, where, namedParams)
                     }
+                }
+
+                @Override
+                void visitOrOp() {
+                    opOps.push(where)
+                    where = []
+                }
+
+                @Override
+                void visitOrOpEnd() {
+                    List<String> oldWhere = opOps.pop()
+                    if (where.size() > 0) {
+                        String orWhere = '(' + where.join(' or ') + ')'
+                        where = oldWhere + orWhere
+                    } else
+                        where = oldWhere
+                }
+
+                @Override
+                void visitAndOp() {
+                    opOps.push(where)
+                    where = []
+                }
+
+                @Override
+                void visitAndOpEnd() {
+                    List<String> oldWhere = opOps.pop()
+                    if (where.size() > 0) {
+                        String andWhere = '(' + where.join(' and ') + ')'
+                        where = oldWhere + andWhere
+                    } else
+                        where = oldWhere
                 }
             })
         }
