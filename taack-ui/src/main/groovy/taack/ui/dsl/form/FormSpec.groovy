@@ -47,8 +47,12 @@ final class FormSpec extends FormRowSpec {
      * @param id id param
      * @param params additional params
      */
+    void formAction(String i18n, final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(i18n, Utils.getControllerName(action), action.method, id, params, style)
+    }
+
     void formAction(final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
+        formAction(null, action, id, params, style)
     }
 
     void formAction(String i18n, String url, ButtonStyle style = ButtonStyle.SUCCESS) {
