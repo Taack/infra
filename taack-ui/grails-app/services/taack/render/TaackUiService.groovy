@@ -529,7 +529,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param aClass
      * @return objectClass initialized
      */
-    final <T extends GormEntity> T ajaxBind(Class<T> aClass) {
+    final <T extends GormEntity> T ajaxBind(Class<T> aClass, boolean deleteParams = true) {
         final String AJAX_PARAMS = 'ajaxParams'
         T anObject = aClass.getConstructor().newInstance()
         if (params.containsKey(AJAX_PARAMS)) {
@@ -540,8 +540,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             } else {
                 bindData(anObject, params.ajaxParams as GrailsParameterMap)
             }
-            params.remove(AJAX_PARAMS)
-            params.removeAll { it.key.toString().startsWith(AJAX_PARAMS) }
+            if (deleteParams) {
+                params.remove(AJAX_PARAMS)
+                params.removeAll { it.key.toString().startsWith(AJAX_PARAMS) }
+            }
         }
         return anObject
     }

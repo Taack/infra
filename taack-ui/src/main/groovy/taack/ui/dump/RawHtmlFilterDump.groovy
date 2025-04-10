@@ -72,7 +72,13 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             if (parameter.tabIndex != null) mapAdditionalHiddenParams.put 'tabIndex', new HTMLInput(InputType.HIDDEN, parameter.tabIndex, 'tabIndex')
 
             additionalParams?.each {
-                mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key)
+                if (it.value instanceof Map) {
+                    it.value.each { Map.Entry<String, ?> mIt ->
+                        if (!(mIt.value instanceof Map)) {
+                            mapAdditionalHiddenParams.put it.key + '.'+ mIt.key, new HTMLInput(InputType.HIDDEN, mIt.value, it.key + '.'+ mIt.key)
+                        }
+                    }
+                } else mapAdditionalHiddenParams.put it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key)
             }
             blockLog.topElement.addChildren(
                     formThemed.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()

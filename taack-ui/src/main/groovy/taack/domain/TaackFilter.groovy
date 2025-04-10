@@ -399,6 +399,7 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         Map<String, Object> filter = [:]
         filter.putAll(theParams)
+        filter.remove('ajaxParams')
 
         if (innerDomain) {
             String key = 'visitInnerFilterAnonymous' + innerDomain.name.replace('.', '_') + '.'
@@ -417,7 +418,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         } else
             filter = filter.findAll {
                 (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) ||
-                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous')) ||
+                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous')  && !it.key.startsWith('ajaxParams')) ||
                         (it.key.startsWith('_reverse') || it.key.startsWith('_extension_'))
             }
 
@@ -440,6 +441,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         StringBuffer join = new StringBuffer()
         int occ = 0
 
+        println filter
         Map<String, Object> namedParams = [:]
         filter?.each { Map.Entry<String, Object> entry ->
             if (entry.value && !filterMeta.contains(entry.key) && !entry.key.contains("filterExpression")) {
