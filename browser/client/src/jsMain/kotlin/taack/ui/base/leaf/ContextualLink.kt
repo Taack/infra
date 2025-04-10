@@ -1,6 +1,7 @@
 package taack.ui.base.leaf
 
 import js.array.asList
+import js.uri.encodeURIComponent
 import kotlinx.browser.window
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
@@ -144,7 +145,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                     "${currentHref}?id=$id&isAjax=true"
                 }
                 formData?.forEach { value, key ->
-                    anchorElement.href = "${anchorElement.href}&$key=$value"
+                    anchorElement.href = "${anchorElement.href}&$key=${encodeURIComponent(value.toString())}"
                 }
             }
         }
