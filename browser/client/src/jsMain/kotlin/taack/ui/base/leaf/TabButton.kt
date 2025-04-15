@@ -13,6 +13,7 @@ import web.events.EventHandler
 import web.form.FormData
 import web.html.*
 import web.http.RequestMethod
+import web.url.URL
 import web.xhr.XMLHttpRequest
 
 class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
@@ -30,6 +31,12 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
         b.onclick = EventHandler { e ->
             e.preventDefault()
             val tabIndex = b.getAttribute("id")!!.split("-").last()
+            if (Block.href != null) {
+                val url = URL(Block.href!!)
+                url.searchParams.set("tabIndex", tabIndex)
+                Block.href = url.toString()
+            }
+
             val tabId = b.getAttribute("id")!!.split("-")[1]
             val div: Element? = parent.d.parentElement?.querySelector(".tab-content")
             var divTab: Element? = null
