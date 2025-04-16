@@ -15,8 +15,10 @@ import web.html.HTMLAnchorElement
 import web.html.HTMLButtonElement
 import web.http.RequestMethod
 import web.location.location
+import web.storage.localStorage
 import web.uievents.MouseEvent
 import web.url.URL
+import web.window.window
 import web.xhr.XMLHttpRequest
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
@@ -147,6 +149,7 @@ class Helper {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
                 text.startsWith(RELOAD) -> {
+                    localStorage.setItem("y-scroll", window.scrollY.toString())
                     location.href = (Block.href ?: "")
                 }
 
