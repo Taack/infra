@@ -34,9 +34,9 @@ class Helper {
         private const val CLOSE_LAST_MODAL_AND_UPDATE_BLOCK = "__closeLastModalAndUpdateBlock__:"
         private const val FIELD_INFO = ":__FieldInfo__:"
         private const val FIELD_INFO_END = ":__FieldInfoEnd__"
-        private const val RELOAD = "__reload__"
         private const val REDIRECT = "__redirect__"
         private const val ERROR_START = "__ErrorKeyStart__"
+        const val RELOAD = "__reload__"
         var historyState = HashMap<String, FormDataEntryValue>()
         var traceEnabled = true
         fun trace(level: Int, message: String) {
@@ -231,7 +231,12 @@ class Helper {
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    block.modal.open(text.substring(OPEN_MODAL.length))
+
+                    if (text.endsWith(RELOAD)) {
+                        block.modal.open(text.substring(OPEN_MODAL.length).dropLast(RELOAD.length), true)
+                    } else {
+                        block.modal.open(text.substring(OPEN_MODAL.length), false)
+                    }
                     val s = block.modal.dModalBody.getElementsByTagName("script")
                     trace("Executing $s")
                 }

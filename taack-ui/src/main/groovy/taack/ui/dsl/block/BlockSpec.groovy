@@ -97,8 +97,8 @@ final class BlockSpec extends BlockTabSpec {
      * @param firstPass (optional) if true create a new modal, if false, replace the content of the top modal.
      * @param closure content of the modal
      */
-    void modal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
-        blockVisitor.visitModal()
+    void modal(final boolean reloadWhenClose = false, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        blockVisitor.visitModal(reloadWhenClose)
         closure.delegate = this
         closure.call()
         counter++
