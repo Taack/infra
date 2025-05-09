@@ -1,19 +1,19 @@
 package taack.ui.base.leaf
 
 import js.array.asList
+import js.uri.encodeURIComponent
 import kotlinx.browser.window
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
+import taack.ui.base.element.Filter
 import web.dom.Document
 import web.dom.document
 import web.dom.parsing.DOMParser
 import web.dom.parsing.DOMParserSupportedType
 import web.events.EventHandler
-import web.html.HTMLAnchorElement
-import web.html.HTMLDivElement
-import web.html.HTMLElement
-import web.html.HTMLSpanElement
+import web.form.FormData
+import web.html.*
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
@@ -112,13 +112,13 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                     contextMenu.style.apply {
                         position = "absolute"
                         document.body.appendChild(contextMenu)
-                        val maxX = window.innerWidth - contextMenu.offsetWidth
-                        val maxY = window.innerHeight - contextMenu.offsetHeight
-                        left = "${min(e.clientX, maxX)}px"
-                        top = "${min(e.clientY, maxY)}px"
+                        val maxX = window.innerWidth + window.scrollX - contextMenu.offsetWidth
+                        val maxY = window.innerHeight + window.scrollY - contextMenu.offsetHeight
+                        left = "${min(e.pageX, maxX)}px"
+                        top = "${min(e.pageY, maxY)}px"
                         zIndex = "9999"
                     }
-                    addIdToAnchors(response, id)
+                    addIdToAnchors(response, id, getFilterFormDataOrNull(a))
                     contextMenu.append(response.body)
                     activeContextMenu = contextMenu
                     document.body.appendChild(activeContextMenu!!)
@@ -134,7 +134,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
     }
 
 
-    private fun addIdToAnchors(doc: Document, id: Long) {
+    private fun addIdToAnchors(doc: Document, id: Long, formData: FormData?) {
         doc.querySelectorAll("a").asList().forEach { anchor ->
             val anchorElement = anchor as HTMLAnchorElement
             val currentHref = anchorElement.href
@@ -144,7 +144,31 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                 } else {
                     "${currentHref}?id=$id&isAjax=true"
                 }
+                formData?.forEach { value, key ->
+                    anchorElement.href = "${anchorElement.href}&$key=${encodeURIComponent(value.toString())}"
+                }
             }
         }
+    }
+
+    private fun getFilterFormDataOrNull(span: HTMLSpanElement): FormData? { // If span is in a table with filter, return the formData of the filter
+        var formData: FormData? = null
+        val t = span.closest("table[taacktableid]") as HTMLTableElement?
+        val div = span.closest("div[ajaxblockid]") as HTMLDivElement?
+        if (t != null && div != null) {
+            val tId = t.getAttribute("taacktableid")!!
+            val ajaxBlockId = div.getAttribute("ajaxblockid")!!
+            if (t.nextElementSibling == null) { // Exclude the case where the table has no filter
+                val filter: Filter? = parent.ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)
+                if (filter != null) {
+                    formData = FormData(filter.f)
+                    formData["offset"] = "0"
+                    formData["refresh"] = "true"
+                    formData["filterTableId"] = filter.filterId
+                    formData["ajaxBlockId"] = filter.parent.blockId
+                }
+            }
+        }
+        return formData
     }
 }

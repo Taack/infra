@@ -347,7 +347,7 @@ enum Country {
                     return true
                 }
             }
-            values().findAll {it.continent == c }.sort { it.name() }.each {
+            values().findAll {it.continent == c }.sort { it.name }.each {
                 res[i++] = new IEnumOption() {
                     @Override
                     String getKey() {

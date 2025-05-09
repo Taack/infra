@@ -132,7 +132,8 @@ final class TaackJdbcService {
 
     final static void registerJdbcClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
         def fieldInfoWithId = fieldInfos.toList()
-        fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), aClass.getDeclaredField('id'), null), 'id', (Long) 0)
+        Class aClassWithId = aClass.superclass != Object ? aClass.superclass : aClass
+        fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), aClassWithId.getDeclaredField('id'), null), 'id', (Long) 0)
         fieldInfoMap.put(aClass, fieldInfoWithId as FieldInfo[])
         gormClassesMap.put(aClass.simpleName, aClass)
         gormRealClassesMap.put(aClass.name, aClass)

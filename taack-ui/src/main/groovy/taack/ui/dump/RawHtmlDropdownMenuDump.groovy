@@ -48,7 +48,7 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
         enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
         futurCurrentAjaxBlockId = ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.MENU_CONTEXTUAL)
-        menu = new DropdownMenu(blockLog)
+        menu = new DropdownMenu(parameter.target == Parameter.RenderingTarget.MAIL, blockLog)
         blockLog.topElement = menu.menuStart(blockLog.topElement)
     }
 
@@ -107,7 +107,10 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
         blockLog.stayBlock('visitSubMenuIcon ' + i18n)
 
-        menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        if (parameter.target != Parameter.RenderingTarget.MAIL)
+            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        else
+            menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
     }
 
     @Override

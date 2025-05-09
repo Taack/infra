@@ -35,7 +35,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     private Object aObject
 
     private int tabOccurrence = 0
-    private int tabIds = 0
     private FieldInfo[] lockedFields
 
     final IFormTheme formThemed
@@ -62,7 +61,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         } else if (lockedFields.size() > 0 && lockedFields[0] == null) {
             return !lockedFields*.fieldName.contains(field.fieldName)
         } else {
-            return aObject.hasProperty(ST_ID) && (lockedFields*.fieldName.contains(field.fieldName) || lockedFields.length == 0)
+            return lockedFields*.fieldName.contains(field.fieldName)
         }
     }
 
@@ -92,7 +91,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         }
 
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.FORM)
-        tabIds = 0
     }
 
     @Override
@@ -160,7 +158,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 blockLog.topElement = formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else {
                 String valueString = inputEscape(field.value?.toString())
-                if (numberFormat && field.value instanceof Number) {
+                if (field.value instanceof Number) {
+                    numberFormat ?= parameter.nf
                     valueString = numberFormat.format(field.value)
                 }
                 if (field.fieldConstraint.widget == WidgetKind.PASSWD.name)
@@ -203,12 +202,13 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitFormTabs(List<String> names, Width width = Width.QUARTER) {
         blockLog.topElement.setTaackTag(TaackTag.TABS)
         blockLog.topElement = layout.tabs(blockLog.topElement, names)
-        tabIds++
+        tabOccurrence = 0
     }
 
     @Override
     void visitFormTabsEnd() {
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
+        layout.setTabIdAndCounter(layout.tabIds + 1)
     }
 
     @Override
@@ -242,26 +242,26 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry) {
+    void visitFormFieldFromMap(final String i18n, final FieldInfo field, final String mapEntry, final String controller, final String action, final FieldInfo<?>... fieldInfos) {
         final String trI18n = i18n ?: parameter.trField(field) ?: mapEntry
         final String qualifiedName = field.fieldName + '.' + mapEntry
         String value = (field.value as Map<String, String>)?.get(mapEntry)
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
-        if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
+        if (controller && action) {
+            formThemed.ajaxField(blockLog.topElement, trI18n, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+        } else if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
             formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+        } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
+            formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+        } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
+            formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
         } else {
-            if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-            } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
-                formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
+            value = value ? inputEscape(value) : ''
+            if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
+                formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             } else {
-                value = value ? inputEscape(value) : ''
-                if (field.fieldConstraint.widget == WidgetKind.PASSWD.name) {
-                    formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-                } else {
-                    formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
-                }
+                formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             }
         }
     }
@@ -312,4 +312,19 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             )
         }
     }
+
+    @Override
+    void visitReadOnly(String i18n, String value) {
+        blockLog.topElement = formThemed.normalInput(blockLog.topElement, "", i18n, true, true, value)
+    }
+
+    @Override
+    void visitTriggerUpdate(FieldInfo<?>... fieldInfos) {
+        for (FieldInfo f : fieldInfos) {
+            formThemed.addChildren(
+                    new HTMLInput(InputType.HIDDEN, f.fieldName, '__triggerUpdate__')
+            )
+        }
+    }
+
 }

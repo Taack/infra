@@ -36,7 +36,7 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitColEnd()
 
-    void visitModal()
+    void visitModal(boolean reloadWhenClose)
 
     void visitModalEnd()
 

@@ -50,7 +50,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.trace("AjaxBlock::onPoll")
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(xhr.responseText, parent)
+            Helper.processAjaxLink(null, xhr.responseText, parent)
         }
         xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true", true)
         xhr.send()

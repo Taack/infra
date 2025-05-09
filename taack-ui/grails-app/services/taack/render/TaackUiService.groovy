@@ -7,7 +7,6 @@ import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
-import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.core.io.ResourceLocator
 import org.grails.datastore.gorm.GormEntity
@@ -29,6 +28,8 @@ import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.pdf.RawHtmlPrintableDump
+
+import javax.annotation.PostConstruct
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -59,6 +60,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
     ThemeService themeService
+
+    @Autowired
+    TaackUiConfiguration taackUiPluginConfiguration
 
     @Autowired
     PageRenderer g
@@ -163,7 +167,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
         blockSpecifier.visitBlock(htmlBlock)
-        if (p.isModal) {
+        if (p.isModal && params.boolean("isAjax") != false) {
             params['isAjax'] = true
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
@@ -176,13 +180,13 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
-            return new ModelAndView("/taackUi/blockNoLayout", [
+            return new ModelAndView("/taackUi/block", [
                     themeSize      : themeSize,
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
                     block          : output.toString(),
                     menu           : visitMenu(menu),
-                    conf           : TaackUiConfiguration,
+                    conf           : taackUiPluginConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                     bootstrapJsTag : bootstrapJsTag,
                     bootstrapCssTag: bootstrapCssTag
@@ -275,13 +279,13 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        return new ModelAndView("/taackUi/blockNoLayout", [
+        return new ModelAndView("/taackUi/block", [
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
                 block          : html,
                 menu           : visitMenu(menu),
-                conf           : TaackUiConfiguration,
+                conf           : taackUiPluginConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
@@ -308,7 +312,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 themeAuto      : themeAuto,
                 block          : "",
                 menu           : visitMenu(menu),
-                conf           : TaackUiConfiguration,
+                conf           : taackUiPluginConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
@@ -398,7 +402,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         String html = g.render template: "/taackUi/block-pdf", model: [
                 block          : blockStream.toString(),
                 css            : css.toString(),
-//                root           : taackUiPluginConfiguration.root,
+                root           : taackUiPluginConfiguration.root,
                 headerHeight   : htmlPdf.headerHeight,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
@@ -432,8 +436,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final def downloadPdf(final UiPrintableSpecifier printableSpecifier, final String fileNamePrefix, final Boolean isHtml = false) {
         String fileName = fileNamePrefix + "-${dateFileName}.pdf"
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
-        webUtils.currentResponse.setContentType(isHtml ? "text/html" : "application/pdf")
-        webUtils.currentResponse.setHeader("Content-disposition", "${params.boolean('inline') ? "inline;" : ''}attachment;filename=${fileName}${isHtml ? ".html" : ""}")
+        webUtils.currentResponse.setContentType(isHtml ? 'text/html' : 'application/pdf')
+        webUtils.currentResponse.setHeader('Content-disposition', "${params.boolean('inline') ? 'inline' : 'attachment'};filename=${URLEncoder.encode(fileName, 'UTF-8')}${isHtml ? '.html' : ''}")
         if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
         else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
         try {
@@ -449,7 +453,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         new UiBlockSpecifier().ui {
             modal {
                 custom """\
-                    <iframe src="${Parameter.urlMapped(action, [id: id])}?inline=true"
+                    <iframe src="${(new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(action, [id: id])}?inline=true"
                             width="100%"
                             height="800px">
                     </iframe>
@@ -525,7 +529,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param aClass
      * @return objectClass initialized
      */
-    final <T extends GormEntity> T ajaxBind(Class<T> aClass) {
+    final <T extends GormEntity> T ajaxBind(Class<T> aClass, boolean deleteParams = true) {
         final String AJAX_PARAMS = 'ajaxParams'
         T anObject = aClass.getConstructor().newInstance()
         if (params.containsKey(AJAX_PARAMS)) {
@@ -536,8 +540,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             } else {
                 bindData(anObject, params.ajaxParams as GrailsParameterMap)
             }
-            params.remove(AJAX_PARAMS)
-            params.removeAll { it.key.toString().startsWith(AJAX_PARAMS) }
+            if (deleteParams) {
+                params.remove(AJAX_PARAMS)
+                params.removeAll { it.key.toString().startsWith(AJAX_PARAMS) }
+            }
         }
         return anObject
     }
@@ -582,7 +588,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         htmlPdf.getOutput(output)
         String html = g.render template: "/taackUi/block-mail", model: [
                 block: output.toString(),
-//                root : taackUiPluginConfiguration.root
+                root : taackUiPluginConfiguration.root
         ]
         html
     }

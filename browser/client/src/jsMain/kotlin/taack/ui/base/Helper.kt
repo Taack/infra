@@ -15,8 +15,10 @@ import web.html.HTMLAnchorElement
 import web.html.HTMLButtonElement
 import web.http.RequestMethod
 import web.location.location
+import web.storage.localStorage
 import web.uievents.MouseEvent
 import web.url.URL
+import web.window.window
 import web.xhr.XMLHttpRequest
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
@@ -32,9 +34,9 @@ class Helper {
         private const val CLOSE_LAST_MODAL_AND_UPDATE_BLOCK = "__closeLastModalAndUpdateBlock__:"
         private const val FIELD_INFO = ":__FieldInfo__:"
         private const val FIELD_INFO_END = ":__FieldInfoEnd__"
-        private const val RELOAD = "__reload__"
         private const val REDIRECT = "__redirect__"
         private const val ERROR_START = "__ErrorKeyStart__"
+        const val RELOAD = "__reload__"
         var historyState = HashMap<String, FormDataEntryValue>()
         var traceEnabled = true
         fun trace(level: Int, message: String) {
@@ -113,7 +115,7 @@ class Helper {
                 }.toMap() as HashMap<String, FormDataEntryValue>
                 hydrateStateToUrl(formUrl)
                 history.pushState("{}", document.title, formUrl)
-                processAjaxLink(xhr.responseText, filter)
+                processAjaxLink(null, xhr.responseText, filter)
                 b?.disabled = false
                 if (innerText != null) b.innerText = innerText
 
@@ -141,15 +143,18 @@ class Helper {
         }
 
         private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
+        val urlStack: ArrayDeque<URL> = ArrayDeque()
 
-        fun processAjaxLink(text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
+        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
-                text.contains(RELOAD) -> {
+                text.startsWith(RELOAD) -> {
+                    localStorage.setItem("y-scroll", window.scrollY.toString())
                     location.href = (Block.href ?: "")
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL) -> {
+                    if (url != null) urlStack.removeLast()
                     val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
                     if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
                             text.length - FIELD_INFO_END.length,
@@ -191,11 +196,15 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK) -> {
+                    if (url != null) {
+                        urlStack.removeLast()
+                        urlStack.addLast(url)
+                    }
                     trace("Helper::CLOSE_LAST_MODAL_AND_UPDATE_BLOCK ${block.modal.mId}")
                     if (block.parent != null) block.parent.close()
                     else block.modal.close()
                     val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
-                    processAjaxLink(innerText, block.parent ?: base, process)
+                    processAjaxLink(url, innerText, block.parent ?: base, process)
                 }
 
                 text.startsWith(BLOCK_START) -> {
@@ -216,16 +225,29 @@ class Helper {
 
                 text.startsWith(OPEN_MODAL) -> {
                     trace("Helper::opening modal ...")
+                    if (url != null)
+                        urlStack.addLast(url)
+
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    block.modal.open(text.substring(OPEN_MODAL.length))
+
+                    if (text.endsWith(RELOAD)) {
+                        block.modal.open(text.substring(OPEN_MODAL.length).dropLast(RELOAD.length), true)
+                    } else {
+                        block.modal.open(text.substring(OPEN_MODAL.length), false)
+                    }
                     val s = block.modal.dModalBody.getElementsByTagName("script")
                     trace("Executing $s")
                 }
 
                 text.startsWith(REFRESH_MODAL) -> {
                     trace("Helper::refresh modal $text")
+                    if (url != null) {
+                        urlStack.removeLast()
+                        urlStack.addLast(url)
+                    }
+
                     if (process != null) {
                         processingStack.add(process)
                     }

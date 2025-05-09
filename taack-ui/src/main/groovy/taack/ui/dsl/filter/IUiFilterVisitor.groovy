@@ -37,4 +37,12 @@ interface IUiFilterVisitor  {
     void addHiddenInputs()
 
     void visitInnerFilter(UiFilterSpecifier uiFilterSpecifier, FieldInfo... fieldInfos)
+
+    void visitOrOp()
+
+    void visitOrOpEnd()
+
+    void visitAndOp()
+
+    void visitAndOpEnd()
 }

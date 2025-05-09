@@ -3,6 +3,7 @@ package taack.ui.dsl.form
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.ast.type.FieldInfo
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.html.element.ButtonStyle
@@ -30,16 +31,28 @@ final class FormSpec extends FormRowSpec {
     }
 
     /**
+     * When one of the field is updated, the form is refreshed
+     *
+     * @param fields
+     */
+    void triggerUpdate(FieldInfo... fields) {
+        formVisitor.visitTriggerUpdate(fields)
+    }
+
+    /**
      * form action. The form is POSTed to the target action.
      *
      * @param i18n label of the button
      * @param action methodClosure pointing to the action
      * @param id id param
      * @param params additional params
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
      */
+    void formAction(String i18n, final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(i18n, Utils.getControllerName(action), action.method, id, params, style)
+    }
+
     void formAction(final MethodClosure action, final Long id = null, final Map params = null, ButtonStyle style = ButtonStyle.SUCCESS) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
+        formAction(null, action, id, params, style)
     }
 
     void formAction(String i18n, String url, ButtonStyle style = ButtonStyle.SUCCESS) {

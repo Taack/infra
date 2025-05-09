@@ -9,9 +9,11 @@ import taack.ui.dump.html.element.*
 final class DropdownMenu implements IHTMLElement {
 
     final BlockLog blockLog
+    final boolean isMail
 
-    DropdownMenu(BlockLog blockLog) {
+    DropdownMenu(boolean isMail, BlockLog blockLog) {
         this.blockLog = blockLog
+        this.isMail = isMail
     }
 
 
@@ -26,11 +28,11 @@ final class DropdownMenu implements IHTMLElement {
         return bootstrapMenu.children.first()
     }
 
-    static IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
+    IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
         if (i18n) {
             topElement.addChildren(
                     new HTMLLi().builder.addChildren(
-                            new HTMLAnchor(isAjax, url).builder.addClasses('dropdown-item').putAttributeIfNotNull('ajaxBlockId', ajaxBlockId).addChildren(new HTMLTxtContent(i18n)).build()
+                            new HTMLAnchor(isAjax && !isMail, url).builder.addClasses('dropdown-item').putAttributeIfNotNull('ajaxBlockId', ajaxBlockId).addChildren(new HTMLTxtContent(i18n)).build()
                     ).build()
             )
         } else {

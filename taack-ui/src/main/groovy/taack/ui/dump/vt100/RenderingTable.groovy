@@ -132,7 +132,7 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+    void visitRowAction(String i18n, ActionIcon actionIcon, String key, String label) {
 
     }
 

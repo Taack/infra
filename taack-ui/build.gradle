@@ -33,7 +33,7 @@ if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
         profile "org.grails.profiles:web-plugin"
         runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
 
-        implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
+        api 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
     }
 
     if (rootProject.name == 'infraFalse') {

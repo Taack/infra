@@ -69,7 +69,7 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
-    void visitModal() {
+    void visitModal(boolean reloadWhenClose) {
 
     }
 

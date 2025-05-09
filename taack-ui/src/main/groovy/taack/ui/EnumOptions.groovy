@@ -18,8 +18,7 @@ final class EnumOption implements IEnumOption {
 
     EnumOption(String key, String value, String asset = null, Boolean isSection = false) {
         this.key = key?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
-        String i18n = tr("enum.value.$value", null)
-        this.value = i18n != "enum.value.$value" ? i18n : value
+        this.value = value
         this.asset = asset
         this.section = isSection
     }
@@ -38,6 +37,12 @@ final class EnumOptions implements IEnumOptions {
     final IEnumOption[] options
     final IEnumOption[] currents
     final String paramKey
+
+    static String translateEnumValue(String value) {
+        String trLabel = "enum.value.$value"
+        String i18n = tr(trLabel, null)
+        return i18n != trLabel ? i18n : value
+    }
 
     EnumOptions(IEnumOption[] options, String paramKey, EnumOption... currents) {
         this.currents = currents
@@ -70,8 +75,8 @@ final class EnumOptions implements IEnumOptions {
             for (int i = 0; i < currents.size(); i++) {
                 final Enum v = currents[i]
                 if (v) {
-                    final String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : v
-                    this.currents[i] = new EnumOption(v.name(), name, null, false)
+                    final String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : translateEnumValue(v.toString())
+                    this.currents[i] = new EnumOption(v.name(), name)
                 }
             }
         }
@@ -94,7 +99,7 @@ final class EnumOptions implements IEnumOptions {
                 this.currents = new EnumOption[currents.size()]
                 for (int i = 0; i < currents.size(); i++) {
                     if (isEnumListOrSet) {
-                        String name = currents[i].hasProperty(ST_NAME) ? currents[i].getAt(ST_NAME) : currents[i].toString()
+                        String name = currents[i].hasProperty(ST_NAME) ? currents[i].getAt(ST_NAME) : translateEnumValue(currents[i].toString())
                         this.currents[i] = new EnumOption((currents[i] as Enum).name(), name)
                     } else {
                         this.currents[i] = new EnumOption(currents[i].toString(), currents[i].toString())
@@ -103,7 +108,7 @@ final class EnumOptions implements IEnumOptions {
             } else {
                 boolean isEnum = info.fieldConstraint.field.type.isEnum()
                 if (isEnum) {
-                    String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : v.toString()
+                    String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : translateEnumValue(v.toString())
                     this.currents = [new EnumOption((v as Enum).name(), name)]
                 } else {
                     this.currents = [new EnumOption(v.toString(), v.toString())]
@@ -124,8 +129,8 @@ final class EnumOptions implements IEnumOptions {
 
         for (int i = 0; i < values.size(); i++) {
             final String v = values[i].name()
-            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
-            this.options[i] = new EnumOption(v, name, null, false)
+            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : translateEnumValue(v)
+            this.options[i] = new EnumOption(v, name)
         }
         this.currents = currents
         this.paramKey = paramKey
@@ -137,8 +142,8 @@ final class EnumOptions implements IEnumOptions {
 
         for (int i = 0; i < values.size(); i++) {
             final String v = values[i].name()
-            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
-            this.options[i] = new EnumOption(v.toString(), name, null, false)
+            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : translateEnumValue(v)
+            this.options[i] = new EnumOption(v.toString(), name)
         }
         if (currents && currents.size() > 0) {
             this.currents = new EnumOption[currents.size()]
@@ -146,8 +151,8 @@ final class EnumOptions implements IEnumOptions {
             for (int i = 0; i < currents.size(); i++) {
                 final Enum v = currents[i]
                 if (v) {
-                    final String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : v
-                    this.currents[i] = new EnumOption(v.name(), name, null, false)
+                    final String name = v.hasProperty(ST_NAME) ? v.getAt(ST_NAME) : translateEnumValue(v.toString())
+                    this.currents[i] = new EnumOption(v.name(), name)
                 }
             }
         }
@@ -161,8 +166,8 @@ final class EnumOptions implements IEnumOptions {
 
         for (int i = 0; i < values.size(); i++) {
             final String v = values[i].name()
-            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
-            this.options[i] = new EnumOption(v, name, null, false)
+            final String name = values[i].hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : translateEnumValue(v)
+            this.options[i] = new EnumOption(v, name)
         }
 
         if (currents && currents.size() > 0) {
@@ -171,7 +176,7 @@ final class EnumOptions implements IEnumOptions {
             for (int i = 0; i < currents.size(); i++) {
                 final String v = currents[i]
                 final String name = v
-                if (v) this.currents[i] = new EnumOption(v, name, null, false)
+                if (v) this.currents[i] = new EnumOption(v, name)
             }
         }
 
@@ -183,8 +188,8 @@ final class EnumOptions implements IEnumOptions {
 
         for (int i = 0; i < values.size(); i++) {
             final String v = values[i]
-            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
-            this.options[i] = new EnumOption(v, name, null, false)
+            final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : translateEnumValue(v)
+            this.options[i] = new EnumOption(v, name)
         }
 
         if (currents && currents.size() > 0) {
@@ -192,8 +197,8 @@ final class EnumOptions implements IEnumOptions {
 
             for (int i = 0; i < currents.size(); i++) {
                 final String v = currents[i]
-                final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : v
-                this.currents[i] = new EnumOption(v, name, null, false)
+                final String name = v.hasProperty(ST_NAME) ? values[i].getAt(ST_NAME) : translateEnumValue(v)
+                this.currents[i] = new EnumOption(v, name)
             }
         }
         this.paramKey = paramKey

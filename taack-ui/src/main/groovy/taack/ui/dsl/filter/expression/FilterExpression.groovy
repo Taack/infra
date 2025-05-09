@@ -9,6 +9,7 @@ enum Operator {
     EQ,
     NE,
     LT,
+    IL,
     GT,
     IS_EMPTY
 }

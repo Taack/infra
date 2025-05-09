@@ -103,7 +103,6 @@ class SectionSpec {
      * @param action target action if icon is clicked
      * @param id id parameter
      * @param additionalParams target action additional parameters
-     * @param isAjax true if target action is an ajax one
      */
     void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
         if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitShowAction(i18n, icon, Utils.getControllerName(action), action.method, id, additionalParams, true)

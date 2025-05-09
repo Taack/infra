@@ -46,6 +46,8 @@ final class TaackFilter<T extends GormEntity<T>> {
 
     TaackFilter(FilterBuilder filterBuilder, SessionFactory sessionFactory, Map<String, ? extends Object> theParams) {
         this.theParams = theParams
+        if (filterBuilder.innerDomain)
+            this.theParams.remove('offset')
         this.sessionFactory = sessionFactory
         this.cClass = filterBuilder.cClass
         this.innerDomain = filterBuilder.innerDomain
@@ -283,11 +285,20 @@ final class TaackFilter<T extends GormEntity<T>> {
                     }
                     break
                 case Operator.NE:
-                    if (filterExpression.value) {
-                        where << ("sc.${filterExpression.fieldName} != '${filterExpression.value.toString()}'" as String)
-                        occ++
-                    } else if (filterExpression.value == null) {
+                    if (filterExpression.value == null) {
                         where << ("sc.${filterExpression.fieldName} IS NOT NULL" as String)
+                        occ++
+                    } else {
+                        where << ("(sc.${filterExpression.fieldName} != '${filterExpression.value.toString()}' OR sc.${filterExpression.fieldName} IS NULL)" as String)
+                        occ++
+                    }
+                    break
+                case Operator.IL:
+                    if (filterExpression.value == null) {
+                        where << ("sc.${filterExpression.fieldName} IS NOT NULL" as String)
+                        occ++
+                    } else {
+                        where << ("(sc.${filterExpression.fieldName} like upper('${filterExpression.value.toString()}') OR sc.${filterExpression.fieldName} IS NULL)" as String)
                         occ++
                     }
                     break
@@ -388,6 +399,7 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         Map<String, Object> filter = [:]
         filter.putAll(theParams)
+        filter.remove('ajaxParams')
 
         if (innerDomain) {
             String key = 'visitInnerFilterAnonymous' + innerDomain.name.replace('.', '_') + '.'
@@ -406,13 +418,13 @@ final class TaackFilter<T extends GormEntity<T>> {
         } else
             filter = filter.findAll {
                 (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) ||
-                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous')) ||
+                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous')  && !it.key.startsWith('ajaxParams')) ||
                         (it.key.startsWith('_reverse') || it.key.startsWith('_extension_'))
             }
 
         if (tInstance) {
             tInstance.class.getDeclaredFields().eachWithIndex { Field entry, int i ->
-                if (tInstance[entry.name] != null && [String, Boolean, aClass].contains(entry.type)) filter.put(entry.name, tInstance[entry.name])
+                if (tInstance[entry.name] != null && ([String, Boolean, aClass].contains(entry.type) || entry.type.isEnum())) filter.put(entry.name, tInstance[entry.name])
             }
         }
 
@@ -429,6 +441,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         StringBuffer join = new StringBuffer()
         int occ = 0
 
+        println filter
         Map<String, Object> namedParams = [:]
         filter?.each { Map.Entry<String, Object> entry ->
             if (entry.value && !filterMeta.contains(entry.key) && !entry.key.contains("filterExpression")) {
@@ -459,6 +472,11 @@ final class TaackFilter<T extends GormEntity<T>> {
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
                         boolean entryValue = entry.value instanceof String ? entry.value == "1" : entry.value as Boolean
                         where << ("$aliasKey = $entryValue" as String)
+                    } else if (f && f.type == Map) {
+                        if (entry.value instanceof String) {
+                            join.append(" join ${aliasKey} as j${occ}")
+                            where << ("lower(j${occ}) like lower('${entry.value}')" as String)
+                        }
                     } else if (f && f.type == Set) {
                         if (entry.value instanceof String) {
                             join.append(" inner join ${aliasKey} j${occ}")
@@ -531,6 +549,9 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         if (filterSpecifier) {
             filterSpecifier.visitFilter(new UiFilterVisitorImpl() {
+
+                List<List<String>> opOps = []
+
                 @Override
                 void visitFilterFieldExpressionBool(FilterExpression... filterExpression) {
                     filterExpression.each {
@@ -548,6 +569,38 @@ final class TaackFilter<T extends GormEntity<T>> {
                         occ = visitFilterFieldExpressionBool(it, occ, where, namedParams)
                     }
                 }
+
+                @Override
+                void visitOrOp() {
+                    opOps.push(where)
+                    where = []
+                }
+
+                @Override
+                void visitOrOpEnd() {
+                    List<String> oldWhere = opOps.pop()
+                    if (where.size() > 0) {
+                        String orWhere = '(' + where.join(' or ') + ')'
+                        where = oldWhere + orWhere
+                    } else
+                        where = oldWhere
+                }
+
+                @Override
+                void visitAndOp() {
+                    opOps.push(where)
+                    where = []
+                }
+
+                @Override
+                void visitAndOpEnd() {
+                    List<String> oldWhere = opOps.pop()
+                    if (where.size() > 0) {
+                        String andWhere = '(' + where.join(' and ') + ')'
+                        where = oldWhere + andWhere
+                    } else
+                        where = oldWhere
+                }
             })
         }
 
@@ -560,7 +613,10 @@ final class TaackFilter<T extends GormEntity<T>> {
         String whereClause = where.empty ? " " : " where ${where.join(' and ')} "
         String query = "select distinct sc ${selectOrder}" + from.toString() + join.toString() + removeBrackets(whereClause) + sortOrder
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
-
+        if (Environment.current == Environment.DEVELOPMENT) {
+            println query
+            println count
+        }
         List<T> res
 
         try {

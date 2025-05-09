@@ -56,7 +56,11 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowAction(final String i18n = null, final ActionIcon icon, final Long id, String label) {
-        tableVisitor.visitRowAction(i18n, icon, id, label, null, true)
+        rowAction(i18n, icon, id?.toString(), label)
+    }
+
+    void rowAction(final String i18n = null, final ActionIcon icon, final String key, String label) {
+        tableVisitor.visitRowAction(i18n, icon, key, label)
     }
 
     void rowAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Map params) {
@@ -83,11 +87,11 @@ class RowColumnFieldSpec implements BranchingSpec {
         rowAction(linkText, action, id, null)
     }
 
-    void rowAction(final String linkText, final MethodClosure action, final Long id, final Map params) {
+    void rowAction(final String linkText, final MethodClosure action, final Long id, final Map params, boolean isAjax = true) {
         if (linkText && taackUiEnablerService.hasAccess(action, id, params)) {
             Map<String, ?> p = params ?: [:]
             p.put('id', id)
-            tableVisitor.visitRowAction(linkText, Utils.getControllerName(action), action.method, null, p, true)
+            tableVisitor.visitRowAction(linkText, Utils.getControllerName(action), action.method, null, p, isAjax)
         } else {
             tableVisitor.visitRowFieldRaw(linkText, null)
         }

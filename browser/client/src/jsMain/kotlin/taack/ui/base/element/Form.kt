@@ -4,7 +4,7 @@ import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
-import taack.ui.canvas.MainCanvas
+import taack.ui.wysiwyg.canvasMono.MainCanvas
 import web.dom.document
 import web.file.File
 import web.html.HTMLDivElement
@@ -25,6 +25,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     private val formName = f.attributes.getNamedItem("name")?.value
     val mapFileToSend: MutableMap<String, MutableList<File>> = mutableMapOf()
     private val actions: List<FormActionButton>
+    private val triggers: List<FormTriggerUpdate>
     private var m2oList: List<FormActionInputM2O>
     private val overrideFields: List<FormOverrideField>
     private var m2oSelectM2OList: List<FormActionSelectM2O>
@@ -49,7 +50,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
         errorPlaceHolders = FormErrorInput.getSiblingErrorInput(this).associateBy {
             it.fieldName
         }
-
+        triggers = FormTriggerUpdate.getSiblingFormTriggerUpdate(this)
         val textareaList = f.querySelectorAll("textarea.asciidoctor")
 
         for (element in textareaList) {
@@ -67,7 +68,6 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             textarea.parentElement?.append(scrollContainer)
             MainCanvas(this, textarea, canvasContainer, scrollContainer)
         }
-
 
         Helper.traceDeIndent("Form::init --- formName: $formName")
     }

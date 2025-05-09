@@ -44,7 +44,7 @@ ${raw(css)}
     }
     @bottom-right {
         font-size: 3mm;
-        content: "Page " counter(page) " of " counter(pages);
+        content: counter(page) " / " counter(pages);
     }
 }
 svg {

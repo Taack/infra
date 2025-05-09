@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
+import org.springframework.web.servlet.support.RequestContextUtils
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.ThemeService
@@ -57,6 +58,9 @@ final class Parameter implements WebAttributes {
     static ThemeService uiThemeService = null
     boolean isModal = false
 
+    Parameter() {
+        this(RenderingTarget.WEB)
+    }
 
     Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target, String... paramsToKeep) {
         this.messageSource = messageSource
@@ -77,7 +81,7 @@ final class Parameter implements WebAttributes {
         this.targetAjaxBlockId = params.get('targetAjaxBlockId') ?: null
         this.isAjaxRendering = params.boolean('isAjax') == true
         this.isRefresh = params.boolean('refresh') == true
-        this.lcl = lcl
+        this.lcl = lcl ?: RequestContextUtils.getLocale(webRequest.request)
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null
         this.tabIndex = params.get('tabIndex') ? params.int('tabIndex') : null
@@ -181,28 +185,28 @@ final class Parameter implements WebAttributes {
         return keys.join(',')
     }
 
-    static final String urlMapped(MethodClosure action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+    final String urlMapped(MethodClosure action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         urlMapped(Utils.getControllerName(action), action.method, params, isAjax)
     }
 
-    static final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+    final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         def p = params
         if (isAjax) {
             p = new HashMap<String, Object>()
             if (params) p.putAll(params)
             p.put('isAjax', true)
         }
-        applicationTagLib.createLink(controller: controller, action: action, params: p)
+        applicationTagLib.createLink(controller: controller, action: action, params: p, absolute: target == RenderingTarget.MAIL)
     }
 
-    static final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> params = null, boolean isAjax = false) {
+    final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         def p = params
         if (isAjax) {
             p = new HashMap<String, Object>()
             if (params) p.putAll(params)
             p.put('isAjax', true)
         }
-        applicationTagLib.createLink(controller: controller, action: action, params: p, id: id)
+        applicationTagLib.createLink(controller: controller, action: action, params: p, absolute: target == RenderingTarget.MAIL, id: id)
     }
 
     final String urlMapped() {

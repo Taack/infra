@@ -4,6 +4,8 @@ import kotlinx.browser.document
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import taack.ui.base.BaseElement
+import taack.ui.base.Helper.Companion.RELOAD
+import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
@@ -25,6 +27,7 @@ class Modal(val parent: Block) : BaseElement {
     private var dModalDialog: HTMLDivElement
     var dModalBody: HTMLDivElement
     private val dModalContent: HTMLDivElement
+    private val closeButton: HTMLButtonElement
     private val escModalCallback = { event: Event ->
         val e = event as KeyboardEvent
         if (e.key == "Escape") {
@@ -54,7 +57,7 @@ class Modal(val parent: Block) : BaseElement {
             e.preventDefault()
             toggleFullscreen()
         }
-        val closeButton = document.createElement("button") as HTMLButtonElement
+        closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
         closeButton.className = "btn-close"
         closeButton.onclick = EventHandler { e ->
@@ -74,7 +77,7 @@ class Modal(val parent: Block) : BaseElement {
         parent.d.parentElement?.appendChild(dModal)
     }
 
-    fun open(htmlContent: String) {
+    fun open(htmlContent: String, reloadWhenClose: Boolean = false) {
         traceIndent("Modal::open $mId")
         dModalBody.innerHTML = htmlContent
         dModal.style.display = "block"
@@ -86,6 +89,13 @@ class Modal(val parent: Block) : BaseElement {
         modalBackdrop.id = "modal-backdrop-$mId"
         modalBackdrop.classList.add("modal-backdrop", "fade", "show")
         parent.d.parentElement!!.appendChild(modalBackdrop)
+
+        if (reloadWhenClose) {
+            closeButton.onclick = EventHandler { e ->
+                e.preventDefault()
+                processAjaxLink(null, RELOAD, parent)
+            }
+        }
     }
 
     fun close() {

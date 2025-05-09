@@ -3,6 +3,7 @@ package taack.ui.dump.html.form
 import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import taack.ui.EnumOptions
 import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.dsl.common.Style
@@ -174,11 +175,11 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, choices?.options?.find { it.key == current?.key }?.value ?: current?.value, null, null, disable, true).builder.setId(qualifiedName).putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, choices?.options?.find { it.key == current?.key }?.value ?: current?.value, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
         el.addChildren(inputHidden)
         el.addChildren(divError(qualifiedName))
         topElement
@@ -207,7 +208,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             String inputLabelId = hiddenInputId + "-label"
             HTMLDiv m2mParent = themeStartInputs(el).builder.addClasses('M2MParent').build() as HTMLDiv
             if (!disabled) m2mParent.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
-            HTMLInput input = new HTMLInput(InputType.STRING, it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
+            HTMLInput input = new HTMLInput(InputType.STRING, it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
             m2mParent.addChildren(input)
             if (!noLabel) m2mParent.addChildren(formLabelInput(inputLabelId, trI18n))
@@ -234,7 +235,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
 
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, val?.toString(), null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        HTMLInput input = new HTMLInput(InputType.STRING, val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString(), null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
@@ -307,7 +308,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
         HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses("wysiwyg-content", "markdown").setId(qualifiedName).build() as HTMLTextarea
         container.addChildren(textareaInput)
-        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses("wysiwyg-markdown-preview").build() as HTMLDiv
+        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses("wysiwyg-markdown-preview markdown-body").build() as HTMLDiv
         container.addChildren(preview)
         HTMLInput attachmentSelectInput = new HTMLInput(InputType.STRING, null, null, null, false, true).builder.setId("${qualifiedName}-attachment-select").addClasses(formControl).putAttribute('taackajaxformm2oaction', '/markdown/selectAttachment').build() as HTMLInput
         container.addChildren(attachmentSelectInput)

@@ -50,7 +50,6 @@ class FormAjaxFieldSpec extends FormVisitable {
      * @param action methodClosure pointing to the action
      * @param id id param
      * @param params additional params
-     * @param isAjax if true, the action is of ajax kind (either open a modal or updating part of the page, without reloading the page)
      */
     void innerFormAction(final MethodClosure action, final Long id = null, final Map params = null) {
         if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitInnerFormAction(null, Utils.getControllerName(action), action.method, id, params, ButtonStyle.SECONDARY)
@@ -58,6 +57,10 @@ class FormAjaxFieldSpec extends FormVisitable {
 
     void hiddenField(final FieldInfo field) {
         formVisitor.visitFormHiddenField(field)
+    }
+
+    void readOnly(final String i18n, String value) {
+        formVisitor.visitReadOnly(i18n, value)
     }
 
     void field(final String i18n = null, final FieldInfo field) {
@@ -93,7 +96,10 @@ class FormAjaxFieldSpec extends FormVisitable {
     }
 
     void fieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry) {
-        formVisitor.visitFormFieldFromMap(i18n, field, mapEntry)
+        formVisitor.visitFormFieldFromMap(i18n, field, mapEntry, null, null)
     }
 
+    void ajaxFieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry, final MethodClosure action, final FieldInfo<?>... fieldInfos) {
+        formVisitor.visitFormFieldFromMap(i18n, field, mapEntry, Utils.getControllerName(action), action?.method, fieldInfos)
+    }
 }

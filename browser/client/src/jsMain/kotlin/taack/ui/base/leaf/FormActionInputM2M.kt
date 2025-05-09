@@ -58,7 +58,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
@@ -80,7 +80,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         i2.name = inputName
         i2.value = key
         for (field in otherField) {
-            val taOrI = parent.f.querySelector("#${field.key}")
+            val taOrI = parent.f.querySelector("[id='${field.key}']")
             if (taOrI is HTMLInputElement) taOrI.value = field.value
             else if (taOrI is HTMLTextAreaElement) taOrI.value = field.value
         }

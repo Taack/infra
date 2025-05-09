@@ -12,6 +12,7 @@ import web.history.history
 import web.html.HTMLElement
 import web.http.RequestMethod
 import web.location.location
+import web.uievents.MouseButton
 import web.uievents.MouseEvent
 import web.url.URL
 import web.xhr.XMLHttpRequest
@@ -31,22 +32,30 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                 return url
             } else return URL("${location.protocol}//${location.host}")
         }
+
+        var lastUrlClicked: URL? = null
     }
 
     private val action: String? =
         a.attributes.getNamedItem("ajaxAction")?.value ?: a.attributes.getNamedItem("href")?.value
-    private val isHref = a.hasAttribute("href")
+    private val isHref = !a.hasAttribute("ajaxaction")
 
     init {
         trace("BaseAjaxAction::init $action $isHref")
-        if (!(action != null && action.contains("#")))
-            a.onclick = EventHandler { e -> onclickBaseAjaxAction(e) }
+        if (!(action != null && action.contains("#"))) {
+            a.onclick = EventHandler { e ->
+                if (e.button != MouseButton.AUXILIARY && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
+                    onclickBaseAjaxAction(e)
+                }
+            }
+        }
         else trace("BaseAjaxAction::init no onClick added")
     }
 
     private fun onclickBaseAjaxAction(e: MouseEvent) {
         e.preventDefault()
-        val targetUrl = createUrl(!isHref, action).toString()
+        lastUrlClicked = createUrl(!isHref, action)
+        val targetUrl = lastUrlClicked.toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
         //Display load spinner
         val loader = document.getElementById("taack-load-spinner")
@@ -82,7 +91,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                     document.close()
                 } else {
                     trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
-                    processAjaxLink(text, parent)
+                    processAjaxLink(lastUrlClicked, text, parent)
                 }
             }
         }

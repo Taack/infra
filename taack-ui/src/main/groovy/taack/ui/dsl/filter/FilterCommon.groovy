@@ -28,6 +28,26 @@ class FilterCommon {
         filterVisitor.visitFilterFieldExpressionBool(filterExpression)
     }
 
+    void filterFieldExpressionBool(final FilterExpression... filterExpressions) {
+        filterVisitor.visitFilterFieldExpressionBool(filterExpressions)
+    }
+
+    void orOp(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FilterCommon) final Closure closure) {
+        filterVisitor.visitOrOp()
+        closure.delegate = new SectionSpec(filterVisitor)
+        closure.call()
+        filterVisitor.visitOrOpEnd()
+
+    }
+
+    void andOp(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FilterCommon) final Closure closure) {
+        filterVisitor.visitAndOp()
+        closure.delegate = new SectionSpec(filterVisitor)
+        closure.call()
+        filterVisitor.visitAndOpEnd()
+
+    }
+
     void innerFilter(UiFilterSpecifier filterSpecifier, final FieldInfo... fields = null) {
         filterVisitor.visitInnerFilter(filterSpecifier, fields)
     }

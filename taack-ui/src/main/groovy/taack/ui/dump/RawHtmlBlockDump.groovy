@@ -114,7 +114,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
-        boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal && !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
+        boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal) //&& !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
         simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
     }
@@ -127,7 +127,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void setRenderTab(boolean isRender) {
-        renderTab = isRender
+        renderTab = isRender || parameter.target == Parameter.RenderingTarget.MAIL
     }
 
     @Override
@@ -320,16 +320,17 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.stayBlock('visitCloseModal')
         blockLog.topElement.addChildren(new HTMLAjaxCloseLastModal(id, value))
         for (FieldInfo fi : fields) {
-            if (fi.value) {
-                if (parameter.nf && fi.value instanceof Number)
-                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, parameter.nf.format(fi.value)))
-                else {
-                    blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, fi.value.toString()))
-                    if (GormEntity.isAssignableFrom(fi.fieldConstraint.field.type)) {
-                        blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', (fi.value as GormEntity).ident().toString()))
-                    }
-                }
+            String label
+            if (fi.value == null) {
+                label = ""
+            } else if (parameter.nf && fi.value instanceof Number) {
+                label = parameter.nf.format(fi.value)
+            } else {
+                label = fi.value.toString()
             }
+            blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName, label)) // for normal field
+            blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'String', label)) // for ajaxField whose first input is to display object label
+            blockLog.topElement.addChildren(new HTMLFieldInfo(fi.fieldName + 'Id', fi.value && fi.value instanceof GormEntity ? (fi.value as GormEntity).ident().toString() : label)) // for ajaxField whose second input is hidden to transfer object key value
         }
     }
 
@@ -362,7 +363,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTabsEnd() {
         exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
-        blockLog.topElement = block.tabs(oldParent, currentTabNames, "/$parameter.applicationTagLib.controllerName/$parameter.applicationTagLib.actionName${parameter.beanId ? "/" + parameter.beanId : ''}")
+        blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId))
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }
@@ -374,11 +375,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitModal() {
+    void visitModal(boolean reloadWhenClose) {
         enterBlock('visitModal modalId:' + modalId + ' isModalRefresh:' + isRefreshing)
         isModal = true
         parameter.isModal = true
-        HTMLAjaxModal modal = new HTMLAjaxModal(isRefreshing)
+        HTMLAjaxModal modal = new HTMLAjaxModal(isRefreshing, reloadWhenClose)
         blockLog.topElement.addChildren(modal)
         blockLog.topElement.setTaackTag(TaackTag.MODAL)
         blockLog.topElement = modal
@@ -447,7 +448,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
         futurCurrentAjaxBlockId = ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.MENU)
-        menu = new BootstrapMenu(blockLog)
+        menu = new BootstrapMenu(parameter.target == Parameter.RenderingTarget.MAIL, blockLog)
         blockLog.topElement = menu.menuStart(blockLog.topElement)
     }
 
@@ -533,7 +534,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             splitMenu()
         }
 
-        menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        if (parameter.target != Parameter.RenderingTarget.MAIL)
+            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+        else
+            menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
     }
 
     @Override

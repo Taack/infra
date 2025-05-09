@@ -31,7 +31,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     final ThemableTable themableTable
 
     private int indent = -1
-    private boolean rowIndentIsExpended = false
+    private Map<Integer, Boolean> rowIndentIsExpended = [:]
     int colCount = 0
     boolean isInCol = false
     Style rowStyle = null
@@ -54,7 +54,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         this.initialForm = new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}")
     }
 
-    static final <T> String dataFormat(T value, String format) {
+    static final <T> String dataFormat(T value, String format, Locale locale = null) {
         if (value == null) return ''
         switch (value.class) {
             case BigDecimal:
@@ -64,10 +64,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
                 return sdf.format(value)
             case Enum:
-                String i18n = tr("enum.value.${value.toString()}", null)
+                String i18n = tr("enum.value.${value.toString()}", locale)
                 return i18n != "enum.value.${value.toString()}" ? i18n : value.toString()
             case [Boolean, boolean]:
-                return tr("default.boolean.${value.toString()}", null)
+                return tr("default.boolean.${value.toString()}", locale)
             default:
                 return TaackUiEnablerService.sanitizeString(value.toString())
         }
@@ -114,6 +114,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         initialForm.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
         blockLog.exitBlock('visitTableEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
+
+        if (initalSortingOrder) {
+            blockLog.topElement.children[0].getBuilder().putAttribute("initialSortField", initalSortingOrder.aValue)
+        }
     }
 
     @Override
@@ -178,11 +182,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             tr.attributes.put('taackTableRowGroup', indent.toString())
             tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
             if (hasChildren) {
-                tr.attributes.put('taackTableRowIsExpended', rowIndentIsExpended.toString())
+                tr.attributes.put('taackTableRowIsExpended', rowIndentIsExpended[indent].toString())
             }
-        }
-        if (indent > 0 && !rowIndentIsExpended && parameter.target == Parameter.RenderingTarget.WEB) {
-            tr.setStyleDescriptor(new DisplayNone())
+            if (rowIndentIsExpended[indent - 1] == false && parameter.target == Parameter.RenderingTarget.WEB) {
+                tr.setStyleDescriptor(new DisplayNone())
+            }
         }
         blockLog.topElement.builder.addChildren(tr)
         blockLog.topElement = tr
@@ -200,7 +204,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowIndent(Boolean isExpended = false) {
         blockLog.enterBlock('visitRowIndent')
         indent++
-        rowIndentIsExpended = isExpended
+        rowIndentIsExpended[indent] = rowIndentIsExpended[indent - 1] == false ? false : isExpended
     }
 
     @Override
@@ -290,7 +294,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
                 new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
-                        new HTMLTxtContent("<a>${i18n}</a>")
+                        new HTMLTxtContent(i18n)
                 ).build()
         )
         if (addColumn) visitColumnEnd()
@@ -328,13 +332,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, id ?: parameter.params.long('id')))//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
         } else {
-            visitRowField(dataFormat(fieldInfo?.value, format), style)
+            visitRowField(dataFormat(fieldInfo?.value, format, parameter.lcl), style)
         }
     }
 
     @Override
     void visitRowField(final GetMethodReturn fieldInfo, final String format, final Style style) {
-        visitRowField(dataFormat(fieldInfo?.value, format), style)
+        visitRowField(dataFormat(fieldInfo?.value, format, parameter.lcl), style)
     }
 
     @Override
@@ -355,10 +359,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowAction(String i18n, ActionIcon actionIcon, Long id, String label, Map<String, ?> params, Boolean isAjax) {
+    void visitRowAction(String i18n, ActionIcon actionIcon, String key, String label) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        visitRowAction(i18n, actionIcon, 'progress', 'echoSelect', id, [label: label], isAjax)
+        visitRowAction(i18n, actionIcon, 'progress', 'echoSelect', null, [key: key, label: label], true)
         if (addColumn) visitColumnEnd()
     }
 

@@ -11,32 +11,38 @@ class BootstrapLayout {
 
     final BlockLog blockLog
     static int tabIdsConter = 0
-    final int tabIds
+    int tabIds
     final Parameter parameter
 
     BootstrapLayout(final BlockLog blockLog, Parameter parameter = null) {
         this.blockLog = blockLog
-        this.parameter = parameter
-        tabIdsConter ++
-        tabIds = this.parameter?.tabId == null ? tabIdsConter : this.parameter.tabId
+        this.parameter = parameter ?: new Parameter()
+
+        tabIdsConter++
+        tabIds = this.parameter.tabId == null ? tabIdsConter : this.parameter.tabId
         if (tabIdsConter > 32_000) tabIdsConter = 0
     }
 
     IHTMLElement tabs(IHTMLElement topElement, List<String> names, String action = null) {
-        Integer tabIndex = this.parameter?.tabIndex ?: 0
+        Integer tabIndex = this.parameter.tabIndex ?: 0
         IHTMLElement[] elements = new IHTMLElement[names.size()]
-        names.eachWithIndex{ String entry, int i ->
-            elements[i] = new HTMLLi().builder.addClasses('nav-item').putAttribute('role', 'presentation').addChildren(
-                    new HTMLButton(entry).builder.addClasses('nav-link', i == tabIndex ? 'active' : '')
-                            .putAttribute('data-bs-toggle', 'tab')
-                            .putAttribute('role', 'tab')
-                            .putAttribute('data-bs-target', "#tab-$tabIds-$i-pane")
-                            .putAttribute('aria-selected', i == tabIndex ? 'true' : 'false')
-                            .putAttribute('aria-controls', "tab-$tabIds-$i-pane")
-                            .putAttribute("action", action)
-                            .setId("tab-$tabIds-$i").build()
-            ).build()
-        }
+        if (parameter.target != Parameter.RenderingTarget.MAIL)
+            names.eachWithIndex { String entry, int i ->
+                elements[i] = new HTMLLi().builder.addClasses('nav-item').putAttribute('role', 'presentation').addChildren(
+                        new HTMLButton(entry).builder.addClasses('nav-link', i == tabIndex ? 'active' : '')
+                                .putAttribute('data-bs-toggle', 'tab')
+                                .putAttribute('role', 'tab')
+                                .putAttribute('data-bs-target', "#tab-$tabIds-$i-pane")
+                                .putAttribute('aria-selected', i == tabIndex ? 'true' : 'false')
+                                .putAttribute('aria-controls', "tab-$tabIds-$i-pane")
+                                .putAttribute("action", action)
+                                .setId("tab-$tabIds-$i").build()
+                ).build()
+            }
+        else
+            names.eachWithIndex { String entry, int i ->
+                elements[i] = new HTMLDiv().builder.addChildren(new HTMLTxtContent(entry)).build()
+            }
 
         IHTMLElement tabsContent = new HTMLDiv().builder.addClasses('tab-content').setId("tab-content-$tabIds").build()
 
@@ -59,7 +65,7 @@ class BootstrapLayout {
 
         Integer tabIndex = this.parameter?.tabIndex ?: 0
         if (occ == tabIndex)
-            tabContent.addClasses('show', 'active')
+            tabContent.addClasses('show', 'active', 'loaded')
 
         topElement.builder.addChildren(
                 tabContent
@@ -78,4 +84,8 @@ class BootstrapLayout {
         topElement.children.last()
     }
 
+    void setTabIdAndCounter(int i) {
+        tabIds = i
+        tabIdsConter = tabIds
+    }
 }

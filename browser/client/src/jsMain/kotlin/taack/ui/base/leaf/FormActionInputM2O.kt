@@ -52,19 +52,19 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         // TODO: change to Post (see FilterActionButton.kt)
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
     }
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionInputM2O::modalReturnSelect $key $value")
+        trace("FormActionInputM2O::modalReturnSelect $key $value $otherField")
         i.value = value
         val i2 = i.parentElement!!.querySelector("input[type=hidden]")!! as HTMLInputElement
         i2.value = key
         for (field in otherField) {
-            val taOrI = parent.f.querySelector("#${field.key}")
+            val taOrI = parent.f.querySelector("[id='${field.key}']")
             if (taOrI is HTMLInputElement) taOrI.value = field.value
             else if (taOrI is HTMLTextAreaElement) taOrI.value = field.value
         }

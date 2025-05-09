@@ -53,14 +53,14 @@ class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectE
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(xhr.responseText, parent.parent.parent, ::modalReturnSelect)
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
     }
 
     private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionSelectM2O::modalReturnSelect $key $value")
+        trace("FormActionSelectM2O::modalReturnSelect $key $value $otherField")
         val opt = document.createElement("option") as HTMLOptionElement
         opt.value = key
         opt.text = value

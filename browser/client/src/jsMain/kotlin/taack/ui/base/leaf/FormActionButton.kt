@@ -67,7 +67,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 document.write(t)
                 document.close()
             } else {
-                Helper.processAjaxLink(t, parent, ::modalReturnSelect)
+                Helper.processAjaxLink(null, t, parent, ::modalReturnSelect)
             }
         }
         xhr.open(RequestMethod.POST, b.formAction)
