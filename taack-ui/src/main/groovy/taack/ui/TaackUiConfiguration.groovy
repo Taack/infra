@@ -8,19 +8,22 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties("taack-ui")
 class TaackUiConfiguration {
+    String defaultTitle
+    String logoFileName
+    int logoWidth
+    int logoHeight
 
-    static String defaultTitle = 'Taack Framework'
-    static String logoFileName = 'logo-taack-web.svg'
-    static int logoWidth = 70
-    static int logoHeight = 60
+    boolean fixedTop
+    boolean hasMenuLogin
+    boolean outlineContainer
+    String bgColor
+    String fgColor
+    String bodyBgColor
 
-    static boolean hasMenuLogin = true
-    static boolean outlineContainer = false
-    static boolean fixedTop = false
-    static String bgColor = '#05294c'
-    static String fgColor = '#eeeeee'
-    static String bodyBgColor = '#fff'
-
-    static String solrUrl = 'http://localhost:8983/solr/taack'
-    static Boolean disableSecurity = false
+    String root
+    String resources
+    String javaPath
+    String plantUmlPath
+    String solrUrl
+    Boolean disableSecurity = false
 }

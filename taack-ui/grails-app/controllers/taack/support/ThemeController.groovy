@@ -2,6 +2,7 @@ package taack.support
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
+import jakarta.servlet.http.Cookie
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackUiService
 import taack.render.ThemeService
@@ -11,7 +12,6 @@ import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dump.html.theme.ThemeSize
 
-import javax.servlet.http.Cookie
 
 // TODO: Develop the UI
 @GrailsCompileStatic

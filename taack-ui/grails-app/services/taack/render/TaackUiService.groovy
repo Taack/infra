@@ -7,6 +7,7 @@ import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.core.io.ResourceLocator
 import org.grails.datastore.gorm.GormEntity
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
-import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.method.support.ModelAndViewContainer
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUi
 import taack.ui.TaackUiConfiguration
@@ -29,7 +30,6 @@ import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.pdf.RawHtmlPrintableDump
 
-import javax.annotation.PostConstruct
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -62,7 +62,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     ThemeService themeService
 
     @Autowired
-    TaackUiConfiguration taackUiPluginConfiguration
+    TaackUiConfiguration taackUiConfiguration
 
     @Autowired
     PageRenderer g
@@ -180,17 +180,20 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
-            return new ModelAndView("/taackUi/block", [
+            ModelAndViewContainer mvc = new ModelAndViewContainer()
+            mvc.setViewName("/taackUi/block")
+            mvc.addAllAttributes([
                     themeSize      : themeSize,
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
                     block          : output.toString(),
                     menu           : visitMenu(menu),
-                    conf           : taackUiPluginConfiguration,
+                    conf           : taackUiConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                     bootstrapJsTag : bootstrapJsTag,
                     bootstrapCssTag: bootstrapCssTag
             ])
+            mvc
         }
 
     }
@@ -279,17 +282,20 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        return new ModelAndView("/taackUi/block", [
+        ModelAndViewContainer mvc = new ModelAndViewContainer()
+        mvc.setViewName("/taackUi/block")
+        mvc.addAllAttributes([
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
                 block          : html,
                 menu           : visitMenu(menu),
-                conf           : taackUiPluginConfiguration,
+                conf           : taackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
         ])
+        mvc
     }
 
     /**
@@ -306,17 +312,20 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        return new ModelAndView(viewName, [
+        ModelAndViewContainer mvc = new ModelAndViewContainer()
+        mvc.setViewName(viewName)
+        mvc.addAllAttributes([
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
                 block          : "",
                 menu           : visitMenu(menu),
-                conf           : taackUiPluginConfiguration,
+                conf           : taackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
         ] + model)
+        mvc
     }
 
     /**
@@ -402,7 +411,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         String html = g.render template: "/taackUi/block-pdf", model: [
                 block          : blockStream.toString(),
                 css            : css.toString(),
-                root           : taackUiPluginConfiguration.root,
+                root           : taackUiConfiguration.root,
                 headerHeight   : htmlPdf.headerHeight,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
@@ -588,7 +597,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         htmlPdf.getOutput(output)
         String html = g.render template: "/taackUi/block-mail", model: [
                 block: output.toString(),
-                root : taackUiPluginConfiguration.root
+                root : taackUiConfiguration.root
         ]
         html
     }

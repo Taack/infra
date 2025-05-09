@@ -46,9 +46,12 @@ final class TaackSolrSearchService implements WebAttributes {
 
     private SolrClient solrClient
 
+    @Autowired
+    TaackUiConfiguration taackUiConfiguration
+
     @PostConstruct
     void init() {
-        solrClient = new Http2SolrClient.Builder(TaackUiConfiguration.solrUrl).build()
+        solrClient = new Http2SolrClient.Builder(taackUiConfiguration.solrUrl).build()
     }
 
     final UiBlockSpecifier search(String q, MC search, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, Class<? extends GormEntity>... classes) {

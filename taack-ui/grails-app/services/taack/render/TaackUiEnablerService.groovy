@@ -5,6 +5,7 @@ import grails.util.Environment
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
+import org.owasp.html.PolicyFactory
 import org.owasp.html.Sanitizers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
@@ -44,6 +45,9 @@ class TaackUiEnablerService implements WebAttributes {
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
     def policy
+
+    @Autowired
+    TaackUiConfiguration taackUiConfiguration
 
     @PostConstruct
     void init() {
@@ -96,7 +100,7 @@ class TaackUiEnablerService implements WebAttributes {
         boolean isAllowed = true
         switch (Environment.current) {
             case Environment.DEVELOPMENT:
-                if (!TaackUiConfiguration.disableSecurity)
+                if (!taackUiConfiguration.disableSecurity)
                     isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
                 break
             case Environment.PRODUCTION:
