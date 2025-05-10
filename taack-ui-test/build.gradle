@@ -115,9 +115,9 @@ application {
     mainClass.set("taack.ui.test.Application")
 }
 
-java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-}
+//java {
+//    sourceCompatibility = JavaVersion.toVersion("17")
+//}
 
 assets {
     minifyJs = true

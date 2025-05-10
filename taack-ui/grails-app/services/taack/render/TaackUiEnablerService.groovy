@@ -9,6 +9,7 @@ import org.owasp.html.PolicyFactory
 import org.owasp.html.Sanitizers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
 import taack.ui.TaackUiConfiguration
@@ -91,12 +92,12 @@ class TaackUiEnablerService implements WebAttributes {
      * @return true if allowed, false if not
      */
     boolean hasAccess(final String controller, final String action, final Long id, final Map params) {
-        def authContext = SecurityContextHolder.getContext().getAuthentication()
+        Authentication authContext = SecurityContextHolder.getContext().getAuthentication()
         if (!authContext?.authenticated) {
             return true
         }
 
-        def path = '/' + controller + '/' + action
+        String path = '/' + controller + '/' + action
         boolean isAllowed = true
         switch (Environment.current) {
             case Environment.DEVELOPMENT:

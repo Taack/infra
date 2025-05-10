@@ -99,7 +99,7 @@ dependencies {
     implementation "org.asciidoctor:asciidoctorj-api:${asciidoctorJ}"
 }
 
-compileJava.options.release = 17
+//compileJava.options.release = 17
 
 if (rootProject.name != 'infra') {
     grails {

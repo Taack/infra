@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration
 
 @CompileStatic
 @Configuration
-@ConfigurationProperties("taack-ui")
+@ConfigurationProperties(prefix = "taack-ui")
 class TaackUiConfiguration {
     String defaultTitle
     String logoFileName
