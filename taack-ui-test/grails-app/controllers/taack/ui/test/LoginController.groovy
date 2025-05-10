@@ -44,16 +44,22 @@ class LoginController extends LoginController implements GrailsConfigurationAwar
 	def auth() {
 		ConfigObject conf = getConf()
 
+		println "COUCOU"
+
 		if ((springSecurityService as SpringSecurityService).isLoggedIn()) {
+			println "COUCOU1"
 			redirect uri: conf.successHandler["defaultTargetUrl"]
 			return
 		}
+		println "COUCOU2"
 
 		String postUrl = request.contextPath + conf.apf["filterProcessesUrl"]
+		println "COUCOU3 $postUrl"
 
 		User user = new User()
 
 		UiFormSpecifier f = new UiFormSpecifier().ui(user) {
+			println "COUCOU4 $user"
 			section 'Credentials', {
 				field user.username_
 				field user.password_
@@ -61,6 +67,7 @@ class LoginController extends LoginController implements GrailsConfigurationAwar
 			formAction('Login', postUrl)
 		}
 
+		println "COUCOU5"
 		taackUiService.show(new UiBlockSpecifier().ui {
 			form f
 		}, buildMenu())

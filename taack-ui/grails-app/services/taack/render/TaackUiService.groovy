@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
-import org.springframework.web.method.support.ModelAndViewContainer
+import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
 import taack.ui.TaackUi
 import taack.ui.TaackUiConfiguration
@@ -180,9 +180,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
-            ModelAndViewContainer mvc = new ModelAndViewContainer()
-            mvc.setViewName("/taackUi/block")
-            mvc.addAllAttributes([
+            ModelAndView mv = new ModelAndView("/taackUi/blockNoLayout", [
                     themeSize      : themeSize,
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
@@ -193,7 +191,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     bootstrapJsTag : bootstrapJsTag,
                     bootstrapCssTag: bootstrapCssTag
             ])
-            mvc
+            mv
         }
 
     }
@@ -260,11 +258,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null, String... paramsToKeep) {
         if (!block) return
         if (menu && !params.containsKey('refresh') && !params.containsKey('targetAjaxBlockId')) params.remove('isAjax')
-
         if (params.boolean('isAjax')) {
             render visit(block, paramsToKeep)
         } else {
-            return visitAndRender(menu, block, paramsToKeep)
+            visitAndRender(menu, block, paramsToKeep)
         }
     }
 
@@ -282,9 +279,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        ModelAndViewContainer mvc = new ModelAndViewContainer()
-        mvc.setViewName("/taackUi/block")
-        mvc.addAllAttributes([
+        ModelAndView mv = new ModelAndView("/taackUi/block", [
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
@@ -295,7 +290,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
         ])
-        mvc
+        mv
     }
 
     /**
@@ -312,9 +307,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        ModelAndViewContainer mvc = new ModelAndViewContainer()
-        mvc.setViewName(viewName)
-        mvc.addAllAttributes([
+        ModelAndView mv = new ModelAndView(viewName, [
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
@@ -325,7 +318,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
         ] + model)
-        mvc
+        mv
     }
 
     /**
