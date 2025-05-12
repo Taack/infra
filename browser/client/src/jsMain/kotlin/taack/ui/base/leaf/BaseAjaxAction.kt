@@ -67,31 +67,32 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
         }
 
         xhr.onloadend = EventHandler { ev ->
-            ev.preventDefault()
-            trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}'")
-            loader?.classList?.add("tck-hidden")
-            if (xhr.responseType == XMLHttpRequestResponseType.blob) {
-                val contentDispo = xhr.getResponseHeader("Content-Disposition")
-                if (contentDispo != null) {
-                    val fileName =
-                        Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
-                    if (fileName != null) {
-                        trace("saveOrOpenBlog $fileName")
-                        saveOrOpenBlob(xhr.response as Blob, fileName)
+            trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}' status: '${xhr.status}'")
+            if (xhr.status == 200.toShort()) {
+                ev.preventDefault()
+                loader?.classList?.add("tck-hidden")
+                if (xhr.responseType == XMLHttpRequestResponseType.blob) {
+                    val contentDispo = xhr.getResponseHeader("Content-Disposition")
+                    if (contentDispo != null) {
+                        val fileName =
+                            Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
+                        if (fileName != null) {
+                            trace("saveOrOpenBlog $fileName")
+                            saveOrOpenBlob(xhr.response as Blob, fileName)
+                        }
                     }
-                }
-            } else {
-                val text = xhr.responseText
-                if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
-                    trace("Full webpage ...|$action|${document.title}|${document.documentURI}")
-                    history.pushState("{}", document.title, targetUrl)
-                    trace("Setting location.href: $targetUrl")
-                    location.href = targetUrl
-                    document.write(text)
-                    document.close()
                 } else {
-                    trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
-                    processAjaxLink(lastUrlClicked, text, parent)
+                    val text = xhr.responseText
+                    if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
+                        trace("Full webpage ...|$action|${document.title}|${document.documentURI}|${xhr.responseURL}")
+                        history.pushState("{}", document.title, xhr.responseURL)
+                        location.href = xhr.responseURL
+                        document.write(text)
+                        document.close()
+                    } else {
+                        trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
+                        processAjaxLink(lastUrlClicked, text, parent)
+                    }
                 }
             }
         }
