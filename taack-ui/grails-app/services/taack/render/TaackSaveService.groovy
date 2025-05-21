@@ -2,6 +2,7 @@ package taack.render
 
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBinder
 import org.codehaus.groovy.runtime.MethodClosure as MC
@@ -16,10 +17,12 @@ import taack.ast.type.FieldInfo
 import taack.domain.IDomainHistory
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.helper.Utils
+import taack.user.TaackUser
 
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
     TaackUiService taackUiService
+    SpringSecurityService springSecurityService
 
     private final static Map<String, Closure> fieldCustomSavingClosures = [:]
 
@@ -129,17 +132,17 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c3 = System.currentTimeMillis()
 
-//        // Todo
-//        User currentUser = User.read(springSecurityService.currentUserId as Long)
-//        if (gormEntity.hasChanged()) {
-//            if (gormEntity.hasProperty("userCreated") && gormEntity["userCreated"] == null) {
-//                gormEntity["userCreated"] = currentUser
-//            }
-//
-//            if (gormEntity.hasProperty("userUpdated")) {
-//                gormEntity["userUpdated"] = currentUser
-//            }
-//        }
+        try {
+            TaackUser currentUser = springSecurityService.currentUser as TaackUser
+            if (gormEntity.hasChanged()) {
+                if (gormEntity.hasProperty("userCreated") && gormEntity["userCreated"] == null) {
+                    gormEntity["userCreated"] = currentUser
+                }
+                if (gormEntity.hasProperty("userUpdated")) {
+                    gormEntity["userUpdated"] = currentUser
+                }
+            }
+        } catch (ignored) {}
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
