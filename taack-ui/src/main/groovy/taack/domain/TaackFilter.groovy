@@ -234,7 +234,12 @@ final class TaackFilter<T extends GormEntity<T>> {
                             occ++
                         }
                     } else if (filterExpression.value instanceof Collection) {
-                        where << ("sc.${fieldName} in :${'npfe' + occ}" as String)
+                        Class gClass = filterExpression.operand?.last()?.fieldConstraint?.field?.type
+                        if (gClass && GormEntity.isAssignableFrom(gClass)) {
+                            where << ("sc.${fieldName}.id in :${'npfe' + occ}" as String)
+                        } else {
+                            where << ("sc.${fieldName} in :${'npfe' + occ}" as String)
+                        }
                         namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
@@ -418,7 +423,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         } else
             filter = filter.findAll {
                 (filterMeta.contains(it.key) || (fieldNames.contains(it.key) && !(it.value instanceof Map))) ||
-                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous')  && !it.key.startsWith('ajaxParams')) ||
+                        (it.key.contains('.') && !it.key.endsWith('.id') && !it.key.contains('Default') && !it.key.startsWith('visitInnerFilterAnonymous') && !it.key.startsWith('ajaxParams')) ||
                         (it.key.startsWith('_reverse') || it.key.startsWith('_extension_'))
             }
 
