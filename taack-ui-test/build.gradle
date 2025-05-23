@@ -33,30 +33,30 @@ repositories {
     maven { url "https://repo.grails.org/grails/core/" }
 }
 
-configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
-}
+//configurations {
+//    developmentOnly
+//    runtimeClasspath {
+//        extendsFrom developmentOnly
+//    }
+//}
 
-dependencyManagement {
-    dependencies {
-        dependency "org.apache.solr:solr-solrj:${solrj}"
-
-        // 9.4.53.v20231009
-        dependency "org.eclipse.jetty.http2:http2-common:${jetty}"
-        dependency "org.eclipse.jetty.http2:http2-client:${jetty}"
-        dependency "org.eclipse.jetty.http2:http2-hpack:${jetty}"
-        dependency "org.eclipse.jetty.http2:http2-http-client-transport:${jetty}"
-        dependency "org.eclipse.jetty:jetty-alpn-client:${jetty}"
-        dependency "org.eclipse.jetty:jetty-http:${jetty}"
-        dependency "org.eclipse.jetty:jetty-io:${jetty}"
-        dependency "org.eclipse.jetty:jetty-util:${jetty}"
-        dependency "org.eclipse.jetty:jetty-client:${jetty}"
-        dependency "org.eclipse.jetty:jetty-alpn-java-client:${jetty}"
-    }
-}
+//dependencyManagement {
+//    dependencies {
+//        dependency "org.apache.solr:solr-solrj:${solrj}"
+//
+//        // 9.4.53.v20231009
+//        dependency "org.eclipse.jetty.http2:http2-common:${jetty}"
+//        dependency "org.eclipse.jetty.http2:http2-client:${jetty}"
+//        dependency "org.eclipse.jetty.http2:http2-hpack:${jetty}"
+//        dependency "org.eclipse.jetty.http2:http2-http-client-transport:${jetty}"
+//        dependency "org.eclipse.jetty:jetty-alpn-client:${jetty}"
+//        dependency "org.eclipse.jetty:jetty-http:${jetty}"
+//        dependency "org.eclipse.jetty:jetty-io:${jetty}"
+//        dependency "org.eclipse.jetty:jetty-util:${jetty}"
+//        dependency "org.eclipse.jetty:jetty-client:${jetty}"
+//        dependency "org.eclipse.jetty:jetty-alpn-java-client:${jetty}"
+//    }
+//}
 
 dependencies {
     implementation platform("org.grails:grails-bom:$grailsVersion")
@@ -111,9 +111,9 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-application {
-    mainClass.set("taack.ui.test.Application")
-}
+//application {
+//    mainClass.set("taack.ui.test.Application")
+//}
 
 //java {
 //    sourceCompatibility = JavaVersion.toVersion("17")
@@ -124,10 +124,10 @@ assets {
     minifyCss = true
 }
 
-tasks.withType(Test) {
-    useJUnitPlatform()
-    systemProperty "geb.env", System.getProperty('geb.env')
-    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
-    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
-    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
-}
+//tasks.withType(Test) {
+//    useJUnitPlatform()
+//    systemProperty "geb.env", System.getProperty('geb.env')
+//    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
+//    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
+//    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
+//}
