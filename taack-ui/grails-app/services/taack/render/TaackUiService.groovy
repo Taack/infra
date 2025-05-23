@@ -572,7 +572,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final void cleanForm() {
         if (isProcessingForm())
             params.removeAll { k, v ->
-                !["action", "controller"].contains(k)
+                !["action", "controller", "isAjax"].contains(k)
             }
     }
 
