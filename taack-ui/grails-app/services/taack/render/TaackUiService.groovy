@@ -3,6 +3,7 @@ package taack.render
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
@@ -28,6 +29,7 @@ import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
 import taack.ui.dump.pdf.RawHtmlPrintableDump
+import taack.user.TaackUser
 
 import javax.annotation.PostConstruct
 /**
@@ -60,6 +62,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
     ThemeService themeService
+    SpringSecurityService springSecurityService
 
     @Autowired
     TaackUiConfiguration taackUiPluginConfiguration
@@ -157,6 +160,14 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         output.toString()
     }
 
+    private TaackUser getCurrentUser() {
+        try {
+            return springSecurityService.currentUser as TaackUser
+        } catch (ignored) {
+            return null
+        }
+    }
+
     /**
      * Render a block.
      *
@@ -189,7 +200,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     conf           : taackUiPluginConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                     bootstrapJsTag : bootstrapJsTag,
-                    bootstrapCssTag: bootstrapCssTag
+                    bootstrapCssTag: bootstrapCssTag,
+                    currentUser    : currentUser
             ])
         }
 
@@ -288,7 +300,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 conf           : taackUiPluginConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
-                bootstrapCssTag: bootstrapCssTag
+                bootstrapCssTag: bootstrapCssTag,
+                currentUser    : currentUser
         ])
     }
 
@@ -315,7 +328,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 conf           : taackUiPluginConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
-                bootstrapCssTag: bootstrapCssTag
+                bootstrapCssTag: bootstrapCssTag,
+                currentUser    : currentUser
         ] + model)
     }
 

@@ -1,4 +1,4 @@
-<%@ page import="taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="taack.app.TaackLinkClass; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -69,12 +69,41 @@
                         </sec:ifSwitched>
                         <sec:ifNotSwitched>
                             <li class="nav-item dropdown">
+                                <%
+                                    TaackUser user = currentUser
+                                    List<GormEntity> notifications = user?.getUnreadRelatedDataList() ?: []
+                                %>
                                 <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
-                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                   ${!notifications.isEmpty() ? "unread-notification-number=${notifications.size()}" : ""}>
                                     <sec:username/>
                                 </a>
 
-                                <ul class="dropdown-menu" aria-labelledby="navbarUser">
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUser" style="text-align: center;">
+                                    <g:if test="${!notifications.isEmpty()}">
+                                        <li class="nav-item dropdown">
+                                            <span class="user-notification-header">
+                                                <b>Notification (${notifications.size()})</b>
+                                            </span>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <div class="user-notification-body">
+                                                <g:each in="${notifications.groupBy { TaackAppRegisterService.getTaackLinkClass(it.class.name) }}">
+                                                    <%
+                                                        TaackLinkClass t = it.key as TaackLinkClass
+                                                        List<GormEntity> objects = it.value as List<GormEntity>
+                                                    %>
+                                                    <div class="group-header"><g:message code="${t != null ? "${t.controller}.app" : "enum.value.OTHER"}" /> (${objects.size()})</div>
+                                                    <g:each in="${objects}" var="object">
+                                                        <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${t.controller}&objectAction=${t.action}&objectClass=${object.class.name}&objectId=${object.ident()}"
+                                                           class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(object.toString())}">
+                                                            ${object.toString()}
+                                                        </a>
+                                                    </g:each>
+                                                </g:each>
+                                            </div>
+                                        </li>
+                                    </g:if>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link ajaxLink taackAjaxLink"
                                            ajaxaction="/theme?isAjax=true"><g:message code="theme.label"/></a>

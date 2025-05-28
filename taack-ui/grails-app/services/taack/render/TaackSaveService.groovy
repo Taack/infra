@@ -13,6 +13,7 @@ import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.Errors
+import taack.app.TaackAppRegisterService
 import taack.ast.type.FieldInfo
 import taack.domain.IDomainHistory
 import taack.ui.dsl.UiBlockSpecifier
@@ -146,17 +147,23 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
-            gormEntity.save(failsOnError: true)
+            gormEntity.save(flush: true, failsOnError: true)
         }
 
         long c5 = System.currentTimeMillis()
 
         log.info "constrainedProperties: ${c2 - c1}ms, bindingName: ${c3 - c2}ms, gormEntity.hasChanged: ${c4 - c3}ms, save: ${c5 - c4}ms: ELAPSED:${c5 - c1}ms"
 
-        if (!doNotSave && gormEntity.hasErrors()) {
-            log.error "${gormEntity.errors}"
-            return gormEntity
-        } else return gormEntity
+        if (!doNotSave) {
+            if (gormEntity.hasErrors()) {
+                log.error "${gormEntity.errors}"
+            } else if (!id) {
+                TaackAppRegisterService.getTaackLinkClass(gormEntity.class.name)?.notificationUserListWhenCreating?.call(gormEntity)?.each { TaackUser u ->
+                    u.addToUnreadRelatedDataList(gormEntity)
+                }
+            }
+        }
+        return gormEntity
     }
 
     def redirectOrRenderErrors(final GormEntity gormEntity, final MC redirectAction = null) {

@@ -483,3 +483,52 @@ li:hover > .nested-dropdown{
     border-left: 5px solid #333;
 }
 
+#navbarUser {
+    position: relative;
+}
+
+#navbarUser[unread-notification-number]::before{
+    content: attr(unread-notification-number);
+    position: absolute;
+    top: 0;
+    right: 1em;
+    min-width: 18px;
+    padding: 0 3px;
+    font-size: 70%;
+    border-radius: 9px;
+    text-align: center;
+    background-color: red;
+}
+
+.user-notification-header {
+    color: #00C4C4;
+    font-size: small;
+}
+
+.user-notification-body {
+    background-color: white;
+    width: 150px;
+    max-height: 300px;
+    text-align: left;
+    white-space: nowrap;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    margin: 0 .5em;
+    padding: 3px;
+}
+
+.user-notification-body .group-header {
+    color: darkgrey;
+    font-weight: bold;
+    font-size: 12px;
+    padding-top: 3px;
+}
+
+.user-notification-body .group-item {
+    color: black !important;
+    padding: 5px;
+}
+
+.user-notification-body .group-item:hover {
+    background: lightgrey;
+}
