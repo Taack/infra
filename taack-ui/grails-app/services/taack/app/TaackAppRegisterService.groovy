@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull
 import taack.render.TaackUiService
 import taack.ui.EnumOption
 import taack.ui.dsl.helper.Utils
+import taack.user.TaackUser
 
 @CompileStatic
 final class TaackApp implements Comparable {
@@ -42,10 +43,12 @@ final class TaackApp implements Comparable {
 final class TaackLinkClass {
     final Class<? extends GormEntity> linkClass
     final MethodClosure showMethod
+    final Closure<List<TaackUser>> notificationUserListWhenCreating
 
-    TaackLinkClass(Class<? extends GormEntity> linkClass, MethodClosure showMethod) {
+    TaackLinkClass(Class<? extends GormEntity> linkClass, MethodClosure showMethod, Closure<List<TaackUser>> notificationUserListWhenCreating = null) {
         this.linkClass = linkClass
         this.showMethod = showMethod
+        this.notificationUserListWhenCreating = notificationUserListWhenCreating
     }
 
     String getController() {
@@ -64,6 +67,10 @@ class TaackAppRegisterService {
 
     static void register(TaackApp app, TaackLinkClass... linkClasses) {
         taackApps.add(app)
+        taackLinkClasses.addAll(linkClasses)
+    }
+
+    static void register(TaackLinkClass... linkClasses) {
         taackLinkClasses.addAll(linkClasses)
     }
 

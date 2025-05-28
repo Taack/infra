@@ -1,24 +1,37 @@
 package taack.domain
 
+import attachment.config.AttachmentContentType
 import attachment.config.AttachmentContentTypeCategory
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
+import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import org.apache.commons.io.FileUtils
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import attachment.Attachment
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.taack.IAttachmentConverter
 import org.taack.IAttachmentPreviewConverter
 import org.taack.IAttachmentShowIFrame
+import taack.render.TaackSaveService
 import taack.ui.TaackUiConfiguration
 
 import javax.annotation.PostConstruct
+import javax.imageio.ImageIO
+import javax.imageio.ImageReader
+import javax.imageio.stream.FileImageInputStream
+import javax.imageio.stream.ImageInputStream
+import java.security.MessageDigest
 
 @GrailsCompileStatic
-class TaackAttachmentService implements WebAttributes, DataBinder {
+class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttributes {
     final Object imageConverter = new Object()
+
+    static Map<String, File> filePaths = [:]
 
     TaackSearchService taackSearchService
     @Autowired
@@ -37,6 +50,10 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
 
     String getAttachmentTxtPath() {
         intranetRoot + "/attachment/txt"
+    }
+
+    String getAttachmentStorePath() {
+        intranetRoot + "/attachment/store"
     }
 
     enum PreviewFormat {
@@ -163,6 +180,60 @@ class TaackAttachmentService implements WebAttributes, DataBinder {
         for (PreviewFormat f : PreviewFormat.values()) {
             FileUtils.forceMkdir(new File(previewPath(f)))
         }
+
+        TaackSaveService.registerFieldCustomSavingClosures("filePath", { GormEntity gormEntity, Map params ->
+            if (gormEntity.hasProperty("filePath")) {
+                final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles("filePath")
+                final mf = mfl.first()
+                if (mf.size > 0) {
+                    final String sha1ContentSum = MessageDigest.getInstance("SHA1").digest(mf.bytes).encodeHex().toString()
+                    final String p = sha1ContentSum + "." + (mf.originalFilename.substring(mf.originalFilename.lastIndexOf('.') + 1) ?: "NONE")
+                    final String d = (filePaths.get(controllerName) ?: attachmentStorePath)
+                    File target = new File(d + "/" + p)
+                    mf.transferTo(target)
+
+                    gormEntity["filePath"] = p
+                    if (gormEntity.hasProperty("contentType")) {
+                        gormEntity["contentType"] = mf.contentType
+                        if (gormEntity.hasProperty("contentTypeEnum")) {
+                            gormEntity["contentTypeEnum"] = AttachmentContentType.fromMimeType(mf.contentType)
+                        }
+                    }
+                    if (gormEntity.hasProperty("originalName")) {
+                        gormEntity["originalName"] = mf.originalFilename
+                    }
+                    if (gormEntity.hasProperty("md5sum")) {
+                        gormEntity["md5sum"] = MessageDigest.getInstance("MD5").digest(mf.bytes).encodeHex().toString()
+                    }
+                    if (gormEntity.hasProperty("contentShaOne")) {
+                        gormEntity["contentShaOne"] = sha1ContentSum
+                    }
+                    if (gormEntity.hasProperty("fileSize")) {
+                        gormEntity["fileSize"] = mf.size
+                    }
+                    if (gormEntity.hasProperty("width")) {
+                        final String suffix = mf.name.substring(mf.name.lastIndexOf('.') + 1)
+                        Iterator<ImageReader> iter = ImageIO.getImageReadersBySuffix(suffix)
+                        while (iter.hasNext()) {
+                            ImageReader reader = iter.next()
+                            try {
+                                ImageInputStream stream = new FileImageInputStream(target)
+                                reader.setInput(stream)
+                                int width = reader.getWidth(reader.getMinIndex())
+                                int height = reader.getHeight(reader.getMinIndex())
+                                gormEntity["width"] = width
+                                if (gormEntity.hasProperty("height")) gormEntity["height"] = height
+                                break
+                            } catch (IOException e) {
+                                log.warn "Error reading: " + mf.name, e
+                            } finally {
+                                reader.dispose()
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
 
     File attachmentPreview(final Attachment attachment, PreviewFormat previewFormat = PreviewFormat.DEFAULT) {

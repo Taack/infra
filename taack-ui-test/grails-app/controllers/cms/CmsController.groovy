@@ -13,8 +13,8 @@ import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackAttachmentService
 import taack.domain.TaackFilterService
-import taack.domain.TaackSaveService
 import taack.render.TaackEditorService
+import taack.render.TaackSaveService
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
 import taack.ui.dsl.*
@@ -58,7 +58,7 @@ class CmsController implements WebAttributes {
         cmsFileRoot = rootPath + "/cms"
         def f = new File(cmsFileRoot)
         f.mkdir()
-        TaackSaveService.filePaths.put(controllerName, f)
+        TaackAttachmentService.filePaths.put(controllerName, f)
     }
 
     static private UiMenuSpecifier buildMenu(String q = null) {
