@@ -147,7 +147,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
-            gormEntity.save(flush: true, failsOnError: true)
+            gormEntity.save(failsOnError: true)
         }
 
         long c5 = System.currentTimeMillis()
