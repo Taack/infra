@@ -404,7 +404,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         selectColumnParamsKey = paramsKey ?: 'selectedItems'
         BootstrapForm f = new BootstrapForm(blockLog).builder.putAttribute('onsubmit', "return this.querySelector('input[type=\\'hidden\\']').value !== ''").addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params[selectColumnParamsKey]?.toString(), selectColumnParamsKey)
-        ).build() as BootstrapForm
+        ).addClasses('taackForm').build() as BootstrapForm
         HTMLTh th = new HTMLTh().builder.setTaackTag(TaackTag.TABLE_COL).setStyle(Style.LABEL_WIDTH_AUTO_MIN).addChildren(
                 new HTMLDiv().builder.addChildren(
                         new HTMLInput(InputType.CHECK, null, null).builder.putAttribute('paramsKey', selectColumnParamsKey).putAttribute('selectAll', 'true').build(),

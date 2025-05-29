@@ -18,7 +18,7 @@ class ColumnHeaderSelectSpec {
 
     void columnSelectButton(final String buttonText, final MethodClosure action, final Map params = null) {
         if (taackUiEnablerService.hasAccess(action, null, params)) {
-            tableVisitor.visitColumnSelectButton(buttonText, Utils.getControllerName(action), action.method, params, true)
+            tableVisitor.visitColumnSelectButton(buttonText, Utils.getControllerName(action), action.method, params, null)
         } else {
             tableVisitor.visitColumnSelectButton(buttonText, null, null, null, null)
         }
