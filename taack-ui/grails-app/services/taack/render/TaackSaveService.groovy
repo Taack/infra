@@ -18,6 +18,8 @@ import taack.ast.type.FieldInfo
 import taack.domain.IDomainHistory
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.helper.Utils
+import taack.user.IUserCreated
+import taack.user.IUserUpdated
 import taack.user.TaackUser
 
 @GrailsCompileStatic
@@ -136,11 +138,17 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         try {
             TaackUser currentUser = springSecurityService.currentUser as TaackUser
             if (gormEntity.hasChanged()) {
-                if (gormEntity.hasProperty("userCreated") && gormEntity["userCreated"] == null) {
+                if (gormEntity instanceof IUserCreated && gormEntity.objectGetUserCreated() == null) {
+                    gormEntity.objectSetUserCreated(currentUser)
+                } else if (gormEntity.hasProperty("userCreated") && gormEntity["userCreated"] == null) {
                     gormEntity["userCreated"] = currentUser
                 }
-                if (gormEntity.hasProperty("userUpdated")) {
+                if (gormEntity instanceof IUserUpdated) {
+                    gormEntity.objectSetUserUpdated(currentUser)
+                } else if (gormEntity.hasProperty("userUpdated")) {
                     gormEntity["userUpdated"] = currentUser
+                } else if (gormEntity.hasProperty("userLastUpdated")) {
+                    gormEntity["userLastUpdated"] = currentUser
                 }
             }
         } catch (ignored) {}
