@@ -88,13 +88,13 @@
                                         </li>
                                         <li class="nav-item dropdown">
                                             <div class="user-notification-body">
-                                                <g:each in="${notifications.groupBy { TaackAppRegisterService.getTaackLinkClass(it.class.name) }}">
+                                                <g:each in="${notifications.groupBy { TaackAppRegisterService.getTaackLinkClass(it.class.name) }.sort { it.key?.controller }}">
                                                     <%
                                                         TaackLinkClass t = it.key as TaackLinkClass
                                                         List<GormEntity> objects = it.value as List<GormEntity>
                                                     %>
                                                     <div class="group-header"><g:message code="${t != null ? "${t.controller}.app" : "enum.value.OTHER"}" /> (${objects.size()})</div>
-                                                    <g:each in="${objects}" var="object">
+                                                    <g:each in="${objects.sort { -it.ident() }}" var="object">
                                                         <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${t.controller}&objectAction=${t.action}&objectClass=${object.class.name}&objectId=${object.ident()}"
                                                            class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(object.toString())}">
                                                             ${object.toString()}

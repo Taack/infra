@@ -181,7 +181,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
             FileUtils.forceMkdir(new File(previewPath(f)))
         }
 
-        TaackSaveService.registerFieldCustomSavingClosures("filePath", { GormEntity gormEntity, Map params ->
+        TaackSaveService.registerFieldCustomSavingClosure("filePath", { GormEntity gormEntity, Map params ->
             if (gormEntity.hasProperty("filePath")) {
                 final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles("filePath")
                 final mf = mfl.first()

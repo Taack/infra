@@ -30,27 +30,34 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
     private final static Map<String, Closure> fieldCustomSavingClosures = [:]
 
     /**
-     * Allow to register a custom save for specific field when saving a gormEntity. (Currently being used for "filePath" only)
+     * Allow to register a custom save for specific field when saving a gormEntity.
      *
      * Example:
-     *      TaackSaveService.registerFieldCustomSavingClosures("projectName", { GormEntity gormEntity, Map params ->
-     *          if (gormEntity.hasProperty("projectName")) {
-     *              gormEntity["projectName"] = "CUSTOM_" + params["projectName"]
+     *      TaackSaveService.registerFieldCustomSavingClosure("projectName", { GormEntity gormEntity, Map params ->
+     *          if (gormEntity instaceof Project) {
+     *              gormEntity.projectName = "CUSTOM_" + gormEntity.projectName
+     *              // gormEntity.projectName = "CUSTOM_" + params["projectName"]
      *          }
      *      }
      *
-     * @param fieldName: Name of target field (TODO: But cannot recognize a specific domain class. To implement it if needed.)
+     * @param fieldName: Name of target field
      * @param closure: Custom saving process
      */
-    static final void registerFieldCustomSavingClosures(String fieldName, Closure closure) {
+    static final void registerFieldCustomSavingClosure(String fieldName, Closure closure) {
         fieldCustomSavingClosures.put(fieldName, closure)
     }
+
+//    static <D extends GormEntity> boolean beanIsOwnerLocking(D entity) {
+//        boolean ret = false
+//        return ret
+//    }
 
     final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         def p = params
         if (isAjax && params && !params.containsKey('isAjax')) {
             p = new HashMap<String, Object>()
             p.putAll(params)
+//            p.remove('recordState')
             p.put('isAjax', true)
         }
         grailsApplication.mainContext.getBean(ApplicationTagLib).createLink(controller: controller, action: action, params: p)
@@ -67,6 +74,17 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             GrailsHibernateUtil.unwrapIfProxy(entity)
         }
     }
+
+//    static <D extends GormEntity> boolean beanIsLocked(D entity) {
+//        Class beanClass = beanRealClass(entity)
+////        if (IUserInterface.isAssignableFrom(beanClass) && beanClass.getAt("enumTransition")) {
+////            IEnumTransition enumTransition = entity.getAt(beanClass.getAt("enumTransition") as String) as IEnumTransition
+////            if (enumTransition.lockedFields?.contains('*') && enumTransition.lockedFields?.size() == 1) {
+////                return true
+////            }
+////        }
+//        return beanIsOwnerLocking(entity)
+//    }
 
     private static <D extends GormEntity> D getGorm(Long id, Class<D> classD) {
         GormEntity gormEntity = ((GormStaticApi<D>) GormEnhancer.findStaticApi(classD)).get(id)
@@ -96,13 +114,28 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 includeOrExclude = [include: lockedFields[1..<lockedFields.size()]*.fieldName]
             }
         }
+//
+//        if (beanIsLocked(gormEntity))
+//            if (!bindingName)// || !bindingName.equals(transitionName))
+//                throw new SecurityException("bean is locked!")
 
         long c1 = System.currentTimeMillis()
+// TODO very slow
+//        gormEntity.getProperties().get('constrainedProperties').each {
+//            if (it.properties.get('value')['widget'] == 'ajax') {
+//                if (params[it.properties.get('key')] && (params[it.properties.get('key')] as String).isEmpty()) {
+//                    params[it.properties.get('key')] = null
+//                }
+//            }
+//        }
 
         long c2 = System.currentTimeMillis()
+//        T oldEntity
         if (gormEntity instanceof IDomainHistory && gormEntity.ident() != null) {
+//            if (gormEntity.dirty) {
             T oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
             save(oldEntity, lockedFields, doNotSave, true)
+//            } else return gormEntity
         }
 
         if (!doNotBindParams)
@@ -115,6 +148,20 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     String realFieldName = bindingName.substring(0, iPoint)
                     String key = bindingName.substring(iPoint + 1)
                     (gormEntity.getAt(realFieldName) as Map).put(key, params.get(bindingName))
+//                } else if (bindingName.contains("_setKey_")) {
+//                    int iPoint = bindingName.indexOf('_setKey_')
+//                    String realFieldName = bindingName.substring(0, iPoint)
+//                    String key = bindingName.substring(iPoint + 8)
+//                    Object o = (gormEntity.getAt(realFieldName) as Map)[key]
+//                    (gormEntity.getAt(realFieldName) as Map).remove(key)
+//                    String newKey = params.get(bindingName)
+//                    (gormEntity.getAt(realFieldName) as Map).put(newKey, o ?: "")
+//                } else if (bindingName.contains("_setValue_")) {
+//                    int iPoint = bindingName.indexOf('_setValue_')
+//                    String realFieldName = bindingName.substring(0, iPoint)
+//                    String key = bindingName.substring(iPoint + 10)
+//                    (gormEntity.getAt(realFieldName) as Map)[key] = params.get(bindingName)
+//                    println gormEntity.getAt(realFieldName)
                 } else {
                     if (id) {
                         if (bindingName.contains(',')) {
@@ -123,14 +170,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     } else bindData(gormEntity, params)
                 }
             } else {
-                fieldCustomSavingClosures.each { e ->
-                    if (gormEntity.hasProperty(e.key)) {
-                        e.value.call(gormEntity, params as Map)
-                        params.remove(e.key)
-                    }
+                Map p = params as Map
+                p.remove("filePath") // TODO: gormEntity.save() will always fail on "filePath" if this field has been treated by bindData (Although we re-set a new value after). Why ??
+                if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
+                else bindData(gormEntity, p)
+
+                gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
+                    fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
                 }
-                if (includeOrExclude) bindData(gormEntity, params, includeOrExclude)
-                else bindData(gormEntity, params)
             }
 
         long c3 = System.currentTimeMillis()
@@ -155,7 +202,15 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
+//            if (oldEntity && gormEntity instanceof IDomainHistory && gormEntity.ident() != null) {
+//                gormEntity.save(failsOnError: true)
+//                oldEntity.save(failsOnError: true)
+//                if (oldEntity.hasErrors()) {
+//                    log.error "oldEntity errors: ${oldEntity.errors}"
+//                }
+//            } else {
             gormEntity.save(failsOnError: true)
+//            }
         }
 
         long c5 = System.currentTimeMillis()
@@ -190,6 +245,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
             }.join('')
         } else {
+//            String rs = params.containsKey('recordState') && params['recordState'] ? '?recordState=' + params['recordState'] : ''
 
             if (redirectAction) {
                 render """__redirect__${urlMapped(Utils.getControllerName(redirectAction), redirectAction.method)}/${params.id ?: gormEntity.ident() ?: ''}"""
