@@ -133,6 +133,17 @@ final class BlockSpec extends BlockTabSpec {
      * Close the topmost modal. Usually, it passes an ID and a label to a form in a many to many relationship, if you open a modal using
      * {@link taack.ui.dsl.form.FormSpec#ajaxField(taack.ast.type.FieldInfo, org.codehaus.groovy.runtime.MethodClosure)}.
      *
+     * @param idValueMap map containing ID and value to be passed back to the form
+     * @param fields allow to update the form from which ajaxField has been called with the values of the fields listed
+     */
+    void closeModal(final Map<String, String> idValueMap, final FieldInfo[] fields = null) {
+        blockVisitor.visitCloseModal(idValueMap, fields)
+    }
+
+    /**
+     * Close the topmost modal. Usually, it passes an ID and a label to a form in a many to many relationship, if you open a modal using
+     * {@link taack.ui.dsl.form.FormSpec#ajaxField(taack.ast.type.FieldInfo, org.codehaus.groovy.runtime.MethodClosure)}.
+     *
      * @param fields allow to update the form from which ajaxField has been called with the values of the fields listed
      */
     void closeModal(final FieldInfo[] fields) {

@@ -134,6 +134,11 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitCloseModal(Map<String, String> idValueMap, FieldInfo[] fields) {
+
+    }
+
+    @Override
     void visitBlockTab(String i18n) {
 
     }
