@@ -4,10 +4,7 @@ import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
-import taack.ui.base.leaf.TableGroupableColumn
-import taack.ui.base.leaf.TableSortableColumn
-import taack.ui.base.leaf.TablePaginate
-import taack.ui.base.leaf.TableSelectCheckbox
+import taack.ui.base.leaf.*
 import web.html.HTMLTableElement
 
 class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
@@ -29,6 +26,7 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
     val filter: Filter
     private val paginate: TablePaginate?
     val tableSelectCheckboxes: Pair<TableSelectCheckbox, List<TableSelectCheckbox>>?
+    private val tableMultiSelectButtons: List<TableMultiSelectButton>?
 
     init {
         traceIndent("Table::init +++ tableId: $tableId")
@@ -39,6 +37,7 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
         rows = TableRow.getSiblingRows(this)
         paginate = TablePaginate.getSiblingTablePaginate(this)
         tableSelectCheckboxes = TableSelectCheckbox.getSiblingTableSelectCheckbox(this)
+        tableMultiSelectButtons = TableMultiSelectButton.getSiblingTableMultiSelectButton(this)
         traceDeIndent("Table::init --- tableId: $tableId")
     }
 
