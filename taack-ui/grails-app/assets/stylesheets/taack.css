@@ -487,7 +487,7 @@ li:hover > .nested-dropdown{
     position: relative;
 }
 
-#navbarUser[unread-notification-number]::before{
+#navbarUser[unread-notification-number]:not([unread-notification-number='0'])::before {
     content: attr(unread-notification-number);
     position: absolute;
     top: 0;
@@ -503,11 +503,12 @@ li:hover > .nested-dropdown{
 .user-notification-header {
     color: #00C4C4;
     font-size: small;
+    font-weight: bold;
 }
 
 .user-notification-body {
     background-color: white;
-    width: 150px;
+    max-width: 200px;
     max-height: 300px;
     text-align: left;
     white-space: nowrap;
@@ -515,6 +516,21 @@ li:hover > .nested-dropdown{
     overflow-y: scroll;
     margin: 0 .5em;
     padding: 3px;
+}
+
+.user-notification-header a[unread-notification-number], .user-notification-body a[unread-notification-number] {
+    text-decoration: unset;
+    vertical-align: text-bottom;
+    padding: 2px;
+}
+
+.user-notification-header a[unread-notification-number]::after, .user-notification-body a[unread-notification-number]::after {
+    content: " (" attr(unread-notification-number) ")";
+}
+
+.user-notification-header a[unread-notification-number]:hover, .user-notification-body a[unread-notification-number]:hover {
+    background: darkgrey;
+    color: white;
 }
 
 .user-notification-body .group-header {
@@ -527,6 +543,7 @@ li:hover > .nested-dropdown{
 .user-notification-body .group-item {
     color: black !important;
     padding: 5px;
+    font-size: smaller;
 }
 
 .user-notification-body .group-item:hover {
