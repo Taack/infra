@@ -1,4 +1,4 @@
-<%@ page import="taack.app.TaackLinkClass; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="grails.util.Pair; taack.app.TaackLinkClass; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -90,21 +90,21 @@
                                         </li>
                                         <li class="nav-item dropdown">
                                             <div class="user-notification-body">
-                                                <g:each in="${notifications.groupBy { TaackAppRegisterService.getTaackLinkClass(it.class.name) }.sort { it.key?.controller }}">
+                                                <g:each in="${notifications.collect {
+                                                    new Pair(it, TaackAppRegisterService.getTaackLinkClass(it.class.name))
+                                                }.groupBy { Pair<GormEntity, TaackLinkClass> it ->
+                                                    it.bValue?.controller
+                                                }.sort { it.key }}" var="group">
                                                     <div class="user-notification-group">
-                                                        <%
-                                                            TaackLinkClass t = it.key as TaackLinkClass
-                                                            List<GormEntity> objects = it.value as List<GormEntity>
-                                                        %>
                                                         <div class="group-header">
-                                                            <g:message code="${t != null ? "${t.controller}.app" : "enum.value.OTHER"}" />
-                                                            <a ajaxaction="/taackUserNotification/readAllUserNotifications?objectController=${t?.controller ?: ""}"
-                                                               unread-notification-number="${objects.size()}"></a>
+                                                            <g:message code="${group.key != null ? "${group.key}.app" : "enum.value.OTHER"}" />
+                                                            <a ajaxaction="/taackUserNotification/readAllUserNotifications?objectController=${group.key ?: ""}"
+                                                               unread-notification-number="${(group.value as List).size()}"></a>
                                                         </div>
-                                                        <g:each in="${objects.sort { -it.ident() }}" var="object">
-                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${t.controller}&objectAction=${t.action}&objectClass=${object.class.name}&objectId=${object.ident()}"
-                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(object.toString())}">
-                                                                ${object.toString()}
+                                                        <g:each in="${(group.value as List<Pair<GormEntity, TaackLinkClass>>).sort { -it.aValue.ident() }}" var="object">
+                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.controller}&objectAction=${object.bValue?.action}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
+                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(object.aValue.toString())}">
+                                                                ${object.aValue.toString()}
                                                             </a>
                                                         </g:each>
                                                     </div>
