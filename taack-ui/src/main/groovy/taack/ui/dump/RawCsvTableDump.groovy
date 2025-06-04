@@ -8,6 +8,9 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 
+import java.text.DateFormat
+import java.text.NumberFormat
+
 @CompileStatic
 final class RawCsvTableDump implements IUiTableVisitor {
     final private ByteArrayOutputStream out
@@ -106,6 +109,20 @@ final class RawCsvTableDump implements IUiTableVisitor {
     @Override
     void visitRowField(final String value, final Style style) {
         out << surroundCell(value)
+    }
+
+    @Override
+    void visitRowField(Number value, NumberFormat nf, Style style) {
+        out << sep
+        out << nf.format(value)
+        out << sep
+    }
+
+    @Override
+    void visitRowField(Date value, DateFormat df, Style style) {
+        out << sep
+        out << df.format(value)
+        out << sep
     }
 
     @Override

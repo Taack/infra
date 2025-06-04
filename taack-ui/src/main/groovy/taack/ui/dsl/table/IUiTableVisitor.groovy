@@ -7,6 +7,9 @@ import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 
+import java.text.DateFormat
+import java.text.NumberFormat
+
 @CompileStatic
 interface IUiTableVisitor {
     void visitTable()
@@ -44,6 +47,10 @@ interface IUiTableVisitor {
     void visitRowField(GetMethodReturn fieldInfo, String format, final Style style)
 
     void visitRowField(String value, final Style style)
+
+    void visitRowField(Number value, NumberFormat locale, final Style style)
+
+    void visitRowField(Date value, DateFormat locale, final Style style)
 
     void visitRowFieldRaw(String value, final Style style)
 

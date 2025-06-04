@@ -18,7 +18,9 @@ import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
 
+import java.text.DateFormat
 import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 import static taack.render.TaackUiService.tr
@@ -348,6 +350,16 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
 //, firstInCol, isInCol))
         if (addColumn) visitColumnEnd()
+    }
+
+    @Override
+    void visitRowField(Number value, NumberFormat locale, Style style) {
+        visitRowField(locale.format(value), style)
+    }
+
+    @Override
+    void visitRowField(Date value, DateFormat locale, Style style) {
+        visitRowField(locale.format(value), style)
     }
 
     @Override
