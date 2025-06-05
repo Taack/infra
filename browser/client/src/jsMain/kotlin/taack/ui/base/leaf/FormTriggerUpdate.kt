@@ -1,6 +1,7 @@
 package taack.ui.base.leaf
 
 import js.array.asList
+import js.iterable.toList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -53,7 +54,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         trace("FormTriggerUpdate::onclick: ${inputElement.formAction}")
         val f = parent.f
         val fd = FormData(f)
-//        fd.append("isAjax", "true")
+        fd["isAjax"] = "true"
         fd["refresh"] = "true"
 
         parent.mapFileToSend.forEach { inputKey ->
@@ -64,13 +65,13 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             val t = xhr.responseText
-            println(t)
             parent.parent.d.innerHTML = t
             parent.parent.refresh()
 //            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
         }
         val targetUrl = Helper.urlStack.last()
-        targetUrl.searchParams.keys().forEach {
+        val paramKeys = targetUrl.searchParams.keys().toList()
+        paramKeys.forEach {
             targetUrl.searchParams.delete(it)
         }
         xhr.open(RequestMethod.POST, targetUrl)
