@@ -170,7 +170,7 @@ class Helper {
                         val begin = text.indexOf('|', CLOSE_LAST_MODAL.length)
                         val idValueMapString = if (posField == -1) text.substring(begin + 1) else text.substring(begin + 1, posField)
                         val idValueMap = idValueMapString.split("|").associate {
-                            val (id, value) = it.split(":")
+                            val (id, value) = it.split(":", limit = 2)
                             id to value
                         }
                         var otherField = emptyMap<String, String>()
