@@ -102,10 +102,10 @@ class TaackUiEnablerService implements WebAttributes {
         switch (Environment.current) {
             case Environment.DEVELOPMENT:
                 if (!taackUiConfiguration.disableSecurity)
-                    isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+                    isAllowed = webInvocationPrivilegeEvaluator.isAllowed(null, path, 'GET', authContext)
                 break
             case Environment.PRODUCTION:
-                isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+                isAllowed = webInvocationPrivilegeEvaluator.isAllowed(null, path, 'GET', authContext)
                 break
         }
         if (isAllowed) {
