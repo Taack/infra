@@ -9,7 +9,8 @@
 
 rootProject.name = 'infra'
 
-include 'taack-jdbc-common'
+//include 'taack-jdbc-common'
+include 'taack-ui-diagram'
 include 'taack-ui'
 
 if (taackReleaseVersion.endsWith('SNAPSHOT')) {
@@ -18,4 +19,3 @@ if (taackReleaseVersion.endsWith('SNAPSHOT')) {
 }
 
 
-include 'taack-ui-diagram'

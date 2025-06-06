@@ -11,14 +11,15 @@ import java.time.Duration
 
 buildscript {
     repositories {
-        mavenLocal()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://repo.grails.org/grails/core" }
+        mavenCentral()
+        maven { url "https://repository.apache.org/content/groups/public" }
+        maven { url "https://repo.grails.org/grails/restricted" }
+
     }
     dependencies {
-        classpath platform("org.grails:grails-bom:$grailsVersion")
-        classpath "org.grails:grails-gradle-plugin"
-        classpath "org.grails.plugins:hibernate5"
+        classpath platform("org.apache.grails:grails-bom:$grailsVersion")
+        classpath "org.apache.grails:grails-gradle-plugins"
+        classpath "org.apache.grails:grails-data-hibernate5"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle"
     }
 }
@@ -26,14 +27,15 @@ buildscript {
 ext.releaseVersion = taackReleaseVersion
 ext.isReleaseVersion = { -> !releaseVersion.endsWith('SNAPSHOT') }
 
-version releaseVersion
-group "org.taack"
-
-ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
-ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
-ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
 
 if (isReleaseVersion()) {
+    version releaseVersion
+    group "org.taack"
+
+    ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
+    ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
+    ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
+
     apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
     nexusPublishing {
@@ -55,170 +57,132 @@ if (isReleaseVersion()) {
             delayBetween.set(Duration.ofMillis(2000))
         }
     }
-}
 
-subprojects {
-    ext.isTaackUi = { -> 'taack-ui' == project.name }
-    ext.isTaackUiCommand = { -> 'taack-ui-commands' == project.name }
-    ext.isTaackJdbcCommon = { -> 'taack-jdbc-common' == project.name }
 
-    if (isTaackJdbcCommon() || isTaackUiCommand() || isTaackUi()) {
-        version releaseVersion
-        group "org.taack"
+    subprojects {
+        ext.isTaackUi = { -> 'taack-ui' == project.name }
+        ext.isTaackJdbcCommon = { -> 'taack-jdbc-common' == project.name }
 
-        apply plugin: 'maven-publish'
-        apply plugin: 'signing'
-        apply plugin: 'java'
-        apply plugin: 'java-library'
+        if (isTaackJdbcCommon() || isTaackUi()) {
+            version releaseVersion
+            group "org.taack"
 
-        repositories {
-            mavenLocal()
-            mavenCentral()
-            maven { url "https://repo.grails.org/grails/core" }
-        }
+            apply plugin: 'maven-publish'
+            apply plugin: 'signing'
+            apply plugin: 'java'
+            apply plugin: 'java-library'
 
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    from components.java
-                    if (isTaackJdbcCommon()) {
-                        afterEvaluate {
-                            artifact source: sourcesJar, classifier: "sources"
-                            artifact source: javadocJar, classifier: "javadoc"
-                        }
+            repositories {
+                mavenLocal()
+                mavenCentral()
+                maven { url "https://repo.grails.org/grails/core" }
+            }
 
-                        versionMapping {
-                            usage('java-api') {
-                                fromResolutionOf('runtimeClasspath')
+            publishing {
+                publications {
+                    maven(MavenPublication) {
+                        from components.java
+                        if (isTaackJdbcCommon()) {
+                            afterEvaluate {
+                                artifact source: sourcesJar, classifier: "sources"
+                                artifact source: javadocJar, classifier: "javadoc"
                             }
-                            usage('java-runtime') {
-                                fromResolutionResult()
-                            }
-                        }
-                        pom {
-                            name = 'Taack JDBC Common'
-                            description = 'Taack JDBC Common'
-                            url = 'http://taack.org'
-                            licenses {
-                                license {
-                                    name = 'The Apache License, Version 2.0'
-                                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+
+                            versionMapping {
+                                usage('java-api') {
+                                    fromResolutionOf('runtimeClasspath')
+                                }
+                                usage('java-runtime') {
+                                    fromResolutionResult()
                                 }
                             }
-                            scm {
-                                url = 'scm:git@github.com:Taack/infra.git'
-                                connection = 'scm:git@github.com:Taack/infra.git'
-                                developerConnection = 'scm:git@github.com:Taack/infra.git'
-                            }
-                            developers {
-                                developer {
-                                    id = 'Taack'
-                                    name = 'Adrien Guichard'
-                                    email = 'adrien.guichard@taack.org'
+                            pom {
+                                name = 'Taack JDBC Common'
+                                description = 'Taack JDBC Common'
+                                url = 'http://taack.org'
+                                licenses {
+                                    license {
+                                        name = 'The Apache License, Version 2.0'
+                                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                                    }
+                                }
+                                scm {
+                                    url = 'scm:git@github.com:Taack/infra.git'
+                                    connection = 'scm:git@github.com:Taack/infra.git'
+                                    developerConnection = 'scm:git@github.com:Taack/infra.git'
+                                }
+                                developers {
+                                    developer {
+                                        id = 'Taack'
+                                        name = 'Adrien Guichard'
+                                        email = 'adrien.guichard@taack.org'
+                                    }
                                 }
                             }
-                        }
-                    } else if (isTaackUiCommand()) {
-                        afterEvaluate {
-                            artifact source: sourcesJar, classifier: "sources"
-                            artifact source: javadocJar, classifier: "javadoc"
-                        }
-                        versionMapping {
-                            usage('java-api') {
-                                fromResolutionOf('runtimeClasspath')
-                            }
-                            usage('java-runtime') {
-                                fromResolutionResult()
-                            }
-                        }
-                        pom {
-                            name = 'Taack UI Framework Commands'
-                            description = 'Taack UI Framework Commands'
-                            url = 'http://taack.org'
-                            licenses {
-                                license {
-                                    name = 'The Apache License, Version 2.0'
-                                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                                }
-                            }
-                            scm {
-                                url = 'scm:git@github.com:Taack/infra.git'
-                                connection = 'scm:git@github.com:Taack/infra.git'
-                                developerConnection = 'scm:git@github.com:Taack/infra.git'
-                            }
-                            developers {
-                                developer {
-                                    id = 'Taack'
-                                    name = 'Adrien Guichard'
-                                    email = 'adrien.guichard@taack.org'
-                                }
-                            }
-                        }
-                    } else {
 //                        afterEvaluate {
 //                            artifact source: sourcesJar, classifier: "sources"
 //                            artifact source: javadocJar, classifier: "javadoc"
 //                        }
-                        pom {
-                            name = 'Taack UI Framework'
-                            description = 'Taack UI Framework'
-                            url = 'http://taack.org'
-                            licenses {
-                                license {
-                                    name = 'The Apache License, Version 2.0'
-                                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            pom {
+                                name = 'Taack UI Framework'
+                                description = 'Taack UI Framework'
+                                url = 'http://taack.org'
+                                licenses {
+                                    license {
+                                        name = 'The Apache License, Version 2.0'
+                                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                                    }
                                 }
-                            }
-                            scm {
-                                url = 'scm:git@github.com:Taack/infra.git'
-                                connection = 'scm:git@github.com:Taack/infra.git'
-                                developerConnection = 'scm:git@github.com:Taack/infra.git'
-                            }
-                            developers {
-                                developer {
-                                    id = 'Taack'
-                                    name = 'Adrien Guichard'
-                                    email = 'adrien.guichard@taack.org'
+                                scm {
+                                    url = 'scm:git@github.com:Taack/infra.git'
+                                    connection = 'scm:git@github.com:Taack/infra.git'
+                                    developerConnection = 'scm:git@github.com:Taack/infra.git'
+                                }
+                                developers {
+                                    developer {
+                                        id = 'Taack'
+                                        name = 'Adrien Guichard'
+                                        email = 'adrien.guichard@taack.org'
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        if (isTaackJdbcCommon() || isTaackUiCommand()) {
-            tasks.register('javadocJar', Jar) {
-                archiveClassifier = 'javadoc'
-                from javadoc
-            }
-
-            tasks.register('sourcesJar', Jar) {
-                archiveClassifier = 'sources'
-                from sourceSets.main.allSource
-            }
-        }
-        if (isReleaseVersion()) {
-            println "isReleaseVersion() ${isReleaseVersion()}"
-            println "isReleaseVersion ${isReleaseVersion}"
-            afterEvaluate {
-                artifacts {
-                    archives javadocJar, sourcesJar
+            if (isTaackJdbcCommon()) {
+                tasks.register('javadocJar', Jar) {
+                    archiveClassifier = 'javadoc'
+                    from javadoc
                 }
 
-                signing {
-                    required { isReleaseVersion() && gradle.taskGraph.hasTask("publish") }
-                    sign publishing.publications.maven
+                tasks.register('sourcesJar', Jar) {
+                    archiveClassifier = 'sources'
+                    from sourceSets.main.allSource
                 }
             }
+            if (isReleaseVersion()) {
+                println "isReleaseVersion() ${isReleaseVersion()}"
+                println "isReleaseVersion ${isReleaseVersion}"
+                afterEvaluate {
+                    artifacts {
+                        archives javadocJar, sourcesJar
+                    }
 
-            tasks.withType(Sign).configureEach {
-                onlyIf { isReleaseVersion() }
-            }
-            //do not generate extra load on Nexus with new staging repository if signing fails
-            tasks.withType(InitializeNexusStagingRepository).configureEach {
-                shouldRunAfter(tasks.withType(Sign))
+                    signing {
+                        required { isReleaseVersion() && gradle.taskGraph.hasTask("publish") }
+                        sign publishing.publications.maven
+                    }
+                }
+
+                tasks.withType(Sign).configureEach {
+                    onlyIf { isReleaseVersion() }
+                }
+                //do not generate extra load on Nexus with new staging repository if signing fails
+                tasks.withType(InitializeNexusStagingRepository).configureEach {
+                    shouldRunAfter(tasks.withType(Sign))
+                }
             }
         }
     }
 }
-
