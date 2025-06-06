@@ -1,4 +1,4 @@
-package taack.ssh.vfs.impl.sftp
+package taack.ssh.vfs.impl
 
 import groovy.transform.CompileStatic
 import org.apache.sshd.common.PropertyResolverUtils

@@ -23,6 +23,7 @@ plugins {
     id 'com.bertramlabs.asset-pipeline'
     id "org.grails.grails-plugin"
     id "application"
+    id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
 group = "taack.ui.test"
@@ -39,6 +40,10 @@ repositories {
 //        extendsFrom developmentOnly
 //    }
 //}
+
+application {
+    mainClass = "taack.ui.test.Application"
+}
 
 dependencyManagement {
     dependencies {
@@ -131,3 +136,24 @@ assets {
 //    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
 //    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
 //}
+
+graalvmNative {
+    toolchainDetection = true
+    binaries.main {
+        mainClass = 'taack.ui.test.Application'
+        buildArgs.addAll(
+                '--initialize-at-build-time=org.apache.sshd.common.file.root.RootedFileSystemProvider',
+                '--initialize-at-build-time=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider',
+                '--initialize-at-build-time=ch.qos.logback.classic.Logger',
+                '-O3', '-march=native', '--link-at-build-time')
+    }
+    agent {
+        enabled = true
+
+    }
+}
+
+/**
+ * ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
+ *
+ */
