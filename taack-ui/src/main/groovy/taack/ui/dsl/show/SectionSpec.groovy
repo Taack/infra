@@ -105,7 +105,7 @@ class SectionSpec {
      * @param additionalParams target action additional parameters
      */
     void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
-        if (taackUiEnablerService.hasAccess(action, id)) showVisitor.visitShowAction(i18n, icon, Utils.getControllerName(action), action.method, id, additionalParams, true)
+        if (taackUiEnablerService.hasAccess(action, id, additionalParams)) showVisitor.visitShowAction(i18n, icon, Utils.getControllerName(action), action.method, id, additionalParams, true)
     }
 
     void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
@@ -121,7 +121,7 @@ class SectionSpec {
     }
 
     void showAction(final String i18n = null, final String linkText, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
-        if (taackUiEnablerService.hasAccess(action, id)) {
+        if (taackUiEnablerService.hasAccess(action, id, additionalParams)) {
             showVisitor.visitShowAction(i18n, linkText, Utils.getControllerName(action), action.method, id, additionalParams, true)
         } else {
             showVisitor.visitShowField(i18n, linkText, null)
