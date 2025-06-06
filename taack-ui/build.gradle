@@ -84,9 +84,9 @@ dependencies {
 
 
     if (rootProject.name != 'infra' && rootProject.name != 'taack-ui-test') {
-        api project(':infra:taack-jdbc-common')
+        api project(':infra:taack-ui-diagram')
     } else {
-        api project(':taack-jdbc-common')
+        api project(':taack-ui-diagram')
     }
 
     implementation "org.asciidoctor:asciidoctorj-api:${asciidoctorJ}"

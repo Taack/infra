@@ -17,3 +17,5 @@ if (taackReleaseVersion.endsWith('SNAPSHOT')) {
     include 'browser:client'
 }
 
+
+include 'taack-ui-diagram'

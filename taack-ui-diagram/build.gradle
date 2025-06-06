@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+group = 'org.taack'
+version = '0.7-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.apache.groovy:groovy:${groovyVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
