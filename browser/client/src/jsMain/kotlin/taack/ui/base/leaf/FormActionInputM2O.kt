@@ -1,9 +1,11 @@
 package taack.ui.base.leaf
 
 import js.array.asList
+import taack.ui.base.CloseModalPostProcessing
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
+import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import web.events.Event
 import web.events.EventHandler
@@ -52,7 +54,10 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         // TODO: change to Post (see FilterActionButton.kt)
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
-            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
+            val callback: CloseModalPostProcessing = { key, value, otherField ->
+                modalReturnSelect(key, value, otherField)
+            }
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ModalCloseProcessing.Type1(callback))
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()

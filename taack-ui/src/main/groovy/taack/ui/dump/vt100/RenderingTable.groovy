@@ -9,6 +9,9 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.vt100.DisplayManager as DM
 
+import java.text.DateFormat
+import java.text.NumberFormat
+
 @CompileStatic
 final class RenderingTable implements IUiTableVisitor {
     private final DM dm
@@ -124,6 +127,16 @@ final class RenderingTable implements IUiTableVisitor {
     @Override
     void visitRowField(String value, Style style) {
         drawCell(value.toString())
+    }
+
+    @Override
+    void visitRowField(Number value, NumberFormat locale, Style style) {
+
+    }
+
+    @Override
+    void visitRowField(Date value, DateFormat locale, Style style) {
+
     }
 
     @Override

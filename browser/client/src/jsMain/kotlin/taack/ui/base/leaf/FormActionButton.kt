@@ -1,9 +1,11 @@
 package taack.ui.base.leaf
 
 import js.array.asList
+import taack.ui.base.CloseModalPostProcessing
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
+import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import web.dom.document
 import web.events.Event
@@ -67,7 +69,10 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 document.write(t)
                 document.close()
             } else {
-                Helper.processAjaxLink(null, t, parent, ::modalReturnSelect)
+                val callback: CloseModalPostProcessing = { key, value, otherField ->
+                    modalReturnSelect(key, value, otherField)
+                }
+                Helper.processAjaxLink(null, t, parent, ModalCloseProcessing.Type1(callback))
             }
         }
         xhr.open(RequestMethod.POST, b.formAction)

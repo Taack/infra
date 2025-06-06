@@ -18,7 +18,9 @@ import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.table.*
 
+import java.text.DateFormat
 import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 import static taack.render.TaackUiService.tr
@@ -351,6 +353,16 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void visitRowField(Number value, NumberFormat locale, Style style) {
+        visitRowField(locale.format(value), style)
+    }
+
+    @Override
+    void visitRowField(Date value, DateFormat locale, Style style) {
+        visitRowField(locale.format(value), style)
+    }
+
+    @Override
     void visitRowFieldRaw(final String value, final Style style) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
@@ -402,7 +414,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.enterBlock('visitColumnSelect')
         isInCol = true
         selectColumnParamsKey = paramsKey ?: 'selectedItems'
-        BootstrapForm f = new BootstrapForm(blockLog).builder.putAttribute('onsubmit', "return this.querySelector('input[type=\\'hidden\\']').value !== ''").addChildren(
+        BootstrapForm f = new BootstrapForm(blockLog).builder.addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params[selectColumnParamsKey]?.toString(), selectColumnParamsKey)
         ).build() as BootstrapForm
         HTMLTh th = new HTMLTh().builder.setTaackTag(TaackTag.TABLE_COL).setStyle(Style.LABEL_WIDTH_AUTO_MIN).addChildren(

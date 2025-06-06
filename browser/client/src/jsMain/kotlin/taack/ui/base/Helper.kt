@@ -22,6 +22,12 @@ import web.window.window
 import web.xhr.XMLHttpRequest
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
+typealias CloseModalPostProcessing2 = ((Map<String, String>, Map<String, String>) -> Unit)
+
+sealed class ModalCloseProcessing {
+    data class Type1(val fn: CloseModalPostProcessing) : ModalCloseProcessing()
+    data class Type2(val fn: CloseModalPostProcessing2) : ModalCloseProcessing()
+}
 
 class Helper {
     companion object {
@@ -142,10 +148,10 @@ class Helper {
             return m
         }
 
-        private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
+        private val processingStack: ArrayDeque<ModalCloseProcessing> = ArrayDeque()
         val urlStack: ArrayDeque<URL> = ArrayDeque()
 
-        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
+        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: ModalCloseProcessing? = null) {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
                 text.startsWith(RELOAD) -> {
@@ -155,16 +161,18 @@ class Helper {
 
                 text.startsWith(CLOSE_LAST_MODAL) -> {
                     if (url != null) urlStack.removeLast()
-                    val pos = text.indexOf(':', CLOSE_LAST_MODAL.length)
                     if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
                             text.length - FIELD_INFO_END.length,
                             text.length
                         ) == FIELD_INFO_END
                     ) {
                         var posField = text.indexOf(FIELD_INFO)
-                        val id = text.substring(CLOSE_LAST_MODAL.length, pos)
-                        val value =
-                            if (posField == -1) text.substring(pos + 1) else text.substring(pos + 1, posField)
+                        val begin = text.indexOf('|', CLOSE_LAST_MODAL.length)
+                        val idValueMapString = if (posField == -1) text.substring(begin + 1) else text.substring(begin + 1, posField)
+                        val idValueMap = idValueMapString.split("|").associate {
+                            val (id, value) = it.split(":", limit = 2)
+                            id to value
+                        }
                         var otherField = emptyMap<String, String>()
                         while (posField != -1) {
                             val endFieldNameIndex = text.indexOf(':', posField + FIELD_INFO.length)
@@ -176,8 +184,14 @@ class Helper {
                         }
                         if (processingStack.isNotEmpty()) {
                             trace("Helper::process")
-                            val f = processingStack.removeLast()
-                            f(id, value, otherField)
+                            when (val f = processingStack.removeLast()) {
+                                is ModalCloseProcessing.Type1 -> {
+                                    f.fn(idValueMap.keys.first(), idValueMap.values.first(), otherField)
+                                }
+                                is ModalCloseProcessing.Type2 -> {
+                                    f.fn(idValueMap, otherField)
+                                }
+                            }
                         }
                     } else {
                         if (text.length > CLOSE_LAST_MODAL.length + 1 && text.substring(CLOSE_LAST_MODAL.length + 1)

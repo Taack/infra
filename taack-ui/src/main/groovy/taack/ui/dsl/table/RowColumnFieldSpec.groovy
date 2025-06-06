@@ -36,7 +36,7 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowField(final BigDecimal value, NumberFormat nf, final Style style = Style.ALIGN_RIGHT) {
-        tableVisitor.visitRowField(nf.format(value), style)
+        tableVisitor.visitRowField(value, nf, style)
     }
 
     void rowField(final BigDecimal value, final Style style = Style.ALIGN_RIGHT) {

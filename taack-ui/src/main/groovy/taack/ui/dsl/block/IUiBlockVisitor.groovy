@@ -62,6 +62,8 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitCloseModal(String id, String value, FieldInfo[] fields)
 
+    void visitCloseModal(Map<String, String> idValueMap, FieldInfo[] fields)
+
     void visitBlockTab(String i18n)
 
     void visitBlockTabEnd()

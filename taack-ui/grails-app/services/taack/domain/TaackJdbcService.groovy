@@ -20,6 +20,7 @@ import taack.jdbc.common.tql.gen.TQLLexer
 import taack.jdbc.common.tql.gen.TQLParser
 import taack.jdbc.common.tql.listener.TQLTranslator
 
+import java.lang.reflect.Modifier
 import java.sql.DatabaseMetaData
 
 import static taack.jdbc.common.TaackResultSetOuterClass.*
@@ -132,7 +133,7 @@ final class TaackJdbcService {
 
     final static void registerJdbcClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
         def fieldInfoWithId = fieldInfos.toList()
-        Class aClassWithId = aClass.superclass != Object ? aClass.superclass : aClass
+        Class aClassWithId = aClass.superclass != Object && !Modifier.isAbstract(aClass.superclass.getModifiers()) ? aClass.superclass : aClass
         fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), aClassWithId.getDeclaredField('id'), null), 'id', (Long) 0)
         fieldInfoMap.put(aClass, fieldInfoWithId as FieldInfo[])
         gormClassesMap.put(aClass.simpleName, aClass)
