@@ -130,12 +130,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 //        }
 
         long c2 = System.currentTimeMillis()
-//        T oldEntity
-        if (gormEntity instanceof IDomainHistory && gormEntity.ident() != null) {
-//            if (gormEntity.dirty) {
-            T oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
-            save(oldEntity, lockedFields, doNotSave, true)
-//            } else return gormEntity
+
+        T oldEntity
+        if (gormEntity instanceof IDomainHistory && id != null) {
+            oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
         }
 
         if (!doNotBindParams)
@@ -202,15 +200,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
-//            if (oldEntity && gormEntity instanceof IDomainHistory && gormEntity.ident() != null) {
-//                gormEntity.save(failsOnError: true)
-//                oldEntity.save(failsOnError: true)
-//                if (oldEntity.hasErrors()) {
-//                    log.error "oldEntity errors: ${oldEntity.errors}"
-//                }
-//            } else {
-            gormEntity.save(failsOnError: true)
-//            }
+            if (oldEntity && gormEntity.validate() && gormEntity.isDirty()) {
+                save(oldEntity, lockedFields, doNotSave, true)
+            }
+            gormEntity.save(flush: true, failsOnError: true)
         }
 
         long c5 = System.currentTimeMillis()
