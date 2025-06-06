@@ -1,4 +1,4 @@
-<%@ page import="grails.util.Pair; taack.app.TaackLinkClass; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="grails.util.Pair; taack.app.TaackLinkClass; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -103,7 +103,7 @@
                                                         </div>
                                                         <g:each in="${(group.value as List<Pair<GormEntity, TaackLinkClass>>).sort { -it.aValue.ident() }}" var="object">
                                                             <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.controller}&objectAction=${object.bValue?.action}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
-                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(object.aValue.toString())}">
+                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${object.aValue}">
                                                                 ${object.aValue.toString()}
                                                             </a>
                                                         </g:each>

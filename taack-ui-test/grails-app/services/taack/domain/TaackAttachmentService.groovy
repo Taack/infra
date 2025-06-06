@@ -7,6 +7,7 @@ import grails.util.Pair
 import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
+import jakarta.annotation.PostConstruct
 import org.apache.commons.io.FileUtils
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +21,6 @@ import org.taack.IAttachmentShowIFrame
 import taack.render.TaackSaveService
 import taack.ui.TaackUiConfiguration
 
-import javax.annotation.PostConstruct
 import javax.imageio.ImageIO
 import javax.imageio.ImageReader
 import javax.imageio.stream.FileImageInputStream
