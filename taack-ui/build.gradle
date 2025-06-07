@@ -53,7 +53,7 @@ dependencies {
     implementation 'org.apache.grails:grails-controllers'
 
     implementation 'org.apache.grails:grails-data-hibernate5'
-    implementation "org.grails:spring-security-core:${grailsSpringSecurity}"
+    implementation "org.apache.grails:spring-security-core:${grailsSpringSecurity}"
     implementation "org.apache.grails:grails-interceptors"
 
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
