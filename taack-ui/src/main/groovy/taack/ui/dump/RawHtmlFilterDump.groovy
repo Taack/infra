@@ -64,6 +64,8 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
             if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
             if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
+            if (parameter.lastReadingDate) mapAdditionalHiddenParams.put 'lastReadingDate', new HTMLInput(InputType.HIDDEN, parameter.lastReadingDate, 'lastReadingDate')
+            if (parameter.readingDateFieldString) mapAdditionalHiddenParams.put 'readingDateFieldString', new HTMLInput(InputType.HIDDEN, parameter.readingDateFieldString, 'readingDateFieldString')
             if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
             if (parameter.additionalId) mapAdditionalHiddenParams.put 'additionalId', new HTMLInput(InputType.HIDDEN, parameter.additionalId, 'additionalId')
             if (parameter.brand) mapAdditionalHiddenParams.put 'brand', new HTMLInput(InputType.HIDDEN, parameter.brand, 'brand')

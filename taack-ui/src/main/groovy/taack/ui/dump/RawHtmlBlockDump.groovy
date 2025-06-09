@@ -280,6 +280,10 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             filterVisitor.setAdditionalParams('sort', tableVisitor.getSortingOrder().aValue)
             filterVisitor.setAdditionalParams('order', tableVisitor.getSortingOrder().bValue)
         }
+        if (tableVisitor.getLastReadingDateString()) {
+            filterVisitor.setAdditionalParams('lastReadingDate', tableVisitor.getLastReadingDateString())
+            filterVisitor.setAdditionalParams('readingDateFieldString', tableVisitor.getReadingDateFieldString())
+        }
         if (tableVisitor.getSelectColumnParamsKey()) {
             String paramsKey = tableVisitor.getSelectColumnParamsKey()
             filterVisitor.setAdditionalParams(paramsKey, parameter.applicationTagLib.params[paramsKey]?.toString())

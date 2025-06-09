@@ -66,9 +66,17 @@ interface IUiTableVisitor {
     
     void visitPaginate(Number max, Number count)
 
-    void setSortingOrder(Pair<String, String>sortingOrder)
+    void setSortingOrder(Pair<String, String> sortingOrder)
 
     Pair<String, String> getSortingOrder()
+
+    void setLastReadingDate(Pair<Date, String> lastReadingDate)
+
+    String getLastReadingDateString()
+
+    Date getLastReadingDate()
+
+    String getReadingDateFieldString()
 
     void visitColumnSelect(String paramsKey)
 
