@@ -1,97 +1,15 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url "https://repository.apache.org/content/groups/public" }
-        maven { url "https://repo.grails.org/grails/restricted" }
-
-    }
-    dependencies {
-        classpath platform("org.apache.grails:grails-bom:$grailsVersion")
-        classpath "org.apache.grails:grails-gradle-plugins"
-        classpath "org.apache.grails:grails-data-hibernate5"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle"
-    }
+plugins {
+    id 'taack-grails-plugin'
+    id 'taack-asciidoctor'
+    id 'taack-grails-assets-plugin'
 }
 
-apply plugin: "idea"
-apply plugin: "war"
-apply plugin: "org.apache.grails.gradle.grails-web"
-apply plugin: "com.bertramlabs.asset-pipeline"
-apply plugin: "org.apache.grails.gradle.grails-gsp"
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://repository.apache.org/content/groups/public" }
-    maven { url "https://repo.grails.org/grails/restricted" }
-}
-
-bootJar.enabled = false
-
-//dependencyManagement {
-//    dependencies {
-//        dependency "org.apache.solr:solr-solrj:${solrj}"
-//    }
-//}
 dependencies {
-    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
-    developmentOnly "org.springframework.boot:spring-boot-devtools"
-    implementation "org.apache.grails:grails-core"
-    implementation "org.apache.grails:grails-web-boot"
-    implementation "org.apache.grails:grails-logging"
-    implementation "org.apache.grails:grails-databinding"
-    implementation "org.apache.grails:grails-i18n"
-    implementation "org.apache.grails:grails-services"
-    implementation "org.apache.grails:grails-gsp"
-    profile "org.grails.profiles:web-plugin"
-    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
-
     implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
-
     implementation "com.itextpdf:html2pdf:${html2pdf}"
-
-    implementation 'org.apache.grails:grails-controllers'
-
     implementation 'org.apache.grails:grails-data-hibernate5'
-    implementation "org.apache.grails:spring-security-core:${grailsSpringSecurity}"
-    implementation "org.apache.grails:grails-interceptors"
-
+    implementation 'org.apache.grails:grails-interceptors'
+    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
-
-    implementation "org.apache.solr:solr-solrj:${solrj}"
-    implementation "org.apache.tika:tika-core:${tika}"
-    implementation "org.apache.tika:tika-parsers-standard:${tika}"
-    implementation "org.apache.tika:tika-parser-ocr-module:${tika}"
-    implementation "org.apache.tika:tika-parser-html-module:${tika}"
-
-    implementation project(':taack-ui-diagram')
-
     implementation "org.asciidoctor:asciidoctorj-api:${asciidoctorJ}"
 }
-
-assets {
-    minifyJs = true
-    minifyCss = true
-    configOptions = [:]
-
-    minifyOptions = [
-            languageMode     : 'ES_NEXT_IN',
-            targetLanguage   : 'ES_NEXT_IN', //Can go from ES6 to ES5 for those bleeding edgers
-            optimizationLevel: 'SIMPLE',
-            angularPass      : false // Can use @ngInject annotation for Angular Apps
-    ]
-
-    //excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
-
-    //for plugin packaging
-    packagePlugin = true //set to true if this is a library
-
-    //developmentRuntime can be turned off
-    developmentRuntime = true
-
-    //if you want to customize the jar task this task runs on you can specify a jarTaskName
-    jarTaskName = null
-}
-
-
-

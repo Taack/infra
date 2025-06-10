@@ -1,7 +1,7 @@
 package taack.ui.dump.html.element
 
 import groovy.transform.CompileStatic
-import org.apache.http.client.utils.URIBuilder
+import org.springframework.web.util.UriComponentsBuilder
 
 @CompileStatic
 final class HTMLAnchor implements IHTMLElement {
@@ -10,7 +10,7 @@ final class HTMLAnchor implements IHTMLElement {
         if (url)
             if (isAjax) {
                 attributes.put('ajaxAction', url)
-                attributes.put('href', new URIBuilder(url).setParameter('isAjax', 'false').build().toString())
+                attributes.put('href', UriComponentsBuilder.newInstance(url).replaceQueryParam('isAjax', 'false').build().toString())
             } else {
                 attributes.put('href', url)
             }

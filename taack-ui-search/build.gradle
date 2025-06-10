@@ -1,0 +1,19 @@
+plugins {
+    id 'taack-grails-plugin'
+    id 'taack-asciidoctor'
+}
+
+dependencies {
+    implementation "org.apache.solr:solr-solrj:${solrj}"
+    implementation "org.apache.tika:tika-core:${tika}"
+    implementation "org.apache.tika:tika-parsers-standard:${tika}"
+    implementation "org.apache.tika:tika-parser-ocr-module:${tika}"
+    implementation "org.apache.tika:tika-parser-html-module:${tika}"
+
+    implementation "org.apache.grails:grails-data-hibernate5"
+
+    implementation project(':taack-ui')
+}
+
+
+
