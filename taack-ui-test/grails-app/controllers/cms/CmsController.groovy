@@ -16,6 +16,7 @@ import taack.domain.TaackAttachmentService
 import taack.domain.TaackFilterService
 import taack.render.TaackEditorService
 import taack.render.TaackSaveService
+import taack.render.TaackUiPdfService
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
 import taack.ui.dsl.*
@@ -39,6 +40,7 @@ import static grails.async.Promises.task
 @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_USER", "ROLE_CMS_DIRECTOR"])
 class CmsController implements WebAttributes {
     TaackUiService taackUiService
+    TaackUiPdfService taackUiPdfService
     TaackSaveService taackSaveService
     CmsHtmlGeneratorService cmsHtmlGeneratorService
     TaackAttachmentService taackAttachmentService
@@ -1168,7 +1170,7 @@ class CmsController implements WebAttributes {
 
         }
 
-        taackUiService.downloadPdf(pdf, 'testChart', false)
+        taackUiPdfService.downloadPdf(pdf, 'testChart', false)
     }
 
     private static UiDiagramSpecifier barDiagram(boolean isStacked) {

@@ -1,0 +1,173 @@
+#gantt-body {
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    user-select:none;
+}
+
+#gantt-body .navbar {
+    background-color: #e3f2fd;
+    padding: 0 1em 0 1em;
+}
+
+#gantt-body .navbar-nav {
+    width: 100%;
+}
+
+#gantt-body .navbar-toggler-icon {
+    background-image: url('/assets/taack/icons/actions/confirm.svg') !important;
+    background-size: 32px;
+}
+
+#gantt-body .dropdown-toggle.show, #gantt-body .dropdown-item:hover, #gantt-body .dropdown-item:focus, #gantt-body .right-menu-in-dropdown .nav-link:hover {
+    color: white !important;
+    background-color: #0d6efd;
+}
+
+#gantt-body .dropdown-menu {
+    background-color: #e3f2fd !important;
+    margin-top: 0;
+    padding: 0;
+}
+
+#gantt-body .dropdown-divider {
+    margin: .25em 0;
+}
+
+#gantt-body .dropdown-header {
+    padding: .25em .5em;
+}
+
+#gantt-body .right-menu-in-dropdown.dropend .dropdown-menu {
+    margin-left: -1px;
+}
+
+#gantt-body .right-menu-in-dropdown.dropend .nav-link  {
+    padding: .1em 1em;
+}
+
+#gantt-body .right-menu-in-dropdown .nav-link:not(.disabled) {
+    color: #212529;
+}
+
+#gantt-body .dropdown-item:hover {
+    cursor: pointer;
+}
+
+#gantt-body .dropdown-item.selected::after {
+    display: inline-block;
+    margin-left: .5em;
+    content: "";
+    background-image: url('/assets/taack/icons/actions/confirm.svg');
+    background-repeat: no-repeat;
+    width: 15px;
+    height: 15px;
+}
+
+#gantt-body .gantt-navigation-right-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#gantt-body .gantt-navigation-right-section .dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#gantt-body .gantt-navigation-right-section .section-left, .section-left-2 {
+    display: flex;
+    padding-left: 1em;
+}
+
+#gantt-body .gantt-navigation-right-section .section-left .section-left-2 input {
+    background-color: #ffffff;
+    width: 15em;
+}
+
+#gantt-body .gantt-left-menu {
+    display: inline-flex;
+    flex-direction: column;
+    margin: .4em;
+    width: 63px;
+}
+
+#gantt-body .gantt-menu-double-buttons {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#gantt-body .gantt-menu-double-buttons button {
+    outline: none;
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+}
+
+#gantt-body .gantt-menu-double-buttons button:hover:not(.inactive) {
+    background-color: #cbdbea;
+}
+
+#gantt-body .gantt-menu-double-buttons button:active {
+    background-color: transparent !important;
+}
+
+#gantt-body .gantt-left-menu hr {
+    margin-top: .5em;
+    margin-bottom: .5em;
+    color: #26a6d1;
+}
+
+#gantt-body .gantt-left-menu .button-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#gantt-body .button-header {
+    color: #6c757d;
+    font-size: 50%;
+    text-align: center;
+    margin-bottom: .5em;
+}
+
+#gantt-body .gantt-menu-single-button {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#gantt-body .gantt-menu-single-button button {
+    margin-bottom: 0.4em;
+}
+
+#gantt-body .gantt-canvas {
+    display: inline-block;
+    vertical-align: top;
+    height: Calc(100vh - 150px);
+    width: Calc(100vw - 63px - 0.8em - 10px);
+    overflow: auto;
+    border-left: 1px solid #26a6d1;
+    min-height: 300px;
+}
+
+.progression-container {
+    height: 32px;
+    position: relative;
+}
+
+.progression-container .progression-element {
+    position: absolute;
+    top: 40%;
+}
+
+.progression-container .progression-bar {
+    height: 4px;
+}
+
+.progression-container .progression-percent {
+    position: absolute;
+    top: 10%;
+    font-size: 85%;
+}

@@ -1,29 +1,25 @@
 package taack.render
 
-import ResponseRenderer
-import GrailsCompileStatic
-import WebAttributes
-import DataBinder
-import ResourceLocator
-import GrailsWebRequest
-import WebUtils
-import Autowired
-import Value
-import Resource
-import TaackUiConfiguration
-import UiBlockSpecifier
-import UiShowSpecifier
-import BlockSpec
+import grails.compiler.GrailsCompileStatic
+import grails.web.api.WebAttributes
+import grails.web.databinding.DataBinder
+import org.grails.core.io.ResourceLocator
+import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.web.util.WebUtils
+import org.springframework.core.io.Resource
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiShowSpecifier
+import taack.ui.dsl.block.BlockSpec
 import taack.wysiwyg.Asciidoc
 
-import java.nio.file.Files
 import java.nio.file.Path
-import java.util.zip.Inflater
 /**
  * Service providing TQL support to scripts in the editor
  */
 @GrailsCompileStatic
-final class TaackEditorService implements WebAttributes, ResponseRenderer, DataBinder {
+final class TaackEditorService implements WebAttributes, DataBinder {
 
     enum ImageExtension {
         png('png'), jpg('jpeg'), svg('svg+xml')

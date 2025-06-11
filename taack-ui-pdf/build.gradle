@@ -1,13 +1,17 @@
 plugins {
     id 'taack-grails-plugin'
-    id 'taack-grails-assets-plugin'
+    id 'org.apache.grails.gradle.grails-gsp'
+    id 'taack-asciidoctor'
 }
 
 dependencies {
-//    implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
-    implementation 'org.apache.grails:grails-data-hibernate5'
-    implementation 'org.apache.grails:grails-interceptors'
-    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+    implementation "com.itextpdf:html2pdf:${html2pdf}"
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+    implementation "org.apache.grails:grails-gsp"
+    implementation "org.apache.grails:grails-validation"
+    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
+
+    implementation project(':taack-ui')
 }
 
 // ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar

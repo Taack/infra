@@ -15,6 +15,7 @@ import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
 import taack.domain.TaackMetaModelService
 import taack.render.TaackSaveService
+import taack.render.TaackUiPdfService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiFilterSpecifier
@@ -28,6 +29,7 @@ import taack.ui.dsl.common.IconStyle
 @Secured(['isAuthenticated()'])
 class CrewController implements WebAttributes {
     TaackUiService taackUiService
+    TaackUiPdfService taackUiPdfService
     TaackFilterService taackFilterService
     TaackSaveService taackSaveService
     SpringSecurityService springSecurityService
@@ -399,10 +401,10 @@ class CrewController implements WebAttributes {
     }
 
     def downloadBinPdf() {
-        taackUiService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', true)
+        taackUiPdfService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', true)
     }
 
     def downloadBinPdf2() {
-        taackUiService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', false)
+        taackUiPdfService.downloadPdf(crewPdfService.buildPdfHierarchy(), 'UserHierarchy', false)
     }
 }

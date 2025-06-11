@@ -5,8 +5,8 @@ import grails.util.Environment
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
-import org.owasp.html.PolicyFactory
-import org.owasp.html.Sanitizers
+//import org.owasp.html.PolicyFactory
+//import org.owasp.html.Sanitizers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
@@ -41,19 +41,19 @@ import taack.ui.dsl.helper.Utils
 @GrailsCompileStatic
 class TaackUiEnablerService implements WebAttributes {
 
-    static lazyInit = false
+//    static lazyInit = false
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
-    def policy
+//    def policy
 
     @Autowired
     TaackUiConfiguration taackUiConfiguration
 
-    @PostConstruct
-    void init() {
-        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS)
-    }
+//    @PostConstruct
+//    void init() {
+//        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS)
+//    }
 
     static String sanitizeString(String toSanitize) {
         return toSanitize
