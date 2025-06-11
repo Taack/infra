@@ -374,7 +374,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitBlockTabsEnd() {
         exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
-        blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId, parameter.params))
+        Map<String, Object> p = parameter.params.sort()
+        if (p) p.remove("tabIndex")
+        blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId, p))
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
     }
