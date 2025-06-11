@@ -17,5 +17,3 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
-rootProject.name="taack-grails-gradle"

@@ -1,9 +1,11 @@
 plugins {
     id 'taack-grails-plugin'
+    id 'org.apache.grails.gradle.grails-gsp'
     id 'com.bertramlabs.asset-pipeline'
 }
 
 dependencies {
+    implementation "org.apache.grails:grails-gsp"
     runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
 }
 

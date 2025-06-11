@@ -2,7 +2,6 @@ package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
-import grails.web.api.WebAttributes
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
 import taack.solr.SolrSpecifier
@@ -42,7 +41,7 @@ import taack.ui.dsl.UiBlockSpecifier
  *
  */
 @GrailsCompileStatic
-final class TaackSearchService implements WebAttributes {
+class TaackSearchService {
 
     TaackSolrSearchService taackSolrSearchService
 
@@ -55,7 +54,7 @@ final class TaackSearchService implements WebAttributes {
         List<? extends GormEntity> indexThose(Class<? extends GormEntity> toIndex)
     }
 
-    private Map<Class<? extends GormEntity>, Pair<IIndexService, SolrSpecifier>> mapSolrSpecifier = [:]
+    private static Map<Class<? extends GormEntity>, Pair<IIndexService, SolrSpecifier>> mapSolrSpecifier = [:]
 
     /**
      * Register the way each domain class will be indexed and faceted.
@@ -63,7 +62,7 @@ final class TaackSearchService implements WebAttributes {
      * @param indexService The service
      * @param solrSpecifier How to index data
      */
-    final void registerSolrSpecifier(IIndexService indexService, SolrSpecifier solrSpecifier) {
+    final static void registerSolrSpecifier(IIndexService indexService, SolrSpecifier solrSpecifier) {
         mapSolrSpecifier.putIfAbsent(solrSpecifier.type, new Pair(indexService, solrSpecifier))
     }
 

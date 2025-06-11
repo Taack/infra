@@ -1,9 +1,11 @@
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"war"
-apply plugin:"org.apache.grails.gradle.grails-web"
-apply plugin:"com.bertramlabs.asset-pipeline"
-apply plugin:"org.apache.grails.gradle.grails-gsp"
+plugins {
+    id 'taack-grails-common'
+    id 'org.apache.grails.gradle.grails-app'
+    id 'war'
+    id 'org.apache.grails.gradle.grails-web'
+    id 'org.apache.grails.gradle.grails-gsp'
+    id 'com.bertramlabs.asset-pipeline'
+}
 
 repositories {
     mavenCentral()

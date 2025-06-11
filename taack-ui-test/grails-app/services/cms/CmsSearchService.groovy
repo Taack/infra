@@ -19,8 +19,8 @@ class CmsSearchService implements TaackSearchService.IIndexService {
     TaackSearchService taackSearchService
 
     @PostConstruct
-    private void init() {
-        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(CmsPage, CmsController.&editPage as MethodClosure, this.&labelingPage as MethodClosure, { CmsPage p ->
+    void init() {
+        TaackSearchService.registerSolrSpecifier(this, new SolrSpecifier(CmsPage, CmsController.&editPage as MethodClosure, this.&labelingPage as MethodClosure, { CmsPage p ->
             p ?= new CmsPage()
             if (p.id)
                 for (SupportedLanguage l in SupportedLanguage.values()) {
