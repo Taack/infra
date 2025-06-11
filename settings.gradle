@@ -11,6 +11,7 @@ rootProject.name = 'infra'
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url "https://repository.apache.org/content/groups/public" }
         maven { url "https://repo.grails.org/grails/restricted" }
@@ -26,9 +27,10 @@ buildscript {
 include 'taack-ui-search'
 include 'taack-ui'
 
-if (taackReleaseVersion.endsWith('SNAPSHOT')) {
-    include 'taack-ui-test'
-    include 'browser:client'
-}
+include 'taack-ui-test'
+include 'taack-ui-test-minimal'
+//include 'browser:client'
+//if (taackReleaseVersion.endsWith('SNAPSHOT')) {
+//}
 
 

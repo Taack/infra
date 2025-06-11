@@ -60,6 +60,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     static lazyInit = false
 
+    TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
     ThemeService themeService
     SpringSecurityService springSecurityService
 
@@ -385,6 +386,50 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         show(block)
     }
 
+    /**
+     * Allow to get the HTML version of the PDF, also, render the PDF in the outputStream parameter.
+     *
+     * @param printableSpecifier PDF descriptor
+     * @param outputStream connection to the client browser
+     * @param locale the language the PDF must be rendered
+     * @return the HTML version of the PDF
+     */
+    final String streamPdf(final UiPrintableSpecifier printableSpecifier, final OutputStream outputStream = null, Locale locale = null) {
+        ByteArrayOutputStream blockStream = new ByteArrayOutputStream(8_000)
+        RawHtmlPrintableDump htmlPdf = new RawHtmlPrintableDump(blockStream, new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.PDF))
+        printableSpecifier.visitPrintableBlock(htmlPdf)
+        final StringBuffer css = new StringBuffer()
+        final listCss = [
+
+                'taack.css',
+                'taack-pdf.css',
+                'custom-pdf.css'
+        ]
+        listCss.each {
+            Resource r = assetResourceLocator.findResourceForURI(it)
+            if (r?.exists()) {
+                css.append('\n/*! ' + it.toString() + '++++ */\n')
+                css.append(r.inputStream.text)
+                css.append('\n')
+                css.append('\n/*! ' + it.toString() + '---- */\n')
+            }
+        }
+
+        String html = g.render template: "/taackUi/block-pdf", model: [
+                block          : blockStream.toString(),
+                css            : css.toString(),
+                root           : taackUiConfiguration.root,
+                headerHeight   : htmlPdf.headerHeight,
+                bootstrapJsTag : bootstrapJsTag,
+                bootstrapCssTag: bootstrapCssTag
+        ]
+
+        if (outputStream) {
+            taackPdfConverterFromHtmlService.generatePdfFromHtmlIText(outputStream, html)
+        }
+        html
+    }
+
     static final String getDateFileName() {
         Calendar cal = Calendar.getInstance()
         int y = cal.get(Calendar.YEAR)
@@ -394,6 +439,30 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         int mn = cal.get(Calendar.MINUTE)
         int sec = cal.get(Calendar.SECOND)
         "$y$m$dm$hd$mn$sec"
+    }
+    /**
+     * Allow to upload the PDF to the client browser
+     *
+     * @param printableSpecifier PDF descriptor
+     * @param fileName
+     * @param isHtml
+     * @param brutHtml
+     * @return
+     */
+    final def downloadPdf(final UiPrintableSpecifier printableSpecifier, final String fileNamePrefix, final Boolean isHtml = false) {
+        String fileName = fileNamePrefix + "-${dateFileName}.pdf"
+        GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
+        webUtils.currentResponse.setContentType(isHtml ? 'text/html' : 'application/pdf')
+        webUtils.currentResponse.setHeader('Content-disposition', "${params.boolean('inline') ? 'inline' : 'attachment'};filename=${URLEncoder.encode(fileName, 'UTF-8')}${isHtml ? '.html' : ''}")
+        if (!isHtml) streamPdf(printableSpecifier, webUtils.currentResponse.outputStream)
+        else webUtils.currentResponse.outputStream << streamPdf(printableSpecifier)
+        try {
+            webUtils.currentResponse.outputStream.flush()
+            webUtils.currentResponse.outputStream.close()
+            webRequest.renderView = false
+        } catch (e) {
+            log.error "${e.message}"
+        }
     }
 
     static UiBlockSpecifier downloadPdfIFrame(MethodClosure action, Long id = null) {

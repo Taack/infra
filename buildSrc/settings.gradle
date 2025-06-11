@@ -16,4 +16,7 @@ pluginManagement {
         maven { url "https://repo.grails.org/grails/restricted" }
         gradlePluginPortal()
     }
+    plugins {
+        id "org.graalvm.buildtools.native" version "${graalvmBuildtoolsVersion}"
+    }
 }

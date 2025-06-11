@@ -1,19 +1,19 @@
 package taack.render
 
-import grails.artefact.controller.support.ResponseRenderer
-import grails.compiler.GrailsCompileStatic
-import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
-import org.grails.core.io.ResourceLocator
-import org.grails.web.servlet.mvc.GrailsWebRequest
-import org.grails.web.util.WebUtils
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.Resource
-import taack.ui.TaackUiConfiguration
-import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiShowSpecifier
-import taack.ui.dsl.block.BlockSpec
+import ResponseRenderer
+import GrailsCompileStatic
+import WebAttributes
+import DataBinder
+import ResourceLocator
+import GrailsWebRequest
+import WebUtils
+import Autowired
+import Value
+import Resource
+import TaackUiConfiguration
+import UiBlockSpecifier
+import UiShowSpecifier
+import BlockSpec
 import taack.wysiwyg.Asciidoc
 
 import java.nio.file.Files
@@ -86,7 +86,7 @@ final class TaackEditorService implements WebAttributes, ResponseRenderer, DataB
                 webUtils.currentResponse.outputStream.close()
                 webRequest.renderView = false
             } catch (e) {
-                log.error "${e.message}"
+                taack.render.TaackEditorService.log.error "${e.message}"
             }
             return null
         } else {
