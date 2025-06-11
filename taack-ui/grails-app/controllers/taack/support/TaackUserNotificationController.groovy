@@ -7,7 +7,7 @@ import grails.web.api.WebAttributes
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import taack.app.TaackAppRegisterService
+import taack.domain.TaackGormClassRegisterService
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
@@ -39,12 +39,12 @@ class TaackUserNotificationController implements WebAttributes {
         }
     }
 
-    def readAllUserNotifications(String objectController) {
+    def readAllUserNotifications(String title) {
         Integer option = params.option ? params.int('option') : null
         if (option == 1) {
             TaackUser currentUser = springSecurityService.currentUser as TaackUser
             currentUser.getUnreadRelatedDataList()?.each {
-                if (objectController == "all" || (TaackAppRegisterService.getTaackLinkClass(it.class.name)?.controller ?: "") == objectController) {
+                if (title == "all" || (TaackGormClassRegisterService.getTaackGormClass(it.class.name)?.notification?.getTitleClosure()?.call(it.ident()) ?: "other") == title) {
                     currentUser.markRelatedDataAsRead(it)
                 }
             }
@@ -53,10 +53,9 @@ class TaackUserNotificationController implements WebAttributes {
             taackUiService.show(new UiBlockSpecifier().ui {
                 modal {
                     show new UiShowSpecifier().ui {
-                        String notificationGroupName = objectController ? tr("${objectController}.app", null) : tr("enum.value.OTHER", null)
-                        showAction "<h5>Mark all Notifications ${objectController == "all" ? "" : "of \"${notificationGroupName}\" "}as Read ?</h5>",
+                        showAction "<h5>Mark all Notifications ${title == "all" ? "" : "of \"${title ?: tr("enum.value.OTHER", null)}\" "}as Read ?</h5>",
                                 TaackUserNotificationController.&readAllUserNotifications as MethodClosure,
-                                [objectController: objectController, option: 1]
+                                [title: title, option: 1]
                     }
                 }
             })

@@ -1,4 +1,4 @@
-<%@ page import="grails.util.Pair; taack.app.TaackLinkClass; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="taack.domain.TaackGormClass; taack.domain.TaackGormClassRegisterService; grails.util.Pair; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -84,27 +84,35 @@
                                         <li class="nav-item dropdown">
                                             <span class="user-notification-header">
                                                 Notification
-                                                <a ajaxaction="/taackUserNotification/readAllUserNotifications?objectController=all"
+                                                <a ajaxaction="/taackUserNotification/readAllUserNotifications?title=all"
                                                    unread-notification-number="${notifications.size()}"></a>
                                             </span>
                                         </li>
                                         <li class="nav-item dropdown">
                                             <div class="user-notification-body">
                                                 <g:each in="${notifications.collect {
-                                                    new Pair(it, TaackAppRegisterService.getTaackLinkClass(it.class.name))
-                                                }.groupBy { Pair<GormEntity, TaackLinkClass> it ->
-                                                    it.bValue?.controller
+                                                    new Pair(it, TaackGormClassRegisterService.getTaackGormClass(it.class.name))
+                                                }.groupBy { Pair<GormEntity, TaackGormClass> it ->
+                                                    it.bValue?.notification?.getTitleClosure()?.call(it.aValue.ident())
                                                 }.sort { it.key }}" var="group">
                                                     <div class="user-notification-group">
                                                         <div class="group-header">
-                                                            <g:message code="${group.key != null ? "${group.key}.app" : "enum.value.OTHER"}" />
-                                                            <a ajaxaction="/taackUserNotification/readAllUserNotifications?objectController=${group.key ?: ""}"
+                                                            <g:if test="${group.key != null}">
+                                                                ${group.key}
+                                                            </g:if>
+                                                            <g:else>
+                                                                <g:message code="enum.value.OTHER" />
+                                                            </g:else>
+                                                            <a ajaxaction="/taackUserNotification/readAllUserNotifications?title=${group.key ?: "other"}"
                                                                unread-notification-number="${(group.value as List).size()}"></a>
                                                         </div>
-                                                        <g:each in="${(group.value as List<Pair<GormEntity, TaackLinkClass>>).sort { -it.aValue.ident() }}" var="object">
-                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.controller}&objectAction=${object.bValue?.action}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
-                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(object.aValue.toString())}">
-                                                                ${object.aValue.toString()}
+                                                        <g:each in="${(group.value as List<Pair<GormEntity, TaackGormClass>>).sort { -it.aValue.ident() }}" var="object">
+                                                            <%
+                                                                String displayLabel = object.bValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
+                                                            %>
+                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.showController}&objectAction=${object.bValue?.showAction}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
+                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(displayLabel)}">
+                                                                ${displayLabel}
                                                             </a>
                                                         </g:each>
                                                     </div>

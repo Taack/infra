@@ -4,6 +4,8 @@ package crew
 import grails.compiler.GrailsCompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
+import taack.domain.TaackGormClass
+import taack.domain.TaackGormClassRegisterService
 import taack.domain.TaackSearchService
 import taack.solr.SolrSpecifier
 import taack.solr.SolrFieldType
@@ -20,7 +22,7 @@ class CrewSearchService implements TaackSearchService.IIndexService {
 
     @PostConstruct
     private void init() {
-        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MethodClosure, this.&labeling as MethodClosure, { User u ->
+        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, { User u ->
             u ?= new User()
             indexField SolrFieldType.TXT_NO_ACCENT, u.username_
             indexField SolrFieldType.TXT_GENERAL, u.username_
@@ -31,11 +33,14 @@ class CrewSearchService implements TaackSearchService.IIndexService {
             indexField SolrFieldType.DATE, 0.5f, true, u.dateCreated_
             indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, u.userCreated?.username
         }))
-    }
-
-    String labeling(Long id) {
-        def u = User.read(id)
-        "User: ${u.firstName} ${u.lastName} ($id)"
+        TaackGormClassRegisterService.register(
+                new TaackGormClass(User.class).builder
+                        .setShowMethod(CrewController.&showUserFromSearch as MethodClosure)
+                        .setShowLabel({ Long id ->
+                            def u = User.read(id)
+                            return "User: ${u.firstName} ${u.lastName} ($id)"
+                        }).build()
+        )
     }
 
     @Override

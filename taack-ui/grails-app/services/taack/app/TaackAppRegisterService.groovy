@@ -39,39 +39,12 @@ final class TaackApp implements Comparable {
     }
 }
 
-@CompileStatic
-final class TaackLinkClass {
-    final Class<? extends GormEntity> linkClass
-    final MethodClosure showMethod
-    final Closure<List<TaackUser>> notificationUserListWhenCreating
-
-    TaackLinkClass(Class<? extends GormEntity> linkClass, MethodClosure showMethod, Closure<List<TaackUser>> notificationUserListWhenCreating = null) {
-        this.linkClass = linkClass
-        this.showMethod = showMethod
-        this.notificationUserListWhenCreating = notificationUserListWhenCreating
-    }
-
-    String getController() {
-        Utils.getControllerName(showMethod)
-    }
-
-    String getAction() {
-        showMethod.method
-    }
-}
-
 @GrailsCompileStatic
 class TaackAppRegisterService {
     private final static SortedSet<TaackApp> taackApps = new TreeSet<TaackApp>()
-    private final static List<TaackLinkClass> taackLinkClasses = []
 
-    static void register(TaackApp app, TaackLinkClass... linkClasses) {
+    static void register(TaackApp app) {
         taackApps.add(app)
-        taackLinkClasses.addAll(linkClasses)
-    }
-
-    static void register(TaackLinkClass... linkClasses) {
-        taackLinkClasses.addAll(linkClasses)
     }
 
     static List<TaackApp> getApps() {
@@ -84,9 +57,5 @@ class TaackAppRegisterService {
             res.add new EnumOption(Utils.getControllerName(it.entryPoint), it.label)
         }
         res as EnumOption[]
-    }
-
-    static TaackLinkClass getTaackLinkClass(String clazz) {
-        return taackLinkClasses.find { it.linkClass?.name == clazz }
     }
 }

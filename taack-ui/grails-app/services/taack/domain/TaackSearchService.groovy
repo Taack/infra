@@ -20,7 +20,7 @@ import taack.ui.dsl.UiBlockSpecifier
  *
  * @PostConstruct
  *      private void init() {
- *          taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MC, this.&labeling as MC, { User u ->
+ *          taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, { User u ->
  *              u ?= new User()
  *              indexField "User Name (without Accents)", SolrFieldType.TXT_NO_ACCENT, u.username_
  *              indexField "User Name", SolrFieldType.TXT_GENERAL, u.username_
@@ -31,6 +31,14 @@ import taack.ui.dsl.UiBlockSpecifier
  *              indexField "Date Created", SolrFieldType.DATE, 0.5f, true, u.dateCreated_
  *              indexField "User Created", SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, u.userCreated?.username
  *          }))
+ *
+ *          TaackGormClassRegisterService.register(
+ *                  new TaackGormClass(User.class).build()
+ *                          .setShowMethod(CrewController.&showUserFromSearch as MethodClosure)
+ *                          .setShowLabel({ Long id ->
+ *                              // define how to label the object
+ *                          }).build()
+ *          )
  *      }
  *
  * @Override

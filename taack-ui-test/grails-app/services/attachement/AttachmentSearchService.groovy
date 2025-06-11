@@ -7,6 +7,8 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import attachment.Attachment
 import taack.domain.TaackAttachmentService
+import taack.domain.TaackGormClass
+import taack.domain.TaackGormClassRegisterService
 import taack.domain.TaackSearchService
 import taack.solr.SolrFieldType
 import taack.solr.SolrSpecifier
@@ -24,7 +26,7 @@ class AttachmentSearchService implements TaackSearchService.IIndexService {
 
     @PostConstruct
     private void init() {
-        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(Attachment, AttachmentController.&showAttachment as MethodClosure, this.&labeling as MethodClosure, { Attachment a ->
+        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(Attachment, { Attachment a ->
             a ?= new Attachment()
             String content = taackAttachmentService.attachmentContent(a)
             indexField SolrFieldType.TXT_GENERAL, a.originalName_
@@ -34,11 +36,14 @@ class AttachmentSearchService implements TaackSearchService.IIndexService {
             indexField SolrFieldType.DATE, 0.5f, true, a.dateCreated_
             indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, a.userCreated?.username
         }))
-    }
-
-    String labeling(Long id) {
-        def a = Attachment.read(id)
-        "Attachment: ${a.originalName} ($id)"
+        TaackGormClassRegisterService.register(
+                new TaackGormClass(Attachment.class).builder
+                        .setShowMethod(AttachmentController.&showAttachment as MethodClosure)
+                        .setShowLabel({ Long id ->
+                            def a = Attachment.read(id)
+                            return "Attachment: ${a.originalName} ($id)"
+                        }).build()
+        )
     }
 
     @Override

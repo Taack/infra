@@ -177,11 +177,11 @@ final class TaackSolrSearchService implements WebAttributes {
                                 def solrSpecifier = mapSolrSpecifier[classMap[docId.substring(0, iSep)]]?.bValue
                                 if (solrSpecifier) {
                                     def id = Long.parseLong(docId.substring(iSep + 1))
-                                    String label = solrSpecifier.label.call(id)
                                     row {
                                         rowColumn(2) {
-                                            rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, solrSpecifier.show, id)
-                                            rowField label
+                                            TaackGormClass c = TaackGormClassRegisterService.getTaackGormClass(solrSpecifier.type.name)
+                                            rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, c.showMethod, id)
+                                            rowField c.showLabel.call(id) as String
                                         }
                                     }
                                     for (def hli in hl) {

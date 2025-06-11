@@ -13,9 +13,9 @@ import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.Errors
-import taack.app.TaackAppRegisterService
 import taack.ast.type.FieldInfo
 import taack.domain.IDomainHistory
+import taack.domain.TaackGormClassRegisterService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.helper.Utils
 import taack.user.IUserCreated
@@ -214,7 +214,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             if (gormEntity.hasErrors()) {
                 log.error "${gormEntity.errors}"
             } else if ((!(gormEntity instanceof IDomainHistory) && !id) || (gormEntity instanceof IDomainHistory && !doNotBindParams)) {
-                TaackAppRegisterService.getTaackLinkClass(gormEntity.class.name)?.notificationUserListWhenCreating?.call(gormEntity)?.each { TaackUser u ->
+                TaackGormClassRegisterService.getTaackGormClass(gormEntity.class.name)?.notification?.getRecipientsClosure()?.call(gormEntity.ident())?.each { TaackUser u ->
                     u.addToUnreadRelatedDataList(gormEntity)
                 }
             }
