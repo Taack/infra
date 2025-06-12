@@ -3,46 +3,23 @@ plugins {
     id 'org.apache.grails.gradle.grails-app'
     id 'war'
     id 'org.apache.grails.gradle.grails-web'
-    id 'org.apache.grails.gradle.grails-gsp'
     id 'com.bertramlabs.asset-pipeline'
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://repository.apache.org/content/groups/public" }
-    maven { url "https://repo.grails.org/grails/restricted" }
 }
 
 dependencies {
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    integrationTestImplementation testFixtures("org.apache.grails:grails-geb")
-    console "org.apache.grails:grails-console"
-    implementation "org.springframework.boot:spring-boot-starter-logging"
-    implementation "org.springframework.boot:spring-boot-starter-validation"
-    implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation "org.springframework.boot:spring-boot-starter"
-    implementation "org.apache.grails:grails-core"
+//    implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-tomcat"
     implementation "org.apache.grails:grails-web-boot"
-    implementation "org.apache.grails:grails-logging"
-    implementation "org.apache.grails:grails-rest-transforms"
-    implementation "org.apache.grails:grails-databinding"
-    implementation "org.apache.grails:grails-i18n"
-    implementation "org.apache.grails:grails-services"
     implementation "org.apache.grails:grails-url-mappings"
-    implementation "org.apache.grails:grails-interceptors"
-    implementation "org.apache.grails:grails-scaffolding"
-    implementation "org.apache.grails:grails-data-hibernate5"
-    implementation "org.apache.grails:grails-gsp"
+    implementation "org.apache.grails:grails-rest-transforms"
+
     profile "org.apache.grails.profiles:web"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "com.zaxxer:HikariCP"
     runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
-    testImplementation "org.apache.grails:grails-testing-support-datamapping"
-    testImplementation "org.apache.grails:grails-testing-support-web"
-    testImplementation "org.spockframework:spock-core"
 }
 
 compileJava.options.release = 17

@@ -1,6 +1,6 @@
 plugins {
     id 'taack-grails-webapp'
-    id 'org.graalvm.buildtools.native'
+//    id 'org.graalvm.buildtools.native'
 }
 
 group = "taack.ui.test"
@@ -51,23 +51,22 @@ assets {
 //    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
 //}
 
-graalvmNative {
-    toolchainDetection = true
-    binaries.main {
-        mainClass = 'taack.ui.test.Application'
-        buildArgs.addAll(
-                '--no-fallback',
-                '--initialize-at-build-time=org.apache.sshd.common.file.root.RootedFileSystemProvider',
-                '--initialize-at-build-time=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider',
-                '--initialize-at-build-time=ch.qos.logback.classic.Logger',
-                '-O3', '-march=native', '--link-at-build-time')
-        configurationFileDirectories.from(file('src/graalvm'))
-    }
-    agent {
-        enabled = true
-
-    }
-}
+//graalvmNative {
+//    toolchainDetection = true
+//    binaries.main {
+//        mainClass = 'taack.ui.test.Application'
+//        buildArgs.addAll(
+//                '--no-fallback',
+//                '--initialize-at-build-time=org.apache.sshd.common.file.root.RootedFileSystemProvider',
+//                '--initialize-at-build-time=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider',
+//                '--initialize-at-build-time=ch.qos.logback.classic.Logger',
+//                '-O3', '-march=native', '--link-at-build-time')
+//        configurationFileDirectories.from(file('src/graalvm'))
+//    }
+//    agent {
+//        enabled = true
+//    }
+//}
 
 /**
  * ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar

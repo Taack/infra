@@ -6,13 +6,12 @@ import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider
 import com.itextpdf.io.font.FontProgram
 import com.itextpdf.io.font.FontProgramFactory
 import com.itextpdf.layout.font.FontProvider
-import groovy.transform.CompileStatic
-
+import grails.compiler.GrailsCompileStatic
 /**
  * Convert HTML code to PDF (WiP).
  * <p>Fonts should be located in ${taackUiConfiguration.root}/pdf/fonts/
  */
-@CompileStatic
+@GrailsCompileStatic
 class TaackPdfConverterFromHtmlService {
     static final String FONT_BOLD = "fonts/Roboto-Bold.ttf"
     static final String FONT_ITALIC = "fonts/Roboto-Italic.ttf"

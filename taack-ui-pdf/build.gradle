@@ -1,17 +1,14 @@
 plugins {
     id 'taack-grails-plugin'
-    id 'org.apache.grails.gradle.grails-gsp'
     id 'taack-asciidoctor'
 }
 
 dependencies {
+    implementation project(':taack-ui')
+
     implementation "com.itextpdf:html2pdf:${html2pdf}"
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
-    implementation "org.apache.grails:grails-gsp"
-    implementation "org.apache.grails:grails-validation"
-    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
 
-    implementation project(':taack-ui')
 }
 
 // ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
