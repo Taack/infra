@@ -1,8 +1,7 @@
-package taack.jdbc
+package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
-import TaackJdbcService
 
 /**
  * Support Controller that communicate with the JDBC Driver. Tested for Libreoffice and Intellij clients.

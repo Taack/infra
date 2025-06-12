@@ -64,6 +64,8 @@ def publishedProjects = [
         'taack-ui',
         'taack-ui-pdf',
         'taack-ui-search',
+        'taack-jdbc-common',
+        'taack-ui-jdbc',
 ]
 
 subprojects {

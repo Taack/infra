@@ -1,0 +1,9 @@
+plugins {
+    id 'taack-grails-plugin'
+    id 'taack-asciidoctor'
+}
+
+dependencies {
+    implementation project(':taack-jdbc-common')
+    implementation project(':taack-ui')
+}

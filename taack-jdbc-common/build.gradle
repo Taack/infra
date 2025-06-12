@@ -10,23 +10,12 @@ repositories {
 dependencies {
     api "com.google.protobuf:protobuf-java:${protobufVersion}"
     antlr "org.antlr:antlr4:${antlr4}"
-    implementation "org.antlr:antlr4-runtime:${antlr4}"
+    api "org.antlr:antlr4-runtime:${antlr4}"
 }
 
 protobuf {
-
-    if (new File("/usr/local/bin/protoc").exists()) {
-        protoc {
-            path = '/usr/local/bin/protoc'
-        }
-    } else if (new File("/opt/homebrew/bin/protoc").exists()) {
-        protoc {
-            path = '/opt/homebrew/bin/protoc'
-        }
-    } else {
-        protoc {
-            artifact = "com.google.protobuf:protoc:${protobufVersion}"
-        }
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
 }
 
@@ -36,7 +25,5 @@ generateGrammarSource {
     outputDirectory outputDir
 }
 
-sourcesJar {
-    dependsOn(generateGrammarSource)
-}
+//sourcesJar.dependsOn generateGrammarSource
 assemble.dependsOn generateGrammarSource
