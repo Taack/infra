@@ -5,8 +5,8 @@ import grails.util.Environment
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
-//import org.owasp.html.PolicyFactory
-//import org.owasp.html.Sanitizers
+import org.owasp.html.PolicyFactory
+import org.owasp.html.Sanitizers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
@@ -41,33 +41,32 @@ import taack.ui.dsl.helper.Utils
 @GrailsCompileStatic
 class TaackUiEnablerService implements WebAttributes {
 
-//    static lazyInit = false
+    static lazyInit = false
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
-//    def policy
+    PolicyFactory policy
 
     @Autowired
     TaackUiConfiguration taackUiConfiguration
 
-//    @PostConstruct
-//    void init() {
-//        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS)
-//    }
-
-    static String sanitizeString(String toSanitize) {
-        return toSanitize
-//        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
+    @PostConstruct
+    void init() {
+        policy = Sanitizers.FORMATTING & Sanitizers.LINKS
     }
 
-//    static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
-//        PolicyFactory pf = Sanitizers.FORMATTING
-//        allowing?.each {
-//            pf = pf.and(it)
-//        }
-//        return pf.sanitize(toSanitize)
-//        return toSanitize
-//    }
+    static String sanitizeString(String toSanitize) {
+        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
+    }
+
+    static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
+        PolicyFactory pf = Sanitizers.FORMATTING
+        allowing?.each {
+            pf = pf.and(it)
+        }
+        return pf.sanitize(toSanitize)
+        return toSanitize
+    }
 
     private final static Map<String, Closure> securityClosures = [:]
 

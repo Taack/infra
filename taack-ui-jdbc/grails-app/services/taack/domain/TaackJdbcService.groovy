@@ -117,6 +117,19 @@ final class TaackJdbcService {
      *   }
      * }</pre>
      */
+    final static class Jdbc {
+        static final void registerClassProperties(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
+            registerJdbcClass(aClass, fieldInfos)
+        }
+
+        static final void registerClassGetters(Class<? extends GormEntity> aClass, GetMethodReturn... methodReturns) {
+            registerJdbcClass(aClass, methodReturns)
+        }
+
+        static final Map<Class<? extends GormEntity>, FieldInfo[]> getFieldInfoMap() {
+            TaackJdbcService.fieldInfoMap
+        }
+    }
 
     final static void registerJdbcClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
         def fieldInfoWithId = fieldInfos.toList()

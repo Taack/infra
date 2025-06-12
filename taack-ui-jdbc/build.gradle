@@ -4,6 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(':taack-jdbc-common')
+    api project(':taack-jdbc-common')
     implementation project(':taack-ui')
 }
