@@ -12,7 +12,6 @@ import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.Parameter
-import test.TestService
 
 /*
 TODO: Add an infrastructure to list new stuffs from a user and a timestamp
@@ -84,9 +83,4 @@ class RootController {
         render 'Done !'
     }
 
-    TestService testService
-
-    def test() {
-        render testService.sayThis()
-    }
 }

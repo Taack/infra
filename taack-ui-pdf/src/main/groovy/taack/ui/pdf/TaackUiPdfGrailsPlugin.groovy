@@ -1,8 +1,9 @@
-package taack.ui
+package taack.ui.pdf
 
-import grails.plugins.*
 
-class TaackUiGrailsPlugin extends Plugin {
+import grails.plugins.Plugin
+
+class TaackUiPdfGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "7.0.0-M4 > *"
