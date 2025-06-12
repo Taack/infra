@@ -1,4 +1,4 @@
-<%@ page import="taack.domain.TaackGormClass; taack.domain.TaackGormClassRegisterService; grails.util.Pair; org.apache.commons.lang.StringEscapeUtils; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="taack.domain.TaackGormClass; taack.domain.TaackGormClassRegisterService; grails.util.Pair; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -111,7 +111,7 @@
                                                                 String displayLabel = object.bValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
                                                             %>
                                                             <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.showController}&objectAction=${object.bValue?.showAction}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
-                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${StringEscapeUtils.escapeHtml(displayLabel)}">
+                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${displayLabel}">
                                                                 ${displayLabel}
                                                             </a>
                                                         </g:each>
