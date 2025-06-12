@@ -171,6 +171,26 @@ final class RawCsvTableDump implements IUiTableVisitor {
     }
 
     @Override
+    void setLastReadingDate(Pair<Date, String> lastReadingDate) {
+
+    }
+
+    @Override
+    String getLastReadingDateString() {
+        return null
+    }
+
+    @Override
+    Date getLastReadingDate() {
+        return null
+    }
+
+    @Override
+    String getReadingDateFieldString() {
+        return null
+    }
+
+    @Override
     void visitColumnSelect(String paramsKey) {
 
     }

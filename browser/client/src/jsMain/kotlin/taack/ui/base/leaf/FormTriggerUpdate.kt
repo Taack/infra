@@ -70,10 +70,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
 //            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
         }
         val targetUrl = Helper.urlStack.last()
-        val paramKeys = targetUrl.searchParams.keys().toList()
-        paramKeys.forEach {
-            targetUrl.searchParams.delete(it)
-        }
+        targetUrl.searchParams.delete("isAjax")
         xhr.open(RequestMethod.POST, targetUrl)
         xhr.send(fd)
     }

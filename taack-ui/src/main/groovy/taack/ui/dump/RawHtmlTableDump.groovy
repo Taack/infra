@@ -42,7 +42,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     int level = 0
     boolean firstInCol = false
     private final IHTMLElement initialForm
-    private Pair<String, String> initalSortingOrder
+    private Pair<String, String> initialSortingOrder
+    private Pair<Date, String> initialLastReadingDate
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
     private String selectColumnParamsKey
 
@@ -117,8 +118,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.exitBlock('visitTableEnd')
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
 
-        if (initalSortingOrder) {
-            blockLog.topElement.children[0].getBuilder().putAttribute("initialSortField", initalSortingOrder.aValue)
+        if (initialSortingOrder) {
+            blockLog.topElement.children[0].getBuilder().putAttribute("initialSortField", initialSortingOrder.aValue)
         }
     }
 
@@ -393,13 +394,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void setSortingOrder(Pair<String, String> sortingOrderParam) {
-        initalSortingOrder = sortingOrderParam
+        initialSortingOrder = sortingOrderParam
         setSortingOrder(sortingOrderParam.aValue, sortingOrderParam.bValue)
     }
 
     @Override
     Pair<String, String> getSortingOrder() {
-        return initalSortingOrder
+        return initialSortingOrder
     }
 
     void setSortingOrder(String sort, String order) {
@@ -407,6 +408,41 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, sort, 'sort')
             mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, order, 'order')
         }
+    }
+
+    @Override
+    void setLastReadingDate(Pair<Date, String> lastReadingDate) {
+        initialLastReadingDate = lastReadingDate
+        if (!parameter.lastReadingDate) {
+            mapAdditionalHiddenParams.put 'lastReadingDate', new HTMLInput(InputType.HIDDEN, getLastReadingDateString(), 'lastReadingDate')
+        }
+        if (!parameter.readingDateFieldString) {
+            mapAdditionalHiddenParams.put 'readingDateFieldString', new HTMLInput(InputType.HIDDEN, lastReadingDate.bValue, 'readingDateFieldString')
+        }
+    }
+
+    String getLastReadingDateString() {
+        if (parameter.lastReadingDate)
+            return parameter.lastReadingDate
+        if (initialLastReadingDate)
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(initialLastReadingDate.aValue)
+        return null
+    }
+
+    Date getLastReadingDate() {
+        if (parameter.lastReadingDate)
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(parameter.lastReadingDate)
+        if (initialLastReadingDate)
+            return initialLastReadingDate.aValue
+        return null
+    }
+
+    String getReadingDateFieldString() {
+        if (parameter.readingDateFieldString)
+            return parameter.readingDateFieldString
+        if (initialLastReadingDate)
+            return initialLastReadingDate.bValue
+        return null
     }
 
     @Override

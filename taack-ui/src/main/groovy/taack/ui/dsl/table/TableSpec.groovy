@@ -61,10 +61,22 @@ final class TableSpec {
         if (taackFilter.getSortString()) {
             tableVisitor.setSortingOrder(new Pair<String, String>(taackFilter.sortString, taackFilter.orderString))
         }
+        if (taackFilter.getDateLastReading()) {
+            tableVisitor.setLastReadingDate(new Pair<Date, String>(taackFilter.dateLastReading, taackFilter.readingDateFieldString))
+        }
         c.delegate = new RowColumnSpec(tableVisitor)
         Pair<List<T>, Long> res = taackFilter.list()
+
+        Date lastReadingDate = tableVisitor.getLastReadingDate()
+        String readingDateField = tableVisitor.getReadingDateFieldString()
         for (T t in res.aValue) {
-            tableVisitor.visitRow(null, false)
+            if (lastReadingDate && readingDateField
+                    && t.hasProperty(readingDateField) && t[readingDateField] instanceof Date
+                    && (t[readingDateField] as Date) > lastReadingDate) {
+                tableVisitor.visitRow(Style.BOLD, false) // mark the row as unread
+            } else {
+                tableVisitor.visitRow(null, false)
+            }
             c.call(t)
             tableVisitor.visitRowEnd()
         }

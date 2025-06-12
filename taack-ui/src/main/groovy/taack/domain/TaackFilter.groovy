@@ -43,6 +43,8 @@ final class TaackFilter<T extends GormEntity<T>> {
     private List<Long> restrictedIds
     private FieldInfo[] sortFields
     private Order order
+    private FieldInfo readingDateField
+    private Date lastReadingDate
 
     TaackFilter(FilterBuilder filterBuilder, SessionFactory sessionFactory, Map<String, ? extends Object> theParams) {
         this.theParams = theParams
@@ -57,6 +59,8 @@ final class TaackFilter<T extends GormEntity<T>> {
         this.restrictedIds = filterBuilder.restrictedIds
         this.sortFields = filterBuilder.sortFields
         this.order = filterBuilder.order
+        this.readingDateField = filterBuilder.readingDateField
+        this.lastReadingDate = filterBuilder.lastReadingDate
     }
 
     @Override
@@ -73,6 +77,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                 ", restrictedIds=" + restrictedIds +
                 ", sortFields=" + Arrays.toString(sortFields) +
                 ", order=" + order +
+                ", dateFields=" + readingDateField +
+                ", lastReadingDate=" + lastReadingDate +
                 '}'
     }
 
@@ -177,6 +183,15 @@ final class TaackFilter<T extends GormEntity<T>> {
         else if (order == Order.DESC) "desc"
         else null
     }
+
+    String getReadingDateFieldString() {
+        readingDateField.fieldName
+    }
+
+    Date getDateLastReading() {
+        lastReadingDate
+    }
+
     /**
      * Helper method allowing to execute a query
      * @param query
@@ -208,7 +223,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         q.uniqueResult() as Long
     }
 
-    private final static List<String> filterMeta = ['offset', 'max', 'sort', 'order', 'grouping']
+    private final static List<String> filterMeta = ['offset', 'max', 'sort', 'order', 'grouping', 'lastReadingDate', 'readingDateFieldString']
 
     private static String escapeHqlParameter(final String hqlParam) {
         hqlParam?.replace("'", "''")
@@ -713,6 +728,8 @@ final class TaackFilter<T extends GormEntity<T>> {
         private Class innerDomain = null
         private FieldInfo[] sortFields
         private Order order
+        private FieldInfo readingDateField
+        private Date lastReadingDate
 
         FilterBuilder(Class<U> cClass, SessionFactory sessionFactory, Map<String, ?> theParams) {
             this.cClass = cClass
@@ -752,6 +769,12 @@ final class TaackFilter<T extends GormEntity<T>> {
         FilterBuilder addRestrictedIds(Long... ids) {
             restrictedIds ?= []
             if (ids) this.restrictedIds.addAll ids
+            this
+        }
+
+        FilterBuilder setLastReadingDate(Date lastReadingDate, FieldInfo readingDateField) {
+            this.lastReadingDate = lastReadingDate
+            this.readingDateField = readingDateField
             this
         }
 
