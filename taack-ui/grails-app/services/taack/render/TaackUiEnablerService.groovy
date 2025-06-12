@@ -52,7 +52,7 @@ class TaackUiEnablerService implements WebAttributes {
 
     @PostConstruct
     void init() {
-        policy = Sanitizers.FORMATTING & Sanitizers.LINKS
+        policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
     }
 
     static String sanitizeString(String toSanitize) {
