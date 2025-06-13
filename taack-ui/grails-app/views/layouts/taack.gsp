@@ -1,7 +1,11 @@
 <%@ page import="grails.util.Pair; taack.app.TaackLinkClass; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
-
-<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
+<g:if test="${themeMode && themeAuto}">
+    <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
+</g:if>
+<g:else>
+    <html lang="${lang}">
+</g:else>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">

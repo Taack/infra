@@ -21,6 +21,7 @@ grails {
     plugins {
         implementation project(':taack-ui')
         implementation project(':taack-ui-pdf')
+        implementation project(':taack-ui-jdbc')
         implementation project(':taack-ui-search')
     }
 }

@@ -18,20 +18,20 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 //    integrationTestImplementation testFixtures("org.apache.grails:grails-geb")
 //    console "org.apache.grails:grails-console"
-    api "org.springframework.boot:spring-boot-starter-logging"
-    api "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
 //    implementation "org.springframework.boot:spring-boot-autoconfigure"
-    api "org.springframework.boot:spring-boot-starter"
-    api "org.apache.grails:grails-core"
-    api "org.apache.grails:grails-validation"
-    api "org.apache.grails:grails-gsp"
-    api "org.apache.grails:grails-logging"
-    api "org.apache.grails:grails-services"
-    api "org.apache.grails:grails-i18n"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.apache.grails:grails-core"
+    implementation "org.apache.grails:grails-validation"
+    implementation "org.apache.grails:grails-gsp"
+    implementation "org.apache.grails:grails-logging"
+    implementation "org.apache.grails:grails-services"
+    implementation "org.apache.grails:grails-i18n"
 
-    api 'org.apache.grails:grails-data-hibernate5'
-    api 'org.apache.grails:grails-interceptors'
-    api "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+    implementation 'org.apache.grails:grails-data-hibernate5'
+    implementation 'org.apache.grails:grails-interceptors'
+    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
     profile "org.apache.grails.profiles:plugin"
 
 //    testImplementation "org.apache.grails:grails-testing-support-datamapping"
