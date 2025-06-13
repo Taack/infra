@@ -62,6 +62,7 @@ ext.isReleaseVersion = { -> !releaseVersion.endsWith('SNAPSHOT') }
 
 def publishedProjects = [
         'taack-ui',
+        'taack-ui-ssh',
         'taack-ui-pdf',
         'taack-ui-search',
         'taack-jdbc-common',

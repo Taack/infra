@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+    api "org.apache.groovy:groovy:${groovyVersion}"
+    api "org.apache.groovy:groovy-xml:${groovyVersion}"
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 //    integrationTestImplementation testFixtures("org.apache.grails:grails-geb")

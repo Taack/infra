@@ -26,6 +26,7 @@ buildscript {
 //include 'taack-jdbc-common'
 include 'taack-jdbc-common'
 include 'taack-ui-jdbc'
+include 'taack-ui-ssh'
 include 'taack-ui-search'
 include 'taack-ui-pdf'
 include 'taack-ui'

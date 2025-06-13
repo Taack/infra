@@ -1,15 +1,11 @@
 plugins {
-    id 'groovy'
-}
-
-group = 'org.example'
-version = '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+    id 'taack-grails-plugin'
+    id 'taack-asciidoctor'
 }
 
 dependencies {
+    implementation project(':taack-ui')
+
     implementation 'net.i2p.crypto:eddsa:0.3.0'
     implementation "org.apache.sshd:sshd:${minaSshd}"
     implementation "org.apache.sshd:sshd-core:${minaSshd}"
@@ -17,8 +13,5 @@ dependencies {
     implementation "org.apache.sshd:sshd-sftp:${minaSshd}"
     implementation "org.apache.sshd:sshd-git:${minaSshd}"
     implementation "org.apache.sshd:sshd-cli:${minaSshd}"
-}
 
-test {
-    useJUnitPlatform()
 }

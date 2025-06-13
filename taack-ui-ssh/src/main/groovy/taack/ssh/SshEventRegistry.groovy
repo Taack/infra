@@ -24,8 +24,8 @@ import taack.ssh.vfs.FileTree
 import taack.ssh.vfs.impl.VfsFactory
 import taack.ssh.vfs.impl.VfsPath
 import taack.ssh.vfs.impl.VfsPosixFileAttributes
-import taack.ssh.vfs.impl.sftp.VfsSftpEventListener
-import taack.ssh.vfs.impl.sftp.VfsSftpFileSystemAccessor
+import taack.ssh.vfs.impl.VfsSftpEventListener
+import taack.ssh.vfs.impl.VfsSftpFileSystemAccessor
 
 import java.nio.channels.SeekableByteChannel
 import java.nio.file.*
@@ -33,8 +33,8 @@ import java.security.PublicKey
 import java.util.logging.Logger
 
 @CompileStatic
-enum SshEventRegistry {
-    INSTANCE
+class SshEventRegistry {
+    static final SshEventRegistry INSTANCE = new SshEventRegistry()
 
     private static final Logger log = Logger.getLogger(SshEventRegistry.class.name)
 
@@ -85,6 +85,7 @@ enum SshEventRegistry {
         void closeCommandConnection(String username)
     }
 
+    @CompileStatic
     static final class GitHelper {
         static void registerUserGitRepoChecker(UserGitRepoChecker userGitRepoChecker) {
             userGitRepoCheckers.add(userGitRepoChecker)
@@ -473,6 +474,7 @@ enum SshEventRegistry {
                     if (pubKey.isEmpty()) continue
                     log.info "authenticate testing entry: $pubKey"
                     try {
+//                        final String pkUser = AuthorizedKeyEntry.parseAuthorizedKeyEntry(pubKey.trim()).keyData.encodeHex().toString().substring(37)
                         final String pkUser = AuthorizedKeyEntry.parseAuthorizedKeyEntry(pubKey.trim()).keyData.encodeHex().toString().substring(37)
                         if (pkUser && pkUser == incomingPk) {
                             log.info "authenticate $username authenticated with $pkUser"
