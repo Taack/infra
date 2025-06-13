@@ -1,73 +1,32 @@
-//plugins {
-//    id 'org.springframework.boot'
-//    id 'taack-grails-webapp'
-////    id 'org.graalvm.buildtools.native'
+plugins {
+    id 'taack-grails-webapp'
+}
+
+group = "taack.ui.test.minimal"
+
+dependencies {
+    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+}
+
+grails {
+    // should use gradle -Dgrails.run.active=true bootRun
+    exploded = true
+    plugins {
+        implementation project(':taack-ui')
+    }
+}
+
+bootJar {
+    enabled = true
+    requiresUnpack '**/asciidoctorj*.jar'
+}
+
+//application {
+//    mainClass.set("taack.ui.test.Application")
 //}
-//
-//group = "taack.ui.test.minimal"
-//
-//dependencies {
-//    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
-//}
-//
-//grails {
-//    // should use gradle -Dgrails.run.active=true bootRun
-//    exploded = true
-//    plugins {
-//        implementation project(':taack-ui')
-//    }
-//}
-//
-//bootJar {
-//    enabled = true
-//}
-//
-////application {
-////    mainClass.set("taack.ui.test.Application")
-////}
-//
-////java {
-////    sourceCompatibility = JavaVersion.toVersion("17")
-////}
-//
-//assets {
-//    minifyJs = true
-//    minifyCss = true
-//}
-//
-////tasks.withType(Test) {
-////    useJUnitPlatform()
-////    systemProperty "geb.env", System.getProperty('geb.env')
-////    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
-////    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
-////    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
-////}
-//
-////graalvmNative {
-////    toolchainDetection = true
-////    binaries.main {
-////        mainClass = 'taack.ui.test.Application'
-////        buildArgs.addAll(
-//////                '--no-fallback',
-//////                '--initialize-at-build-time=org.apache.sshd.common.file.root.RootedFileSystemProvider',
-//////                '--initialize-at-build-time=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider',
-//////                '--initialize-at-build-time=ch.qos.logback.classic.Logger',
-////                '-O3', '-march=native', '--link-at-build-time')
-////        configurationFileDirectories.from(file('src/graalvm'))
-////    }
-////    agent {
-////        enabled = true
-////
-////    }
-////}
-//
-//tasks.nativeCompileClasspathJar {
-//    setProperty("zip64", true)
-//}
-//
-/**
- *  ~/.jdks/openjdk-24.0.1/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -Xmx512m -jar taack-ui-test-minimal.jar
- * ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
- * ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --initialize-at-build-time=org.springframework.boot.loader.nio.file.NestedFileSystemProvider -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
- * ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --no-fallback --initialize-at-build-time=org.springframework.boot.loader.nio.file.NestedFileSystemProvider -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
- */
+
+
+assets {
+    minifyJs = true
+    minifyCss = true
+}
