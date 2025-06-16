@@ -47,7 +47,6 @@ class TaackUiEnablerService implements WebAttributes {
 
     PolicyFactory policy
 
-    @Autowired
     TaackUiConfiguration taackUiConfiguration
 
     @PostConstruct

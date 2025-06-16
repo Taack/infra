@@ -34,7 +34,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
     static Map<String, File> filePaths = [:]
 
     TaackSearchService taackSearchService
-    @Autowired
+
     TaackUiConfiguration taackUiConfiguration
 
     @Value('${intranet.root}')

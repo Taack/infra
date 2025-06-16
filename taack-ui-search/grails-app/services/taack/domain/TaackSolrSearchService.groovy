@@ -46,7 +46,6 @@ final class TaackSolrSearchService implements WebAttributes {
 
     private SolrClient solrClient
 
-    @Autowired
     TaackUiConfiguration taackUiConfiguration
 
     @PostConstruct

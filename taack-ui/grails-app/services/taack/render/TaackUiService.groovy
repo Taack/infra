@@ -62,7 +62,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     ThemeService themeService
     SpringSecurityService springSecurityService
 
-    @Autowired
     TaackUiConfiguration taackUiConfiguration
 
     @Autowired

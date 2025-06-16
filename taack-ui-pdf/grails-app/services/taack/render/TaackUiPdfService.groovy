@@ -45,7 +45,6 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
 
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
 
-    @Autowired
     TaackUiConfiguration taackUiConfiguration
 
     @Autowired
