@@ -62,8 +62,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     ThemeService themeService
     SpringSecurityService springSecurityService
 
-    TaackUiConfiguration taackUiConfiguration
-
     @Autowired
     PageRenderer g
 
@@ -194,7 +192,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     themeAuto      : themeAuto,
                     block          : output.toString(),
                     menu           : visitMenu(menu),
-                    conf           : taackUiConfiguration,
+                    conf           : TaackUiConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                     bootstrapJsTag : bootstrapJsTag,
                     bootstrapCssTag: bootstrapCssTag,
@@ -294,7 +292,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 themeAuto      : themeAuto,
                 block          : html,
                 menu           : visitMenu(menu),
-                conf           : taackUiConfiguration,
+                conf           : TaackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag,
@@ -323,7 +321,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 themeAuto      : themeAuto,
                 block          : "",
                 menu           : visitMenu(menu),
-                conf           : taackUiConfiguration,
+                conf           : TaackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag,
@@ -533,7 +531,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         htmlPdf.getOutput(output)
         String html = g.render template: "/taackUi/block-mail", model: [
                 block: output.toString(),
-                root : taackUiConfiguration.root
+                root : TaackUiConfiguration.root
         ]
         html
     }

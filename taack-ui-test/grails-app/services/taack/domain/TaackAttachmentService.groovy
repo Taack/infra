@@ -1,5 +1,6 @@
 package taack.domain
 
+import attachment.Attachment
 import attachment.config.AttachmentContentType
 import attachment.config.AttachmentContentTypeCategory
 import grails.compiler.GrailsCompileStatic
@@ -10,9 +11,6 @@ import grails.web.databinding.DataBinder
 import jakarta.annotation.PostConstruct
 import org.apache.commons.io.FileUtils
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import attachment.Attachment
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.taack.IAttachmentConverter
@@ -31,14 +29,11 @@ import java.security.MessageDigest
 class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttributes {
     final Object imageConverter = new Object()
 
-    static Map<String, File> filePaths = [:]
-
     TaackSearchService taackSearchService
 
-    TaackUiConfiguration taackUiConfiguration
+    static Map<String, File> filePaths = [:]
 
-    @Value('${intranet.root}')
-    String intranetRoot
+    String intranetRoot = TaackUiConfiguration.root
 
     String getStorePath() {
         intranetRoot + "/attachment/store"
@@ -237,7 +232,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
     }
 
     File attachmentPreview(final Attachment attachment, PreviewFormat previewFormat = PreviewFormat.DEFAULT) {
-        if (!attachment) return new File("${taackUiConfiguration.resources}/noPreview.${previewFormat.previewExtension}")
+        if (!attachment) return new File("${TaackUiConfiguration.resources}/noPreview.${previewFormat.previewExtension}")
         final File preview = new File(attachmentPreviewPath(previewFormat, attachment))
         if (preview.exists()) {
             return preview
@@ -278,7 +273,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
                 log.error "attachmentPreview killed before finishing for ${attachment.name} ${eio}"
             }
         }
-        return new File("${taackUiConfiguration.resources}/noPreview.${previewFormat.previewExtension}")
+        return new File("${TaackUiConfiguration.resources}/noPreview.${previewFormat.previewExtension}")
     }
 
     static void registerPreviewConverter(IAttachmentPreviewConverter previewConverter) {

@@ -7,7 +7,6 @@ import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
 import org.owasp.html.Sanitizers
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -46,8 +45,6 @@ class TaackUiEnablerService implements WebAttributes {
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
     PolicyFactory policy
-
-    TaackUiConfiguration taackUiConfiguration
 
     @PostConstruct
     void init() {
@@ -101,7 +98,7 @@ class TaackUiEnablerService implements WebAttributes {
         boolean isAllowed = true
         switch (Environment.current) {
             case Environment.DEVELOPMENT:
-                if (!taackUiConfiguration.disableSecurity)
+                if (!TaackUiConfiguration.disableSecurity)
                     isAllowed = webInvocationPrivilegeEvaluator.isAllowed(null, path, 'GET', authContext)
                 break
             case Environment.PRODUCTION:

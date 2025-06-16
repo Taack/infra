@@ -31,13 +31,15 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-//application {
-//    mainClass.set("taack.ui.test.Application")
-//}
-
-//java {
-//    sourceCompatibility = JavaVersion.toVersion("17")
-//}
+bootRun {
+    ignoreExitValue true
+    jvmArgs(
+            '-Dspring.output.ansi.enabled=always',
+            '-XX:+UnlockExperimentalVMOptions',
+            '-XX:+UseCompactObjectHeaders', // Java 24, comment for Java 17
+            '-Xmx1024m'
+    )
+}
 
 assets {
     minifyJs = true

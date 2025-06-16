@@ -21,10 +21,18 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-//application {
-//    mainClass.set("taack.ui.test.Application")
-//}
-
+bootRun {
+    ignoreExitValue true
+    jvmArgs(
+            '-Dspring.output.ansi.enabled=always',
+            '-noverify',
+            '-XX:TieredStopAtLevel=1',
+            '-XX:+UnlockExperimentalVMOptions',
+            '-XX:+UseCompactObjectHeaders',
+            '-XX:+UseEpsilonGC',
+            '-Xmx1024m'
+    )
+}
 
 assets {
     minifyJs = true
