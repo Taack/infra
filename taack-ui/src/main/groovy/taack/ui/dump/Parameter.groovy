@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
-import org.springframework.web.servlet.support.RequestContextUtils
+import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.ThemeService
@@ -85,7 +85,7 @@ final class Parameter implements WebAttributes {
         this.targetAjaxBlockId = params.get('targetAjaxBlockId') ?: null
         this.isAjaxRendering = params.boolean('isAjax') == true
         this.isRefresh = params.boolean('refresh') == true
-        this.lcl = lcl ?: RequestContextUtils.getLocale(webRequest.request)
+        this.lcl = lcl ?: LocaleContextHolder.locale
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null
         this.tabIndex = params.get('tabIndex') ? params.int('tabIndex') : null
