@@ -108,11 +108,15 @@
                                                         </div>
                                                         <g:each in="${(group.value as List<Pair<GormEntity, TaackGormClass>>).sort { -it.aValue.ident() }}" var="object">
                                                             <%
-                                                                String displayLabel = object.bValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
+                                                                String labelPrefix = object.bValue?.showLabelPrefix?.call(object.aValue.ident())
+                                                                String label = object.bValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
                                                             %>
                                                             <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.showController}&objectAction=${object.bValue?.showAction}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
-                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${displayLabel}">
-                                                                ${displayLabel}
+                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${label}">
+                                                                <g:if test="${labelPrefix}">
+                                                                    <span class="group-item-prefix">${labelPrefix}</span>
+                                                                </g:if>
+                                                                ${label}
                                                             </a>
                                                         </g:each>
                                                     </div>

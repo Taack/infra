@@ -546,6 +546,10 @@ li:hover > .nested-dropdown{
     font-size: smaller;
 }
 
+.user-notification-body .group-item .group-item-prefix {
+    color: darkcyan;
+}
+
 .user-notification-body .group-item:hover {
     background: lightgrey;
 }
