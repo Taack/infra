@@ -1,105 +1,18 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url "https://repo.grails.org/grails/core/" }
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://repo.grails.org/grails/core" }
-    }
-    dependencies {
-        classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
-        classpath "org.grails.plugins:hibernate5:${grailsHibernate5}"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipeline}"
-    }
-}
-
 plugins {
-    id "groovy"
-    id "org.grails.grails-web"
-    id "org.grails.grails-gsp"
-    id 'com.bertramlabs.asset-pipeline'
-    id "org.grails.grails-plugin"
-    id "application"
+    id 'taack-grails-webapp'
+//    id 'org.graalvm.buildtools.native'
 }
 
 group = "taack.ui.test"
 
-repositories {
-    mavenCentral()
-    maven { url "https://repo.grails.org/grails/core/" }
-}
-
-configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
-}
-
-dependencyManagement {
-    dependencies {
-        dependency "org.apache.solr:solr-solrj:${solrj}"
-
-        // 9.4.53.v20231009
-        dependency "org.eclipse.jetty.http2:http2-common:${jetty}"
-        dependency "org.eclipse.jetty.http2:http2-client:${jetty}"
-        dependency "org.eclipse.jetty.http2:http2-hpack:${jetty}"
-        dependency "org.eclipse.jetty.http2:http2-http-client-transport:${jetty}"
-        dependency "org.eclipse.jetty:jetty-alpn-client:${jetty}"
-        dependency "org.eclipse.jetty:jetty-http:${jetty}"
-        dependency "org.eclipse.jetty:jetty-io:${jetty}"
-        dependency "org.eclipse.jetty:jetty-util:${jetty}"
-        dependency "org.eclipse.jetty:jetty-client:${jetty}"
-        dependency "org.eclipse.jetty:jetty-alpn-java-client:${jetty}"
-    }
-}
-
 dependencies {
-    if (Os.isFamily(Os.FAMILY_MAC)) {
-        runtimeOnly 'net.java.dev.jna:jna:5.14.0'
-        implementation 'io.methvin:directory-watcher:0.18.0'
-    }
-    developmentOnly('org.springframework.boot:spring-boot-devtools')
-    console 'org.grails:grails-console'
-    implementation 'org.grails.plugins:gsp'
-    profile 'org.grails.profiles:web'
-
-    compileOnly("io.micronaut:micronaut-inject-groovy")
-    implementation("org.grails:grails-core")
-    implementation("org.grails:grails-logging")
-    implementation("org.grails:grails-plugin-databinding")
-    implementation("org.grails:grails-plugin-i18n")
-    implementation("org.grails:grails-plugin-interceptors")
-    implementation("org.grails.plugins:async")
-    implementation("org.grails:grails-plugin-rest")
-    implementation("org.grails:grails-plugin-services")
-    implementation("org.grails:grails-plugin-url-mappings")
-    implementation("org.grails:grails-web-boot")
-    implementation("org.grails.plugins:gsp")
-    implementation("org.grails.plugins:hibernate5")
-    implementation("org.hibernate:hibernate-core:5.6.14.Final")
-    implementation "org.grails.plugins:events"
-    implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-logging")
-    implementation("org.springframework.boot:spring-boot-starter-tomcat")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("javax.xml.bind:jaxb-api:2.3.1")
-    runtimeOnly("org.apache.tomcat:tomcat-jdbc")
-    runtimeOnly("org.glassfish.web:el-impl:2.2.1-b05")
-    runtimeOnly("com.bertramlabs.plugins:asset-pipeline-grails:4.3.0")
-
-    implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
+    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
 
     implementation 'commons-io:commons-io:2.18.0'
     implementation "org.asciidoctor:asciidoctorj:${asciidoctorJ}"
     implementation 'org.asciidoctor:asciidoctorj-pdf:2.3.19'
     implementation 'org.asciidoctor:asciidoctorj-diagram:2.3.1'
     implementation 'org.asciidoctor:asciidoctorj-revealjs:5.1.0'
-
 }
 
 grails {
@@ -107,6 +20,9 @@ grails {
     exploded = true
     plugins {
         implementation project(':taack-ui')
+        implementation project(':taack-ui-pdf')
+        implementation project(':taack-ui-jdbc')
+        implementation project(':taack-ui-search')
     }
 }
 
@@ -115,12 +31,14 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-application {
-    mainClass.set("taack.ui.test.Application")
-}
-
-java {
-    sourceCompatibility = JavaVersion.toVersion("17")
+bootRun {
+    ignoreExitValue true
+    jvmArgs(
+            '-Dspring.output.ansi.enabled=always',
+            '-XX:+UnlockExperimentalVMOptions',
+            '-XX:+UseCompactObjectHeaders', // Java 24, comment for Java 17
+            '-Xmx1024m'
+    )
 }
 
 assets {
@@ -128,10 +46,33 @@ assets {
     minifyCss = true
 }
 
-tasks.withType(Test) {
-    useJUnitPlatform()
-    systemProperty "geb.env", System.getProperty('geb.env')
-    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
-    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
-    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
-}
+//tasks.withType(Test) {
+//    useJUnitPlatform()
+//    systemProperty "geb.env", System.getProperty('geb.env')
+//    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
+//    systemProperty 'webdriver.chrome.driver', "${System.getenv('CHROMEWEBDRIVER')}/chromedriver"
+//    systemProperty 'webdriver.gecko.driver', "${System.getenv('GECKOWEBDRIVER')}/geckodriver"
+//}
+
+//graalvmNative {
+//    toolchainDetection = true
+//    binaries.main {
+//        mainClass = 'taack.ui.test.Application'
+//        buildArgs.addAll(
+//                '--no-fallback',
+//                '--initialize-at-build-time=org.apache.sshd.common.file.root.RootedFileSystemProvider',
+//                '--initialize-at-build-time=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider',
+//                '--initialize-at-build-time=ch.qos.logback.classic.Logger',
+//                '-O3', '-march=native', '--link-at-build-time')
+//        configurationFileDirectories.from(file('src/graalvm'))
+//    }
+//    agent {
+//        enabled = true
+//    }
+//}
+
+/**
+ * ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
+ * ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --initialize-at-build-time=org.springframework.boot.loader.nio.file.NestedFileSystemProvider -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
+ * ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --no-fallback --initialize-at-build-time=org.springframework.boot.loader.nio.file.NestedFileSystemProvider -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
+ */

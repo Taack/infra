@@ -35,7 +35,7 @@ class BootstrapLayout {
                                 .putAttribute('data-bs-target', "#tab-$tabIds-$i-pane")
                                 .putAttribute('aria-selected', i == tabIndex ? 'true' : 'false')
                                 .putAttribute('aria-controls', "tab-$tabIds-$i-pane")
-                                .putAttribute("action", action)
+                                .putAttribute('action', action)
                                 .setId("tab-$tabIds-$i").build()
                 ).build()
             }

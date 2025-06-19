@@ -11,7 +11,7 @@ final class HTMLAjaxCloseModal implements IHTMLElement {
 
     @Override
     void getOutput(StringBuffer res) {
-        res.append "__closeLastModalAndUpdateBlock__:"
+        res.append '__closeLastModalAndUpdateBlock__:'
         children*.getOutput(res)
     }
 }

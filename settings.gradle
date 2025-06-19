@@ -9,11 +9,32 @@
 
 rootProject.name = 'infra'
 
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://repository.apache.org/content/groups/public" }
+        maven { url "https://repo.grails.org/grails/restricted" }
+
+    }
+    dependencies {
+        classpath platform("org.apache.grails:grails-bom:$grailsVersion")
+        classpath "org.apache.grails:grails-gradle-plugins"
+    }
+}
+
+//include 'taack-jdbc-common'
 include 'taack-jdbc-common'
+include 'taack-ui-jdbc'
+include 'taack-ui-ssh'
+include 'taack-ui-search'
+include 'taack-ui-pdf'
 include 'taack-ui'
 
-if (taackReleaseVersion.endsWith('SNAPSHOT')) {
-    include 'taack-ui-test'
-    include 'browser:client'
-}
+include 'taack-ui-test'
+include 'taack-ui-test-minimal'
+//include 'browser:client'
+//if (taackReleaseVersion.endsWith('SNAPSHOT')) {
+//}
+
 

@@ -17,7 +17,7 @@ import taack.user.TaackUser
 import static taack.render.TaackUiService.tr
 
 @GrailsCompileStatic
-@Secured("isAuthenticated()")
+@Secured('isAuthenticated()')
 class TaackUserNotificationController implements WebAttributes {
     TaackUiService taackUiService
     SpringSecurityService springSecurityService
@@ -33,7 +33,7 @@ class TaackUserNotificationController implements WebAttributes {
         } else {
             taackUiService.show(new UiBlockSpecifier().ui {
                 modal {
-                    custom "<h2>Access Denied</h2>"
+                    custom '<h2>Access Denied</h2>'
                 }
             })
         }
@@ -44,7 +44,7 @@ class TaackUserNotificationController implements WebAttributes {
         if (option == 1) {
             TaackUser currentUser = springSecurityService.currentUser as TaackUser
             currentUser.getUnreadRelatedDataList()?.each {
-                if (objectController == "all" || (TaackAppRegisterService.getTaackLinkClass(it.class.name)?.controller ?: "") == objectController) {
+                if (objectController == 'all' || (TaackAppRegisterService.getTaackLinkClass(it.class.name)?.controller ?: '') == objectController) {
                     currentUser.markRelatedDataAsRead(it)
                 }
             }
@@ -53,8 +53,8 @@ class TaackUserNotificationController implements WebAttributes {
             taackUiService.show(new UiBlockSpecifier().ui {
                 modal {
                     show new UiShowSpecifier().ui {
-                        String notificationGroupName = objectController ? tr("${objectController}.app", null) : tr("enum.value.OTHER", null)
-                        showAction "<h5>Mark all Notifications ${objectController == "all" ? "" : "of \"${notificationGroupName}\" "}as Read ?</h5>",
+                        String notificationGroupName = objectController ? tr("${objectController}.app", null) : tr('enum.value.OTHER', null)
+                        showAction "<h5>Mark all Notifications ${objectController == 'all' ? '' : "of \"${notificationGroupName}\" "}as Read ?</h5>",
                                 TaackUserNotificationController.&readAllUserNotifications as MethodClosure,
                                 [objectController: objectController, option: 1]
                     }

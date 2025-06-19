@@ -49,7 +49,7 @@ final class RawCsvTableDump implements IUiTableVisitor {
 
     @Override
     void visitHeaderEnd() {
-        out << "\n"
+        out << '\n'
     }
 
     @Override
@@ -69,7 +69,7 @@ final class RawCsvTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowEnd() {
-        out << "\n"
+        out << '\n'
     }
 
     @Override

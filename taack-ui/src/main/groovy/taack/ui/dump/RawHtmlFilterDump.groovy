@@ -137,7 +137,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             EnumOptions eos = value != null ? new EnumOptions(type as Class<Enum>, qualifiedName, value) : new EnumOptions(type as Class<Enum>, qualifiedName, fieldInfo?.value as Enum)
             blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, i18n, eos, false, false, true)
         } else if (type == boolean || type == Boolean) {
-            Boolean isChecked = value != null ? (value == "1" ? true : value == "0" ? false : null) : (fieldInfo?.value as Boolean)
+            Boolean isChecked = value != null ? (value == '1' ? true : value == '0' ? false : null) : (fieldInfo?.value as Boolean)
             blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, i18n, false, true, isChecked)
         } else if (type == Date) {
             blockLog.topElement = formThemed.datePairInputs(blockLog.topElement, qualifiedName, i18n, false, true, value != null ? TaackFilter.parseDate(value) : new Pair(fieldInfo?.value, null), fieldInfo?.fieldConstraint?.widget == WidgetKind.DATETIME.name)

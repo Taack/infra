@@ -61,10 +61,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (value == null) return ''
         switch (value.class) {
             case BigDecimal:
-                DecimalFormat df = new DecimalFormat(format ?: "#,###.00")
+                DecimalFormat df = new DecimalFormat(format ?: '#,###.00')
                 return df.format(value)
             case Date:
-                SimpleDateFormat sdf = new SimpleDateFormat(format ?: "yyyy-MM-dd")
+                SimpleDateFormat sdf = new SimpleDateFormat(format ?: 'yyyy-MM-dd')
                 return sdf.format(value)
             case Enum:
                 String i18n = tr("enum.value.${value.toString()}", locale)
@@ -81,7 +81,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (cell && style) {
             displayBlock += style
         }
-        HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: "<br>")
+        HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: '<br>')
         if (!url) return new HTMLSpan().builder
                 .setStyle(displayBlock)
                 .addChildren(cellHTML).build()
@@ -93,7 +93,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (fieldInfo && style) {
             displayBlock += style
         }
-        HTMLTxtContent cellHTML = new HTMLTxtContent(TaackUiEnablerService.sanitizeString(fieldInfo.value.toString()) ?: "<br>")
+        HTMLTxtContent cellHTML = new HTMLTxtContent(TaackUiEnablerService.sanitizeString(fieldInfo.value.toString()) ?: '<br>')
 
         UiMenuSpecifier menu = TaackUiService.contextualMenuClosureFromField(fieldInfo)
         IHTMLElement.HTMLElementBuilder htmlBuilder = new HTMLSpan().builder.setStyle(displayBlock).addChildren(cellHTML)
@@ -119,7 +119,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
 
         if (initialSortingOrder) {
-            blockLog.topElement.children[0].getBuilder().putAttribute("initialSortField", initialSortingOrder.aValue)
+            blockLog.topElement.children[0].getBuilder().putAttribute('initialSortField', initialSortingOrder.aValue)
         }
     }
 
@@ -385,7 +385,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             blockLog.topElement.builder.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
                     .putAttribute('taackMax', max?.toString())
-                    .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: "0")
+                    .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: '0')
                     .putAttribute('taackCount', count?.toString())
                     .build()
             )
@@ -506,7 +506,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
-                HTMLInput.inputCheck(value, null, (parameter.applicationTagLib.params[selectColumnParamsKey]?.toString() ?: '').split(",").contains(value), !isSelectable)
+                HTMLInput.inputCheck(value, null, (parameter.applicationTagLib.params[selectColumnParamsKey]?.toString() ?: '').split(',').contains(value), !isSelectable)
                         .builder.putAttribute('paramsKey', selectColumnParamsKey).build()
         )
         if (addColumn) visitColumnEnd()

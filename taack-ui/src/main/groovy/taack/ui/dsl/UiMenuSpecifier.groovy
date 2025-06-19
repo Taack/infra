@@ -14,7 +14,7 @@ import taack.ui.dsl.menu.MenuSpec
  *      menu CrewController.&listRoles as MC
  *      menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
  *      menuIcon ActionIcon.EXPORT_CSV, this.&downloadBinPdf as MC
- *      label "Admin", {
+ *      label 'Admin', {
  *          subMenu this.&confSites as MC
  *          subMenu this.&menuEntries as MC
  *          subMenu this.&testDiagram as MC

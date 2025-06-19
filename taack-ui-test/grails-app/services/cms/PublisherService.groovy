@@ -13,7 +13,7 @@ class PublisherService {
 //    @Value('${publish.proto.directory}')
 //    String publishProtoDirectory
 //
-//    final String outputDir = "/home/auo/pdfs/bp/"
+//    final String outputDir = '/home/auo/pdfs/bp/'
 
 //    private File generateProto(String brand) {
 //        CmsContent.Structure content = contentProtoGeneratorService.generateProto(brand)
@@ -64,45 +64,45 @@ class PublisherService {
 //        CredentialsProvider provider = null
 //
 //        switch (brand) {
-//            case "2cp":
-//                uri = "citel.fr/refreshCmsContent"
+//            case '2cp':
+//                uri = 'citel.fr/refreshCmsContent'
 //                break
-//            case "Inc":
-//                uri = "citel.us/refreshCmsContent"
+//            case 'Inc':
+//                uri = 'citel.us/refreshCmsContent'
 ////                provider = new BasicCredentialsProvider()
-////                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("auo", "!23AuOOO")
+////                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials('auo', '!23AuOOO')
 ////                provider.setCredentials(AuthScope.ANY, credentials)
 //                break
-//            case "shanghai":
-//                uri = "citel.cn/refreshCmsContent"
+//            case 'shanghai':
+//                uri = 'citel.cn/refreshCmsContent'
 //                provider = new BasicCredentialsProvider()
-//                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("auo", "123auo32")
+//                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials('auo', '123auo32')
 //                provider.setCredentials(AuthScope.ANY, credentials)
 //                break
-//            case "obsta":
-//                uri = "obsta.com/refreshCmsContent"
+//            case 'obsta':
+//                uri = 'obsta.com/refreshCmsContent'
 //                break
-//            case "gmbh":
-//                uri = "citel.de/refreshCmsContent"
+//            case 'gmbh':
+//                uri = 'citel.de/refreshCmsContent'
 //                break
-//            case "india":
-//                uri = "citel.in/refreshCmsContent"
+//            case 'india':
+//                uri = 'citel.in/refreshCmsContent'
 //                break
-//            case "ooo":
-//                uri = "citel.ru/refreshCmsContent"
+//            case 'ooo':
+//                uri = 'citel.ru/refreshCmsContent'
 //                break
 //            default:
 //                return false
 //        }
-//        final String random = "QERGoij2345aùtqsdfgZ54qrfg"
+//        final String random = 'QERGoij2345aùtqsdfgZ54qrfg'
 //
-//        final HttpPost post = new HttpPost("https://" + uri)
-////        final HttpPost post = new HttpPost("http://localhost:9442/refreshCmsContent")
+//        final HttpPost post = new HttpPost('https://' + uri)
+////        final HttpPost post = new HttpPost('http://localhost:9442/refreshCmsContent')
 //        String salt = new Date().toString()
 //        String key = (random + salt).sha256()
 //
 //        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
-//        entityBuilder.addTextBody("salt", salt).addTextBody("key", key)
+//        entityBuilder.addTextBody('salt', salt).addTextBody('key', key)
 //        final HttpEntity entity = entityBuilder.build()
 //        post.setEntity(entity)
 //        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
@@ -125,8 +125,8 @@ class PublisherService {
 //    private boolean reloadService(String brand) {
 //        CmsBrand cmsBrand = CmsBrand.getCmsBrandByName(brand)
 //        log.info "restart ${cmsBrand.url}"
-//        Process p = new ProcessBuilder("/usr/bin/ssh",
-//                "${cmsBrand.url}", "-C",
+//        Process p = new ProcessBuilder('/usr/bin/ssh',
+//                "${cmsBrand.url}', '-C",
 //                "sudo systemctl restart ${cmsBrand.serviceName}").start()
 //        def output = new StringWriter(), error = new StringWriter()
 //        p.waitForProcessOutput(output, error)
@@ -141,8 +141,8 @@ class PublisherService {
 //    private boolean rsyncFiles(String brand) {
 //        CmsBrand cmsBrand = CmsBrand.getCmsBrandByName(brand)
 //        log.info "rsyncFiles ${cmsBrand.url}"
-//        Process p = new ProcessBuilder("/usr/bin/ssh",
-//                "${cmsBrand.url}", "-C",
+//        Process p = new ProcessBuilder('/usr/bin/ssh',
+//                "${cmsBrand.url}', '-C",
 //                'rsync -avz -e ssh auo@intranet.citel.fr:/home/auo/f .').start()
 //        def output = new StringWriter(), error = new StringWriter()
 //        p.waitForProcessOutput(output, error)
@@ -159,8 +159,8 @@ class PublisherService {
 //    private boolean rsyncCmsFiles(String brand) {
 //        CmsBrand cmsBrand = CmsBrand.getCmsBrandByName(brand)
 //        log.info "rsyncCmsFiles ${cmsBrand.url}"
-//        Process p = new ProcessBuilder("/usr/bin/ssh",
-//                "${cmsBrand.url}", "-C",
+//        Process p = new ProcessBuilder('/usr/bin/ssh',
+//                "${cmsBrand.url}', '-C",
 //                "rsync -avz -e ssh auo@intranet.citel.fr:/home/auo/CMS/TaackCMS/originalContent ${cmsBrand.homeDir}CMS/TaackCMS/").start()
 //        def output = new StringWriter(), error = new StringWriter()
 //        p.waitForProcessOutput(output, error)
@@ -177,8 +177,8 @@ class PublisherService {
 //    private boolean rsyncPdfs(String brand) {
 //        CmsBrand cmsBrand = CmsBrand.getCmsBrandByName(brand)
 //        log.info "rsyncPdfs ${cmsBrand.url}"
-//        Process p = new ProcessBuilder("/usr/bin/ssh",
-//                "${cmsBrand.url}", "-C",
+//        Process p = new ProcessBuilder('/usr/bin/ssh',
+//                "${cmsBrand.url}', '-C",
 //                'rsync -avz -e ssh auo@intranet.citel.fr:/home/auo/pdfs .').start()
 //        def output = new StringWriter(), error = new StringWriter()
 //        p.waitForProcessOutput(output, error)
@@ -211,7 +211,7 @@ class PublisherService {
 //
 //        File dir = new File(outputDir)
 //        dir.mkdirs()
-//        ObjectOutputStream status = new ObjectOutputStream(new FileOutputStream(outputDir + "status_" + brand))
+//        ObjectOutputStream status = new ObjectOutputStream(new FileOutputStream(outputDir + 'status_' + brand))
 //        status.writeObject(cmsBrand.languages)
 //
 //        items.each { Item item ->
@@ -229,24 +229,24 @@ class PublisherService {
 //    boolean publishCmsContent(String brand) {
 //        File proto = generateProto(brand)
 //        if (!proto) return false
-//        log.info "publishCmsContent proto"
+//        log.info 'publishCmsContent proto'
 //        if (!copyFile(brand, proto)) return false
-//        log.info "publishCmsContent copy proto"
+//        log.info 'publishCmsContent copy proto'
 //        if (!rsyncCmsFiles(brand)) return false
-//        log.info "publishCmsContent rsync OK"
+//        log.info 'publishCmsContent rsync OK'
 //        reloadCmsContent(brand)
 //    }
 //
 //    boolean publishBpContent(String brand) {
 //        File proto = generateBpProto(brand)
 //        if (!proto) return false
-//        log.info "publishBpContent proto"
+//        log.info 'publishBpContent proto'
 //        if (!copyBpFile(brand, proto)) return false
-//        log.info "publishBpContent copy proto"
+//        log.info 'publishBpContent copy proto'
 //        if (!rsyncFiles(brand)) return false
-//        log.info "publishBpContent rsync OK"
+//        log.info 'publishBpContent rsync OK'
 //        if (!rsyncCmsFiles(brand)) return false
-//        log.info "publishBpContent rsync CMS OK"
+//        log.info 'publishBpContent rsync CMS OK'
 //        reloadService(brand)
 //    }
 //

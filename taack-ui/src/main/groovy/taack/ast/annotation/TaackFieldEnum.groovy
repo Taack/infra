@@ -9,6 +9,6 @@ import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.SOURCE)
 @Target([ElementType.TYPE])
-@GroovyASTTransformationClass(["taack.ast.model.TaackFieldEnumASTTransformation"])
+@GroovyASTTransformationClass(['taack.ast.model.TaackFieldEnumASTTransformation'])
 @interface TaackFieldEnum {
 }

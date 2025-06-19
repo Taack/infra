@@ -1,0 +1,40 @@
+plugins {
+    id 'taack-grails-webapp'
+}
+
+group = "taack.ui.test.minimal"
+
+dependencies {
+    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+}
+
+grails {
+    // should use gradle -Dgrails.run.active=true bootRun
+    exploded = true
+    plugins {
+        implementation project(':taack-ui')
+    }
+}
+
+bootJar {
+    enabled = true
+    requiresUnpack '**/asciidoctorj*.jar'
+}
+
+bootRun {
+    ignoreExitValue true
+    jvmArgs(
+            '-Dspring.output.ansi.enabled=always',
+            '-noverify',
+            '-XX:TieredStopAtLevel=1',
+            '-XX:+UnlockExperimentalVMOptions',
+            '-XX:+UseCompactObjectHeaders',
+            '-XX:+UseEpsilonGC',
+            '-Xmx1024m'
+    )
+}
+
+assets {
+    minifyJs = true
+    minifyCss = true
+}

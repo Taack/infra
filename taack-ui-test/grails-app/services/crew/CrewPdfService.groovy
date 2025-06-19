@@ -84,13 +84,13 @@ class CrewPdfService implements WebAttributes {
         new UiPrintableSpecifier().ui {
             printableHeaderLeft('7.5cm') {
                 show new UiShowSpecifier().ui {
-                    field Style.BOLD, "Printed for"
+                    field Style.BOLD, 'Printed for'
                     field """${cu.firstName} ${cu.lastName}"""
                 }, BlockSpec.Width.THIRD
                 show new UiShowSpecifier().ui {
                     field """\
-                        <div style="height: 2cm; text-align: center;align-content: center; width: 100%;margin-left: 1cm;">
-                            ${this.taackUiService.dumpAsset("logo-taack-web.svg")}
+                        <div style='height: 2cm; text-align: center;align-content: center; width: 100%;margin-left: 1cm;'>
+                            ${this.taackUiService.dumpAsset('logo-taack-web.svg')}
                         </div>
                     """.stripIndent()
                 }, BlockSpec.Width.THIRD
@@ -111,7 +111,7 @@ class CrewPdfService implements WebAttributes {
             }
             printableFooter {
                 show new UiShowSpecifier().ui {
-                    field "<b>Taackly</b> Powered"
+                    field '<b>Taackly</b> Powered'
                 }, BlockSpec.Width.MAX
             }
 

@@ -14,7 +14,7 @@ import taack.ui.dsl.block.UiBlockVisitor
  *
  * <pre>{@code
  *          String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
- *                            custom("""<p>Test ended</p>""")
+ *                            custom('''<p>Test ended</p>''')
  *          }, 100)
  *  def task = task {
  *      customerRows.eachWithIndex { String[] row, int i ->
@@ -30,7 +30,7 @@ import taack.ui.dsl.block.UiBlockVisitor
  *}</pre>
  */
 @GrailsCompileStatic
-@Secured("isAuthenticated()")
+@Secured('isAuthenticated()')
 class ProgressController {
 
     TaackUiProgressBarService taackUiProgressBarService

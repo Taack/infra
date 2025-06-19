@@ -9,13 +9,13 @@ import java.nio.charset.StandardCharsets
 @CompileStatic
 final class Utils {
     static final private String[] fieldsToExclude = [
-            "belongsTo",
-            "constraints",
-            "instanceControllersDomainBindingApi",
-            "transients",
-            "log",
-            "instanceConvertersApi",
-            "metaClass"
+            'belongsTo',
+            'constraints',
+            'instanceControllersDomainBindingApi',
+            'transients',
+            'log',
+            'instanceConvertersApi',
+            'metaClass'
     ]
 
     static String transformInCamelCase(String name) {
@@ -37,17 +37,17 @@ final class Utils {
 
     static Map<String, String> getAdditionalFields(final Object currentObject, final FieldInfo field = null, final List<String> toExcludes = []) {
         Map<String, String> additionalFields = [:]
-        if (!currentObject["id"]) {
+        if (!currentObject['id']) {
             currentObject.class.declaredFields.each {
                 if (!(it.name as String).contains('_') && !(it.name as String).contains('$') && !fieldsToExclude.contains(it.name) && (it.name != field?.fieldName) && !toExcludes.contains(it.name)) {
-                    if (currentObject[it.name]?.hasProperty("id"))
-                        additionalFields.put(it.name, currentObject[it.name]["id"]?.toString())
+                    if (currentObject[it.name]?.hasProperty('id'))
+                        additionalFields.put(it.name, currentObject[it.name]['id']?.toString())
                     else
                         additionalFields.put(it.name, currentObject[it.name]?.toString())
                 }
             }
         } else {
-            additionalFields.put("id", currentObject["id"].toString())
+            additionalFields.put('id', currentObject['id'].toString())
         }
         additionalFields
     }
@@ -72,7 +72,7 @@ final class Utils {
             } else {
                 "${it.key}="
             }
-        }?.join('&')?:""
+        }?.join('&')?:''
     }
 
     static String paramsJson(final Map<String, ? extends Object> params) {

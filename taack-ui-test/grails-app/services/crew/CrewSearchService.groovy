@@ -9,7 +9,7 @@ import taack.solr.SolrSpecifier
 import taack.solr.SolrFieldType
 import taack.ui.dsl.UiBlockSpecifier
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class CrewSearchService implements TaackSearchService.IIndexService {
@@ -20,16 +20,16 @@ class CrewSearchService implements TaackSearchService.IIndexService {
 
     @PostConstruct
     private void init() {
-        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MethodClosure, this.&labeling as MethodClosure, { User u ->
+        TaackSearchService.registerSolrSpecifier(this, new SolrSpecifier(User, CrewController.&showUserFromSearch as MethodClosure, this.&labeling as MethodClosure, { User u ->
             u ?= new User()
             indexField SolrFieldType.TXT_NO_ACCENT, u.username_
             indexField SolrFieldType.TXT_GENERAL, u.username_
             indexField SolrFieldType.TXT_NO_ACCENT, u.firstName_
             indexField SolrFieldType.TXT_NO_ACCENT, u.lastName_
-            indexField SolrFieldType.POINT_STRING, "mainSubsidiary", true, u.subsidiary?.toString()
-            indexField SolrFieldType.POINT_STRING, "businessUnit", true, u.businessUnit?.toString()
+            indexField SolrFieldType.POINT_STRING, 'mainSubsidiary', true, u.subsidiary?.toString()
+            indexField SolrFieldType.POINT_STRING, 'businessUnit', true, u.businessUnit?.toString()
             indexField SolrFieldType.DATE, 0.5f, true, u.dateCreated_
-            indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, u.userCreated?.username
+            indexField SolrFieldType.POINT_STRING, 'userCreated', 0.5f, true, u.userCreated?.username
         }))
     }
 

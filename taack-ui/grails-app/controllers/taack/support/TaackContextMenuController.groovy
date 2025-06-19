@@ -7,7 +7,7 @@ import taack.render.TaackUiService
 import taack.ui.dsl.UiMenuSpecifier
 
 @GrailsCompileStatic
-@Secured(["permitAll"])
+@Secured(['permitAll'])
 class TaackContextMenuController implements WebAttributes {
 
     def index() {

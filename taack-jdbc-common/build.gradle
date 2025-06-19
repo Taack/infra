@@ -1,7 +1,7 @@
 plugins {
     id 'com.google.protobuf' version '0.9.4'
     id 'antlr'
-    id 'groovy'
+    id 'java'
 }
 
 repositories {
@@ -11,32 +11,20 @@ repositories {
 dependencies {
     api "com.google.protobuf:protobuf-java:${protobufVersion}"
     antlr "org.antlr:antlr4:${antlr4}"
-    implementation "org.antlr:antlr4-runtime:${antlr4}"
-    implementation "org.codehaus.groovy:groovy:${groovyVersion}"
+    api "org.antlr:antlr4-runtime:${antlr4}"
 }
 
 protobuf {
-
-    if (new File("/usr/local/bin/protoc").exists()) {
-        protoc {
-            path = '/usr/local/bin/protoc'
-        }
-    } else if (new File("/opt/homebrew/bin/protoc").exists()) {
-        protoc {
-            path = '/opt/homebrew/bin/protoc'
-        }
-    } else {
-        protoc {
-            artifact = "com.google.protobuf:protoc:${protobufVersion}"
-        }
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
 }
 
 
 generateGrammarSource {
     File outputDir = new File(projectDir.path + "/src/main/java/taack/jdbc/common/tql/gen")
-    println outputDir.path
     outputDirectory outputDir
 }
 
+//sourcesJar.dependsOn generateGrammarSource
 assemble.dependsOn generateGrammarSource

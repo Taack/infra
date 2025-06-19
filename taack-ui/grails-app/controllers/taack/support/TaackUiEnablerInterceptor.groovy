@@ -10,7 +10,7 @@ import taack.render.TaackUiEnablerService
 class TaackUiEnablerInterceptor implements Interceptor {
 
     TaackUiEnablerInterceptor() {
-        matchAll()
+       this.matchAll()
                 .excludes(controller: 'assets')
                 .excludes(controller: 'errors')
     }
@@ -28,6 +28,7 @@ class TaackUiEnablerInterceptor implements Interceptor {
                 taackUiEnablerService.checkAccess()
             } catch (e) {
                 log.error "Access Denied: $c $a ${e.message}, ${SecurityContextHolder.getContext().getAuthentication().name}, $params"
+                e.printStackTrace()
                 return false
             }
         } else {

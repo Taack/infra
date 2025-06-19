@@ -1,0 +1,20 @@
+plugins {
+    id 'taack-grails-plugin'
+    id 'taack-asciidoctor'
+}
+
+dependencies {
+    implementation project(':taack-ui')
+
+    implementation "com.itextpdf:html2pdf:${html2pdf}"
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+
+}
+
+// ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --pgo-instrument --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-ui-test.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --gc=G1 -march=native -O3 --link-at-build-time --pgo=../../graalvm/default.iprof --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-edge-client-1.0-SNAPSHOT-all.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --gc=G1 -march=native -O3 --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-ui-test.jar
+// ~/.jdks/openjdk-24.0.1/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -Xmx100M -jar taack-ui-test.jar --test
+

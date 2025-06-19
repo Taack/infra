@@ -33,10 +33,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
      * Allow to register a custom save for specific field when saving a gormEntity.
      *
      * Example:
-     *      TaackSaveService.registerFieldCustomSavingClosure("projectName", { GormEntity gormEntity, Map params ->
+     *      TaackSaveService.registerFieldCustomSavingClosure('projectName', { GormEntity gormEntity, Map params ->
      *          if (gormEntity instaceof Project) {
-     *              gormEntity.projectName = "CUSTOM_" + gormEntity.projectName
-     *              // gormEntity.projectName = "CUSTOM_" + params["projectName"]
+     *              gormEntity.projectName = 'CUSTOM_' + gormEntity.projectName
+     *              // gormEntity.projectName = 'CUSTOM_' + params['projectName']
      *          }
      *      }
      *
@@ -77,8 +77,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
 //    static <D extends GormEntity> boolean beanIsLocked(D entity) {
 //        Class beanClass = beanRealClass(entity)
-////        if (IUserInterface.isAssignableFrom(beanClass) && beanClass.getAt("enumTransition")) {
-////            IEnumTransition enumTransition = entity.getAt(beanClass.getAt("enumTransition") as String) as IEnumTransition
+////        if (IUserInterface.isAssignableFrom(beanClass) && beanClass.getAt('enumTransition')) {
+////            IEnumTransition enumTransition = entity.getAt(beanClass.getAt('enumTransition') as String) as IEnumTransition
 ////            if (enumTransition.lockedFields?.contains('*') && enumTransition.lockedFields?.size() == 1) {
 ////                return true
 ////            }
@@ -97,7 +97,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
     }
 
     final <T extends GormEntity> T save(final Class<T> aClass, final FieldInfo[] lockedFields = null, final boolean doNotSave = false) {
-        final Long id = params.long("id")
+        final Long id = params.long('id')
         T gormEntity = getGorm(id, aClass)
         save(gormEntity, lockedFields, doNotSave)
     }
@@ -105,7 +105,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
     final <T extends GormEntity> T save(final T gormEntity, final FieldInfo[] lockedFields = null, final boolean doNotSave = false, boolean doNotBindParams = false) {
         final id = gormEntity.ident()
         if (lockedFields && lockedFields.size() == 0) return null
-        final String bindingName = params["fieldName"]
+        final String bindingName = params['fieldName']
         Map includeOrExclude = null
         if (lockedFields) {
             if (lockedFields[0]) {
@@ -117,7 +117,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 //
 //        if (beanIsLocked(gormEntity))
 //            if (!bindingName)// || !bindingName.equals(transitionName))
-//                throw new SecurityException("bean is locked!")
+//                throw new SecurityException('bean is locked!')
 
         long c1 = System.currentTimeMillis()
 // TODO very slow
@@ -146,15 +146,15 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     String realFieldName = bindingName.substring(0, iPoint)
                     String key = bindingName.substring(iPoint + 1)
                     (gormEntity.getAt(realFieldName) as Map).put(key, params.get(bindingName))
-//                } else if (bindingName.contains("_setKey_")) {
+//                } else if (bindingName.contains('_setKey_')) {
 //                    int iPoint = bindingName.indexOf('_setKey_')
 //                    String realFieldName = bindingName.substring(0, iPoint)
 //                    String key = bindingName.substring(iPoint + 8)
 //                    Object o = (gormEntity.getAt(realFieldName) as Map)[key]
 //                    (gormEntity.getAt(realFieldName) as Map).remove(key)
 //                    String newKey = params.get(bindingName)
-//                    (gormEntity.getAt(realFieldName) as Map).put(newKey, o ?: "")
-//                } else if (bindingName.contains("_setValue_")) {
+//                    (gormEntity.getAt(realFieldName) as Map).put(newKey, o ?: '')
+//                } else if (bindingName.contains('_setValue_')) {
 //                    int iPoint = bindingName.indexOf('_setValue_')
 //                    String realFieldName = bindingName.substring(0, iPoint)
 //                    String key = bindingName.substring(iPoint + 10)
@@ -169,7 +169,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 }
             } else {
                 Map p = params as Map
-                p.remove("filePath") // TODO: gormEntity.save() will always fail on "filePath" if this field has been treated by bindData (Although we re-set a new value after). Why ??
+                p.remove('filePath') // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
                 if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
                 else bindData(gormEntity, p)
 
@@ -185,15 +185,15 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             if (gormEntity.hasChanged()) {
                 if (gormEntity instanceof IUserCreated && gormEntity.objectGetUserCreated() == null) {
                     gormEntity.objectSetUserCreated(currentUser)
-                } else if (gormEntity.hasProperty("userCreated") && gormEntity["userCreated"] == null) {
-                    gormEntity["userCreated"] = currentUser
+                } else if (gormEntity.hasProperty('userCreated') && gormEntity['userCreated'] == null) {
+                    gormEntity['userCreated'] = currentUser
                 }
                 if (gormEntity instanceof IUserUpdated) {
                     gormEntity.objectSetUserUpdated(currentUser)
-                } else if (gormEntity.hasProperty("userUpdated")) {
-                    gormEntity["userUpdated"] = currentUser
-                } else if (gormEntity.hasProperty("userLastUpdated")) {
-                    gormEntity["userLastUpdated"] = currentUser
+                } else if (gormEntity.hasProperty('userUpdated')) {
+                    gormEntity['userUpdated'] = currentUser
+                } else if (gormEntity.hasProperty('userLastUpdated')) {
+                    gormEntity['userLastUpdated'] = currentUser
                 }
             }
         } catch (ignored) {}

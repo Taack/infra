@@ -1,6 +1,5 @@
 package taack.ui.dsl.diagram
 
-import diagram.scene.DiagramXLabelDateFormat
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -43,7 +42,7 @@ class DiagramDatasetSpec extends DiagramActionSpec {
      *
      *      So they are divided to 3 groups with their own count: [2025-01: 3, 2025-02: 2, 2025-03: 1].
      *      The groups will be used as data to draw:
-     *          - xLabels = ["2025-01", "2025-02", "2025-03"]
+     *          - xLabels = ['2025-01', '2025-02', '2025-03']
      *          - yDataList = [3.0, 2.0, 1.0]
      *
      * @param key

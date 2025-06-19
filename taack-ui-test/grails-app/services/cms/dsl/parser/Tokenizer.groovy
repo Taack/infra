@@ -35,7 +35,7 @@ class Tokenizer {
         String s = new String(str)
         tokens.clear()
 
-        while (!s.equals("")) {
+        while (!s.equals('')) {
             boolean match = false
 
             for (Token t : Token.values()) {
@@ -48,9 +48,9 @@ class Tokenizer {
                     String tok = m.group().trim()
                     tokens.add(new TokenInfo(t, tok, start, end))
                     start += m.end()
-                    s = m.replaceFirst("")
+                    s = m.replaceFirst('')
                     int ws = s.length()
-                    s = ltrim(s).replaceFirst("[\n\r]", "")
+                    s = ltrim(s).replaceFirst('[\n\r]', '')
                     ws -= s.length()
                     start += ws
                     end += ws
@@ -59,8 +59,8 @@ class Tokenizer {
             }
             if (!match) {
                 tokens.add(new TokenInfo(Token.ERROR, s, start, start))
-                s = ""
-//                throw new TokenizerException("Unexpected character in input! ", s)
+                s = ''
+//                throw new TokenizerException('Unexpected character in input! ', s)
             }
         }
     }

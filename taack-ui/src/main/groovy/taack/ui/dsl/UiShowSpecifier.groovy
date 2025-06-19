@@ -22,7 +22,7 @@ import taack.ui.dsl.show.ShowSpec
  *          fieldLabeled item.labeling_
  *          fieldLabeled item.gtin_
  *          if (item.range)
- *              fieldAction "Show Range", ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, Bp2Controller.&showRange as MethodClosure, [id: item.range.id, subsidiary: subsidiary.toString()], false
+ *              fieldAction 'Show Range', ActionIcon.SHOW * ActionIconStyleModifier.SCALE_DOWN, Bp2Controller.&showRange as MethodClosure, [id: item.range.id, subsidiary: subsidiary.toString()], false
  *          fieldLabeled Style.BLUE, item.range_
  *          fieldLabeled item.dateCreated_
  *          fieldLabeled item.userCreated_

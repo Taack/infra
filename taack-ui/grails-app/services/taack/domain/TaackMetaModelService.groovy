@@ -2,12 +2,12 @@ package taack.domain
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
+import jakarta.persistence.metamodel.*
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.SessionFactory
 import org.hibernate.query.Query
 import org.springframework.beans.factory.annotation.Value
 
-import javax.persistence.metamodel.*
 import java.nio.file.Files
 
 /**
@@ -121,9 +121,9 @@ final class TaackMetaModelService {
         Metamodel metamodel = sessionFactory.getMetamodel()
         final Set<EntityType<?>> types = metamodel.entities
         StringBuffer res = new StringBuffer()
-        res.append("digraph mygraph {\n" +
-                "  overlap = false;\n${toClass?"layout=circo;\n":""}" +
-                "  node [shape=box];\n")
+        res.append('digraph mygraph {\n' +
+                "  overlap = false;\n${toClass?'layout=circo;\n':''}" +
+                '  node [shape=box];\n')
         types.each {
             it.attributes.each { ait ->
                 if (ait instanceof SingularAttribute && types*.javaType.contains(ait.javaType)) {
@@ -145,14 +145,14 @@ final class TaackMetaModelService {
                 }
             }
         }
-        res.append("}")
+        res.append('}')
         res.toString()
     }
 
     private String enumTransitionGraph(IEnumTransition2 enumTransition2, Set<IEnumTransition2> visited) {
         StringBuffer ret = new StringBuffer()
         for (def et : enumTransition2.transitionsTo(null)) {
-            ret << enumTransition2.toString() + " -> " + et.toString() + "\n"
+            ret << enumTransition2.toString() + ' -> ' + et.toString() + '\n'
         }
         visited.add enumTransition2
         for (def et : enumTransition2.transitionsTo(null)) {
@@ -183,7 +183,7 @@ final class TaackMetaModelService {
      * @return SVG String
      */
     String svg(String graph) {
-        def f = Files.createTempFile("graph_", ".dot").toFile()
+        def f = Files.createTempFile('graph_', '.dot').toFile()
         f << graph
         def p = "${exeDotPath} -Tsvg ${f.path}".execute()
         p.text

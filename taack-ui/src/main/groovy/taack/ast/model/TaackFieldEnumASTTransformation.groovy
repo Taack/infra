@@ -1,6 +1,7 @@
 package taack.ast.model
 
 import groovy.transform.CompileStatic
+import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.*
 import org.codehaus.groovy.ast.stmt.BlockStatement
@@ -15,20 +16,16 @@ import org.codehaus.groovy.syntax.Types
 import org.codehaus.groovy.transform.AbstractASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.codehaus.groovy.transform.stc.StaticTypesMarker
-
 import taack.ast.annotation.TaackFieldEnum
 import taack.ast.type.FieldConstraint
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 
 import java.lang.reflect.Field
-import java.lang.reflect.Method
 
+import static org.apache.groovy.ast.tools.ClassNodeUtils.addGeneratedMethod
 import static org.codehaus.groovy.ast.ClassHelper.make
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*
-import static org.apache.groovy.ast.tools.ClassNodeUtils.addGeneratedMethod
-
-
 /**
  * Handles generation of code for the @TaackFieldEnum annotation.
  */
@@ -102,7 +99,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                     // Filter pure Getters
                     if (it.name.startsWith('get') && !it.name.contains('_') && !it.name.contains('Solr') &&
                             !it.name.contains('Iterator') && it.parameters.size() == 0 &&
-                            (it.modifiers & ACC_PRIVATE) == 0) {
+                            (it.modifiers & Opcodes.ACC_PRIVATE) == 0) {
 
                         if (debugEnum == DebugEnum.NORMAL || debugEnum == DebugEnum.ONLY_METHOD) {
                             addGetMethodMethodNode(classNode, it)
@@ -113,7 +110,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
             classNode.fields.each { FieldNode fIt ->
                 // hasMany fields are added after semantic analysis
-                if (fIt.name == 'belongsTo' /*|| fIt.name == "hasMany"*/) {
+                if (fIt.name == 'belongsTo' /*|| fIt.name == 'hasMany'*/) {
                     if (fIt.initialExpression instanceof MapExpression) {
 
                         MapExpression me = fIt.initialExpression as MapExpression
@@ -152,14 +149,14 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                     }
                 } else if (!(fIt.name.startsWith('get') || fIt.name.contains('_') || fIt.name.contains('$')
                         || fIt.name.contains('hasMany') || DOMAIN_RESERVED.contains(fIt.name) ||
-                        fIt.type.name.contains('DetachedCriteria') && (fIt.modifiers & ACC_PRIVATE) != 0)) {
+                        fIt.type.name.contains('DetachedCriteria') && (fIt.modifiers & Opcodes.ACC_PRIVATE) != 0)) {
 
                     List<AnnotationNode> annotationNodes = fIt.getAnnotations(TFE_TYPE)
                     String constraintName = null
                     FieldConstraint.Constraints constraints = constraintsMap.get(fIt.name)
                     if (!annotationNodes.empty) {
                         AnnotationNode enumName = annotationNodes.first()
-                        ConstantExpression constantExpression = (ConstantExpression) enumName.getMember("name")
+                        ConstantExpression constantExpression = (ConstantExpression) enumName.getMember('name')
                         constraintName = constantExpression.value
                     }
 
@@ -234,7 +231,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
         addGeneratedMethod(
                 classNode,
                 'getSelfObject_',
-                ACC_PUBLIC,
+                Opcodes.ACC_PUBLIC,
                 fiNode,
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,
@@ -403,7 +400,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
         addGeneratedMethod(
                 classNode,
                 transformNameIntoMethodName(fieldNode),
-                ACC_PUBLIC,
+                Opcodes.ACC_PUBLIC,
                 GenericsUtils.makeClassSafeWithGenerics(FieldInfo, castTypeToClass(fieldNode.type)),
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,
@@ -472,7 +469,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
         addGeneratedMethod(
                 classNode,
                 genMethodName,
-                ACC_PUBLIC,
+                Opcodes.ACC_PUBLIC,
                 GRM_TYPE,
                 Parameter.EMPTY_ARRAY,
                 ClassNode.EMPTY_ARRAY,

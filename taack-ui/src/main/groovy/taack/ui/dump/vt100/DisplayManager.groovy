@@ -102,10 +102,10 @@ final class DisplayManager {
         protected String padString(int len = content.length()) {
             if (len < 0) throw new IllegalArgumentException("len($len) < 0")
             if (len == content.length()) content
-            else if (content.length() < len) content + " " * (len - content.length())
+            else if (content.length() < len) content + ' ' * (len - content.length())
             else if (content.length() > len && len > 1) {
-                content.substring(0, len - 1) + "<"
-            } else "<"
+                content.substring(0, len - 1) + '<'
+            } else '<'
         }
 
         void draw() {
@@ -141,10 +141,10 @@ final class DisplayManager {
         int len
 
         String padString(int pLen = len) {
-            if (pLen < 0) throw new IllegalArgumentException("len < 0")
+            if (pLen < 0) throw new IllegalArgumentException('len < 0')
             String s = content
             if (pLen == s.length()) s
-            else if (s.length() < pLen) s + " " * (pLen - s.length())
+            else if (s.length() < pLen) s + ' ' * (pLen - s.length())
             else if (s.length() > pLen && pLen > 1) {
                 s.substring(0, pLen - 1) + cellScroll
             } else cellScroll
@@ -327,7 +327,7 @@ final class DisplayManager {
     DisplayManager(InputStream inputStream, OutputStream outputStream) {
         this.ins = inputStream
         this.out = outputStream
-        log.info "query dim"
+        log.info 'query dim'
         curDim = dimensions
         log.info "create new DisplayManager with original dimension ${curDim.col} x ${curDim.row}"
     }

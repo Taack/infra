@@ -47,10 +47,10 @@ final class UiFilterSpecifier {
         this.closure = closure
         this.aClass = aClass
         this.additionalParams = fieldInfos.toList().findAll {it.value }.collectEntries {
-            if (it.value.hasProperty("id"))
-                new MapEntry("ajaxParams." + it.fieldName + ".id", it.value.getAt("id"))
+            if (it.value.hasProperty('id'))
+                new MapEntry('ajaxParams.' + it.fieldName + '.id', it.value.getAt('id'))
             else
-                new MapEntry("ajaxParams." + it.fieldName, it.value.toString())
+                new MapEntry('ajaxParams.' + it.fieldName, it.value.toString())
         }
         this
     }

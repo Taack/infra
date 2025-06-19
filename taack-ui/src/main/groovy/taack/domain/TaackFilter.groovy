@@ -65,20 +65,20 @@ final class TaackFilter<T extends GormEntity<T>> {
 
     @Override
     String toString() {
-        return "TaackFilter{" +
-                "sessionFactory=" + sessionFactory +
-                ", theParams=" + theParams +
-                ", joinEntityMap=" + joinEntityMap +
-                ", joinEntityOrder=" + joinEntityOrder +
-                ", cClass=" + cClass +
-                ", oObject=" + oObject +
-                ", max=" + max +
-                ", additionalFilters=" + additionalFilters +
-                ", restrictedIds=" + restrictedIds +
-                ", sortFields=" + Arrays.toString(sortFields) +
-                ", order=" + order +
-                ", dateFields=" + readingDateField +
-                ", lastReadingDate=" + lastReadingDate +
+        return 'TaackFilter{' +
+                'sessionFactory=' + sessionFactory +
+                ', theParams=' + theParams +
+                ', joinEntityMap=' + joinEntityMap +
+                ', joinEntityOrder=' + joinEntityOrder +
+                ', cClass=' + cClass +
+                ', oObject=' + oObject +
+                ', max=' + max +
+                ', additionalFilters=' + additionalFilters +
+                ', restrictedIds=' + restrictedIds +
+                ', sortFields=' + Arrays.toString(sortFields) +
+                ', order=' + order +
+                ', dateFields=' + readingDateField +
+                ', lastReadingDate=' + lastReadingDate +
                 '}'
     }
 
@@ -129,7 +129,7 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
     private static String removeBrackets(String join) {
-        return join.replaceAll("\\[[0-9]?\\]", '')
+        return join.replaceAll('\\[[0-9]?\\]', '')
     }
 
     private final JoinEntity getJoinEntity(String path) {
@@ -179,8 +179,8 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
     String getOrderString() {
-        if (order == Order.ASC) "asc"
-        else if (order == Order.DESC) "desc"
+        if (order == Order.ASC) 'asc'
+        else if (order == Order.DESC) 'desc'
         else null
     }
 
@@ -230,7 +230,7 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
     private static final int visitFilterFieldExpressionBool(FilterExpression filterExpression, int occ, List<String> where, Map namedParams) {
-        final String fieldName = filterExpression.fieldName.replace("selfObject", "id")
+        final String fieldName = filterExpression.fieldName.replace('selfObject', 'id')
 
         if (!filterExpression.isCollection) {
             switch (filterExpression.operator) {
@@ -238,7 +238,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                     if (filterExpression.value instanceof GetMethodReturn) {
                         GetMethodReturn methodReturn = filterExpression.value as GetMethodReturn
                         List<Long> listOfLongs = (methodReturn.value as List<? extends GormEntity>)*.ident() as List<Long>
-                        if (filterExpression.fieldName.endsWith("selfObject") && !listOfLongs.isEmpty()) {
+                        if (filterExpression.fieldName.endsWith('selfObject') && !listOfLongs.isEmpty()) {
                             where << ("sc.${fieldName} in (${listOfLongs.join(',')})" as String)
                             occ++
                         }
@@ -267,8 +267,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                             occ++
                         } else {
                             List<Long> listOfLongs = (filterExpression.value as List<? extends GormEntity>)*.ident() as List<Long>
-                            if (filterExpression.fieldName.endsWith("selfObject") && !listOfLongs.isEmpty()) {
-                                where << ("sc.${filterExpression.fieldName.replace("selfObject", "id")} not in (${listOfLongs.join(',')})" as String)
+                            if (filterExpression.fieldName.endsWith('selfObject') && !listOfLongs.isEmpty()) {
+                                where << ("sc.${filterExpression.fieldName.replace('selfObject', 'id')} not in (${listOfLongs.join(',')})" as String)
                                 occ++
                             }
                         }
@@ -376,10 +376,10 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
     /**
-     *  Given date string like "[yyyy-MM-dd, yyyy-MM-dd]" to present dateMin and dateMax for filter. Return them as Date objects.
+     *  Given date string like '[yyyy-MM-dd, yyyy-MM-dd]' to present dateMin and dateMax for filter. Return them as Date objects.
      */
     static final Pair<Date, Date> parseDate(final String dateListString) {
-        if (dateListString?.startsWith("[") && dateListString?.endsWith("]")) {
+        if (dateListString?.startsWith('[') && dateListString?.endsWith(']')) {
             List<String> l = dateListString[1..-2].split(',')*.trim().toList()
             Closure parse = { String s ->
                 if (!s) return null
@@ -411,10 +411,10 @@ final class TaackFilter<T extends GormEntity<T>> {
      */
     final Pair<List<T>, Long> list(final Class<T> aClass, final int max = 20, final UiFilterSpecifier filterSpecifier = null, final T tInstance = null, final FieldInfo[] fields = null, final Order order = null, final Collection<Long> idsInList = null) {
         if (idsInList != null && idsInList.empty) return new Pair<>([], 0)
-        def fieldNames = aClass.declaredFields*.name.findAll { it != "id" }
+        def fieldNames = aClass.declaredFields*.name.findAll { it != 'id' }
         def superClass = aClass.superclass
         if (superClass) {
-            fieldNames.addAll superClass.declaredFields*.name.findAll { it != "id" }
+            fieldNames.addAll superClass.declaredFields*.name.findAll { it != 'id' }
         }
 
         Map<String, Object> filter = [:]
@@ -448,11 +448,11 @@ final class TaackFilter<T extends GormEntity<T>> {
             }
         }
 
-        String simpleClassName = aClass.name.substring(aClass.name.lastIndexOf(".") + 1)
+        String simpleClassName = aClass.name.substring(aClass.name.lastIndexOf('.') + 1)
         List<String> where = []
         if (idsInList) {
             if (!idsInList.empty) {
-                where << ("sc.id in (${idsInList.join(",")})" as String)
+                where << ("sc.id in (${idsInList.join(',')})" as String)
             } else {
                 where << 'sc.id is null'
             }
@@ -464,7 +464,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         println filter
         Map<String, Object> namedParams = [:]
         filter?.each { Map.Entry<String, Object> entry ->
-            if (entry.value && !filterMeta.contains(entry.key) && !entry.key.contains("filterExpression")) {
+            if (entry.value && !filterMeta.contains(entry.key) && !entry.key.contains('filterExpression')) {
                 final String entryKey = entry.key as String
                 occ++
                 /**
@@ -472,7 +472,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                  */
                 if (entryKey.startsWith('_reverse')) {
                     String[] t = entryKey.split('_')
-                    final String reverseClassName = t[2].substring(t[2].lastIndexOf(".") + 1)
+                    final String reverseClassName = t[2].substring(t[2].lastIndexOf('.') + 1)
                     final String reverseFieldName = t[3]
                     final String targetField = t[4]
                     where << ("sc.id IN (select auo.${reverseFieldName}.id from ${reverseClassName} auo where auo.${targetField} like '${escapeHqlParameter(entry.value as String)}')" as String)
@@ -490,7 +490,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                         if (dates.bValue)
                             where << ("$aliasKey < '${DateFormat.format(dates.bValue, 'yyyy-MM-dd')}'" as String)
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
-                        boolean entryValue = entry.value instanceof String ? entry.value == "1" : entry.value as Boolean
+                        boolean entryValue = entry.value instanceof String ? entry.value == '1' : entry.value as Boolean
                         where << ("$aliasKey = $entryValue" as String)
                     } else if (f && f.type == Map) {
                         if (entry.value instanceof String) {
@@ -627,10 +627,10 @@ final class TaackFilter<T extends GormEntity<T>> {
         join = buildJoinClause() ? buildJoinClause().append(join) : join
         String simpleOrder = filter['order'] ?: order?.toString()
         String simpleSort = filter['sort'] ?: fields ? RawHtmlFilterDump.getQualifiedName(fields) : null
-        String sortOrder = simpleSort && simpleOrder ? " order by sc.$simpleSort $simpleOrder" : ""
-        String selectOrder = simpleSort && simpleOrder ? " ,sc.$simpleSort " : ""
+        String sortOrder = simpleSort && simpleOrder ? " order by sc.$simpleSort $simpleOrder" : ''
+        String selectOrder = simpleSort && simpleOrder ? " ,sc.$simpleSort " : ''
 
-        String whereClause = where.empty ? " " : " where ${where.join(' and ')} "
+        String whereClause = where.empty ? ' ' : " where ${where.join(' and ')} "
         String query = "select distinct sc ${selectOrder}" + from.toString() + join.toString() + removeBrackets(whereClause) + sortOrder
         String count = 'select count(distinct sc) ' + from.toString() + join.toString() + removeBrackets(whereClause)
         if (Environment.current == Environment.DEVELOPMENT) {
@@ -640,7 +640,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         List<T> res
 
         try {
-            Integer offset = (theParams["offset"] ?: "0") as Integer
+            Integer offset = (theParams['offset'] ?: '0') as Integer
             if (simpleSort && simpleOrder) {
                 res = (executeQuery(query, namedParams, (max == -1) ? null : max, offset) as List<List>)*.first() as List<T>
             } else {

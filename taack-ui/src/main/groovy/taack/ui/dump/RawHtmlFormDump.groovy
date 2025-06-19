@@ -69,7 +69,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitForm(final Object aObject, final FieldInfo[] lockedFields = null) {
         this.lockedFields = lockedFields
         this.aObject = aObject
-        String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : "") : ""
+        String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : '') : ''
         blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(
                 formThemed.builder.addClasses('row', 'taackForm').addChildren(
@@ -315,7 +315,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitReadOnly(String i18n, String value) {
-        blockLog.topElement = formThemed.normalInput(blockLog.topElement, "", i18n, true, true, value)
+        blockLog.topElement = formThemed.normalInput(blockLog.topElement, '', i18n, true, true, value)
     }
 
     @Override

@@ -1,6 +1,5 @@
 package taack.ui.dsl.diagram
 
-import diagram.scene.DiagramXLabelDateFormat
 import groovy.transform.CompileStatic
 
 @CompileStatic

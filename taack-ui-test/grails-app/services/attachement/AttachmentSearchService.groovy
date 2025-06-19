@@ -12,7 +12,7 @@ import taack.solr.SolrFieldType
 import taack.solr.SolrSpecifier
 import taack.ui.dsl.UiBlockSpecifier
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class AttachmentSearchService implements TaackSearchService.IIndexService {
@@ -24,15 +24,15 @@ class AttachmentSearchService implements TaackSearchService.IIndexService {
 
     @PostConstruct
     private void init() {
-        taackSearchService.registerSolrSpecifier(this, new SolrSpecifier(Attachment, AttachmentController.&showAttachment as MethodClosure, this.&labeling as MethodClosure, { Attachment a ->
+        TaackSearchService.registerSolrSpecifier(this, new SolrSpecifier(Attachment, AttachmentController.&showAttachment as MethodClosure, this.&labeling as MethodClosure, { Attachment a ->
             a ?= new Attachment()
             String content = taackAttachmentService.attachmentContent(a)
             indexField SolrFieldType.TXT_GENERAL, a.originalName_
             if (content || !a.id)
-                indexField SolrFieldType.TXT_GENERAL, "fileContent", content
-            indexField SolrFieldType.POINT_STRING, "contentTypeCategoryEnum", true, a.contentTypeCategoryEnum?.toString()
+                indexField SolrFieldType.TXT_GENERAL, 'fileContent', content
+            indexField SolrFieldType.POINT_STRING, 'contentTypeCategoryEnum', true, a.contentTypeCategoryEnum?.toString()
             indexField SolrFieldType.DATE, 0.5f, true, a.dateCreated_
-            indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, a.userCreated?.username
+            indexField SolrFieldType.POINT_STRING, 'userCreated', 0.5f, true, a.userCreated?.username
         }))
     }
 

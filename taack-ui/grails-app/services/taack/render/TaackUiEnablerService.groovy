@@ -3,18 +3,16 @@ package taack.render
 import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
 import grails.web.api.WebAttributes
-import grails.web.servlet.mvc.GrailsParameterMap
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
 import org.owasp.html.Sanitizers
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.helper.Utils
-
-import javax.annotation.PostConstruct
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.
@@ -46,14 +44,11 @@ class TaackUiEnablerService implements WebAttributes {
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
 
-    @Autowired
-    TaackUiConfiguration taackUiConfiguration
-
-    def policy
+    PolicyFactory policy
 
     @PostConstruct
     void init() {
-        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS)
+        policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
     }
 
     static String sanitizeString(String toSanitize) {
@@ -66,6 +61,7 @@ class TaackUiEnablerService implements WebAttributes {
             pf = pf.and(it)
         }
         return pf.sanitize(toSanitize)
+        return toSanitize
     }
 
     private final static Map<String, Closure> securityClosures = [:]
@@ -79,7 +75,7 @@ class TaackUiEnablerService implements WebAttributes {
      */
     static void securityClosure(Closure closure, final MethodClosure... actions) {
         actions.each { action ->
-            securityClosures.put("/" + Utils.getControllerName(action) + "/" + action.method.toString(), closure)
+            securityClosures.put('/' + Utils.getControllerName(action) + '/' + action.method.toString(), closure)
         }
     }
 
@@ -93,20 +89,20 @@ class TaackUiEnablerService implements WebAttributes {
      * @return true if allowed, false if not
      */
     boolean hasAccess(final String controller, final String action, final Long id, final Map params) {
-        def authContext = SecurityContextHolder.getContext().getAuthentication()
+        Authentication authContext = SecurityContextHolder.getContext().getAuthentication()
         if (!authContext?.authenticated) {
             return true
         }
 
-        def path = '/' + controller + '/' + action
+        String path = '/' + controller + '/' + action
         boolean isAllowed = true
         switch (Environment.current) {
             case Environment.DEVELOPMENT:
-                if (!taackUiConfiguration.disableSecurity)
-                    isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+                if (!TaackUiConfiguration.disableSecurity)
+                    isAllowed = webInvocationPrivilegeEvaluator.isAllowed(null, path, 'GET', authContext)
                 break
             case Environment.PRODUCTION:
-                isAllowed = webInvocationPrivilegeEvaluator.isAllowed(path, authContext)
+                isAllowed = webInvocationPrivilegeEvaluator.isAllowed(null, path, 'GET', authContext)
                 break
         }
         if (isAllowed) {

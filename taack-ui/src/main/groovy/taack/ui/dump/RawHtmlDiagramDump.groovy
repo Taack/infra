@@ -1,19 +1,19 @@
 package taack.ui.dump
 
-import diagram.IDiagramRender
-import diagram.PngDiagramRender
-import diagram.SvgDiagramRender
-import diagram.scene.AreaDiagramScene
-import diagram.scene.BarDiagramScene
-import diagram.scene.DiagramXLabelDateFormat
-import diagram.scene.LineDiagramScene
-import diagram.scene.PieDiagramScene
-import diagram.scene.ScatterDiagramScene
-import diagram.scene.WhiskersDiagramScene
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.common.BlockLog
+import taack.ui.dump.diagram.IDiagramRender
+import taack.ui.dump.diagram.PngDiagramRender
+import taack.ui.dump.diagram.SvgDiagramRender
+import taack.ui.dump.diagram.scene.AreaDiagramScene
+import taack.ui.dump.diagram.scene.BarDiagramScene
+import taack.ui.dump.diagram.scene.LineDiagramScene
+import taack.ui.dump.diagram.scene.PieDiagramScene
+import taack.ui.dump.diagram.scene.ScatterDiagramScene
+import taack.ui.dump.diagram.scene.WhiskersDiagramScene
 import taack.ui.dump.html.block.HTMLOutput
 
 import java.text.SimpleDateFormat

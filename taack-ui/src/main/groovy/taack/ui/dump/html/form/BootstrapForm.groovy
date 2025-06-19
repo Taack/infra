@@ -163,7 +163,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, (multiple || !nullable ? null : floating ? "" : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, (multiple || !nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
         el.addChildren(s)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
@@ -205,7 +205,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         int occ = 0
         vals?.each {
             String hiddenInputId = idPrefix + "-${occ++}"
-            String inputLabelId = hiddenInputId + "-label"
+            String inputLabelId = hiddenInputId + '-label'
             HTMLDiv m2mParent = themeStartInputs(el).builder.addClasses('M2MParent').build() as HTMLDiv
             if (!disabled) m2mParent.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
             HTMLInput input = new HTMLInput(InputType.STRING, it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
@@ -216,7 +216,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             m2mParent.addChildren(inputHidden)
         }
         String hiddenInputId = idPrefix + "-${occ++}"
-        String inputLabelId = hiddenInputId + "-label"
+        String inputLabelId = hiddenInputId + '-label'
         HTMLDiv m2mToDuplicate = themeStartInputs(el).builder.addClasses('M2MToDuplicate').build() as HTMLDiv
         if (!disabled) m2mToDuplicate.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
         HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
@@ -258,7 +258,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLDiv div = new HTMLDiv().builder.setStyle(new Style(null, "display: flex;")).build() as HTMLDiv
+        HTMLDiv div = new HTMLDiv().builder.setStyle(new Style(null, 'display: flex;')).build() as HTMLDiv
 
         Date value1 = value.aValue
         if (floating || !noLabel) {
@@ -271,7 +271,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             div.addChildren(dateInput1)
         }
 
-        HTMLSpan dash = new HTMLSpan().builder.addChildren(new HTMLTxtContent('-')).setStyle(new Style(null, "padding: .375rem;")).build() as HTMLSpan
+        HTMLSpan dash = new HTMLSpan().builder.addChildren(new HTMLTxtContent('-')).setStyle(new Style(null, 'padding: .375rem;')).build() as HTMLSpan
         div.addChildren(dash)
 
         Date value2 = value.bValue
@@ -306,9 +306,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
 
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
-        HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses("wysiwyg-content", "markdown").setId(qualifiedName).build() as HTMLTextarea
+        HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses('wysiwyg-content', 'markdown').setId(qualifiedName).build() as HTMLTextarea
         container.addChildren(textareaInput)
-        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses("wysiwyg-markdown-preview markdown-body").build() as HTMLDiv
+        HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview').addClasses('wysiwyg-markdown-preview markdown-body").build() as HTMLDiv
         container.addChildren(preview)
         HTMLInput attachmentSelectInput = new HTMLInput(InputType.STRING, null, null, null, false, true).builder.setId("${qualifiedName}-attachment-select").addClasses(formControl).putAttribute('taackajaxformm2oaction', '/markdown/selectAttachment').build() as HTMLInput
         container.addChildren(attachmentSelectInput)
@@ -325,7 +325,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
         if (!noLabel) container.addChildren(formLabelInput(qualifiedName, trI18n))
-        HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses("asciidoctor").setId(qualifiedName).build() as HTMLTextarea
+        HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses('asciidoctor').setId(qualifiedName).build() as HTMLTextarea
         container.addChildren(textareaInput)
         el.addChildren(container)
         el.addChildren(divError(qualifiedName))

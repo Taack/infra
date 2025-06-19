@@ -1,137 +1,16 @@
-if (rootProject.name == 'infra' || rootProject.name == 'taack-ui-test') {
-    apply plugin: "org.grails.grails-plugin"
-    apply plugin: "idea"
-    apply plugin: "asset-pipeline"
-    apply plugin: "org.grails.grails-gsp"
-
-    if (rootProject.name == 'taack-ui-test') {
-        apply plugin: 'java-library'
-
-        repositories {
-            mavenCentral()
-            maven { url "https://repo.grails.org/grails/core/" }
-        }
-    }
-
-    configurations {
-        developmentOnly
-        runtimeClasspath {
-            extendsFrom developmentOnly
-        }
-    }
-
-    dependencies {
-        developmentOnly("org.springframework.boot:spring-boot-devtools")
-        compileOnly "io.micronaut:micronaut-inject-groovy"
-        implementation "org.grails:grails-core"
-        implementation "org.grails:grails-web-boot"
-        implementation "org.grails:grails-logging"
-        implementation "org.grails:grails-plugin-databinding"
-        implementation "org.grails:grails-plugin-i18n"
-        implementation "org.grails:grails-plugin-services"
-        implementation "org.grails.plugins:gsp"
-        profile "org.grails.profiles:web-plugin"
-        runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipeline}"
-        assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipeline}"
-        assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipeline}"
-
-        api 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
-    }
-
-    if (rootProject.name == 'infraFalse') {
-        bootRun {
-            ignoreExitValue true
-            jvmArgs(
-                    '-Dspring.output.ansi.enabled=always',
-                    '-noverify',
-                    '-XX:TieredStopAtLevel=1',
-                    '-Xmx1024m')
-            sourceResources sourceSets.main
-            String springProfilesActive = 'spring.profiles.active'
-            systemProperty springProfilesActive, System.getProperty(springProfilesActive)
-        }
-        tasks.withType(GroovyCompile) {
-            configure(groovyOptions) {
-                forkOptions.jvmArgs = ['-Xmx1024m']
-            }
-        }
-
-        tasks.withType(Test) {
-            useJUnitPlatform()
-        }
-    } else
-        bootJar.enabled = false
+plugins {
+    id 'taack-grails-plugin'
+    id 'taack-grails-assets-plugin'
 }
-dependencyManagement {
-    dependencies {
-        dependency "org.apache.solr:solr-solrj:${solrj}"
-    }
-}
+
 dependencies {
-    implementation "com.itextpdf:html2pdf:${html2pdf}"
-
-    implementation 'org.grails:grails-plugin-controllers'
-
-    implementation 'org.grails.plugins:hibernate5'
-    implementation "org.grails.plugins:spring-security-core:${grailsSpringSecurity}"
-    implementation "org.grails:grails-plugin-interceptors"
-
-    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
-
-    implementation "org.apache.solr:solr-solrj:${solrj}"
-    implementation "org.apache.tika:tika-core:${tika}"
-    implementation "org.apache.tika:tika-parsers-standard:${tika}"
-    implementation "org.apache.tika:tika-parser-ocr-module:${tika}"
-    implementation "org.apache.tika:tika-parser-html-module:${tika}"
-
-    implementation 'net.i2p.crypto:eddsa:0.3.0'
-    implementation "org.apache.sshd:sshd:${minaSshd}"
-    implementation "org.apache.sshd:sshd-core:${minaSshd}"
-    implementation "org.apache.sshd:sshd-common:${minaSshd}"
-    implementation "org.apache.sshd:sshd-sftp:${minaSshd}"
-    implementation "org.apache.sshd:sshd-git:${minaSshd}"
-    implementation "org.apache.sshd:sshd-cli:${minaSshd}"
-
-    if (rootProject.name != 'infra' && rootProject.name != 'taack-ui-test') {
-        api project(':infra:taack-jdbc-common')
-    } else {
-        api project(':taack-jdbc-common')
-    }
-
-    implementation "org.asciidoctor:asciidoctorj-api:${asciidoctorJ}"
+    api 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
 }
 
-if (rootProject.name != 'infra') {
-    grails {
-        // should use gradle -Dgrails.run.active=true bootRun
-        exploded = true
-        plugins {
-        }
-    }
-} else {
-    assets {
-        minifyJs = true
-        minifyCss = true
-        configOptions = [:]
-
-        minifyOptions = [
-                languageMode: 'ES_NEXT_IN',
-                targetLanguage: 'ES_NEXT_IN', //Can go from ES6 to ES5 for those bleeding edgers
-                optimizationLevel: 'SIMPLE',
-                angularPass: false // Can use @ngInject annotation for Angular Apps
-        ]
-
-        //excludes = ['reveal.js/plugin/*/plugin.js', '**/*esm*']
-
-        //for plugin packaging
-        packagePlugin = true //set to true if this is a library
-
-        //developmentRuntime can be turned off
-        developmentRuntime = true
-
-        //if you want to customize the jar task this task runs on you can specify a jarTaskName
-        jarTaskName = null
-    }
-
-}
+// ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --pgo-instrument --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-ui-test.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --gc=G1 -march=native -O3 --link-at-build-time --pgo=../../graalvm/default.iprof --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-edge-client-1.0-SNAPSHOT-all.jar
+// ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --gc=G1 -march=native -O3 --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-ui-test.jar
+// ~/.jdks/openjdk-24.0.1/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -Xmx100M -jar taack-ui-test.jar --test
 

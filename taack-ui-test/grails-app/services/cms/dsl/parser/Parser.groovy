@@ -43,7 +43,7 @@ class Parser {
             start = lookahead.start
             end = lookahead.end
         } else {
-            lookahead = new Tokenizer.TokenInfo(Token.EPSILON, "", end, end)
+            lookahead = new Tokenizer.TokenInfo(Token.EPSILON, '', end, end)
         }
     }
 
@@ -66,13 +66,13 @@ class Parser {
         String ret = expression()
 
         if (lookahead.token != Token.EPSILON) {
-            throw new ParserException("Unexpected symbol found!", this.tokens, lookahead)
+            throw new ParserException('Unexpected symbol found!', this.tokens, lookahead)
         }
         ret
     }
 
     String expression() {
-        String ret = ""
+        String ret = ''
         if (lookahead.token == Token.IMG) {
             suggesterStatus = SuggesterStatus.ID_IMG
             nextToken()
@@ -80,13 +80,13 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsImage i = CmsImage.read(id.substring(1))
-                    if (!i) throw new WrongDataException("No Image", id)
-                    else if (i.hide) throw new WrongDataException("Image Not Published", id)
+                    if (!i) throw new WrongDataException('No Image', id)
+                    else if (i.hide) throw new WrongDataException('Image Not Published', id)
                 }
                 nextToken()
                 ret = MarkDownRender.renderImage(id, lang, arguments(new Arguments()))
             } else {
-                throw new ParserException("Missing Image ID", this.tokens, lookahead)
+                throw new ParserException('Missing Image ID', this.tokens, lookahead)
             }
         } else if (lookahead.token == Token.IMG_LINK) {
             suggesterStatus = SuggesterStatus.ID_IMG
@@ -95,13 +95,13 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsImage i = CmsImage.read(id.substring(1))
-                    if (!i) throw new WrongDataException("No Image", id)
-                    else if (i.hide) throw new WrongDataException("Image Not Published", id)
+                    if (!i) throw new WrongDataException('No Image', id)
+                    else if (i.hide) throw new WrongDataException('Image Not Published', id)
                 }
                 nextToken()
                 ret = "/cms/mediaPreview/${id.substring(1)}"
             } else {
-                throw new ParserException("Missing Image ID", this.tokens, lookahead)
+                throw new ParserException('Missing Image ID', this.tokens, lookahead)
             }
         } else if (lookahead.token == Token.VID) {
             suggesterStatus = SuggesterStatus.ID_VID
@@ -110,13 +110,13 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsVideoFile v = CmsVideoFile.read(id.substring(1))
-                    if (!v) throw new WrongDataException("No Video", id)
-                    else if (v.hide) throw new WrongDataException("Video Not Published", id)
+                    if (!v) throw new WrongDataException('No Video', id)
+                    else if (v.hide) throw new WrongDataException('Video Not Published', id)
                 }
                 nextToken()
                 ret = MarkDownRender.renderVideo(id, arguments(new Arguments()), lang)
             } else {
-                throw new ParserException("Missing Video ID", this.tokens, lookahead)
+                throw new ParserException('Missing Video ID', this.tokens, lookahead)
 
             }
         } else if (lookahead.token == Token.PDF) {
@@ -126,12 +126,12 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsPdfFile v = CmsPdfFile.read(id.substring(1))
-                    if (!v) throw new WrongDataException("No PDF", id)
+                    if (!v) throw new WrongDataException('No PDF', id)
                 }
                 nextToken()
                 ret = MarkDownRender.renderPdf(id, arguments(new Arguments()), lang)
             } else {
-                throw new ParserException("Missing Video ID", this.tokens, lookahead)
+                throw new ParserException('Missing Video ID', this.tokens, lookahead)
 
             }
         } else if (lookahead.token == Token.VID_LINK) {
@@ -141,13 +141,13 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsVideoFile v = CmsVideoFile.get(id.substring(1))
-                    if (!v) throw new WrongDataException("No Video", id)
-                    else if (v.hide) throw new WrongDataException("Video Not Published", id)
+                    if (!v) throw new WrongDataException('No Video', id)
+                    else if (v.hide) throw new WrongDataException('Video Not Published', id)
                 }
                 nextToken()
                 ret = MarkDownRender.renderVideoImage(id, lang, arguments(new Arguments()))
             } else {
-                throw new ParserException("Missing Video ID", this.tokens, lookahead)
+                throw new ParserException('Missing Video ID', this.tokens, lookahead)
 
             }
         } else if (lookahead.token == Token.SLIDESHOW) {
@@ -157,14 +157,14 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsPage v = CmsPage.get(id.substring(1))
-                    if (!v) throw new WrongDataException("No Slideshow", id)
-                    else if (!v.published) throw new WrongDataException("Slideshow Not Published", id)
+                    if (!v) throw new WrongDataException('No Slideshow', id)
+                    else if (!v.published) throw new WrongDataException('Slideshow Not Published', id)
                     else if (v.pageType != CmsPageType.SLIDESHOW) throw new WrongDataException("Slideshow Not a Slideshow ... ${v}", id)
                 }
                 nextToken()
                 ret = CmsUiService.INSTANCE.bodySlideshow(CmsPage.read(id.substring(1)), SupportedLanguage.fromIso2(lang))
             } else {
-                throw new ParserException("Missing Slideshow ID", this.tokens, lookahead)
+                throw new ParserException('Missing Slideshow ID', this.tokens, lookahead)
 
             }
         } else if (lookahead.token == Token.INSERT_LINK) {
@@ -174,11 +174,11 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsInsert v = CmsInsert.get(id.substring(1))
-                    if (!v) throw new WrongDataException("No Insert", id)
+                    if (!v) throw new WrongDataException('No Insert', id)
                 }
                 nextToken()
             } else {
-                throw new ParserException("Missing Insert ID", this.tokens, lookahead)
+                throw new ParserException('Missing Insert ID', this.tokens, lookahead)
 
             }
         } else if (lookahead.token == Token.ITEM_LINK) {
@@ -188,7 +188,7 @@ class Parser {
                 String id = lookahead.sequence
                 nextToken()
             } else {
-                throw new ParserException("Missing Insert ID", this.tokens, lookahead)
+                throw new ParserException('Missing Insert ID', this.tokens, lookahead)
             }
         } else if (lookahead.token == Token.LINK) {
             suggesterStatus = SuggesterStatus.ID_PAGE
@@ -197,8 +197,8 @@ class Parser {
                 String id = lookahead.sequence
                 if (checkValue) {
                     CmsPage p = CmsPage.get(id.substring(1))
-                    if (!p) throw new WrongDataException("No Video", id)
-                    else if (!p.published) throw new WrongDataException("Page Not Published", id)
+                    if (!p) throw new WrongDataException('No Video', id)
+                    else if (!p.published) throw new WrongDataException('Page Not Published', id)
                 }
                 nextToken()
                 ret = MarkDownRender.renderLinkFromPage(id, lang, arguments(new Arguments()))
@@ -208,11 +208,11 @@ class Parser {
                 nextToken()
                 ret = MarkDownRender.renderLinkFromUrl(url, arguments(new Arguments()))
             } else {
-                throw new ParserException("Missing Page ID", this.tokens, lookahead)
+                throw new ParserException('Missing Page ID', this.tokens, lookahead)
             }
         } else if (lookahead.token == Token.CLOSE_LINK) {
             nextToken()
-            ret = "</a>"
+            ret = '</a>'
         }
         ret
     }
@@ -229,10 +229,10 @@ class Parser {
 
         @Override
         String toString() {
-            String ret = ""
+            String ret = ''
             if (classes) ret += " class=$classes "
             if (style) ret += " style=$style "
-            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'":"'right'"}"
+            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'':''right''}'
             ret
         }
 
@@ -240,12 +240,12 @@ class Parser {
             if (!this.style) return toString()
             String style = this.style
             properties.each {
-                style = style.replaceAll("$it: .*;", "")
+                style = style.replaceAll("$it: .*;', '")
             }
-                        String ret = ""
+                        String ret = ''
             if (classes) ret += " class=$classes "
             if (style) ret += " style=$style "
-            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'":"'right'"}"
+            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'':''right''}'
             ret
         }
     }
@@ -258,13 +258,13 @@ class Parser {
             if (lookahead.token == Token.CLASS) {
                 nextToken()
                 if (lookahead.token == Token.CLASS_LIST) a.classes = lookahead.sequence
-                else throw new ParserException("Class List Malformed: ", this.tokens, lookahead)
+                else throw new ParserException('Class List Malformed: ', this.tokens, lookahead)
                 nextToken()
                 arguments(a)
             } else if (lookahead.token == Token.STYLE) {
                 nextToken()
                 if (lookahead.token == Token.STYLE_LITERAL) a.style = lookahead.sequence
-                else throw new ParserException("Style List Invalid: ", this.tokens, lookahead)
+                else throw new ParserException('Style List Invalid: ', this.tokens, lookahead)
                 nextToken()
                 arguments(a)
             } else if (lookahead.token == Token.ALIGN_LEFT) {
@@ -287,19 +287,19 @@ class Parser {
 
         @Override
         String toString() {
-            return "Suggestion{" +
+            return 'Suggestion{' +
                     "remainingChars='" + remainingChars + '\'' +
-                    ", suggesterStatus=" + suggesterStatus +
-                    ", results=" + results +
+                    ', suggesterStatus=' + suggesterStatus +
+                    ', results=' + results +
                     '}'
         }
     }
 
     Suggestion suggest(String entry) {
         Suggestion s = new Suggestion()
-        if (entry == null || entry == "") {
-            s.remainingChars = ""
-            s.results = suggestFirstExpr("")
+        if (entry == null || entry == '') {
+            s.remainingChars = ''
+            s.results = suggestFirstExpr('')
         }
         try {
             parse(entry)
@@ -336,13 +336,13 @@ class Parser {
     }
 
     enum FirstExpr {
-        IMG(Token.IMG, "Insert an Image"),
-        VID(Token.VID, "Insert a Video"),
-        PDF(Token.PDF, "Insert a PDF"),
-        VID_LINK(Token.VID_LINK, "Insert a Video Link"),
-        INSERT_LINK(Token.INSERT_LINK, "Insert an Insert Link"),
-        LINK(Token.LINK, "Insert a Link"),
-        LINK_CLOSE(Token.CLOSE_LINK, "Insert a Link Close")
+        IMG(Token.IMG, 'Insert an Image'),
+        VID(Token.VID, 'Insert a Video'),
+        PDF(Token.PDF, 'Insert a PDF'),
+        VID_LINK(Token.VID_LINK, 'Insert a Video Link'),
+        INSERT_LINK(Token.INSERT_LINK, 'Insert an Insert Link'),
+        LINK(Token.LINK, 'Insert a Link'),
+        LINK_CLOSE(Token.CLOSE_LINK, 'Insert a Link Close')
         Token token
         String description
 
@@ -356,7 +356,7 @@ class Parser {
         List<Triple<String, String, String>> res = []
         for (FirstExpr f : FirstExpr.values()) {
             String tokenString = f.token.toString()
-            if (tokenString != seq && (tokenString.startsWith(seq) || seq == "")) {
+            if (tokenString != seq && (tokenString.startsWith(seq) || seq == '')) {
                 String toComplete = tokenString
                 Triple<String, String, String> matchedExpr = new Triple<>(
                         toComplete - seq,
@@ -370,9 +370,9 @@ class Parser {
     }
 
     enum SecondaryParameter {
-        EMPTY("", "", "", "", 0),
-        CLASS("CLASS:", "Class list", ", ", " \"\"", 2),
-        STYLE("STYLE:", "Style", ", ", " \"\"", 2)
+        EMPTY('', '', '', '', 0),
+        CLASS('CLASS:', 'Class list', ', ', ' \'\'', 2),
+        STYLE('STYLE:', 'Style', ', ', ' \'\'', 2)
 
         String token
         String description

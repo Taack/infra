@@ -34,7 +34,7 @@ final class UiTableSpecifier {
      * <pre>{@code
      *      row {
      *          rowColumn 4, {
-     *              footerButton("Merge", Bp2Controller.&mergeValuesSave as MethodClosure, valueToMerge.id)
+     *              footerButton('Merge', Bp2Controller.&mergeValuesSave as MethodClosure, valueToMerge.id)
      *          }
      *      }
      * }</pre>

@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id 'org.apache.grails.gradle.grails-gsp'
+    id 'org.apache.grails.gradle.grails-plugin'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://repository.apache.org/content/groups/public" }
+    maven { url "https://repo.grails.org/grails/restricted" }
+}
+
+dependencies {
+    api "org.apache.groovy:groovy:${groovyVersion}"
+    api "org.apache.groovy:groovy-xml:${groovyVersion}"
+    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+//    integrationTestImplementation testFixtures("org.apache.grails:grails-geb")
+//    console "org.apache.grails:grails-console"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+//    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.apache.grails:grails-core"
+    implementation "org.apache.grails:grails-validation"
+    implementation "org.apache.grails:grails-gsp"
+    implementation "org.apache.grails:grails-logging"
+    implementation "org.apache.grails:grails-services"
+    implementation "org.apache.grails:grails-i18n"
+
+    implementation 'org.apache.grails:grails-data-hibernate5'
+    implementation 'org.apache.grails:grails-interceptors'
+    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+    profile "org.apache.grails.profiles:plugin"
+
+//    testImplementation "org.apache.grails:grails-testing-support-datamapping"
+}

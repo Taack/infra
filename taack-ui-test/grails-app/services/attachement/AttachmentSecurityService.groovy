@@ -10,7 +10,7 @@ import taack.app.TaackApp
 import taack.app.TaackAppRegisterService
 import taack.render.TaackUiEnablerService
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class AttachmentSecurityService {
@@ -31,7 +31,7 @@ class AttachmentSecurityService {
                 this.&securityClosure,
                 AttachmentController.&downloadBinAttachment as MC,
                 AttachmentController.&extensionForAttachment as MC)
-        TaackAppRegisterService.register(new TaackApp(AttachmentController.&index as MC, new String(AttachmentSecurityService.getResourceAsStream("/att/att.svg").readAllBytes())))
+        TaackAppRegisterService.register(new TaackApp(AttachmentController.&index as MC, new String(AttachmentSecurityService.getResourceAsStream('/att/att.svg').readAllBytes())))
 
     }
 

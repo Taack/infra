@@ -1,9 +1,9 @@
 package crew
 
 import grails.compiler.GrailsCompileStatic
-import taack.domain.TaackJdbcService
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
+import taack.domain.TaackJdbcService
 
 
 @GrailsCompileStatic

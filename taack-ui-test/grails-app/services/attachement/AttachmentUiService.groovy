@@ -26,8 +26,6 @@ import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
 
-import javax.annotation.PostConstruct
-
 import static taack.render.TaackUiService.tr
 
 @GrailsCompileStatic
@@ -40,20 +38,20 @@ final class AttachmentUiService implements WebAttributes {
     ApplicationTagLib applicationTagLib
 
     String preview(final Long id) {
-        if (!id) return "<span/>"
-        if (params.boolean("isPdf")) """<img style="max-height: 64px; max-width: 64px;" src="file://${taackAttachmentService.attachmentPreview(Attachment.get(id)).path}">"""
-        else """<div style="text-align: center;"><img style="max-height: 64px; max-width: 64px;" src="${applicationTagLib.createLink(controller: 'attachment', action: 'preview', id: id)}"></div>"""
+        if (!id) return '<span/>'
+        if (params.boolean('isPdf')) '''<img style='max-height: 64px; max-width: 64px;' src='file://${taackAttachmentService.attachmentPreview(Attachment.get(id)).path}'>'''
+        else '''<div style='text-align: center;'><img style='max-height: 64px; max-width: 64px;' src='${applicationTagLib.createLink(controller: 'attachment', action: 'preview', id: id)}'></div>'''
     }
 
     String preview(final Long id, TaackAttachmentService.PreviewFormat format) {
-        if (!id) return "<span/>"
-        if (format.isPdf) """<img style="max-height: 64px; max-width: 64px;" src="file://${taackAttachmentService.attachmentPreview(Attachment.get(id), format).path}">"""
-        else """<div style="text-align: center;"><img style="max-height: ${format.pixelHeight}px; max-width: ${format.pixelWidth}px;" src="${applicationTagLib.createLink(controller: 'attachment', action: 'preview', id: id, params: [format: format.toString()])}"></div>"""
+        if (!id) return '<span/>'
+        if (format.isPdf) '''<img style='max-height: 64px; max-width: 64px;' src='file://${taackAttachmentService.attachmentPreview(Attachment.get(id), format).path}'>'''
+        else '''<div style='text-align: center;'><img style='max-height: ${format.pixelHeight}px; max-width: ${format.pixelWidth}px;' src='${applicationTagLib.createLink(controller: 'attachment', action: 'preview', id: id, params: [format: format.toString()])}'></div>'''
     }
 
     String previewFull(Long id, String p = null) {
-        if (!id) return "<span/>"
-        """<div style="text-align: center;"><img style="max-height: 420px" src="${applicationTagLib.createLink(controller: 'attachment', action: 'previewFull', id: id)}${p ? "?$p" : ""}"></div>"""
+        if (!id) return '<span/>'
+        '''<div style='text-align: center;'><img style='max-height: 420px' src='${applicationTagLib.createLink(controller: 'attachment', action: 'previewFull', id: id)}${p ? "?$p' : ''}'></div>"""
     }
 
     Closure<BlockSpec> buildAttachmentsBlock(final MC selectMC = null, final Map selectParams = null, final MC uploadAttachment = AttachmentController.&uploadAttachment as MC) {
@@ -70,7 +68,7 @@ final class AttachmentUiService implements WebAttributes {
                 filterField a.contentTypeEnum_
                 filterField a.documentCategory_, dc.category_
                 filterField a.documentCategory_, dc.tags_, term.termGroupConfig_
-                filterFieldExpressionBool "Active", new FilterExpression(true, Operator.EQ, a.active_)
+                filterFieldExpressionBool 'Active', new FilterExpression(true, Operator.EQ, a.active_)
             }
             section tr('file.access.label'), {
                 filterField a.userCreated_, u.username_
@@ -84,7 +82,7 @@ final class AttachmentUiService implements WebAttributes {
         t.ui {
             header {
                 column {
-                    label "Preview"
+                    label 'Preview'
                 }
                 column {
                     sortableFieldHeader a.originalName_
@@ -99,7 +97,7 @@ final class AttachmentUiService implements WebAttributes {
                     sortableFieldHeader a.userCreated_, u.subsidiary_
                 }
                 column {
-                    label "Actions"
+                    label 'Actions'
                 }
             }
             iterate(taackFilterService.getBuilder(Attachment)
@@ -138,7 +136,7 @@ final class AttachmentUiService implements WebAttributes {
         }
     }
 
-    Closure<BlockSpec> buildShowAttachmentBlock(final Attachment attachment, final String fieldName = "") {
+    Closure<BlockSpec> buildShowAttachmentBlock(final Attachment attachment, final String fieldName = '') {
         String iFrame = TaackAttachmentService.showIFrame(attachment)
         def converterExtensions = TaackAttachmentService.converterExtensions(attachment)
         BlockSpec.buildBlockSpec {
@@ -167,17 +165,17 @@ final class AttachmentUiService implements WebAttributes {
         DocumentCategory dc = new DocumentCategory()
         new UiShowSpecifier().ui attachment, {
             if (hasPreview)
-                section "Preview", {
+                section 'Preview', {
                     field this.previewFull(attachment.id)
                 }
-            section "File Meta", {
+            section 'File Meta', {
                 fieldLabeled attachment.originalName_
                 fieldLabeled attachment.fileSize_
                 fieldLabeled attachment.dateCreated_
                 fieldLabeled attachment.contentType_
 
             }
-            section "Attachment Meta", {
+            section 'Attachment Meta', {
                 fieldLabeled attachment.documentCategory_, dc.category_
                 fieldLabeled attachment.documentAccess_, da.isInternal_
             }
@@ -207,7 +205,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildDocumentAccessForm(DocumentAccess docAccess, MC returnMethod = AttachmentController.&saveDocAccess as MC, Map other = null) {
         new UiFormSpecifier().ui docAccess, {
-            section "Security", {
+            section 'Security', {
                 row {
                     col {
                         field docAccess.isInternal_
@@ -229,7 +227,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildDocumentDescriptorForm(DocumentCategory docCat, MC returnMethod = AttachmentController.&saveDocDesc as MC, Map other = null) {
         new UiFormSpecifier().ui docCat, {
-            section "Category", {
+            section 'Category', {
                 field docCat.category_
                 ajaxField docCat.tags_, AttachmentController.&selectTagsM2M as MC
             }
@@ -239,7 +237,7 @@ final class AttachmentUiService implements WebAttributes {
 
     static UiFormSpecifier buildAttachmentForm(Attachment attachment, MC returnMethod = AttachmentController.&saveAttachment as MC, Map other = null) {
         new UiFormSpecifier().ui attachment, {
-            section "File Info", {
+            section 'File Info', {
                 field attachment.filePath_
                 ajaxField attachment.documentCategory_, AttachmentController.&selectDocumentCategory as MC, attachment.documentCategory_
                 ajaxField attachment.documentAccess_, AttachmentController.&selectDocumentAccess as MC, attachment.documentAccess_
@@ -250,7 +248,7 @@ final class AttachmentUiService implements WebAttributes {
 
     UiFormSpecifier buildTermForm(Term term) {
         new UiFormSpecifier().ui term, {
-            section "Term", {
+            section 'Term', {
                 field term.name_
                 field term.termGroupConfig_
                 ajaxField term.parent_, AttachmentController.&selectTermM2O as MC
@@ -271,12 +269,12 @@ final class AttachmentUiService implements WebAttributes {
     UiFilterSpecifier buildTermFilter() {
         Term t = new Term(parent: new Term())
         new UiFilterSpecifier().ui Term, {
-            section "Term", {
+            section 'Term', {
                 filterField t.name_
                 filterField t.termGroupConfig_
                 filterField t.parent_, t.parent.name_
-                filterFieldExpressionBool "Display", new FilterExpression(true, Operator.EQ, t.display_)
-                filterFieldExpressionBool "Active", new FilterExpression(true, Operator.EQ, t.active_)
+                filterFieldExpressionBool 'Display', new FilterExpression(true, Operator.EQ, t.display_)
+                filterFieldExpressionBool 'Active', new FilterExpression(true, Operator.EQ, t.active_)
             }
         }
     }
@@ -290,7 +288,7 @@ final class AttachmentUiService implements WebAttributes {
                 sortableFieldHeader ti.parent_, ti.parent.name_
                 sortableFieldHeader ti.display_
                 sortableFieldHeader ti.active_
-                label "Actions"
+                label 'Actions'
             }
 
             iterate(taackFilterService.getBuilder(Term)

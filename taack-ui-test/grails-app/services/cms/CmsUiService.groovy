@@ -20,7 +20,7 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.filter.expression.FilterExpression
 import taack.ui.dsl.filter.expression.Operator
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @GrailsCompileStatic
 class CmsUiService implements WebAttributes {
@@ -38,20 +38,20 @@ class CmsUiService implements WebAttributes {
     @PostConstruct
     void init() {
         INSTANCE = this
-        TaackAppRegisterService.register(new TaackApp(CmsController.&index as MC, new String(CmsUiService.getResourceAsStream("/cms/cms.svg").readAllBytes())))
+        TaackAppRegisterService.register(new TaackApp(CmsController.&index as MC, new String(CmsUiService.getResourceAsStream('/cms/cms.svg').readAllBytes())))
 
         // TODO: Pfffff
         //     asciidoctor = Asciidoctor.Factory.create()
-        //     asciidoctor.requireLibrary("asciidoctor-diagram", "asciidoctor-revealjs")
+        //     asciidoctor.requireLibrary('asciidoctor-diagram', 'asciidoctor-revealjs')
     }
 
 
     private static String previewMedia(Long id) {
-        """<img style="max-height: 64px; max-width: 64px;" src="/cms/mediaPreview/${id ?: 0}">"""
+        '''<img style='max-height: 64px; max-width: 64px;' src='/cms/mediaPreview/${id ?: 0}'>'''
     }
 
     private static String previewPdf(Long id) {
-        """<img style="max-height: 64px; max-width: 64px;" src="/cms/mediaPreviewPdf/${id ?: 0}">"""
+        '''<img style='max-height: 64px; max-width: 64px;' src='/cms/mediaPreviewPdf/${id ?: 0}'>'''
     }
 
     TaackFilterService taackFilterService
@@ -62,7 +62,7 @@ class CmsUiService implements WebAttributes {
         UiFilterSpecifier f = new UiFilterSpecifier()
 
         f.ui CmsPage, {
-            section "Page", {
+            section 'Page', {
                 filterField p.name_
                 filterField p.subsidiary_
                 filterField p.pageType_
@@ -88,7 +88,7 @@ class CmsUiService implements WebAttributes {
         def u = new User()
 
         new UiFilterSpecifier().ui(CmsPage, {
-            section "Slideshow Meta-inf", {
+            section 'Slideshow Meta-inf', {
                 filterField ss.userCreated_, u.username_
                 filterField ss.userUpdated_, u.username_
                 filterField ss.name_
@@ -162,7 +162,7 @@ class CmsUiService implements WebAttributes {
         new UiTableSpecifier().ui {
             header {
                 column {
-                    label "Preview"
+                    label 'Preview'
                 }
                 column {
                     sortableFieldHeader p.dateCreated_
@@ -174,14 +174,14 @@ class CmsUiService implements WebAttributes {
                 }
                 column {
                     sortableFieldHeader p.name_
-                    label "Languages"
+                    label 'Languages'
                 }
                 column {
                     sortableFieldHeader p.subsidiary_
                     sortableFieldHeader p.pageType_
                 }
                 column {
-                    label "Title"
+                    label 'Title'
                 }
             }
 
@@ -232,14 +232,14 @@ class CmsUiService implements WebAttributes {
         CmsImage i = new CmsImage(cmsPage: new CmsPage(pageLayout: null), imageType: imageType)
 
         f.ui CmsImage, cmsPage ? [id: cmsPage.id] : null, {
-            section "Image", {
+            section 'Image', {
                 filterField i.hide_
                 filterField i.originalName_
                 filterField i.imageType_
                 if (!cmsPage)
-                    filterFieldExpressionBool "Type Restriction", true, new FilterExpression(i.imageType_, Operator.EQ, i.imageType_)
+                    filterFieldExpressionBool 'Type Restriction', true, new FilterExpression(i.imageType_, Operator.EQ, i.imageType_)
             }
-            section "Page", {
+            section 'Page', {
                 filterField i.cmsPage_, i.cmsPage.name_
                 filterField i.cmsPage_, i.cmsPage.subsidiary_
                 filterField i.cmsPage_, i.cmsPage.pageType_
@@ -252,11 +252,11 @@ class CmsUiService implements WebAttributes {
         def pdf = new CmsPdfFile(cmsPage: new CmsPage(pageLayout: null))
 
         new UiFilterSpecifier().ui CmsPdfFile, cmsPage ? [id: cmsPage.id] : null, {
-            section "Image", {
+            section 'Image', {
                 filterField pdf.hide_
                 filterField pdf.originalName_
             }
-            section "Origin", {
+            section 'Origin', {
                 filterField pdf.cmsPage_, pdf.cmsPage.name_
                 filterField pdf.cmsPage_, pdf.cmsPage.subsidiary_
                 filterField pdf.cmsPage_, pdf.cmsPage.pageType_
@@ -268,11 +268,11 @@ class CmsUiService implements WebAttributes {
         def i = new CmsVideoFile(cmsPage: new CmsPage(pageLayout: null))
 
         new UiFilterSpecifier().ui CmsVideoFile, cmsPage ? [id: cmsPage.id] : null, {
-            section "Video", {
+            section 'Video', {
                 filterField i.hide_
                 filterField i.originalName_
             }
-            section "Page", {
+            section 'Page', {
                 filterField i.cmsPage_, i.cmsPage.name_
                 filterField i.cmsPage_, i.cmsPage.subsidiary_
                 filterField i.cmsPage_, i.cmsPage.pageType_
@@ -287,7 +287,7 @@ class CmsUiService implements WebAttributes {
         new UiTableSpecifier().ui {
             header {
                 column {
-                    label "Preview"
+                    label 'Preview'
                 }
                 column {
                     sortableFieldHeader i.dateCreated_
@@ -300,11 +300,11 @@ class CmsUiService implements WebAttributes {
                 column {
                     sortableFieldHeader i.contentType_
                     sortableFieldHeader i.imageType_
-                    label "Insert TEXT"
+                    label 'Insert TEXT'
                 }
                 column {
                     sortableFieldHeader i.originalName_
-                    label "Page Name"
+                    label 'Page Name'
                 }
                 if (!cmsPage) {
                     column {
@@ -370,7 +370,7 @@ class CmsUiService implements WebAttributes {
         new UiTableSpecifier().ui {
             header {
                 column {
-                    label "Preview"
+                    label 'Preview'
                 }
                 column {
                     sortableFieldHeader i.dateCreated_
@@ -381,7 +381,7 @@ class CmsUiService implements WebAttributes {
                     sortableFieldHeader i.userUpdated_, u.username_
                 }
                 column {
-                    label "Insert TEXT"
+                    label 'Insert TEXT'
                 }
                 column {
                     sortableFieldHeader i.originalName_
@@ -439,19 +439,19 @@ class CmsUiService implements WebAttributes {
                     sortableFieldHeader i.lastUpdated_
                 }
                 column {
-                    label "x, y, width"
-                    label "Title"
+                    label 'x, y, width'
+                    label 'Title'
                 }
                 column {
-                    label "Page"
-                    label "Image application"
+                    label 'Page'
+                    label 'Image application'
                 }
                 column {
                     sortableFieldHeader i.itemId_
                     sortableFieldHeader i.subFamilyId_
                     sortableFieldHeader i.rangeId_
                 }
-                label "Action"
+                label 'Action'
             }
 
             iterate(taackFilterService.getBuilder(CmsInsert)
@@ -468,7 +468,7 @@ class CmsUiService implements WebAttributes {
                 }
                 rowColumn {
                     rowField ci.cmsPage_
-                    rowField ci.imageApplication?.id + " " + ci.imageApplication?.originalName
+                    rowField ci.imageApplication?.id + ' ' + ci.imageApplication?.originalName
                 }
                 rowColumn {
                     rowField ci.itemId_
@@ -487,7 +487,7 @@ class CmsUiService implements WebAttributes {
         new UiTableSpecifier().ui {
             header {
                 column {
-                    label "Preview"
+                    label 'Preview'
                 }
                 column {
                     sortableFieldHeader i.dateCreated_
@@ -498,7 +498,7 @@ class CmsUiService implements WebAttributes {
                     sortableFieldHeader i.userUpdated_, u.username_
                 }
                 column {
-                    label "Insert TEXT"
+                    label 'Insert TEXT'
                 }
                 column {
                     sortableFieldHeader i.originalName_
@@ -547,7 +547,7 @@ class CmsUiService implements WebAttributes {
     }
 
     byte[] getWebSmallPic(CmsPdfFile pdfFile, String localPath) {
-        String extension = "-smallpic2.png"
+        String extension = '-smallpic2.png'
         File pic = new File(localPath + extension)
         if (!pic.exists()) {
             final String cmd = "gs -sDEVICE=png16m -o ${pic.path} -dDownScaleFactor=6 -dFirstPage=1 -dLastPage=1 ${localPath}"
@@ -618,15 +618,15 @@ class CmsUiService implements WebAttributes {
 """
         innerHtml.append this.cmsHtmlGeneratorService.translateExpression(content, language.iso2)
         AttributesBuilder attributes = Attributes.builder()
-                .docType("article")
-                .backend("revealjs")
-                .title("Test")
+                .docType('article')
+                .backend('revealjs')
+                .title('Test')
         OptionsBuilder options = Options.builder()
                 .safe(SafeMode.UNSAFE)
                 .attributes(attributes.build())
 
 //        Asciidoctor asciidoctor = Asciidoctor.Factory.create()
-//        asciidoctor.requireLibrary("asciidoctor-diagram", "asciidoctor-revealjs")
+//        asciidoctor.requireLibrary('asciidoctor-diagram', 'asciidoctor-revealjs')
         Document document = asciidoctor.load(innerHtml.toString(), options.build())
         String slideshowContent = document.convert()
 //        asciidoctor.shutdown()
@@ -634,12 +634,12 @@ class CmsUiService implements WebAttributes {
         """
             <div style="height: ${height}px;">
                 <div class="reveal deck${id ?: 1}">
-                    <div class="slides">
+                    <div class='slides'>
                         ${slideshowContent}
                     </div>
                 </div>
             </div>
-<script postExecute="true">
+<script postExecute='true'>
     // More info about initialization & config:
     // - https://revealjs.com/initialization/
     // - https://revealjs.com/config/

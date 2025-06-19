@@ -86,7 +86,7 @@ class CrewUiService implements WebAttributes {
                     sortableFieldHeader role.authority_
                 }
                 column {
-                    label "Action"
+                    label 'Action'
                 }
             }
             iterate(taackFilterService.getBuilder(Role)
@@ -141,15 +141,15 @@ class CrewUiService implements WebAttributes {
                     .addFilter(f).build()
 
             iterate tf, { User ru ->
-                boolean hasActions = crewSecurityService.canEdit(ru)
+                boolean hasActions = this.crewSecurityService.canEdit(ru)
                 if (!hasSelect) {
                     rowColumn {
-                        rowFieldRaw attachmentUiService.preview(ru.mainPicture?.id)
+                        rowFieldRaw this.attachmentUiService.preview(ru.mainPicture?.id)
                     }
                 }
                 rowColumn {
                     if (hasSelect)
-                        rowAction "Select User", ActionIcon.SELECT * IconStyle.SCALE_DOWN, ru.id, ru.toString()
+                        rowAction 'Select User', ActionIcon.SELECT * IconStyle.SCALE_DOWN, ru.id, ru.toString()
                     else {
                         rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, CrewController.&showUser as MC, ru.id
                         if (hasActions) {
@@ -193,7 +193,7 @@ class CrewUiService implements WebAttributes {
 
     UiShowSpecifier buildUserShow(User u, boolean update = false) {
         new UiShowSpecifier().ui{
-            field "Picture", attachmentUiService.previewFull(u.mainPicture?.id, update ? "${System.currentTimeMillis()}" : null)
+            field 'Picture', this.attachmentUiService.previewFull(u.mainPicture?.id, update ? "${System.currentTimeMillis()}" : null)
             fieldLabeled u.username_
             fieldLabeled u.firstName_
             fieldLabeled u.lastName_

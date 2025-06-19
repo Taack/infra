@@ -1,0 +1,46 @@
+plugins {
+    id 'taack-grails-common'
+    id 'org.apache.grails.gradle.grails-app'
+    id 'war'
+    id 'org.apache.grails.gradle.grails-web'
+    id 'com.bertramlabs.asset-pipeline'
+}
+
+dependencies {
+    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+//    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-tomcat"
+    implementation "org.apache.grails:grails-web-boot"
+    implementation "org.apache.grails:grails-url-mappings"
+    implementation "org.apache.grails:grails-rest-transforms"
+
+    profile "org.apache.grails.profiles:web"
+    runtimeOnly "com.h2database:h2"
+    runtimeOnly "com.zaxxer:HikariCP"
+    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
+}
+
+compileJava.options.release = 17
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+
+assets {
+    excludes = [
+            'webjars/jquery/**',
+            'webjars/bootstrap/**',
+            'webjars/bootstrap-icons/**'
+    ]
+    includes = [
+            'webjars/jquery/*/dist/jquery.js',
+            'webjars/bootstrap/*/dist/js/bootstrap.bundle.js',
+            'webjars/bootstrap/*/dist/css/bootstrap.css',
+            'webjars/bootstrap-icons/*/font/bootstrap-icons.css',
+            'webjars/bootstrap-icons/*/font/fonts/*',
+    ]
+}
+
