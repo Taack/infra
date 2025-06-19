@@ -525,8 +525,6 @@ li:hover > .nested-dropdown{
 }
 
 .user-notification-header a[unread-notification-number], .user-notification-body a[unread-notification-number] {
-    text-decoration: unset;
-    vertical-align: unset;
     padding: 2px;
 }
 
@@ -542,7 +540,7 @@ li:hover > .nested-dropdown{
 .user-notification-body .group-header {
     color: royalblue;
     font-weight: bold;
-    font-size: 12px;
+    font-size: small;
     padding-top: 3px;
 }
 
