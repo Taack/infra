@@ -501,9 +501,15 @@ li:hover > .nested-dropdown{
 }
 
 .user-notification-header {
-    color: #00C4C4;
+    color: #c9d6ff;
     font-size: small;
     font-weight: bold;
+}
+
+.user-notification-detail-btn {
+    position: absolute;
+    top: -1px;
+    right: .5em;
 }
 
 .user-notification-body {
@@ -520,7 +526,7 @@ li:hover > .nested-dropdown{
 
 .user-notification-header a[unread-notification-number], .user-notification-body a[unread-notification-number] {
     text-decoration: unset;
-    vertical-align: text-bottom;
+    vertical-align: unset;
     padding: 2px;
 }
 
@@ -534,7 +540,7 @@ li:hover > .nested-dropdown{
 }
 
 .user-notification-body .group-header {
-    color: darkgrey;
+    color: royalblue;
     font-weight: bold;
     font-size: 12px;
     padding-top: 3px;
@@ -547,7 +553,7 @@ li:hover > .nested-dropdown{
 }
 
 .user-notification-body .group-item .group-item-prefix {
-    color: darkcyan;
+    color: royalblue;
 }
 
 .user-notification-body .group-item:hover {

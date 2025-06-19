@@ -1,4 +1,4 @@
-<%@ page import="taack.domain.TaackGormClass; taack.domain.TaackGormClassRegisterService; grails.util.Pair; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="grails.util.Triple; taack.ui.dsl.common.ActionIcon; taack.domain.TaackGormClass; taack.domain.TaackGormClassRegisterService; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -71,7 +71,7 @@
                             <li class="nav-item dropdown">
                                 <%
                                     TaackUser user = currentUser
-                                    List<GormEntity> notifications = user?.getUnreadRelatedDataList() ?: []
+                                    Map<GormEntity, Date> notifications = user?.getNotificationRelatedDataList(true) ?: [:]
                                 %>
                                 <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -87,13 +87,16 @@
                                                 <a ajaxaction="/taackUserNotification/readAllUserNotifications?title=all"
                                                    unread-notification-number="${notifications.size()}"></a>
                                             </span>
+                                            <a class="user-notification-detail-btn" ajaxaction="/taackUserNotification/showUserNotifications" href="/taackUserNotification/showUserNotifications?isAjax=false">
+                                                ${raw(ActionIcon.SHOW.getHtml("Details", 20))}
+                                            </a>
                                         </li>
                                         <li class="nav-item dropdown">
                                             <div class="user-notification-body">
                                                 <g:each in="${notifications.collect {
-                                                    new Pair(it, TaackGormClassRegisterService.getTaackGormClass(it.class.name))
-                                                }.groupBy { Pair<GormEntity, TaackGormClass> it ->
-                                                    it.bValue?.notification?.getTitleClosure()?.call(it.aValue.ident())
+                                                    new Triple(it.key, it.value, TaackGormClassRegisterService.getTaackGormClass(it.key.class.name))
+                                                }.groupBy { Triple<GormEntity, Date, TaackGormClass> info ->
+                                                    info.cValue?.notification?.getTitleClosure()?.call(info.aValue.ident())
                                                 }.sort { it.key }}" var="group">
                                                     <div class="user-notification-group">
                                                         <div class="group-header">
@@ -106,12 +109,12 @@
                                                             <a ajaxaction="/taackUserNotification/readAllUserNotifications?title=${group.key ?: "other"}"
                                                                unread-notification-number="${(group.value as List).size()}"></a>
                                                         </div>
-                                                        <g:each in="${(group.value as List<Pair<GormEntity, TaackGormClass>>).sort { -it.aValue.ident() }}" var="object">
+                                                        <g:each in="${(group.value as List<Triple<GormEntity, Date, TaackGormClass>>).sort { -it.bValue.time }}" var="object">
                                                             <%
-                                                                String labelPrefix = object.bValue?.showLabelPrefix?.call(object.aValue.ident())
-                                                                String label = object.bValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
+                                                                String labelPrefix = object.cValue?.showLabelPrefix?.call(object.aValue.ident())
+                                                                String label = object.cValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
                                                             %>
-                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.showController}&objectAction=${object.bValue?.showAction}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
+                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
                                                                class="group-item nav-link ajaxLink taackAjaxLink" title="${label}">
                                                                 <g:if test="${labelPrefix}">
                                                                     <span class="group-item-prefix">${labelPrefix}</span>
