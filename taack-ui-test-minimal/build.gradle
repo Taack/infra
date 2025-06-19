@@ -38,3 +38,16 @@ assets {
     minifyJs = true
     minifyCss = true
 }
+
+bootBuildImage {
+//    verboseLogging = true
+//    builder = "paketobuildpacks/builder-jammy-base"
+//    buildpacks = [
+//            "gcr.io/paketo-buildpacks/amazon-corretto:latest",
+//            "gcr.io/paketo-buildpacks/java:latest",
+//            "gcr.io/paketo-buildpacks/spring-boot"
+//    ]
+//    environment = ["BP_JVM_VERSION": "24"]
+//    imageName = "${project.name}:${project.version}"
+}
+//docker run -u root -p 8080:9442 -v $(pwd)/w:/workspace/test:Z docker.io/library/taack-ui-test chown -R node:node /workspace/test
