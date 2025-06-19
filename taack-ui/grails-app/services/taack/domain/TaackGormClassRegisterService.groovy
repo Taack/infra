@@ -20,7 +20,7 @@ import taack.user.TaackUser
  * @attribute gormClass The Gorm class
  * @attribute showMethod The action to show when clicking on the object. The access control should be managed from there
  * @attribute showLabel The closure to define the displayed label of this object
- * @attribute showLabelPrefix The closure to define the prefix text of the displayed label of this object
+ * @attribute typeLabel The closure to define the displayed label of the type of this object
  * @attribute notification The notification to send to certain users when a new object is created
  */
 @CompileStatic
@@ -28,7 +28,7 @@ final class TaackGormClass {
     final Class<? extends GormEntity> gormClass
     MethodClosure showMethod
     Closure<String> showLabel
-    Closure<String> showLabelPrefix
+    Closure<String> typeLabel
     TaackNotification notification
 
     TaackGormClass(Class<? extends GormEntity> c) {
@@ -79,9 +79,9 @@ final class TaackGormClass {
             this
         }
 
-        TaackGormClassBuilder setShowLabel(Closure<String> showLabel, Closure<String> showLabelPrefix = null) {
+        TaackGormClassBuilder setShowLabel(Closure<String> showLabel, Closure<String> typeLabel = null) {
             taackGormClass.showLabel = showLabel
-            taackGormClass.showLabelPrefix = showLabelPrefix
+            taackGormClass.typeLabel = typeLabel
             this
         }
 
@@ -125,10 +125,10 @@ class TaackGormClassRegisterService {
         }
     }
 
-    static void registerShowLabel(Class<? extends GormEntity> gormClass, Closure<String> showLabel, Closure<String> showLabelPrefix = null) {
+    static void registerShowLabel(Class<? extends GormEntity> gormClass, Closure<String> showLabel, Closure<String> typeLabel = null) {
         TaackGormClass c = getTaackGormClass(gormClass.name)
         if (!c) {
-            taackGormClasses.add(new TaackGormClass(gormClass).builder.setShowLabel(showLabel, showLabelPrefix).build())
+            taackGormClasses.add(new TaackGormClass(gormClass).builder.setShowLabel(showLabel, typeLabel).build())
         } else {
             c.builder.setShowLabel(showLabel)
         }

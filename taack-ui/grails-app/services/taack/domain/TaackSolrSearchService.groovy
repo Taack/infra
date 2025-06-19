@@ -181,9 +181,9 @@ final class TaackSolrSearchService implements WebAttributes {
                                         rowColumn(2) {
                                             TaackGormClass c = TaackGormClassRegisterService.getTaackGormClass(solrSpecifier.type.name)
                                             String label = c.showLabel.call(id)
-                                            String prefix = c.showLabelPrefix?.call(id)
+                                            String prefix = c.typeLabel?.call(id)
                                             if (prefix) {
-                                                label = prefix + ' ' + label
+                                                label = prefix + ': ' + label
                                             }
                                             rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, c.showMethod, id)
                                             rowField label

@@ -111,13 +111,13 @@
                                                         </div>
                                                         <g:each in="${(group.value as List<Triple<GormEntity, Date, TaackGormClass>>).sort { -it.bValue.time }}" var="object">
                                                             <%
-                                                                String labelPrefix = object.cValue?.showLabelPrefix?.call(object.aValue.ident())
+                                                                String labelPrefix = object.cValue?.typeLabel?.call(object.aValue.ident())
                                                                 String label = object.cValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
                                                             %>
                                                             <a ajaxaction="/taackUserNotification/readUserNotification?objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
                                                                class="group-item nav-link ajaxLink taackAjaxLink" title="${label}">
                                                                 <g:if test="${labelPrefix}">
-                                                                    <span class="group-item-prefix">${labelPrefix}</span>
+                                                                    <span class="group-item-prefix">[${labelPrefix}]</span>
                                                                 </g:if>
                                                                 ${label}
                                                             </a>

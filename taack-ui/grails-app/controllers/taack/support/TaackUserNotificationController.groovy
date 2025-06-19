@@ -56,7 +56,7 @@ class TaackUserNotificationController implements WebAttributes {
                             rowField new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.value)
                             TaackGormClass c = TaackGormClassRegisterService.getTaackGormClass(object.class.name)
                             rowField c?.notification?.getTitleClosure()?.call(object.ident())?.toString()
-                            rowField c?.showLabelPrefix?.call(object.ident())?.toString()
+                            rowField c?.typeLabel?.call(object.ident())?.toString()
                             rowColumn {
                                 rowAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, TaackUserNotificationController.&readUserNotification as MethodClosure,
                                         [objectController: c?.showController, objectAction: c?.showAction, objectClass: object.class.name, objectId: object.ident()]
