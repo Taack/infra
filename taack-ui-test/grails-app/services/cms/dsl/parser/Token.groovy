@@ -33,9 +33,9 @@ enum Token {
     ALIGN_RIGHT('ALIGN_RIGHT'),
     STYLE('STYLE:'),
     PEEK_ARG_SEP(','),
-    URL_LITERAL('https?://[a-z\\?\\&=/]'),
-    CLASS_LIST('[\'']'[a-zA-Z0-9_\\- ]*[\"']"),
-    STYLE_LITERAL('[\''][a-z\\%0-9_\\-:; ]*[\"']")
+    URL_LITERAL("https?://[a-z\\?\\&=/]"),
+    CLASS_LIST("[\"']'[a-zA-Z0-9_\\- ]*[\"']"),
+    STYLE_LITERAL("[\"'][a-z\\%0-9_\\-:; ]*[\"']")
 
     Token(String regex) {
         this.regex = Pattern.compile('^(' + regex + ')')

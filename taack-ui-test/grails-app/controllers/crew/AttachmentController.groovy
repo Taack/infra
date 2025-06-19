@@ -218,7 +218,7 @@ class AttachmentController {
         def f = TaackAttachmentService.convertExtension(attachment, ext)
         if (f?.exists()) {
             response.setContentType("application/${ext}")
-            response.setHeader('Content-disposition', 'filename=' + "${URLEncoder.encode('${attachment.originalNameWithoutExtension}.${ext}', 'UTF-8')}\'')
+            response.setHeader('Content-disposition', 'filename=' + "${URLEncoder.encode("${attachment.extension}.${ext}", 'UTF-8')}")
             response.outputStream << f.bytes
         } else return null
     }

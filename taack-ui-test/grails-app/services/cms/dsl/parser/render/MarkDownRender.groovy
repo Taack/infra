@@ -230,21 +230,19 @@ ${insert.title.get(lang)}
         } ?: MediaStyle.SMALL_IMAGE
         if (v.youtubeI18n[lang])
             """
-<div class='imageContainer' ${arguments.style ? arguments : 'style='width: 320px; margin: auto;''}>
-<a class='popup' href='#!' data-link='${v.youtubeI18n[lang]}' data-width="${v.width ?: 960}px' data-height='${
-                v.height ?: 640
-            }px" >
-<img ${arguments.style ? arguments.printWithoutProperties(['margin']) : 'width='320''} src="/cms/mediaPreview/${i?.id?:0}?mediaStyle=${mediaStyleImage}' onload='youtubeVideo();' alt='${alt}" >
+<div class='imageContainer' ${arguments.style ? arguments : "style='width: 320px; margin: auto;'"}>
+<a class='popup' href='#!' data-link='${v.youtubeI18n[lang]}' data-width="${v.width ?: 960}px" data-height='${v.height ?: 640}px" >
+<img ${arguments.style ? arguments.printWithoutProperties(['margin']) : 'width=320'} src="/cms/mediaPreview/${i?.id?:0}?mediaStyle=${mediaStyleImage}' onload='youtubeVideo();' alt='${alt}" >
 <div class='imageOverlay'>${/*v.getDesc(lang)*/ false ?: ''}</div>
 </a>
 </div>
 """
         else """
-<div class='imageContainer' ${arguments.style ? arguments : 'style='width: 320px; margin: auto;''}>
+<div class='imageContainer' ${arguments.style ? arguments : 'style="width: 320px; margin: auto;"'}>
 <a class='popup' href='#!' data-link='/${lang}/video/${v.id}' data-width="${v.width ?: 960}px' data-height='${
             v.height ?: 640
         }px">
-<img ${arguments.style ? arguments.printWithoutProperties(['margin']) : 'width='320''} src="/cms/mediaPreview/${i?.id?:0}?mediaStyle=${mediaStyleImage}'  onload='youtubeVideo();' alt='${alt}" $arguments>
+<img ${arguments.style ? arguments.printWithoutProperties(['margin']) : 'width=320'} src="/cms/mediaPreview/${i?.id?:0}?mediaStyle=${mediaStyleImage}'  onload='youtubeVideo();' alt='${alt}" $arguments>
 <div class='imageOverlay'>${/*v.getDesc(lang)*/ false ?: ''}</div>
 </a>
 </div>
@@ -256,7 +254,7 @@ ${insert.title.get(lang)}
         if (v == null) throw new WrongDataException('Wrong Pdf ID', id)
 
         """
-<div style="text-align: center;${arguments.style ? arguments.style.replace("'', '") : ''}">
+<div style="text-align: center;${arguments.style ? arguments.style.replace('\'', '') : ''}">
 <a href=''>
 <img src="/cms/mediaPreviewPdf/${v.id}"/>
 <div>${v.altText[lang]}</div>

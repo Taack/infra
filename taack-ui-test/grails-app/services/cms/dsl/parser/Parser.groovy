@@ -232,7 +232,7 @@ class Parser {
             String ret = ''
             if (classes) ret += " class=$classes "
             if (style) ret += " style=$style "
-            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'':''right''}'
+            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'":"right'"}"
             ret
         }
 
@@ -240,12 +240,12 @@ class Parser {
             if (!this.style) return toString()
             String style = this.style
             properties.each {
-                style = style.replaceAll("$it: .*;', '")
+                style = style.replaceAll("$it: .*;", '')
             }
                         String ret = ''
             if (classes) ret += " class=$classes "
             if (style) ret += " style=$style "
-            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'':''right''}'
+            if (alignment) ret += " align=${alignment == Alignment.LEFT?"'left'":"'right'"}"
             ret
         }
     }

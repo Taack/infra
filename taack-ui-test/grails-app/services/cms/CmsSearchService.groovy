@@ -35,10 +35,10 @@ class CmsSearchService implements TaackSearchService.IIndexService {
                 }
             else {
                 def cl = SupportedLanguage.fromContext()
-                indexField SolrFieldType.TXT_NO_ACCENT, "pageTitle-${cl.toString().toLowerCase()}', 'p.title[l.iso2]"
-                indexField SolrFieldType.TXT_GENERAL, "pageTitle-${cl.toString().toLowerCase()}', 'p.title[l.iso2]"
-                indexField SolrFieldType.TXT_NO_ACCENT, "pageBody-${cl.toString().toLowerCase()}', 'p.bodyContent[l.iso2]"
-                indexField SolrFieldType.TXT_GENERAL, "pageBody-${cl.toString().toLowerCase()}', 'p.bodyContent[l.iso2]"
+                indexField SolrFieldType.TXT_NO_ACCENT, "pageTitle-${cl.toString().toLowerCase()}", "p.title[l.iso2]"
+                indexField SolrFieldType.TXT_GENERAL, "pageTitle-${cl.toString().toLowerCase()}", "p.title[l.iso2]"
+                indexField SolrFieldType.TXT_NO_ACCENT, "pageBody-${cl.toString().toLowerCase()}", "p.bodyContent[l.iso2]"
+                indexField SolrFieldType.TXT_GENERAL, "pageBody-${cl.toString().toLowerCase()}", "p.bodyContent[l.iso2]"
 
             }
             indexField SolrFieldType.POINT_STRING, 'subsidiary', true, p.subsidiary?.toString()

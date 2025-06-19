@@ -317,7 +317,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
         File f = new File(attachmentPath(attachment))
         if (f.exists()) {
             response.setContentType(attachment.contentType)
-            response.setHeader('Content-disposition', 'attachment;filename=\'${URLEncoder.encode(attachment.getName(), 'UTF-8')}\'')
+            response.setHeader('Content-disposition', "attachment;filename=${URLEncoder.encode(attachment.getName(), 'UTF-8')}")
             response.outputStream << f.bytes
         } else {
             log.error "No file: ${f.path}"

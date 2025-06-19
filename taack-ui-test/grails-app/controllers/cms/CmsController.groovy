@@ -545,9 +545,9 @@ class CmsController implements WebAttributes {
 
     def previewImage() {
         UiBlockSpecifier b = new UiBlockSpecifier()
-        String html = params.long('mainImage') ? '''<div class='markdown-body">
+        String html = params.long('mainImage') ? """<div class="markdown-body">
                         <img src="/cms/mediaPreview/${params.long('mainImage')}"
-                    </div>''' : '''No Preview"""
+                    </div>""" : 'No Preview'
         b.ui {
             modal {
                 custom html
@@ -559,9 +559,9 @@ class CmsController implements WebAttributes {
     def previewVideo() {
         CmsVideoFile videoFile = CmsVideoFile.read params.long('mainVideo')
         UiBlockSpecifier b = new UiBlockSpecifier()
-        String html = videoFile?.preview?.id ? '''<div class='markdown-body">
+        String html = videoFile?.preview?.id ? """<div class="markdown-body">
                         <img src="/cms/mediaPreview/${videoFile?.preview?.id}"
-                    </div>''' : ''' No Preview"""
+                    </div>""" : 'No Preview'
         b.ui {
             modal {
                 custom html
@@ -596,7 +596,7 @@ class CmsController implements WebAttributes {
     def mediaPreview(Long id) {
         CmsImage cmsImage = CmsImage.read(id)
         response.setContentType(cmsImage?.contentType ?: 'image/svg+xml')
-        response.setHeader('Content-disposition', 'filename=\'${URLEncoder.encode(cmsImage?.fileName ?: 'noPreview.svg', 'UTF-8')}\'')
+        response.setHeader('Content-disposition', "filename=${URLEncoder.encode(cmsImage?.fileName ?: 'noPreview.svg', 'UTF-8')}")
         if (!cmsImage) response.setHeader('Cache-Control', 'max-age=604800')
         if (!cmsImage?.filePath) {
             response.outputStream << """\
@@ -1279,9 +1279,9 @@ class CmsController implements WebAttributes {
                         }
                         diagram new UiDiagramSpecifier().ui({
                             scatter({
-                                dataset('client', [1.1: 10.0, 2: 20.1, 13: 30.0])
-                                dataset('admin', [3: 5.0, 6.9: 7.5])
-                                dataset('other', [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                                dataset('client', [1.1: 10.0, 2: 20.1, 13: 30.0] as Map<Object, BigDecimal>)
+                                dataset('admin', [3: 5.0, 6.9: 7.5] as Map<Object, BigDecimal>)
+                                dataset('other', [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0] as Map<Object, BigDecimal>)
                             }, '/assets/skin/house.png', '/assets/skin/exclamation.png', '/assets/taack/intranet.png')
                             // todo:
                             // the pointImageHref doesn't work in PDF (So in PDF we will replace it by default image)
