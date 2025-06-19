@@ -1,6 +1,7 @@
 plugins {
     id 'taack-grails-plugin'
     id 'taack-asciidoctor'
+    id 'taack-grails-assets-plugin'
 }
 
 dependencies {

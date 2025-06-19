@@ -63,7 +63,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 //        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.PNG)
 //        this.out << """<img src='data:image/png;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
         uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.SVG_PDF)
-        this.out << """<img src='data:image/svg+xml;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
+        this.out << """<img src="data:image/svg+xml;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}"/>"""
         visitInnerBlockEnd()
     }
 
@@ -77,13 +77,13 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     @Override
     void visitPrintableHeader(final String height) {
         this.headerHeight = height
-        out << '''<div id='header' class='pure-g'>'''
+        out << '<div id="header" class="pure-g">'
     }
 
     @Override
     void visitPrintableHeaderLeft(String height) {
         this.headerHeight = height
-        out << '''<div id='header-left' class='pure-g'>'''
+        out << '<div id="header-left" class="pure-g">'
     }
 
     @Override
@@ -93,7 +93,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitPrintableHeaderRight(String right) {
-        out << '''<div id='header-right' class='pure-g'>'''
+        out << '<div id="header-right" class="pure-g">'
     }
 
     @Override
@@ -108,7 +108,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitPrintableFooter() {
-        out << '''<div id='footer'>'''
+        out << '<div id="footer">'
     }
 
     @Override
@@ -128,7 +128,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitAnonymousBlock(BlockSpec.Width width) {
-        out << '''<div class='${width.pdfCss}'>'''
+        out << "<div class=\"${width.pdfCss}\">"
     }
 
     @Override
@@ -144,7 +144,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitInnerBlock(BlockSpec.Width width) {
-        out << '''<div class='${width.pdfCss}'>'''
+        out << "<div class=\"${width.pdfCss}\">"
     }
 
     @Override

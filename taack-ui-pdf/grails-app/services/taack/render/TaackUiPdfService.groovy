@@ -79,7 +79,6 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
         printableSpecifier.visitPrintableBlock(htmlPdf)
         final StringBuffer css = new StringBuffer()
         final listCss = [
-
                 'taack.css',
                 'taack-pdf.css',
                 'custom-pdf.css'

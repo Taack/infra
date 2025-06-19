@@ -9,8 +9,8 @@
 *
 *= require first
 *= require wysiwyg
-*= require taack.css
+*= require taack
 *= require taack-asciidoc
-*= require custom.css
+*= require custom
 *= require_self
 */
