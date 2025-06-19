@@ -6,20 +6,20 @@ import grails.plugins.Plugin
 class TaackUiPdfGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "7.0.0-M4 > *"
+    def grailsVersion = '7.0.0-M4 > *'
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+        'grails-app/views/error.gsp'
     ]
 
     // TODO Fill in these fields
-    def title = "Taack Ui Grails Plugin" // Headline display name of the plugin
-    def author = "Adrien Guichard"
-    def authorEmail = "adrien.guichard@taack.org"
+    def title = 'Taack Ui Grails Plugin' // Headline display name of the plugin
+    def author = 'Adrien Guichard'
+    def authorEmail = 'adrien.guichard@taack.org'
 
     def profiles = ['web']
-    def documentation = "http://taack.org"
-    def license = "APACHE"
+    def documentation = 'http://taack.org'
+    def license = 'APACHE'
 
     Closure doWithSpring() { {->
             // TODO Implement runtime spring config (optional)

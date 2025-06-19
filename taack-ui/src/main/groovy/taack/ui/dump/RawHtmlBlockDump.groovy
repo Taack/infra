@@ -84,11 +84,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         if (parameter.target == Parameter.RenderingTarget.MAIL) return true
         simpleLog("doRenderElement0 :> renderTab: $renderTab, id: $id, theCurrentExplicitAjaxBlockId: ${theCurrentExplicitAjaxBlockId}, isModal: ${isModal}, params: ${parameter.params}")
         if (!parameter.isAjaxRendering) {
-            simpleLog("doRenderElement01: true")
+            simpleLog('doRenderElement01: true')
             return true
         }
         if (renderTab && parameter.isAjaxRendering) {
-            simpleLog("doRenderElement02: true")
+            simpleLog('doRenderElement02: true')
            return true
         }
 
@@ -177,7 +177,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
      */
     @Override
     void visitAjaxBlock(String id) {
-        enterBlock('visitAjaxBlock id: ' + id + " parameter.isAjaxRendering: " + parameter.isAjaxRendering + " parameter.ajaxBlockId: " + parameter.ajaxBlockId)
+        enterBlock('visitAjaxBlock id: ' + id + ' parameter.isAjaxRendering: ' + parameter.isAjaxRendering + ' parameter.ajaxBlockId: ' + parameter.ajaxBlockId)
         if (!id) id = parameter.ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
         // if many blocks in the same response, only redraw current block
@@ -227,7 +227,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitHtmlBlock(String html, Style style) {
         blockLog.stayBlock('visitHtmlBlock')
         blockLog.topElement.addChildren(
-                new HTMLDiv().builder.addClasses(style?.cssClassesString).putAttribute("style", style?.cssStyleString).addChildren(
+                new HTMLDiv().builder.addClasses(style?.cssClassesString).putAttribute('style', style?.cssStyleString).addChildren(
                         new HTMLTxtContent(html)
                 ).build()
         )
@@ -296,7 +296,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 //    void visitChart(final UiChartSpecifier chartSpecifier) {
 //        blockLog.stayBlock('visitChart')
 //        ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
-//        chartSpecifier.visitChart(new RawHtmlChartDump(out, "ajaxBlockId"))
+//        chartSpecifier.visitChart(new RawHtmlChartDump(out, 'ajaxBlockId'))
 //        blockLog.topElement.addChildren(new HTMLOutput(out))
 //    }
 
@@ -333,7 +333,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         for (FieldInfo fi : fields) {
             String label
             if (fi.value == null) {
-                label = ""
+                label = ''
             } else if (parameter.nf && fi.value instanceof Number) {
                 label = parameter.nf.format(fi.value)
             } else {
@@ -375,7 +375,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         exitBlock('visitBlockTabsEnd')
         IHTMLElement tabsContent = blockLog.topElement
         Map<String, Object> p = parameter.params.sort()
-        if (p) p.remove("tabIndex")
+        if (p) p.remove('tabIndex')
         blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId, p))
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
@@ -571,7 +571,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
         enterBlock('visitMenuSearch')
         splitMenu()
-        menu.menuSearch(blockLog.topElement, q?.replace('"', "&quot;"), parameter.urlMapped(Utils.getControllerName(action), action.method))
+        menu.menuSearch(blockLog.topElement, q?.replace('"', '&quot;'), parameter.urlMapped(Utils.getControllerName(action), action.method))
         splitMenuEnd()
         exitBlock('visitMenuSearch')
     }
@@ -584,7 +584,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         IEnumOption currentOption = selectedOptionKey ? (enumOptions.options.find { it.key == selectedOptionKey }) : enumOptions.currents?.first() as IEnumOption
         String selectedOptionValue = currentOption ? currentOption.value : selectedOptionKey
-        String img = currentOption && currentOption.asset? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: "padding: .5em 0em;") : ''
+        String img = currentOption && currentOption.asset? parameter.applicationTagLib.img(file: currentOption.asset, width: 20, style: 'padding: .5em 0em;') : ''
 
         blockLog.topElement = menu.menuOptions(blockLog.topElement, img, selectedOptionValue)
         blockLog.topElement.setTaackTag(TaackTag.MENU_OPTION)
@@ -599,7 +599,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         for (i; i < im;) {
             IEnumOption option = options[i++]
             parameter.params.put(enumOptions.paramKey, option.key)
-            img = option.asset ? parameter.applicationTagLib.img(file: option.asset, width: 20, style: "padding: .5em 0em;") : null
+            img = option.asset ? parameter.applicationTagLib.img(file: option.asset, width: 20, style: 'padding: .5em 0em;') : null
             if (option.isSection()) {
                 menu.menuOptionSection(blockLog.topElement, img, option.value)
             } else {

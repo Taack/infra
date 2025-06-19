@@ -7,7 +7,7 @@ import taack.domain.TaackMetaModelService
 
 // TODO: Develop the UI
 @GrailsCompileStatic
-@Secured(["ROLE_ADMIN"])
+@Secured(['ROLE_ADMIN'])
 class ModelVisitorController {
     TaackMetaModelService taackMetaModelService
     def model() {

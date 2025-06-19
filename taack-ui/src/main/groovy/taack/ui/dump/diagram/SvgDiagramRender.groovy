@@ -17,12 +17,12 @@ class SvgDiagramRender implements IDiagramRender {
     private final Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
-    private String fillStyle = "black"
+    private String fillStyle = 'black'
     private BigDecimal lineWidth = 1.3
 
     SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false) {
-        // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params "width/height" will be used to do ZOOM
-        // if isViewBox == false, the diagramWidth/diagramHeight will be fixed to params "width/height"
+        // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params 'width/height' will be used to do ZOOM
+        // if isViewBox == false, the diagramWidth/diagramHeight will be fixed to params 'width/height'
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
@@ -194,7 +194,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderTriangle(BigDecimal length, boolean isDown) {
         String tmpStyle = fillStyle
-        fillStyle = "black"
+        fillStyle = 'black'
         if (isDown) {
             renderPoly(
                     [0.0, 0.0,
@@ -270,7 +270,7 @@ class SvgDiagramRender implements IDiagramRender {
     void renderClipSection(String id, List<BigDecimal> coords) {
         outStr.append("""<clipPath id="${id}">""")
         renderPoly(coords)
-        outStr.append("""</clipPath>""")
+        outStr.append('</clipPath>')
     }
 
     @Override

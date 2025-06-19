@@ -95,7 +95,7 @@ trait IHTMLElement {
     }
 
     String indent() {
-        String ret = "    "
+        String ret = '    '
         IHTMLElement p = this
         while (p.parent) {
             ret += ret
@@ -157,9 +157,9 @@ trait IHTMLElement {
             childrenOutput.append('</' + tag + '>')
 
 //        if (tag) {
-//            "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\"" : "${it.key}" }.join(' ')}>" + "${children*.output.join("\n")}" + "\n</$tag>"
+//            "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\'' : "${it.key}" }.join(' ')}>' + '${children*.output.join('\n')}' + '\n</$tag>"
 //        } else {
-//            children*.output.join("\n")
+//            children*.output.join('\n')
 //        }
     }
 

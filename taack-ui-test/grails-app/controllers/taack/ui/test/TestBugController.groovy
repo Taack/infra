@@ -68,7 +68,7 @@ class TestBugController {
 
     def logForm() {
         println params
-        render "OK"
+        render 'OK'
     }
 
     def bugFilter1() {

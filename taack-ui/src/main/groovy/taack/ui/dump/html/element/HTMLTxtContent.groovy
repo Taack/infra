@@ -19,6 +19,6 @@ final class HTMLTxtContent implements IHTMLElement {
 
     @Override
     void addChildren(IHTMLElement... elements) {
-        throw new Exception("NO Children for this tag !!")
+        throw new Exception('NO Children for this tag !!')
     }
 }

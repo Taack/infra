@@ -202,7 +202,7 @@ class SshEventRegistry {
             // TODO: Add code for relative path
             VfsPath p = path.toAbsolutePath().normalize() as VfsPath
             final int nc = p.nameCount
-            if (nc == 1 || (nc == 2 && ((VfsPath) p.getName(1)).first == ".")) {
+            if (nc == 1 || (nc == 2 && ((VfsPath) p.getName(1)).first == '.')) {
                 final String username = ((VfsPath) p.getName(0)).first
                 if (username)
                     return new VfsPosixFileAttributes(false, 0, 0, username, dateInitialized)
@@ -345,10 +345,10 @@ class SshEventRegistry {
     @CompileStatic
     static final class Command {
         private enum DefaultCommands {
-            LS(new CommandTree("ls", [], "list contextual command")),
-            CD(new CommandTree("cd", [
-                    new CommandTree.Arg(CommandTree.Arg.Type.STRING, false, true, null, "App Name"),
-            ] as List<ICommand>, "change directory context"))
+            LS(new CommandTree('ls', [], 'list contextual command')),
+            CD(new CommandTree('cd', [
+                    new CommandTree.Arg(CommandTree.Arg.Type.STRING, false, true, null, 'App Name'),
+            ] as List<ICommand>, 'change directory context'))
 
             DefaultCommands(CommandTree commandTree) {
                 this.commandTree = commandTree
@@ -430,16 +430,16 @@ class SshEventRegistry {
             else if (cc) {
                 def c1 = cc.next()
                 switch (c1.command.substring(c1.startPos, c1.endPos)) {
-                    case "ls":
-                        if (commandUserContext.keySet().contains(username)) return "none."
-                        else return commandsPerUserPerApp[username].keySet().join("\n")
-                    case "cd":
+                    case 'ls':
+                        if (commandUserContext.keySet().contains(username)) return 'none.'
+                        else return commandsPerUserPerApp[username].keySet().join('\n')
+                    case 'cd':
                         def a = cc.next()
                         if (a) {
                             def cdNewName = a.command.substring(a.startPos + 1, a.endPos - 1)
                             if (commandEventPerApp.keySet().contains(cdNewName)) {
                                 commandUserContext[username] = cdNewName
-                                return "done."
+                                return 'done.'
                             }
                         } else {
                             commandUserContext.remove(username)
@@ -518,7 +518,7 @@ class SshEventRegistry {
         def sshdBuilder = ServerBuilder.builder().publickeyAuthenticator(auth)
         sshd = sshdBuilder.build()
         sshd.setPort(22_222)
-        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Path.of("hostkey.ser")))
+        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Path.of('hostkey.ser')))
 
         // Git
         final resolver = new GitLocationResolver() {
@@ -588,7 +588,7 @@ class SshEventRegistry {
             }
         })
         sshd.start()
-        log.info "Ssh Started !!"
+        log.info 'Ssh Started !!'
     }
 
     static void destroySsh() {

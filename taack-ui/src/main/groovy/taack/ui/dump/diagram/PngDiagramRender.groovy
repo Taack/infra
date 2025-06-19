@@ -237,13 +237,13 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderGroup(Map attributes) {
-        String t = attributes.get("transform")
-        if (t?.startsWith("translate")) {
-            int i1 = "translate(".length()
-            int i2 = t.indexOf(",", i1)
-            int i3 = t.indexOf(")", i2)
+        String t = attributes.get('transform')
+        if (t?.startsWith('translate')) {
+            int i1 = 'translate('.length()
+            int i2 = t.indexOf(',', i1)
+            int i3 = t.indexOf(')', i2)
             Double x = t.substring(i1, i2).toDouble()
-            Double y = t.substring(i2 + ",".length(), i3).toDouble()
+            Double y = t.substring(i2 + ','.length(), i3).toDouble()
             ig2.translate(x, y)
         }
     }

@@ -35,23 +35,23 @@ class CmsSearchService implements TaackSearchService.IIndexService {
                 }
             else {
                 def cl = SupportedLanguage.fromContext()
-                indexField SolrFieldType.TXT_NO_ACCENT, "pageTitle-${cl.toString().toLowerCase()}", "p.title[l.iso2]"
-                indexField SolrFieldType.TXT_GENERAL, "pageTitle-${cl.toString().toLowerCase()}", "p.title[l.iso2]"
-                indexField SolrFieldType.TXT_NO_ACCENT, "pageBody-${cl.toString().toLowerCase()}", "p.bodyContent[l.iso2]"
-                indexField SolrFieldType.TXT_GENERAL, "pageBody-${cl.toString().toLowerCase()}", "p.bodyContent[l.iso2]"
+                indexField SolrFieldType.TXT_NO_ACCENT, "pageTitle-${cl.toString().toLowerCase()}', 'p.title[l.iso2]"
+                indexField SolrFieldType.TXT_GENERAL, "pageTitle-${cl.toString().toLowerCase()}', 'p.title[l.iso2]"
+                indexField SolrFieldType.TXT_NO_ACCENT, "pageBody-${cl.toString().toLowerCase()}', 'p.bodyContent[l.iso2]"
+                indexField SolrFieldType.TXT_GENERAL, "pageBody-${cl.toString().toLowerCase()}', 'p.bodyContent[l.iso2]"
 
             }
-            indexField SolrFieldType.POINT_STRING, "subsidiary", true, p.subsidiary?.toString()
+            indexField SolrFieldType.POINT_STRING, 'subsidiary', true, p.subsidiary?.toString()
             indexField SolrFieldType.DATE, 0.5f, true, p.dateCreated_
-            indexField SolrFieldType.POINT_STRING, "userCreated", 0.5f, true, p.userCreated?.username
+            indexField SolrFieldType.POINT_STRING, 'userCreated', 0.5f, true, p.userCreated?.username
             indexField SolrFieldType.DATE, 0.5f, true, p.lastUpdated_
-            indexField SolrFieldType.POINT_STRING, "userUpdated", 0.5f, true, p.userUpdated?.username
+            indexField SolrFieldType.POINT_STRING, 'userUpdated', 0.5f, true, p.userUpdated?.username
         }))
     }
 
     String labelingPage(Long id) {
         def i = CmsPage.read(id)
-        "Page: ${i.name} ${i.name ?: ""} ($id)"
+        "Page: ${i.name} ${i.name ?: ''} ($id)"
     }
 
     @Override

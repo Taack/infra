@@ -21,11 +21,11 @@ class VfsPath implements Path {
     }
 
     private Collection<String> sliced() {
-        first.split("/").findAll { !it.empty }
+        first.split('/').findAll { !it.empty }
     }
 
     private Collection<String> sliced(Range<Integer> range) {
-        def c = first.split("/").findAll { !it.empty }
+        def c = first.split('/').findAll { !it.empty }
         c.toList()[range]
     }
 
@@ -36,12 +36,12 @@ class VfsPath implements Path {
 
     @Override
     boolean isAbsolute() {
-        first.startsWith("/")
+        first.startsWith('/')
     }
 
     @Override
     Path getRoot() {
-        return new VfsPath(vfsFileSystem, "/")
+        return new VfsPath(vfsFileSystem, '/')
     }
 
     @Override
@@ -52,7 +52,7 @@ class VfsPath implements Path {
 
     @Override
     Path getParent() {
-        if (nameCount >= 2) new VfsPath(vfsFileSystem, "/" + sliced(0..(nameCount - 2)).join("/"))
+        if (nameCount >= 2) new VfsPath(vfsFileSystem, '/' + sliced(0..(nameCount - 2)).join('/'))
         else null
     }
 
@@ -89,16 +89,16 @@ class VfsPath implements Path {
     @Override
     Path normalize() {
         def sl = sliced().toList()
-        sl.remove(".")
+        sl.remove('.')
         boolean contains2dots = true
         while (contains2dots) {
-            int index = sl.findIndexOf { it == ".." }
-            if (index > 0) { // "../toto" stop here !!
+            int index = sl.findIndexOf { it == '..' }
+            if (index > 0) { // '../toto' stop here !!
                 sl.remove(index - 1)
                 sl.remove(index - 1)
             } else contains2dots = false
         }
-        String newFirst = (first.startsWith("/") ? "/" : "") + sl.join("/") + (first.endsWith("/") ? "/" : "")
+        String newFirst = (first.startsWith('/') ? '/' : '') + sl.join('/') + (first.endsWith('/') ? '/' : '')
         if (newFirst == first) this
         else new VfsPath(vfsFileSystem, newFirst, more)
     }
@@ -109,7 +109,7 @@ class VfsPath implements Path {
         if (other instanceof VfsPath) {
             if (other.isAbsolute()) other
             else if (other.first.empty) this
-            else new VfsPath(vfsFileSystem, (this.first + "/").replace("//", "/") + other.first, null)
+            else new VfsPath(vfsFileSystem, (this.first + '/').replace('//', '/') + other.first, null)
         } else null
     }
 

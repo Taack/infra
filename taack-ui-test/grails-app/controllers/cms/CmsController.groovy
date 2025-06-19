@@ -37,7 +37,7 @@ import static grails.async.Promises.task
 */
 
 @GrailsCompileStatic
-@Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_USER", "ROLE_CMS_DIRECTOR"])
+@Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_USER', 'ROLE_CMS_DIRECTOR'])
 class CmsController implements WebAttributes {
     TaackUiService taackUiService
     TaackUiPdfService taackUiPdfService
@@ -56,7 +56,7 @@ class CmsController implements WebAttributes {
 
     @PostConstruct
     void init() {
-        cmsFileRoot = rootPath + "/cms"
+        cmsFileRoot = rootPath + '/cms'
         def f = new File(cmsFileRoot)
         f.mkdir()
         TaackAttachmentService.filePaths.put(controllerName, f)
@@ -65,14 +65,14 @@ class CmsController implements WebAttributes {
     static private UiMenuSpecifier buildMenu(String q = null) {
         UiMenuSpecifier m = new UiMenuSpecifier()
         m.ui {
-            menu "CMS", this.&index as MC
+            menu 'CMS', this.&index as MC
             menu this.&pages as MC
             menu this.&images as MC
             menu this.&pdfs as MC
             menu this.&videos as MC
             menu this.&blocks as MC
             menu this.&slideshows as MC
-            label "Admin", {
+            label 'Admin', {
                 subMenu this.&confSites as MC
                 subMenu this.&menuEntries as MC
                 subMenu this.&testDiagram as MC
@@ -117,7 +117,7 @@ class CmsController implements WebAttributes {
 
     private static UiFormSpecifier buildCmsPageForm(final CmsPage cmsPage) {
         new UiFormSpecifier().ui cmsPage, {
-            section "Page Information", {
+            section 'Page Information', {
                 row {
                     col {
                         field cmsPage.name_
@@ -167,7 +167,7 @@ class CmsController implements WebAttributes {
 
         new UiFormSpecifier().ui cmsPage, {
             hiddenField(cmsPage.pageType_)
-            section "Slideshow Information", {
+            section 'Slideshow Information', {
                 row {
                     col {
                         field cmsPage.name_
@@ -198,13 +198,13 @@ class CmsController implements WebAttributes {
 
     private static UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
         new UiFormSpecifier().ui cmsInsert, {
-            section "Position", {
+            section 'Position', {
                 field cmsInsert.x_
                 field cmsInsert.y_
                 field cmsInsert.width_
             }
 
-            section "Object", {
+            section 'Object', {
                 field cmsInsert.itemId_
                 field cmsInsert.subFamilyId_
                 field cmsInsert.rangeId_
@@ -226,7 +226,7 @@ class CmsController implements WebAttributes {
         UiFormSpecifier f = new UiFormSpecifier()
         f.ui cmsImage, {
             if (cmsImage.cmsPage) hiddenField cmsImage.cmsPage_
-            section "File Upload", {
+            section 'File Upload', {
                 field cmsImage.filePath_
                 field cmsImage.imageType_
                 for (SupportedLanguage language : SupportedLanguage.values()) {
@@ -241,18 +241,18 @@ class CmsController implements WebAttributes {
     private static UiFormSpecifier buildCmsVideoForm(final CmsVideoFile cmsVideo) {
         new UiFormSpecifier().ui cmsVideo, {
             hiddenField cmsVideo.cmsPage_
-            section "File Upload", {
+            section 'File Upload', {
                 field cmsVideo.filePath_
             }
-            section "Video Preview", {
+            section 'Video Preview', {
                 ajaxField cmsVideo.preview_, CmsController.&selectM2mCmsImage as MC, ['imageType': ImageType.MEDIA_POSTER.toString()]
             }
-            section "Alt Text", {
+            section 'Alt Text', {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "ALT Text ${language.label}", cmsVideo.altText_, language.toString().toLowerCase()
                 }
             }
-            section "Youtube id", {
+            section 'Youtube id', {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "id for ${language.label}", cmsVideo.youtubeI18n_, language.toString().toLowerCase()
                 }
@@ -264,10 +264,10 @@ class CmsController implements WebAttributes {
     private static UiFormSpecifier buildCmsPdfForm(final CmsPdfFile pdfFile) {
         new UiFormSpecifier().ui pdfFile, {
             hiddenField pdfFile.cmsPage_
-            section "File Upload", {
+            section 'File Upload', {
                 field pdfFile.filePath_
             }
-            section "Alt Text", {
+            section 'Alt Text', {
                 for (SupportedLanguage language : SupportedLanguage.values()) {
                     fieldFromMap "ALT Text ${language.label}", pdfFile.altText_, language.toString().toLowerCase()
                 }
@@ -283,7 +283,7 @@ class CmsController implements WebAttributes {
             header {
                 sortableFieldHeader cb.position_
                 sortableFieldHeader cb.subsidiary_
-                label "Page OR Menu Entry"
+                label 'Page OR Menu Entry'
             }
             iterate(taackFilterService.getBuilder(CmsBlock).build()) { CmsBlock o ->
                 rowField o.position
@@ -291,10 +291,10 @@ class CmsController implements WebAttributes {
                 rowField o.subsidiary.toString()
                 String lastCol = null
                 if (o.cmsPage) {
-                    lastCol = " PAGE: " + o.cmsPage.title.toString()
+                    lastCol = ' PAGE: ' + o.cmsPage.title.toString()
                 }
                 if (o.cmsMenuEntry) {
-                    lastCol += " MENU: " + o.cmsMenuEntry.title.toString()
+                    lastCol += ' MENU: ' + o.cmsMenuEntry.title.toString()
                 }
                 rowColumn {
                     rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&editBlock as MC, o.id
@@ -305,25 +305,25 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def saveCmsPage() {
         taackSaveService.saveThenRedirectOrRenderErrors(CmsPage, this.&pages as MC)
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def saveCmsSlideshow() {
         taackSaveService.saveThenRedirectOrRenderErrors(CmsPage, this.&slideshows as MC)
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def saveCmsMenuEntry() {
         taackSaveService.saveThenRedirectOrRenderErrors(CmsMenuEntry, this.&menuEntries as MC)
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def saveCmsBlock() {
         taackSaveService.saveThenRedirectOrRenderErrors(CmsBlock, this.&blocks as MC)
     }
@@ -381,8 +381,8 @@ class CmsController implements WebAttributes {
                 }
                 col {
                     tabs {
-                        tab "Images", buildImagesTab(slideshow)
-                        tab "Videos", buildVideosTab(slideshow)
+                        tab 'Images', buildImagesTab(slideshow)
+                        tab 'Videos', buildVideosTab(slideshow)
                     }
                 }
             }
@@ -391,7 +391,7 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    @Secured(["ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def saveCmsInsert() {
         taackSaveService.saveThenReloadOrRenderErrors(CmsInsert)
     }
@@ -435,7 +435,7 @@ class CmsController implements WebAttributes {
 
     def editCmsVideo(CmsVideoFile videoFile) {
         UiBlockSpecifier b = new UiBlockSpecifier()
-        if (!videoFile) videoFile = new CmsVideoFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
+        if (!videoFile) videoFile = new CmsVideoFile(cmsPage: CmsPage.read(params.long('cmsPageId')))
         b.ui {
             modal {
                 form buildCmsVideoForm(videoFile)
@@ -446,7 +446,7 @@ class CmsController implements WebAttributes {
 
     def editCmsPdf(CmsPdfFile pdfFile) {
         UiBlockSpecifier b = new UiBlockSpecifier()
-        if (!pdfFile) pdfFile = new CmsPdfFile(cmsPage: CmsPage.read(params.long("cmsPageId")))
+        if (!pdfFile) pdfFile = new CmsPdfFile(cmsPage: CmsPage.read(params.long('cmsPageId')))
         b.ui {
             modal {
                 form buildCmsPdfForm(pdfFile)
@@ -456,7 +456,7 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def uploadCmsImage() {
         if (taackUiService.isProcessingForm()) {
             if (params.containsKey('cmsPage.id')) {
@@ -478,12 +478,12 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def uploadCmsVideo() {
         if (taackUiService.isProcessingForm()) {
             def videoFile = taackSaveService.save(CmsVideoFile)
             videoFile.save(flush: true)
-            def page = CmsPage.read(params.long("cmsPage.id"))
+            def page = CmsPage.read(params.long('cmsPage.id'))
             taackUiService.cleanForm()
             taackSaveService.displayBlockOrRenderErrors(videoFile, new UiBlockSpecifier().ui {
                 closeModalAndUpdateBlock buildVideosTab(page)
@@ -492,12 +492,12 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def uploadCmsPdf() {
         if (taackUiService.isProcessingForm()) {
             def pdfFile = taackSaveService.save(CmsPdfFile)
             pdfFile.save(flush: true)
-            def page = CmsPage.read(params.long("cmsPage.id"))
+            def page = CmsPage.read(params.long('cmsPage.id'))
             taackUiService.cleanForm()
             taackSaveService.displayBlockOrRenderErrors(pdfFile, new UiBlockSpecifier().ui {
                 closeModalAndUpdateBlock buildPdfsTab(page)
@@ -519,8 +519,8 @@ class CmsController implements WebAttributes {
     def previewBody(String previewLanguage, boolean asciidoc) {
         UiBlockSpecifier b = new UiBlockSpecifier()
         String html = """\
-            <div class="markdown-body">
-                ${cmsHtmlGeneratorService.translate(params["bodyContent"][previewLanguage] as String, previewLanguage, asciidoc, this.&downloadBinBodyContentFiles as MC, params.long('id'))}
+            <div class='markdown-body'>
+                ${cmsHtmlGeneratorService.translate(params['bodyContent'][previewLanguage] as String, previewLanguage, asciidoc, this.&downloadBinBodyContentFiles as MC, params.long('id'))}
             </div>""".stripIndent()
         b.ui {
             modal {
@@ -545,9 +545,9 @@ class CmsController implements WebAttributes {
 
     def previewImage() {
         UiBlockSpecifier b = new UiBlockSpecifier()
-        String html = params.long("mainImage") ? """<div class="markdown-body">
-                        <img src="/cms/mediaPreview/${params.long("mainImage")}"
-                    </div>""" : """No Preview"""
+        String html = params.long('mainImage') ? '''<div class='markdown-body">
+                        <img src="/cms/mediaPreview/${params.long('mainImage')}"
+                    </div>''' : '''No Preview"""
         b.ui {
             modal {
                 custom html
@@ -557,11 +557,11 @@ class CmsController implements WebAttributes {
     }
 
     def previewVideo() {
-        CmsVideoFile videoFile = CmsVideoFile.read params.long("mainVideo")
+        CmsVideoFile videoFile = CmsVideoFile.read params.long('mainVideo')
         UiBlockSpecifier b = new UiBlockSpecifier()
-        String html = videoFile?.preview?.id ? """<div class="markdown-body">
+        String html = videoFile?.preview?.id ? '''<div class='markdown-body">
                         <img src="/cms/mediaPreview/${videoFile?.preview?.id}"
-                    </div>""" : """ No Preview"""
+                    </div>''' : ''' No Preview"""
         b.ui {
             modal {
                 custom html
@@ -590,24 +590,24 @@ class CmsController implements WebAttributes {
     }
 
     private static String localPath(final String filePath) {
-        cmsFileRoot + "/" + filePath
+        cmsFileRoot + '/' + filePath
     }
 
     def mediaPreview(Long id) {
         CmsImage cmsImage = CmsImage.read(id)
-        response.setContentType(cmsImage?.contentType ?: "image/svg+xml")
-        response.setHeader("Content-disposition", "filename=\"${URLEncoder.encode(cmsImage?.fileName ?: 'noPreview.svg', 'UTF-8')}\"")
-        if (!cmsImage) response.setHeader("Cache-Control", "max-age=604800")
+        response.setContentType(cmsImage?.contentType ?: 'image/svg+xml')
+        response.setHeader('Content-disposition', 'filename=\'${URLEncoder.encode(cmsImage?.fileName ?: 'noPreview.svg', 'UTF-8')}\'')
+        if (!cmsImage) response.setHeader('Cache-Control', 'max-age=604800')
         if (!cmsImage?.filePath) {
             response.outputStream << """\
-                <svg fill="#000000" width="800px" height="800px" viewBox="0 0 32 32" id="icon" xmlns="http://www.w3.org/2000/svg">
+                <svg fill='#000000' width='800px' height='800px' viewBox='0 0 32 32' id='icon' xmlns='http://www.w3.org/2000/svg'>
                     <defs>
                         <style>.cls-1{fill:none;}</style>
                     </defs>
                     <title>no-image</title>
-                    <path d="M30,3.4141,28.5859,2,2,28.5859,3.4141,30l2-2H26a2.0027,2.0027,0,0,0,2-2V5.4141ZM26,26H7.4141l7.7929-7.793,2.3788,2.3787a2,2,0,0,0,2.8284,0L22,19l4,3.9973Zm0-5.8318-2.5858-2.5859a2,2,0,0,0-2.8284,0L19,19.1682l-2.377-2.3771L26,7.4141Z"/>
-                    <path d="M6,22V19l5-4.9966,1.3733,1.3733,1.4159-1.416-1.375-1.375a2,2,0,0,0-2.8284,0L6,16.1716V6H22V4H6A2.002,2.002,0,0,0,4,6V22Z"/>
-                    <rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"/>
+                    <path d='M30,3.4141,28.5859,2,2,28.5859,3.4141,30l2-2H26a2.0027,2.0027,0,0,0,2-2V5.4141ZM26,26H7.4141l7.7929-7.793,2.3788,2.3787a2,2,0,0,0,2.8284,0L22,19l4,3.9973Zm0-5.8318-2.5858-2.5859a2,2,0,0,0-2.8284,0L19,19.1682l-2.377-2.3771L26,7.4141Z'/>
+                    <path d='M6,22V19l5-4.9966,1.3733,1.3733,1.4159-1.416-1.375-1.375a2,2,0,0,0-2.8284,0L6,16.1716V6H22V4H6A2.002,2.002,0,0,0,4,6V22Z'/>
+                    <rect id='_Transparent_Rectangle_' data-name='&lt;Transparent Rectangle&gt;' class='cls-1' width='32' height='32'/>
                 </svg>
             """.stripIndent()
         } else {
@@ -626,8 +626,8 @@ class CmsController implements WebAttributes {
             if (fp) {
                 final String fn = fp.substring(fp.lastIndexOf('/') + 1)
                 try {
-                    response.setHeader("Content-disposition", "attachment; filename=" + (fn)?.replaceAll('[^a-zA-Z0-9_\\.\\-]', '_'))
-                    response.contentType = "image/png"
+                    response.setHeader('Content-disposition', 'attachment; filename=' + (fn)?.replaceAll('[^a-zA-Z0-9_\\.\\-]', '_'))
+                    response.contentType = 'image/png'
                     response.outputStream << cmsUiService.getWebSmallPic(pdfFile, fp)
                 } catch (e) {
                     log.error "mediaPreviewPdf ${pdfFile.id}: ${e.message}"
@@ -668,16 +668,16 @@ class CmsController implements WebAttributes {
                     }
                     col {
                         tabs {
-                            tab "Images", buildImagesTab(cmsPage)
-                            tab "Pdfs", buildPdfsTab(cmsPage)
-                            tab "Videos", buildVideosTab(cmsPage)
+                            tab 'Images', buildImagesTab(cmsPage)
+                            tab 'Pdfs', buildPdfsTab(cmsPage)
+                            tab 'Videos', buildVideosTab(cmsPage)
                         }
                     }
                 }
             }, buildMenu()
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_DIRECTOR", "ROLE_CMS_MANAGER"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_DIRECTOR', 'ROLE_CMS_MANAGER'])
     def editBlock(CmsBlock block) {
         def cu = springSecurityService.currentUser as User
         def cmsSub = CmsSubsidiary.values().find { it.getSubsidiary() == cu.subsidiary }
@@ -689,7 +689,7 @@ class CmsController implements WebAttributes {
                         field block.position_
                         field block.subsidiary_
                     }
-                    section("Block Content") {
+                    section('Block Content') {
                         ajaxField block.cmsMenuEntry_, this.&selectM2oMenu as MC, ['subsidiary': block.subsidiary, 'theId': block.id]
                         ajaxField block.cmsPage_, this.&selectM2oPage as MC, ['subsidiary': block.subsidiary]
                     }
@@ -827,56 +827,56 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def addCmsImageToPage() {
-        CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
-        cmsPage.addToBodyImages(CmsImage.get(params.getLong("cmsImageId")))
+        CmsPage cmsPage = CmsPage.get(params.long('cmsPageId'))
+        cmsPage.addToBodyImages(CmsImage.get(params.getLong('cmsImageId')))
         taackUiService.show(new UiBlockSpecifier().ui {
             closeModalAndUpdateBlock buildImagesTab(cmsPage)
         })
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def addCmsPdfToPage() {
-        CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
-        cmsPage.addToBodyPdfs(CmsPdfFile.get(params.getLong("cmsPdfId")))
+        CmsPage cmsPage = CmsPage.get(params.long('cmsPageId'))
+        cmsPage.addToBodyPdfs(CmsPdfFile.get(params.getLong('cmsPdfId')))
         taackUiService.show(new UiBlockSpecifier().ui {
             closeModalAndUpdateBlock buildPdfsTab(cmsPage)
         })
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def addCmsVideoToPage() {
-        CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
-        cmsPage.addToBodyVideos(CmsVideoFile.get(params.getLong("cmsVideoId")))
+        CmsPage cmsPage = CmsPage.get(params.long('cmsPageId'))
+        cmsPage.addToBodyVideos(CmsVideoFile.get(params.getLong('cmsVideoId')))
         taackUiService.show(new UiBlockSpecifier().ui {
             closeModalAndUpdateBlock buildVideosTab(cmsPage)
         })
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def removeCmsImageFromPage() {
-        CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
-        cmsPage.removeFromBodyImages(CmsImage.read(params.getLong("cmsImageId")))
+        CmsPage cmsPage = CmsPage.get(params.long('cmsPageId'))
+        cmsPage.removeFromBodyImages(CmsImage.read(params.getLong('cmsImageId')))
         taackUiService.show(new UiBlockSpecifier().ui(buildImagesTab(cmsPage)))
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def removeCmsPdfFromPage() {
-        CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
-        cmsPage.removeFromBodyPdfs(CmsPdfFile.read(params.getLong("cmsPdfId")))
+        CmsPage cmsPage = CmsPage.get(params.long('cmsPageId'))
+        cmsPage.removeFromBodyPdfs(CmsPdfFile.read(params.getLong('cmsPdfId')))
         taackUiService.show(new UiBlockSpecifier().ui(buildPdfsTab(cmsPage)))
     }
 
     @Transactional
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def removeCmsVideoFromPage() {
-        CmsPage cmsPage = CmsPage.get(params.long("cmsPageId"))
-        cmsPage.removeFromBodyVideos(CmsVideoFile.read(params.getLong("cmsVideoId")))
+        CmsPage cmsPage = CmsPage.get(params.long('cmsPageId'))
+        cmsPage.removeFromBodyVideos(CmsVideoFile.read(params.getLong('cmsVideoId')))
         taackUiService.show(new UiBlockSpecifier().ui(buildVideosTab(cmsPage)))
     }
 
@@ -887,15 +887,15 @@ class CmsController implements WebAttributes {
         t.ui {
             header {
                 column {
-                    label "Subsidiary"
-                    label "Code"
+                    label 'Subsidiary'
+                    label 'Code'
                 }
-                label "Published"
-                label "Title L1"
-                label "Title L2"
-                label "Title L3"
-                label "Page"
-                label "Link"
+                label 'Published'
+                label 'Title L1'
+                label 'Title L2'
+                label 'Title L3'
+                label 'Page'
+                label 'Link'
             }
 
             Closure rec
@@ -906,16 +906,16 @@ class CmsController implements WebAttributes {
                         boolean muHasChildren = !menuEntry.children.isEmpty()
                         rowTree muHasChildren, {
                             rowColumn {
-                                if (subsidiary) rowAction "Select Menu", ActionIcon.SELECT * IconStyle.SCALE_DOWN, this.&selectM2oMenuCloseModal as MC, menuEntry.id, ['theId': theId]
+                                if (subsidiary) rowAction 'Select Menu', ActionIcon.SELECT * IconStyle.SCALE_DOWN, this.&selectM2oMenuCloseModal as MC, menuEntry.id, ['theId': theId]
                                 else {
-                                    rowAction "Edit Menu", ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&editMenu as MC, menuEntry.id
-                                    if (level == 1 || menuEntry.isSideMenu) rowAction "Add Child", ActionIcon.ADD * IconStyle.SCALE_DOWN, this.&editMenu as MC, ['parentMenu': menuEntry.id]
+                                    rowAction 'Edit Menu', ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&editMenu as MC, menuEntry.id
+                                    if (level == 1 || menuEntry.isSideMenu) rowAction 'Add Child', ActionIcon.ADD * IconStyle.SCALE_DOWN, this.&editMenu as MC, ['parentMenu': menuEntry.id]
                                 }
                                 rowField menuEntry.code
                             }
                             rowField menuEntry.published.toString()
                             for (def l : sub.languages) rowField menuEntry.title[l.toString().toLowerCase()]?.toString()
-                            for (int i = 0; i < 3 - sub.languages.size(); i++) rowField ""
+                            for (int i = 0; i < 3 - sub.languages.size(); i++) rowField ''
                             rowField menuEntry.page?.name
                             rowField menuEntry.suffixLink
                         }
@@ -933,7 +933,7 @@ class CmsController implements WebAttributes {
             for (def g : subsidiaries) {
                 row {
                     rowColumn(2) {
-                        rowField g.toString() + " " + g.languages*.label.join(', ')
+                        rowField g.toString() + ' ' + g.languages*.label.join(', ')
                     }
                 }
                 rec(CmsMenuEntry.findAllBySubsidiaryAndParentIsNull(g), g, 0)
@@ -969,7 +969,7 @@ class CmsController implements WebAttributes {
     def editMenu(CmsMenuEntry menuEntry) {
         CmsMenuEntry p = null
         if (params.containsKey('parentMenu')) p = CmsMenuEntry.read(params.long('parentMenu'))
-        String title = menuEntry ? "Edit Menu Entry" : "Create Menu Entry"
+        String title = menuEntry ? 'Edit Menu Entry' : 'Create Menu Entry'
         menuEntry ?= new CmsMenuEntry(parent: p, subsidiary: p?.subsidiary)
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
@@ -978,7 +978,7 @@ class CmsController implements WebAttributes {
                         hiddenField menuEntry.parent_
                         hiddenField menuEntry.subsidiary_
                     }
-                    section "Menu Entry", {
+                    section 'Menu Entry', {
                         field menuEntry.code_
                         field menuEntry.suffixLink_
                         field menuEntry.position_
@@ -990,7 +990,7 @@ class CmsController implements WebAttributes {
                         ajaxField menuEntry.page_, this.&selectM2oPage as MC, menuEntry.subsidiary_
 
                     }
-                    section "Menu Entry Translation", {
+                    section 'Menu Entry Translation', {
                         for (def l in SupportedLanguage.values()) {
                             fieldFromMap "Title ${l.label}", menuEntry.title_, l.toString().toLowerCase()
                         }
@@ -1062,7 +1062,7 @@ class CmsController implements WebAttributes {
         })
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_CMS_MANAGER", "ROLE_CMS_DIRECTOR"])
+    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     @Transactional
     def saveCmsConfSite() {
         taackSaveService.saveThenReloadOrRenderErrors(CmsConfSite)
@@ -1071,7 +1071,7 @@ class CmsController implements WebAttributes {
     def testProgressBar() {
         String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
             row {
-                custom("""<p>Test ended2</p>""", null) {
+                custom('''<p>Test ended2</p>''', null) {
                     menuIcon(ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC)
                 }
             }
@@ -1116,13 +1116,13 @@ class CmsController implements WebAttributes {
         def pdf = new UiPrintableSpecifier().ui {
             printableHeaderLeft('8.5cm') {
                 show new UiShowSpecifier().ui {
-                    field Style.BOLD, "Printed for"
+                    field Style.BOLD, 'Printed for'
                     field """${cu.firstName} ${cu.lastName}"""
                 }, BlockSpec.Width.THIRD
                 show new UiShowSpecifier().ui {
                     field """\
-                        <div style="height: 2cm; text-align: center;align-content: center; width: 100%;margin-left: 1cm;">
-                            ${this.taackUiService.dumpAsset("logo-taack-web.svg")}
+                        <div style='height: 2cm; text-align: center;align-content: center; width: 100%;margin-left: 1cm;'>
+                            ${this.taackUiService.dumpAsset('logo-taack-web.svg')}
                         </div>
                     """.stripIndent()
                 }, BlockSpec.Width.THIRD
@@ -1133,7 +1133,7 @@ class CmsController implements WebAttributes {
             }
 
             printableBody {
-                // if width is null, it will be set to default value "720px"
+                // if width is null, it will be set to default value '720px'
                 // if height is null, it will be set depending on width (Pie: height = width; Else: height = width / 2)
                 // See details in RawHtmlDiagramDump.createDiagramRender()
                 diagram barDiagram(false), BlockSpec.Width.MAX
@@ -1145,12 +1145,12 @@ class CmsController implements WebAttributes {
 
                 diagram new UiDiagramSpecifier().ui({
                     whiskers({
-                        labels "T1", "T2", "T3", "T4"
+                        labels 'T1', 'T2', 'T3', 'T4'
                         dataset 'Truc1', {
-                            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0 // for "T1"
-                            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0 // for "T2"
-                            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7 // for "T3"
-                            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3 // for "T4"
+                            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0 // for 'T1'
+                            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0 // for 'T2'
+                            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7 // for 'T3'
+                            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3 // for 'T4'
                         }
                         dataset 'Truc2', {
                             boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
@@ -1164,7 +1164,7 @@ class CmsController implements WebAttributes {
 
             printableFooter {
                 show new UiShowSpecifier().ui {
-                    field "<b>Taackly</b> Powered"
+                    field '<b>Taackly</b> Powered'
                 }, BlockSpec.Width.MAX
             }
 
@@ -1176,7 +1176,7 @@ class CmsController implements WebAttributes {
     private static UiDiagramSpecifier barDiagram(boolean isStacked) {
         new UiDiagramSpecifier().ui {
             bar(isStacked, {
-                labels "T1", "T2", "T3", "T4"
+                labels 'T1', 'T2', 'T3', 'T4'
                 dataset 'Truc1', 1.0, 2.0, 1.0, 4.0
                 dataset 'Truc2', 2.0, 0.1, 1.0, 0.0
                 dataset 'Truc3', 2.0, 0.1, 1.0, 1.0
@@ -1187,7 +1187,7 @@ class CmsController implements WebAttributes {
     private static UiDiagramSpecifier areaDiagram() {
         new UiDiagramSpecifier().ui {
             area({
-                labels "T1", "T2", "T3", "T4"
+                labels 'T1', 'T2', 'T3', 'T4'
                 dataset 'Truc1', 1.0, 1.0, 1.0, 2.0
                 dataset 'Truc2', 2.0, 2.0, 1.0, 0.0
                 dataset 'Truc3', 3.0, 3.0, 1.0, 3.0
@@ -1198,26 +1198,26 @@ class CmsController implements WebAttributes {
     private static UiDiagramSpecifier pieDiagram(boolean hasSlice) {
         new UiDiagramSpecifier().ui({
             pie(hasSlice, {
-                labels "Pie"
-                dataset("cli", 1.47)
-                dataset("client", 0.28)
-                dataset("client1", 0.1)
-                dataset("client2", 1.45)
-                dataset("client3", 0.05)
-                dataset("client31", 0.05)
-                dataset("client32", 0.05)
-                dataset("c33", 0.05)
-                dataset("client311", 0.05)
-                dataset("client312", 0.05)
-                dataset("client313", 0.05)
-                dataset("client4", 0.8)
-                dataset("client5", 2.1)
-                dataset("client55", 0.1)
-                dataset("client555", 0.2)
-                dataset("client5555", 0.3)
-                dataset("client55555", 0.3)
-                dataset("admin", 1.6)
-                dataset("test1", 0.05)
+                labels 'Pie'
+                dataset('cli', 1.47)
+                dataset('client', 0.28)
+                dataset('client1', 0.1)
+                dataset('client2', 1.45)
+                dataset('client3', 0.05)
+                dataset('client31', 0.05)
+                dataset('client32', 0.05)
+                dataset('c33', 0.05)
+                dataset('client311', 0.05)
+                dataset('client312', 0.05)
+                dataset('client313', 0.05)
+                dataset('client4', 0.8)
+                dataset('client5', 2.1)
+                dataset('client55', 0.1)
+                dataset('client555', 0.2)
+                dataset('client5555', 0.3)
+                dataset('client55555', 0.3)
+                dataset('admin', 1.6)
+                dataset('test1', 0.05)
             })
         })
     }
@@ -1234,18 +1234,18 @@ class CmsController implements WebAttributes {
                 col {
                     diagram new UiDiagramSpecifier().ui({
                         line {
-                            labels "day1", "day2", "day3", "day4", "day5", "day6"
-                            dataset "client", 10.0, 20.1, 30.0
-                            dataset "admin", 5.0, 7.0
-                            dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+                            labels 'day1', 'day2', 'day3', 'day4', 'day5', 'day6'
+                            dataset 'client', 10.0, 20.1, 30.0
+                            dataset 'admin', 5.0, 7.0
+                            dataset 'other', 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
                         }
                     })
                     diagram new UiDiagramSpecifier().ui({
                         line {
-                            labels "day1", "day2", "day3", "day4", "day5", "day6"
-                            dataset "client", 10.0, 20.1, 30.0
-                            dataset "admin", 5.0, 7.0
-                            dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+                            labels 'day1', 'day2', 'day3', 'day4', 'day5', 'day6'
+                            dataset 'client', 10.0, 20.1, 30.0
+                            dataset 'admin', 5.0, 7.0
+                            dataset 'other', 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
                         }
                     })
                 }
@@ -1253,17 +1253,17 @@ class CmsController implements WebAttributes {
                     diagram new UiDiagramSpecifier().ui({
                         line {
                             labels 1.5, 3, 4.4, 5, 7.8, 8
-                            dataset "client", 10.0, 20.1, 30.0
-                            dataset "admin", 5.0, 7.0
-                            dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+                            dataset 'client', 10.0, 20.1, 30.0
+                            dataset 'admin', 5.0, 7.0
+                            dataset 'other', 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
                         }
                     })
                     diagram new UiDiagramSpecifier().ui({
                         line {
                             // second way to set X axis
-                            dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
-                            dataset("admin", [3: 5.0, 6.9: 7.5])
-                            dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                            dataset('client', [1.1: 10.0, 2: 20.1, 13: 30.0])
+                            dataset('admin', [3: 5.0, 6.9: 7.5])
+                            dataset('other', [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
                         }
                     })
                 }
@@ -1272,17 +1272,17 @@ class CmsController implements WebAttributes {
                 col BlockSpec.Width.THIRD, {
                     diagram new UiDiagramSpecifier().ui({
                         scatter {
-                            labels "day1", "day2", "day3", "day4", "day5", "day6"
-                            dataset "client", 10.0, 20.1, 30.0
-                            dataset "admin", 5.0, 7.0
-                            dataset "other", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
+                            labels 'day1', 'day2', 'day3', 'day4', 'day5', 'day6'
+                            dataset 'client', 10.0, 20.1, 30.0
+                            dataset 'admin', 5.0, 7.0
+                            dataset 'other', 1.0, 2.0, 3.0, 4.0, 5.0, 6.0
                         }
                         diagram new UiDiagramSpecifier().ui({
                             scatter({
-                                dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
-                                dataset("admin", [3: 5.0, 6.9: 7.5])
-                                dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
-                            }, "/assets/skin/house.png", "/assets/skin/exclamation.png", "/assets/taack/intranet.png")
+                                dataset('client', [1.1: 10.0, 2: 20.1, 13: 30.0])
+                                dataset('admin', [3: 5.0, 6.9: 7.5])
+                                dataset('other', [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                            }, '/assets/skin/house.png', '/assets/skin/exclamation.png', '/assets/taack/intranet.png')
                             // todo:
                             // the pointImageHref doesn't work in PDF (So in PDF we will replace it by default image)
                             // because in PDF the href will locate from client side... So instead of a href, we should give an url that refers to our online server assets ?
@@ -1295,9 +1295,9 @@ class CmsController implements WebAttributes {
                     diagram areaDiagram()
                     diagram new UiDiagramSpecifier().ui({
                         area {
-                            dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
-                            dataset("admin", [3: 5.0, 6.9: 7.5])
-                            dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                            dataset('client', [1.1: 10.0, 2: 20.1, 13: 30.0])
+                            dataset('admin', [3: 5.0, 6.9: 7.5])
+                            dataset('other', [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
                         }
                     })
 
@@ -1309,9 +1309,9 @@ class CmsController implements WebAttributes {
                     // continuous
                     diagram new UiDiagramSpecifier().ui({
                         area {
-                            dataset("client", [1.1: 10.0, 2: 20.1, 13: 30.0])
-                            dataset("admin", [3: 5.0, 6.9: 7.5])
-                            dataset("other", [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
+                            dataset('client', [1.1: 10.0, 2: 20.1, 13: 30.0])
+                            dataset('admin', [3: 5.0, 6.9: 7.5])
+                            dataset('other', [1: 1.0, 10.7: 2.0, 3: 3.0, 8.9: 4.0, 7: 5.0, 20: 6.0])
                         }
                     })
                 }
@@ -1326,13 +1326,13 @@ class CmsController implements WebAttributes {
             // ------- Whiskers diagram -------
             diagram new UiDiagramSpecifier().ui({
                 whiskers({
-                    labels "T1", "T2", "T3", "T4"
+                    labels 'T1', 'T2', 'T3', 'T4'
 
                     dataset 'Truc1', {
-                        boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0 // for "T1"
-                        boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0 // for "T2"
-                        boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7 // for "T3"
-                        boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3 // for "T4"
+                        boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0 // for 'T1'
+                        boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0 // for 'T2'
+                        boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7 // for 'T3'
+                        boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3 // for 'T4'
                     }
                     dataset 'Truc2', {
                         boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
@@ -1360,13 +1360,13 @@ class CmsController implements WebAttributes {
                 // ------- Whiskers diagram -------
                 diagram new UiDiagramSpecifier().ui({
                     whiskers({
-                        labels "T1", "T2", "T3", "T4"
+                        labels 'T1', 'T2', 'T3', 'T4'
 
                         dataset 'Truc1', {
-                            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0 // for "T1"
-                            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0 // for "T2"
-                            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7 // for "T3"
-                            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3 // for "T4"
+                            boxData 1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0 // for 'T1'
+                            boxData 1.5, 2.5, 3.5, 6.0, 7.0, 8.0, 9.0 // for 'T2'
+                            boxData 2.0, 2.0, 2.1, 2.5, 5.5, 5.6, 6.7 // for 'T3'
+                            boxData 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3 // for 'T4'
                         }
                         dataset 'Truc2', {
                             boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5

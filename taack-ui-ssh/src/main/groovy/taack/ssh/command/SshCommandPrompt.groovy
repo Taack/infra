@@ -32,8 +32,8 @@ class SshCommandPrompt implements Command, Runnable, ServerSessionAware {
     // https://stackoverflow.com/questions/37557309/how-to-set-cursor-color-in-bash-shell
     // https://unix.stackexchange.com/questions/55423/how-to-change-cursor-shape-color-and-blinkrate-of-linux-console
     private final char escape = 27
-    private final String cursorForegroundYellow = "12"
-    private final String cursorForegroundDarkBlue = "10"
+    private final String cursorForegroundYellow = '12'
+    private final String cursorForegroundDarkBlue = '10'
     private final String styleReset = "$escape[0m"
     private final String redForeground = '31'
     private final String greenForeground = '32'
@@ -62,9 +62,9 @@ class SshCommandPrompt implements Command, Runnable, ServerSessionAware {
     private final String insertKey = '[2'
     private final String hideCursor = '[?25l'
     private final String showCursor = '[?25h'
-    private final String insertModeSelected = "[4h"
-    private final String replacementModeSelected = "[4l"
-    private final String clearCurrentLine = "[k"
+    private final String insertModeSelected = '[4h'
+    private final String replacementModeSelected = '[4l'
+    private final String clearCurrentLine = '[k'
 
     private final String taack52 = """
 Et
@@ -126,12 +126,12 @@ $styleReset
     }
 
     private void newPrompt() {
-        out << "\n"
+        out << '\n'
         refreshPrompt()
     }
 
     private void commandEnterExecution() {
-        out << "\n"
+        out << '\n'
         refreshLine()
     }
 
@@ -272,11 +272,11 @@ $styleReset
         if (cols >= 52) toDraw = taack52
         else if (cols > 40) toDraw = taack41
         else if (cols >= 34) toDraw = taack34
-        else toDraw = "Taack | Intranet Builder"
+        else toDraw = 'Taack | Intranet Builder'
         toDraw.lines().each {
             out << it
             refreshLine()
-            out << "\n"
+            out << '\n'
         }
     }
 
@@ -289,15 +289,15 @@ $styleReset
             try {
                 newPrompt()
                 String cmd = readCommand(inputStream)
-                if (cmd == "exit" || cmd.contains(new String(ctrlD))) {
+                if (cmd == 'exit' || cmd.contains(new String(ctrlD))) {
                     done = true
-                } else if (cmd == "history") {
-                    out << "history:\n"
+                } else if (cmd == 'history') {
+                    out << 'history:\n'
                     history.each {
                         refreshLine()
                         out << "${it}\n"
                     }
-                } else if (cmd == "clear") {
+                } else if (cmd == 'clear') {
                     out << "$escape$clearTheScreen"
                     taackLogo()
                 } else {
@@ -312,11 +312,11 @@ $styleReset
                             printHelp = true
                         }
                     if (printHelp) {
-                        if (cmd && cmd != "h" && cmd != "help") {
+                        if (cmd && cmd != 'h' && cmd != 'help') {
                             out << "Command not found: ${styleRedBold}$cmd${styleReset}\n"
                             refreshLine()
                         }
-                        out << "TaackShell usage:\n"
+                        out << 'TaackShell usage:\n'
                         refreshLine()
                         out << "\t<TAB>\t${styleGreenBold}Autocompletion when available${styleReset}\n"
                         refreshLine()
@@ -336,14 +336,14 @@ $styleReset
                         CommandRegister contextualCommands = SshEventRegistry.Command.contextualCommandRegisterForUser(session.username)
                         if (contextualCommands) {
                             refreshLine()
-                            out << "Other commands:\n"
+                            out << 'Other commands:\n'
                             refreshLine()
 
                             contextualCommands.help().lines().each {
-                                out << "\t"
+                                out << '\t'
                                 out << it
                                 refreshLine()
-                                out << "\n"
+                                out << '\n'
                             }
                         }
                     }
@@ -362,37 +362,37 @@ $styleReset
 
     @Override
     void setExitCallback(ExitCallback callback) {
-        log.info "SshCommandPrompt::setExitCallback"
+        log.info 'SshCommandPrompt::setExitCallback'
         this.callback = callback
     }
 
     @Override
     void setErrorStream(OutputStream err) {
-        log.info "SshCommandPrompt::setErrorStream"
+        log.info 'SshCommandPrompt::setErrorStream'
         this.err = err as ChannelOutputStream
     }
 
     @Override
     void setInputStream(InputStream inputStream) {
-        log.info "SshCommandPrompt::setInputStream"
+        log.info 'SshCommandPrompt::setInputStream'
         this.inputStream = inputStream
     }
 
     @Override
     void setOutputStream(OutputStream out) {
-        log.info "SshCommandPrompt::setOutputStream"
+        log.info 'SshCommandPrompt::setOutputStream'
         this.out = out as ChannelOutputStream
     }
 
     @Override
     void start(ChannelSession channel, Environment env) throws IOException {
-        log.info "SshCommandPrompt::start"
+        log.info 'SshCommandPrompt::start'
         new Thread(this, session.toString()).start()
     }
 
     @Override
     void destroy(ChannelSession channel) throws Exception {
-        log.info "SshCommandPrompt::destroy"
+        log.info 'SshCommandPrompt::destroy'
         inputStream.close()
         out.close()
         err.close()
@@ -401,7 +401,7 @@ $styleReset
 
     @Override
     void setSession(ServerSession session) {
-        log.info "SshCommandPrompt::setSession"
+        log.info 'SshCommandPrompt::setSession'
         this.session = session
         SshEventRegistry.Command.newCommandConnection(session.username)
     }

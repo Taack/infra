@@ -20,56 +20,56 @@ class VfsFileSystem extends FileSystem {
 
     @Override
     FileSystemProvider provider() {
-        log.fine "provider"
+        log.fine 'provider'
         provider
     }
 
     @Override
     void close() throws IOException {
-        log.info "close"
+        log.info 'close'
 
     }
 
     @Override
     boolean isOpen() {
-        log.info "isOpen"
+        log.info 'isOpen'
 
         return true
     }
 
     @Override
     boolean isReadOnly() {
-        log.info "isReadOnly"
+        log.info 'isReadOnly'
 
         return false
     }
 
     @Override
     String getSeparator() {
-        log.fine "getSeparator"
+        log.fine 'getSeparator'
 
-        return "/"
+        return '/'
     }
 
     @Override
     Iterable<Path> getRootDirectories() {
-        log.info "getRootDirectories"
+        log.info 'getRootDirectories'
 
         return null
     }
 
     @Override
     Iterable<FileStore> getFileStores() {
-        log.info "getFileStores"
+        log.info 'getFileStores'
 
         return null
     }
 
     @Override
     Set<String> supportedFileAttributeViews() {
-        log.fine "supportedFileAttributeViews"
+        log.fine 'supportedFileAttributeViews'
 
-        return Collections.unmodifiableSet(["basic", "posix"] as Set<String>)
+        return Collections.unmodifiableSet(['basic', 'posix'] as Set<String>)
     }
 
     @Override
@@ -88,14 +88,14 @@ class VfsFileSystem extends FileSystem {
 
     @Override
     UserPrincipalLookupService getUserPrincipalLookupService() {
-        log.info "getUserPrincipalLookupService"
+        log.info 'getUserPrincipalLookupService'
 
         return null
     }
 
     @Override
     WatchService newWatchService() throws IOException {
-        log.info "newWatchService"
+        log.info 'newWatchService'
 
         return null
     }

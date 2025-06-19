@@ -139,7 +139,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
             keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
                 // image or rect, with text
-                render.renderGroup(["element-type": ElementType.LEGEND, "dataset": keyEntry.key, "transform": "translate(${startX},${startY})", style: "pointer-events: bounding-box;"])
+                render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})', style: 'pointer-events: bounding-box;"])
                 if (legendIndex < pointImageHref.size()) {
                     render.translateTo(0.0, 0.0 - (LEGEND_IMAGE_WIDTH - fontSize))
                     render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
@@ -166,7 +166,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void drawHorizontalBackground(BigDecimal minY = null, BigDecimal maxY = null) {
-        render.renderGroup(["element-type": ElementType.HORIZONTAL_BACKGROUND])
+        render.renderGroup(['element-type': ElementType.HORIZONTAL_BACKGROUND])
         if (minY == null || maxY == null) {
             Set<BigDecimal> values = dataPerKey.collect { it.value.values() }.flatten().sort() as Set<BigDecimal>
             minY ?= values.first() >= 0 ? 0.0 : Math.floor(values.first().toDouble()).toBigDecimal()
@@ -213,10 +213,10 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
         boolean isDate = xLabelList.every { it instanceof Date }
-        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? xLabelDateFormat.format(it as Date) : it.toString() }.join(""))
+        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? xLabelDateFormat.format(it as Date) : it.toString() }.join(''))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)).toDouble()).toInteger()
 
-        render.renderGroup(["element-type": ElementType.VERTICAL_BACKGROUND, "show-label-every-x": xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)])
+        render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND, 'show-label-every-x': xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)])
         render.fillStyle(GREY_COLOR)
         BigDecimal minX = objectToNumber(xLabelList.first())
         BigDecimal maxX = objectToNumber(xLabelList.last())
@@ -263,7 +263,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void buildTransformAreaStart(String shapeType, String diagramActionUrl = null, BigDecimal shapeMaxWidth = 0.0) {
-        String id = "clipSection"
+        String id = 'clipSection'
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
                                   width - DIAGRAM_MARGIN_RIGHT + 1, 0.0,
@@ -274,14 +274,14 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                                   DIAGRAM_MARGIN_LEFT / 2, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
                                   DIAGRAM_MARGIN_LEFT - 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
 
-        render.renderGroup(["clip-path": "url(#${id})"])
-        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA,
-                            "diagram-action-url": diagramActionUrl ?: "",
-                            "shape-type": shapeType,
-                            "shape-max-width": shapeMaxWidth,
-                            "area-min-x": DIAGRAM_MARGIN_LEFT,
-                            "area-max-x": width - DIAGRAM_MARGIN_RIGHT,
-                            "area-max-y": height - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(['clip-path': "url(#${id})"])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
+                            'diagram-action-url': diagramActionUrl ?: '',
+                            'shape-type': shapeType,
+                            'shape-max-width': shapeMaxWidth,
+                            'area-min-x': DIAGRAM_MARGIN_LEFT,
+                            'area-max-x': width - DIAGRAM_MARGIN_RIGHT,
+                            'area-max-y': height - DIAGRAM_MARGIN_BOTTOM])
     }
 
     void buildTransformAreaEnd() {

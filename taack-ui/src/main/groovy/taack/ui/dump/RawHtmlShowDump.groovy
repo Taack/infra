@@ -32,7 +32,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
@@ -152,9 +152,9 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowInlineHtml(String html, String additionalCSSClass) {
-        out << "</div>"
+        out << '</div>'
         out << """<div class="$additionalCSSClass">$html</div>"""
-        out << "<div class='property-list taackShow col-12'>"
+        out << '<div class="property-list taackShow col-12">'
     }
 
 }

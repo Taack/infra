@@ -20,7 +20,7 @@ class GitPath implements Path {
     }
 
     private Collection<String> sliced() {
-        pathString.split("/").findAll { !it.empty }
+        pathString.split('/').findAll { !it.empty }
     }
 
     @Override
@@ -38,7 +38,7 @@ class GitPath implements Path {
     @Override
     Path getRoot() {
         log.fine("getRoot $rootDirectory $pathString")
-        return new GitPath(rootDirectory, "")
+        return new GitPath(rootDirectory, '')
     }
 
     @Override
@@ -94,16 +94,16 @@ class GitPath implements Path {
     Path normalize() {
         log.fine("normalize $rootDirectory $pathString")
         def sl = sliced().toList()
-        sl.remove(".")
+        sl.remove('.')
         boolean contains2dots = true
         while (contains2dots) {
-            int index = sl.findIndexOf { it == ".." }
-            if (index > 0) { // "../toto" stop here !!
+            int index = sl.findIndexOf { it == '..' }
+            if (index > 0) { // '../toto' stop here !!
                 sl.remove(index - 1)
                 sl.remove(index - 1)
             } else contains2dots = false
         }
-        String newFirst = (pathString.startsWith("/") ? "/" : "") + sl.join("/") + (pathString.endsWith("/") ? "/" : "")
+        String newFirst = (pathString.startsWith('/') ? '/' : '') + sl.join('/') + (pathString.endsWith('/') ? '/' : '')
         if (newFirst == pathString) this
         else new GitPath(rootDirectory, newFirst)
     }
@@ -114,8 +114,8 @@ class GitPath implements Path {
         if (other.isAbsolute()) other
         else if (other.toString().empty) this
         else {
-            if (isAbsolute()) new GitPath(rootDirectory, (pathString - other.toString() + "/" + other.toString()).replace("//", "/"))
-            else new GitPath(rootDirectory, (rootDirectory + '/' + pathString - other.toString() + "/" + other.toString()).replace("//", "/"))
+            if (isAbsolute()) new GitPath(rootDirectory, (pathString - other.toString() + '/' + other.toString()).replace('//', '/'))
+            else new GitPath(rootDirectory, (rootDirectory + '/' + pathString - other.toString() + '/' + other.toString()).replace('//', '/'))
         }
     }
 

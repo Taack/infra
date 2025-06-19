@@ -33,7 +33,7 @@ class CrewSecurityService {
                 this.&securityClosure,
                 CrewController.&editUser as MC,
                 CrewController.&saveUser as MC)
-        TaackAppRegisterService.register(new TaackApp(CrewController.&index as MC, new String(Application.getResourceAsStream("/crew/crew.svg").readAllBytes())))
+        TaackAppRegisterService.register(new TaackApp(CrewController.&index as MC, new String(Application.getResourceAsStream('/crew/crew.svg').readAllBytes())))
         TaackUiService.registerContextualMenuClosure(User, new UiMenuSpecifier().ui {
             menu CrewController.&showUser as MC
             menu CrewController.&editUser as MC

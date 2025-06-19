@@ -43,7 +43,7 @@ final class FilterExpression {
     String getFieldName() {
         if (!operand) return 'id'
         else {
-            operand*.fieldName.join(".")
+            operand*.fieldName.join('.')
         }
     }
 

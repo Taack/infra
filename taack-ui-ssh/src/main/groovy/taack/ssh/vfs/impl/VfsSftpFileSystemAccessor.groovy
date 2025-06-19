@@ -35,7 +35,7 @@ class VfsSftpFileSystemAccessor implements SftpFileSystemAccessor {
 ////            SshEventRegistry.Vfs.resolveLocalFilePath(session, rootDir, remotePath) ?: rootDir.resolve(remotePath)
 //            rootDir.resolve(remotePath)
 //        } else {
-//            log.warning("resolveLocalFilePath: rootDir not instanceof VfsPath")
+//            log.warning('resolveLocalFilePath: rootDir not instanceof VfsPath')
 //            null
 //        }
 //    }
@@ -79,12 +79,12 @@ class VfsSftpFileSystemAccessor implements SftpFileSystemAccessor {
         if (remotePath.contains('../')) return null
 
 //        if (remotePath.startsWith(rootDir.toString())) {
-//            if (remotePath.endsWith('/..')) return new VfsPath(rootDir.fileSystem as VfsFileSystem, remotePath.substring(0, (remotePath - "/..").lastIndexOf('/')))
+//            if (remotePath.endsWith('/..')) return new VfsPath(rootDir.fileSystem as VfsFileSystem, remotePath.substring(0, (remotePath - '/..').lastIndexOf('/')))
 //            else return new VfsPath(rootDir.fileSystem as VfsFileSystem, remotePath)
 //        }
         boolean endWithParent = false
-        if (remotePath.endsWith("/..")) {
-            remotePath -= "/.."
+        if (remotePath.endsWith('/..')) {
+            remotePath -= '/..'
             endWithParent = true
         }
         if (!remotePath.startsWith(rootDir.toString()) && remotePath.count('/') > 2) {
@@ -138,7 +138,7 @@ class VfsSftpFileSystemAccessor implements SftpFileSystemAccessor {
         if (file instanceof VfsPath) {
             final attr = SshEventRegistry.Vfs.readAttributes(file, subsystem.serverSession)
             if (!attr) throw new NoSuchFileException(file.toString())
-            if (view.contains("posix")) {
+            if (view.contains('posix')) {
                 attr.posixMap()
             } else {
                 attr.basicMap()
@@ -189,7 +189,7 @@ class VfsSftpFileSystemAccessor implements SftpFileSystemAccessor {
 
     @Override
     void createLink(SftpSubsystemProxy subsystem, Path link, Path existing, boolean symLink) throws IOException {
-        log.fine "createLink(session, subsystem, link, existing, symLink)"
+        log.fine 'createLink(session, subsystem, link, existing, symLink)'
     }
 
     @Override

@@ -51,13 +51,13 @@ final class BlockSpec extends BlockTabSpec {
     }
 
     enum Width {
-        FLEX("pure-u-1", "pure-u-1", 'col'),
-        MAX("pure-u-1", "pure-u-1", 'col-12'),
-        THREE_QUARTER("pure-u-1 pure-u-md-3-4", "pure-u-3-4", 'col-12 col-md-9'),
-        TWO_THIRD("pure-u-1 pure-u-md-2-3", "pure-u-2-3", 'col-12 col-md-8'),
-        HALF("pure-u-1 pure-u-md-1-2", "pure-u-1-2", 'col-12 col-md-6'),
-        THIRD("pure-u-1 pure-u-md-1-3", "pure-u-1-3", 'col-12 col-sm-6 col-md-4'),
-        QUARTER("pure-u-1 pure-u-md-1-4", "pure-u-1-4", 'col-12 col-md-3')
+        FLEX('pure-u-1', 'pure-u-1', 'col'),
+        MAX('pure-u-1', 'pure-u-1', 'col-12'),
+        THREE_QUARTER('pure-u-1 pure-u-md-3-4', 'pure-u-3-4', 'col-12 col-md-9'),
+        TWO_THIRD('pure-u-1 pure-u-md-2-3', 'pure-u-2-3', 'col-12 col-md-8'),
+        HALF('pure-u-1 pure-u-md-1-2', 'pure-u-1-2', 'col-12 col-md-6'),
+        THIRD('pure-u-1 pure-u-md-1-3', 'pure-u-1-3', 'col-12 col-sm-6 col-md-4'),
+        QUARTER('pure-u-1 pure-u-md-1-4', 'pure-u-1-4', 'col-12 col-md-3')
 
         Width(final String css, final String pdfCss, final String bootstrapCss) {
             this.css = css

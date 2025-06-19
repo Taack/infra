@@ -134,7 +134,7 @@ final class TaackJdbcService {
     final static void registerJdbcClass(Class<? extends GormEntity> aClass, FieldInfo... fieldInfos) {
         def fieldInfoWithId = fieldInfos.toList()
         Class aClassWithId = aClass.superclass != Object && !Modifier.isAbstract(aClass.superclass.getModifiers()) ? aClass.superclass : aClass
-        fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), aClassWithId.getDeclaredField('id'), null), 'id', (Long) 0)
+        fieldInfoWithId.add 0, new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints('', false, false, null, null), aClassWithId.getDeclaredField('id'), null), 'id', (Long) 0)
         fieldInfoMap.put(aClass, fieldInfoWithId as FieldInfo[])
         gormClassesMap.put(aClass.simpleName, aClass)
         gormRealClassesMap.put(aClass.name, aClass)
@@ -195,8 +195,8 @@ final class TaackJdbcService {
         if (translator.isStar()) {
             for (def f in fieldInfoMap[gormClassesMap[simpleName]]) columnDescs << new ColumnDesc(f, f.fieldName, f.fieldName)
             translator.columns.removeAll { true }
-            translator.addColumnNames(fieldInfoMap[gormClassesMap[simpleName]]*.fieldName as List<String>, "t")
-            translator.tabAliasMap.put(simpleName, "t")
+            translator.addColumnNames(fieldInfoMap[gormClassesMap[simpleName]]*.fieldName as List<String>, 't')
+            translator.tabAliasMap.put(simpleName, 't')
         } else {
             List<TQLTranslator.Col> columns = []
             columns.addAll translator.columns
@@ -209,19 +209,19 @@ final class TaackJdbcService {
                     sn = translator.tabAliasMap.find { it.value == alias }.key
                 }
                 def gec = gormClassesMap[sn]
-                if (!gec) throw new TaackJdbcError("From clause analysis", "No table ${sn}, avalaible tables ${gormClassesMap.keySet()}")
+                if (!gec) throw new TaackJdbcError('From clause analysis', "No table ${sn}, avalaible tables ${gormClassesMap.keySet()}")
                 def f = fieldInfoMap[gec].find { cn.startsWith(it.fieldName) }
                 if (f) {
                     columnDescs << new ColumnDesc(f, translator.colAliasMap[col], cn)
                 } else if (!f && ct == TQLTranslator.Col.Type.FORMULA) {
                     // Complex case like t.* or *
-//                    def fi = new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints("", false, false, null, null), null, null), 'id', (BigDecimal) 0)
+//                    def fi = new FieldInfo(new FieldConstraint(new FieldConstraint.Constraints('', false, false, null, null), null, null), 'id', (BigDecimal) 0)
                     columnDescs << new ColumnDesc(null as FieldInfo, translator.colAliasMap[col], col.colName)
                 } else if (translator.isStar()) {
                     for (def fi in fieldInfoMap[gec]) columnDescs << new ColumnDesc(fi, fi.fieldName, fi.fieldName)
                     translator.columns.removeAll { true }
-                    translator.addColumnNames(fieldInfoMap[gec]*.fieldName as List<String>, "t")
-                    translator.tabAliasMap.put(sn, "t")
+                    translator.addColumnNames(fieldInfoMap[gec]*.fieldName as List<String>, 't')
+                    translator.tabAliasMap.put(sn, 't')
                 } else if (translator.hasAliasedStar()) {
                     for (def fi in fieldInfoMap[gec]) columnDescs << new ColumnDesc(fi, fi.fieldName, fi.fieldName)
                     translator.columns.removeAll { true }
@@ -232,7 +232,7 @@ final class TaackJdbcService {
                         columnDescs << new ColumnDesc(m, translator.colAliasMap[col], cn)
                         col.colType = TQLTranslator.Col.Type.GETTER
                     } else
-                    throw new TaackJdbcError("Select clause analysis", "No column ${col.colName}, avalaible columns ${fieldInfoMap[gec]*.fieldName as List<String>}")
+                    throw new TaackJdbcError('Select clause analysis', "No column ${col.colName}, avalaible columns ${fieldInfoMap[gec]*.fieldName as List<String>}")
                 }
             }
         }
@@ -248,7 +248,7 @@ final class TaackJdbcService {
             c.setIsNullable(columnDesc.fieldInfo?.fieldConstraint?.nullable ?: false)
             c.setTableName(simpleName)
 
-            switch (columnDesc.fieldType) { // todo [ccn]: when "count(object.field)/sum()/...", javaType should be INT, instead of object.field.fieldType
+            switch (columnDesc.fieldType) { // todo [ccn]: when 'count(object.field)/sum()/...', javaType should be INT, instead of object.field.fieldType
                 case String:
                     c.javaType = TaackResultSetOuterClass.Column.JavaType.STRING
                     c.sqlType = 12
@@ -436,16 +436,16 @@ final class TaackJdbcService {
     final private static TaackResultSetOuterClass.TaackResultSet getTables(String schemasPattern, String tableNamePattern) {
         if (!schemasPattern || schemasPattern.trim().empty || schemasPattern == 'public') {
             TaackResultSetOuterClass.TaackResultSet.Builder b = TaackResultSetOuterClass.TaackResultSet.newBuilder()
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("REMARKS"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_CAT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_SCHEM"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SELF_REFERENCING_COL_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("REF_GENERATION"))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_CAT'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_SCHEM'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_NAME'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_TYPE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('REMARKS'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TYPE_CAT'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TYPE_SCHEM'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TYPE_NAME'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('SELF_REFERENCING_COL_NAME'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('REF_GENERATION'))
 
             if (!tableNamePattern || tableNamePattern == '%') {
                 int i = 0;
@@ -475,7 +475,7 @@ final class TaackJdbcService {
         switch (col.fieldConstraint.field.type) {
             case String:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(12)) // DATA_TYPE
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("varchar")) // TYPE_NAME
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('varchar')) // TYPE_NAME
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(255)) // COLUMN_SIZE
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder()) // BUFFER_LENGTH
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0)) // DECIMAL_DIGITS
@@ -484,7 +484,7 @@ final class TaackJdbcService {
                 break
             case Date:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(93))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("timestamp"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('timestamp'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(29))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(6))
@@ -493,7 +493,7 @@ final class TaackJdbcService {
                 break
             case Long:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(-5))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int8"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('int8'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(19))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
@@ -502,7 +502,7 @@ final class TaackJdbcService {
                 break
             case BigDecimal:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(2))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("numeric"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('numeric'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(19))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(6))
@@ -511,7 +511,7 @@ final class TaackJdbcService {
                 break
             case Boolean:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(-7))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("bool"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('bool'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(1))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
@@ -519,7 +519,7 @@ final class TaackJdbcService {
                 break
             case Byte:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(4))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int4"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('int4'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
@@ -527,7 +527,7 @@ final class TaackJdbcService {
                 break
             case Short:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(4))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int4"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('int4'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
@@ -535,7 +535,7 @@ final class TaackJdbcService {
                 break
             case Integer:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(4))
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("int4"))
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('int4'))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(10))
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0))
@@ -552,7 +552,7 @@ final class TaackJdbcService {
                 break
             default:
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(12)) // DATA_TYPE
-                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("varchar")) // TYPE_NAME
+                b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('varchar')) // TYPE_NAME
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(255)) // COLUMN_SIZE
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder()) // BUFFER_LENGTH
                 b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(0)) // DECIMAL_DIGITS
@@ -566,13 +566,13 @@ final class TaackJdbcService {
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(charOctetLength))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setIntValue(ordinal))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(col.fieldConstraint.nullable ? "YES" : "NO"))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(col.fieldConstraint.nullable ? 'YES' : 'NO'))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("NO"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("NO"))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('NO'))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('NO'))
     }
 
     final private static int addTableColumnsToResultSet(TaackResultSetOuterClass.TaackResultSet.Builder b, String name, String columnPattern) {
@@ -591,30 +591,30 @@ final class TaackJdbcService {
     final private static TaackResultSetOuterClass.TaackResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) {
         if (schemaPattern == null || schemaPattern.isEmpty() || schemaPattern == 'public' || schemaPattern == '%') {
             TaackResultSetOuterClass.TaackResultSet.Builder b = TaackResultSetOuterClass.TaackResultSet.newBuilder()
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("DATA_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TYPE_NAME"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("COLUMN_SIZE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("BUFFER_LENGTH"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("DECIMAL_DIGITS"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("NUM_PREC_RADIX"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("NULLABLE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("REMARKS"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_DEF"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("SQL_DATA_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("SQL_DATETIME_SUB"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("CHAR_OCTET_LENGTH"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("ORDINAL_POSITION"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("IS_NULLABLE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SCOPE_CATALOG"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SCOPE_SCHEMA"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("SCOPE_TABLE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName("SOURCE_DATA_TYPE"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("IS_AUTOINCREMENT"))
-            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("IS_GENERATEDCOLUMN"))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_CAT'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_SCHEM'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_NAME'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('COLUMN_NAME'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('DATA_TYPE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TYPE_NAME'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('COLUMN_SIZE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('BUFFER_LENGTH'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('DECIMAL_DIGITS'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('NUM_PREC_RADIX'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('NULLABLE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('REMARKS'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('COLUMN_DEF'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('SQL_DATA_TYPE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('SQL_DATETIME_SUB'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('CHAR_OCTET_LENGTH'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('ORDINAL_POSITION'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('IS_NULLABLE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('SCOPE_CATALOG'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('SCOPE_SCHEMA'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('SCOPE_TABLE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.INT).setName('SOURCE_DATA_TYPE'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('IS_AUTOINCREMENT'))
+            b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('IS_GENERATEDCOLUMN'))
             int counter = 0
             if (tableNamePattern == null || tableNamePattern.isEmpty() || tableNamePattern == '%') {
                 gormClassesMap.keySet().each {
@@ -665,17 +665,17 @@ final class TaackJdbcService {
 
     final byte[] getPrimaryKey(String table) {
         TaackResultSetOuterClass.TaackResultSet.Builder b = TaackResultSetOuterClass.TaackResultSet.newBuilder()
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName("KEY_SEQ"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("PK_NAME"))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_CAT'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_SCHEM'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_NAME'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('COLUMN_NAME'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName('KEY_SEQ'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('PK_NAME'))
 
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("default"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("public"))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('default'))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('public'))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(table))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("id"))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('id'))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(1))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
 
@@ -687,29 +687,29 @@ final class TaackJdbcService {
 
     final byte[] getIndexInfo(String table) {
         TaackResultSetOuterClass.TaackResultSet.Builder b = TaackResultSetOuterClass.TaackResultSet.newBuilder()
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_CAT"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_SCHEM"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("TABLE_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.BOOL).setName("NON_UNIQUE"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("INDEX_QUALIFIER"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("INDEX_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName("TYPE"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName("ORDINAL_POSITION"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("COLUMN_NAME"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("ASC_OR_DESC"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName("CARDINALITY"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName("PAGES"))
-        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName("FILTER_CONDITION"))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_CAT'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_SCHEM'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('TABLE_NAME'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.BOOL).setName('NON_UNIQUE'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('INDEX_QUALIFIER'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('INDEX_NAME'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName('TYPE'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.SHORT).setName('ORDINAL_POSITION'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('COLUMN_NAME'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('ASC_OR_DESC'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName('CARDINALITY'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName('PAGES'))
+        b.addColumns(TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.STRING).setName('FILTER_CONDITION'))
 
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("default"))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("public"))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('default'))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('public'))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue(table))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setBoolValue(false))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(DatabaseMetaData.tableIndexStatistic))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setShortValue(0))
-        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue("id"))
+        b.addCells(TaackResultSetOuterClass.Cell.newBuilder().setStringValue('id'))
         b.addCells(TaackResultSetOuterClass.Cell.newBuilder())
 
         TaackFilter tf = new TaackFilter.FilterBuilder<>(GormEntity, sessionFactory, null).build()
@@ -728,7 +728,7 @@ final class TaackJdbcService {
         TaackResultSetOuterClass.Column.Builder cId = TaackResultSetOuterClass.Column.newBuilder().setJavaType(TaackResultSetOuterClass.Column.JavaType.LONG).setName('id')
         cId.setColNumber(1)
         cId.setSqlType(-5)
-        cId.setSqlTypeName("int8")
+        cId.setSqlTypeName('int8')
         cId.setTableName(table)
         cId.setScale(0)
         cId.setIsNullable(false)

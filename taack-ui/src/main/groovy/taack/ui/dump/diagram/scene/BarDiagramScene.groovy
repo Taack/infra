@@ -47,7 +47,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         int showGapEveryX = 1
         BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / xLabelList.size()
         if (!alwaysShowFullInfo) {
-            // bar width should be bigger than a min value (In the case of "smaller", we will combine several gaps to get enough space and only draw bars of the first gap. It means "showGapEveryX".)
+            // bar width should be bigger than a min value (In the case of 'smaller', we will combine several gaps to get enough space and only draw bars of the first gap. It means 'showGapEveryX'.)
             int barNumber = isStacked ? 1 : keys.size()
             BigDecimal singleBarWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
             if (singleBarWidth < MIN_BAR_WIDTH) {
@@ -78,12 +78,12 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 BigDecimal yData = data.get(xLabel) ?: 0.0
                 String yDataLabel = numberToString(yData)
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
-                render.renderGroup(["element-type": ElementType.DATA,
+                render.renderGroup(['element-type': ElementType.DATA,
                                     dataset: keys[j],
-                                    "gap-index": i,
-                                    "data-x": xLabel,
-                                    "data-y": yDataLabel,
-                                    "data-label": "${xLabel}: ${yDataLabel}"])
+                                    'gap-index': i,
+                                    'data-x': xLabel,
+                                    'data-y': yDataLabel,
+                                    'data-label': "${xLabel}: ${yDataLabel}"])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
@@ -116,7 +116,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         dataPerKey = dataPerKey.collectEntries { [(it.key): it.value.collectEntries { [(objectToString(it.key)): it.value] }] }
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart(isStacked ? "stackedBar" : "bar", diagramActionUrl, MAX_BAR_WIDTH)
+        buildTransformAreaStart(isStacked ? 'stackedBar' : 'bar', diagramActionUrl, MAX_BAR_WIDTH)
         drawVerticalBackgroundAndDataBar()
         buildTransformAreaEnd()
     }

@@ -23,8 +23,8 @@ class MarkdownController {
     }
 
     def selectAttachment() {
-        if (params['directUpload'] == "true") {
-            redirect action: "uploadAttachment", params: [directUpload: true, isAjax: true]
+        if (params['directUpload'] == 'true') {
+            redirect action: 'uploadAttachment', params: [directUpload: true, isAjax: true]
             return
         }
         taackUiService.show(new UiBlockSpecifier().ui {
@@ -45,7 +45,7 @@ class MarkdownController {
     def uploadAttachment() {
         taackUiService.show(new UiBlockSpecifier().ui {
             modal {
-                    form AttachmentUiService.buildAttachmentForm(new Attachment(), MarkdownController.&saveAttachment as MethodClosure, [directUpload: params['directUpload'] == "true"])
+                    form AttachmentUiService.buildAttachmentForm(new Attachment(), MarkdownController.&saveAttachment as MethodClosure, [directUpload: params['directUpload'] == 'true'])
             }
         })
     }
@@ -55,7 +55,7 @@ class MarkdownController {
         if (taackUiService.isProcessingForm()) {
             Attachment a = taackSaveService.save(Attachment)
             a.save(flush: true, failOnError: true)
-            if (params['directUpload'] == "true") {
+            if (params['directUpload'] == 'true') {
                 selectAttachmentCloseModal(a)
             } else {
                 taackUiService.cleanForm()

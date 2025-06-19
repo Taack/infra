@@ -22,7 +22,7 @@ class CommandTree implements ICommand {
             StringBuffer help = new StringBuffer()
             help.append(' ' * indent)
             help.append("Sub Command \"${subCommandName}\": ${comment}")
-            help.append("\n")
+            help.append('\n')
             commandDatumIterator.each {
                 help.append(it.getHelp(indent + 2))
             }
@@ -34,7 +34,7 @@ class CommandTree implements ICommand {
             if (command.length() < from) return null
             final int trailingWhiteSpace = countTrailingWhiteSpace(command.substring(from))
             from += trailingWhiteSpace
-            if (command.substring(from).startsWith(subCommandName + " ") || command.substring(from).endsWith(subCommandName)) {
+            if (command.substring(from).startsWith(subCommandName + ' ') || command.substring(from).endsWith(subCommandName)) {
                 List<CommandContextToken> res = []
                 res.add(new CommandContextToken(this, null, command, from, from + subCommandName.length()))
                 from += subCommandName.length()
@@ -77,7 +77,7 @@ class CommandTree implements ICommand {
                 case Type.STRING:
                     return "'String Literal'"
                 case Type.NUMBER:
-                    return "Number [0-9.]+"
+                    return 'Number [0-9.]+'
                 case Type.DATE:
                     return "'yyyy-MM-dd'"
             }
@@ -99,7 +99,7 @@ class CommandTree implements ICommand {
             StringBuffer help = new StringBuffer()
             help.append(' ' * indent)
             help.append("${argName ? "--${argName}" : ''} ${formatArgType()}: ${comment} (${optional ? 'Optional' : 'Mandatory'})")
-            help.append("\n")
+            help.append('\n')
             return help.toString()
         }
 
@@ -133,7 +133,7 @@ class CommandTree implements ICommand {
     String getHelp(int indent) {
         StringBuffer help = new StringBuffer()
         help.append("Command \"${commandName}\": ${comment}")
-        help.append("\n")
+        help.append('\n')
         cmdIterator.each {
             help.append(it.getHelp(2))
         }

@@ -30,7 +30,7 @@ class CommandRegister {
         if (ck && registry.entrySet().contains(ck)) {
             registry[command]
         } else {
-            registry.keySet().join("\n")
+            registry.keySet().join('\n')
         }
     }
 

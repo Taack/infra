@@ -31,26 +31,26 @@ class StatsController {
             row {
                 col BlockSpec.Width.HALF, {
                     diagram(statsService.&buildChart as MethodClosure) {
-                        label "Sales1"
+                        label 'Sales1'
                         if (showMonthlyGraph) {
-                            menu "Yearly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
-                            if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true']
-                            else menu "Ungroup", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false']
+                            menu 'Yearly', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
+                            if (!groupPerMonth) menu 'Group by month', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true']
+                            else menu 'Ungroup', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false']
                         } else {
-                            menu "Monthly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true']
+                            menu 'Monthly', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true']
                         }
                     }
 
                 }
                 col BlockSpec.Width.HALF, {
                     diagram(statsService::buildChart as MethodClosure) {
-                        label "Sales2"
+                        label 'Sales2'
                         if (showMonthlyGraph) {
-                            menu "Yearly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
-                            if (!groupPerMonth) menu "Group by month", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true']
-                            else menu "Ungroup", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false']
+                            menu 'Yearly', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'false']
+                            if (!groupPerMonth) menu 'Group by month', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'true']
+                            else menu 'Ungroup', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true'] + [groupPerMonth: 'false']
                         } else {
-                            menu "Monthly", StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true']
+                            menu 'Monthly', StatsController.&topCustomerSales2 as MethodClosure, [showMonthlyGraph: 'true']
                         }
                     }
                 }

@@ -72,11 +72,11 @@ final class FieldInfo<T> {
 //    }
 
 //    final boolean isMapKey() {
-//        fieldName.contains("_setKey_")
+//        fieldName.contains('_setKey_')
 //    }
 
 //    final boolean isMapValue() {
-//        fieldName.contains("_setValue_")
+//        fieldName.contains('_setValue_')
 //    }
 
 //    /**

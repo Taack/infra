@@ -44,7 +44,7 @@ import taack.user.TaackUser
  * <pre>{@code
  *  taackUiSimpleService.show(new UiBlockSpecifier() {
  *      modal {
- *          ajaxBlock "showUser", {
+ *          ajaxBlock 'showUser', {
  *              show "${u.username}", crewUiService.buildUserShow(u), BlockSpec.Width.MAX
  *          }
  *      }
@@ -116,12 +116,12 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     static final String tr(final String code, final Locale locale = null, final String... args) {
-        if (LocaleContextHolder.locale.language == "test") return code
+        if (LocaleContextHolder.locale.language == 'test') return code
         try {
             staticMs.getMessage(code, args, locale ?: LocaleContextHolder.locale)
         } catch (e1) {
             try {
-                staticMs.getMessage(code, args, new Locale("en"))
+                staticMs.getMessage(code, args, new Locale('en'))
             } catch (e2) {
                 code
             }
@@ -130,7 +130,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     static final String tr(final FieldInfo fieldInfo, final Locale locale = null, final String... args) {
         String[] keys = ['default.' + fieldInfo.fieldName + '.label', fieldInfo.fieldConstraint.field.type.simpleName.uncapitalize() + fieldInfo.fieldName + '.label']
-        if (LocaleContextHolder.locale.language == "test") return keys.join(',')
+        if (LocaleContextHolder.locale.language == 'test') return keys.join(',')
 
         for (String key in keys) {
             String i18n = tr(key, locale, args)
@@ -173,7 +173,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
         blockSpecifier.visitBlock(htmlBlock)
-        if (p.isModal && params.boolean("isAjax") != false) {
+        if (p.isModal && params.boolean('isAjax') != false) {
             params['isAjax'] = true
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
@@ -186,7 +186,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
             StringBuffer output = new StringBuffer(8128)
             htmlBlock.getOutput(output)
-            ModelAndView mv = new ModelAndView("/taackUi/blockNoLayout", [
+            ModelAndView mv = new ModelAndView('/taackUi/blockNoLayout', [
                     themeSize      : themeSize,
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
@@ -216,7 +216,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             StringBuffer res = new StringBuffer(4096)
             htmlBlock.menu.getOutput(res)
             res.toString()
-        } else ""
+        } else ''
     }
 
     /**
@@ -232,7 +232,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             StringBuffer res = new StringBuffer(4096)
             htmlBlock.menu.getOutput(res)
             res.toString()
-        } else ""
+        } else ''
     }
 
     /**
@@ -250,7 +250,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     private final static Object decodeCookie(String encoded) {
-        if (encoded) new JsonSlurper().parseText(URLDecoder.decode(new String(Base64.getDecoder().decode(encoded)), "UTF-8"))
+        if (encoded) new JsonSlurper().parseText(URLDecoder.decode(new String(Base64.getDecoder().decode(encoded)), 'UTF-8'))
         else null
     }
 
@@ -286,7 +286,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        ModelAndView mv = new ModelAndView("/taackUi/block", [
+        ModelAndView mv = new ModelAndView('/taackUi/block', [
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
@@ -319,7 +319,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 themeSize      : themeSize,
                 themeMode      : themeMode,
                 themeAuto      : themeAuto,
-                block          : "",
+                block          : '',
                 menu           : visitMenu(menu),
                 conf           : TaackUiConfiguration,
                 clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
@@ -419,8 +419,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(stream)
         diagramSpecifier.visitDiagram(diagramDump, diagramBase)
         boolean isSvg = diagramBase != UiDiagramSpecifier.DiagramBase.PNG
-        webUtils.currentResponse.setContentType(isSvg ? "image/svg+xml" : "image/png")
-        webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName}.${isSvg ? "svg" : "png"}")
+        webUtils.currentResponse.setContentType(isSvg ? 'image/svg+xml' : 'image/png')
+        webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${fileName}.${isSvg ? 'svg' : 'png'}")
         stream.writeTo(webUtils.currentResponse.outputStream)
         try {
             webUtils.currentResponse.outputStream.flush()
@@ -434,13 +434,13 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * Allow to upload a CSV version of a table to the client browser
      *
      * @param tableSpecifier table descriptor
-     * @param fileNamePrefix part of the filename before ".csv"
+     * @param fileNamePrefix part of the filename before '.csv'
      * @return
      */
     final def downloadCsv(final UiTableSpecifier tableSpecifier, final String fileNamePrefix) {
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
-        webUtils.currentResponse.setContentType("text/csv")
-        webUtils.currentResponse.setHeader("Content-disposition", "filename=${fileNamePrefix}.csv")
+        webUtils.currentResponse.setContentType('text/csv')
+        webUtils.currentResponse.setHeader('Content-disposition', "filename=${fileNamePrefix}.csv")
         webUtils.currentResponse.outputStream << visitTable(tableSpecifier)
     }
 
@@ -453,7 +453,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final String dumpAsset(String assetName) {
         Resource r = assetResourceLocator.findResourceForURI(assetName)
         if (r?.exists()) r.inputStream.text
-        else ""
+        else ''
     }
 
     /**
@@ -495,7 +495,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * Allow to reload the current page
      */
     final void ajaxReload() {
-        render """__reload__"""
+        render '''__reload__'''
     }
 
     /**
@@ -504,7 +504,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return
      */
     final boolean isProcessingForm() {
-        params.containsKey("originController")
+        params.containsKey('originController')
     }
 
     /**
@@ -513,7 +513,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final void cleanForm() {
         if (isProcessingForm())
             params.removeAll { k, v ->
-                !["action", "controller", "isAjax"].contains(k)
+                !['action', 'controller', 'isAjax'].contains(k)
             }
     }
 
@@ -529,7 +529,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         blockSpecifier.visitBlock(htmlPdf)
         StringBuffer output = new StringBuffer(4096)
         htmlPdf.getOutput(output)
-        String html = g.render template: "/taackUi/block-mail", model: [
+        String html = g.render template: '/taackUi/block-mail', model: [
                 block: output.toString(),
                 root : TaackUiConfiguration.root
         ]

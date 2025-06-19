@@ -54,49 +54,49 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     final UiBlockSpecifier search(String q, MC search, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, Class<? extends GormEntity>... classes) {
-        List<String> facetsClicked = params.list("facetsClicked")
-        List<String> rangesClicked = params.list("rangesClicked")
+        List<String> facetsClicked = params.list('facetsClicked')
+        List<String> rangesClicked = params.list('rangesClicked')
         SolrQuery sq = new SolrQuery(q)
-        sq.add("defType", "edismax")
-//        sq.add("facet.limit", "-1")
-        sq.add("hl.snippets", "4")
-        sq.add("hl.mergeContiguous", "true")
-        sq.add("hl.highlightMultiTerm", "true")
-        sq.add("facet.mincount", "1")
-        //sq.add("facet.range", "lastUpdated_dt")
-        //sq.add("facet.range", "lastUpdated_dt")
-        sq.add("facet.range", "dateCreated_dt")
-        sq.add("facet.range", "lastUpdated_dt")
-        sq.add("facet.range.start", "NOW/MONTHS-10YEARS")
-        sq.add("facet.range.end", "NOW/MONTHS")
-        sq.add("facet.range.gap", "+12MONTHS")
-        sq.add("f.lastUpdated_dt.facet.range.start", "NOW/MONTHS-10YEARS")
-        sq.add("f.lastUpdated_dt.facet.range.end", "NOW/MONTHS")
-        sq.add("f.lastUpdated_dt.facet.range.gap", "+12MONTHS")
-        sq.add("f.dateCreated_dt.facet.range.start", "NOW/MONTHS-10YEARS")
-        sq.add("f.dateCreated_dt.facet.range.end", "NOW/MONTHS")
-        sq.add("f.dateCreated_dt.facet.range.gap", "+12MONTHS")
-        sq.add("ps", "7")
-        sq.add("group", "false")
+        sq.add('defType', 'edismax')
+//        sq.add('facet.limit', '-1')
+        sq.add('hl.snippets', '4')
+        sq.add('hl.mergeContiguous', 'true')
+        sq.add('hl.highlightMultiTerm', 'true')
+        sq.add('facet.mincount', '1')
+        //sq.add('facet.range', 'lastUpdated_dt')
+        //sq.add('facet.range', 'lastUpdated_dt')
+        sq.add('facet.range', 'dateCreated_dt')
+        sq.add('facet.range', 'lastUpdated_dt')
+        sq.add('facet.range.start', 'NOW/MONTHS-10YEARS')
+        sq.add('facet.range.end', 'NOW/MONTHS')
+        sq.add('facet.range.gap', '+12MONTHS')
+        sq.add('f.lastUpdated_dt.facet.range.start', 'NOW/MONTHS-10YEARS')
+        sq.add('f.lastUpdated_dt.facet.range.end', 'NOW/MONTHS')
+        sq.add('f.lastUpdated_dt.facet.range.gap', '+12MONTHS')
+        sq.add('f.dateCreated_dt.facet.range.start', 'NOW/MONTHS-10YEARS')
+        sq.add('f.dateCreated_dt.facet.range.end', 'NOW/MONTHS')
+        sq.add('f.dateCreated_dt.facet.range.gap', '+12MONTHS')
+        sq.add('ps', '7')
+        sq.add('group', 'false')
         sq.rows = 70
-        //sq.add("group.field", "type_s")
-        //sq.add("group.limit", "10")
+        //sq.add('group.field', 'type_s')
+        //sq.add('group.limit', '10')
 
         for (String f in facetsClicked) {
-            sq.add("fq", f.replace(";", ":"))
+            sq.add('fq', f.replace(';', ':'))
         }
         for (String r in rangesClicked) {
-            sq.add("fq", r.replace(";", ":"))
+            sq.add('fq', r.replace(';', ':'))
         }
 
         def targetClasses = (classes ?: mapSolrSpecifier.keySet()) as Collection<Class<? extends GormEntity>>
-        sq.addFacetField("type_s")
+        sq.addFacetField('type_s')
         Map<String, String> i18nMap = [:]
         Map<String, Class> classMap = [:]
         Set<String> highlightFields = []
         Set<String> queryFields = []
         String fqType = "type_s:${targetClasses*.simpleName.join(' OR type_s:')}"
-        sq.add("fq", fqType)
+        sq.add('fq', fqType)
         for (def c in targetClasses) {
             def s = mapSolrSpecifier[c]?.bValue
             def visitor = new SolrSearcherVisitor(RCU.getLocale(webRequest.request), messageSource)
@@ -110,7 +110,7 @@ final class TaackSolrSearchService implements WebAttributes {
             queryFields.addAll visitor.boostFields
         }
         sq.addHighlightField(highlightFields.join(' '))
-        sq.add("qf", queryFields.join(' '))
+        sq.add('qf', queryFields.join(' '))
         QueryResponse queryResponse = solrClient.query(sq, SolrRequest.METHOD.POST)
         GroupResponse groupResponse = queryResponse.groupResponse
         List<FacetField> facets = queryResponse.facetFields
@@ -121,7 +121,7 @@ final class TaackSolrSearchService implements WebAttributes {
         new UiBlockSpecifier().ui {
             row {
                 col BlockSpec.Width.THIRD, {
-                    ajaxBlock "range", {
+                    ajaxBlock 'range', {
                         table new UiTableSpecifier().ui {
                             for (def r in ranges) {
                                 if (i18nMap[r.name]) {
@@ -144,7 +144,7 @@ final class TaackSolrSearchService implements WebAttributes {
                             }
                         }
                     }
-                    ajaxBlock "faceting", {
+                    ajaxBlock 'faceting', {
                         table new UiTableSpecifier().ui {
                             for (def f in facets) {
                                 header {
@@ -153,7 +153,7 @@ final class TaackSolrSearchService implements WebAttributes {
                                     }
                                 }
                                 for (def v in f.values) {
-                                    String currentFacet = "${f.name ?: "type_s"};${v.name}"
+                                    String currentFacet = "${f.name ?: 'type_s'};${v.name}"
                                     row {
                                         rowColumn {
                                             if (facetsClicked.contains(currentFacet)) rowAction ActionIcon.DELETE * IconStyle.SCALE_DOWN, search, [facetsClicked: facetsClicked - [currentFacet], rangesClicked: rangesClicked, q: q]
@@ -167,9 +167,9 @@ final class TaackSolrSearchService implements WebAttributes {
                     }
                 }
                 col BlockSpec.Width.TWO_THIRD, {
-                    ajaxBlock "results", {
+                    ajaxBlock 'results', {
                         table new UiTableSpecifier().ui {
-                            for (def resp in response["response"]) {
+                            for (def resp in response['response']) {
                                 def docId = resp['id'] as String
                                 def hl = highlighting[docId]
                                 def iSep = docId.lastIndexOf('-')
@@ -219,7 +219,7 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     final void indexAll(Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier) {
-        solrClient.deleteByQuery("*:*")
+        solrClient.deleteByQuery('*:*')
         createSolrSchemas()
         mapSolrSpecifier.each {
             indexAllClass(it.key, mapSolrSpecifier, it.value.aValue, it.value.bValue)
@@ -227,7 +227,7 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     final void indexAllOnly(String name, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier) {
-        solrClient.deleteByQuery("*:*")
+        solrClient.deleteByQuery('*:*')
         createSolrSchemas()
         mapSolrSpecifier.each {
             if (it.key.simpleName == name) indexAllClass(it.key, mapSolrSpecifier, it.value.aValue, it.value.bValue)
@@ -236,9 +236,9 @@ final class TaackSolrSearchService implements WebAttributes {
 
     private void createSolrSchemas() {
         try {
-            def deleteDynamicFieldQuery = new SchemaRequest.DeleteDynamicField("*_noAccent")
+            def deleteDynamicFieldQuery = new SchemaRequest.DeleteDynamicField('*_noAccent')
             deleteDynamicFieldQuery.process(solrClient)
-            def deleteFieldTypeQuery = new SchemaRequest.DeleteFieldType("text_noAccents")
+            def deleteFieldTypeQuery = new SchemaRequest.DeleteFieldType('text_noAccents')
             deleteFieldTypeQuery.process(solrClient)
             solrClient.commit()
         } catch (e) {
@@ -247,14 +247,14 @@ final class TaackSolrSearchService implements WebAttributes {
 
         def definition = new FieldTypeDefinition()
         def analyzer = new AnalyzerDefinition()
-        analyzer.charFilters = [["class": "solr.MappingCharFilterFactory", "mapping": "mapping-ISOLatin1Accent.txt"] as Map<String, Object>]
-        analyzer.tokenizer = ["class": "solr.StandardTokenizerFactory"] as Map<String, Object>
-        analyzer.filters = [["class": "solr.LowerCaseFilterFactory"] as Map<String, Object>, ["class": "solr.DoubleMetaphoneFilterFactory", "inject": "false"] as Map<String, Object>]
+        analyzer.charFilters = [['class': 'solr.MappingCharFilterFactory', 'mapping': 'mapping-ISOLatin1Accent.txt'] as Map<String, Object>]
+        analyzer.tokenizer = ['class': 'solr.StandardTokenizerFactory'] as Map<String, Object>
+        analyzer.filters = [['class': 'solr.LowerCaseFilterFactory'] as Map<String, Object>, ['class': 'solr.DoubleMetaphoneFilterFactory', 'inject': 'false'] as Map<String, Object>]
         definition.analyzer = analyzer
-        definition.attributes = [name: "text_noAccents", "class": "solr.TextField"] as Map<String, Object>
+        definition.attributes = [name: 'text_noAccents', 'class': 'solr.TextField'] as Map<String, Object>
         def fieldTypeRequest = new SchemaRequest.AddFieldType(definition)
         fieldTypeRequest.process(solrClient)
-        def dynamicFieldRequest = new SchemaRequest.AddDynamicField([name: "*_noAccent", type: "text_noAccents"] as Map<String, Object>)
+        def dynamicFieldRequest = new SchemaRequest.AddDynamicField([name: '*_noAccent', type: 'text_noAccents'] as Map<String, Object>)
         dynamicFieldRequest.process(solrClient)
         solrClient.commit()
     }

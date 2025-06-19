@@ -26,7 +26,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowEnd() {
-        out << "</ul>"
+        out << '</ul>'
     }
 
     @Override
@@ -36,7 +36,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitSectionEnd() {
-        out << "</ul>"
+        out << '</ul>'
     }
 
     @Override
@@ -63,11 +63,11 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     void visitShowField(final String i18n, final FieldInfo field, final Style style) {
         if (field?.value) {
             boolean isDiv = style?.isDiv
-            final String htmlElement = "${isDiv?"div":"span"}"
-            String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n}</span>""" : ""
-            String value = !field.value.toString().trim().empty ? """<${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${RawHtmlTableDump.dataFormat(field.value, null, parameter.lcl)}</${htmlElement}>""" : ""
+            final String htmlElement = "${isDiv?'div':'span'}"
+            String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:''}">${i18n}</span>""" : ''
+            String value = !field.value.toString().trim().empty ? """<${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${RawHtmlTableDump.dataFormat(field.value, null, parameter.lcl)}</${htmlElement}>""" : ''
             out << """
-                <li class="fieldcontain">
+                <li class='fieldcontain'>
                     $label
                     $value
                 </li>
@@ -79,12 +79,12 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     void visitShowField(final String i18n, final String field, final Style style) {
         if (field) {
             boolean isDiv = style?.isDiv
-            final String htmlElement = "${isDiv?"div":"span"}"
-            String label = i18n && !i18n.trim().empty ? """<span class="property-label ref-prefix" style="${style?.labelCssStyleString ?:""}">${i18n}</span>""" : ""
+            final String htmlElement = "${isDiv?'div':'span'}"
+            String label = i18n && !i18n.trim().empty ? '''<span class='property-label ref-prefix' style='${style?.labelCssStyleString ?:''}">${i18n}</span>''' : ''
             out << """
-                <li class="fieldcontain">
+                <li class='fieldcontain'>
                     $label
-                    <${htmlElement} class="property-value ${style?.cssClassesString ?: ''}" style="${style?.cssStyleString ?: ''}">${field}</${htmlElement}>
+                    <${htmlElement} class="property-value ${style?.cssClassesString ?: ''}' style='${style?.cssStyleString ?: ''}">${field}</${htmlElement}>
                 </li>
             """
         }
@@ -97,9 +97,9 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitShowInlineHtml(String html, String additionalCSSClass) {
-        out << """<div class="$additionalCSSClass">"""
+        out << '''<div class='$additionalCSSClass'>'''
         out << html
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override

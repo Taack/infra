@@ -17,7 +17,7 @@ class LineDiagramScene extends ScatterDiagramScene {
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart("line", diagramActionUrl)
+        buildTransformAreaStart('line', diagramActionUrl)
         drawVerticalBackground()
         drawDataPoint(true)
         buildTransformAreaEnd()

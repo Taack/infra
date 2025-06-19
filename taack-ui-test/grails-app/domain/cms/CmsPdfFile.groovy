@@ -24,7 +24,7 @@ class CmsPdfFile {
 
     static constraints = {
         altText nullable: true
-        filePath widget: "filePath"
+        filePath widget: 'filePath'
         contentShaOne nullable: true
         originalName nullable: true
         cmsPage nullable: true

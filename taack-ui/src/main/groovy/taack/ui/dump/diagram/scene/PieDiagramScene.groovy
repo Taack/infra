@@ -33,7 +33,7 @@ class PieDiagramScene extends DiagramScene {
     }
 
     void draw(String diagramActionUrl = null) {
-        render.renderGroup(["element-type": ElementType.TRANSFORM_AREA, "diagram-action-url": diagramActionUrl ?: "", "shape-type": "pie", "shape-max-width": 0.0, "area-min-x": DIAGRAM_MARGIN_LEFT, "area-max-x": width - DIAGRAM_MARGIN_RIGHT, "area-max-y": height])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-max-y': height])
         BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - DIAGRAM_MARGIN_TOP - 5.0) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = width / 2
         BigDecimal centerY = DIAGRAM_MARGIN_TOP + radius * (1 + slicePositionRate)
@@ -43,7 +43,7 @@ class PieDiagramScene extends DiagramScene {
             // sector
             BigDecimal angle1 = 0.0
             pieDataPerKey.eachWithIndex { Map.Entry<String, BigDecimal> it, int i ->
-                render.renderGroup(["element-type": ElementType.DATA, dataset: it.key, "data-x": it.key, "data-y": it.value])
+                render.renderGroup(['element-type': ElementType.DATA, dataset: it.key, 'data-x': it.key, 'data-y': it.value])
                 BigDecimal value = it.value
                 BigDecimal percent = value / total
                 BigDecimal angle2 = angle1 + 360.0 * percent
@@ -117,13 +117,13 @@ class PieDiagramScene extends DiagramScene {
                             render.fillStyle(Color.BLACK)
                             render.renderLine(pointX - labelX, pointY - labelY)
 
-                            BigDecimal outsideLineLength = OUTSIDE_LABEL_MARGIN + valueLabelLength + render.measureText(" ") + percentLabelLength + OUTSIDE_LABEL_MARGIN
+                            BigDecimal outsideLineLength = OUTSIDE_LABEL_MARGIN + valueLabelLength + render.measureText(' ') + percentLabelLength + OUTSIDE_LABEL_MARGIN
                             if (drawByClockwise) {
                                 if (pointX > lastOutsideLabelX + OUTSIDE_LABEL_MARGIN || pointY - OUTSIDE_LABEL_MARGIN - fontSize - OUTSIDE_LABEL_MARGIN > lastOutsideLabelY) { // normal
                                     render.translateTo(pointX, pointY)
                                     render.renderLine(outsideLineLength, 0.0)
                                     render.translateTo(pointX + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                    render.renderLabel(valueLabel + " " + percentLabel)
+                                    render.renderLabel(valueLabel + ' ' + percentLabel)
                                     lastOutsideLabelX = pointX + outsideLineLength
                                     lastOutsideLabelY = pointY
                                 } else { // prolong line
@@ -132,7 +132,7 @@ class PieDiagramScene extends DiagramScene {
                                         render.translateTo(pointX, pointY)
                                         render.renderLine(lastOutsideLabelX - pointX + marginBetweenLabels + outsideLineLength, 0.0)
                                         render.translateTo(lastOutsideLabelX + marginBetweenLabels + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        render.renderLabel(valueLabel + ' ' + percentLabel)
                                         lastOutsideLabelX = lastOutsideLabelX + marginBetweenLabels + outsideLineLength
                                         lastOutsideLabelY = pointY
                                     } else { // prolong line at vertical direction
@@ -143,7 +143,7 @@ class PieDiagramScene extends DiagramScene {
                                         render.translateTo(point2X, point2Y)
                                         render.renderLine(outsideLineLength, 0.0)
                                         render.translateTo(point2X + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
-                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        render.renderLabel(valueLabel + ' ' + percentLabel)
                                         lastOutsideLabelX = width
                                         lastOutsideLabelY = point2Y
                                     }
@@ -153,7 +153,7 @@ class PieDiagramScene extends DiagramScene {
                                     render.translateTo(pointX, pointY)
                                     render.renderLine(-outsideLineLength, 0.0)
                                     render.translateTo(pointX - outsideLineLength + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                    render.renderLabel(valueLabel + " " + percentLabel)
+                                    render.renderLabel(valueLabel + ' ' + percentLabel)
                                     lastOutsideLabelX = pointX - outsideLineLength
                                     lastOutsideLabelY = pointY
                                 } else { // prolong line
@@ -162,7 +162,7 @@ class PieDiagramScene extends DiagramScene {
                                         render.translateTo(pointX, pointY)
                                         render.renderLine(-(pointX - labelDrawingStartX), 0.0)
                                         render.translateTo(labelDrawingStartX + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
-                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        render.renderLabel(valueLabel + ' ' + percentLabel)
                                         lastOutsideLabelX = labelDrawingStartX
                                         lastOutsideLabelY = pointY
                                     } else { // prolong line at vertical direction
@@ -173,7 +173,7 @@ class PieDiagramScene extends DiagramScene {
                                         render.translateTo(point2X, point2Y)
                                         render.renderLine(-outsideLineLength, 0.0)
                                         render.translateTo(point2X - outsideLineLength + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
-                                        render.renderLabel(valueLabel + " " + percentLabel)
+                                        render.renderLabel(valueLabel + ' ' + percentLabel)
                                         lastOutsideLabelX = 0.0
                                         lastOutsideLabelY = point2Y
                                     }
@@ -195,7 +195,7 @@ class PieDiagramScene extends DiagramScene {
             render.fillStyle(KeyColor.GREY.color)
             render.renderCircle(radius, IDiagramRender.DiagramStyle.fill)
 
-            String label = "No data"
+            String label = 'No data'
             render.translateTo(centerX - render.measureText(label) / 2, centerY - fontSize / 2)
             render.renderLabel(label)
         }

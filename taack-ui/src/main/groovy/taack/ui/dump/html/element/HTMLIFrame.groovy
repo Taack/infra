@@ -7,7 +7,7 @@ final class HTMLIFrame implements IHTMLElement {
     HTMLIFrame(String url, String height = null) {
         tag = 'iframe'
         attributes.put('src', url)
-        attributes.put('width', "100%")
+        attributes.put('width', '100%')
         if (height) attributes.put('height', height)
     }
 }

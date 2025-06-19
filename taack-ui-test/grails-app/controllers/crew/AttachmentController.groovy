@@ -62,7 +62,7 @@ class AttachmentController {
     def preview(Attachment attachment, String format) {
         TaackAttachmentService.PreviewFormat f = format as TaackAttachmentService.PreviewFormat ?: TaackAttachmentService.PreviewFormat.DEFAULT
         response.setContentType('image/webp')
-        response.setHeader('Content-disposition', "filename=" + "${URLEncoder.encode((attachment?.getName() ?: 'noPreview.webp'), 'UTF-8')}")
+        response.setHeader('Content-disposition', 'filename=' + "${URLEncoder.encode((attachment?.getName() ?: 'noPreview.webp'), 'UTF-8')}")
         if (!attachment?.getName()) response.setHeader('Cache-Control', 'max-age=604800')
         response.outputStream << (taackAttachmentService.attachmentPreview(attachment, f)).bytes
         return false
@@ -70,7 +70,7 @@ class AttachmentController {
 
     def previewFull(Attachment attachment) {
         response.setContentType('image/webp')
-        response.setHeader('Content-disposition', "filename=" + "${URLEncoder.encode((attachment?.getName() ?: 'noPreview.webp'), 'UTF-8')}")
+        response.setHeader('Content-disposition', 'filename=' + "${URLEncoder.encode((attachment?.getName() ?: 'noPreview.webp'), 'UTF-8')}")
         if (!attachment?.getName()) response.setHeader('Cache-Control', 'max-age=604800')
         response.outputStream << (taackAttachmentService.attachmentPreview(attachment, TaackAttachmentService.PreviewFormat.PREVIEW_LARGE)).bytes
         return false
@@ -218,7 +218,7 @@ class AttachmentController {
         def f = TaackAttachmentService.convertExtension(attachment, ext)
         if (f?.exists()) {
             response.setContentType("application/${ext}")
-            response.setHeader('Content-disposition', "filename=" + "${URLEncoder.encode('${attachment.originalNameWithoutExtension}.${ext}', 'UTF-8')}\"")
+            response.setHeader('Content-disposition', 'filename=' + "${URLEncoder.encode('${attachment.originalNameWithoutExtension}.${ext}', 'UTF-8')}\'')
             response.outputStream << f.bytes
         } else return null
     }

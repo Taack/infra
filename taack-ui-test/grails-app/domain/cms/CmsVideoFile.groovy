@@ -35,7 +35,7 @@ class CmsVideoFile {
         altText nullable: true
         width nullable: true
         height nullable: true
-        filePath nullable: true, widget: "filePath"
+        filePath nullable: true, widget: 'filePath'
         contentShaOne nullable: true
         originalName nullable: true
         cmsPage nullable: true

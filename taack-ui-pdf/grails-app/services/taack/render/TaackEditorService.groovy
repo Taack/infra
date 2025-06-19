@@ -75,14 +75,14 @@ final class TaackEditorService implements WebAttributes, DataBinder {
             ImageExtension imageExtension = path[-3..-1] as ImageExtension
             GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
             webUtils.currentResponse.setContentType("image/${imageExtension.mimeImage}")
-            webUtils.currentResponse.setHeader("Content-disposition", "attachment;filename=${fileName.split('/')[-1]}")
+            webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${fileName.split('/')[-1]}")
             webUtils.currentResponse.outputStream << cl.getResourceAsStream(fnPath + path)
             try {
                 webUtils.currentResponse.outputStream.flush()
                 webUtils.currentResponse.outputStream.close()
                 webRequest.renderView = false
             } catch (e) {
-                taack.render.TaackEditorService.log.error "${e.message}"
+                log.error "${e.message}"
             }
             return null
         } else {
@@ -92,7 +92,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
                 return new UiBlockSpecifier().ui {
                     modal {
                         show new UiShowSpecifier().ui {
-                            inlineHtml("""<p>No $fileName Resource</p>""")
+                            inlineHtml("<p>No $fileName Resource</p>")
                         }
                     }
                 }
@@ -104,13 +104,13 @@ final class TaackEditorService implements WebAttributes, DataBinder {
             }
             resourceFile.text = resource.text
             StringBuffer out = new StringBuffer()
-            out.append Asciidoc.getContentHtml(resourceFile, "")
-            Resource r = assetResourceLocator.findResourceForURI("asciidoc.js")
+            out.append Asciidoc.getContentHtml(resourceFile, '')
+            Resource r = assetResourceLocator.findResourceForURI('asciidoc.js')
             if (r?.exists()) {
                 out.append('\n')
-                out.append("""<script postexecute="true">""")
+                out.append('<script postexecute="true">')
                 out.append(r.inputStream.text)
-                out.append("</script>")
+                out.append('</script>')
                 out.append('\n')
             }
             Closure<BlockSpec> blockSpecClosure = BlockSpec.buildBlockSpec {
@@ -119,7 +119,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
                     }
                     col(BlockSpec.Width.THREE_QUARTER) {
                         show new UiShowSpecifier().ui {
-                            inlineHtml out.toString(), "asciidocMain"
+                            inlineHtml out.toString(), 'asciidocMain'
                         }
                     }
                 }

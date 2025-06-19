@@ -41,8 +41,8 @@ class CmsImage {
         width nullable: true
         height nullable: true
         hide nullable: true
-        filePath widget: "filePath"
-//        filePathI18n nullable: true, widget: "filePath"
+        filePath widget: 'filePath'
+//        filePathI18n nullable: true, widget: 'filePath'
         cmsPage nullable: true
         originalName nullable: true
         contentShaOne nullable: true

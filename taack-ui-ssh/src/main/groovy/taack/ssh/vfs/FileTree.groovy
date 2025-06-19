@@ -94,10 +94,10 @@ final class FileTree {
             StringBuffer p = new StringBuffer()
             Folder f = this
             while(f) {
-                p.insert(0, "/" + f.name)
+                p.insert(0, '/' + f.name)
                 f = f.parent as Folder
             }
-            p.insert(0, "/" + username)
+            p.insert(0, '/' + username)
             p.toString()
         }
     }
@@ -124,8 +124,8 @@ final class FileTree {
         VfsPosixFileAttributes getAttributes(long fileSize) {
             java.io.File f = realFilePath ? new java.io.File(realFilePath) : null
             if (f && f.exists()) {
-                FileTime creationTime = (FileTime) Files.getAttribute(f.toPath(), "creationTime")
-                FileTime lastModified = (FileTime) Files.getAttribute(f.toPath(), "lastModifiedTime")
+                FileTime creationTime = (FileTime) Files.getAttribute(f.toPath(), 'creationTime')
+                FileTime lastModified = (FileTime) Files.getAttribute(f.toPath(), 'lastModifiedTime')
                 fileSize = f ? f.size() : fileSize
                 new VfsPosixFileAttributes(true, fileSize, inode, username, creationTime, lastModified, isWritable)
             } else if (f && !f.exists()) {
@@ -141,7 +141,7 @@ final class FileTree {
 
         @Override
         void addChild(INode node) {
-            throw new OperationNotSupportedException("cannot add child to a file")
+            throw new OperationNotSupportedException('cannot add child to a file')
         }
 
         @Override
@@ -184,7 +184,7 @@ final class FileTree {
             try {
                 for (Path p : (Files.list(new java.io.File(folder).toPath()).toArray() as List<Path>)) {
                     def f = new File(cb, p.fileName.toString(), isWritable)
-                    f.realFilePath = folder + "/" + p.fileName.toString()
+                    f.realFilePath = folder + '/' + p.fileName.toString()
                     nodes.add(f)
                 }
             } catch (e) {
@@ -243,7 +243,7 @@ final class FileTree {
         final p = path
         final int nc = p.nameCount
         final String lastName = ((VfsPath) p.getName(nc - 1)).first
-        final newNc = lastName == "." ? nc - 1 : nc
+        final newNc = lastName == '.' ? nc - 1 : nc
         Iterator<INode> traversing = [(INode) root].iterator()
         INode matching = null
         for (int i = 1; i < newNc; i++) {
@@ -285,12 +285,12 @@ final class FileTree {
                 return null
             } else {
                 Folder traversing = iNode as Folder
-                // traversing.children.collect { new VfsPath(path.vfsFileSystem, path.first + "/" + it.name, null) }.iterator() as Iterator<Path>
+                // traversing.children.collect { new VfsPath(path.vfsFileSystem, path.first + '/' + it.name, null) }.iterator() as Iterator<Path>
                 List<VfsPath> ret = []
                 def it = traversing.children
                 while (it.hasNext()) {
                     INode c = it.next()
-                    ret.add(new VfsPath(path.vfsFileSystem, path.first + "/" + c.name, null))
+                    ret.add(new VfsPath(path.vfsFileSystem, path.first + '/' + c.name, null))
                 }
                 return ret.iterator() as Iterator<Path>
             }

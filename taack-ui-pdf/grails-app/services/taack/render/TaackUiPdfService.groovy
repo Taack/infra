@@ -17,6 +17,7 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.UiPrintableSpecifier
 import taack.ui.dump.Parameter
 import taack.ui.dump.pdf.RawHtmlPrintableDump
+
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -30,7 +31,7 @@ import taack.ui.dump.pdf.RawHtmlPrintableDump
  * <pre>{@code
  *  taackUiSimpleService.show(new UiBlockSpecifier() {
  *      modal {
- *          ajaxBlock "showUser", {
+ *          ajaxBlock 'showUser', {
  *              show "${u.username}", crewUiService.buildUserShow(u), BlockSpec.Width.MAX
  *          }
  *      }
@@ -44,8 +45,6 @@ import taack.ui.dump.pdf.RawHtmlPrintableDump
 final class TaackUiPdfService implements WebAttributes, DataBinder {
 
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
-
-    TaackUiConfiguration taackUiConfiguration
 
     @Autowired
     PageRenderer g
@@ -95,10 +94,10 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
             }
         }
 
-        String html = g.render template: "/taackUi/block-pdf", model: [
+        String html = g.render template: '/taackUi/block-pdf', model: [
                 block          : blockStream.toString(),
                 css            : css.toString(),
-                root           : taackUiConfiguration.root,
+                root           : TaackUiConfiguration.root,
                 headerHeight   : htmlPdf.headerHeight,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag

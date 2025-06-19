@@ -43,7 +43,7 @@ class CmsMenuEntry {
     }
 
     static mapping = {
-        code unique: "subsidiary"
+        code unique: 'subsidiary'
     }
 
     List<CmsMenuEntry> getChildren() {

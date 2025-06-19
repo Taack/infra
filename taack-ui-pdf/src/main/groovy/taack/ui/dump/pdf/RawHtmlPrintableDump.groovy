@@ -48,7 +48,7 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     void visitTable(UiTableSpecifier uiTableSpecifier, BlockSpec.Width width) {
         visitInnerBlock(width)
         this.blockLog.topElement = new HTMLEmpty() // TODO: Remove when no out
-        uiTableSpecifier.visitTable(new RawHtmlTableDump(blockLog, "pdf", parameter))
+        uiTableSpecifier.visitTable(new RawHtmlTableDump(blockLog, 'pdf', parameter))
         StringBuffer output = new StringBuffer(8128)
         blockLog.topElement.getOutput(output)
         out << output.toString()
@@ -77,43 +77,43 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     @Override
     void visitPrintableHeader(final String height) {
         this.headerHeight = height
-        out << """<div id="header" class="pure-g">"""
+        out << '''<div id='header' class='pure-g'>'''
     }
 
     @Override
     void visitPrintableHeaderLeft(String height) {
         this.headerHeight = height
-        out << """<div id="header-left" class="pure-g">"""
+        out << '''<div id='header-left' class='pure-g'>'''
     }
 
     @Override
     void visitPrintableHeaderLeftEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
     void visitPrintableHeaderRight(String right) {
-        out << """<div id="header-right" class="pure-g">"""
+        out << '''<div id='header-right' class='pure-g'>'''
     }
 
     @Override
     void visitPrintableHeaderRightEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
     void visitPrintableHeaderEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
     void visitPrintableFooter() {
-        out << """<div id="footer">"""
+        out << '''<div id='footer'>'''
     }
 
     @Override
     void visitPrintableFooterEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
@@ -128,32 +128,32 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
 
     @Override
     void visitAnonymousBlock(BlockSpec.Width width) {
-        out << """<div class="${width.pdfCss}">"""
+        out << '''<div class='${width.pdfCss}'>'''
     }
 
     @Override
     void visitAnonymousBlockEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
     void visitInnerBlockEnd() {
         hasPureG--
-        out << "</div>"
+        out << '</div>'
     }
 
     @Override
     void visitInnerBlock(BlockSpec.Width width) {
-        out << """<div class="${width.pdfCss}">"""
+        out << '''<div class='${width.pdfCss}'>'''
     }
 
     @Override
     void visitPrintableBody() {
-        out << "<div id=\"body\" class=\"pure-g\">"
+        out << '<div id=\'body\' class=\'pure-g\'>'
     }
 
     @Override
     void visitPrintableBodyEnd() {
-        out << "</div>"
+        out << '</div>'
     }
 }

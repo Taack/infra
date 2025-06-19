@@ -15,7 +15,7 @@ import taack.ui.dump.html.theme.ThemeSize
 
 // TODO: Develop the UI
 @GrailsCompileStatic
-@Secured(["permitAll"])
+@Secured(['permitAll'])
 class ThemeController {
 
     TaackUiService taackUiService

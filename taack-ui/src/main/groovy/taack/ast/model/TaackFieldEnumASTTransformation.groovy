@@ -110,7 +110,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
 
             classNode.fields.each { FieldNode fIt ->
                 // hasMany fields are added after semantic analysis
-                if (fIt.name == 'belongsTo' /*|| fIt.name == "hasMany"*/) {
+                if (fIt.name == 'belongsTo' /*|| fIt.name == 'hasMany'*/) {
                     if (fIt.initialExpression instanceof MapExpression) {
 
                         MapExpression me = fIt.initialExpression as MapExpression
@@ -156,7 +156,7 @@ final class TaackFieldEnumASTTransformation extends AbstractASTTransformation {
                     FieldConstraint.Constraints constraints = constraintsMap.get(fIt.name)
                     if (!annotationNodes.empty) {
                         AnnotationNode enumName = annotationNodes.first()
-                        ConstantExpression constantExpression = (ConstantExpression) enumName.getMember("name")
+                        ConstantExpression constantExpression = (ConstantExpression) enumName.getMember('name')
                         constraintName = constantExpression.value
                     }
 

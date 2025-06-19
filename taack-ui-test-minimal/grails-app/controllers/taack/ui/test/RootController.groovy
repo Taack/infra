@@ -16,7 +16,7 @@ TODO: Add an infrastructure to list new stuffs from a user and a timestamp
  */
 
 @GrailsCompileStatic
-@Secured(["permitAll"])
+@Secured(['permitAll'])
 class RootController {
     TaackUiService taackUiService
     StatsService statsService
@@ -33,7 +33,7 @@ class RootController {
         UiBlockSpecifier b = new UiBlockSpecifier().ui {
             diagram this.statsService.buildChart()
             show new UiShowSpecifier().ui {
-                field("""couo""")
+                field('''couo''')
             }
             row {
                 TaackAppRegisterService.apps.eachWithIndex { TaackApp a, int i ->
@@ -47,9 +47,9 @@ class RootController {
 
     def updates() {
         taackUiService.show(new UiBlockSpecifier().ui {
-            ajaxBlock "updates", {
+            ajaxBlock 'updates', {
                 show(new UiShowSpecifier().ui {
-                    inlineHtml("WiP", "")
+                    inlineHtml('WiP', '')
                 })
             }
         }, buildMenu())
@@ -57,9 +57,9 @@ class RootController {
 
     def todo() {
         taackUiService.show(new UiBlockSpecifier().ui {
-            ajaxBlock "todo", {
+            ajaxBlock 'todo', {
                 show(new UiShowSpecifier().ui {
-                    inlineHtml("WiP", "")
+                    inlineHtml('WiP', '')
                 })
             }
         }, buildMenu())

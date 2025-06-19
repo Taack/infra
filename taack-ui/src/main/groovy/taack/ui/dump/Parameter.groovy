@@ -69,8 +69,8 @@ final class Parameter implements WebAttributes {
         this.target = target
         this.sort = params.get(P_SORT) ?: null
         this.order = params.get(P_ORDER) ?: null
-        this.lastReadingDate = params.get("lastReadingDate") ?: null
-        this.readingDateFieldString = params.get("readingDateFieldString") ?: null
+        this.lastReadingDate = params.get('lastReadingDate') ?: null
+        this.readingDateFieldString = params.get('readingDateFieldString') ?: null
         this.max = params.int(P_MAX) ?: 20
         this.offset = params.int(P_OFFSET) ?: 0
         this.additionalId = params.long(P_ADDITIONAL_ID) ?: null

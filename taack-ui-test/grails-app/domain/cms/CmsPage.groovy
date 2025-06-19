@@ -75,14 +75,14 @@ class CmsPage {
             bodyVideos: CmsVideoFile
     ]
 
-    static mappedBy = [bodyImages: "none", bodyVideos: "none", bodyPdfs: "none"]
+    static mappedBy = [bodyImages: 'none', bodyVideos: 'none', bodyPdfs: 'none']
 
     static constraints = {
         name nullable: true
         urlPart nullable: true
         title nullable: true
         hatContent nullable: true
-        bodyContent nullable: true, widget: "asciidoc"
+        bodyContent nullable: true, widget: 'asciidoc'
         mainImage nullable: true
         mainVideo nullable: true
         bodyImages nullable: true

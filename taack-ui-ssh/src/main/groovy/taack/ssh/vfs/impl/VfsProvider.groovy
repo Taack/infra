@@ -29,7 +29,7 @@ final class VfsProvider extends FileSystemProvider {
 
     @Override
     String getScheme() {
-        return "intranet"
+        return 'intranet'
     }
 
     @Override
@@ -145,7 +145,7 @@ final class VfsProvider extends FileSystemProvider {
         log.fine "readAttributes $path $s $linkOptions"
         if (path instanceof VfsPath) {
             final attr = SshEventRegistry.Vfs.readAttributes(path, serverSession)
-            if (s.contains("posix")) {
+            if (s.contains('posix')) {
                 attr?.posixMap()
             } else {
                 attr?.basicMap()

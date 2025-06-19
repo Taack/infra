@@ -28,7 +28,7 @@ class CmsInsert {
         imageApplication nullable: true
         itemId nullable: true
         title nullable: true
-        hat nullable: true, widget: "textarea"
+        hat nullable: true, widget: 'textarea'
         width nullable: true
         additionalClasses nullable: true
         imageApplication nullable: true

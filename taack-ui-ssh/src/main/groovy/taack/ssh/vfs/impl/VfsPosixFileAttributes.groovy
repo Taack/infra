@@ -124,32 +124,32 @@ final class VfsPosixFileAttributes implements PosixFileAttributes {
 
     Map<String, Object> basicMap() {
         [
-                "lastAccessTime"  : creationTime,
-                "lastModifiedTime": lastModifiedTime,
-                "size"            : size as Long,
-                "creationTime"    : creationTime,
-                "isSymbolicLink"  : false,
-                "isRegularFile"   : isRegFile,
-                "fileKey"         : key,
-                "isOther"         : false,
-                "isDirectory"     : !isRegFile
+                'lastAccessTime'  : creationTime,
+                'lastModifiedTime': lastModifiedTime,
+                'size'            : size as Long,
+                'creationTime'    : creationTime,
+                'isSymbolicLink'  : false,
+                'isRegularFile'   : isRegFile,
+                'fileKey'         : key,
+                'isOther'         : false,
+                'isDirectory'     : !isRegFile
         ] as Map<String, Object>
     }
 
     Map<String, Object> posixMap() {
         [
-                "lastAccessTime"  : creationTime,
-                "lastModifiedTime": lastModifiedTime,
-                "size"            : size as Long,
-                "creationTime"    : creationTime,
-                "isSymbolicLink"  : false,
-                "isRegularFile"   : isRegFile,
-                "fileKey"         : key,
-                "isOther"         : false,
-                "isDirectory"     : !isRegFile,
-                "owner"           : owner().name,
-                "group"           : group().name,
-                "permissions"     : permissions()
+                'lastAccessTime'  : creationTime,
+                'lastModifiedTime': lastModifiedTime,
+                'size'            : size as Long,
+                'creationTime'    : creationTime,
+                'isSymbolicLink'  : false,
+                'isRegularFile'   : isRegFile,
+                'fileKey'         : key,
+                'isOther'         : false,
+                'isDirectory'     : !isRegFile,
+                'owner'           : owner().name,
+                'group'           : group().name,
+                'permissions'     : permissions()
         ] as Map<String, Object>
     }
 

@@ -18,12 +18,12 @@ class CommandContextToken {
 
     @Override
     String toString() {
-        return "CommandContextDatum{" + \
-                "commandDatum=" + commandDatum + \
-                ", context=" + context + \
+        return 'CommandContextDatum{' + \
+                'commandDatum=' + commandDatum + \
+                ', context=' + context + \
                 ", command='" + command + '\'' + \
-                ", startPos=" + startPos + \
-                ", endPos=" + endPos + \
+                ', startPos=' + startPos + \
+                ', endPos=' + endPos + \
                 '}'
     }
 }

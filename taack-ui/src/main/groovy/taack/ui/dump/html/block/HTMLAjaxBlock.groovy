@@ -15,6 +15,6 @@ final class HTMLAjaxBlock implements IHTMLElement {
     void getOutput(StringBuffer childrenOutput) {
         childrenOutput.append("__ajaxBlockStart__$id:")
         children*.getOutput(childrenOutput)
-        childrenOutput.append("__ajaxBlockEnd__")
+        childrenOutput.append('__ajaxBlockEnd__')
     }
 }

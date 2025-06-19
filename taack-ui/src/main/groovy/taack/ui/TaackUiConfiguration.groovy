@@ -4,8 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class TaackUiConfiguration {
-    static String defaultTitle = "Taack"
-    static String logoFileName = "logo-taack-web.svg"
+    static String defaultTitle = 'Taack'
+    static String logoFileName = 'logo-taack-web.svg'
     static int logoWidth = 70
     static int logoHeight = 60
 
@@ -16,7 +16,7 @@ class TaackUiConfiguration {
     static String fgColor = '#eeeeee'
     static String bodyBgColor = '#fff'
 
-    static String home = System.getProperty("user.home")
+    static String home = System.getProperty('user.home')
     static String root = home + '/intranetFiles'
     static String taack = home + '/taack'
     static String resources = root + '/resources'

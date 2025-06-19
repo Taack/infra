@@ -18,7 +18,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
     }
 
     static String objectToString(Object o) {
-        return o instanceof Date ? new SimpleDateFormat("yyyy-MM-dd HH:mm").format(o) : o instanceof Number ? numberToString(o.toBigDecimal()) : o.toString()
+        return o instanceof Date ? new SimpleDateFormat('yyyy-MM-dd HH:mm').format(o) : o instanceof Number ? numberToString(o.toBigDecimal()) : o.toString()
     }
 
     void drawDataPoint(Boolean hasLineBetweenPoints) {
@@ -44,12 +44,12 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
-                        render.renderGroup(["element-type": ElementType.DATA,
+                        render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[i],
-                                            "data-x": xLabel,
-                                            "data-y": yLabel,
-                                            "data-label": dataLabel,
-                                            style: "pointer-events: bounding-box;"])
+                                            'data-x': xLabel,
+                                            'data-y': yLabel,
+                                            'data-label': dataLabel,
+                                            style: 'pointer-events: bounding-box;'])
                         if (i < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[i], dataPointRadius * 2, dataPointRadius * 2)
@@ -61,7 +61,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     }
                     // line to next circle
                     if (hasLineBetweenPoints && j < xList.size() - 1) {
-                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[i]])
+                        render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i]])
                         BigDecimal nextX = objectToNumber(xList[j + 1])
                         BigDecimal nextY = pointList[xList[j + 1]]
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
@@ -93,12 +93,12 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
-                        render.renderGroup(["element-type": ElementType.DATA,
+                        render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[j],
-                                            "data-x": xLabelList[i],
-                                            "data-y": yDataLabel,
-                                            "data-label": "${xLabelList[i]}: ${yDataLabel}",
-                                            style: "pointer-events: bounding-box;"])
+                                            'data-x': xLabelList[i],
+                                            'data-y': yDataLabel,
+                                            'data-label': "${xLabelList[i]}: ${yDataLabel}",
+                                            style: 'pointer-events: bounding-box;'])
                         if (j < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
@@ -112,7 +112,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     }
                     // line to next circle
                     if (hasLineBetweenPoints && i < xLabelList.size() - 1) {
-                        render.renderGroup(["element-type": ElementType.DATA, dataset: keys[j]])
+                        render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j]])
                         BigDecimal nextYHeight = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + gapWidth * (i + 1)
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
@@ -143,7 +143,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend(pointImageHref)
         drawHorizontalBackground()
-        buildTransformAreaStart("scatter", diagramActionUrl)
+        buildTransformAreaStart('scatter', diagramActionUrl)
         drawVerticalBackground()
         drawDataPoint(false)
         buildTransformAreaEnd()

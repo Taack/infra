@@ -15,8 +15,8 @@ class SolrIndexerVisitor implements ISolrIndexerVisitor {
         if (entity instanceof HibernateProxy) {
             simpleName = entity.class.superclass.simpleName
         }
-        document.addField "id", simpleName + "-" + entity.ident().toString()
-        document.addField "type_s", simpleName
+        document.addField 'id', simpleName + '-' + entity.ident().toString()
+        document.addField 'type_s', simpleName
     }
 
     @Override

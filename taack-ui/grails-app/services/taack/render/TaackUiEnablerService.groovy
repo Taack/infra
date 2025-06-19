@@ -75,7 +75,7 @@ class TaackUiEnablerService implements WebAttributes {
      */
     static void securityClosure(Closure closure, final MethodClosure... actions) {
         actions.each { action ->
-            securityClosures.put("/" + Utils.getControllerName(action) + "/" + action.method.toString(), closure)
+            securityClosures.put('/' + Utils.getControllerName(action) + '/' + action.method.toString(), closure)
         }
     }
 
