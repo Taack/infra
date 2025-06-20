@@ -6,7 +6,7 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 interface IUserNotification {
 
-    List<GormEntity> getUnreadRelatedDataList()
+    Map<GormEntity, Date> getNotificationRelatedDataList(Boolean unread)
 
     void addToUnreadRelatedDataList(GormEntity gormEntity)
 

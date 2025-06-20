@@ -176,10 +176,15 @@ final class TaackSolrSearchService implements WebAttributes {
                                 def solrSpecifier = mapSolrSpecifier[classMap[docId.substring(0, iSep)]]?.bValue
                                 if (solrSpecifier) {
                                     def id = Long.parseLong(docId.substring(iSep + 1))
-                                    String label = solrSpecifier.label.call(id)
                                     row {
                                         rowColumn(2) {
-                                            rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, solrSpecifier.show, id)
+                                            TaackGormClass c = TaackGormClassRegisterService.getTaackGormClass(solrSpecifier.type.name)
+                                            String label = c.showLabel.call(id)
+                                            String prefix = c.typeLabel?.call(id)
+                                            if (prefix) {
+                                                label = prefix + ': ' + label
+                                            }
+                                            rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, c.showMethod, id)
                                             rowField label
                                         }
                                     }
