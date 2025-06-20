@@ -1,5 +1,6 @@
 plugins {
     id 'taack-grails-webapp'
+//    id 'org.graalvm.buildtools.native' version 'x.x.x'
 }
 
 group = "taack.ui.test.minimal"
@@ -40,14 +41,32 @@ assets {
 }
 
 bootBuildImage {
-//    verboseLogging = true
-//    builder = "paketobuildpacks/builder-jammy-base"
-//    buildpacks = [
-//            "gcr.io/paketo-buildpacks/amazon-corretto:latest",
-//            "gcr.io/paketo-buildpacks/java:latest",
-//            "gcr.io/paketo-buildpacks/spring-boot"
-//    ]
-//    environment = ["BP_JVM_VERSION": "24"]
-//    imageName = "${project.name}:${project.version}"
+    verboseLogging = true
+    builder = "paketobuildpacks/builder-jammy-base"
+    buildpacks.add("paketo-buildpacks/java")
+    buildpacks.add("paketo-buildpacks/syft")
+    buildpacks.add("paketo-buildpacks/executable-jar")
+    buildpacks.add("paketobuildpacks/graalvm")
+    buildpacks.add("paketo-buildpacks/native-image")
+    buildpacks.add("paketo-buildpacks/java-native-image")
+    environment = [
+            "BP_NATIVE_IMAGE": "true",
+            "BPL_SPRING_AOT_ENABLED": "true",
+            "BPgr_SPRING_AOT_ENABLED": "true",
+            "BP_JVM_VERSION": "24",
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": """
+				--gc=serial
+				-H:+UnlockExperimentalVMOptions
+				-H:-ReduceImplicitExceptionStackTraceInformation
+				-march=compatibility 
+			""", // -O3 --link-at-build-time --gc=serial -march=native -J-XX:MaxRAMPercentage=80.0
+            "BP_HEALTH_CHECKER_ENABLED": "true"
+    ]
+    imageName = "${project.name}:${project.version}"
+
 }
-//docker run -u root -p 8080:9442 -v $(pwd)/w:/workspace/test:Z docker.io/library/taack-ui-test chown -R node:node /workspace/test
+// docker run -u root -p 8080:9442 -v $(pwd)/w:/workspace/test:Z docker.io/library/taack-ui-test chown -R node:node /workspace/test
+// docker run --rm -p 9442:9442 docker.io/library/taack-ui-test-minimal
+// docker save docker.io/library/taack-ui-test-minimal > taack-ui-test-minimal.tar
+// docker exec -it docker.io/library/taack-ui-test-minimal /bin/bash
+// docker export 2438e7fad559 > output.tar
