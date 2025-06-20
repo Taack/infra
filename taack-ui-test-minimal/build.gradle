@@ -1,17 +1,34 @@
 plugins {
-    id 'taack-grails-webapp'
-//    id 'org.graalvm.buildtools.native' version 'x.x.x'
+    id 'taack-grails-common'
+    id 'org.apache.grails.gradle.grails-app'
+    id 'war'
+    id 'org.apache.grails.gradle.grails-web'
+    id 'com.bertramlabs.asset-pipeline'
 }
 
 group = "taack.ui.test.minimal"
+version = "0.7.0"
 
 dependencies {
+    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
+//    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-tomcat"
+    implementation "org.apache.grails:grails-web-boot"
+    implementation "org.apache.grails:grails-url-mappings"
+    implementation "org.apache.grails:grails-rest-transforms"
+
+    profile "org.apache.grails.profiles:web"
+    runtimeOnly "com.h2database:h2"
+    runtimeOnly "com.zaxxer:HikariCP"
+    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
     implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+
 }
 
 grails {
     // should use gradle -Dgrails.run.active=true bootRun
-    exploded = true
+    exploded = false
     plugins {
         implementation project(':taack-ui')
     }
@@ -52,7 +69,7 @@ bootBuildImage {
     environment = [
             "BP_NATIVE_IMAGE": "true",
             "BPL_SPRING_AOT_ENABLED": "true",
-            "BPgr_SPRING_AOT_ENABLED": "true",
+            "BP_SPRING_AOT_ENABLED": "true",
             "BP_JVM_VERSION": "24",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": """
 				--gc=serial
@@ -70,3 +87,4 @@ bootBuildImage {
 // docker save docker.io/library/taack-ui-test-minimal > taack-ui-test-minimal.tar
 // docker exec -it docker.io/library/taack-ui-test-minimal /bin/bash
 // docker export 2438e7fad559 > output.tar
+// docker run -it --entrypoint /bin/bash taack-ui-test-minimal:0.7.0

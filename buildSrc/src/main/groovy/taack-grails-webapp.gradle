@@ -22,7 +22,7 @@ dependencies {
     runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails"
 }
 
-compileJava.options.release = 17
+//compileJava.options.release = 17
 
 tasks.withType(Test) {
     useJUnitPlatform()
