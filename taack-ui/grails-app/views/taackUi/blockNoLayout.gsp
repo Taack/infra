@@ -1,4 +1,4 @@
-<%@ page import="taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
+<%@ page import="grails.util.Pair; taack.app.TaackLinkClass; org.grails.datastore.gorm.GormEntity; taack.app.TaackAppRegisterService; taack.user.TaackUser; taack.support.ThemeController; taack.ui.dump.html.theme.ThemeMode" %>
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -68,12 +68,49 @@
                         </sec:ifSwitched>
                         <sec:ifNotSwitched>
                             <li class="nav-item dropdown">
+                                <%
+                                    TaackUser user = currentUser
+                                    List<GormEntity> notifications = user?.getUnreadRelatedDataList() ?: []
+                                %>
                                 <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
-                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    ${!notifications.isEmpty() ? "unread-notification-number=${notifications.size()}" : ""}>
                                     <sec:username/>
                                 </a>
 
-                                <ul class="dropdown-menu" aria-labelledby="navbarUser">
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUser" style="text-align: center;">
+                                    <g:if test="${!notifications.isEmpty()}">
+                                        <li class="nav-item dropdown">
+                                            <span class="user-notification-header">
+                                                Notification
+                                                <a ajaxaction="/taackUserNotification/readAllUserNotifications?objectController=all"
+                                                   unread-notification-number="${notifications.size()}"></a>
+                                            </span>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <div class="user-notification-body">
+                                                <g:each in="${notifications.collect {
+                                                    new Pair(it, TaackAppRegisterService.getTaackLinkClass(it.class.name))
+                                                }.groupBy { Pair<GormEntity, TaackLinkClass> it ->
+                                                    it.bValue?.controller
+                                                }.sort { it.key }}" var="group">
+                                                    <div class="user-notification-group">
+                                                        <div class="group-header">
+                                                            <g:message code="${group.key != null ? "${group.key}.app" : "enum.value.OTHER"}" />
+                                                            <a ajaxaction="/taackUserNotification/readAllUserNotifications?objectController=${group.key ?: ""}"
+                                                               unread-notification-number="${(group.value as List).size()}"></a>
+                                                        </div>
+                                                        <g:each in="${(group.value as List<Pair<GormEntity, TaackLinkClass>>).sort { -it.aValue.ident() }}" var="object">
+                                                            <a ajaxaction="/taackUserNotification/readUserNotification?objectController=${object.bValue?.controller}&objectAction=${object.bValue?.action}&objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
+                                                               class="group-item nav-link ajaxLink taackAjaxLink" title="${object.aValue}">
+                                                                ${object.aValue.toString()}
+                                                            </a>
+                                                        </g:each>
+                                                    </div>
+                                                </g:each>
+                                            </div>
+                                        </li>
+                                    </g:if>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link ajaxLink taackAjaxLink"
                                            ajaxaction="/theme?isAjax=true"><g:message code="theme.label"/></a>
