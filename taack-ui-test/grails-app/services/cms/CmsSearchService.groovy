@@ -4,6 +4,8 @@ import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
+import taack.domain.TaackGormClass
+import taack.domain.TaackGormClassRegisterService
 import taack.domain.TaackSearchService
 import taack.solr.SolrFieldType
 import taack.solr.SolrSpecifier
@@ -20,7 +22,7 @@ class CmsSearchService implements TaackSearchService.IIndexService {
 
     @PostConstruct
     void init() {
-        TaackSearchService.registerSolrSpecifier(this, new SolrSpecifier(CmsPage, CmsController.&editPage as MethodClosure, this.&labelingPage as MethodClosure, { CmsPage p ->
+        TaackSearchService.registerSolrSpecifier(this, new SolrSpecifier(CmsPage, { CmsPage p ->
             p ?= new CmsPage()
             if (p.id)
                 for (SupportedLanguage l in SupportedLanguage.values()) {
@@ -47,11 +49,14 @@ class CmsSearchService implements TaackSearchService.IIndexService {
             indexField SolrFieldType.DATE, 0.5f, true, p.lastUpdated_
             indexField SolrFieldType.POINT_STRING, 'userUpdated', 0.5f, true, p.userUpdated?.username
         }))
-    }
-
-    String labelingPage(Long id) {
-        def i = CmsPage.read(id)
-        "Page: ${i.name} ${i.name ?: ''} ($id)"
+        TaackGormClassRegisterService.register(
+                new TaackGormClass(CmsPage.class).builder
+                        .setShowMethod(CmsController.&editPage as MethodClosure)
+                        .setShowLabel({ Long id ->
+                            def i = CmsPage.read(id)
+                            return "Page: ${i.name} ${i.name ?: ""} ($id)"
+                        }).build()
+        )
     }
 
     @Override
