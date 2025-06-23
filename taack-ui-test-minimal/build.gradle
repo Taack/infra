@@ -82,9 +82,14 @@ bootBuildImage {
     imageName = "${project.name}:${project.version}"
 
 }
+
+// OK
+// docker run -it --net=host taack-ui-test-minimal:0.7.0
+// docker run -it --entrypoint /bin/bash taack-ui-test-minimal:0.7.0
+// docker export 2438e7fad559 > output.tar
+
+// Other
+// docker exec -it docker.io/library/taack-ui-test-minimal /bin/bash
 // docker run -u root -p 8080:9442 -v $(pwd)/w:/workspace/test:Z docker.io/library/taack-ui-test chown -R node:node /workspace/test
 // docker run --rm -p 9442:9442 docker.io/library/taack-ui-test-minimal
 // docker save docker.io/library/taack-ui-test-minimal > taack-ui-test-minimal.tar
-// docker exec -it docker.io/library/taack-ui-test-minimal /bin/bash
-// docker export 2438e7fad559 > output.tar
-// docker run -it --entrypoint /bin/bash taack-ui-test-minimal:0.7.0
