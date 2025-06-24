@@ -1,7 +1,7 @@
 package taack.ui.dsl.common
 
-import groovy.json.StringEscapeUtils
 import groovy.transform.CompileStatic
+import org.springframework.web.util.HtmlUtils
 
 @CompileStatic
 enum IconStyle {
@@ -83,7 +83,7 @@ class ActionIcon {
     }
 
     static private String escapeHtml(String input) {
-        StringEscapeUtils.escapeJavaScript(input).replace('\'', '&apos;')
+        HtmlUtils.htmlEscape(input).replace('\'', '&apos;')
     }
 
     String getHtml(final String title, final Integer width = 40) {
