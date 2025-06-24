@@ -83,10 +83,9 @@
                                         <li class="nav-item dropdown">
                                             <span class="user-notification-header">
                                                 Notification
-                                                <a ajaxaction="/taackUserNotification/readAllUserNotifications?title=all"
-                                                   unread-notification-number="${notifications.size()}"></a>
+                                                <span unread-notification-number="${notifications.size()}"></span>
                                             </span>
-                                            <a class="user-notification-detail-btn" ajaxaction="/taackUserNotification/showUserNotifications" href="/taackUserNotification/showUserNotifications?isAjax=false">
+                                            <a class="show-user-notification-list-btn" ajaxaction="/taackUserNotification/showUserNotifications" href="/taackUserNotification/showUserNotifications?isAjax=false">
                                                 ${raw(ActionIcon.SHOW.getHtml("Details", 20))}
                                             </a>
                                         </li>
@@ -105,8 +104,10 @@
                                                             <g:else>
                                                                 <g:message code="enum.value.OTHER" />
                                                             </g:else>
-                                                            <a ajaxaction="/taackUserNotification/readAllUserNotifications?title=${group.key ?: "other"}"
-                                                               unread-notification-number="${(group.value as List).size()}"></a>
+                                                            <span unread-notification-number="${(group.value as List).size()}"></span>
+                                                            <a class="read-all-user-notification-btn" ajaxaction="/taackUserNotification/readAllUserNotifications?title=${group.key ?: "other"}">
+                                                                ${raw(ActionIcon.CONFIRM.getHtml("Mark all as Read", 15))}
+                                                            </a>
                                                         </div>
                                                         <g:each in="${(group.value as List<Triple<GormEntity, Date, TaackGormClass>>).sort { -it.bValue.time }}" var="object">
                                                             <%

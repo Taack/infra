@@ -506,7 +506,7 @@ li:hover > .nested-dropdown{
     font-weight: bold;
 }
 
-.user-notification-detail-btn {
+.show-user-notification-list-btn {
     position: absolute;
     top: -1px;
     right: .5em;
@@ -524,24 +524,28 @@ li:hover > .nested-dropdown{
     padding: 3px;
 }
 
-.user-notification-header a[unread-notification-number], .user-notification-body a[unread-notification-number] {
-    padding: 2px;
-}
-
-.user-notification-header a[unread-notification-number]::after, .user-notification-body a[unread-notification-number]::after {
+.user-notification-header span[unread-notification-number]::after, .user-notification-body span[unread-notification-number]::after {
     content: " (" attr(unread-notification-number) ")";
-}
-
-.user-notification-header a[unread-notification-number]:hover, .user-notification-body a[unread-notification-number]:hover {
-    background: darkgrey;
-    color: white;
+    padding-left: 2px;
 }
 
 .user-notification-body .group-header {
+    position: relative;
     color: royalblue;
     font-weight: bold;
     font-size: small;
     padding-top: 3px;
+}
+
+.user-notification-body .group-header .read-all-user-notification-btn {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    padding: 0 2px 2px 2px;
+}
+
+.user-notification-body .group-header .read-all-user-notification-btn:hover {
+    background: #e5e5e5;
 }
 
 .user-notification-body .group-item {

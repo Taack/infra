@@ -7,7 +7,7 @@ function manageNotificationReading() {
         for (let i = 0; i < notificationGroups.length; i++) {
             let group = notificationGroups[i]
             let header = group.querySelector('.group-header')
-            let itemSizeSpan = header.querySelector('a[unread-notification-number]')
+            let itemSizeSpan = header.querySelector('span[unread-notification-number]')
             let items = group.querySelectorAll('.group-item')
             for (let j = 0; j < items.length; j++) {
                 items[j].addEventListener('click', function () {
