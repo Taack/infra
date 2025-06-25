@@ -39,7 +39,7 @@ final class TaackFilter<T extends GormEntity<T>> {
     private final Class innerDomain
     private final T oObject
     int max
-    private List<UiFilterSpecifier> additionalFilters
+    private UiFilterSpecifier additionalFilters
     private List<Long> restrictedIds
     private FieldInfo[] sortFields
     private Order order
@@ -55,7 +55,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         this.innerDomain = filterBuilder.innerDomain
         this.oObject = (filterBuilder.oObject ?: null) as T
         this.max = filterBuilder.maxNumberOfLine ?: 0 as int
-        this.additionalFilters = filterBuilder.additionalFilters.empty ? null : filterBuilder.additionalFilters
+        this.additionalFilters = filterBuilder.additionalFilters
         this.restrictedIds = filterBuilder.restrictedIds
         this.sortFields = filterBuilder.sortFields
         this.order = filterBuilder.order
@@ -709,7 +709,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         list(
                 cClass as Class<T>,
                 max,
-                additionalFilters?.empty ? null : additionalFilters?.first() as UiFilterSpecifier,
+                additionalFilters,
                 oObject as T,
                 sortFields,
                 order,
@@ -723,7 +723,7 @@ final class TaackFilter<T extends GormEntity<T>> {
         private final SessionFactory sessionFactory
         private final Map<String, ?> theParams
         private int maxNumberOfLine = 8
-        private List<UiFilterSpecifier> additionalFilters = []
+        private UiFilterSpecifier additionalFilters
         private List<Long> restrictedIds = null
         private Class innerDomain = null
         private FieldInfo[] sortFields
@@ -757,7 +757,8 @@ final class TaackFilter<T extends GormEntity<T>> {
         }
 
         FilterBuilder addFilter(UiFilterSpecifier securityClosure) {
-            this.additionalFilters.add securityClosure
+            if (additionalFilters) additionalFilters.join(securityClosure)
+            else additionalFilters = securityClosure
             this
         }
 
