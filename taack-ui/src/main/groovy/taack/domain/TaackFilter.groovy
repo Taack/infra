@@ -762,6 +762,15 @@ final class TaackFilter<T extends GormEntity<T>> {
             this
         }
 
+        FilterBuilder addFilter(Class<GormEntity> aClass, FilterExpression filterExpression) {
+            UiFilterSpecifier securityClosure = new UiFilterSpecifier().sec(aClass, {
+                filterFieldExpressionBool filterExpression
+            })
+            if (additionalFilters) additionalFilters.join(securityClosure)
+            else additionalFilters = securityClosure
+            this
+        }
+
         FilterBuilder setInnerDomain(Class<? extends GormEntity> bClass) {
             this.innerDomain = bClass
             this
