@@ -19,7 +19,7 @@ class TaackUiConfiguration {
     static String home = System.getProperty('user.home')
     static String root = home + '/intranetFiles'
     static String taack = home + '/taack'
-    static String resources = root + '/resources'
+    static String resources = taack + '/resources'
     static String javaPath = '/usr/bin/java'
     static String plantUmlPath = home + '/plantuml-1.2022.7.jar'
     static String solrUrl = 'http://localhost:8983/solr/taack'
