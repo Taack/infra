@@ -46,7 +46,8 @@ trait IHTMLElement {
     }
 
     void putAttr(String key, String value) {
-        attr.append(' ' + key + '="' + value + '"')
+        if (value) attr.append(' ' + key + '="' + value + '"')
+        else attr.append(' ' + key)
     }
 
     void resetClasses() {
@@ -139,7 +140,7 @@ trait IHTMLElement {
                 putAttr('onclick', onClick.output)
             }
 
-            childrenOutput.append('<' + tag)
+            childrenOutput.append('\n<' + tag)
             childrenOutput.append(attr)
             childrenOutput.append('>')
         }

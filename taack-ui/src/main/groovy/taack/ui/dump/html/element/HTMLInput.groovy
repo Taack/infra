@@ -27,7 +27,7 @@ final class HTMLInput implements IHTMLElement {
 
 
     HTMLInput(InputType inputType, Object value, String name, String placeHolder = null, boolean disabled = false, boolean readonly = false) {
-        if (value != null) putAttr('value', value != null ? value.toString() : '')
+        putAttr('value', value != null ? value.toString() : '')
         putAttr('type', inputType.typeText)
         if (name) putAttr('name', name)
         if (placeHolder) putAttr('placeHolder', placeHolder)
