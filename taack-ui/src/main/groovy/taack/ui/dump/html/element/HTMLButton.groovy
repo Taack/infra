@@ -19,12 +19,12 @@ final class HTMLButton implements IHTMLElement {
 
     HTMLButton(String i18n) {
         this(null, i18n)
-        attributes.put('type', 'button')
+        putAttr('type', 'button')
     }
 
     HTMLButton(String url, String i18n, ButtonStyle style = null) {
         if (url) {
-            attributes.put('formaction', url)
+            putAttr('formaction', url)
             addClasses('btn', 'w-75', 'mb-1')
         }
 

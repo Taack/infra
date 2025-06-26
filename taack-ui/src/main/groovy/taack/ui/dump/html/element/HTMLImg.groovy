@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 final class HTMLImg implements IHTMLElement {
     HTMLImg(String src) {
-        attributes.put('src', src)
+        putAttr('src', src)
     }
 
     @Override

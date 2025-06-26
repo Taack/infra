@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 final class HTMLForm implements IHTMLElement {
     HTMLForm(String action) {
-        attributes.put('action', action)
+        putAttr('action', action)
     }
 
     @Override

@@ -12,10 +12,10 @@ final class HTMLOption implements IHTMLElement {
     HTMLOption(IEnumOption option, Boolean selected) {
         if (option.isSection()) {
             isOptGroup = true
-            attributes.put('label', option.value)
+            putAttr('label', option.value)
         } else {
-            attributes.put('value', option.key)
-            if (selected) attributes.put('selected', null)
+            putAttr('value', option.key)
+            if (selected) putAttr('selected', null)
             addChildren(new HTMLTxtContent(option.value))
         }
     }
@@ -38,11 +38,11 @@ final class HTMLSelect implements IHTMLElement {
         addChildren(options.options.toList().collect {
             new HTMLOption(it, options.currents*.key?.contains(it.key))
         } as HTMLOption[])
-        attributes.put('name', options.paramKey)
-        if (disabled) attributes.put('disabled', null)
+        putAttr('name', options.paramKey)
+        if (disabled) putAttr('disabled', null)
         if (multiple) {
-            attributes.put('multiple', null)
-            attributes.put('style', 'height: 200px')
+            putAttr('multiple', null)
+            putAttr('style', 'height: 200px')
         }
     }
 

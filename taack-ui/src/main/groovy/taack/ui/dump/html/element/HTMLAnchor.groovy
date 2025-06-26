@@ -8,10 +8,10 @@ final class HTMLAnchor implements IHTMLElement {
     HTMLAnchor(boolean isAjax = true, String url = null) {
         if (url)
             if (isAjax) {
-                attributes.put('ajaxAction', url)
-                attributes.put('href', UriComponentsBuilder.newInstance().path(url).replaceQueryParam('isAjax', 'false').build().toString())
+                putAttr('ajaxAction', url)
+                putAttr('href', UriComponentsBuilder.newInstance().path(url).replaceQueryParam('isAjax', 'false').build().toString())
             } else {
-                attributes.put('href', url)
+                putAttr('href', url)
             }
     }
 

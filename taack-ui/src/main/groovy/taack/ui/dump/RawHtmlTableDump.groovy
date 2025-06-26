@@ -180,12 +180,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         HTMLTr tr = new HTMLTr()
         tr.taackTag = TaackTag.TABLE_ROW
         if (style?.cssClassesString) tr.addClasses(style.cssClassesString)
-        if (style?.cssStyleString) tr.attributes.put('style', style.cssStyleString)
+        if (style?.cssStyleString) tr.putAttr('style', style.cssStyleString)
         if (indent >= 0) {
-            tr.attributes.put('taackTableRowGroup', indent.toString())
-            tr.attributes.put('taackTableRowGroupHasChildren', hasChildren.toString())
+            tr.putAttr('taackTableRowGroup', indent.toString())
+            tr.putAttr('taackTableRowGroupHasChildren', hasChildren.toString())
             if (hasChildren) {
-                tr.attributes.put('taackTableRowIsExpended', rowIndentIsExpended[indent].toString())
+                tr.putAttr('taackTableRowIsExpended', rowIndentIsExpended[indent].toString())
             }
             if (rowIndentIsExpended[indent - 1] == false && parameter.target == Parameter.RenderingTarget.WEB) {
                 tr.setStyleDescriptor(new DisplayNone())
@@ -248,7 +248,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         isInCol = true
         HTMLTd td = new HTMLTd(colSpan, rowSpan)
         if (style?.cssClassesString) td.addClasses(style.cssClassesString)
-        if (style?.cssStyleString) td.attributes.put('style', style.cssStyleString)
+        if (style?.cssStyleString) td.putAttr('style', style.cssStyleString)
         if (firstInCol) td.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
         firstInCol = false
         blockLog.topElement.builder.addChildren(td)

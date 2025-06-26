@@ -33,8 +33,8 @@ final class ThemableTable {
 
     IHTMLElement table(IHTMLElement topElement, String blockId) {
         HTMLTable htmlTable = new HTMLTable()
-        htmlTable.classes.append " $tableSized table-striped table-hover table-bordered pure-table pure-table-bordered "
-        htmlTable.attributes.put('taackTableId', blockId)
+        htmlTable.putClass "$tableSized table-striped table-hover table-bordered pure-table pure-table-bordered"
+        htmlTable.putAttr('taackTableId', blockId)
         topElement.addChildren(
                 htmlTable
         )

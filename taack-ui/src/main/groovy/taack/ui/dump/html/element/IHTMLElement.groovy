@@ -34,8 +34,8 @@ enum TaackTag {
 @CompileStatic
 trait IHTMLElement {
     TaackTag taackTag
-    final StringBuffer classes = new StringBuffer()
-    final Map<String, String> attributes = [:]
+    private final StringBuffer attr = new StringBuffer()
+    private final StringBuffer classes = new StringBuffer()
     IJavascriptDescriptor onClick
     IStyleDescriptor styleDescriptor
     Vector<IHTMLElement> children = new Vector<>()
@@ -45,16 +45,36 @@ trait IHTMLElement {
         return null
     }
 
+    void putAttr(String key, String value) {
+        attr.append(' ' + key + '="' + value + '"')
+    }
+
+    void resetClasses() {
+        classes.setLength(0)
+    }
+
+    void putClass(String value) {
+        classes.append(' ' + value)
+
+    }
+
     void setId(String id) {
-        attributes['id'] = id
+        putAttr('id',id)
     }
 
     String getId() {
-        attributes['id']
+        int p = attr.indexOf('id=')
+        if (p != -1) {
+            int p1 = attr.indexOf('"', p)
+            int p2 = attr.indexOf(' ', p)
+            if (p2 != -1 && p1 > p2) return attr.substring(p, p2)
+            else return attr.substring(p)
+        }
+        null
     }
 
     void addClasses(String... aClasses) {
-        if (aClasses) classes.append(' ' + aClasses.join(' ') + ' ')
+        if (aClasses) putClass(aClasses.join(' '))
     }
 
     void addChildren(IHTMLElement... elements) {
@@ -74,7 +94,7 @@ trait IHTMLElement {
             ltt << ret
         }
         if (!ret) {
-            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.taackTag?.toString() + ':' + this.attributes} has no parent ${taackTags} ltt = ${ltt*.taackTag}")
+            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.taackTag?.toString() + ':' + this.attr} has no parent ${taackTags} ltt = ${ltt*.taackTag}")
         }
         ret
     }
@@ -88,19 +108,9 @@ trait IHTMLElement {
         taackTags.contains ret?.taackTag
     }
 
-    List<IHTMLElement> getParents() {
-        IHTMLElement ret = this
-        List<IHTMLElement> ltt = []
-        while (ret.parent) {
-            ret = ret.parent
-            ltt << ret
-        }
-        ltt
-    }
-
     @Override
     String toString() {
-        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attributes}"""
+        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attr}"""
     }
 
     String indent() {
@@ -113,59 +123,33 @@ trait IHTMLElement {
         ret
     }
 
-    Map<String, String> getAllAttributes() {
-        Map res = this.attributes
-
-        if (taackTag)
-            res += ['taackTag': taackTag.toString()]
-        if (styleDescriptor) {
-            if (styleDescriptor.classes) classes.append styleDescriptor.classes
-            res += ['style': styleDescriptor.styleOutput]
-        }
-        if (classes)
-            res += ['class': classes.grep { it != null} .join(' ')]
-        if (onClick)
-            res += ['onclick': onClick.output]
-        res
-    }
-
-    void getOutput(StringBuffer childrenOutput = new StringBuffer(8128)) {
+    void getOutput(StringBuffer childrenOutput = new StringBuffer(1024)) {
         if (tag) {
-            childrenOutput.append('<' + tag)
-            for (Map.Entry a : attributes) {
-                childrenOutput.append(' ' + a.key + '="' + (a.value ?:'') + '"')
-            }
             if (taackTag) {
-                childrenOutput.append(' taackTag="' + taackTag + '"')
+                putAttr('taackTag', taackTag.name())
             }
             if (styleDescriptor) {
-                if (styleDescriptor.classes) classes.append styleDescriptor.classes
-                childrenOutput.append(' style="' + styleDescriptor.styleOutput + '"')
+                if (styleDescriptor.classes) putClass styleDescriptor.classes
+                putAttr('style', styleDescriptor.styleOutput)
             }
-            if (classes) {
-                childrenOutput.append(' class="')
-                childrenOutput.append(classes + '"')
-            }
+            if (classes.length() > 0)
+                putAttr('class', classes.toString())
+
             if (onClick) {
-                childrenOutput.append(' onclick="')
-                childrenOutput.append(onClick.output + '"')
+                putAttr('onclick', onClick.output)
             }
+
+            childrenOutput.append('<' + tag)
+            childrenOutput.append(attr)
             childrenOutput.append('>')
         }
 
         for (IHTMLElement c : children) {
             c.getOutput(childrenOutput)
-//            childrenOutput.append('\n')
         }
 
         if (tag)
             childrenOutput.append('</' + tag + '>')
-
-//        if (tag) {
-//            "<$tag ${allAttributes.collect { Map.Entry<String, String> it -> it.value ? "${it.key}=\"${it.value}\'' : "${it.key}" }.join(' ')}>' + '${children*.output.join('\n')}' + '\n</$tag>"
-//        } else {
-//            children*.output.join('\n')
-//        }
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {
@@ -195,12 +179,12 @@ trait IHTMLElement {
         }
 
         HTMLElementBuilder<T> putAttribute(String key, String value) {
-            element.attributes.put key, value
+            element.putAttr(key, value)
             this
         }
 
         HTMLElementBuilder<T> putAttributeIfNotNull(String key, String value) {
-            if (value && key) element.attributes.put key, value
+            if (value && key) putAttribute key, value
             this
         }
 

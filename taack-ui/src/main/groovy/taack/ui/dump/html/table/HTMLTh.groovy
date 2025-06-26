@@ -6,8 +6,8 @@ import taack.ui.dump.html.element.IHTMLElement
 @CompileStatic
 final class HTMLTh implements IHTMLElement {
     HTMLTh(Integer colspan = null, Integer rowspan = null) {
-        if (rowspan) attributes.put('rowspan', rowspan.toString())
-        if (colspan) attributes.put('colspan', colspan.toString())
+        if (rowspan) putAttr('rowspan', rowspan.toString())
+        if (colspan) putAttr('colspan', colspan.toString())
     }
 
     @Override

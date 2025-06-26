@@ -43,8 +43,8 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     }
 
     void constructorIFormThemed(InputMode inputMode = InputMode.POST, EncType encType = EncType.DATA) {
-        attributes.put('method', inputMode.modeText)
-        attributes.put('enctype', encType.text)
+        putAttr('method', inputMode.modeText)
+        putAttr('enctype', encType.text)
     }
 
     abstract <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder()

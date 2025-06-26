@@ -6,7 +6,7 @@ import taack.ui.dump.html.element.IHTMLElement
 @CompileStatic
 final class HTMLTr implements IHTMLElement {
     HTMLTr(Integer colspan = null) {
-        if (colspan) attributes.put('colspan', colspan.toString())
+        if (colspan) putAttr('colspan', colspan.toString())
     }
 
     @Override

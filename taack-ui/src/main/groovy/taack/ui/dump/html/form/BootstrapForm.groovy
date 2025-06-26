@@ -176,7 +176,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, choices?.options?.find { it.key == current?.key }?.value ?: current?.value, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
@@ -209,7 +209,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             HTMLDiv m2mParent = themeStartInputs(el).builder.addClasses('M2MParent').build() as HTMLDiv
             if (!disabled) m2mParent.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
             HTMLInput input = new HTMLInput(InputType.STRING, it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
-            if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+            if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
             m2mParent.addChildren(input)
             if (!noLabel) m2mParent.addChildren(formLabelInput(inputLabelId, trI18n))
             HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it instanceof GormEntity ? it.ident() : it instanceof Enum ? it.name() : it?.toString(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(hiddenInputId).addClasses(formControl).build() as HTMLInput
@@ -220,7 +220,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLDiv m2mToDuplicate = themeStartInputs(el).builder.addClasses('M2MToDuplicate').build() as HTMLDiv
         if (!disabled) m2mToDuplicate.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
         HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         m2mToDuplicate.addChildren(input)
         if (!noLabel) m2mToDuplicate.addChildren(formLabelInput(inputLabelId, trI18n))
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, '', null).builder.putAttribute('attr-name', qualifiedName).setId(hiddenInputId).addClasses(formControl).build() as HTMLInput
@@ -236,7 +236,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
         HTMLInput input = new HTMLInput(InputType.STRING, val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString(), null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
@@ -266,8 +266,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             div.addChildren(dateInput1, formLabelInput(qualifiedName + '-min', trI18n))
         } else {
             HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value1 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value1) : null, qualifiedName, inputEscape(trI18n) + ' (Min)', disable).builder.setId(qualifiedName + '-min').addClasses(formControl).build() as HTMLInput
-            dateInput1.attributes.put('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
-            dateInput1.attributes.put('onblur', "this.type='${InputType.STRING.typeText}'" as String)
+            dateInput1.putAttr('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
+            dateInput1.putAttr('onblur', "this.type='${InputType.STRING.typeText}'" as String)
             div.addChildren(dateInput1)
         }
 
@@ -280,8 +280,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             div.addChildren(dateInput1, formLabelInput(qualifiedName + '-max', trI18n))
         } else {
             HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value2 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value2) : null, qualifiedName, inputEscape(trI18n) + ' (Max)', disable).builder.setId(qualifiedName + '-max').addClasses(formControl).build() as HTMLInput
-            dateInput1.attributes.put('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
-            dateInput1.attributes.put('onblur', "this.type='${InputType.STRING.typeText}'" as String)
+            dateInput1.putAttr('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
+            dateInput1.putAttr('onblur', "this.type='${InputType.STRING.typeText}'" as String)
             div.addChildren(dateInput1)
         }
 
@@ -294,7 +294,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLTextarea input = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses(formControl).setId(qualifiedName).build() as HTMLTextarea
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
@@ -336,7 +336,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement fileInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.FILE, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
@@ -347,7 +347,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
@@ -358,7 +358,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement passwdInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.PASSWD, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
-        if (floating || noLabel) input.attributes.put('placeholder', inputEscape(trI18n))
+        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
