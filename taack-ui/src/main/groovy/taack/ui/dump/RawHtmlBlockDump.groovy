@@ -607,6 +607,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                 menu.menuOption(blockLog.topElement, img, option.value, url)
             }
         }
+        parameter.params.remove(enumOptions.paramKey)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_OPTION)
         splitMenuEnd()
         exitBlock('visitMenuOptions')
