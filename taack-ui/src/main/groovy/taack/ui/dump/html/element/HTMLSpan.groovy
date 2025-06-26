@@ -5,7 +5,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 final class HTMLSpan implements IHTMLElement {
 
-    HTMLSpan() {
-        tag = 'span'
+    @Override
+    String getTag() {
+        'span'
     }
 }

@@ -9,7 +9,6 @@ final class HTMLTextarea implements IHTMLElement {
 
 
     HTMLTextarea(Object value, String name, String placeHolder = null, boolean disabled = false, boolean readonly = false) {
-        tag = 'textarea'
         if (value) {
             addChildren(
                     new HTMLTxtContent(value.toString())
@@ -35,5 +34,10 @@ final class HTMLTextarea implements IHTMLElement {
         HTMLInput ret = new HTMLInput(InputType.RADIO, value, name, null,  disabled)
         if (checked) ret.attributes.put('checked', 'checked')
         ret
+    }
+
+    @Override
+    String getTag() {
+        'textarea'
     }
 }

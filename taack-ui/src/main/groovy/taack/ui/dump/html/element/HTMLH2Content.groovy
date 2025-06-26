@@ -8,7 +8,6 @@ final class HTMLH2Content implements IHTMLElement {
     final String content
 
     HTMLH2Content(String content) {
-        tag = null
         this.content = content ?: ''
     }
 

@@ -4,7 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLDiv implements IHTMLElement {
-    HTMLDiv() {
-        tag = 'div'
+    @Override
+    String getTag() {
+        'div'
     }
 }

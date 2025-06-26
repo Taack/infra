@@ -120,7 +120,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitSectionEnd() {
         HTMLDiv d = blockLog.topElement.toParentTaackTag(TaackTag.SECTION) as HTMLDiv
         if (uncollapseSection) {
-            d.classes = []
+            d.classes.setLength(0)
             uncollapseSection = false
         }
         blockLog.topElement = d.parent

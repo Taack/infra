@@ -4,7 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLSection implements IHTMLElement {
-    HTMLSection() {
-        tag = 'section'
+    @Override
+    String getTag() {
+        'section'
     }
 }

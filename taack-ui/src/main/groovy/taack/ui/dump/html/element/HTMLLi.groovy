@@ -4,7 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLLi implements IHTMLElement {
-    HTMLLi() {
-        tag = 'li'
+    @Override
+    String getTag() {
+        'li'
     }
 }

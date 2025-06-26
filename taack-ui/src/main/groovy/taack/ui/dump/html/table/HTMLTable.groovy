@@ -5,7 +5,8 @@ import taack.ui.dump.html.element.IHTMLElement
 
 @CompileStatic
 final class HTMLTable implements IHTMLElement {
-    HTMLTable() {
-        tag = 'table'
+    @Override
+    String getTag() {
+        'table'
     }
 }

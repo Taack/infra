@@ -19,7 +19,7 @@ final class DropdownMenu implements IHTMLElement {
 
     IHTMLElement menuStart(IHTMLElement topElement = null) {
         IHTMLElement bootstrapMenu = this//new BootstrapMenu(themeMode, themeSize)
-        children = []
+        children.removeAllElements()
         topElement.addChildren(
                 bootstrapMenu.builder.addChildren(
                         new HTMLUl().builder.build()

@@ -27,7 +27,6 @@ final class HTMLInput implements IHTMLElement {
 
 
     HTMLInput(InputType inputType, Object value, String name, String placeHolder = null, boolean disabled = false, boolean readonly = false) {
-        tag = 'input'
         attributes.put('value', value != null ? value.toString() : '')
         attributes.put('type', inputType.typeText)
         if (name) attributes.put('name', name)
@@ -46,5 +45,10 @@ final class HTMLInput implements IHTMLElement {
         HTMLInput ret = new HTMLInput(InputType.RADIO, value, name, null,  disabled)
         if (checked) ret.attributes.put('checked', 'checked')
         ret
+    }
+
+    @Override
+    String getTag() {
+        'input'
     }
 }

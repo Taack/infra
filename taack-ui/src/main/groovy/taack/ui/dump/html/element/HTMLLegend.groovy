@@ -4,7 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLLegend implements IHTMLElement {
-    HTMLLegend() {
-        tag = 'legend'
+    @Override
+    String getTag() {
+        'label'
     }
 }

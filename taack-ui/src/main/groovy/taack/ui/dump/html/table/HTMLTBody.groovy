@@ -5,7 +5,8 @@ import taack.ui.dump.html.element.IHTMLElement
 
 @CompileStatic
 final class HTMLTBody implements IHTMLElement {
-    HTMLTBody() {
-        tag = 'tbody'
+    @Override
+    String getTag() {
+        'tbody'
     }
 }

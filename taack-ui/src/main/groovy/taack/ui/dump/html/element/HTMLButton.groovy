@@ -23,7 +23,6 @@ final class HTMLButton implements IHTMLElement {
     }
 
     HTMLButton(String url, String i18n, ButtonStyle style = null) {
-        tag = 'button'
         if (url) {
             attributes.put('formaction', url)
             addClasses('btn', 'w-75', 'mb-1')
@@ -31,5 +30,10 @@ final class HTMLButton implements IHTMLElement {
 
         addChildren(new HTMLTxtContent(i18n))
         if (style) addClasses(style.classString)
+    }
+
+    @Override
+    String getTag() {
+        'button'
     }
 }

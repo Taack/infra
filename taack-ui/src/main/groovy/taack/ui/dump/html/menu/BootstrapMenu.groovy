@@ -19,7 +19,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     IHTMLElement menuStart(IHTMLElement topElement = null) {
         IHTMLElement bootstrapMenu = this//new BootstrapMenu(themeMode, themeSize)
-        children = []
+        children.removeAllElements()
         topElement.addChildren(
                 bootstrapMenu.builder.addChildren(
                         new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').build()
@@ -146,5 +146,10 @@ final class BootstrapMenu implements IHTMLElement {
                 ).build(),
         )
         topElement.children.last().children.first().children.last()
+    }
+
+    @Override
+    String getTag() {
+        ''
     }
 }

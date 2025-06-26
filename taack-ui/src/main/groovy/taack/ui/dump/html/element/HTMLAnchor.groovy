@@ -6,7 +6,6 @@ import org.springframework.web.util.UriComponentsBuilder
 @CompileStatic
 final class HTMLAnchor implements IHTMLElement {
     HTMLAnchor(boolean isAjax = true, String url = null) {
-        tag = 'a'
         if (url)
             if (isAjax) {
                 attributes.put('ajaxAction', url)
@@ -14,5 +13,10 @@ final class HTMLAnchor implements IHTMLElement {
             } else {
                 attributes.put('href', url)
             }
+    }
+
+    @Override
+    String getTag() {
+        'a'
     }
 }

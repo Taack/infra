@@ -127,4 +127,5 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     void visitMenuOptions(IEnumOptions enumOptions) {
 
     }
+
 }

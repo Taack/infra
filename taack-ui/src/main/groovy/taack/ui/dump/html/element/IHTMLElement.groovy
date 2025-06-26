@@ -33,18 +33,28 @@ enum TaackTag {
 
 @CompileStatic
 trait IHTMLElement {
-    String id
     TaackTag taackTag
-    String[] classes = []
+    final StringBuffer classes = new StringBuffer()
     final Map<String, String> attributes = [:]
     IJavascriptDescriptor onClick
     IStyleDescriptor styleDescriptor
-    IHTMLElement[] children = []
+    Vector<IHTMLElement> children = new Vector<>()
     IHTMLElement parent
-    String tag
+
+    String getTag() {
+        return null
+    }
+
+    void setId(String id) {
+        attributes['id'] = id
+    }
+
+    String getId() {
+        attributes['id']
+    }
 
     void addClasses(String... aClasses) {
-        classes += aClasses
+        if (aClasses) classes.append(' ' + aClasses.join(' ') + ' ')
     }
 
     void addChildren(IHTMLElement... elements) {
@@ -52,7 +62,7 @@ trait IHTMLElement {
             e.parent = this
         }
 
-        if (elements) children += elements
+        if (elements) children.addAll(elements)
     }
 
     IHTMLElement toParentTaackTag(TaackTag... taackTags) {
@@ -64,7 +74,7 @@ trait IHTMLElement {
             ltt << ret
         }
         if (!ret) {
-            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.tag + ':' + this.taackTag + ':' + this.attributes} has no parent ${taackTags}, tags = ${ltt*.tag}, ltt = ${ltt*.taackTag}")
+            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.taackTag?.toString() + ':' + this.attributes} has no parent ${taackTags} ltt = ${ltt*.taackTag}")
         }
         ret
     }
@@ -90,8 +100,7 @@ trait IHTMLElement {
 
     @Override
     String toString() {
-        List<IHTMLElement> p = parents
-        """IHTMLElement ${this.tag + ':' + this.taackTag + ':' + this.attributes}, ${p*.tag}, ${p*.taackTag}"""
+        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attributes}"""
     }
 
     String indent() {
@@ -106,12 +115,11 @@ trait IHTMLElement {
 
     Map<String, String> getAllAttributes() {
         Map res = this.attributes
-        if (id)
-            res += ['id': id]
+
         if (taackTag)
             res += ['taackTag': taackTag.toString()]
         if (styleDescriptor) {
-            if (styleDescriptor.classes) classes += styleDescriptor.classes.trim().split(/ +/)
+            if (styleDescriptor.classes) classes.append styleDescriptor.classes
             res += ['style': styleDescriptor.styleOutput]
         }
         if (classes)
@@ -127,19 +135,16 @@ trait IHTMLElement {
             for (Map.Entry a : attributes) {
                 childrenOutput.append(' ' + a.key + '="' + (a.value ?:'') + '"')
             }
-            if (id) {
-                childrenOutput.append(' id="' + id + '"')
-            }
             if (taackTag) {
                 childrenOutput.append(' taackTag="' + taackTag + '"')
             }
             if (styleDescriptor) {
-                if (styleDescriptor.classes) classes += styleDescriptor.classes
+                if (styleDescriptor.classes) classes.append styleDescriptor.classes
                 childrenOutput.append(' style="' + styleDescriptor.styleOutput + '"')
             }
             if (classes) {
                 childrenOutput.append(' class="')
-                childrenOutput.append(classes.join(' ') + '"')
+                childrenOutput.append(classes + '"')
             }
             if (onClick) {
                 childrenOutput.append(' onclick="')
@@ -175,7 +180,7 @@ trait IHTMLElement {
         }
 
         HTMLElementBuilder<T> setId(String id) {
-            element.id = id
+            putAttribute('id', id)
             this
         }
 

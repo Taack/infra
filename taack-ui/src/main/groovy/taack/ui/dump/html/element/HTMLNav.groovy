@@ -4,7 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLNav implements IHTMLElement {
-    HTMLNav() {
-        tag = 'nav'
+    @Override
+    String getTag() {
+        'nav'
     }
 }

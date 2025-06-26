@@ -6,8 +6,12 @@ import taack.ui.dump.html.element.IHTMLElement
 @CompileStatic
 final class HTMLTh implements IHTMLElement {
     HTMLTh(Integer colspan = null, Integer rowspan = null) {
-        tag = 'th'
         if (rowspan) attributes.put('rowspan', rowspan.toString())
         if (colspan) attributes.put('colspan', colspan.toString())
+    }
+
+    @Override
+    String getTag() {
+        'th'
     }
 }

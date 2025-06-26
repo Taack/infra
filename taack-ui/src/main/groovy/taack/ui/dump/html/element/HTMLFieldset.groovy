@@ -4,7 +4,8 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLFieldset implements IHTMLElement {
-    HTMLFieldset() {
-        tag = 'fieldset'
+    @Override
+    String getTag() {
+        'fieldset'
     }
 }

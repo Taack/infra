@@ -8,7 +8,6 @@ final class HTMLTxtContent implements IHTMLElement {
     final String content
 
     HTMLTxtContent(String content) {
-        tag = null
         this.content = content ?: ''
     }
 

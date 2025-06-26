@@ -267,4 +267,5 @@ class UiBlockVisitor implements IUiBlockVisitor {
     void visitMenuOptions(IEnumOptions enumOptions) {
 
     }
+
 }
