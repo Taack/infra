@@ -134,7 +134,7 @@ trait IHTMLElement {
                 putAttr('style', styleDescriptor.styleOutput)
             }
             if (classes.length() > 0)
-                putAttr('class', classes.toString())
+                putAttr('class', classes.toString().trim())
 
             if (onClick) {
                 putAttr('onclick', onClick.output)
