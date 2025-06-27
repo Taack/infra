@@ -66,10 +66,8 @@ trait IHTMLElement {
     String getId() {
         int p = attr.indexOf('id=')
         if (p != -1) {
-            int p1 = attr.indexOf('"', p)
-            int p2 = attr.indexOf(' ', p)
-            if (p2 != -1 && p1 > p2) return attr.substring(p, p2)
-            else return attr.substring(p)
+            int p1 = attr.indexOf('"', p + 4)
+            if (p1 != -1) return attr.substring(p + 4, p1)
         }
         null
     }
