@@ -34,10 +34,9 @@ enum TaackTag {
 @CompileStatic
 trait IHTMLElement {
     TaackTag taackTag
-    private final StringBuffer attr = new StringBuffer()
-    private final StringBuffer classes = new StringBuffer()
-    IJavascriptDescriptor onClick
-    IStyleDescriptor styleDescriptor
+    String id
+    private String classes
+    private String attr
     Vector<IHTMLElement> children = new Vector<>()
     IHTMLElement parent
 
@@ -46,30 +45,27 @@ trait IHTMLElement {
     }
 
     void putAttr(String key, String value) {
-        if (value) attr.append(' ' + key + '="' + value + '"')
-        else attr.append(' ' + key)
+        if (attr && !attr.empty) attr += ' ' + key + '="' + value + '" '
+        else attr = key + '="' + value + '" '
     }
 
     void resetClasses() {
-        classes.setLength(0)
+        classes = ''
     }
 
     void putClass(String value) {
-        classes.append(' ' + value)
-
+        if (classes && !classes.empty) classes += ' ' + value
+        else classes = value
     }
 
-    void setId(String id) {
-        putAttr('id',id)
+    void setOnClick(IJavascriptDescriptor onc) {
+        putAttr('onclick', onc.output)
     }
 
-    String getId() {
-        int p = attr.indexOf('id=')
-        if (p != -1) {
-            int p1 = attr.indexOf('"', p + 4)
-            if (p1 != -1) return attr.substring(p + 4, p1)
-        }
-        null
+    void setStyleDescriptor(IStyleDescriptor sd) {
+        if (sd.classes) putClass sd.classes
+        putAttr('style', sd.styleOutput)
+
     }
 
     void addClasses(String... aClasses) {
@@ -122,33 +118,22 @@ trait IHTMLElement {
         ret
     }
 
-    void getOutput(StringBuffer childrenOutput = new StringBuffer(1024)) {
+    void getOutput(ByteArrayOutputStream out) {
         if (tag) {
-            if (taackTag) {
-                putAttr('taackTag', taackTag.name())
-            }
-            if (styleDescriptor) {
-                if (styleDescriptor.classes) putClass styleDescriptor.classes
-                putAttr('style', styleDescriptor.styleOutput)
-            }
-            if (classes.length() > 0)
-                putAttr('class', classes.toString().trim())
-
-            if (onClick) {
-                putAttr('onclick', onClick.output)
-            }
-
-            childrenOutput.append('\n<' + tag)
-            childrenOutput.append(attr)
-            childrenOutput.append('>')
+            out << '\n<' + tag
+            if (taackTag) out << ' taackTag="' + taackTag.name() + '"'
+            if (id) out << ' id="' + id + '"'
+            if (classes) out << ' class="' + classes + '"'
+            if (attr) out << ' ' + attr.trim()
+            out << '>'
         }
 
         for (IHTMLElement c : children) {
-            c.getOutput(childrenOutput)
+            c.getOutput(out)
         }
 
         if (tag)
-            childrenOutput.append('</' + tag + '>')
+            out << '</' + tag + '>'
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {

@@ -11,7 +11,7 @@ final class HTMLEmpty implements IHTMLElement {
     }
 
     @Override
-    void getOutput(StringBuffer res) {
-        children*.getOutput(res)
+    void getOutput(ByteArrayOutputStream out) {
+        children*.getOutput(out)
     }
 }

@@ -12,8 +12,8 @@ final class HTMLH2Content implements IHTMLElement {
     }
 
     @Override
-    void getOutput(StringBuffer res) {
-        res.append('<h2>' + content + '</h2>')
+    void getOutput(ByteArrayOutputStream out) {
+        out << '<h2>' + content + '</h2>'
     }
 
     @Override

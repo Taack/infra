@@ -12,8 +12,8 @@ final class HTMLTxtContent implements IHTMLElement {
     }
 
     @Override
-    void getOutput(StringBuffer res) {
-        res.append content
+    void getOutput(ByteArrayOutputStream out) {
+        out << content
     }
 
     @Override

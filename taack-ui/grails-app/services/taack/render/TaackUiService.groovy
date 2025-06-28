@@ -150,7 +150,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (!blockSpecifier) return ''
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep))
         blockSpecifier.visitBlock(htmlBlock)
-        StringBuffer output = new StringBuffer(16256)
+        ByteArrayOutputStream output = new ByteArrayOutputStream(16256)
         htmlBlock.getOutput(output)
         output.toString()
     }
@@ -175,7 +175,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         blockSpecifier.visitBlock(htmlBlock)
         if (p.isModal && params.boolean('isAjax') != false) {
             params['isAjax'] = true
-            StringBuffer output = new StringBuffer(8128)
+            ByteArrayOutputStream output = new ByteArrayOutputStream(8128)
             htmlBlock.getOutput(output)
             render output.toString()
         } else {
@@ -184,7 +184,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             ThemeMode themeMode = themeSelector.themeMode
             ThemeMode themeAuto = themeSelector.themeAuto
 
-            StringBuffer output = new StringBuffer(8128)
+            ByteArrayOutputStream output = new ByteArrayOutputStream(8128)
             htmlBlock.getOutput(output)
             ModelAndView mv = new ModelAndView('/taackUi/blockNoLayout', [
                     themeSize      : themeSize,
@@ -213,9 +213,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
-            StringBuffer res = new StringBuffer(4096)
-            htmlBlock.menu.getOutput(res)
-            res.toString()
+            ByteArrayOutputStream out = new ByteArrayOutputStream(8192)
+            htmlBlock.menu.getOutput(out)
+            out.toString()
         } else ''
     }
 
@@ -229,9 +229,9 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         RawHtmlDropdownMenuDump htmlBlock = new RawHtmlDropdownMenuDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock, id)
-            StringBuffer res = new StringBuffer(4096)
-            htmlBlock.menu.getOutput(res)
-            res.toString()
+            ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
+            htmlBlock.menu.getOutput(out)
+            out.toString()
         } else ''
     }
 
@@ -527,7 +527,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
         RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
         blockSpecifier.visitBlock(htmlPdf)
-        StringBuffer output = new StringBuffer(4096)
+        ByteArrayOutputStream output = new ByteArrayOutputStream(4096)
         htmlPdf.getOutput(output)
         String html = g.render template: '/taackUi/block-mail', model: [
                 block: output.toString(),

@@ -12,9 +12,9 @@ final class HTMLAjaxBlock implements IHTMLElement {
     }
 
     @Override
-    void getOutput(StringBuffer childrenOutput) {
-        childrenOutput.append("__ajaxBlockStart__$id:")
-        children*.getOutput(childrenOutput)
-        childrenOutput.append('__ajaxBlockEnd__')
+    void getOutput(ByteArrayOutputStream out) {
+        out << "__ajaxBlockStart__$id:"
+        children*.getOutput(out)
+        out << '__ajaxBlockEnd__'
     }
 }

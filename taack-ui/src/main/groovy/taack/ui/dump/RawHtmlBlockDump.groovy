@@ -614,8 +614,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void getOutput(StringBuffer res) {
-        blockLog.topElement.getOutput(res)
+    void getOutput(ByteArrayOutputStream out) {
+        blockLog.topElement.getOutput(out)
     }
 
 }

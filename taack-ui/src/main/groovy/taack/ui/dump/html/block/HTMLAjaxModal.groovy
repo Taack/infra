@@ -15,9 +15,9 @@ final class HTMLAjaxModal implements IHTMLElement {
     }
 
     @Override
-    void getOutput(StringBuffer res) {
-        if (!refresh) res.append('__openModal__:')
-        children*.getOutput(res)
-        if (reloadWhenClose) res.append('__reload__')
+    void getOutput(ByteArrayOutputStream out) {
+        if (!refresh) out << '__openModal__:'
+        children*.getOutput(out)
+        if (reloadWhenClose) out << '__reload__'
     }
 }
