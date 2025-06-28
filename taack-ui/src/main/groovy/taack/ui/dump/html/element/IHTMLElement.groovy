@@ -45,8 +45,8 @@ trait IHTMLElement {
     }
 
     void putAttr(String key, String value) {
-        if (attr && !attr.empty) attr += ' ' + key + '="' + value + '" '
-        else attr = key + '="' + value + '" '
+        if (attr && !attr.empty) attr += ' ' + key + '="' + (value?:'') + '" '
+        else attr = key + '="' + (value?:'') + '" '
     }
 
     void resetClasses() {
