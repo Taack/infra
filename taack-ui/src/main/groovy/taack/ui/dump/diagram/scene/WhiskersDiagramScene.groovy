@@ -92,7 +92,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                         BigDecimal upperExtreme = boxData.last()
                         if (lowerExtreme > startLabelY) {
                             String yDataLabel = numberToString(upperExtreme)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}', style: 'pointer-events: bounding-box;"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", style: 'pointer-events: bounding-box;'])
                             // line from upperExtreme to upperQuartile
                             render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
                             render.fillStyle(BLACK_COLOR)
@@ -123,7 +123,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.renderGroupEnd()
 
                             yDataLabel = numberToString(lowerQuartile)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}', style: 'pointer-events: bounding-box;"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", style: 'pointer-events: bounding-box;'])
                             // line from lowerQuartile to lowerExtreme
                             render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
                             render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)

@@ -3,9 +3,9 @@ package taack.ui.dump.diagram
 import groovy.transform.CompileStatic
 
 import java.awt.Color
-//import java.awt.Font
-//import java.awt.FontMetrics
-//import java.awt.image.BufferedImage
+import java.awt.Font
+import java.awt.FontMetrics
+import java.awt.image.BufferedImage
 
 @CompileStatic
 class SvgDiagramRender implements IDiagramRender {
@@ -13,7 +13,7 @@ class SvgDiagramRender implements IDiagramRender {
     private final BigDecimal svgWidth
     private final BigDecimal svgHeight
     private final isViewBox
-//    private final FontMetrics fm
+    private final FontMetrics fm
     private final Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
@@ -26,7 +26,7 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
-//        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
+        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
     }
 
     @Override
@@ -290,8 +290,7 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     BigDecimal measureText(String text) {
-//        return fm.stringWidth(text)
-        text.length() * fontSize
+        return fm.stringWidth(text)
     }
 
     String getRendered() {

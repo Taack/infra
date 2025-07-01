@@ -139,7 +139,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
             keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
                 // image or rect, with text
-                render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})', style: 'pointer-events: bounding-box;"])
+                render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})", style: 'pointer-events: bounding-box;'])
                 if (legendIndex < pointImageHref.size()) {
                     render.translateTo(0.0, 0.0 - (LEGEND_IMAGE_WIDTH - fontSize))
                     render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
