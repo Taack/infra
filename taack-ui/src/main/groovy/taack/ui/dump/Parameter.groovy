@@ -194,21 +194,16 @@ final class Parameter implements WebAttributes {
     }
 
     final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
-        def p = params
-        if (isAjax) {
-            p = new HashMap<String, Object>()
-            if (params) p.putAll(params)
-            p.put('isAjax', true)
-        }
-        applicationTagLib.createLink(controller: controller, action: action, params: p, absolute: target == RenderingTarget.MAIL)
+        urlMapped(controller, action, null, params, isAjax)
     }
 
     final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> params = null, boolean isAjax = false) {
-        def p = params
+        def p = params ?: [:]
         if (isAjax) {
-            p = new HashMap<String, Object>()
-            if (params) p.putAll(params)
             p.put('isAjax', true)
+        }
+        paramsToKeep.each {
+            p.putIfAbsent(it.key, it.value)
         }
         applicationTagLib.createLink(controller: controller, action: action, params: p, absolute: target == RenderingTarget.MAIL, id: id)
     }

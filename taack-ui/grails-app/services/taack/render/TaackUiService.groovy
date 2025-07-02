@@ -191,7 +191,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     themeMode      : themeMode,
                     themeAuto      : themeAuto,
                     block          : output.toString(),
-                    menu           : visitMenu(menu),
+                    menu           : visitMenu(menu, paramsToKeep),
                     conf           : TaackUiConfiguration,
                     clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
                     bootstrapJsTag : bootstrapJsTag,
@@ -209,8 +209,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menuSpecifier menu descriptor
      * @return String the contains the HTML snippet
      */
-    static String visitMenu(final UiMenuSpecifier menuSpecifier) {
-        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
+    static String visitMenu(final UiMenuSpecifier menuSpecifier, String... paramsToKeep) {
+        RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB, paramsToKeep))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
             ByteArrayOutputStream out = new ByteArrayOutputStream(8192)
