@@ -30,6 +30,7 @@ class BootstrapLayout {
             names.eachWithIndex { String entry, int i ->
                 elements[i] = new HTMLLi().builder.addClasses('nav-item').putAttribute('role', 'presentation').addChildren(
                         new HTMLButton(entry).builder.addClasses('nav-link', i == tabIndex ? 'active' : '')
+                                .putAttribute('type', 'button')
                                 .putAttribute('data-bs-toggle', 'tab')
                                 .putAttribute('role', 'tab')
                                 .putAttribute('data-bs-target', "#tab-$tabIds-$i-pane")

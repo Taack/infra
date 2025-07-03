@@ -19,7 +19,6 @@ final class HTMLButton implements IHTMLElement {
 
     HTMLButton(String i18n) {
         this(null, i18n)
-        putAttr('type', 'button')
     }
 
     HTMLButton(String url, String i18n, ButtonStyle style = null) {
