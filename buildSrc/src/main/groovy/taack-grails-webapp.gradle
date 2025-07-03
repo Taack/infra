@@ -1,28 +1,37 @@
 plugins {
-    id 'taack-grails-common'
-    id 'org.apache.grails.gradle.grails-app'
+    id 'taack-grails-assets-common'
     id 'war'
-    id 'org.apache.grails.gradle.grails-web'
-    id 'cloud.wondrify.asset-pipeline'
 }
 
 dependencies {
-    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-//    implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-tomcat"
-    implementation "org.apache.grails:grails-web-boot"
-    implementation "org.apache.grails:grails-url-mappings"
-    implementation "org.apache.grails:grails-rest-transforms"
-
     profile "org.apache.grails.profiles:web"
+    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
+    implementation "org.apache.grails:grails-core"
+    implementation "org.apache.grails:grails-data-hibernate5"
+    implementation "org.apache.grails:grails-databinding"
+    implementation "org.apache.grails:grails-gsp"
+    implementation "org.apache.grails:grails-i18n"
+    implementation "org.apache.grails:grails-interceptors"
+    implementation "org.apache.grails:grails-logging"
+    implementation "org.apache.grails:grails-rest-transforms"
+    implementation "org.apache.grails:grails-scaffolding"
+    implementation "org.apache.grails:grails-services"
+    implementation "org.apache.grails:grails-url-mappings"
+    implementation "org.apache.grails:grails-web-boot"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
+    implementation "org.springframework.boot:spring-boot-starter-tomcat"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+//    console "org.apache.grails:grails-console"
+    runtimeOnly "cloud.wondrify:asset-pipeline-grails"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "com.zaxxer:HikariCP"
-    runtimeOnly "cloud.wondrify:asset-pipeline-grails"
+    runtimeOnly "org.fusesource.jansi:jansi"
 }
 
-//compileJava.options.release = 17
+compileJava.options.release = 17
 
 tasks.withType(Test) {
     useJUnitPlatform()

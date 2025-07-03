@@ -12,7 +12,7 @@ final class HTMLH1Content implements IHTMLElement {
     }
 
     @Override
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         out << '<h1>' + content + '</h1>'
     }
 

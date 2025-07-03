@@ -12,7 +12,7 @@ final class HTMLH2Content implements IHTMLElement {
     }
 
     @Override
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         out << '<h2>' + content + '</h2>'
     }
 

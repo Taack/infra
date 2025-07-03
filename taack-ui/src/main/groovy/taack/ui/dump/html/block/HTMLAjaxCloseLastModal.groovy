@@ -12,7 +12,7 @@ final class HTMLAjaxCloseLastModal implements IHTMLElement {
     }
 
     @Override
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         out << '__closeLastModal__:'
         idValueMap.each { String id, String value ->
             out << "|${id?:''}:${value?:''}"

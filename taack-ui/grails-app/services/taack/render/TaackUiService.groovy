@@ -1,9 +1,11 @@
 package taack.render
 
+import asset.pipeline.grails.AssetResourceLocator
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.util.Triple
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
@@ -19,12 +21,14 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
-import org.springframework.web.servlet.ModelAndView
 import taack.ast.type.FieldInfo
+import taack.domain.TaackGormClass
+import taack.domain.TaackGormClassRegisterService
 import taack.ui.TaackUi
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.ActionIcon
 import taack.ui.dump.*
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
@@ -146,13 +150,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param blockSpecifier block descriptor
      * @return String that contains the HTML snippet
      */
-    String visit(final UiBlockSpecifier blockSpecifier, String... paramsToKeep) {
-        if (!blockSpecifier) return ''
+    void visit(final UiBlockSpecifier blockSpecifier, String... paramsToKeep) {
+        if (!blockSpecifier) return
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep))
         blockSpecifier.visitBlock(htmlBlock)
-        ByteArrayOutputStream output = new ByteArrayOutputStream(16256)
-        htmlBlock.getOutput(output)
-        output.toString()
+        htmlBlock.getOutput(webRequest.response.outputStream)
     }
 
     private TaackUser getCurrentUser() {
@@ -168,55 +170,54 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      *
      * @param blockSpecifier block descriptor
      */
-    def visitAndRender(UiMenuSpecifier menu, final UiBlockSpecifier blockSpecifier, String... paramsToKeep) {
-        if (!blockSpecifier) return ''
+    void visitAndRender(UiMenuSpecifier menu, final UiBlockSpecifier blockSpecifier, String... paramsToKeep) {
+        if (!blockSpecifier) return
         Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
         blockSpecifier.visitBlock(htmlBlock)
         if (p.isModal && params.boolean('isAjax') != false) {
             params['isAjax'] = true
-            ByteArrayOutputStream output = new ByteArrayOutputStream(8128)
-            htmlBlock.getOutput(output)
-            render output.toString()
+            htmlBlock.getOutput(webRequest.response.outputStream)
         } else {
             ThemeSelector themeSelector = themeService.themeSelector
             ThemeSize themeSize = themeSelector.themeSize
             ThemeMode themeMode = themeSelector.themeMode
             ThemeMode themeAuto = themeSelector.themeAuto
 
-            ByteArrayOutputStream output = new ByteArrayOutputStream(8128)
-            htmlBlock.getOutput(output)
-            ModelAndView mv = new ModelAndView('/taackUi/blockNoLayout', [
-                    themeSize      : themeSize,
-                    themeMode      : themeMode,
-                    themeAuto      : themeAuto,
-                    block          : output.toString(),
-                    menu           : visitMenu(menu, paramsToKeep),
-                    conf           : TaackUiConfiguration,
-                    clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
-                    bootstrapJsTag : bootstrapJsTag,
-                    bootstrapCssTag: bootstrapCssTag,
-                    currentUser    : currentUser
-            ])
-            mv
+
+//            ModelAndView mv = new ModelAndView('/taackUi/blockNoLayout', [
+//                    themeSize      : themeSize,
+//                    themeMode      : themeMode,
+//                    themeAuto      : themeAuto,
+//                    block          : htmlBlock,
+//                    menu           : visitMenu(menu, paramsToKeep),
+//                    conf           : TaackUiConfiguration,
+//                    clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+//                    bootstrapJsTag : bootstrapJsTag,
+//                    bootstrapCssTag: bootstrapCssTag,
+//                    currentUser    : currentUser
+//            ])
+//            mv
+            RawHtmlBlockDump menuBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB, paramsToKeep))
+            menu?.visitMenu(menuBlock)
+
+            noTemplate(
+                    params.lang as String,
+                    themeMode,
+                    themeAuto,
+                    htmlBlock,
+                    menuBlock
+            )
         }
 
     }
 
-    /**
-     * Allows to retrieve the content of a menu without rendering it.
-     *
-     * @param menuSpecifier menu descriptor
-     * @return String the contains the HTML snippet
-     */
-    static String visitMenu(final UiMenuSpecifier menuSpecifier, String... paramsToKeep) {
+    void visitMenu(final UiMenuSpecifier menuSpecifier, String... paramsToKeep) {
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB, paramsToKeep))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock)
-            ByteArrayOutputStream out = new ByteArrayOutputStream(8192)
-            htmlBlock.menu.getOutput(out)
-            out.toString()
-        } else ''
+            htmlBlock.menu.getOutput(webRequest.response.outputStream)
+        }
     }
 
     /**
@@ -225,13 +226,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menuSpecifier menu descriptor
      * @return String the contains the HTML snippet
      */
-    static String visitContextualMenu(final UiMenuSpecifier menuSpecifier, Long id) {
+    static void visitContextualMenu(final OutputStream out, final UiMenuSpecifier menuSpecifier, Long id) {
         RawHtmlDropdownMenuDump htmlBlock = new RawHtmlDropdownMenuDump(new Parameter(LocaleContextHolder.locale, staticMs, Parameter.RenderingTarget.WEB))
         if (menuSpecifier) {
             menuSpecifier.visitMenu(htmlBlock, id)
-            ByteArrayOutputStream out = new ByteArrayOutputStream(4096)
             htmlBlock.menu.getOutput(out)
-            out.toString()
         } else ''
     }
 
@@ -262,11 +261,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menu menu descriptor
      * @return
      */
-    final def show(UiBlockSpecifier block, UiMenuSpecifier menu = null, String... paramsToKeep) {
+    final void show(UiBlockSpecifier block, UiMenuSpecifier menu = null, String... paramsToKeep) {
         if (!block) return
         if (menu && !params.containsKey('refresh') && !params.containsKey('targetAjaxBlockId')) params.remove('isAjax')
         if (params.boolean('isAjax')) {
-            render visit(block, paramsToKeep)
+            visit(block, paramsToKeep)
         } else {
             visitAndRender(menu, block, paramsToKeep)
         }
@@ -280,25 +279,25 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menu menu descriptor
      * @return
      */
-    final def show(String html, UiMenuSpecifier menu = null) {
+    final void show(String html, UiMenuSpecifier menu = null) {
         ThemeSelector themeSelector = themeService.themeSelector
         ThemeSize themeSize = themeSelector.themeSize
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        ModelAndView mv = new ModelAndView('/taackUi/block', [
-                themeSize      : themeSize,
-                themeMode      : themeMode,
-                themeAuto      : themeAuto,
-                block          : html,
-                menu           : visitMenu(menu),
-                conf           : TaackUiConfiguration,
-                clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
-                bootstrapJsTag : bootstrapJsTag,
-                bootstrapCssTag: bootstrapCssTag,
-                currentUser    : currentUser
-        ])
-        mv
+//        ModelAndView mv = new ModelAndView('/taackUi/block', [
+//                themeSize      : themeSize,
+//                themeMode      : themeMode,
+//                themeAuto      : themeAuto,
+//                block          : html,
+//                menu           : visitMenu(menu),
+//                conf           : TaackUiConfiguration,
+//                clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+//                bootstrapJsTag : bootstrapJsTag,
+//                bootstrapCssTag: bootstrapCssTag,
+//                currentUser    : currentUser
+//        ])
+//        mv
     }
 
     /**
@@ -309,25 +308,24 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @param menu menu descriptor
      * @return
      */
-    final def showView(String viewName, Map model, UiMenuSpecifier menu) {
+    final void showView(String viewName, Map model, UiMenuSpecifier menu) {
         ThemeSelector themeSelector = themeService.themeSelector
         ThemeSize themeSize = themeSelector.themeSize
         ThemeMode themeMode = themeSelector.themeMode
         ThemeMode themeAuto = themeSelector.themeAuto
 
-        ModelAndView mv = new ModelAndView(viewName, [
-                themeSize      : themeSize,
-                themeMode      : themeMode,
-                themeAuto      : themeAuto,
-                block          : '',
-                menu           : visitMenu(menu),
-                conf           : TaackUiConfiguration,
-                clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
-                bootstrapJsTag : bootstrapJsTag,
-                bootstrapCssTag: bootstrapCssTag,
-                currentUser    : currentUser
-        ] + model)
-        mv
+//        ModelAndView mv = new ModelAndView(viewName, [
+//                themeSize      : themeSize,
+//                themeMode      : themeMode,
+//                themeAuto      : themeAuto,
+//                block          : '',
+//                menu           : visitMenu(menu),
+//                conf           : TaackUiConfiguration,
+//                clientJsPath   : clientJsPath?.length() > 0 ? clientJsPath : null,
+//                bootstrapJsTag : bootstrapJsTag,
+//                bootstrapCssTag: bootstrapCssTag,
+//                currentUser    : currentUser
+//        ] + model)
     }
 
     /**
@@ -540,4 +538,131 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         show(TaackUi.createModal(closure))
     }
 
+    private void noTemplate(String lang, ThemeMode themeMode, ThemeMode themeAuto, RawHtmlBlockDump htmlBlock, RawHtmlBlockDump menuBlock, String... paramsToKeep) {
+
+//        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
+
+        // TODO: Notifications should not be added here, it must be added explicitly, like for languages.
+        // TODO: make menu extensible if necessary
+        TaackUiConfiguration conf
+        webRequest.response.outputStream << """\
+<!DOCTYPE html>
+
+<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+"""
+        if (themeMode == ThemeMode.DARK)
+            webRequest.response.outputStream << """\
+        <meta name="color-scheme" content="dark">
+        <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
+"""
+        else if (themeMode == ThemeMode.LIGHT)
+            webRequest.response.outputStream << """\
+        <meta name="color-scheme" content="light">
+        <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+"""
+        webRequest.response.outputStream << """\
+    <title>${conf.defaultTitle}</title>
+    ${bootstrapCssTag}
+    <link rel="stylesheet" href="/assets/application-taack.css"/>
+
+    <style>
+    .navbar-nav > li > .dropdown-menu {
+        background-color: ${conf.bgColor};
+        z-index: 9999;
+    }
+
+    body > nav .navbar-nav a.nav-link {
+        color: ${conf.fgColor};
+    }
+    </style>
+
+    <link rel="icon" type="image/png" href="/assets/favicon.png"/>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" :""}" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
+    <div id="dropdownNav" class="container-fluid">
+        <a class="navbar-brand" href="/"><img src='/assets/${conf.logoFileName}' width='${conf.logoWidth}'
+                                                      height='${conf.logoHeight}' alt="Logo"/>
+        </a>
+        <button id="dLabel" class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                data-bs-toggle="dropdownNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">"""
+
+        menuBlock.getOutput(webRequest.response.outputStream)
+
+        webRequest.response.outputStream << """
+            <ul class="navbar-nav flex-row ml-md-auto ">
+"""
+        if (conf.hasMenuLogin)
+            if (currentUser)
+                webRequest.response.outputStream << """
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    ${currentUser.username}
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUser" style="text-align: center;">
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link ajaxLink taackAjaxLink"
+                                           ajaxaction="/theme?isAjax=true">${tr 'theme.label'}</a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link" href="/logout">${tr'logout.label'}</a>
+                                    </li>
+                                </ul>
+
+                            </li>
+   
+                    """
+        else
+                webRequest.response.outputStream << """
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src="/assets/taack/icons/actions/config.svg"/>
+                            </a>
+
+                            <ul class="dropdown-menu" aria-labelledby="navbarUser">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link" ajaxaction="/theme?isAjax=true">${tr('theme.label')}</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link" href="/taackLogin">Login</a>
+                                </li>
+
+                            </ul>
+
+                        </li>
+
+                    """
+
+        webRequest.response.outputStream << """
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div id="taack-main-block">"""
+        htmlBlock.getOutput(webRequest.response.outputStream)
+        webRequest.response.outputStream << """\
+    <div id="taack-load-spinner" class="tck-hidden"></div>
+</div>
+
+${bootstrapJsTag}
+    <script src="/assets/application-taack.js"></script>
+</body>
+</html>
+        """
+    }
 }

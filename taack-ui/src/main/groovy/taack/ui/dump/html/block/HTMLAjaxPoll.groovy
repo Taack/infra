@@ -15,7 +15,7 @@ final class HTMLAjaxPoll implements IHTMLElement {
     }
 
     @Override
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         out << "__poll__:$millis:$url:"
         children*.getOutput(out)
     }

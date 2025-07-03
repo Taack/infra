@@ -118,7 +118,7 @@ trait IHTMLElement {
         ret
     }
 
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         if (tag) {
             out << '\n<' + tag
             if (taackTag) out << ' taackTag="' + taackTag.name() + '"'

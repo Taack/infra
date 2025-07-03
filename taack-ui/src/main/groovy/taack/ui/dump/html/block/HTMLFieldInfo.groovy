@@ -14,7 +14,7 @@ final class HTMLFieldInfo implements IHTMLElement {
     }
 
     @Override
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         out << ":__FieldInfo__:${id?:''}:${value?:''}:__FieldInfoEnd__"
     }
 }

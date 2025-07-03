@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
     implementation "org.apache.grails:grails-gsp"
-    runtimeOnly "cloud.wondrify:asset-pipeline-grails"
+    implementation "cloud.wondrify:asset-pipeline-grails"
 }
 
 assets {

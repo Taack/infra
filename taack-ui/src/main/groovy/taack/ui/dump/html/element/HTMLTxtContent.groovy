@@ -12,7 +12,7 @@ final class HTMLTxtContent implements IHTMLElement {
     }
 
     @Override
-    void getOutput(ByteArrayOutputStream out) {
+    void getOutput(OutputStream out) {
         out << content
     }
 
