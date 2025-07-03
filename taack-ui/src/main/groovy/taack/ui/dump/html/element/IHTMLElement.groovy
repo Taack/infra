@@ -142,6 +142,7 @@ trait IHTMLElement {
 
     static final class HTMLElementBuilder<T extends IHTMLElement> {
         private T element
+        private Map<String, String> attr = [:]
 
         HTMLElementBuilder(T element) {
             this.element = element
@@ -163,7 +164,7 @@ trait IHTMLElement {
         }
 
         HTMLElementBuilder<T> putAttribute(String key, String value) {
-            element.putAttr(key, value)
+            attr.put(key, value)
             this
         }
 
@@ -188,6 +189,9 @@ trait IHTMLElement {
         }
 
         T build() {
+            attr.each {
+                element.putAttr(it.key, it.value)
+            }
             element
         }
     }
