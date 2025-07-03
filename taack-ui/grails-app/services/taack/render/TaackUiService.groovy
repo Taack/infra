@@ -542,10 +542,12 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
 //        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
 
+        BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, 8192)
+
         // TODO: Notifications should not be added here, it must be added explicitly, like for languages.
         // TODO: make menu extensible if necessary
         TaackUiConfiguration conf
-        webRequest.response.outputStream << """\
+        bout << """\
 <!DOCTYPE html>
 
 <html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
@@ -554,16 +556,16 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     <meta name="viewport" content="width=device-width">
 """
         if (themeMode == ThemeMode.DARK)
-            webRequest.response.outputStream << """\
+            bout << """\
         <meta name="color-scheme" content="dark">
         <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
 """
         else if (themeMode == ThemeMode.LIGHT)
-            webRequest.response.outputStream << """\
+            bout << """\
         <meta name="color-scheme" content="light">
         <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
 """
-        webRequest.response.outputStream << """\
+        bout << """\
     <title>${conf.defaultTitle}</title>
     ${bootstrapCssTag}
     <link rel="stylesheet" href="/assets/application-taack.css"/>
@@ -598,14 +600,14 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">"""
 
-        menuBlock.getOutput(webRequest.response.outputStream)
+        menuBlock.getOutput(bout)
 
-        webRequest.response.outputStream << """
+        bout << """
             <ul class="navbar-nav flex-row ml-md-auto ">
 """
         if (conf.hasMenuLogin)
             if (currentUser)
-                webRequest.response.outputStream << """
+                bout << """
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -626,7 +628,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
    
                     """
         else
-                webRequest.response.outputStream << """
+                bout << """
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -647,15 +649,15 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
                     """
 
-        webRequest.response.outputStream << """
+        bout << """
             </ul>
         </div>
     </div>
 </nav>
 
 <div id="taack-main-block">"""
-        htmlBlock.getOutput(webRequest.response.outputStream)
-        webRequest.response.outputStream << """\
+        htmlBlock.getOutput(bout)
+        bout << """\
     <div id="taack-load-spinner" class="tck-hidden"></div>
 </div>
 
@@ -664,5 +666,6 @@ ${bootstrapJsTag}
 </body>
 </html>
         """
+        bout.flush()
     }
 }
