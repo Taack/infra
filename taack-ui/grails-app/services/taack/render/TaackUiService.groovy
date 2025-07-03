@@ -608,7 +608,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                 webRequest.response.outputStream << """
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
-                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     ${currentUser.username}
                                 </a>
 
