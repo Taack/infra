@@ -36,7 +36,7 @@ trait IHTMLElement {
     TaackTag taackTag
     String id
     private String classes
-    private Map<String, String> attrMap = [:]
+    private String attr
     Vector<IHTMLElement> children = new Vector<>()
     IHTMLElement parent
 
@@ -45,7 +45,8 @@ trait IHTMLElement {
     }
 
     void putAttr(String key, String value) {
-        attrMap.put(key, value)
+        if (attr && !attr.empty) attr += ' ' + key + '="' + (value?:'') + '" '
+        else attr = key + '="' + (value?:'') + '" '
     }
 
     void resetClasses() {
@@ -88,7 +89,7 @@ trait IHTMLElement {
             ltt << ret
         }
         if (!ret) {
-            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.taackTag?.toString() + ':' + this.attrMap.toString()} has no parent ${taackTags} ltt = ${ltt*.taackTag}")
+            throw new Exception("ERROR IHTMLElement::toParentTaackTag ${this.taackTag?.toString() + ':' + attr} has no parent ${taackTags} ltt = ${ltt*.taackTag}")
         }
         ret
     }
@@ -104,7 +105,7 @@ trait IHTMLElement {
 
     @Override
     String toString() {
-        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attrMap.toString()}"""
+        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attr}"""
     }
 
     String indent() {
@@ -123,7 +124,7 @@ trait IHTMLElement {
             if (taackTag) out << ' taackTag="' + taackTag.name() + '"'
             if (id) out << ' id="' + id + '"'
             if (classes) out << ' class="' + classes + '"'
-            if (!attrMap.isEmpty()) out << ' ' + attrMap.collect { it.key + '="' + (it.value?:'') + '"' }.join(' ')
+            if (attr) out << ' ' + attr.trim()
             out << '>'
         }
 
@@ -141,13 +142,13 @@ trait IHTMLElement {
 
     static final class HTMLElementBuilder<T extends IHTMLElement> {
         private T element
-
+        private final Map<String, String> attr = [:]
         HTMLElementBuilder(T element) {
             this.element = element
         }
 
         HTMLElementBuilder<T> setId(String id) {
-            putAttribute('id', id)
+            element.id = id
             this
         }
 
@@ -162,7 +163,7 @@ trait IHTMLElement {
         }
 
         HTMLElementBuilder<T> putAttribute(String key, String value) {
-            element.putAttr(key, value)
+            attr.put(key, value)
             this
         }
 
@@ -187,6 +188,9 @@ trait IHTMLElement {
         }
 
         T build() {
+            attr.each {
+                element.putAttr(it.key, it.value)
+            }
             element
         }
     }
