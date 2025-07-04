@@ -544,8 +544,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
         BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, 8192)
 
-        // TODO: Notifications should not be added here, it must be added explicitly, like for languages.
-        // TODO: make menu extensible if necessary
         TaackUiConfiguration conf
         bout << """\
 <!DOCTYPE html>
@@ -605,50 +603,99 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         bout << """
             <ul class="navbar-nav flex-row ml-md-auto ">
 """
-        if (conf.hasMenuLogin)
-            if (currentUser)
+        if (conf.hasMenuLogin) {
+            TaackUser currentUser = getCurrentUser()
+            if (currentUser) {
+                Map<GormEntity, Date> notifications = currentUser?.getNotificationRelatedDataList(true) ?: [:]
+                bout << """
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" unread-notification-number=${notifications.size()}>
+                            ${currentUser.username}
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUser" style="text-align: center;">
+                """
+
+                // TODO: put Notifications here temporarily, but it should be added explicitly in Intranet using MENU, and should be divided per each application.
+                if (!notifications.isEmpty()) {
+                    bout << """
+                            <li class="nav-item dropdown">
+                                <span class="user-notification-header">
+                                    Notification
+                                    <span unread-notification-number="${notifications.size()}"></span>
+                                </span>
+                                <a class="show-user-notification-list-btn" ajaxaction="/taackUserNotification/showUserNotifications" href="/taackUserNotification/showUserNotifications?isAjax=false">
+                                    ${ActionIcon.SHOW.getHtml("Details", 20)}
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <div class="user-notification-body">
+                    """
+                    notifications.collect {
+                        new Triple(it.key, it.value, TaackGormClassRegisterService.getTaackGormClass(it.key.class.name))
+                    }.groupBy { Triple info ->
+                        (info.cValue as TaackGormClass)?.notification?.getTitleClosure()?.call((info.aValue as GormEntity).ident())?.toString()
+                    }.sort { it.key }.each { Map.Entry<String, List<Triple>> group ->
+                        bout << """
+                                    <div class="user-notification-group">
+                                        <div class="group-header">
+                                            ${group.key ?: tr('enum.value.OTHER')}
+                                            <span unread-notification-number="${group.value.size()}"></span>
+                                            <a class="read-all-user-notification-btn" ajaxaction="/taackUserNotification/readAllUserNotifications?title=${group.key ?: "other"}">
+                                                ${ActionIcon.CONFIRM.getHtml("Mark all as Read", 15)}
+                                            </a>
+                                        </div>
+                        """
+                        (group.value as List<Triple<GormEntity, Date, TaackGormClass>>).sort { -it.bValue.time }.each { object ->
+                            String objectType = object.cValue?.typeLabel?.call(object.aValue.ident())
+                            String objectLabel = object.cValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
+                            bout << """
+                                        <a ajaxaction="/taackUserNotification/readUserNotification?objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
+                                           class="group-item nav-link ajaxLink taackAjaxLink" title="${objectLabel}">
+                                            ${objectType ? "<span class='group-item-prefix'>[${objectType}]</span>" : ''} ${objectLabel}
+                                        </a>
+                            """
+                        }
+                        bout << '</div>'
+                    }
+                    bout << """
+                                </div>
+                            </li>
+                        """
+                }
+
                 bout << """
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
-                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    ${currentUser.username}
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUser" style="text-align: center;">
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link ajaxLink taackAjaxLink"
-                                           ajaxaction="/theme?isAjax=true">${tr 'theme.label'}</a>
-                                    </li>
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link" href="/logout">${tr'logout.label'}</a>
-                                    </li>
-                                </ul>
-
+                                <a class="nav-link ajaxLink taackAjaxLink"
+                                   ajaxaction="/theme?isAjax=true">${tr 'theme.label'}</a>
                             </li>
-   
-                    """
-        else
-                bout << """
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
-                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img src="/assets/taack/icons/actions/config.svg"/>
-                            </a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" href="/logout">${tr'logout.label'}</a>
+                            </li>
+                        </ul>
+                    </li>
+                """
+            }
+        } else
+            bout << """
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="/assets/taack/icons/actions/config.svg"/>
+                        </a>
 
-                            <ul class="dropdown-menu" aria-labelledby="navbarUser">
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link" ajaxaction="/theme?isAjax=true">${tr('theme.label')}</a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link" href="/taackLogin">Login</a>
-                                </li>
+                        <ul class="dropdown-menu" aria-labelledby="navbarUser">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" ajaxaction="/theme?isAjax=true">${tr('theme.label')}</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" href="/taackLogin">Login</a>
+                            </li>
 
-                            </ul>
-
-                        </li>
-
-                    """
-
+                        </ul>
+                    </li>
+            """
         bout << """
             </ul>
         </div>
