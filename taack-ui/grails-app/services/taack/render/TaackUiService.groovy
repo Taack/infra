@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
+import org.springframework.web.util.HtmlUtils
 import taack.ast.type.FieldInfo
 import taack.domain.TaackGormClass
 import taack.domain.TaackGormClassRegisterService
@@ -652,7 +653,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                             String objectLabel = object.cValue?.showLabel?.call(object.aValue.ident()) ?: object.aValue.toString()
                             bout << """
                                         <a ajaxaction="/taackUserNotification/readUserNotification?objectClass=${object.aValue.class.name}&objectId=${object.aValue.ident()}"
-                                           class="group-item nav-link ajaxLink taackAjaxLink" title="${objectLabel}">
+                                           class="group-item nav-link ajaxLink taackAjaxLink" title="${HtmlUtils.htmlEscape(objectLabel)}">
                                             ${objectType ? "<span class='group-item-prefix'>[${objectType}]</span>" : ''} ${objectLabel}
                                         </a>
                             """

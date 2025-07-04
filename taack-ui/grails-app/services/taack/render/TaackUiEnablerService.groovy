@@ -61,7 +61,6 @@ class TaackUiEnablerService implements WebAttributes {
             pf = pf.and(it)
         }
         return pf.sanitize(toSanitize)
-        return toSanitize
     }
 
     private final static Map<String, Closure> securityClosures = [:]
