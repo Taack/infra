@@ -93,12 +93,12 @@ final class BootstrapMenu implements IHTMLElement {
         topElement
     }
 
-    IHTMLElement menuSearch(IHTMLElement topElement, String query, String action) {
+    IHTMLElement menuSearch(IHTMLElement topElement, String i18n, String query, String action) {
         if (!isMail)
             topElement.addChildren(
                     new HTMLForm(action).builder.addClasses('solrSearch-input', 'py-1').addChildren(
                             new HTMLDiv().builder.addClasses('input-group', 'rounded').addChildren(
-                                    new HTMLInput(InputType.STRING, query, 'q', TaackUiService.tr('action.search.label')).builder.putAttribute('aria-label', 'Search').addClasses('form-control', 'rounded', 'bg-white').build()
+                                    new HTMLInput(InputType.STRING, query, 'q', i18n?: TaackUiService.tr('action.search.label')).builder.putAttribute('aria-label', 'Search').addClasses('form-control', 'rounded', 'bg-white').build()
                             ).build()
                     ).build()
             )

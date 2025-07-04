@@ -569,9 +569,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses) {
+        String i18n = parameter.trField(Utils.getControllerName(action), action.method.toString(), false)
+
         enterBlock('visitMenuSearch')
         splitMenu()
-        menu.menuSearch(blockLog.topElement, q?.replace('"', '&quot;'), parameter.urlMapped(Utils.getControllerName(action), action.method))
+        menu.menuSearch(blockLog.topElement, i18n, q?.replace('"', '&quot;'), parameter.urlMapped(Utils.getControllerName(action), action.method))
         splitMenuEnd()
         exitBlock('visitMenuSearch')
     }
