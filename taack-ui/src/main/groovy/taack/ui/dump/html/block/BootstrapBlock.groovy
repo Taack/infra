@@ -27,13 +27,14 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
     }
 
     IHTMLElement blockHeader(IHTMLElement topElement) {
-        HTMLDiv menuDiv = new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent' + blockCounter).build() as HTMLDiv
+        final int bc = blockCounter ++
+        HTMLDiv menuDiv = new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent' + bc).build() as HTMLDiv
         if (parameter.target != Parameter.RenderingTarget.MAIL) {
             HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
                     new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
                             .addClasses('navbar-toggler', 'navbar-dark')
                             .putAttribute('data-bs-toggle', 'collapse')
-                            .putAttribute('data-bs-target', '#navbarSupportedContent')
+                            .putAttribute('data-bs-target', '#navbarSupportedContent' + bc)
                             .putAttribute('aria-controls', 'navbarSupportedContent')
                             .putAttribute('aria-expanded', 'false')
                             .putAttribute('aria-label', 'Toggle navigation')
