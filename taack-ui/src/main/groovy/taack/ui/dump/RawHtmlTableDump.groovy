@@ -77,26 +77,27 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url) {
-        Style displayBlock = new Style(null, 'display: block;')
+        Style displayBlock = new Style('text-truncate', 'display: block;max-width: 256px;')
         if (cell && style) {
             displayBlock += style
         }
         HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: '<br>')
         if (!url) return new HTMLSpan().builder
-                .setStyle(displayBlock)
+                .setStyle(displayBlock).putAttribute('title', cell ?: '')
                 .addChildren(cellHTML).build()
         return new HTMLAnchor(true, url).builder.addChildren(cellHTML).build()
     }
 
     static final IHTMLElement displayCell(final FieldInfo fieldInfo, final Style style, Long id = null) {
-        Style displayBlock = new Style(null, 'display: block;')
+        Style displayBlock = new Style('text-truncate', 'display: block;max-width: 256px;')
         if (fieldInfo && style) {
             displayBlock += style
         }
-        HTMLTxtContent cellHTML = new HTMLTxtContent(TaackUiEnablerService.sanitizeString(fieldInfo.value.toString()) ?: '<br>')
+        String content = TaackUiEnablerService.sanitizeString(fieldInfo.value.toString())
+        HTMLTxtContent cellHTML = new HTMLTxtContent(content ?: '<br>')
 
         UiMenuSpecifier menu = TaackUiService.contextualMenuClosureFromField(fieldInfo)
-        IHTMLElement.HTMLElementBuilder htmlBuilder = new HTMLSpan().builder.setStyle(displayBlock).addChildren(cellHTML)
+        IHTMLElement.HTMLElementBuilder htmlBuilder = new HTMLSpan().builder.setStyle(displayBlock).putAttribute('title', content).addChildren(cellHTML)
         if (menu && fieldInfo.value) {
             String ident = fieldInfo.value.toString()
             String className = fieldInfo.fieldConstraint.field.type.simpleName
@@ -107,7 +108,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 className = fieldInfo.fieldConstraint.field.declaringClass.simpleName
             }
             return htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
-                        .build()
+                    .build()
         }
         return htmlBuilder.build()
     }
@@ -328,11 +329,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowField(final FieldInfo fieldInfo,Long id = null, final String format, final Style style) {
+    void visitRowField(final FieldInfo fieldInfo, Long id = null, final String format, final Style style) {
         if (TaackUiService.contextualMenuClosureFromField(fieldInfo) && fieldInfo.value) {
             boolean addColumn = !isInCol
             if (addColumn) visitColumn(null, null)
-            blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, id ?: parameter.params.long('id')))//, firstInCol, isInCol))
+            blockLog.topElement.builder.addChildren(displayCell(fieldInfo, style, id ?: parameter.params.long('id')))
+//, firstInCol, isInCol))
             if (addColumn) visitColumnEnd()
         } else {
             visitRowField(dataFormat(fieldInfo?.value, format, parameter.lcl), style)
