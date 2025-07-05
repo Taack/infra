@@ -77,6 +77,8 @@ class Style implements IStyleDescriptor {
 
     final static Style MARKDOWN_BODY = new Style('markdown-body')
 
+    final static Style TABLE_TRUCATE = new Style('text-truncate', 'max-with: 256px;')
+
     Style(final String cssClassesString, final String cssStyleString = null, final boolean isDiv = false, final boolean applyToLabel = false) {
         if (applyToLabel) {
             this.labelCssClassesString = cssClassesString

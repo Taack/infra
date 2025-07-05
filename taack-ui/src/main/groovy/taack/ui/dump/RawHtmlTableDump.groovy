@@ -77,19 +77,19 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url) {
-        Style displayBlock = new Style('text-truncate', 'display: block;max-width: 256px;')
+        Style displayBlock = new Style(null, 'display: block;')
         if (cell && style) {
             displayBlock += style
         }
         HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: '<br>')
         if (!url) return new HTMLSpan().builder
-                .setStyle(displayBlock).putAttribute('title', cell ?: '')
+                .setStyle(displayBlock)//.putAttribute('title', cell ?: '')
                 .addChildren(cellHTML).build()
         return new HTMLAnchor(true, url).builder.addChildren(cellHTML).build()
     }
 
     static final IHTMLElement displayCell(final FieldInfo fieldInfo, final Style style, Long id = null) {
-        Style displayBlock = new Style('text-truncate', 'display: block;max-width: 256px;')
+        Style displayBlock = new Style('text-truncate', 'display: block;max-with: 256px;')
         if (fieldInfo && style) {
             displayBlock += style
         }
