@@ -5,6 +5,7 @@ import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.util.Pair
 import grails.util.Triple
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
@@ -535,6 +536,25 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         html
     }
 
+    /**
+     * Dump a block in Mail HTML version.
+     *
+     * @param blockSpecifier block descriptor
+     * @param locale language
+     * @return HTML content, and attachment to add to the mail
+     */
+    final Pair<String, Map<String, byte[]>> dumpMailHtmlWithDiagram(UiBlockSpecifier blockSpecifier, Locale locale = null) {
+        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
+        blockSpecifier.visitBlock(htmlPdf)
+        ByteArrayOutputStream output = new ByteArrayOutputStream(4096)
+        htmlPdf.getOutput(output)
+        String html = g.render template: '/taackUi/block-mail', model: [
+                block: output.toString(),
+                root : TaackUiConfiguration.root
+        ]
+        new Pair(html, htmlPdf.mailAttachment)
+    }
+
     final void createModal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         show(TaackUi.createModal(closure))
     }
@@ -543,7 +563,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
 //        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
 
-        BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, 32768)
+        BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, 4096)
 
         TaackUiConfiguration conf
         bout << """\

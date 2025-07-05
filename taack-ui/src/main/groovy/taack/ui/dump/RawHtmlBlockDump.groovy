@@ -28,6 +28,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     String futurCurrentAjaxBlockId
     String theCurrentExplicitAjaxBlockId
 
+    Map<String, byte[]> mailAttachment = [:]
+
     boolean isModal = false
     boolean isRefreshing = false
     boolean renderTab = false
@@ -308,7 +310,12 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         filterSpecifier.visitFilter(filterVisitor)
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog), UiDiagramSpecifier.DiagramBase.SVG)
+        if (parameter.target == Parameter.RenderingTarget.MAIL) {
+            RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog, mailAttachment)
+            diagramSpecifier.visitDiagram(diagramDump, UiDiagramSpecifier.DiagramBase.PNG)
+        } else
+            diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog), UiDiagramSpecifier.DiagramBase.SVG)
+
         filterVisitor.addHiddenInputs()
         visitColEnd()
     }
@@ -316,7 +323,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitDiagram(final UiDiagramSpecifier diagramSpecifier) {
         blockLog.stayBlock('visitDiagram')
-        diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog), UiDiagramSpecifier.DiagramBase.SVG)
+        if (parameter.target == Parameter.RenderingTarget.MAIL) {
+            RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog, mailAttachment)
+            diagramSpecifier.visitDiagram(diagramDump, UiDiagramSpecifier.DiagramBase.PNG)
+        } else
+            diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog), UiDiagramSpecifier.DiagramBase.SVG)
     }
 
     @Override

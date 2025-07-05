@@ -8,24 +8,22 @@ import taack.ui.dump.common.BlockLog
 import taack.ui.dump.diagram.IDiagramRender
 import taack.ui.dump.diagram.PngDiagramRender
 import taack.ui.dump.diagram.SvgDiagramRender
-import taack.ui.dump.diagram.scene.AreaDiagramScene
-import taack.ui.dump.diagram.scene.BarDiagramScene
-import taack.ui.dump.diagram.scene.LineDiagramScene
-import taack.ui.dump.diagram.scene.PieDiagramScene
-import taack.ui.dump.diagram.scene.ScatterDiagramScene
-import taack.ui.dump.diagram.scene.WhiskersDiagramScene
+import taack.ui.dump.diagram.scene.*
 import taack.ui.dump.html.block.HTMLOutput
 
 import java.text.SimpleDateFormat
+import java.util.concurrent.ThreadLocalRandom
 
 @CompileStatic
 class RawHtmlDiagramDump implements IUiDiagramVisitor {
     final private ByteArrayOutputStream out
     private final BlockLog blockLog
+    final Map<String, byte[]> mailAttachment
 
-    RawHtmlDiagramDump(final ByteArrayOutputStream out, final BlockLog blockLog = null) {
+    RawHtmlDiagramDump(final ByteArrayOutputStream out, final BlockLog blockLog = null, final Map<String, byte[]> mailAttachment = null) {
         this.out = out
         this.blockLog = blockLog
+        this.mailAttachment = mailAttachment
     }
 
     UiDiagramSpecifier.DiagramBase diagramBase
@@ -176,7 +174,12 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitDiagramEnd() {
         if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            (this.render as PngDiagramRender).writeImage(out)
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+            (this.render as PngDiagramRender).writeImage(byteArrayOutputStream)
+            String fileName = ThreadLocalRandom.current().nextInt(0, 1_000_000).toString() + '-diagram.png'
+
+            mailAttachment.put(fileName, byteArrayOutputStream.toByteArray())
+            out << """<img src="cid:${fileName}" style="display:block" width="720" height="360">"""
         } else {
             out << (this.render as SvgDiagramRender).getRendered()
         }
@@ -192,6 +195,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         out << html
         if (blockLog) {
             ByteArrayOutputStream clone = new ByteArrayOutputStream()
+
             out.writeTo(clone)
             blockLog.topElement.addChildren(new HTMLOutput(clone))
         }
