@@ -43,14 +43,16 @@ bootRun {
     ignoreExitValue true
     jvmArgs(
             '-Dspring.output.ansi.enabled=always',
-            '-noverify',
-            '-XX:TieredStopAtLevel=1',
-            '-XX:+UnlockExperimentalVMOptions',
-            '-XX:+UseCompactObjectHeaders',
-            '-XX:+UseEpsilonGC',
-            '-Xmx1024m'
+//            '-noverify',
+//            '-XX:TieredStopAtLevel=1',
+//            '-XX:+UnlockExperimentalVMOptions',
+//            '-XX:+UseCompactObjectHeaders',
+//            '-XX:+UseEpsilonGC',
+            '-Xmx256m'
     )
 }
+
+// ~/.jdks/openjdk-24.0.1/bin/java -Xmx256m  -XX:+UseStringDeduplication -XX:+UnlockExperimentalVMOptions -XX:+UseSerialGC -XX:+UseCompactObjectHeaders -jar taack-ui-test-minimal-0.7.0.jar
 
 assets {
     minifyJs = true
@@ -93,3 +95,6 @@ bootBuildImage {
 // docker run -u root -p 8080:9442 -v $(pwd)/w:/workspace/test:Z docker.io/library/taack-ui-test chown -R node:node /workspace/test
 // docker run --rm -p 9442:9442 docker.io/library/taack-ui-test-minimal
 // docker save docker.io/library/taack-ui-test-minimal > taack-ui-test-minimal.tar
+
+
+//
