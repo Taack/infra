@@ -267,11 +267,11 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     fieldErrors.put(it.field, [grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale)])
                 }
             }
-            return fieldErrors.collect {
+            fieldErrors.collect {
                 render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
             }.join('')
         } else {
-            render taackUiService.visit(blockSpecifier)
+            taackUiService.visit(blockSpecifier)
         }
     }
 
