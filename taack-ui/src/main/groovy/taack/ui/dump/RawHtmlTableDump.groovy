@@ -16,6 +16,7 @@ import taack.ui.dump.html.element.*
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
+import taack.ui.dump.html.style.Height2p8rem
 import taack.ui.dump.html.table.*
 
 import java.text.DateFormat
@@ -386,6 +387,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (max != -1 && count > max) {
             blockLog.topElement.builder.addChildren(new HTMLDiv().builder
                     .addClasses('taackTablePaginate')
+                    .setStyle(new Height2p8rem())
                     .putAttribute('taackMax', max?.toString())
                     .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: '0')
                     .putAttribute('taackCount', count?.toString())
