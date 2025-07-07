@@ -22,7 +22,8 @@ repositories {
 
 
 dependencies {
-    implementation "org.grails:grails-gradle-plugin:7.0.0-M4"
+    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
+    implementation "org.apache.grails:grails-gradle-plugins"
     implementation "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:${graalvmBuildtoolsVersion}"
     implementation "org.gradle.crypto.checksum:org.gradle.crypto.checksum.gradle.plugin:${gradleChecksumPluginVersion}"
 }

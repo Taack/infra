@@ -11,6 +11,7 @@ import java.time.Duration
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url "https://repository.apache.org/content/groups/public" }
         maven { url "https://repo.grails.org/grails/restricted" }
