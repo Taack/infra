@@ -78,6 +78,7 @@ class CmsController implements WebAttributes {
                 subMenu this.&testDiagram as MC
             }
             menuIcon ActionIcon.CHART, this.&testProgressBar as MC
+            menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC
 
             menuSearch CmsController.&search as MC, q
             menuOptions(SupportedLanguage.fromContext())
@@ -1117,7 +1118,7 @@ class CmsController implements WebAttributes {
             printableHeaderLeft('8.5cm') {
                 show new UiShowSpecifier().ui {
                     field Style.BOLD, 'Printed for'
-                    field """${cu.firstName} ${cu.lastName}"""
+                    field Style.BLUE, cu.username_
                 }, BlockSpec.Width.THIRD
                 show new UiShowSpecifier().ui {
                     field """\
@@ -1133,15 +1134,38 @@ class CmsController implements WebAttributes {
             }
 
             printableBody {
-                // if width is null, it will be set to default value '720px'
-                // if height is null, it will be set depending on width (Pie: height = width; Else: height = width / 2)
-                // See details in RawHtmlDiagramDump.createDiagramRender()
-                diagram barDiagram(false), BlockSpec.Width.MAX
-                diagram barDiagram(true), BlockSpec.Width.MAX
-                diagram barDiagram(true), BlockSpec.Width.MAX
-                diagram areaDiagram(), BlockSpec.Width.MAX
-                diagram pieDiagram(false), BlockSpec.Width.MAX
-                diagram pieDiagram(true), BlockSpec.Width.MAX
+                anonymousBlock BlockSpec.Width.MAX, {
+                    // if width is null, it will be set to default value '720px'
+                    // if height is null, it will be set depending on width (Pie: height = width; Else: height = width / 2)
+                    // See details in RawHtmlDiagramDump.createDiagramRender()
+                    diagram barDiagram(false), BlockSpec.Width.MAX
+                    diagram barDiagram(true), BlockSpec.Width.MAX
+                    diagram barDiagram(true), BlockSpec.Width.MAX
+                    diagram areaDiagram(), BlockSpec.Width.MAX
+                    diagram pieDiagram(false), BlockSpec.Width.MAX
+                    diagram pieDiagram(true), BlockSpec.Width.MAX
+                }
+
+                table(new UiTableSpecifier().ui {
+                    header {
+                        label 'tutu'
+                        label 'tutu2'
+                        label 'tutu3'
+                        label 'tutu4'
+                    }
+                    row {
+                        rowField 'titi1'
+                        rowField 'titi2'
+                        rowField 'titi3'
+                        rowField 'titi4'
+                    }
+                    row {
+                        rowField 'titi1'
+                        rowField 'titi2'
+                        rowField 'titi3'
+                        rowField 'titi4'
+                    }
+                }, BlockSpec.Width.MAX)
 
                 diagram new UiDiagramSpecifier().ui({
                     whiskers({
@@ -1170,7 +1194,17 @@ class CmsController implements WebAttributes {
 
         }
 
-        taackUiPdfService.downloadPdf(pdf, 'testChart', false)
+        if (params.boolean('html')) {
+            params.remove('html')
+            params['isPdf'] = true
+            taackUiPdfService.downloadPdf(pdf, 'testChart', true)
+        } else {
+            params.put('isPdf', true)
+            taackUiPdfService.downloadPdf(pdf, 'testChart', false)
+        }
+        return false
+
+
     }
 
     private static UiDiagramSpecifier barDiagram(boolean isStacked) {
