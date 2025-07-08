@@ -173,15 +173,25 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitDiagramEnd() {
-        if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
-            (this.render as PngDiagramRender).writeImage(byteArrayOutputStream)
-            String fileName = ThreadLocalRandom.current().nextInt(0, 1_000_000).toString() + '-diagram.png'
-
-            mailAttachment.put(fileName, byteArrayOutputStream.toByteArray())
-            out << """<img src="cid:${fileName}" style="display:block" width="720" height="360">"""
+        if (mailAttachment == null) {
+            if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
+                (this.render as PngDiagramRender).writeImage(out)
+            } else {
+                out << (this.render as SvgDiagramRender).getRendered()
+            }
         } else {
-            out << (this.render as SvgDiagramRender).getRendered()
+            ByteArrayOutputStream fileStream = new ByteArrayOutputStream()
+            String suffix
+            if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
+                (this.render as PngDiagramRender).writeImage(fileStream)
+                suffix = 'png'
+            } else {
+                fileStream << (this.render as SvgDiagramRender).getRendered()
+                suffix = 'svg'
+            }
+            String fileName = ThreadLocalRandom.current().nextInt(0, 1_000_000).toString() + '-diagram.' + suffix
+            mailAttachment.put(fileName, fileStream.toByteArray())
+            out << """<img src="cid:${fileName}" style="display:block" width="720" height="360">"""
         }
         if (blockLog) {
             ByteArrayOutputStream clone = new ByteArrayOutputStream()

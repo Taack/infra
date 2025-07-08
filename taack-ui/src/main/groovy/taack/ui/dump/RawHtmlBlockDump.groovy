@@ -310,11 +310,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         filterSpecifier.visitFilter(filterVisitor)
         visitColEnd()
         visitCol(BlockSpec.Width.THREE_QUARTER)
-        if (parameter.target == Parameter.RenderingTarget.MAIL) {
-            RawHtmlDiagramDump diagramDump = new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog, mailAttachment)
-            diagramSpecifier.visitDiagram(diagramDump, UiDiagramSpecifier.DiagramBase.PNG)
-        } else
-            diagramSpecifier.visitDiagram(new RawHtmlDiagramDump(new ByteArrayOutputStream(4096), blockLog), UiDiagramSpecifier.DiagramBase.SVG)
+
+        visitDiagram(diagramSpecifier)
 
         filterVisitor.addHiddenInputs()
         visitColEnd()
