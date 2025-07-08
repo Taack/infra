@@ -20,7 +20,7 @@ class PngDiagramRender implements IDiagramRender {
     private final BigDecimal pngHeight
     private final FontMetrics fm
     private final AffineTransform initialTransform
-    private final Integer fontSize = 13
+    private final Integer fontSize = 13 * 3
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private Color fillStyle = Color.BLACK

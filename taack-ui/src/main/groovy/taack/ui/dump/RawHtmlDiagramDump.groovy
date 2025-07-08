@@ -108,7 +108,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             BigDecimal width = 720.0
             this.render = new SvgDiagramRender(width, width * heightWidthRadio, false)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            BigDecimal width = 720.0
+            BigDecimal width = 720.0 * 3
             this.render = new PngDiagramRender(width, width * heightWidthRadio)
         }
     }
