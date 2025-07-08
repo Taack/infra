@@ -85,6 +85,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         // further the first block must be in ajaxMode until current block ends
         if (parameter.target == Parameter.RenderingTarget.MAIL) return true
         simpleLog("doRenderElement0 :> renderTab: $renderTab, id: $id, theCurrentExplicitAjaxBlockId: ${theCurrentExplicitAjaxBlockId}, isModal: ${isModal}, params: ${parameter.params}")
+
         if (!parameter.isAjaxRendering) {
             simpleLog('doRenderElement01: true')
             return true
@@ -116,7 +117,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
-        boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (isModal) //&& !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
+        boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (!currentAjaxBlockId && isModal) //&& !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
         simpleLog("doRenderElement4 => doRender = $doRender")
         return doRender
     }
