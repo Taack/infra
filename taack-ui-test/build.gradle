@@ -9,7 +9,7 @@ dependencies {
     implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
 
     implementation 'commons-io:commons-io:2.18.0'
-    implementation "org.asciidoctor:asciidoctorj:${asciidoctorJ}"
+    implementation 'org.asciidoctor:asciidoctorj:3.0.0'
     implementation 'org.asciidoctor:asciidoctorj-pdf:2.3.19'
     implementation 'org.asciidoctor:asciidoctorj-diagram:2.3.1'
     implementation 'org.asciidoctor:asciidoctorj-revealjs:5.1.0'
