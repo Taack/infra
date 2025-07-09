@@ -47,9 +47,6 @@ ${raw(css)}
         content: counter(page) " / " counter(pages);
     }
 }
-svg {
-    width: 3cm;
-}
 
 .pure-u-1-3 {
     width: 60mm;
