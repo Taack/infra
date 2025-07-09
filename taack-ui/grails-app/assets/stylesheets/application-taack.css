@@ -12,5 +12,6 @@
 *= require taack
 *= require taack-asciidoc
 *= require custom
+*= require taack-editor
 *= require_self
 */

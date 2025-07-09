@@ -728,8 +728,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         bout << """\
     <div id="taack-load-spinner" class="tck-hidden"></div>
 </div>
-
 ${bootstrapJsTag}
+    <script src="${clientJsPath}"></script>
     <script src="/assets/application-taack.js"></script>
 </body>
 </html>

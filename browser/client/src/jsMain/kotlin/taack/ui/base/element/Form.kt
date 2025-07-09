@@ -5,7 +5,8 @@ import js.iterable.iterator
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
-import taack.ui.wysiwyg.canvasMono.MainCanvas
+import taack.ui.wysiwyg.contentEditableMono.MainContentEditable
+//import taack.ui.wysiwyg.canvasMono.MainCanvas
 import web.dom.document
 import web.file.File
 import web.html.HTMLDivElement
@@ -62,12 +63,16 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             scrollContainer.style.border = "1px solid grey"
             scrollContainer.style.overflow = "auto"
             val largeContainer = document.createElement("div") as HTMLDivElement
-            largeContainer.style.overflow = "hidden"
+//            largeContainer.style.overflow = "hidden"
             val canvasContainer = document.createElement("div") as HTMLDivElement
             largeContainer.append(canvasContainer)
             scrollContainer.append(largeContainer)
             textarea.parentElement?.append(scrollContainer)
-            MainCanvas(this, textarea, canvasContainer, scrollContainer)
+//            MainCanvas(this, textarea, canvasContainer, scrollContainer)
+
+            println("COUCOUCUOCOUCOU")
+
+            MainContentEditable(this, canvasContainer)
         }
 
         Helper.traceDeIndent("Form::init --- formName: $formName")
