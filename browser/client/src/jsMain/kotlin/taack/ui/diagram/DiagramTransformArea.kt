@@ -32,7 +32,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     init {
         if (shapeType == "line" && dataList.any { it.g.hasAttribute("data-label") }) {
-            currentHoverLine = document.createElement(SvgTagName("line")) as SVGLineElement
+            currentHoverLine = document.createElement("line") as SVGLineElement
             currentHoverLine!!.setAttribute("y1", verticalBackgroundLines.firstOrNull()?.getAttribute("y1") ?: "43.0")
             currentHoverLine!!.setAttribute("y2", verticalBackgroundLines.firstOrNull()?.getAttribute("y2") ?: "425.0")
             currentHoverLine!!.setAttribute("style", "stroke:rgb(180, 180, 180);stroke-width:1.3")

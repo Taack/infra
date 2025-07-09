@@ -12,6 +12,7 @@ import web.events.EventHandler
 import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
 import web.html.HTMLTextAreaElement
+import web.http.GET
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 

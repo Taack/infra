@@ -6,6 +6,7 @@ import taack.ui.wysiwyg.canvasStyled.item.CanvasImg
 import taack.ui.wysiwyg.canvasStyled.table.CanvasTable
 import web.encoding.btoa
 import web.events.EventHandler
+import web.http.POST
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 

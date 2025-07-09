@@ -14,10 +14,12 @@ import web.form.FormData
 import web.html.HTMLButtonElement
 import web.html.HTMLFormElement
 import web.html.HTMLInputElement
+import web.http.POST
 import web.http.RequestMethod
 import web.location.location
 import web.xhr.XMLHttpRequest
 import web.xhr.XMLHttpRequestResponseType
+import web.xhr.blob
 import kotlin.math.min
 
 class TableMultiSelectButton(private val parent: Table, private val b: HTMLButtonElement): LeafElement {
@@ -64,7 +66,7 @@ class TableMultiSelectButton(private val parent: Table, private val b: HTMLButto
                     val t = xhr.responseText
                     if (t.substring(0, min(20, t.length)).contains("<!DOCTYPE html>", false)) {
                         location.href = b.formAction
-                        document.write(t)
+                        document.textContent =t
                         document.close()
                     } else {
                         processAjaxLink(null, t, parent, null)

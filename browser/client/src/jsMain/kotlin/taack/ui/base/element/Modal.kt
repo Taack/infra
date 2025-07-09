@@ -9,10 +9,13 @@ import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
+import web.cssom.ClassName
+import web.dom.ElementId
 import web.events.EventHandler
 import web.html.ButtonType
 import web.html.HTMLButtonElement
 import web.html.HTMLDivElement
+import web.html.button
 
 class Modal(val parent: Block) : BaseElement {
     companion object {
@@ -41,33 +44,33 @@ class Modal(val parent: Block) : BaseElement {
     init {
         trace("Modal::init $mId")
         dModal = document.createElement("div") as HTMLDivElement
-        dModal.classList.add("modal")
+        dModal.classList.add(ClassName("modal"))
         dModalDialog = document.createElement("div") as HTMLDivElement
-        dModalDialog.classList.add("modal-dialog", "modal-xl", "modal-dialog-scrollable", "modal-dialog-centered")
+        dModalDialog.classList.add(ClassName("modal-dialog"), ClassName("modal-xl"), ClassName("modal-dialog-scrollable"), ClassName("modal-dialog-centered"))
         dModalContent = document.createElement("div") as HTMLDivElement
         dModalBody = document.createElement("div") as HTMLDivElement
-        dModalBody.classList.add("modal-body", "overflow-y-auto")
-        dModalContent.classList.add("modal-content")
-        dModalContent.classList.add("taackModal")
+        dModalBody.classList.add(ClassName("modal-body"), ClassName("overflow-y-auto"))
+        dModalContent.classList.add(ClassName("modal-content"))
+        dModalContent.classList.add(ClassName("taackModal"))
         val dClose = document.createElement("div") as HTMLDivElement
         val fullscreenButton = document.createElement("button") as HTMLButtonElement
         fullscreenButton.type = ButtonType.button
-        fullscreenButton.className = "btn-fullscreen"
+        fullscreenButton.className = ClassName("btn-fullscreen")
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
             toggleFullscreen()
         }
         closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
-        closeButton.className = "btn-close"
+        closeButton.className = ClassName("btn-close")
         closeButton.onclick = EventHandler { e ->
             e.preventDefault()
             close()
         }
         document.addEventListener("keydown", escModalCallback)
 
-        dClose.classList.add("taack-close")
-        dClose.classList.add("modal-header")
+        dClose.classList.add(ClassName("taack-close"))
+        dClose.classList.add(ClassName("modal-header"))
         dClose.appendChild(fullscreenButton)
         dClose.appendChild(closeButton)
         dModalContent.appendChild(dClose)
@@ -86,8 +89,8 @@ class Modal(val parent: Block) : BaseElement {
         document.body!!.style.paddingRight = "15px"
         document.body!!.style.overflowY = "hidden"
         val modalBackdrop = document.createElement("div") as HTMLDivElement
-        modalBackdrop.id = "modal-backdrop-$mId"
-        modalBackdrop.classList.add("modal-backdrop", "fade", "show")
+        modalBackdrop.id = ElementId("modal-backdrop-$mId")
+        modalBackdrop.classList.add(ClassName("modal-backdrop"), ClassName("fade"), ClassName("show"))
         parent.d.parentElement!!.appendChild(modalBackdrop)
 
         if (reloadWhenClose) {
@@ -111,10 +114,10 @@ class Modal(val parent: Block) : BaseElement {
 
     private fun toggleFullscreen() {
         trace("Modal::fullscreen $mId")
-        if (dModalDialog.classList.contains("modal-fullscreen")) {
-            dModalDialog.classList.remove("modal-fullscreen")
+        if (dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
+            dModalDialog.classList.remove(ClassName("modal-fullscreen"))
         } else {
-            dModalDialog.classList.add("modal-fullscreen")
+            dModalDialog.classList.add(ClassName("modal-fullscreen"))
         }
     }
 

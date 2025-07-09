@@ -9,6 +9,7 @@ import taack.ui.base.leaf.ContextualLink
 import taack.ui.diagram.Diagram
 import web.events.EventHandler
 import web.html.HTMLDivElement
+import web.http.GET
 import web.http.RequestMethod
 import web.timers.TimerHandler
 import web.timers.setTimeout

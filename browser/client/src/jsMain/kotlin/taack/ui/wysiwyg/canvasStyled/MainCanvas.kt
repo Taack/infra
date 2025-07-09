@@ -1,11 +1,11 @@
 package taack.ui.wysiwyg.canvasStyled
 
+import js.iterable.iterator
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceEnabled
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.element.Form
-import taack.ui.wysiwyg.command.*
 import taack.ui.wysiwyg.canvasStyled.item.CanvasCaret
 import taack.ui.wysiwyg.canvasStyled.item.CanvasImg
 import taack.ui.wysiwyg.canvasStyled.item.CanvasLink
@@ -13,16 +13,22 @@ import taack.ui.wysiwyg.canvasStyled.table.CanvasTable
 import taack.ui.wysiwyg.canvasStyled.table.TxtHeaderCanvas
 import taack.ui.wysiwyg.canvasStyled.table.TxtRowCanvas
 import taack.ui.wysiwyg.canvasStyled.text.*
+import taack.ui.wysiwyg.command.*
 import web.canvas.CanvasRenderingContext2D
+import web.canvas.ID
 import web.clipboard.ClipboardEvent
+import web.cssom.ClassName
+import web.dom.ElementId
 import web.dom.document
 import web.events.Event
 import web.events.EventHandler
+import web.events.SCROLL
 import web.events.addEventListener
 import web.file.File
 import web.file.FileReader
 import web.html.*
 import web.http.CrossOrigin
+import web.http.anonymous
 import web.uievents.DragEvent
 import web.uievents.KeyboardEvent
 import web.uievents.MouseEvent
@@ -419,11 +425,11 @@ class MainCanvas(
 
     private fun createButton(id: String, innerHtml: String, handler: () -> Unit) {
         val b = document.createElement("button") as HTMLButtonElement
-        b.id = id + textarea.name
+        b.id = ElementId( id + textarea.name)
         b.innerHTML = innerHtml
         b.type = ButtonType.button
-        b.classList.add("btn")
-        b.classList.add("btn-light")
+        b.classList.add(ClassName("btn"))
+        b.classList.add(ClassName("btn-light"))
         b.style.margin = "2px"
         b.style.height = "29px"
         //  b.style.width = "80px"
@@ -438,7 +444,7 @@ class MainCanvas(
 
     init {
 
-        canvas.id = "canvas" + textarea.name
+        canvas.id = ElementId("canvas" + textarea.name)
         if (divHolder.clientWidth > 0) {
             canvas.width = floor(divHolder.clientWidth * dprX).toInt()
             canvas.style.width = "${divHolder.clientWidth}px"

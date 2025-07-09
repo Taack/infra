@@ -7,10 +7,12 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
+import web.cssom.ClassName
 import web.dom.Node
 import web.events.Event
 import web.events.EventHandler
 import web.html.*
+import web.http.GET
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 
@@ -31,7 +33,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
     init {
 
         trace("FormActionInputM2M::init $inputName $m2mClassList")
-        if (m2mClassList.contains("M2MToDuplicate")) input.name = ""
+        if (m2mClassList.contains(ClassName("M2MToDuplicate"))) input.name = ""
         i.onclick = EventHandler { e ->
             onClick(e)
         }
@@ -74,13 +76,13 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
             trace("AUO $index $key $value")
             val m2mDiv = currentInput.parentElement!!
             trace("AUO1 $m2mDiv")
-            if (m2mDiv.classList.contains("M2MToDuplicate") || (index + 1 < idValueMap.size && m2mDiv.nextElementSibling != null && m2mDiv.nextElementSibling!!.classList.contains("M2MParent"))) {
+            if (m2mDiv.classList.contains(ClassName("M2MToDuplicate")) || (index + 1 < idValueMap.size && m2mDiv.nextElementSibling != null && m2mDiv.nextElementSibling!!.classList.contains(ClassName("M2MParent")))) {
                 val m2mDivCloned = m2mDiv.cloneNode(true) as HTMLElement
                 FormActionInputM2M(parent, m2mDivCloned.querySelector("input[taackAjaxFormM2MAction]") as HTMLInputElement)
                 insertAfter(m2mDivCloned, m2mDiv)
             }
-            m2mDiv.classList.remove("M2MToDuplicate")
-            m2mDiv.classList.add("M2MParent")
+            m2mDiv.classList.remove(ClassName("M2MToDuplicate"))
+            m2mDiv.classList.add(ClassName("M2MParent"))
             currentInput.value = value
             val i2 = currentInput.parentElement!!.querySelector("input[type='hidden']")!! as HTMLInputElement
             i2.name = inputName

@@ -12,6 +12,7 @@ import web.form.FormData
 import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
 import web.html.HTMLTextAreaElement
+import web.http.POST
 import web.http.RequestMethod
 import web.url.URL
 import web.xhr.XMLHttpRequest
@@ -54,8 +55,8 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         trace("FormTriggerUpdate::onclick: ${inputElement.formAction}")
         val f = parent.f
         val fd = FormData(f)
-        fd["isAjax"] = "true"
-        fd["refresh"] = "true"
+        fd.set("isAjax", "true")
+        fd.set("refresh", "true")
 
         parent.mapFileToSend.forEach { inputKey ->
             inputKey.value.forEach { fileValue ->

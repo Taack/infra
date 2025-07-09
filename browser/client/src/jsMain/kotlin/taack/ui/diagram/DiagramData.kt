@@ -4,9 +4,12 @@ import js.array.asList
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
+import web.cssom.ClassName
+import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
 import web.history.history
+import web.http.GET
 import web.http.RequestMethod
 import web.location.location
 import web.svg.*
@@ -33,10 +36,10 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         val tooltipLabel = g.getAttribute("data-label")
         if (!tooltipLabel.isNullOrBlank()) {
             val diagramRoot = parent.parent
-            tooltip = document.createElement(SvgTagName("g"))
-            tooltip.classList.add("diagram-tooltip")
+            tooltip = document.createElement("g") as SVGGElement
+            tooltip.classList.add(ClassName("diagram-tooltip"))
 
-            val background: SVGPolygonElement = document.createElement(SvgTagName("polygon"))
+            val background: SVGPolygonElement = document.createElement("polygon") as SVGPolygonElement
             background.style.fill = "#00000090"
             tooltip.appendChild(background)
 
@@ -45,7 +48,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             legend.setAttribute("transform", "translate(0,-15)")
             tooltip.appendChild(legend)
 
-            val value: SVGTextElement = document.createElement(SvgTagName("text"))
+            val value: SVGTextElement = document.createElement("text") as SVGTextElement
             value.setAttribute("text-rendering", "optimizeLegibility")
             value.setAttribute("style", "font-size: 13px; font-family: sans-serif; fill: white")
             value.innerHTML = tooltipLabel
@@ -160,14 +163,14 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         val targetUrl = URL(action + (if (action.contains("?")) "&" else "?") + "dataset=${dataset}&x=${x}&y=${y}&isAjax=true", "${location.protocol}//${location.host}").toString()
 
         //Display load spinner
-        val loader = document.getElementById("taack-load-spinner")
-        loader?.classList?.remove("tck-hidden")
+        val loader = document.getElementById(ElementId("taack-load-spinner"))
+        loader?.classList?.remove(ClassName("tck-hidden"))
         val xhr = XMLHttpRequest()
 
         xhr.onloadend = EventHandler { ev ->
             ev.preventDefault()
             trace("DiagramData::onClickShape: Load End, action: $action responseType: '${xhr.responseType}'")
-            loader?.classList?.add("tck-hidden")
+            loader?.classList?.add(ClassName("tck-hidden"))
 
             val text = xhr.responseText
             if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
@@ -175,7 +178,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                 history.pushState("{}", document.title, targetUrl)
                 trace("Setting location.href: $targetUrl")
                 location.href = targetUrl
-                document.write(text)
+                document.textContent = text
                 document.close()
             } else {
                 trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")

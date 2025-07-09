@@ -6,6 +6,7 @@ import web.events.EventType
 import web.events.addEventListener
 import web.location.location
 import web.scroll.ScrollToOptions
+import web.scroll.instant
 import web.storage.localStorage
 import web.window.window
 

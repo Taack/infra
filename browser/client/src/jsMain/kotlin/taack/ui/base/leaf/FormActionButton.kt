@@ -14,6 +14,7 @@ import web.form.FormData
 import web.html.HTMLButtonElement
 import web.html.HTMLInputElement
 import web.html.HTMLTextAreaElement
+import web.http.POST
 import web.http.RequestMethod
 import web.location.location
 import web.xhr.XMLHttpRequest
@@ -66,7 +67,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
             val t = xhr.responseText
             if (t.substring(0, min(20, t.length)).contains("<!DOCTYPE html>", false)) {
                 location.href = b.formAction
-                document.write(t)
+                document.textContent = t
                 document.close()
             } else {
                 val callback: CloseModalPostProcessing = { key, value, otherField ->

@@ -4,6 +4,7 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Table
+import web.cssom.ClassName
 import web.dom.document
 import web.events.EventHandler
 import web.history.history
@@ -44,8 +45,8 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
         trace("TablePaginate2 currentPage: $currentPage, numberOfPage: $numberOfPage")
 
         val nav = document.createElement("nav")
-        ul.classList.add("pagination")
-        ul.classList.add("pagination-sm")
+        ul.classList.add(ClassName("pagination"))
+        ul.classList.add(ClassName("pagination-sm"))
         nav.appendChild(ul)
         if (numberOfPage > 0) {
             if (numberOfPage < n + (n * 2 - 1) + n) {
@@ -89,10 +90,10 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
     private fun appendAnchor(pageOffset: Int) {
         trace("createAnchor $pageOffset")
         val li = document.createElement("li") as HTMLLIElement
-        li.classList.add("page-item")
+        li.classList.add(ClassName("page-item"))
         if (pageOffset == currentPage) {
             li.style.fontWeight = "bold"
-            li.classList.add("active")
+            li.classList.add(ClassName("active"))
         }
         li.appendChild(createAnchor(pageOffset))
         ul.appendChild(li)
@@ -101,15 +102,15 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
     private fun createAnchor(pageOffset: Int): HTMLAnchorElement {
         val a = document.createElement("a") as HTMLAnchorElement
         a.innerText = " ${pageOffset + 1} "
-        a.classList.add("taackPageOffset")
-        a.classList.add("page-link")
+        a.classList.add(ClassName("taackPageOffset"))
+        a.classList.add(ClassName("page-link"))
         a.setAttribute("taackPageOffset", pageOffset.toString())
         a.onclick = EventHandler { e ->
             e.preventDefault()
             val offset = (a.attributes.getNamedItem("taackPageOffset")!!.value.toDouble() * max.toDouble()).toInt()
             Helper.filterForm(parent.filter, offset, null)
             val offsetUrl = URL(location.href)
-            offsetUrl.searchParams["offset"] = offset.toString()
+            offsetUrl.searchParams.set("offset", offset.toString())
             history.pushState(null, "", offsetUrl)
         }
         return a

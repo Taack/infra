@@ -5,9 +5,9 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Table
+import web.cssom.ClassName
 import web.events.EventHandler
 import web.form.FormData
-import web.html.HTMLAnchorElement
 import web.html.HTMLSpanElement
 import web.uievents.MouseEvent
 
@@ -26,8 +26,8 @@ class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafE
 
     init {
         val fd = FormData(parent.filter.f)
-        if (property == fd["sort"]) {
-            var d: String = if (fd["order"] != null) fd["order"]!!.toString() else "neutral"
+        if (property == fd.get("sort")) {
+            var d: String = if (fd.get("order") != null) fd.get("order")!!.toString() else "neutral"
             if (d.trim().isEmpty()) {
                 d = "neutral"
             }
@@ -36,7 +36,7 @@ class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafE
             direction = "neutral"
         }
         trace("SortableColumn::init $property $direction")
-        s.classList.add(direction)
+        s.classList.add(ClassName(direction))
         s.onclick = EventHandler{ e ->
             onClick(e)
         }

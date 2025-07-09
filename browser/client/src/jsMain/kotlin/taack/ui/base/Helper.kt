@@ -1,5 +1,8 @@
 package taack.ui.base
 
+import js.array.Tuple2
+import js.array.component1
+import js.array.component2
 import js.iterable.asSequence
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
@@ -13,6 +16,7 @@ import web.form.FormDataEntryValue
 import web.history.history
 import web.html.HTMLAnchorElement
 import web.html.HTMLButtonElement
+import web.http.POST
 import web.http.RequestMethod
 import web.location.location
 import web.storage.localStorage
@@ -102,21 +106,21 @@ class Helper {
             val f = filter.f
             val fd = FormData(f)
             val formUrl = URL(f.action)
-            fd["isAjax"] = "true"
-            fd["refresh"] = "true"
-            fd["filterTableId"] = filter.filterId
-            fd["ajaxBlockId"] = filter.parent.blockId
-            if (offset != null) fd["offset"] = offset.toString()
+            fd.set("isAjax", "true")
+            fd.set("refresh", "true")
+            fd.set("filterTableId", filter.filterId)
+            fd.set("ajaxBlockId", filter.parent.blockId)
+            if (offset != null) fd.set("offset",offset.toString())
             else {
-                if (sort != null) fd["sort"] = sort
-                if (order != null && order != "neutral") fd["order"] = order
+                if (sort != null) fd.set("sort", sort)
+                if (order != null && order != "neutral") fd.set("order", order)
                 else fd.delete("order")
             }
 
             val xhr = XMLHttpRequest()
             xhr.onloadend = EventHandler {
                 //Filter used saved to historyState
-                historyState = fd.entries().asSequence().map {
+                historyState = fd.entries().asSequence().map { it: Tuple2<String, Any> ->
                     it.component1() to it.component2()
                 }.toMap() as HashMap<String, FormDataEntryValue>
                 hydrateStateToUrl(formUrl)
@@ -314,7 +318,7 @@ class Helper {
         fun hydrateStateToUrl(targetUrl: URL) {
             historyState.forEach { entry: Map.Entry<String, FormDataEntryValue> ->
                 if (entry.key != "refresh" && entry.value.toString().isNotEmpty()) {
-                    targetUrl.searchParams[entry.key] = entry.value.toString()
+                    targetUrl.searchParams.set(entry.key, entry.value.toString())
                 }
             }
         }

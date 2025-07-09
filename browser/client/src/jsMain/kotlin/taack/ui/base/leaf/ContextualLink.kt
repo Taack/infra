@@ -7,14 +7,17 @@ import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
+import web.cssom.ClassName
 import web.dom.Document
 import web.dom.document
-import web.dom.parsing.DOMParser
-import web.dom.parsing.DOMParserSupportedType
 import web.events.EventHandler
 import web.form.FormData
 import web.html.*
+import web.http.GET
 import web.http.RequestMethod
+import web.parsing.DOMParser
+import web.parsing.DOMParserSupportedType
+import web.parsing.textHtml
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
 
@@ -58,9 +61,9 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
         val dropdownItem = document.createElement("li")
         var hasCopy = false
         dropdownItem.textContent = "Copy"
-        dropdownItem.className = "context-has-dropdown"
+        dropdownItem.className = ClassName("context-has-dropdown")
         val nestedUl = document.createElement("ul")
-        nestedUl.className = "custom-context-menu nested-dropdown"
+        nestedUl.className = ClassName("custom-context-menu nested-dropdown")
         if (!a.textContent.isNullOrEmpty()) {
             val copy = document.createElement("li")
             copy.textContent = "Copy text"
@@ -88,9 +91,9 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
             val rect = dropdownItem.getBoundingClientRect()
             val potentialRightEdge = rect.right + nestedUl.offsetWidth
             if (potentialRightEdge > window.innerWidth) {
-                nestedUl.classList.add("flip-left")
+                nestedUl.classList.add(ClassName("flip-left"))
             } else {
-                nestedUl.classList.remove("flip-left")
+                nestedUl.classList.remove(ClassName("flip-left"))
             }
         }
         return dropdownItem
@@ -108,7 +111,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                     val response = parser.parseFromString(xhr.responseText, DOMParserSupportedType.textHtml)
                     buildCopyDropdown(a)?.let { response.querySelector("ul")?.append(it) }
                     val contextMenu = document.createElement("div") as HTMLDivElement
-                    contextMenu.className = "custom-context-menu"
+                    contextMenu.className = ClassName("custom-context-menu")
                     contextMenu.style.apply {
                         position = "absolute"
                         document.body.appendChild(contextMenu)
@@ -162,10 +165,10 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                 val filter: Filter? = parent.ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)
                 if (filter != null) {
                     formData = FormData(filter.f)
-                    formData["offset"] = "0"
-                    formData["refresh"] = "true"
-                    formData["filterTableId"] = filter.filterId
-                    formData["ajaxBlockId"] = filter.parent.blockId
+                    formData.set("offset", "0")
+                    formData.set("refresh", "true")
+                    formData.set("filterTableId", filter.filterId)
+                    formData.set("ajaxBlockId", filter.parent.blockId)
                 }
             }
         }

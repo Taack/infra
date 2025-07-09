@@ -6,13 +6,16 @@ import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
 import taack.ui.base.element.Tab
+import web.cssom.ClassName
 import web.dom.Element
-import web.dom.parsing.DOMParser
-import web.dom.parsing.DOMParserSupportedType
 import web.events.EventHandler
 import web.form.FormData
 import web.html.*
+import web.http.POST
 import web.http.RequestMethod
+import web.parsing.DOMParser
+import web.parsing.DOMParserSupportedType
+import web.parsing.textHtml
 import web.url.URL
 import web.xhr.XMLHttpRequest
 
@@ -41,10 +44,10 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
             val div: Element? = parent.d.parentElement?.querySelector(".tab-content")
             var divTab: Element? = null
             val fd = FormData()
-            fd["isAjax"] = "true"
-            fd["refresh"] = "true"
-            fd["tabIndex"] = tabIndex
-            fd["tabId"] = tabId
+            fd.set("isAjax", "true")
+            fd.set("refresh", "true")
+            fd.set("tabIndex", tabIndex)
+            fd.set("tabId", tabId)
             val xhr = XMLHttpRequest()
             xhr.onloadend = EventHandler {
                 // Make new parser to parse xhr.responseText
@@ -56,13 +59,13 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
                 if (div != null && divTab != null && tabResponseEl != null) {
                     // Get the clicked tab content pane and fill it with the previously parsed response's inner html
                     divTab!!.innerHTML = tabResponseEl.innerHTML
-                    divTab!!.classList.add("loaded")
+                    divTab!!.classList.add(ClassName("loaded"))
                     AjaxBlock.getSiblingAjaxBlock(parent.parent)
                 }
             }
             if (div != null) divTab = div.querySelector("#tab-${tabId}-${tabIndex}-pane")
             // Avoid requesting twice the same tab content
-            if (divTab != null && !divTab.classList.contains("loaded")) {
+            if (divTab != null && !divTab.classList.contains(ClassName("loaded"))) {
                 // Show loading spinner while loading
                 parent.parent.d.querySelector("#tab-${tabId}-${tabIndex}-pane")?.innerHTML = "<div class='taack-tab-load'></div>"
                 xhr.open(RequestMethod.POST, b.getAttribute("action")!!)

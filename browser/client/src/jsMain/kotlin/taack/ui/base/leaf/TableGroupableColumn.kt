@@ -6,11 +6,13 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Table
+import web.cssom.ClassName
 import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLAnchorElement
 import web.html.HTMLInputElement
 import web.html.HTMLSpanElement
+import web.http.POST
 import web.http.RequestMethod
 import web.uievents.MouseEvent
 import web.xhr.XMLHttpRequest
@@ -32,13 +34,13 @@ class TableGroupableColumn(private val parent: Table, s: HTMLSpanElement) : Leaf
 
     init {
         val fd = FormData(parent.filter.f)
-        if (property == fd["sort"]) {
-            direction = fd["order"] as String
+        if (property == fd.get("sort")) {
+            direction = fd.get("order") as String
         } else {
             direction = null
         }
         trace("TableGroupableColumn::init $property $direction")
-        if (direction != null && direction != "") s.classList.add(direction)
+        if (direction != null && direction != "") s.classList.add(ClassName(direction))
         val a = s.childNodes[0] as HTMLAnchorElement
         a.onclick = EventHandler { e ->
             onClick(e)
@@ -54,12 +56,12 @@ class TableGroupableColumn(private val parent: Table, s: HTMLSpanElement) : Leaf
         trace("TableGroupableColumn::onGroup")
         val f = parent.filter.f
         val fd = FormData(f)
-        val g = fd["grouping"]!! as String
+        val g = fd.get("grouping")!! as String
         val isGrouped = g.contains(property)
         if (!isGrouped) {
-            fd["grouping"] = "$g $property".trim()
+            fd.set("grouping", "$g $property".trim())
         } else {
-            fd["grouping"] = g.replace(property, "").trim()
+            fd.set("grouping", g.replace(property, "").trim())
         }
         fd.append("isAjax", "true")
         val xhr = XMLHttpRequest()

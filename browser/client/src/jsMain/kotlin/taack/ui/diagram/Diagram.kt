@@ -8,7 +8,8 @@ import web.dom.document
 import web.events.EventHandler
 import web.events.EventType
 import web.events.addEventListener
-import web.svg.*
+import web.svg.SVGGElement
+import web.svg.SVGSVGElement
 import web.uievents.MouseEvent
 import web.uievents.WheelEvent
 
@@ -78,7 +79,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     }
 
     fun cloneLegendShape(dataset: String): SVGGElement {
-        val cloned = document.createElement(SvgTagName("g")) as SVGGElement
+        val cloned = document.createElement("g") as SVGGElement
         cloned.innerHTML = legends.find { it.dataset == dataset }?.g?.innerHTML ?: ""
         return cloned
     }

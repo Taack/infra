@@ -6,10 +6,13 @@ import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import web.blob.Blob
+import web.cssom.ClassName
+import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
 import web.history.history
 import web.html.HTMLElement
+import web.http.GET
 import web.http.RequestMethod
 import web.location.location
 import web.uievents.MouseButton
@@ -17,6 +20,7 @@ import web.uievents.MouseEvent
 import web.url.URL
 import web.xhr.XMLHttpRequest
 import web.xhr.XMLHttpRequestResponseType
+import web.xhr.blob
 import kotlin.math.min
 
 open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : LeafElement {
@@ -58,8 +62,8 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
         val targetUrl = lastUrlClicked.toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
         //Display load spinner
-        val loader = document.getElementById("taack-load-spinner")
-        loader?.classList?.remove("tck-hidden")
+        val loader = document.getElementById(ElementId("taack-load-spinner"))
+        loader?.classList?.remove(ClassName("tck-hidden"))
         val xhr = XMLHttpRequest()
         if (action?.contains("downloadBin") == true) {
             trace("Binary Action ... $action")
@@ -70,7 +74,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
             trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}' status: '${xhr.status}'")
             if (xhr.status == 200.toShort()) {
                 ev.preventDefault()
-                loader?.classList?.add("tck-hidden")
+                loader?.classList?.add(ClassName("tck-hidden"))
                 if (xhr.responseType == XMLHttpRequestResponseType.blob) {
                     val contentDispo = xhr.getResponseHeader("Content-Disposition")
                     if (contentDispo != null) {
@@ -87,7 +91,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                         trace("Full webpage ...|$action|${document.title}|${document.documentURI}|${xhr.responseURL}")
                         history.pushState("{}", document.title, xhr.responseURL)
                         location.href = xhr.responseURL
-                        document.write(text)
+                        document.textContent = text
                         document.close()
                     } else {
                         trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")

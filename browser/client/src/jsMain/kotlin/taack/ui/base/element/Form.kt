@@ -1,6 +1,7 @@
 package taack.ui.base.element
 
 import js.array.asList
+import js.iterable.iterator
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
@@ -53,7 +54,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
         triggers = FormTriggerUpdate.getSiblingFormTriggerUpdate(this)
         val textareaList = f.querySelectorAll("textarea.asciidoctor")
 
-        for (element in textareaList) {
+        for (element in textareaList.iterator()) {
             val textarea = element as HTMLTextAreaElement
             textarea.style.display = "none"
             val scrollContainer = document.createElement("div") as HTMLDivElement

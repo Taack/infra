@@ -1,5 +1,6 @@
 package taack.ui.wysiwyg.canvasMono
 
+import js.iterable.iterator
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceEnabled
@@ -9,10 +10,14 @@ import taack.ui.wysiwyg.canvasMono.command.*
 import taack.ui.wysiwyg.canvasMono.item.CanvasCaret
 import taack.ui.wysiwyg.canvasMono.text.*
 import web.canvas.CanvasRenderingContext2D
+import web.canvas.ID
 import web.clipboard.ClipboardEvent
+import web.cssom.ClassName
+import web.dom.ElementId
 import web.dom.document
 import web.events.Event
 import web.events.EventHandler
+import web.events.SCROLL
 import web.events.addEventListener
 import web.file.File
 import web.file.FileReader
@@ -326,11 +331,11 @@ class MainCanvas(
 
     private fun createButton(id: String, innerHtml: String, handler: () -> Unit) {
         val b = document.createElement("button") as HTMLButtonElement
-        b.id = id + textarea.name
+        b.id = ElementId( id + textarea.name)
         b.innerHTML = innerHtml
         b.type = ButtonType.button
-        b.classList.add("btn")
-        b.classList.add("btn-light")
+        b.classList.add(ClassName("btn"))
+        b.classList.add(ClassName("btn-light"))
         b.style.margin = "2px"
         b.style.height = "29px"
         //  b.style.width = "80px"
@@ -345,7 +350,7 @@ class MainCanvas(
 
     init {
 
-        canvas.id = "canvas" + textarea.name
+        canvas.id = ElementId("canvas" + textarea.name)
         if (divHolder.clientWidth > 0) {
             canvas.width = floor(divHolder.clientWidth * dprX).toInt()
             canvas.style.width = "${divHolder.clientWidth}px"
