@@ -113,7 +113,18 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
-        dataPerKey = dataPerKey.collectEntries { [(it.key): it.value.collectEntries { [(objectToString(it.key)): it.value] }] }
+        dataPerKey = dataPerKey.collectEntries { Map.Entry<String, Map<Object, BigDecimal>> keyDataMap -> // format xLabels from Date to String
+            Map<Object, BigDecimal> formattedDataMap = [:]
+            keyDataMap.value.each { Map.Entry<Object, BigDecimal> dataEntry ->
+                String formattedLabel = objectToString(dataEntry.key)
+                if (formattedDataMap.containsKey(formattedLabel) && dataEntry.key instanceof Date) { // sum the value of dates which are in same group
+                    formattedDataMap[formattedLabel] += dataEntry.value
+                } else {
+                    formattedDataMap.put(formattedLabel, dataEntry.value)
+                }
+            }
+            return [(keyDataMap.key): formattedDataMap]
+        }
         drawLegend()
         drawHorizontalBackground()
         buildTransformAreaStart(isStacked ? 'stackedBar' : 'bar', diagramActionUrl, MAX_BAR_WIDTH)
