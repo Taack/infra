@@ -1,6 +1,7 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.Color
@@ -13,11 +14,12 @@ class PieDiagramScene extends DiagramScene {
     final private Map<String, BigDecimal> pieDataPerKey
     final private BigDecimal slicePositionRate
 
-    PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean hasSlice) {
+    PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, boolean hasSlice) {
         this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
+        this.diagramOption = diagramOption
         this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
 
         Map<String, BigDecimal> pieDataPerKey = [:]
@@ -32,8 +34,8 @@ class PieDiagramScene extends DiagramScene {
         this.pieDataPerKey = pieDataPerKey
     }
 
-    void draw(String diagramActionUrl = null) {
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-max-y': height])
+    void draw() {
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-max-y': height])
         BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - DIAGRAM_MARGIN_TOP - 5.0) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = width / 2
         BigDecimal centerY = DIAGRAM_MARGIN_TOP + radius * (1 + slicePositionRate)

@@ -1,8 +1,8 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
-import taack.ui.dump.diagram.RectBackgroundDiagramScene
 
 @CompileStatic
 class BarDiagramScene extends RectBackgroundDiagramScene {
@@ -11,8 +11,8 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
 
     final private boolean isStacked
 
-    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, boolean isStacked) {
-        super(render, dataPerKey)
+    BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, boolean isStacked) {
+        super(render, dataPerKey, diagramOption)
         this.isXLabelInsideGap = true
         this.isStacked = isStacked
     }
@@ -108,7 +108,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+    void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
         }
@@ -127,7 +127,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart(isStacked ? 'stackedBar' : 'bar', diagramActionUrl, MAX_BAR_WIDTH)
+        buildTransformAreaStart(isStacked ? 'stackedBar' : 'bar', MAX_BAR_WIDTH)
         drawVerticalBackgroundAndDataBar()
         buildTransformAreaEnd()
     }

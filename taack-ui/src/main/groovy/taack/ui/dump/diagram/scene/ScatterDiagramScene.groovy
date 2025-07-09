@@ -1,8 +1,8 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
-import taack.ui.dump.diagram.RectBackgroundDiagramScene
 
 import java.text.SimpleDateFormat
 
@@ -11,8 +11,8 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
     final private List<String> pointImageHref
     protected BigDecimal dataPointRadius
 
-    ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, List<String> pointImageHref = []) {
-        super(render, dataPerKey)
+    ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, List<String> pointImageHref = []) {
+        super(render, dataPerKey, diagramOption)
         this.pointImageHref = pointImageHref
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
     }
@@ -136,14 +136,14 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+    void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend(pointImageHref)
         drawHorizontalBackground()
-        buildTransformAreaStart('scatter', diagramActionUrl)
+        buildTransformAreaStart('scatter')
         drawVerticalBackground()
         drawDataPoint(false)
         buildTransformAreaEnd()

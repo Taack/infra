@@ -3,7 +3,8 @@ package taack.ui.dsl.diagram
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class DiagramWhiskersDatasetSpec extends DiagramActionSpec {
+class DiagramWhiskersDatasetSpec {
+    IUiDiagramVisitor diagramVisitor
 
     DiagramWhiskersDatasetSpec(final IUiDiagramVisitor diagramVisitor) {
         this.diagramVisitor = diagramVisitor
@@ -24,5 +25,9 @@ class DiagramWhiskersDatasetSpec extends DiagramActionSpec {
     void dataset(final String key, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersBoxDataSpec) Closure closure) {
         closure.delegate = new DiagramWhiskersBoxDataSpec(key, diagramVisitor)
         closure.call()
+    }
+
+    void option(DiagramOption option) {
+        diagramVisitor.visitDiagramOption(option)
     }
 }

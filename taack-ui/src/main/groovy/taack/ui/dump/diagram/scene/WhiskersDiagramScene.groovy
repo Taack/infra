@@ -1,8 +1,8 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
-import taack.ui.dump.diagram.RectBackgroundDiagramScene
 
 @CompileStatic
 class WhiskersDiagramScene extends RectBackgroundDiagramScene {
@@ -13,8 +13,8 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
     private List<Object> xDataList
     final private Map<String, List<List<BigDecimal>>> yDataListPerKey
 
-    WhiskersDiagramScene(IDiagramRender render, Object[] xDataList, Map<String, List<List<BigDecimal>>> yDataListPerKey) {
-        super(render, yDataListPerKey.collectEntries { [(it.key): xDataList.collectEntries { xData -> [(xData): 0.0] }] } as Map<String, Map<Object, BigDecimal>>)
+    WhiskersDiagramScene(IDiagramRender render, Object[] xDataList, Map<String, List<List<BigDecimal>>> yDataListPerKey, DiagramOption diagramOption) {
+        super(render, yDataListPerKey.collectEntries { [(it.key): xDataList.collectEntries { xData -> [(xData): 0.0] }] } as Map<String, Map<Object, BigDecimal>>, diagramOption)
         this.isXLabelInsideGap = true
         this.xDataList = xDataList.toList()
         this.yDataListPerKey = yDataListPerKey
@@ -149,14 +149,14 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+    void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart('whiskers', diagramActionUrl, MAX_BOX_WIDTH)
+        buildTransformAreaStart('whiskers', MAX_BOX_WIDTH)
         drawVerticalBackgroundAndDataWhiskersBox()
         buildTransformAreaEnd()
     }

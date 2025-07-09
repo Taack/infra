@@ -37,7 +37,7 @@ interface IUiDiagramVisitor {
 
     void visitDiagramEnd()
 
-    void visitCustom(String html)
+    void visitDiagramOption(DiagramOption diagramOption)
 
-    void visitDiagramAction(String controller, String action, Long id, Map<String, ?> params)
+    void visitCustom(String html)
 }

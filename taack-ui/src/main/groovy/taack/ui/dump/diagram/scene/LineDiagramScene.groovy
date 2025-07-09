@@ -1,23 +1,24 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
 @CompileStatic
 class LineDiagramScene extends ScatterDiagramScene {
-    LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
-        super(render, dataPerKey, [])
+    LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
+        super(render, dataPerKey, diagramOption, [])
         this.dataPointRadius = 2.5
     }
 
-    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+    void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart('line', diagramActionUrl)
+        buildTransformAreaStart('line')
         drawVerticalBackground()
         drawDataPoint(true)
         buildTransformAreaEnd()

@@ -1,6 +1,7 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.*
@@ -46,6 +47,7 @@ abstract class DiagramScene {
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
+    protected DiagramOption diagramOption
 
     final protected Color BLACK_COLOR = new Color(64, 64, 64)
     final protected Color GREY_COLOR = new Color(231, 231, 231)

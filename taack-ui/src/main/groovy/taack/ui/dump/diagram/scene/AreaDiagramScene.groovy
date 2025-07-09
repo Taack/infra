@@ -1,13 +1,13 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
-import taack.ui.dump.diagram.RectBackgroundDiagramScene
 
 @CompileStatic
 class AreaDiagramScene extends RectBackgroundDiagramScene {
-    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
-        super(render, dataPerKey)
+    AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
+        super(render, dataPerKey, diagramOption)
     }
 
     void drawHorizontalBackgroundAndDataArea() {
@@ -122,13 +122,13 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void draw(boolean alwaysShowFullInfo = false, String diagramActionUrl = null) {
+    void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramActionUrl ?: '', 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-max-y': height - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-max-y': height - DIAGRAM_MARGIN_BOTTOM])
         drawVerticalBackground()
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()

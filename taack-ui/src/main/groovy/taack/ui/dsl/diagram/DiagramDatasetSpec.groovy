@@ -3,7 +3,8 @@ package taack.ui.dsl.diagram
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class DiagramDatasetSpec extends DiagramActionSpec {
+class DiagramDatasetSpec {
+    IUiDiagramVisitor diagramVisitor
 
     DiagramDatasetSpec(final IUiDiagramVisitor diagramVisitor) {
         this.diagramVisitor = diagramVisitor
@@ -50,5 +51,9 @@ class DiagramDatasetSpec extends DiagramActionSpec {
      */
     void dataset(final String key, final Date... dates) {
         diagramVisitor.dataset(key, dates)
+    }
+
+    void option(DiagramOption option) {
+        diagramVisitor.visitDiagramOption(option)
     }
 }

@@ -1,10 +1,9 @@
-package taack.ui.dump.diagram
+package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dsl.diagram.DiagramXLabelDateFormat
-import taack.ui.dump.diagram.scene.DiagramScene
-import taack.ui.dump.diagram.scene.ElementType
-import taack.ui.dump.diagram.scene.KeyColor
+import taack.ui.dump.diagram.IDiagramRender
 
 @CompileStatic
 abstract class RectBackgroundDiagramScene extends DiagramScene {
@@ -38,12 +37,13 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         }
     }
 
-    RectBackgroundDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey) {
+    RectBackgroundDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
         this.fontSize = render.getFontSize()
         this.width = render.getDiagramWidth()
         this.height = render.getDiagramHeight()
         this.render = render
         this.dataPerKey = dataPerKey
+        this.diagramOption = diagramOption
     }
 
     boolean buildXLabelList() {
@@ -262,7 +262,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
     }
 
-    void buildTransformAreaStart(String shapeType, String diagramActionUrl = null, BigDecimal shapeMaxWidth = 0.0) {
+    void buildTransformAreaStart(String shapeType, BigDecimal shapeMaxWidth = 0.0) {
         String id = 'clipSection'
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
@@ -276,7 +276,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
         render.renderGroup(['clip-path': "url(#${id})"])
         render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
-                            'diagram-action-url': diagramActionUrl ?: '',
+                            'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                             'shape-type': shapeType,
                             'shape-max-width': shapeMaxWidth,
                             'area-min-x': DIAGRAM_MARGIN_LEFT,

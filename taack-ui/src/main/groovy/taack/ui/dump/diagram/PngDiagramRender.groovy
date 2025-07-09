@@ -20,15 +20,17 @@ class PngDiagramRender implements IDiagramRender {
     private final BigDecimal pngHeight
     private final FontMetrics fm
     private final AffineTransform initialTransform
-    private final Integer fontSize = 13 * 3
+    private final Integer fontSize
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private Color fillStyle = Color.BLACK
-    private BigDecimal lineWidth = 1.3
+    private BigDecimal lineWidth
 
-    PngDiagramRender(BigDecimal width, BigDecimal height) {
+    PngDiagramRender(BigDecimal width, BigDecimal height, BigDecimal fontSizePercentage = 1.0) {
         pngWidth = width
         pngHeight = height
+        fontSize = (13 * fontSizePercentage).toInteger()
+        lineWidth = 1.3 * fontSizePercentage
         bi = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(fillStyle)

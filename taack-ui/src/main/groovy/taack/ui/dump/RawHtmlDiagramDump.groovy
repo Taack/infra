@@ -2,6 +2,7 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.common.BlockLog
@@ -31,7 +32,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Object[] xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
-    private String diagramActionUrl
+    private DiagramOption diagramOption
     private DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
     @Override
@@ -45,7 +46,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         this.xDataList = []
         this.dataPerKey = [:]
         this.whiskersYDataListPerKey = [:]
-        this.diagramActionUrl = null
+        this.diagramOption = null
     }
 
     @Override
@@ -102,54 +103,54 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     void createDiagramRender(BigDecimal heightWidthRadio) {
         if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
-            BigDecimal width = 960.0
-            this.render = new SvgDiagramRender(width, width * heightWidthRadio, true)
+            BigDecimal width = diagramOption?.resolution?.width ?: 960.0
+            this.render = new SvgDiagramRender(width, diagramOption?.resolution?.height ?: (width * heightWidthRadio), true, diagramOption?.resolution?.fontSizePercentage ?: 1.0)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_PDF) {
-            BigDecimal width = 720.0
-            this.render = new SvgDiagramRender(width, width * heightWidthRadio, false)
+            BigDecimal width = diagramOption?.resolution?.width ?: 720.0
+            this.render = new SvgDiagramRender(width, diagramOption?.resolution?.height ?: (width * heightWidthRadio), false, diagramOption?.resolution?.fontSizePercentage ?: 1.0)
         } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            BigDecimal width = 720.0 * 3
-            this.render = new PngDiagramRender(width, width * heightWidthRadio)
+            BigDecimal width = diagramOption?.resolution?.width ?: (720.0 * 3)
+            this.render = new PngDiagramRender(width, diagramOption?.resolution?.height ?: (width * heightWidthRadio), diagramOption?.resolution?.fontSizePercentage ?: (1.0 * 3))
         }
     }
 
     @Override
     void visitBarDiagram(boolean isStacked) {
         createDiagramRender(0.5)
-        BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, isStacked)
+        BarDiagramScene scene = new BarDiagramScene(render, dataPerKey, diagramOption, isStacked)
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
 
     @Override
     void visitScatterDiagram(String... pointImageHref) {
         createDiagramRender(0.5)
-        ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, pointImageHref.toList())
+        ScatterDiagramScene scene = new ScatterDiagramScene(render, dataPerKey, diagramOption, pointImageHref.toList())
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
 
     @Override
     void visitLineDiagram() {
         createDiagramRender(0.5)
-        LineDiagramScene scene = new LineDiagramScene(render, dataPerKey)
+        LineDiagramScene scene = new LineDiagramScene(render, dataPerKey, diagramOption)
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
 
     @Override
     void visitAreaDiagram() {
         createDiagramRender(0.5)
-        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey)
+        AreaDiagramScene scene = new AreaDiagramScene(render, dataPerKey, diagramOption)
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
-        scene.draw(false, diagramActionUrl)
+        scene.draw(false)
     }
 
     @Override
     void visitPieDiagram(boolean hasSlice) {
         createDiagramRender(1.0)
-        PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, hasSlice)
-        scene.draw(diagramActionUrl)
+        PieDiagramScene scene = new PieDiagramScene(render, dataPerKey, diagramOption, hasSlice)
+        scene.draw()
     }
 
     @Override
@@ -165,9 +166,9 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitWhiskersDiagram() {
         if (xDataList) {
             createDiagramRender(0.5)
-            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey)
+            WhiskersDiagramScene scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramOption)
             if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
-            scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, diagramActionUrl)
+            scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         }
     }
 
@@ -201,6 +202,11 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
+    void visitDiagramOption(DiagramOption diagramOption) {
+        this.diagramOption = diagramOption
+    }
+
+    @Override
     void visitCustom(String html) {
         out << html
         if (blockLog) {
@@ -209,10 +215,5 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             out.writeTo(clone)
             blockLog.topElement.addChildren(new HTMLOutput(clone))
         }
-    }
-
-    @Override
-    void visitDiagramAction(String controller, String action, Long id, Map<String, ?> params) {
-        diagramActionUrl = (new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(controller, action, id, params)
     }
 }
