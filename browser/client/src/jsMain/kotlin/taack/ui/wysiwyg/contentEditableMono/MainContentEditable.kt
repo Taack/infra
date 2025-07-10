@@ -38,23 +38,23 @@ class MainContentEditable(
             TITLE2(Span("=== ", "asciidoc-h3", false)),
             TITLE3(Span("==== ", "asciidoc-h4", false)),
             TITLE4(Span("===== ", "asciidoc-h5", false)),
-
-            //            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", false)),
             UNORDERED_LIST1(Span("* ", "asciidoc-b1", false)),
             UNORDERED_LIST2(Span("** ", "asciidoc-b2", false)),
             UNORDERED_LIST3(Span("*** ", "asciidoc-b3", false)),
-//            CONSTRAINED_BOLD(Span(".* \\*([^*]*)\\* "), "asciidoc-bold", true)),
-//            CONSTRAINED_ITALIC(Span(" _([^_]*)_ "), "asciidoc-italic", true)),
-//            CONSTRAINED_MONO(Span(" `([^`]*)` "), "asciidoc-mono", true)),
-//            UNCONSTRAINED_BOLD(Span("[^\\*]\\*\\*([^*]*)\\*\\*[^\\*]"), "asciidoc-bold", true)),
-//            UNCONSTRAINED_ITALIC(Span("[^_]__([^_]*)__[^_]"), "asciidoc-italic", true)),
-//            UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]"), "asciidoc-mono", true)),
-//            HIGHLIGHT(Span("[^`]``([^`]*)``[^`]"), "asciidoc-highlight", true)),
-//            UNDERLINE(Span(" \\[.underline]#([^#]*)# "), "asciidoc-underline", true)),
-//            STRIKETHROUGH(Span(" \\[.line-through]#([^#]*)# "), "asciidoc-strikethrough", true)),
-//            SMART_QUOTES(Span("\"`#([^\"`]*)`\""), "asciidoc-smart-quotes", true)),
-//            APOSTROPHES(Span("'`#([^'`]*)`'"), "asciidoc-apostrophe", true)),
-//            URL(Span("https://[^\\[]*\\[[^\\[]*]"), "asciidoc-url", true)),
+
+            CONSTRAINED_BOLD(Span("(.* )(\\*[^*]*\\*)( .*)", "asciidoc-bold", true)),
+//            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", true)),
+//            CONSTRAINED_ITALIC(Span(" _([^_]*)_ ", "asciidoc-italic", true)),
+//            CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)),
+//            UNCONSTRAINED_BOLD(Span("[^\\*]\\*\\*([^*]*)\\*\\*[^\\*]", "asciidoc-bold", true)),
+//            UNCONSTRAINED_ITALIC(Span("[^_]__([^_]*)__[^_]", "asciidoc-italic", true)),
+//            UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]", "asciidoc-mono", true)),
+//            HIGHLIGHT(Span("[^`]``([^`]*)``[^`]", "asciidoc-highlight", true)),
+//            UNDERLINE(Span(" \\[.underline]#([^#]*)# ", "asciidoc-underline", true)),
+//            STRIKETHROUGH(Span(" \\[.line-through]#([^#]*)# ", "asciidoc-strikethrough", true)),
+//            SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)),
+//            APOSTROPHES(Span("'`#([^'`]*)`'", "asciidoc-apostrophe", true)),
+//            URL(Span("https://[^\\[]*\\[[^\\[]*]", "asciidoc-url", true)),
         }
     }
 
@@ -134,7 +134,7 @@ class MainContentEditable(
 
                         if (innerHTML != e.innerHTML) {
                             e.innerHTML = innerHTML
-                            println("Match: ${entry} => ${e.innerHTML}")
+                            println("Match: ${entry}, isSelected: $isSelected => ${e.innerHTML}")
 
                             if (isSelected && focus != null) {
                                 println("Set carret positoin => focus: $focus, ${e.firstChild}")
@@ -144,14 +144,20 @@ class MainContentEditable(
                         return
                     }
                 } else {
-                    matches = matches!!.replace(entry.span.pattern, entry.span.replacement)
+                    val r = Regex(entry.span.pattern)
+                    if (r.matches(matches as CharSequence)) {
+                        println("matches in : $matches ($entry)")
+                        matches = matches!!.replace(Regex(entry.span.pattern), """$1<span class="${entry.span.replacement}">$2</span>$3""")
+                        println("matches out: $matches ($entry)")
+                        e.innerHTML = matches
+                    }
                 }
             }
-            println("No matches found ${e}")
-            if (e.innerHTML != e.textContent && e.innerHTML != "<br>") {
-                println("HTML (${e.innerHTML}) != Txt (${e.textContent})")
-                e.innerHTML = e.textContent ?: "<br>"
-            }
+//            println("No matches found ${e}")
+//            if (e.innerHTML != e.textContent && e.innerHTML != "<br>") {
+//                println("HTML (${e.innerHTML}) != Txt (${e.textContent})")
+//                e.innerHTML = e.textContent ?: "<br>"
+//            }
         }
     }
 

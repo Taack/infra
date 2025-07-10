@@ -43,14 +43,15 @@
 .ͼ1 .cm-lineNumbers .cm-gutterElement {padding: 0 3px 0 5px; min-width: 20px; text-align: right; white-space: nowrap;}
 .ͼ2 .cm-activeLineGutter {background-color: #e2f2ff;}
 .ͼ3 .cm-activeLineGutter {background-color: #222227;}
-.cm-editor .asciidoc-h1 {color: #196d80; font-weight: bold}
-.cm-editor .asciidoc-h2 {color: #196d80; font-weight: bold}
-.cm-editor .asciidoc-h3 {color: #196d80; font-weight: bold}
-.cm-editor .asciidoc-h4 {color: #196d80; font-weight: bold}
-.cm-editor .asciidoc-h5 {color: #196d80; font-weight: bold}
+.cm-editor .asciidoc-h1 {color: aqua; font-weight: bold}
+.cm-editor .asciidoc-h2 {color: aqua; font-weight: bold}
+.cm-editor .asciidoc-h3 {color: aqua; font-weight: bold}
+.cm-editor .asciidoc-h4 {color: aqua; font-weight: bold}
+.cm-editor .asciidoc-h5 {color: aqua; font-weight: bold}
 .cm-editor .asciidoc-b1 {color: #a2f;}
 .cm-editor .asciidoc-b2 {color: #a2f;}
 .cm-editor .asciidoc-b3 {color: #a2f;}
+.cm-editor .asciidoc-bold {font-weight: bold; color: green;}
 .cm-editor [contenteditable="true"] {
     caret-color: red;
 }
