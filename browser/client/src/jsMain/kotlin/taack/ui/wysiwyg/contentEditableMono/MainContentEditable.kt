@@ -3,15 +3,16 @@ package taack.ui.wysiwyg.contentEditableMono
 import js.iterable.iterator
 import taack.ui.base.element.Form
 import web.cssom.ClassName
+import web.dom.Element
+import web.dom.Node
+import web.dom.Text
 import web.dom.document
-import web.dom.keyPressEvent
 import web.events.EventHandler
-import web.events.EventType
-import web.events.addEventListener
 import web.html.AutoCapitalize
 import web.html.HTMLDivElement
-import web.html.HTMLElement
+import web.html.HTMLSpanElement
 import web.html.off
+import web.selection.Selection
 import web.window.window
 
 class MainContentEditable(
@@ -29,32 +30,37 @@ class MainContentEditable(
 
     class CmdLine {
 
-        data class Span(val pattern: Regex, val replacement: String, val inlined: Boolean)
+        data class Span(val pattern: String, val replacement: String, val inlined: Boolean)
 
         enum class SpanStyle(val span: Span) {
-            DOCUMENT(Span(Regex("^= .*"), "<span class='asciidoc-h1'>$0</span>", false)),
-            TITLE1(Span(Regex("^== .*"), "<span class='asciidoc-h2'>$0</span>", false)),
-            TITLE2(Span(Regex("^=== .*"), "<span class='asciidoc-h3'>$0</span>", false)),
-            TITLE3(Span(Regex("^==== .*"), "<span class='asciidoc-h4'>$0</span>", false)),
-            TITLE4(Span(Regex("^===== .*"), "<span class='asciidoc-h5'>$0</span>", false)),
-//            LITERAL_PARAGRAPH(Span(Regex("^ .*"), "asciidoc-literal", false)),
-            UNORDERED_LIST1(Span(Regex("^\\* (.*)"), "<span class='asciidoc-b1'>*</span> $1", false)),
-            UNORDERED_LIST2(Span(Regex("^\\*\\* (.*)"), "<span class='asciidoc-b2'>**</span> $1", false)),
-            UNORDERED_LIST3(Span(Regex("^\\*\\*\\* (.*)"), "<span class='asciidoc-b3'>***</span> $1", false)),
-//            CONSTRAINED_BOLD(Span(Regex(".* \\*([^*]*)\\* "), "asciidoc-bold", true)),
-//            CONSTRAINED_ITALIC(Span(Regex(" _([^_]*)_ "), "asciidoc-italic", true)),
-//            CONSTRAINED_MONO(Span(Regex(" `([^`]*)` "), "asciidoc-mono", true)),
-//            UNCONSTRAINED_BOLD(Span(Regex("[^\\*]\\*\\*([^*]*)\\*\\*[^\\*]"), "asciidoc-bold", true)),
-//            UNCONSTRAINED_ITALIC(Span(Regex("[^_]__([^_]*)__[^_]"), "asciidoc-italic", true)),
-//            UNCONSTRAINED_MONO(Span(Regex("[^`]``([^`]*)``[^`]"), "asciidoc-mono", true)),
-//            HIGHLIGHT(Span(Regex("[^`]``([^`]*)``[^`]"), "asciidoc-highlight", true)),
-//            UNDERLINE(Span(Regex(" \\[.underline]#([^#]*)# "), "asciidoc-underline", true)),
-//            STRIKETHROUGH(Span(Regex(" \\[.line-through]#([^#]*)# "), "asciidoc-strikethrough", true)),
-//            SMART_QUOTES(Span(Regex("\"`#([^\"`]*)`\""), "asciidoc-smart-quotes", true)),
-//            APOSTROPHES(Span(Regex("'`#([^'`]*)`'"), "asciidoc-apostrophe", true)),
-//            URL(Span(Regex("https://[^\\[]*\\[[^\\[]*]"), "asciidoc-url", true)),
+            DOCUMENT(Span("= ", "asciidoc-h1", false)),
+            TITLE1(Span("== ", "asciidoc-h2", false)),
+            TITLE2(Span("=== ", "asciidoc-h3", false)),
+            TITLE3(Span("==== ", "asciidoc-h4", false)),
+            TITLE4(Span("===== ", "asciidoc-h5", false)),
+
+            //            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", false)),
+            UNORDERED_LIST1(Span("* ", "asciidoc-b1", false)),
+            UNORDERED_LIST2(Span("** ", "asciidoc-b2", false)),
+            UNORDERED_LIST3(Span("*** ", "asciidoc-b3", false)),
+//            CONSTRAINED_BOLD(Span(".* \\*([^*]*)\\* "), "asciidoc-bold", true)),
+//            CONSTRAINED_ITALIC(Span(" _([^_]*)_ "), "asciidoc-italic", true)),
+//            CONSTRAINED_MONO(Span(" `([^`]*)` "), "asciidoc-mono", true)),
+//            UNCONSTRAINED_BOLD(Span("[^\\*]\\*\\*([^*]*)\\*\\*[^\\*]"), "asciidoc-bold", true)),
+//            UNCONSTRAINED_ITALIC(Span("[^_]__([^_]*)__[^_]"), "asciidoc-italic", true)),
+//            UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]"), "asciidoc-mono", true)),
+//            HIGHLIGHT(Span("[^`]``([^`]*)``[^`]"), "asciidoc-highlight", true)),
+//            UNDERLINE(Span(" \\[.underline]#([^#]*)# "), "asciidoc-underline", true)),
+//            STRIKETHROUGH(Span(" \\[.line-through]#([^#]*)# "), "asciidoc-strikethrough", true)),
+//            SMART_QUOTES(Span("\"`#([^\"`]*)`\""), "asciidoc-smart-quotes", true)),
+//            APOSTROPHES(Span("'`#([^'`]*)`'"), "asciidoc-apostrophe", true)),
+//            URL(Span("https://[^\\[]*\\[[^\\[]*]"), "asciidoc-url", true)),
         }
     }
+
+    var focus: Int? = 0
+    var selection: Selection? = null
+    var selectedElement: Node? = null
 
     init {
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
@@ -86,59 +92,67 @@ class MainContentEditable(
         createCmdLine("<br>", 0)
 
         divContent.onkeyup = EventHandler { event ->
+
+            if (event.key.startsWith("Arrow")) return@EventHandler
+
             if (event.key == "Enter") {
                 createCmdLine(null, 0)
-
-                val selection = window.getSelection()
-                val range = selection?.getRangeAt(0)
-                if (range != null) {
-                    val element = range.commonAncestorContainer as HTMLElement
-                    println("element.textContent: ${element.textContent}")
-//                    element.innerHTML = asciidocToHtml(element.textContent)
-
-//                    for (i in 0 until divContent.children.length) {
-//                        // Ugly
-//                        println("RDGSDFGSDFGsqdfsqd $i")
-//                        if (divContent.children[i] == element) {
-//                            println("RDGSDFGSDFG $i")
-//                           val previousElement = divContent.children[i]
-//                           previousElement.innerHTML = asciidocToHtml(previousElement.textContent) ?: "<br>"
-//
-//                        }
-//                    }
-
-                }
-//                val element = createCmdLine("<br>")
-//                val range = document.createRange()
-//                val selection = window.getSelection()
-//
-//                range.setStart(element, 0)
-//                range.setEnd(element, 0)
-//                selection?.removeAllRanges()
-//                selection?.addRange(range)
-//                event.preventDefault()
-//
-//                countLines = 0
-//
-//                for (c in divContent.children.iterator()) {
-//                    countLines ++
-//                    c.innerHTML = asciidocToHtml(c.textContent)
-//                    if (c.innerHTML.isEmpty()) c.innerHTML = "<br>"
-//                }
+                return@EventHandler
             }
+            selection = window.getSelection()
+            focus = selection?.focusOffset
+            for (c in divContent.children.iterator()) {
+                asciidocToHtml(c as HTMLDivElement)
+            }
+            val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
+            selectedElement = range?.commonAncestorContainer
+
+            if (selectedElement is Text) selectedElement = selectedElement?.parentElement?.parentElement
+
+            if (focus != null && selectedElement != null && selection != null) {
+                println("focus: $focus")
+                if (selectedElement?.firstChild is HTMLSpanElement) {
+                    println("element.firstChild: ${(selectedElement!!.firstChild as Element).innerHTML}")
+                } else {
+                    println("element: $selectedElement")
+                }
+            }
+
         }
     }
 
+    fun asciidocToHtml(e: HTMLDivElement) {
+        var matches = e.textContent
+        if (matches != null) {
+            for (entry in CmdLine.SpanStyle.entries) {
+                if (!entry.span.inlined) {
+                    if (matches!!.startsWith(entry.span.pattern)) {
 
-    fun asciidocToHtml(s: String?): String? {
-        var matches = s
-        if (matches != null)
-            CmdLine.SpanStyle.entries.forEach { style ->
-                println("match1: ${matches}")
-                matches = matches!!.replace(style.span.pattern, style.span.replacement)
-                println("match2: ${matches}")
+                        println("selectedElement: $selectedElement (${selectedElement?.textContent}), e: $e [${selectedElement == e}]")
+                        val isSelected = selectedElement == e
+                        val innerHTML = """<span class="${entry.span.replacement}">${matches}</span>"""
+
+                        if (innerHTML != e.innerHTML) {
+                            e.innerHTML = innerHTML
+                            println("Match: ${entry} => ${e.innerHTML}")
+
+                            if (isSelected && focus != null) {
+                                println("Set carret positoin => focus: $focus, ${e.firstChild}")
+                                selection?.setPosition(e.firstChild?.firstChild, focus!!)
+                            }
+                        }
+                        return
+                    }
+                } else {
+                    matches = matches!!.replace(entry.span.pattern, entry.span.replacement)
+                }
             }
-        return matches
+            println("No matches found ${e}")
+            if (e.innerHTML != e.textContent && e.innerHTML != "<br>") {
+                println("HTML (${e.innerHTML}) != Txt (${e.textContent})")
+                e.innerHTML = e.textContent ?: "<br>"
+            }
+        }
     }
 
     fun createCmdLine(s: String?, index: Int) {
@@ -164,7 +178,7 @@ class MainContentEditable(
             if (index == 0)
                 divContent.appendChild(cmd)
             else
-                divContent.insertBefore(divContent.children[index],cmd)
+                divContent.insertBefore(divContent.children[index], cmd)
         }
 
         for (i in 0 until divContent.children.length) {
