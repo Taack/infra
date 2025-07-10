@@ -14,7 +14,7 @@ final class DiagramOption {
     String title
     String xTitle
     String yTitle
-    boolean hideCount = false
+    boolean showDataCount = false
     boolean hideLegend = false
     List<Color> keyColors
     DiagramResolution resolution
@@ -31,8 +31,8 @@ final class DiagramOption {
             this.diagramOption = diagramOption
         }
 
-        DiagramOptionBuilder hideCount() {
-            diagramOption.hideCount = true
+        DiagramOptionBuilder showDataCount() {
+            diagramOption.showDataCount = true
             this
         }
 

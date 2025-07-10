@@ -111,6 +111,9 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void drawLegend(List<String> pointImageHref = []) {
+        if (diagramOption?.hideLegend) {
+            return
+        }
         Integer line = 1
         BigDecimal totalLength = 0.0
         Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]

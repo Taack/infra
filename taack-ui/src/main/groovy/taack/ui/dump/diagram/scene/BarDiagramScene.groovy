@@ -91,7 +91,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     render.fillStyle(rectColor.color)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
 
-                    if (!alwaysShowFullInfo) {
+                    if (diagramOption?.showDataCount) {
                         // label
                         render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
                         render.renderLabel(yDataLabel)

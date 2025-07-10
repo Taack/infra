@@ -71,7 +71,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
                     }
-                    if (!alwaysShowFullInfo && gapWidth >= MIN_GAP_WIDTH) {
+                    if (diagramOption?.showDataCount && gapWidth >= MIN_GAP_WIDTH) {
                         // data label
                         if (dataPointRadius > 5) { // put label at right
                             render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
@@ -120,7 +120,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
                     }
-                    if (!alwaysShowFullInfo && gapWidth >= MIN_GAP_WIDTH) {
+                    if (diagramOption?.showDataCount && gapWidth >= MIN_GAP_WIDTH) {
                         // data label
                         if (y > startLabelY) {
                             if (dataPointRadius > 5) { // put label at right
