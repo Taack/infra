@@ -605,7 +605,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
 <body>
 
-<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" :""}" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
+<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" : ""}" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><img src='/assets/${conf.logoFileName}' width='${conf.logoWidth}'
                                                       height='${conf.logoHeight}' alt="Logo"/>
@@ -692,7 +692,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                                    ajaxaction="/theme?isAjax=true">${tr 'theme.label'}</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link" href="/logout">${tr'logout.label'}</a>
+                                <a class="nav-link" href="/logout">${tr 'logout.label'}</a>
                             </li>
                         </ul>
                     </li>
@@ -729,8 +729,17 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     <div id="taack-load-spinner" class="tck-hidden"></div>
 </div>
 ${bootstrapJsTag}
+"""
+        if (clientJsPath != null && !clientJsPath.empty)
+            bout << """\
     <script src="${clientJsPath}"></script>
     <script src="/assets/application-taack.js"></script>
+"""
+        else
+            bout << """\
+    <script src="/assets/application-taack.js"></script>
+    """
+        bout << """\
 </body>
 </html>
         """
