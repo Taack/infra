@@ -283,7 +283,10 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void buildTransformAreaStart(String shapeType, BigDecimal shapeMaxWidth = 0.0) {
-        String id = 'clipSection' + ThreadLocalRandom.current().nextInt(0, 1_000_000).toString()
+        // todo: should modify it to clarify different clipSections (In case of several diagrams with different resolution in one same page)
+//        String id = 'clipSection' + ThreadLocalRandom.current().nextInt(0, 1_000_000).toString()
+        String id = 'clipSection'
+
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
                                   width - DIAGRAM_MARGIN_RIGHT + 1, 0.0,

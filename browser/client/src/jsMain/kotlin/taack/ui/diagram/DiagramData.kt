@@ -189,7 +189,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         xhr.send()
     }
 
-    fun showTooltip() {
+    fun showTooltip() { // todo: bad show at high resolution
         if (tooltip != null) {
             val diagramRoot = parent.parent
             diagramRoot.s.appendChild(tooltip)

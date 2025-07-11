@@ -31,7 +31,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     init {
         s.style.userSelect = "none"
 
-        if (transformArea != null && s.querySelector("clipPath[id^='clipSection']") != null) {
+        if (transformArea != null && s.querySelector("clipPath#clipSection") != null) { // todo: should change to "clipPath[id^='clipSection']" after modification of "RectBackgroundDiagramScene.clipSectionId"
             // Scroll
             s.onmousedown = EventHandler { e ->
                 if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
