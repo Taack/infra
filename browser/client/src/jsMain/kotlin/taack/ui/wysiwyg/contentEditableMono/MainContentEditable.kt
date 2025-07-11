@@ -134,7 +134,6 @@ class MainContentEditable(
     fun asciidocToHtml(e: HTMLDivElement) {
         println("asciidocToHtml ${e.textContent}")
         var matches = e.textContent
-        e.textContent = matches
         if (matches != null) {
             val isSelected = selectedElement == e
             for (entry in CmdLine.SpanStyle.entries) {
@@ -160,7 +159,6 @@ class MainContentEditable(
                     }
                 } else {
                     val r = Regex(entry.span.pattern)
-                    e.textContent = e.textContent
                     if (r.matches(matches as CharSequence)) {
                         var out = "matches in : $matches ($entry)\n"
                         matches = matches!!.replace(Regex(entry.span.pattern), """$1<span class="${entry.span.replacement}">$2</span>$3""")
@@ -194,7 +192,11 @@ class MainContentEditable(
                         }
                         println(out)
                     } else {
-
+                        val html = matches!!.replace(Regex(entry.span.pattern), """$1<span class="${entry.span.replacement}">$2</span>$3""")
+                        if (html != e.textContent) {
+                            e.innerHTML = html
+                            selection?.setPosition(selection?.focusNode, selection?.focusOffset!!)
+                        }
                     }
                 }
             }
@@ -204,7 +206,6 @@ class MainContentEditable(
 //                e.innerHTML = e.textContent ?: "<br>"
 //            }
         } else {
-            selection?.setPosition(selectedElement, focus!!)
         }
     }
 
