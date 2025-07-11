@@ -216,7 +216,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    private fun refreshDataShape(zoomRadio: Double = 1.0) {
+    private fun refreshDataShape(zoomRadio: Double = 1.0) { // todo: should also move the data counts (vertically and horizontally)
         gapWidth *= zoomRadio
         when (shapeType) {
             in listOf("bar", "whiskers") -> {
