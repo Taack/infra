@@ -111,9 +111,6 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void drawLegend(List<String> pointImageHref = []) {
-        if (diagramOption?.hideLegend) {
-            return
-        }
         Integer line = 1
         BigDecimal totalLength = 0.0
         Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
@@ -133,7 +130,9 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             totalLength += length + LEGEND_MARGIN
         }
 
-        diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
+        if (!diagramOption?.hideLegend) {
+            diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
+        }
 
         BigDecimal startY = LEGEND_MARGIN
         Integer legendIndex = 0
@@ -142,7 +141,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
             keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
                 // image or rect, with text
-                render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})", style: 'pointer-events: bounding-box;'])
+                render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})", style: "pointer-events: bounding-box;${diagramOption?.hideLegend ? 'display: none;' : ''}"])
                 if (legendIndex < pointImageHref.size()) {
                     render.translateTo(0.0, 0.0 - (LEGEND_IMAGE_WIDTH - fontSize))
                     render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
