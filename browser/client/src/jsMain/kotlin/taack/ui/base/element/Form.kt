@@ -69,9 +69,6 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             scrollContainer.append(largeContainer)
             textarea.parentElement?.append(scrollContainer)
 //            MainCanvas(this, textarea, canvasContainer, scrollContainer)
-
-            println("COUCOUCUOCOUCOU")
-
             MainContentEditable(this, canvasContainer)
         }
 

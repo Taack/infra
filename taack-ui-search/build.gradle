@@ -1,10 +1,10 @@
 plugins {
     id 'taack-grails-plugin'
-    id 'org.apache.grails.gradle.grails-web'
-    id 'org.apache.grails.gradle.grails-gsp'
 }
 
 dependencies {
+    implementation project(':taack-ui')
+
     implementation "org.apache.solr:solr-solrj:${solrj}"
     implementation "org.apache.tika:tika-core:${tika}"
     implementation "org.apache.tika:tika-parsers-standard:${tika}"
@@ -13,8 +13,6 @@ dependencies {
 
     implementation "org.apache.grails:grails-data-hibernate5"
     implementation "org.apache.grails:grails-gsp"
-
-    implementation project(':taack-ui')
 }
 
 

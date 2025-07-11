@@ -2,9 +2,7 @@ package taack.ui.wysiwyg.contentEditableMono
 
 import js.iterable.iterator
 import web.cssom.ClassName
-import web.dom.Element
 import web.dom.Node
-import web.dom.Text
 import web.dom.document
 import web.events.EventHandler
 import web.html.AutoCapitalize
@@ -27,8 +25,6 @@ class MainContentEditable(
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
 
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
-    private val delimStart = " "
-    private val delimEnd = "[ .,]"
 
     class CmdLine {
 
@@ -50,26 +46,97 @@ class MainContentEditable(
             UNORDERED_LIST2(Span("** ", "asciidoc-b2", false)),
             UNORDERED_LIST3(Span("*** ", "asciidoc-b3", false)),
 
-            //            CONSTRAINED_BOLD(Span("(.* )(\\*[^*]*\\*)( .*)", "asciidoc-bold", true)),
-            CONSTRAINED_BOLD(Span("(\\*[^*]*\\*)", "asciidoc-bold", true, true)),
+            UNCONSTRAINED_BOLD(Span("([^*]?)(\\*\\*[^*]*\\*\\*)([^*]?)", "asciidoc-bold", true, true)),
+            UNCONSTRAINED_ITALIC(Span("([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", true)),
+            UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]", "asciidoc-mono", true)),
+            CONSTRAINED_BOLD(Span("([^\\w\\d*])(\\*[^*]+\\*)([^\\w\\d*]?)", "asciidoc-bold", true, true)),
 //            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", true)),
-//            CONSTRAINED_ITALIC(Span(" _([^_]*)_ ", "asciidoc-italic", true)),
-//            CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)),
-//            UNCONSTRAINED_BOLD(Span("[^\\*]\\*\\*([^*]*)\\*\\*[^\\*]", "asciidoc-bold", true)),
-//            UNCONSTRAINED_ITALIC(Span("[^_]__([^_]*)__[^_]", "asciidoc-italic", true)),
-//            UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]", "asciidoc-mono", true)),
-//            HIGHLIGHT(Span("[^`]``([^`]*)``[^`]", "asciidoc-highlight", true)),
-//            UNDERLINE(Span(" \\[.underline]#([^#]*)# ", "asciidoc-underline", true)),
-//            STRIKETHROUGH(Span(" \\[.line-through]#([^#]*)# ", "asciidoc-strikethrough", true)),
-//            SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)),
-//            APOSTROPHES(Span("'`#([^'`]*)`'", "asciidoc-apostrophe", true)),
-//            URL(Span("https://[^\\[]*\\[[^\\[]*]", "asciidoc-url", true)),
+            CONSTRAINED_ITALIC(Span("([^\\w\\d_])(_[^_]+_)([^\\w\\d_]?)", "asciidoc-italic", true, true)),
+            CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)),
+            HIGHLIGHT(Span("[^`]``([^`]*)``[^`]", "asciidoc-highlight", true)),
+            UNDERLINE(Span("([^\\w\\d]?)(\\[.underline\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-underline", true, true)),
+            STRIKETHROUGH(Span("([^\\w\\d]?)(\\[.line-through\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-line-through", true)),
+            SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)),
+            APOSTROPHES(Span("'`#([^'`]*)`'", "asciidoc-apostrophe", true)),
+            URL(Span("([^\\w\\d]?)(http[s]?://[^[]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-url", true)),
         }
     }
 
     var focus: Int? = 0
+    var currentLine: HTMLDivElement? = currentLineComputed
+    val currentLineComputed: HTMLDivElement?
+        get() {
+            if (selectedElement?.parentElement is HTMLDivElement) {
+                return selectedElement?.parentElement as HTMLDivElement
+            } else if(selectedElement?.parentElement?.parentElement is HTMLDivElement) {
+                return selectedElement?.parentElement ?.parentElement as HTMLDivElement
+            } else if (selectedElement?.parentElement?.parentElement?.parentElement is HTMLDivElement) {
+                return selectedElement?.parentElement?.parentElement?.parentElement as HTMLDivElement
+            }
+            return null
+        }
     var selection: Selection? = null
     var selectedElement: Node? = null
+    var position = 0
+
+
+    fun initSelection() {
+        selection = window.getSelection()
+        focus = selection?.focusOffset
+        selectedElement = selection?.focusNode
+
+        println("selection: $selection")
+        println("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}")
+        println("focus: $focus")
+
+        // position in chars in parent container
+        currentLine = currentLineComputed
+
+        println("currentLine: $currentLine (${currentLine?.innerHTML})")
+        if (currentLine != null) {
+            position = 0
+            for(child in currentLine!!.childNodes.iterator()) {
+                println("child: $child (${child.textContent})")
+
+                if (child == selectedElement || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
+                    position += focus ?: 0
+                    println("child == selectedElement $focus $position")
+                    break
+                } else {
+                    position += child.textContent?.length ?: 0
+                }
+            }
+        } else position = focus ?: 0
+        println("position: $position")
+    }
+
+    fun repairSelection() {
+        println("repairSelection currentLine: $currentLine (${currentLine?.textContent}), ${currentLine?.childElementCount}, ${currentLine?.childNodes?.length}")
+        if (currentLine != null) {
+            var currentPosition = 0
+            for (child in currentLine!!.childNodes.iterator()) {
+                println("child: $child (${child.textContent})")
+
+                val childLength = child.textContent?.length
+
+                childLength?.plus(currentPosition)?.let {
+                    if (it >= position) {
+                        selection?.setPosition(child, 1)
+                        return
+                    }
+                }
+                currentPosition += childLength ?: 0
+
+//                if (child == selectedElement || child == selectedElement?.parentElement) {
+//                    println("child: $child (${child.textContent}), currentPosition: $currentPosition => offset: ${position - currentPosition}")
+//                    selection?.setPosition(child, position - currentPosition)
+//                    return
+//                } else {
+//                    currentPosition += child.textContent?.length ?: 0
+//                }
+            }
+        }
+    }
 
     init {
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
@@ -100,58 +167,57 @@ class MainContentEditable(
 
         createCmdLine("<br>", 0)
 
-        divContent.onkeyup = EventHandler { event ->
+        divContent.onclick = EventHandler { e ->
+            initSelection()
+        }
 
-            if (event.key.startsWith("Arrow")) return@EventHandler
+        divContent.onkeyup = EventHandler { event ->
+            initSelection()
+            if (event.key.startsWith("Arrow")) {
+                return@EventHandler
+            }
 
             if (event.key == "Enter") {
                 createCmdLine(null, 0)
                 val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
                 var e = range?.commonAncestorContainer
+
                 if (e != null) {
                     if (e is HTMLSpanElement) {
                         println("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
-                        (range?.commonAncestorContainer?.parentElement as HTMLDivElement?)?.innerHTML = "<br>"
+                        if (range?.commonAncestorContainer?.parentElement is HTMLDivElement)
+                            range.commonAncestorContainer.parentElement?.innerHTML = "<br>"
+                        else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement)
+                            range.commonAncestorContainer.parentElement?.parentElement?.innerHTML = "<br>"
                     }
                 }
 
                 return@EventHandler
             }
-            selection = window.getSelection()
-            focus = selection?.focusOffset
             for (c in divContent.children.iterator()) {
                 asciidocToHtml(c as HTMLDivElement)
             }
-            val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
-            selectedElement = range?.commonAncestorContainer
-
-            if (selectedElement is Text) selectedElement = selectedElement?.parentElement
-
-            if (focus != null && selectedElement != null && selection != null) {
-                var out = "focus: $focus"
-                if (selectedElement?.firstChild is HTMLSpanElement || selectedElement is HTMLDivElement) {
-                    out += " selectedElement.innerHtml: ${(selectedElement!! as Element).innerHTML}"
-                } else {
-                    out += " selectedElement: ${selectedElement} selectedElement.textContent: ${selectedElement?.textContent}"
-                }
-                println(out)
-            }
-
         }
     }
 
     fun asciidocToHtml(e: HTMLDivElement) {
         val txt = e.textContent
+        println("txt: $txt")
+        if (txt?.isEmpty() == true) {
+            e.innerHTML = "<br>"
+            return
+        }
         if (txt != null) {
             var hasStart: CmdLine.SpanStyle? = null
             var inlineMatchSequence: List<Pair<CmdLine.SpanStyle, MatchResult>> = mutableListOf<Pair<CmdLine.SpanStyle, MatchResult>>()
             for (entry in CmdLine.SpanStyle.entries) {
                 if (!entry.span.inlined && hasStart == null) {
                     if (txt.startsWith(entry.span.pattern)) {
+                        println("Has Prefix")
                         hasStart = entry
                     }
                 } else if (entry.span.inlined) {
-                    val pattern = if (entry.span.delimiter) delimStart + entry.span.pattern + delimEnd else entry.span.pattern
+                    val pattern = entry.span.pattern
                     println("Pattern: $pattern")
                     val regex = Regex(pattern)
                     if (regex.containsMatchIn(txt)) {
@@ -161,127 +227,37 @@ class MainContentEditable(
                     }
                 }
             }
-            val html = e.innerHTML
             var result = ""
-            var txtPosition = 0
             val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
 
+            var i = 0
             for (c in sorted) {
                 val spanStyle: CmdLine.SpanStyle = c.first
                 val match: MatchResult = c.second
+                val start = match.range.first
+                val ends = match.range.endInclusive
+                val replace = """${match.groupValues[1]}<span class="${spanStyle.span.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
+                result += txt.substring(i..start - 1) + replace
+                i = ends + 1
+            }
+            println("result: $result, i: $i, txt.length: ${txt.length}")
+            result += txt.substring(i)
 
-                println(match.range)
-                println(match.value)
+            println("result: $result")
 
-
+            if (hasStart != null) {
+                val cn = hasStart.span.className
+                result = """<span class="${cn}">$result</span>"""
             }
 
-        }
+            if (e.innerHTML != result) {
+                println("selection?.focusOffset: ${selection?.focusOffset}")
+                println("selection?.focusNode: ${selection?.focusNode}")
 
 
-    }
-
-    fun asciidocToHtmlOld(e: HTMLDivElement) {
-        println("asciidocToHtml ${e.textContent}")
-        var matches = e.textContent
-        if (matches != null) {
-            val isSelected = selectedElement == e
-            for (entry in CmdLine.SpanStyle.entries) {
-                if (!entry.span.inlined) {
-                    if (matches!!.startsWith(entry.span.pattern)) {
-
-                        var out = "Matches:  ${entry}, matches: $matches, e.innerHtml: ${e.innerHTML} [${isSelected}]"
-                        val innerHTML = """<span class="${entry.span.className}">${matches}</span>"""
-
-                        if (innerHTML != e.innerHTML) {
-                            e.innerHTML = innerHTML
-                            out += " innerHTML != e.innerHTML "
-
-                            if (isSelected && focus != null) {
-                                out += ", Set carret positoin => focus: $focus, e.children: ${e.children}"
-                                selection?.setPosition(e.firstChild?.firstChild, focus!!)
-                            }
-                        }
-                        println(out)
-                        return
-                    } else if (e.innerHTML.contains(entry.span.className)) {
-                        val pattern = """<span class="${entry.span.className}">([^<]*)</span>"""
-                        var out = "No matches:  ${entry}, but contains ${entry.span.className}, replacing $pattern ... "
-                        e.innerHTML = e.innerHTML.replace(Regex(pattern), "$1")
-                        out += " => ${e.innerHTML}"
-                        println(out)
-                        return
-                    }
-                } else {
-                    println("ok 1")
-
-                    val r =
-                        if (entry.span.delimiter) Regex(delimStart + entry.span.pattern + delimEnd) else Regex(entry.span.pattern)
-                    println("ok 2")
-                    if (r.containsMatchIn(matches as CharSequence)) {
-                        println("ok 3")
-                        var out = "matches in : $matches ($entry)\n"
-                        println("ok 4")
-                        matches = matches.replace(
-                            Regex(entry.span.pattern),
-                            """<span class="${entry.span.className}">$1</span>"""
-                        )
-                        println("ok 5")
-                        out += "matches out: $matches ($entry)\n"
-                        e.innerHTML = matches
-                        if (isSelected && focus != null) {
-                            out += "Set caret position => focus: $focus, e: $e, e.children.length: ${e.children.length}, selection?.focusOffset: ${selection?.focusOffset}\n"
-                            out += "Iterate over children: ${e.childElementCount}\n"
-                            var cursorPos = false
-                            for (c in e.children.iterator()) {
-                                val txt = c.textContent!!
-//                                out += "txt.length >= (focus!! - cursorPos - 1): ${txt.length} >= (${focus} - $cursorPos - 1)\n)"
-//                                if (txt.length >= (focus!! - cursorPos - 1)) {
-//                                    out += txt + " setting to  ${focus!! - cursorPos}\n"
-//                                    selection?.setPosition(c, focus!! - cursorPos)
-//                                    break
-//                                }
-//                                cursorPos += txt.length
-                                cursorPos = true
-                                out += "$txt cursorPos: $cursorPos focus: $focus\n"
-                            }
-                            val lastChildLength = selection?.focusNode?.lastChild?.textContent?.length!!
-                            if (cursorPos && focus!! >= lastChildLength) {
-                                out += "cursorPos && focus!! == true => lastChildLength: $lastChildLength\n"
-                                out += "selection?.focusOffset ${selection?.focusOffset}, selection?.anchorOffset: ${selection?.anchorOffset}, selection?.anchorNode: ${selection?.anchorNode}, selection?.rangeCount: ${selection?.rangeCount}\n"
-
-                                selection?.focusNode?.childNodes?.iterator()?.forEach {
-                                    out += it.textContent
-                                    out += "\n"
-                                }
-                                println(out)
-//                                selection?.setPosition(selection?.focusNode?.lastChild, lastChildLength - 1)
-
-                            } else {
-                                out += "cursorPos && focus!! == true => focus: $focus\n"
-                                selection?.setPosition(selection?.focusNode, focus!!)
-                            }
-                            println(out)
-                        }
-                        println(out)
-                    } else {
-                        val html = matches.replace(
-                            Regex(entry.span.pattern),
-                            """$1<span class="${entry.span.className}">$2</span>$3"""
-                        )
-                        if (html != e.textContent) {
-                            e.innerHTML = html
-                            selection?.setPosition(selection?.focusNode, selection?.focusOffset!!)
-                        }
-                    }
-                }
+                e.innerHTML = result
+                repairSelection()
             }
-//            println("No matches found ${e}")
-//            if (e.innerHTML != e.textContent && e.innerHTML != "<br>") {
-//                println("HTML (${e.innerHTML}) != Txt (${e.textContent})")
-//                e.innerHTML = e.textContent ?: "<br>"
-//            }
-        } else {
         }
     }
 

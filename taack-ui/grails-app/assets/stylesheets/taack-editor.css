@@ -52,6 +52,11 @@
 .cm-editor .asciidoc-b2 {color: #a2f;}
 .cm-editor .asciidoc-b3 {color: #a2f;}
 .cm-editor .asciidoc-bold {font-weight: bold; color: green;}
+.cm-editor .asciidoc-italic {color: green; font-style: italic;}
+.cm-editor .asciidoc-url {color: blue;}
+.cm-editor .asciidoc-underline {text-decoration: underline;}
+.cm-editor .asciidoc-line-through {text-decoration: line-through;}
+.cm-editor .asciidoc-url {color: blue;}
 .cm-editor [contenteditable="true"] {
     caret-color: red;
 }
