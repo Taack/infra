@@ -14,11 +14,15 @@ class SvgDiagramRender implements IDiagramRender {
     private final BigDecimal svgHeight
     private final boolean isViewBox
     private final FontMetrics fm
-    private final Integer fontSize
+    private Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private String fillStyle = 'black'
-    private BigDecimal lineWidth
+    private BigDecimal lineWidth = 1.3
+
+    private BigDecimal LABEL_MARGIN = 2.0
+    final private BigDecimal SMALL_LABEL_RATE = 0.8
+    private BigDecimal ARROW_LENGTH = 8.0
 
     SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false, BigDecimal fontSizePercentage = 1.0) {
         // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params 'width/height' will be used to do ZOOM
@@ -26,9 +30,12 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
-        this.fontSize = (13 * fontSizePercentage).toInteger()
-        this.lineWidth = 1.3 * fontSizePercentage
+        this.fontSize = (this.fontSize * fontSizePercentage).toInteger()
+        this.lineWidth *= fontSizePercentage
         this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
+
+        this.LABEL_MARGIN *= fontSizePercentage
+        this.ARROW_LENGTH *= fontSizePercentage
     }
 
     @Override
@@ -78,7 +85,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderLabel(String label) { // FONT_SIZE = 13.0
         outStr.append("""
-              <text x="${trX}" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="${trX}" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -86,7 +93,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderHiddenLabel(String label) {
         outStr.append("""
-              <text x="${trX}" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="${trX}" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -94,7 +101,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         outStr.append("""
-              <text x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize * 0.8}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="$trX" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize * SMALL_LABEL_RATE}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -102,7 +109,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
-              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -110,7 +117,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
-              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - 2.0}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -167,7 +174,7 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderArrow(BigDecimal... coords) { // ARROW_LENGTH = 8.0
+    void renderArrow(BigDecimal... coords) {
         def it = coords.iterator()
         def sb = new StringBuilder()
         sb.append(" ${trX},${trY}")
@@ -184,9 +191,9 @@ class SvgDiagramRender implements IDiagramRender {
             sb.append(" ${trX + x2},${trY + y2}")
         }
         Double angle = Math.atan2((y2 - y1) as Double, (x2 - x1) as Double)
-        sb.append(" ${trX + x2 - 8.0 * Math.cos(angle - Math.PI / 6)},${trY + (y2 - 8.0 * Math.sin(angle - Math.PI / 6))}")
+        sb.append(" ${trX + x2 - ARROW_LENGTH * Math.cos(angle - Math.PI / 6)},${trY + (y2 - ARROW_LENGTH * Math.sin(angle - Math.PI / 6))}")
         sb.append(" ${trX + x2},${trY + y2}")
-        sb.append(" ${trX + x2 - 8.0 * Math.cos(angle + Math.PI / 6)},${trY + (y2 - 8.0 * Math.sin(angle + Math.PI / 6))}")
+        sb.append(" ${trX + x2 - ARROW_LENGTH * Math.cos(angle + Math.PI / 6)},${trY + (y2 - ARROW_LENGTH * Math.sin(angle + Math.PI / 6))}")
         outStr.append("""
                 <polyline points="$sb" stroke="black" fill="none" />
         """.stripIndent()

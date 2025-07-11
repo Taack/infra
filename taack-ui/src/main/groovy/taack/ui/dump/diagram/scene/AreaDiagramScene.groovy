@@ -70,9 +70,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
-                KeyColor areaColor = KeyColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
-                render.fillStyle(areaColor.color)
+                render.fillStyle(getKeyColor(i))
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()
@@ -112,9 +111,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
-                KeyColor areaColor = KeyColor.colorFrom(i)
                 render.translateTo(0.0, 0.0)
-                render.fillStyle(areaColor.color)
+                render.fillStyle(getKeyColor(i))
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()

@@ -42,7 +42,9 @@ final class DiagramOption {
         }
 
         DiagramOptionBuilder setKeyColors(Color... color) {
-            diagramOption.keyColors = color.toList()
+            if (color?.size() > 0) {
+                diagramOption.keyColors = color.toList()
+            }
             this
         }
 

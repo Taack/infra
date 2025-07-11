@@ -6,8 +6,8 @@ import taack.ui.dump.diagram.IDiagramRender
 
 @CompileStatic
 class BarDiagramScene extends RectBackgroundDiagramScene {
-    final private BigDecimal MIN_BAR_WIDTH = 5.0
-    final private BigDecimal MAX_BAR_WIDTH = 200.0
+    private BigDecimal MIN_BAR_WIDTH = 5.0
+    private BigDecimal MAX_BAR_WIDTH = 200.0
 
     final private boolean isStacked
 
@@ -15,6 +15,12 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         super(render, dataPerKey, diagramOption)
         this.isXLabelInsideGap = true
         this.isStacked = isStacked
+
+        BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
+        if (rate && rate != 1) {
+            MIN_BAR_WIDTH *= rate
+            MAX_BAR_WIDTH *= rate
+        }
     }
 
     String objectToString(Object o) {
@@ -87,8 +93,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
-                    KeyColor rectColor = KeyColor.colorFrom(j)
-                    render.fillStyle(rectColor.color)
+                    render.fillStyle(getKeyColor(j))
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
 
                     if (diagramOption?.showDataCount) {

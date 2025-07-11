@@ -5,18 +5,20 @@ import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dump.diagram.IDiagramRender
 
+import java.util.concurrent.ThreadLocalRandom
+
 @CompileStatic
 abstract class RectBackgroundDiagramScene extends DiagramScene {
-    final protected BigDecimal LEGEND_IMAGE_WIDTH = 19.0
-    final private BigDecimal LEGEND_RECT_WIDTH = 40.0
-    final private BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
-    final private BigDecimal LEGEND_MARGIN = 10.0
-    final private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
-    final private BigDecimal AXIS_LABEL_MARGIN = 10.0
-    final private BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
-    final protected BigDecimal MIN_GAP_WIDTH = 5.0
+    protected BigDecimal LEGEND_IMAGE_WIDTH = 19.0
+    private BigDecimal LEGEND_RECT_WIDTH = 40.0
+    private BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
+    private BigDecimal LEGEND_MARGIN = 10.0
+    private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
+    private BigDecimal AXIS_LABEL_MARGIN = 10.0
+    protected BigDecimal MIN_GAP_WIDTH = 5.0
+    private final BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
 
-    private BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP // will be increased by legend height
+    private BigDecimal diagramMarginTop
     protected Set<Object> xLabelList = []
     protected BigDecimal startLabelY
     protected BigDecimal gapY
@@ -44,6 +46,23 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         this.render = render
         this.dataPerKey = dataPerKey
         this.diagramOption = diagramOption
+
+        BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
+        if (rate && rate != 1) {
+            DIAGRAM_MARGIN_LEFT *= rate
+            DIAGRAM_MARGIN_RIGHT *= rate
+            DIAGRAM_MARGIN_TOP *= rate
+            DIAGRAM_MARGIN_BOTTOM *= rate
+            LEGEND_IMAGE_WIDTH *= rate
+            LEGEND_RECT_WIDTH *= rate
+            LEGEND_RECT_TEXT_SPACING *= rate
+            LEGEND_MARGIN *= rate
+            BACKGROUND_LINE_EXCEED_DIAGRAM *= rate
+            AXIS_LABEL_MARGIN *= rate
+            MIN_GAP_WIDTH *= rate
+        }
+
+        this.diagramMarginTop = DIAGRAM_MARGIN_TOP // will be increased by legend height
     }
 
     boolean buildXLabelList() {
@@ -150,8 +169,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                     render.renderLabel(keyEntry.key)
                 } else {
                     render.translateTo(0.0, 0.0)
-                    KeyColor rectColor = KeyColor.colorFrom(legendIndex)
-                    render.fillStyle(rectColor.color)
+                    render.fillStyle(getKeyColor(legendIndex))
                     render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
 
                     // text
@@ -265,7 +283,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void buildTransformAreaStart(String shapeType, BigDecimal shapeMaxWidth = 0.0) {
-        String id = 'clipSection'
+        String id = 'clipSection' + ThreadLocalRandom.current().nextInt(0, 1_000_000).toString()
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
                                   width - DIAGRAM_MARGIN_RIGHT + 1, 0.0,

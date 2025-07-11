@@ -8,7 +8,7 @@ import taack.ui.dump.diagram.IDiagramRender
 class LineDiagramScene extends ScatterDiagramScene {
     LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
         super(render, dataPerKey, diagramOption, [])
-        this.dataPointRadius = 2.5
+        this.dataPointRadius /= 4
     }
 
     void draw(boolean alwaysShowFullInfo = false) {

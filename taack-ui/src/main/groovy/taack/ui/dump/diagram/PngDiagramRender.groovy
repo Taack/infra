@@ -20,17 +20,21 @@ class PngDiagramRender implements IDiagramRender {
     private final BigDecimal pngHeight
     private final FontMetrics fm
     private final AffineTransform initialTransform
-    private final Integer fontSize
+    private Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
     private Color fillStyle = Color.BLACK
-    private BigDecimal lineWidth
+    private BigDecimal lineWidth = 1.3
+
+    private BigDecimal LABEL_MARGIN = 2.0
+    final private BigDecimal SMALL_LABEL_RATE = 0.8
+    private BigDecimal ARROW_LENGTH = 8.0
 
     PngDiagramRender(BigDecimal width, BigDecimal height, BigDecimal fontSizePercentage = 1.0) {
         pngWidth = width
         pngHeight = height
-        fontSize = (13 * fontSizePercentage).toInteger()
-        lineWidth = 1.3 * fontSizePercentage
+        fontSize = (fontSize * fontSizePercentage).toInteger()
+        lineWidth *= fontSizePercentage
         bi = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(fillStyle)
@@ -38,6 +42,9 @@ class PngDiagramRender implements IDiagramRender {
         ig2.setFont(f)
         fm = ig2.getFontMetrics(f)
         initialTransform = ig2.getTransform()
+
+        this.LABEL_MARGIN *= fontSizePercentage
+        this.ARROW_LENGTH *= fontSizePercentage
     }
 
     @Override
@@ -88,7 +95,7 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderLabel(String label) {
         ig2.setPaint(Color.BLACK)
-        ig2.drawString(label, trX.toInteger(), (trY + fontSize - 2.0).toInteger())
+        ig2.drawString(label, trX.toInteger(), (trY + fontSize - LABEL_MARGIN).toInteger())
         ig2.setPaint(fillStyle)
     }
 
@@ -100,8 +107,8 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         ig2.setPaint(Color.BLACK)
-        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * 0.8).intValue()))
-        ig2.drawString(label, trX.toInteger(), (trY + fontSize - 2.0).toInteger())
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).intValue()))
+        ig2.drawString(label, trX.toInteger(), (trY + fontSize - LABEL_MARGIN).toInteger())
         ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
         ig2.setPaint(fillStyle)
     }
@@ -179,12 +186,12 @@ class PngDiagramRender implements IDiagramRender {
             yPoints.add((trY + y2).toInteger())
         }
         Double angle = Math.atan2((y2 - y1).toDouble(), (x2 - x1).toDouble())
-        xPoints.add((trX + x2 - 8.0 * Math.cos(angle - Math.PI / 6)).toInteger())
-        yPoints.add((trY + (y2 - 8.0 * Math.sin(angle - Math.PI / 6))).toInteger())
+        xPoints.add((trX + x2 - ARROW_LENGTH * Math.cos(angle - Math.PI / 6)).toInteger())
+        yPoints.add((trY + (y2 - ARROW_LENGTH * Math.sin(angle - Math.PI / 6))).toInteger())
         xPoints.add((trX + x2).toInteger())
         yPoints.add((trY + y2).toInteger())
-        xPoints.add((trX + x2 - 8.0 * Math.cos(angle + Math.PI / 6)).toInteger())
-        yPoints.add((trY + (y2 - 8.0 * Math.sin(angle + Math.PI / 6))).toInteger())
+        xPoints.add((trX + x2 - ARROW_LENGTH * Math.cos(angle + Math.PI / 6)).toInteger())
+        yPoints.add((trY + (y2 - ARROW_LENGTH * Math.sin(angle + Math.PI / 6))).toInteger())
         ig2.drawPolyline(xPoints as int[], yPoints as int[], xPoints.size())
     }
 

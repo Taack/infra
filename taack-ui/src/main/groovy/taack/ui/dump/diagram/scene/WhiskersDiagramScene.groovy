@@ -6,9 +6,9 @@ import taack.ui.dump.diagram.IDiagramRender
 
 @CompileStatic
 class WhiskersDiagramScene extends RectBackgroundDiagramScene {
-    final private BigDecimal MIN_BOX_WIDTH = 5.0
-    final private BigDecimal MAX_BOX_WIDTH = 40.0
-    final private BigDecimal BOX_LINE_WIDTH = 2.0
+    private BigDecimal MIN_BOX_WIDTH = 5.0
+    private BigDecimal MAX_BOX_WIDTH = 40.0
+    private BigDecimal BOX_LINE_WIDTH = 2.0
 
     private List<Object> xDataList
     final private Map<String, List<List<BigDecimal>>> yDataListPerKey
@@ -18,6 +18,13 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         this.isXLabelInsideGap = true
         this.xDataList = xDataList.toList()
         this.yDataListPerKey = yDataListPerKey
+
+        BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
+        if (rate && rate != 1) {
+            MIN_BOX_WIDTH *= rate
+            MAX_BOX_WIDTH *= rate
+            BOX_LINE_WIDTH *= rate
+        }
     }
 
     void drawHorizontalBackground() {
@@ -106,7 +113,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}"])
                             // rect from upperQuartile to median
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
-                            render.fillStyle(KeyColor.colorFrom(j).color)
+                            render.fillStyle(getKeyColor(j))
                             render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
                             render.fillStyle(BLACK_COLOR)
                             render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
@@ -116,7 +123,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}"])
                             // rect from median to lowerQuartile
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (median - startLabelY) / gapY * gapHeight)
-                            render.fillStyle(KeyColor.colorFrom(j).color)
+                            render.fillStyle(getKeyColor(j))
                             render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
                             render.fillStyle(BLACK_COLOR)
                             render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
