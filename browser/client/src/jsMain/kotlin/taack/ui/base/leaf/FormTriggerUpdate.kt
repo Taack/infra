@@ -1,7 +1,6 @@
 package taack.ui.base.leaf
 
 import js.array.asList
-import js.iterable.toList
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement

@@ -59,7 +59,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             val textarea = element as HTMLTextAreaElement
             textarea.style.display = "none"
             val scrollContainer = document.createElement("div") as HTMLDivElement
-            scrollContainer.style.height = "calc(max(30vh, 320px))"
+            scrollContainer.style.height = "240px"
             scrollContainer.style.border = "1px solid grey"
             scrollContainer.style.overflow = "auto"
             val largeContainer = document.createElement("div") as HTMLDivElement

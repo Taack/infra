@@ -11,7 +11,6 @@ import web.html.HTMLSpanElement
 import web.html.off
 import web.selection.Selection
 import web.window.window
-import taack.ui.base.element.Form
 import web.html.HTMLTextAreaElement
 
 class MainContentEditable(
@@ -132,7 +131,7 @@ class MainContentEditable(
     init {
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
         divLineNumber.classList.add(ClassName("cm-gutters"))
-        divLineNumber.style.minHeight = "700px"
+        divLineNumber.style.minHeight = "240px"
         divLineNumber.style.position = "sticky"
         divLineNumber.setAttribute("aria-hidden", "true")
         divLineNumber.appendChild(divLineNumberContainer)
@@ -156,7 +155,11 @@ class MainContentEditable(
         divHolder.classList.add(ClassName("cm-editor"), ClassName("ͼ1"), ClassName("ͼ2"))
         divHolder.appendChild(divScroll)
 
-        createCmdLine("<br>", 0)
+        text.textContent?.split("\n")?.forEach {
+            if (it.isNotEmpty())
+                asciidocToHtml(createCmdLine(it, 0)!!)
+            else createCmdLine("<br>", 0)
+        }
 
         divContent.onclick = EventHandler { e ->
             initSelection()
@@ -254,7 +257,7 @@ class MainContentEditable(
         }
     }
 
-    fun createCmdLine(s: String?, index: Int) {
+    fun createCmdLine(s: String?, index: Int): HTMLDivElement? {
         divLineNumberContainer.innerHTML = ""
         if (line == 0) {
             val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
@@ -262,6 +265,16 @@ class MainContentEditable(
             number.style.visibility = "hidden"
             number.style.pointerEvents = "none"
             number.textContent = "99"
+            divLineNumberContainer.appendChild(number)
+        }
+
+        for (i in 0 until divContent.children.length) {
+            line = i + 1
+            val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
+            if (line == 1) number.style.marginTop = "4px"
+            number.classList.add(ClassName("cm-gutterElement"))
+            number.style.height = "22.4px"
+            number.textContent = line.toString()
             divLineNumberContainer.appendChild(number)
         }
 
@@ -278,17 +291,9 @@ class MainContentEditable(
                 divContent.appendChild(cmd)
             else
                 divContent.insertBefore(divContent.children[index], cmd)
+            return cmd
         }
-
-        for (i in 0 until divContent.children.length) {
-            line = i + 1
-            val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
-            if (line == 1) number.style.marginTop = "4px"
-            number.classList.add(ClassName("cm-gutterElement"))
-            number.style.height = "22.4px"
-            number.textContent = line.toString()
-            divLineNumberContainer.appendChild(number)
-        }
+        return null
     }
 
 }
