@@ -2,6 +2,7 @@ package taack.ui.wysiwyg.contentEditableMono
 
 import js.iterable.iterator
 import web.cssom.ClassName
+import web.dom.ElementId
 import web.dom.Node
 import web.dom.document
 import web.events.EventHandler
@@ -19,6 +20,7 @@ class MainContentEditable(
 ) {
 
     private var line = 0
+    private val divAutocomplete = document.createElement("div") as HTMLDivElement
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
 
@@ -108,6 +110,31 @@ class MainContentEditable(
         println("position: $position")
     }
 
+    fun autocomplete(e: HTMLDivElement?) {
+
+        val top = e?.getBoundingClientRect()?.top
+        if (top != null) {
+            val visibleElement = divContent.parentElement?.parentElement?.parentElement?.parentElement
+            if (visibleElement != null) {
+
+                val bottomVisible = visibleElement.getBoundingClientRect().bottom
+                val topVisible = visibleElement.getBoundingClientRect().top
+                println("topVisible: $topVisible, bottomVisible: $bottomVisible")
+                if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
+                    divAutocomplete.style.left = "${e.getBoundingClientRect().left}px"
+                    divAutocomplete.style.top = "${e.getBoundingClientRect().top}px"
+                    divAutocomplete.innerHTML = """ <span id='PopUpText'>TEXT</span> """
+                    divAutocomplete.style.display = "block"
+                } else {
+                    divAutocomplete.style.display = "none"
+                }
+            }
+        }
+
+
+
+    }
+
     fun repairSelection() {
         println("repairSelection currentLine: $currentLine (${currentLine?.textContent}), ${currentLine?.childElementCount}, ${currentLine?.childNodes?.length}")
         if (currentLine != null) {
@@ -149,6 +176,20 @@ class MainContentEditable(
         val divScroll = document.createElement("div") as HTMLDivElement
         divScroll.classList.add(ClassName("cm-scroller"))
         divScroll.setAttribute("tabindex", "-1")
+
+        divAutocomplete.id = ElementId("${text.name}-autocomplete")
+        divAutocomplete.style.display = "none"
+        divAutocomplete.style.backgroundColor = "rgb(200,100,100)"
+        divAutocomplete.style.position = "absolute"
+//        divAutocomplete.style.left = "100px"
+//        divAutocomplete.style.top = "50px"
+        divAutocomplete.style.textAlign = "justify"
+        divAutocomplete.style.fontSize = "12px"
+        divAutocomplete.style.width = "135px"
+        divAutocomplete.style.border = "black 1px solid"
+        divAutocomplete.style.padding = "10px"
+
+        document.body.appendChild(divAutocomplete)
         divScroll.appendChild(divLineNumber)
         divScroll.appendChild(divContent)
 
@@ -163,6 +204,17 @@ class MainContentEditable(
 
         divContent.onclick = EventHandler { e ->
             initSelection()
+        }
+
+        divContent.onkeydown = EventHandler { event ->
+            println("event.key: ${event.key}, event.ctrlKey: ${event.ctrlKey}")
+            if (event.key == " " && event.ctrlKey) {
+                println("autocomplete ...")
+                autocomplete(currentLine)
+                event.preventDefault()
+                event.stopPropagation()
+                return@EventHandler
+            }
         }
 
         divContent.onkeyup = EventHandler { event ->
