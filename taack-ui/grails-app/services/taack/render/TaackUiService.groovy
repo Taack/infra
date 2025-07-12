@@ -733,7 +733,7 @@ ${bootstrapJsTag}
         if (clientJsPath != null && !clientJsPath.empty)
             bout << """\
     <script src="${clientJsPath}"></script>
-    <script src="/assets/application-taack.js"></script>
+    <script src="/assets/application-taack-debug.js"></script>
 """
         else
             bout << """\
