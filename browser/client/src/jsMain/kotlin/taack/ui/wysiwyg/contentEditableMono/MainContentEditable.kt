@@ -12,15 +12,14 @@ import web.html.off
 import web.selection.Selection
 import web.window.window
 import taack.ui.base.element.Form
+import web.html.HTMLTextAreaElement
 
 class MainContentEditable(
-    internal val embeddingForm: Form,
+    internal val text: HTMLTextAreaElement,
     private val divHolder: HTMLDivElement,
 ) {
 
-    private val keyBuffer = StringBuilder()
     private var line = 0
-    private var countLines = 0
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
 
@@ -126,14 +125,6 @@ class MainContentEditable(
                     }
                 }
                 currentPosition += childLength ?: 0
-
-//                if (child == selectedElement || child == selectedElement?.parentElement) {
-//                    println("child: $child (${child.textContent}), currentPosition: $currentPosition => offset: ${position - currentPosition}")
-//                    selection?.setPosition(child, position - currentPosition)
-//                    return
-//                } else {
-//                    currentPosition += child.textContent?.length ?: 0
-//                }
             }
         }
     }
@@ -194,8 +185,10 @@ class MainContentEditable(
 
                 return@EventHandler
             }
+            text.textContent = ""
             for (c in divContent.children.iterator()) {
                 asciidocToHtml(c as HTMLDivElement)
+                text.textContent += c.textContent + "\n"
             }
         }
     }

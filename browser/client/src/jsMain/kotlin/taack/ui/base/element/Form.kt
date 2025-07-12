@@ -69,7 +69,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             scrollContainer.append(largeContainer)
             textarea.parentElement?.append(scrollContainer)
 //            MainCanvas(this, textarea, canvasContainer, scrollContainer)
-            MainContentEditable(this, canvasContainer)
+            MainContentEditable(element, canvasContainer)
         }
 
         Helper.traceDeIndent("Form::init --- formName: $formName")
