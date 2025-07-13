@@ -38,10 +38,15 @@ class MainContentEditable(
 
         enum class SpanStyle(val span: Span) {
             DOCUMENT(Span("= ", "asciidoc-h1", false)),
-            TITLE1(Span("== ", "asciidoc-h2", false)),
-            TITLE2(Span("=== ", "asciidoc-h3", false)),
-            TITLE3(Span("==== ", "asciidoc-h4", false)),
-            TITLE4(Span("===== ", "asciidoc-h5", false)),
+            HEADER1(Span("== ", "asciidoc-h2", false)),
+            HEADER2(Span("=== ", "asciidoc-h3", false)),
+            HEADER3(Span("==== ", "asciidoc-h4", false)),
+            HEADER4(Span("===== ", "asciidoc-h5", false)),
+            TITLE(Span(".", "asciidoc-title", false)),
+            bullet1(Span("()(^--$)()", "asciidoc-bullet1", true)),
+            bullet2(Span("()(^----$)()", "asciidoc-bullet2", true)),
+            bullet3(Span("()(^------$)()", "asciidoc-bullet3", true)),
+            META(Span("()(^\\[[^[\\]]*\\]$)()", "asciidoc-meta", true)),
             UNORDERED_LIST1(Span("* ", "asciidoc-b1", false)),
             UNORDERED_LIST2(Span("** ", "asciidoc-b2", false)),
             UNORDERED_LIST3(Span("*** ", "asciidoc-b3", false)),
@@ -50,7 +55,8 @@ class MainContentEditable(
             UNCONSTRAINED_ITALIC(Span("([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", true)),
             UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]", "asciidoc-mono", true)),
             CONSTRAINED_BOLD(Span("([^\\w\\d*])(\\*[^*]+\\*)([^\\w\\d*]?)", "asciidoc-bold", true, true)),
-//            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", true)),
+
+            //            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", true)),
             CONSTRAINED_ITALIC(Span("([^\\w\\d_])(_[^_]+_)([^\\w\\d_]?)", "asciidoc-italic", true, true)),
             CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)),
             HIGHLIGHT(Span("[^`]``([^`]*)``[^`]", "asciidoc-highlight", true)),
@@ -59,6 +65,8 @@ class MainContentEditable(
             SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)),
             APOSTROPHES(Span("'`#([^'`]*)`'", "asciidoc-apostrophe", true)),
             URL(Span("([^\\w\\d]?)(http[s]?://[^[]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-url", true)),
+            IMAGE(Span("()(^image::[^[:]*\\[[^\\]]*\\]$)()", "asciidoc-image", true)),
+            IMAGE_INLINE(Span("([^\\w\\d]?)(image:[^[:]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-inline-image", true)),
         }
     }
 
@@ -68,8 +76,8 @@ class MainContentEditable(
         get() {
             if (selectedElement?.parentElement is HTMLDivElement) {
                 return selectedElement?.parentElement as HTMLDivElement
-            } else if(selectedElement?.parentElement?.parentElement is HTMLDivElement) {
-                return selectedElement?.parentElement ?.parentElement as HTMLDivElement
+            } else if (selectedElement?.parentElement?.parentElement is HTMLDivElement) {
+                return selectedElement?.parentElement?.parentElement as HTMLDivElement
             } else if (selectedElement?.parentElement?.parentElement?.parentElement is HTMLDivElement) {
                 return selectedElement?.parentElement?.parentElement?.parentElement as HTMLDivElement
             }
@@ -95,7 +103,7 @@ class MainContentEditable(
         println("currentLine: $currentLine (${currentLine?.innerHTML})")
         if (currentLine != null) {
             position = 0
-            for(child in currentLine!!.childNodes.iterator()) {
+            for (child in currentLine!!.childNodes.iterator()) {
                 println("child: $child (${child.textContent})")
 
                 if (child == selectedElement || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
@@ -143,7 +151,8 @@ class MainContentEditable(
                         d.classList.add(ClassName("cmd-autocomplete"))
                         d.textContent = text
                         d.onclick = EventHandler {
-                            e.textContent = e.textContent?.substring(0, position) + text + e.textContent?.substring(position)
+                            e.textContent =
+                                e.textContent?.substring(0, position) + text + e.textContent?.substring(position)
                             position = 1
                             divAutocomplete.style.display = "none"
                             selection?.setPosition(e, position)
@@ -226,6 +235,31 @@ class MainContentEditable(
             else createCmdLine("<br>", 0)
         }
 
+        divContent.onpaste = EventHandler { e ->
+            e.clipboardData?.files?.length?.let {
+                if (it > 0) {
+                    for (f in e.clipboardData!!.files) {
+                        println("f: $f")
+                    }
+                    e.preventDefault()
+                    e.stopPropagation()
+                }
+            }
+        }
+
+        divContent.ondrop = EventHandler { e ->
+            println("ondrop")
+            e.dataTransfer?.files?.length?.let {
+                if (it > 0) {
+                    for (f in e.dataTransfer!!.files) {
+                        println("f: $f")
+                    }
+                    e.preventDefault()
+                    e.stopPropagation()
+                }
+            }
+        }
+
         divContent.onclick = EventHandler { e ->
             initSelection()
         }
@@ -281,7 +315,8 @@ class MainContentEditable(
         }
         if (txt != null) {
             var hasStart: CmdLine.SpanStyle? = null
-            var inlineMatchSequence: List<Pair<CmdLine.SpanStyle, MatchResult>> = mutableListOf<Pair<CmdLine.SpanStyle, MatchResult>>()
+            var inlineMatchSequence: List<Pair<CmdLine.SpanStyle, MatchResult>> =
+                mutableListOf<Pair<CmdLine.SpanStyle, MatchResult>>()
             for (entry in CmdLine.SpanStyle.entries) {
                 if (!entry.span.inlined && hasStart == null) {
                     if (txt.startsWith(entry.span.pattern)) {
@@ -308,7 +343,8 @@ class MainContentEditable(
                 val match: MatchResult = c.second
                 val start = match.range.first
                 val ends = match.range.endInclusive
-                val replace = """${match.groupValues[1]}<span class="${spanStyle.span.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
+                val replace =
+                    """${match.groupValues[1]}<span class="${spanStyle.span.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
                 result += txt.substring(i..start - 1) + replace
                 i = ends + 1
             }
