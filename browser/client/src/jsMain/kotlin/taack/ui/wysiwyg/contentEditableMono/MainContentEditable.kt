@@ -117,12 +117,13 @@ class MainContentEditable(
             val visibleElement = divContent.parentElement?.parentElement?.parentElement?.parentElement
             if (visibleElement != null) {
 
+                val scrollTop = document.body.getBoundingClientRect().top
                 val bottomVisible = visibleElement.getBoundingClientRect().bottom
                 val topVisible = visibleElement.getBoundingClientRect().top
                 println("topVisible: $topVisible, bottomVisible: $bottomVisible")
                 if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
-                    divAutocomplete.style.left = "${e.getBoundingClientRect().left}px"
-                    divAutocomplete.style.top = "${e.getBoundingClientRect().top}px"
+                    divAutocomplete.style.left = "${e.getBoundingClientRect().left + position * 10}px"
+                    divAutocomplete.style.top = "${e.getBoundingClientRect().top - scrollTop + 19}px"
                     divAutocomplete.innerHTML = """ <span id='PopUpText'>TEXT</span> """
                     divAutocomplete.style.display = "block"
                 } else {
