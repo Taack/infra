@@ -112,6 +112,17 @@ class MainContentEditable(
 
     fun autocomplete(e: HTMLDivElement?) {
 
+        val texts = mutableListOf<String>(
+            "image:-name-[]",
+            "image:-name-[Sunset,200,100]",
+            "image::-name-[]",
+            "image::<name>[Sunset,200,100]",
+            "http://-url-[]",
+            "http://-url-[Sunset]",
+            "https://-url-[]",
+            "https://-url-[sunset]",
+        )
+
         val top = e?.getBoundingClientRect()?.top
         if (top != null) {
             val visibleElement = divContent.parentElement?.parentElement?.parentElement?.parentElement
@@ -124,16 +135,28 @@ class MainContentEditable(
                 if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
                     divAutocomplete.style.left = "${e.getBoundingClientRect().left + position * 10}px"
                     divAutocomplete.style.top = "${e.getBoundingClientRect().top - scrollTop + 19}px"
-                    divAutocomplete.innerHTML = """ <span id='PopUpText'>TEXT</span> """
+                    divAutocomplete.innerHTML = ""
+
+
+                    for (text in texts) {
+                        val d = document.createElement("div") as HTMLDivElement
+                        d.classList.add(ClassName("cmd-autocomplete"))
+                        d.textContent = text
+                        d.onclick = EventHandler {
+                            e.textContent = e.textContent?.substring(0, position) + text + e.textContent?.substring(position)
+                            position = 1
+                            divAutocomplete.style.display = "none"
+                            selection?.setPosition(e, position)
+                        }
+                        divAutocomplete.appendChild(d)
+                    }
+
                     divAutocomplete.style.display = "block"
                 } else {
                     divAutocomplete.style.display = "none"
                 }
             }
         }
-
-
-
     }
 
     fun repairSelection() {
@@ -186,7 +209,7 @@ class MainContentEditable(
 //        divAutocomplete.style.top = "50px"
         divAutocomplete.style.textAlign = "justify"
         divAutocomplete.style.fontSize = "12px"
-        divAutocomplete.style.width = "135px"
+        divAutocomplete.style.width = "256px"
         divAutocomplete.style.border = "black 1px solid"
         divAutocomplete.style.padding = "10px"
 
