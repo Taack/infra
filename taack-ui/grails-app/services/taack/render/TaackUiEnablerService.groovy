@@ -87,7 +87,7 @@ class TaackUiEnablerService implements WebAttributes {
      * @param params
      * @return true if allowed, false if not
      */
-    boolean hasAccess(final String controller, final String action, final Long id, final Map params) {
+    boolean hasAccess(final String controller, final String action, final Long id, Map params) {
         Authentication authContext = SecurityContextHolder.getContext().getAuthentication()
         if (!authContext?.authenticated) {
             return true
@@ -105,12 +105,13 @@ class TaackUiEnablerService implements WebAttributes {
                 break
         }
         if (isAllowed) {
+            params = params ?: [:]
             def c = securityClosures[path]
             if (c) {
                 if (id != null) {
                     return c.call(id, params)
                 } else {
-                    String idFromParams = params?.get('id')?.toString() ?: ''
+                    String idFromParams = params.get('id')?.toString() ?: ''
                     return c.call(idFromParams.isNumber() ? idFromParams.toLong() : null, params)
                 }
             }
