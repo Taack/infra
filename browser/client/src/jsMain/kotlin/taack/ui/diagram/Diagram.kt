@@ -31,7 +31,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     init {
         s.style.userSelect = "none"
 
-        if (transformArea != null && s.querySelector("clipPath#clipSection") != null) { // todo: should change to "clipPath[id^='clipSection']" after modification of "RectBackgroundDiagramScene.clipSectionId"
+        if (transformArea != null && s.querySelector("clipPath[id^='clipSection']") != null) {
             // Scroll
             s.onmousedown = EventHandler { e ->
                 if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
@@ -79,7 +79,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     }
 
     fun cloneLegendShape(dataset: String): SVGGElement {
-        val cloned = document.createElement("g") as SVGGElement
+        val cloned = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
         cloned.innerHTML = legends.find { it.dataset == dataset }?.g?.innerHTML ?: ""
         return cloned
     }

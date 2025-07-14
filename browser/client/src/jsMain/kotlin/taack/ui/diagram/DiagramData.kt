@@ -36,10 +36,10 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         val tooltipLabel = g.getAttribute("data-label")
         if (!tooltipLabel.isNullOrBlank()) {
             val diagramRoot = parent.parent
-            tooltip = document.createElement("g") as SVGGElement
+            tooltip = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
             tooltip.classList.add(ClassName("diagram-tooltip"))
 
-            val background: SVGPolygonElement = document.createElement("polygon") as SVGPolygonElement
+            val background: SVGPolygonElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon") as SVGPolygonElement
             background.style.fill = "#00000090"
             tooltip.appendChild(background)
 
@@ -48,7 +48,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             legend.setAttribute("transform", "translate(0,-15)")
             tooltip.appendChild(legend)
 
-            val value: SVGTextElement = document.createElement("text") as SVGTextElement
+            val value: SVGTextElement = document.createElementNS("http://www.w3.org/2000/svg", "text") as SVGTextElement
             value.setAttribute("text-rendering", "optimizeLegibility")
             value.setAttribute("style", "font-size: 13px; font-family: sans-serif; fill: white")
             value.innerHTML = tooltipLabel
