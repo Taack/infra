@@ -1,11 +1,11 @@
 package taack.ui.dsl.form.editor
 
-
 import groovy.transform.CompileStatic
 import jdk.internal.ValueBased
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.ui.dsl.helper.Utils
 
-
+import java.util.zip.Deflater
 
 @CompileStatic
 @ValueBased
@@ -74,8 +74,8 @@ enum Asciidoc {
 
     SpanRegex span
 
-    String toJson() {
-        values()*.span
+    static String toJson(List<SpanRegex> spanRegexes) {
+        '[' + (spanRegexes ?: values()*.span).join(', ') + ']'
     }
 }
 
@@ -126,5 +126,28 @@ final class EditorOption {
         EditorOption build() {
             editorOption
         }
+    }
+
+    String toJson() {
+        """\
+        {
+            ${uploadFileAction ? """uploadFileAction: "${Utils.getControllerName(uploadFileAction) + "/" + uploadFileAction.method}";""" : ''}
+            ${spanRegexes ? """spanRegexes: "${Asciidoc.toJson(spanRegexes)}";""" : ''}
+        }
+        """.stripIndent()
+    }
+
+    String compress() {
+        Deflater deflater = new Deflater()
+        deflater.setInput(toJson().getBytes())
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+            byte[] buffer = new byte[1024]
+
+            while (!deflater.finished()) {
+                int compressedSize = deflater.deflate(buffer)
+                outputStream.write(buffer, 0, compressedSize)
+            }
+        return Base64.encoder.encode(outputStream.toByteArray())
     }
 }

@@ -1,5 +1,6 @@
 package taack.ui.wysiwyg.contentEditableMono
 
+import js.buffer.ArrayBuffer
 import js.iterable.iterator
 import web.cssom.ClassName
 import web.dom.ElementId
@@ -13,6 +14,7 @@ import web.html.off
 import web.selection.Selection
 import web.window.window
 import web.html.HTMLTextAreaElement
+import kotlin.js.Promise
 
 class MainContentEditable(
     internal val text: HTMLTextAreaElement,
@@ -407,5 +409,83 @@ class MainContentEditable(
         }
         return null
     }
+
+
+    fun decompress(str: String): String {
+        println("CanvasScriptCommon::decompress: $str")
+        return js("""
+function decompress(blob, encoding) {
+    var ds = new DecompressionStream(encoding);
+    var decompressedStream = blob.stream().pipeThrough(ds);
+    return new TextEncoder('utf-8').decode(decompressedStream);
+}
+decompress(str, "deflate");
+"""
+        )
+    }
+
+
+    fun compress(str: String): Promise<ArrayBuffer> {
+        println("CanvasScriptCommon::compress: $str")
+        return js("""
+function compress(string, encoding) {
+    var byteArray = new TextEncoder('utf-8').encode(string);
+    var cs = new CompressionStream(encoding);
+    var writer = cs.writable.getWriter();
+    writer.write(byteArray);
+    writer.close();
+    return new Response(cs.readable).arrayBuffer();
+}
+compress(str, "deflate");
+"""
+        )
+    }
+
+//        override val txtScript: String
+//        get() {
+//            if (srcURI != null) {
+//                val txt = txt.substring(srcURI!!.length)
+//                compress(txt).then {
+//                    val bytes = Uint8Array(it)
+//                    val len = bytes.length
+//                    val chars = CharArray(len)
+//                    for (i in 0 until len) {
+//                        chars[i] = bytes[i].toInt().toChar()
+//                    }
+//                    return@then chars.concatToString()
+//                }.then {
+//                    imageSrc =
+//                        "${location.protocol}//${location.hostname}:8000/" + srcURI + "/svg/" + btoa(
+//                            it
+//                        ).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
+//                    image = CanvasImg(imageSrc!!, srcURI!!, 0)
+//                }
+//            }
+//            return txt
+//        }
+
+
+//    def asciidocRenderScript(String script) {
+//        script = script.replaceAll('-', '+').replaceAll('_', '/')
+//        File cached = Path.of(scriptCachePath.toString(), script).toFile()
+//        if (cached.exists()) {
+//            render cached.text
+//        } else {
+//            byte[] b64 = Base64.getDecoder().decode(script)
+//            Inflater inflater = new Inflater()
+//            inflater.setInput(b64)
+//
+//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+//            byte[] buffer = new byte[1024]
+//
+//            while (!inflater.finished()) {
+//                int decompressedSize = inflater.inflate(buffer)
+//                outputStream.write(buffer, 0, decompressedSize)
+//            }
+//
+//            println(new String(outputStream.toByteArray()))
+//
+//        }
+//    }
 
 }
