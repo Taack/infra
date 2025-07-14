@@ -7,6 +7,7 @@ import taack.ast.type.FieldInfo
 import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.html.element.ButtonStyle
 
@@ -97,6 +98,14 @@ class FormAjaxFieldSpec extends FormVisitable {
 
     void fieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry) {
         formVisitor.visitFormFieldFromMap(i18n, field, mapEntry, null, null)
+    }
+
+    void fieldEditor(final String i18n = null, final FieldInfo field, final EditorOption editorOption) {
+        formVisitor.visitFormFieldEditor(i18n, field, editorOption)
+    }
+
+    void fieldEditorFromMap(final String i18n = null, final FieldInfo field, String mapEntry, final EditorOption editorOption) {
+        formVisitor.visitFormFieldEditorFromMap(i18n, field, mapEntry, editorOption, null, null)
     }
 
     void ajaxFieldFromMap(final String i18n = null, final FieldInfo field, String mapEntry, final MethodClosure action, final FieldInfo<?>... fieldInfos) {

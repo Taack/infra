@@ -4,6 +4,7 @@ import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
+import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.IHTMLElement
 
@@ -68,6 +69,8 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
     abstract IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime)
 
     abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
+
+    abstract IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value, EditorOption editorOption)
 
     abstract IHTMLElement markdownInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value)
 

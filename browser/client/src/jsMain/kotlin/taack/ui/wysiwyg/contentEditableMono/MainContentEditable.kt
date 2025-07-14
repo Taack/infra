@@ -191,6 +191,12 @@ class MainContentEditable(
     }
 
     init {
+        val compressedOptions =  text.getAttribute("editoroption")
+        if (compressedOptions != null && compressedOptions.isNotEmpty()) {
+            println("editoroption = ${compressedOptions}")
+            println("decompressing editoroption = ${decompress(compressedOptions)}")
+        }
+
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
         divLineNumber.classList.add(ClassName("cm-gutters"))
         divLineNumber.style.minHeight = "240px"
@@ -230,6 +236,10 @@ class MainContentEditable(
 
         divHolder.classList.add(ClassName("cm-editor"), ClassName("ͼ1"), ClassName("ͼ2"))
         divHolder.appendChild(divScroll)
+
+        if (text.textContent?.length == 0) {
+            text.textContent = "\n"
+        }
 
         text.textContent?.split("\n")?.forEach {
             if (it.isNotEmpty())
@@ -414,10 +424,18 @@ class MainContentEditable(
     fun decompress(str: String): String {
         println("CanvasScriptCommon::decompress: $str")
         return js("""
-function decompress(blob, encoding) {
-    var ds = new DecompressionStream(encoding);
-    var decompressedStream = blob.stream().pipeThrough(ds);
-    return new TextEncoder('utf-8').decode(decompressedStream);
+function decompress(txt, encoding) {
+    var byteArray = new TextEncoder('utf-8').encode(txt);
+//    var byteArray = Uint8Array.from(atob(txt), c => c.charCodeAt(0));
+    var cs = new DecompressionStream(encoding);
+    var writer = cs.writable.getWriter();
+    writer.write(byteArray);
+    writer.close();
+    return new Response(cs.readable).arrayBuffer();
+
+//  var ds = new DecompressionStream(encoding);
+//  var decompressedStream = atob(txt).stream().pipeThrough(ds);
+//  return new Response(decompressedStream).arrayBuffer();
 }
 decompress(str, "deflate");
 """

@@ -74,8 +74,12 @@ enum Asciidoc {
 
     SpanRegex span
 
+    static SpanRegex[] getSpans() {
+        values()*.span.toArray() as SpanRegex[]
+    }
+
     static String toJson(List<SpanRegex> spanRegexes) {
-        '[' + (spanRegexes ?: values()*.span).join(', ') + ']'
+        '[' + ((spanRegexes ?: values()*.span)*.toJson()).join(', ') + ']'
     }
 }
 
@@ -94,18 +98,18 @@ final class AutocompleteChoice {
 @CompileStatic
 final class EditorOption {
     MethodClosure uploadFileAction
-    List<SpanRegex> spanRegexes
-    Map<SpanRegex, AutocompleteChoice[]> autocompleteChoices
+    List<SpanRegex> spanRegexes = []
+    Map<SpanRegex, AutocompleteChoice[]> autocompleteChoices = [:]
 
-    EditorOptionBuilder getBuilder() {
-        return new EditorOptionBuilder(this)
+    static EditorOptionBuilder getBuilder() {
+        return new EditorOptionBuilder()
     }
 
-    final class EditorOptionBuilder {
+    static final class EditorOptionBuilder {
         private EditorOption editorOption
 
-        EditorOptionBuilder(EditorOption diagramOption) {
-            this.editorOption = diagramOption
+        EditorOptionBuilder() {
+            this.editorOption = new EditorOption()
         }
 
         EditorOptionBuilder uploadFileAction(MethodClosure c) {
@@ -131,23 +135,32 @@ final class EditorOption {
     String toJson() {
         """\
         {
-            ${uploadFileAction ? """uploadFileAction: "${Utils.getControllerName(uploadFileAction) + "/" + uploadFileAction.method}";""" : ''}
-            ${spanRegexes ? """spanRegexes: "${Asciidoc.toJson(spanRegexes)}";""" : ''}
+            ${uploadFileAction ? """uploadFileAction: "${Utils.getControllerName(uploadFileAction) + "/" + uploadFileAction.method}";""" : ''}${spanRegexes ? """spanRegexes: ${Asciidoc.toJson(spanRegexes)};""" : ''}
         }
         """.stripIndent()
     }
 
     String compress() {
+
+        String json = toJson()
+        println "AUO1 = $json"
+        println "AUO11 = ${json.getBytes().length}"
         Deflater deflater = new Deflater()
-        deflater.setInput(toJson().getBytes())
+        deflater.setInput(json.getBytes())
+        deflater.finish()
+        println "AUO2"
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-            byte[] buffer = new byte[1024]
+        byte[] buffer = new byte[1024]
 
-            while (!deflater.finished()) {
-                int compressedSize = deflater.deflate(buffer)
-                outputStream.write(buffer, 0, compressedSize)
-            }
-        return Base64.encoder.encode(outputStream.toByteArray())
+//        while (!deflater.finished()) {
+        println "AUO21 deflater.bytesRead: ${deflater.bytesRead} deflater.bytesWritten: ${deflater.bytesWritten}"
+        int compressedSize = deflater.deflate(buffer)
+        println "AUO22 + $compressedSize"
+        outputStream.write(buffer, 0, compressedSize)
+//        }
+        String b64 = new String(Base64.encoder.encode(outputStream.toByteArray()))
+        println "AUO3 $b64"
+        return b64
     }
 }

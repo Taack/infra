@@ -9,6 +9,7 @@ import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec.Width
 import taack.ui.dsl.form.IUiFormVisitor
+import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
@@ -264,6 +265,35 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value)
             }
         }
+    }
+
+    @Override
+    void visitFormFieldEditor(String i18n, FieldInfo field, EditorOption editorOption) {
+        final String trI18n = i18n ?: parameter.trField(field)
+
+        if (field.fieldConstraint.constraints) {
+            if (field.fieldConstraint.constraints.widget == WidgetKind.AJAX.name) {
+                visitFormAjaxField(trI18n, null, null, field, null, null)
+                return
+            }
+        }
+        final String qualifiedName = field.fieldName
+        final boolean isNullable = field.fieldConstraint.nullable
+        final boolean isFieldDisabled = isDisabled(field)
+
+        blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String, editorOption)
+
+    }
+
+    @Override
+    void visitFormFieldEditorFromMap(String i18n, FieldInfo field, String mapEntry, EditorOption editorOption, String controller, String action, FieldInfo<?>... fieldInfos) {
+        final String trI18n = i18n ?: parameter.trField(field) ?: mapEntry
+        final String qualifiedName = field.fieldName + '.' + mapEntry
+        String value = (field.value as Map<String, String>)?.get(mapEntry)
+        final boolean isFieldDisabled = isDisabled(field)
+        final boolean isNullable = field.fieldConstraint.nullable
+
+        blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value, editorOption)
     }
 
     @Override

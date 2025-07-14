@@ -53,7 +53,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             it.fieldName
         }
         triggers = FormTriggerUpdate.getSiblingFormTriggerUpdate(this)
-        val textareaList = f.querySelectorAll("textarea.asciidoctor")
+        val textareaList = f.querySelectorAll("textarea[editoroption]")
 
         for (element in textareaList.iterator()) {
             val textarea = element as HTMLTextAreaElement

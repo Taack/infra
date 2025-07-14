@@ -5,6 +5,7 @@ import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.BlockSpec.Width
+import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.html.element.ButtonStyle
 
 import java.text.NumberFormat
@@ -27,6 +28,10 @@ interface IUiFormVisitor {
     void visitFormField(final String i18n, final FieldInfo field)
 
     void visitFormFieldFromMap(String i18n, FieldInfo fieldInfo, String mapEntry, String controller, String action, FieldInfo<?>... fieldInfos)
+
+    void visitFormFieldEditor(final String i18n, final FieldInfo field, final EditorOption editorOption)
+
+    void visitFormFieldEditorFromMap(String i18n, FieldInfo fieldInfo, String mapEntry, EditorOption editorOption, String controller, String action, FieldInfo<?>... fieldInfos)
 
     void visitFormHiddenField(FieldInfo fieldInfo)
 

@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.form.IFormTheme
@@ -40,6 +41,16 @@ class UiFormVisitorImpl implements IUiFormVisitor {
 
     @Override
     void visitFormFieldFromMap(String i18n, FieldInfo fieldInfo, String mapEntry, String controller, String action, FieldInfo<?>... fieldInfos) {
+
+    }
+
+    @Override
+    void visitFormFieldEditor(String i18n, FieldInfo field, EditorOption editorOption) {
+
+    }
+
+    @Override
+    void visitFormFieldEditorFromMap(String i18n, FieldInfo fieldInfo, String mapEntry, EditorOption editorOption, String controller, String action, FieldInfo<?>... fieldInfos) {
 
     }
 
