@@ -3,6 +3,9 @@ package taack.ui.dump.diagram
 import java.awt.Color
 
 interface IDiagramRender {
+    BigDecimal SMALL_LABEL_RATE = 0.8
+    BigDecimal EMPHASIZED_LABEL_RATE = 1.5
+
     enum DiagramStyle {
         fill,
         stroke,
@@ -34,6 +37,8 @@ interface IDiagramRender {
 
     void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY)
 
+    void renderEmphasizedLabel(String label)
+
     void renderRect(BigDecimal width, BigDecimal height, DiagramStyle diagramStyle)
 
     void renderCircle(BigDecimal radius, DiagramStyle diagramStyle)
@@ -61,4 +66,6 @@ interface IDiagramRender {
     BigDecimal getDiagramHeight()
 
     BigDecimal measureText(String text)
+
+    BigDecimal measureEmphasizedText(String text)
 }

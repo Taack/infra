@@ -27,7 +27,6 @@ class PngDiagramRender implements IDiagramRender {
     private BigDecimal lineWidth = 1.3
 
     private BigDecimal LABEL_MARGIN = 2.0
-    final private BigDecimal SMALL_LABEL_RATE = 0.8
     private BigDecimal ARROW_LENGTH = 8.0
 
     PngDiagramRender(BigDecimal width, BigDecimal height, BigDecimal fontSizePercentage = 1.0) {
@@ -35,7 +34,7 @@ class PngDiagramRender implements IDiagramRender {
         pngHeight = height
         fontSize = (fontSize * fontSizePercentage).toInteger()
         lineWidth *= fontSizePercentage
-        bi = new BufferedImage((int)width, (int)height, BufferedImage.TYPE_INT_ARGB)
+        bi = new BufferedImage(width.toInteger(), height.toInteger(), BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(fillStyle)
         Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
@@ -107,8 +106,8 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         ig2.setPaint(Color.BLACK)
-        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).intValue()))
-        ig2.drawString(label, trX.toInteger(), (trY + fontSize - LABEL_MARGIN).toInteger())
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).toInteger()))
+        ig2.drawString(label, trX.toInteger(), (trY + (fontSize * SMALL_LABEL_RATE).toInteger() - LABEL_MARGIN).toInteger())
         ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
         ig2.setPaint(fillStyle)
     }
@@ -124,6 +123,15 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
 
+    }
+
+    @Override
+    void renderEmphasizedLabel(String label) {
+        ig2.setPaint(Color.BLACK)
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger()))
+        ig2.drawString(label, trX.toInteger(), (trY + (fontSize * EMPHASIZED_LABEL_RATE).toInteger() - LABEL_MARGIN).toInteger())
+        ig2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
+        ig2.setPaint(fillStyle)
     }
 
     @Override
@@ -285,6 +293,11 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     BigDecimal measureText(String text) {
         return fm.stringWidth(text)
+    }
+
+    @Override
+    BigDecimal measureEmphasizedText(String text) {
+        return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
     void writeImage(OutputStream os) {

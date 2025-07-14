@@ -38,12 +38,14 @@ abstract class DiagramScene {
     protected BigDecimal DIAGRAM_MARGIN_RIGHT = 20.0
     protected BigDecimal DIAGRAM_MARGIN_TOP = 20.0
     protected BigDecimal DIAGRAM_MARGIN_BOTTOM = 60.0
+    protected BigDecimal TITLE_MARGIN = 10.0
 
     protected BigDecimal fontSize
     protected BigDecimal width
     protected BigDecimal height
     protected IDiagramRender render
     protected DiagramOption diagramOption
+    protected BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP
 
     final protected Color BLACK_COLOR = new Color(64, 64, 64)
     final protected Color GREY_COLOR = new Color(231, 231, 231)
@@ -55,5 +57,18 @@ abstract class DiagramScene {
 
     static String numberToString(BigDecimal n) {
         return n.toDouble() % 1 == 0 ? "${n.toInteger()}" : "$n"
+    }
+
+    BigDecimal drawTitle() {
+        BigDecimal height
+        if (diagramOption?.title?.size() > 0) {
+            render.translateTo((width - render.measureEmphasizedText(diagramOption.title)) / 2, TITLE_MARGIN)
+            render.renderEmphasizedLabel(diagramOption.title)
+            height = TITLE_MARGIN + (fontSize * render.EMPHASIZED_LABEL_RATE).toInteger() + TITLE_MARGIN / 2
+        } else {
+            height = 0.0
+        }
+        diagramMarginTop += height
+        return height
     }
 }

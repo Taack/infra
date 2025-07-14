@@ -18,7 +18,6 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     protected BigDecimal MIN_GAP_WIDTH = 5.0
     private final BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
 
-    private BigDecimal diagramMarginTop
     protected Set<Object> xLabelList = []
     protected BigDecimal startLabelY
     protected BigDecimal gapY
@@ -53,6 +52,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             DIAGRAM_MARGIN_RIGHT *= rate
             DIAGRAM_MARGIN_TOP *= rate
             DIAGRAM_MARGIN_BOTTOM *= rate
+            TITLE_MARGIN *= rate
             LEGEND_IMAGE_WIDTH *= rate
             LEGEND_RECT_WIDTH *= rate
             LEGEND_RECT_TEXT_SPACING *= rate
@@ -60,9 +60,8 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BACKGROUND_LINE_EXCEED_DIAGRAM *= rate
             AXIS_LABEL_MARGIN *= rate
             MIN_GAP_WIDTH *= rate
+            diagramMarginTop *= rate
         }
-
-        this.diagramMarginTop = DIAGRAM_MARGIN_TOP // will be increased by legend height
     }
 
     boolean buildXLabelList() {
@@ -153,7 +152,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
         }
 
-        BigDecimal startY = LEGEND_MARGIN
+        BigDecimal startY = drawTitle() + LEGEND_MARGIN
         Integer legendIndex = 0
         keyMapPerLine.each {
             Map<String, BigDecimal> keyMap = it.value

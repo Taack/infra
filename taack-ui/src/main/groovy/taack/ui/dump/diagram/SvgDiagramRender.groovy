@@ -21,7 +21,6 @@ class SvgDiagramRender implements IDiagramRender {
     private BigDecimal lineWidth = 1.3
 
     private BigDecimal LABEL_MARGIN = 2.0
-    final private BigDecimal SMALL_LABEL_RATE = 0.8
     private BigDecimal ARROW_LENGTH = 8.0
 
     SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false, BigDecimal fontSizePercentage = 1.0) {
@@ -32,7 +31,7 @@ class SvgDiagramRender implements IDiagramRender {
         this.isViewBox = isViewBox
         this.fontSize = (this.fontSize * fontSizePercentage).toInteger()
         this.lineWidth *= fontSizePercentage
-        this.fm = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
+        this.fm = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
 
         this.LABEL_MARGIN *= fontSizePercentage
         this.ARROW_LENGTH *= fontSizePercentage
@@ -83,7 +82,7 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
-    void renderLabel(String label) { // FONT_SIZE = 13.0
+    void renderLabel(String label) {
         outStr.append("""
               <text x="${trX}" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
@@ -101,7 +100,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         outStr.append("""
-              <text x="$trX" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize * SMALL_LABEL_RATE}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="$trX" y="${trY + (fontSize * SMALL_LABEL_RATE).toInteger() - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${(fontSize * SMALL_LABEL_RATE).toInteger()}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -118,6 +117,14 @@ class SvgDiagramRender implements IDiagramRender {
     void renderHiddenRotatedLabel(String label, BigDecimal rotateAngle, BigDecimal rotatePointX, BigDecimal rotatePointY) {
         outStr.append("""
               <text transform="rotate($rotateAngle,$rotatePointX,$rotatePointY)" x="$trX" y="${trY + fontSize - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${fontSize}px; font-family: sans-serif; display: none; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+        """.stripIndent()
+        )
+    }
+
+    @Override
+    void renderEmphasizedLabel(String label) {
+        outStr.append("""
+              <text x="${trX}" y="${trY + (fontSize * EMPHASIZED_LABEL_RATE).toInteger() - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${(fontSize * EMPHASIZED_LABEL_RATE).toInteger()}px; font-family: sans-serif; font-weight: bold; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -300,6 +307,11 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     BigDecimal measureText(String text) {
         return fm.stringWidth(text)
+    }
+
+    @Override
+    BigDecimal measureEmphasizedText(String text) {
+        return new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
     String getRendered() {
