@@ -13,6 +13,7 @@ class SvgDiagramRender implements IDiagramRender {
     private final BigDecimal svgWidth
     private final BigDecimal svgHeight
     private final boolean isViewBox
+    private final BigDecimal fontSizePercentage
     private final FontMetrics fm
     private Integer fontSize = 13
     private BigDecimal trX = 0.0
@@ -29,6 +30,7 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
+        this.fontSizePercentage = fontSizePercentage
         this.fontSize = (this.fontSize * fontSizePercentage).toInteger()
         this.lineWidth *= fontSizePercentage
         this.fm = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
@@ -317,7 +319,9 @@ class SvgDiagramRender implements IDiagramRender {
     String getRendered() {
         return """<?xml version="1.0" encoding="utf-8"?>
             <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-            <svg class="taackDiagram" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                class="taackDiagram" font-size-percentage="${fontSizePercentage}"
+                ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
             """.stripIndent() + outStr.toString() + "</svg>"
     }
 }

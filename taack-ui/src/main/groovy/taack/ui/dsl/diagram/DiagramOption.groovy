@@ -12,8 +12,6 @@ import java.awt.Color
 @CompileStatic
 final class DiagramOption {
     String title
-    String xTitle
-    String yTitle
     boolean showDataCount = false
     boolean hideLegend = false
     List<Color> keyColors
@@ -50,16 +48,6 @@ final class DiagramOption {
 
         DiagramOptionBuilder setTitle(String title) {
             diagramOption.title = title
-            this
-        }
-
-        DiagramOptionBuilder setXTitle(String xTitle) {
-            diagramOption.xTitle = xTitle
-            this
-        }
-
-        DiagramOptionBuilder setYTitle(String yTitle) {
-            diagramOption.yTitle = yTitle
             this
         }
 

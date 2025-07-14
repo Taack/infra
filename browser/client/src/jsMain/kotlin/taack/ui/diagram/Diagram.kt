@@ -23,6 +23,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
         }
     }
 
+    private val fontSizePercentage: Double = s.attributes.getNamedItem("font-size-percentage")?.value?.toDouble() ?: 1.0
     private var isScrolling: Boolean = false
     private var previousMouseX: Double? = null
     private val legends: List<DiagramLegend> = DiagramLegend.getSiblingDiagramLegend(this)
@@ -66,8 +67,10 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
                 transformArea.refreshCurrentHoverLineAndDataToolTip(e.clientX.toDouble(), e.clientY.toDouble())
             })
             s.addEventListener(EventType("mouseleave"), EventHandler {
-                transformArea.currentHoverLine?.remove()
-                s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
+                if (transformArea.currentHoverLine != null) {
+                    transformArea.currentHoverLine!!.remove()
+                    s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
+                }
             })
         }
     }
@@ -82,6 +85,10 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
         val cloned = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
         cloned.innerHTML = legends.find { it.dataset == dataset }?.g?.innerHTML ?: ""
         return cloned
+    }
+
+    fun getFontSizePercentage(): Double {
+        return fontSizePercentage
     }
 
     override fun getParentBlock(): Block {
