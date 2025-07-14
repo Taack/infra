@@ -4,6 +4,8 @@ import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
+import java.awt.Color
+
 @CompileStatic
 class BarDiagramScene extends RectBackgroundDiagramScene {
     private BigDecimal MIN_BAR_WIDTH = 5.0
@@ -84,16 +86,18 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 BigDecimal yData = data.get(xLabel) ?: 0.0
                 String yDataLabel = numberToString(yData)
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
+                Color keyColor = getKeyColor(j)
                 render.renderGroup(['element-type': ElementType.DATA,
                                     dataset: keys[j],
                                     'gap-index': i,
                                     'data-x': xLabel,
                                     'data-y': yDataLabel,
-                                    'data-label': "${xLabel}: ${yDataLabel}"])
+                                    'data-label': "${xLabel}: ${yDataLabel}",
+                                    'key-color': KeyColor.colorToString(keyColor)])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
-                    render.fillStyle(getKeyColor(j))
+                    render.fillStyle(keyColor)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
 
                     if (diagramOption?.showDataCount) {

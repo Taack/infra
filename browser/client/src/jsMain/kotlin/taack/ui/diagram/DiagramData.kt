@@ -30,6 +30,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
     val dataset: String = g.attributes.getNamedItem("dataset")!!.value
     val gapIndex = g.attributes.getNamedItem("gap-index")?.value?.toInt()
     private val shapes: List<SVGElement> = g.children.asList().filter { it.tagName != "text" }.unsafeCast<List<SVGElement>>()
+    private val keyColor: String = g.attributes.getNamedItem("key-color")?.value ?: "rgb(0, 0, 0)"
     private val tooltip: SVGGElement?
 
     init {
@@ -44,7 +45,11 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             background.style.fill = "#00000090"
             tooltip.appendChild(background)
 
-            val legend: SVGGElement = diagramRoot.cloneLegendShape(dataset)
+            val legend: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
+            legend.innerHTML = """
+                <rect x="0.0" y="0.0" width="${40 * fontSizePercentage}" height="${13 * fontSizePercentage}" style="fill:${keyColor};"></rect>
+                <text x="${45 * fontSizePercentage}" y="${11 * fontSizePercentage}" text-rendering="optimizeLegibility" style="font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif; pointer-events: none;">${dataset}</text>
+            """.trimIndent()
             legend.querySelectorAll("text").forEach { (it as SVGTextElement).style.fill = "white" }
             legend.setAttribute("transform", "translate(0,-${15 * fontSizePercentage})")
             tooltip.appendChild(legend)
@@ -190,7 +195,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         xhr.send()
     }
 
-    fun showTooltip() { // todo: bad show at high resolution
+    fun showTooltip() {
         if (tooltip != null) {
             val diagramRoot = parent.parent
             diagramRoot.s.appendChild(tooltip)

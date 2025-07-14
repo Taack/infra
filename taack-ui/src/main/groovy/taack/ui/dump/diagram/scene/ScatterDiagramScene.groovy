@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
+import java.awt.Color
 import java.text.SimpleDateFormat
 
 @CompileStatic
@@ -39,7 +40,8 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     String xLabel = objectToString(xList[j])
                     String yLabel = numberToString(y)
                     String dataLabel = xList[j] instanceof Date ? "${xLabel}: ${yLabel}" : "($xLabel, $yLabel)"
-                    render.fillStyle(getKeyColor(i))
+                    Color keyColor = getKeyColor(i)
+                    render.fillStyle(keyColor)
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
@@ -48,6 +50,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                                             'data-x': xLabel,
                                             'data-y': yLabel,
                                             'data-label': dataLabel,
+                                            'key-color': KeyColor.colorToString(keyColor),
                                             style: 'pointer-events: bounding-box;'])
                         if (i < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
@@ -66,7 +69,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + (nextX - minX) / (maxX - minX) * totalWidth
                         BigDecimal nextYHeight = (nextY - startLabelY) / gapY * gapHeight
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(getKeyColor(i))
+                        render.fillStyle(keyColor)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
                     }
@@ -89,6 +92,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal y = i < yList.size() ? yList[i] : 0.0
                     String yDataLabel = numberToString(y)
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
+                    Color keyColor = getKeyColor(j)
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
@@ -97,13 +101,14 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                                             'data-x': xLabelList[i],
                                             'data-y': yDataLabel,
                                             'data-label': "${xLabelList[i]}: ${yDataLabel}",
+                                            'key-color': KeyColor.colorToString(keyColor),
                                             style: 'pointer-events: bounding-box;'])
                         if (j < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
                             render.renderImage(pointImageHref[j], dataPointRadius * 2, dataPointRadius * 2)
                         } else {
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                            render.fillStyle(getKeyColor(j))
+                            render.fillStyle(keyColor)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
                         render.renderGroupEnd()
@@ -114,7 +119,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         BigDecimal nextYHeight = ((i + 1 < yList.size() ? yList[i + 1] : 0.0) - startLabelY) / gapY * gapHeight
                         BigDecimal nextXWidth = DIAGRAM_MARGIN_LEFT + gapWidth * (i + 1)
                         render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
-                        render.fillStyle(getKeyColor(j))
+                        render.fillStyle(keyColor)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
                     }

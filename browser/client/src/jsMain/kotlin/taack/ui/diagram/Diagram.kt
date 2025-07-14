@@ -4,11 +4,9 @@ import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
-import web.dom.document
 import web.events.EventHandler
 import web.events.EventType
 import web.events.addEventListener
-import web.svg.SVGGElement
 import web.svg.SVGSVGElement
 import web.uievents.MouseEvent
 import web.uievents.WheelEvent
@@ -26,11 +24,11 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     private val fontSizePercentage: Double = s.attributes.getNamedItem("font-size-percentage")?.value?.toDouble() ?: 1.0
     private var isScrolling: Boolean = false
     private var previousMouseX: Double? = null
-    private val legends: List<DiagramLegend> = DiagramLegend.getSiblingDiagramLegend(this)
     val transformArea: DiagramTransformArea? = DiagramTransformArea.getSiblingDiagramTransformArea(this)
 
     init {
         s.style.userSelect = "none"
+        DiagramLegend.getSiblingDiagramLegend(this)
 
         if (transformArea != null && s.querySelector("clipPath[id^='clipSection']") != null) {
             // Scroll
@@ -79,12 +77,6 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
         val pt = s.createSVGPoint()
         pt.x = x
         return pt.matrixTransform(s.getScreenCTM()!!.inverse()).x
-    }
-
-    fun cloneLegendShape(dataset: String): SVGGElement {
-        val cloned = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
-        cloned.innerHTML = legends.find { it.dataset == dataset }?.g?.innerHTML ?: ""
-        return cloned
     }
 
     fun getFontSizePercentage(): Double {

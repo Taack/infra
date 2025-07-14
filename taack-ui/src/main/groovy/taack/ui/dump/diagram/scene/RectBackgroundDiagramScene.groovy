@@ -129,58 +129,59 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     }
 
     void drawLegend(List<String> pointImageHref = []) {
-        Integer line = 1
-        BigDecimal totalLength = 0.0
-        Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
-        dataPerKey.keySet().eachWithIndex { String key, int i ->
-            BigDecimal length = (i < pointImageHref.size() ? LEGEND_IMAGE_WIDTH : LEGEND_RECT_WIDTH) + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
-            if (totalLength + length > width) {
-                line++
-                totalLength = 0.0
-            }
-            if (keyMapPerLine.keySet().contains(line)) {
-                keyMapPerLine[line].put(key, length)
-            } else {
-                Map<String, BigDecimal> m = [:]
-                m.put(key, length)
-                keyMapPerLine.put(line, m)
-            }
-            totalLength += length + LEGEND_MARGIN
-        }
-
+        BigDecimal titleHeight = drawTitle()
         if (!diagramOption?.hideLegend) {
-            diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
-        }
-
-        BigDecimal startY = drawTitle() + LEGEND_MARGIN
-        Integer legendIndex = 0
-        keyMapPerLine.each {
-            Map<String, BigDecimal> keyMap = it.value
-            BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
-            keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
-                // image or rect, with text
-                render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})", style: "pointer-events: bounding-box;${diagramOption?.hideLegend ? 'display: none;' : ''}"])
-                if (legendIndex < pointImageHref.size()) {
-                    render.translateTo(0.0, 0.0 - (LEGEND_IMAGE_WIDTH - fontSize))
-                    render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
-
-                    render.translateTo(0.0 + LEGEND_IMAGE_WIDTH + LEGEND_RECT_TEXT_SPACING, 0.0)
-                    render.renderLabel(keyEntry.key)
-                } else {
-                    render.translateTo(0.0, 0.0)
-                    render.fillStyle(getKeyColor(legendIndex))
-                    render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
-
-                    // text
-                    render.translateTo(0.0 + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, 0.0)
-                    render.renderLabel(keyEntry.key)
+            Integer line = 1
+            BigDecimal totalLength = 0.0
+            Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
+            dataPerKey.keySet().eachWithIndex { String key, int i ->
+                BigDecimal length = (i < pointImageHref.size() ? LEGEND_IMAGE_WIDTH : LEGEND_RECT_WIDTH) + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
+                if (totalLength + length > width) {
+                    line++
+                    totalLength = 0.0
                 }
-                render.renderGroupEnd()
-
-                startX += keyEntry.value + LEGEND_MARGIN
-                legendIndex++
+                if (keyMapPerLine.keySet().contains(line)) {
+                    keyMapPerLine[line].put(key, length)
+                } else {
+                    Map<String, BigDecimal> m = [:]
+                    m.put(key, length)
+                    keyMapPerLine.put(line, m)
+                }
+                totalLength += length + LEGEND_MARGIN
             }
-            startY += fontSize + LEGEND_MARGIN
+
+            diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
+
+            BigDecimal startY = titleHeight + LEGEND_MARGIN
+            Integer legendIndex = 0
+            keyMapPerLine.each {
+                Map<String, BigDecimal> keyMap = it.value
+                BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
+                keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
+                    // image or rect, with text
+                    render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})", style: "pointer-events: bounding-box;"])
+                    if (legendIndex < pointImageHref.size()) {
+                        render.translateTo(0.0, 0.0 - (LEGEND_IMAGE_WIDTH - fontSize))
+                        render.renderImage(pointImageHref[legendIndex], LEGEND_IMAGE_WIDTH, LEGEND_IMAGE_WIDTH)
+
+                        render.translateTo(0.0 + LEGEND_IMAGE_WIDTH + LEGEND_RECT_TEXT_SPACING, 0.0)
+                        render.renderLabel(keyEntry.key)
+                    } else {
+                        render.translateTo(0.0, 0.0)
+                        render.fillStyle(getKeyColor(legendIndex))
+                        render.renderRect(LEGEND_RECT_WIDTH, fontSize, IDiagramRender.DiagramStyle.fill)
+
+                        // text
+                        render.translateTo(0.0 + LEGEND_RECT_WIDTH + LEGEND_RECT_TEXT_SPACING, 0.0)
+                        render.renderLabel(keyEntry.key)
+                    }
+                    render.renderGroupEnd()
+
+                    startX += keyEntry.value + LEGEND_MARGIN
+                    legendIndex++
+                }
+                startY += fontSize + LEGEND_MARGIN
+            }
         }
     }
 

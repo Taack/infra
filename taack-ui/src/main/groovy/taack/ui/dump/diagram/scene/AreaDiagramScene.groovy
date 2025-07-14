@@ -4,6 +4,8 @@ import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
+import java.awt.Color
+
 @CompileStatic
 class AreaDiagramScene extends RectBackgroundDiagramScene {
     AreaDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
@@ -58,7 +60,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             for (int i = keys.size() - 1; i >= 0; i--) {
                 Map<BigDecimal, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
                 Set<BigDecimal> xDataSet = dataMap.keySet()
-                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': ''])
+                Color keyColor = getKeyColor(i)
+                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': '', 'key-color': KeyColor.colorToString(keyColor)])
                 List<BigDecimal> coordsToDraw = [] // x1, y1, x2, y2, ...
                 for (int j = 0; j < xDataSet.size(); j++) {
                     BigDecimal xWidth = (xDataSet[j] - minX) / (maxX - minX) * totalWidth
@@ -71,7 +74,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 }
 
                 render.translateTo(0.0, 0.0)
-                render.fillStyle(getKeyColor(i))
+                render.fillStyle(keyColor)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()
@@ -95,7 +98,8 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             // draw data area one by one
             BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
             for (int i = 0; i < keys.size(); i++) {
-                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': ''])
+                Color keyColor = getKeyColor(i)
+                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': '', 'key-color': KeyColor.colorToString(keyColor)])
 
                 List<BigDecimal> y1List = i > 0 ? stackedYDataListPerKey[keys[i - 1]] : [minY] * xLabelList.size()
                 List<BigDecimal> y2List = stackedYDataListPerKey[keys[i]]
@@ -112,7 +116,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 }
 
                 render.translateTo(0.0, 0.0)
-                render.fillStyle(getKeyColor(i))
+                render.fillStyle(keyColor)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()

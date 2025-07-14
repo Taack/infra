@@ -58,7 +58,8 @@ class PieDiagramScene extends DiagramScene {
             // sector
             BigDecimal angle1 = 0.0
             pieDataPerKey.eachWithIndex { Map.Entry<String, BigDecimal> it, int i ->
-                render.renderGroup(['element-type': ElementType.DATA, dataset: it.key, 'data-x': it.key, 'data-y': it.value])
+                Color keyColor = getKeyColor(i)
+                render.renderGroup(['element-type': ElementType.DATA, dataset: it.key, 'data-x': it.key, 'data-y': it.value, 'key-color': KeyColor.colorToString(keyColor)])
                 BigDecimal value = it.value
                 BigDecimal percent = value / total
                 BigDecimal angle2 = angle1 + 360.0 * percent
@@ -70,7 +71,7 @@ class PieDiagramScene extends DiagramScene {
                 } else {
                     render.translateTo(centerX, centerY)
                 }
-                render.fillStyle(getKeyColor(i))
+                render.fillStyle(keyColor)
                 render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
                 render.renderGroupEnd()
 

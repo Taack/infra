@@ -30,6 +30,10 @@ enum KeyColor {
     }
 
     final Color color
+
+    static String colorToString(Color color) {
+        return "rgb(${color.red}, ${color.green}, ${color.blue})"
+    }
 }
 
 @CompileStatic
