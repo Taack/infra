@@ -194,7 +194,10 @@ class MainContentEditable(
         val compressedOptions =  text.getAttribute("editoroption")
         if (compressedOptions != null && compressedOptions.isNotEmpty()) {
             println("editoroption = ${compressedOptions}")
-            println("decompressing editoroption = ${decompress(compressedOptions)}")
+            decompress(compressedOptions).then { text ->
+                println("editoroption = $text")
+            }.catch { t -> console.error(t.message) }
+//            println("decompressing editoroption = ${decompress(compressedOptions).then()}")
         }
 
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
@@ -421,23 +424,47 @@ class MainContentEditable(
     }
 
 
-    fun decompress(str: String): String {
-        println("CanvasScriptCommon::decompress: $str")
+    fun decompress(str: String): Promise<ArrayBuffer> {
+        println("CanvasScriptCommon::decompress")
         return js("""
 function decompress(txt, encoding) {
-    var byteArray = new TextEncoder('utf-8').encode(txt);
-//    var byteArray = Uint8Array.from(atob(txt), c => c.charCodeAt(0));
-    var cs = new DecompressionStream(encoding);
-    var writer = cs.writable.getWriter();
-    writer.write(byteArray);
-    writer.close();
-    return new Response(cs.readable).arrayBuffer();
+    var b = atob(txt)
+    var byteArray = new ArrayBuffer(b.length);
+    for(var i = 0; i < b.length; i++) {
+        byteArray[i] = b[i];
+    }
 
-//  var ds = new DecompressionStream(encoding);
-//  var decompressedStream = atob(txt).stream().pipeThrough(ds);
-//  return new Response(decompressedStream).arrayBuffer();
+console.log(b);
+console.log(byteArray);
+
+    var blob = new Blob(byteArray);
+    var ds = new DecompressionStream(encoding);
+    var decompressedStream = blob.stream().pipeThrough(ds);
+    return new Response(decompressedStream).arrayBuffer();
+////return atob(txt);
+//
+////    var byteArray = new TextEncoder('utf-8').encode(txt);
+////    var byteArray = Uint8Array.from(atob(txt), c => c.charCodeAt(0));
+//    var byteArray = atob(txt);
+//
+////    var b = atob(txt)
+////    var byteArray = new Uint8Array(b.length);
+////    for(var i = 0; i < b.length; i++) {
+////        byteArray[i] = b[i];
+////    }
+//
+//    var cs = new DecompressionStream(encoding);
+//    var writer = cs.writable.getWriter();
+//    writer.write(byteArray);
+//    writer.close();
+//    return new Response(cs.readable).arrayBuffer();
+//
+////  var ds = new DecompressionStream(encoding);
+////  var decompressedStream = atob(txt).stream().pipeThrough(ds);
+////  return new Response(decompressedStream).arrayBuffer();
 }
-decompress(str, "deflate");
+decompress(str, "gzip");
+//decompress(str, "deflate-raw");
 """
         )
     }
