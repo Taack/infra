@@ -18,15 +18,15 @@ final class DiagramOption {
     DiagramResolution resolution
     String clickActionUrl
 
-    DiagramOptionBuilder getBuilder() {
-        return new DiagramOptionBuilder(this)
+    static DiagramOptionBuilder getBuilder() {
+        return new DiagramOptionBuilder()
     }
 
-    final class DiagramOptionBuilder {
+    final static class DiagramOptionBuilder {
         private DiagramOption diagramOption
 
-        DiagramOptionBuilder(DiagramOption diagramOption) {
-            this.diagramOption = diagramOption
+        DiagramOptionBuilder() {
+            this.diagramOption = new DiagramOption()
         }
 
         DiagramOptionBuilder showDataCount() {
