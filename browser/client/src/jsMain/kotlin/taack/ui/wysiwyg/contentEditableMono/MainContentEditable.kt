@@ -1,7 +1,6 @@
 package taack.ui.wysiwyg.contentEditableMono
 
 import js.buffer.AllowSharedBufferSource
-import js.buffer.ArrayBuffer
 import js.iterable.iterator
 import js.typedarrays.toUint8Array
 import org.w3c.fetch.Response
@@ -18,7 +17,6 @@ import web.html.*
 import web.selection.Selection
 import web.window.window
 import kotlin.io.encoding.Base64
-import kotlin.js.Promise
 
 class MainContentEditable(
     internal val text: HTMLTextAreaElement,
@@ -32,97 +30,11 @@ class MainContentEditable(
 
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
 
-    class CmdLine {
-
-        data class Span(
-            val pattern: String, val className: String, val inlined: Boolean, val delimiter: Boolean = false
-        )
-
-
-        enum class SpanStyle(val span: Span) {
-            DOCUMENT(Span("= ", "asciidoc-h1", false)), HEADER1(Span("== ", "asciidoc-h2", false)), HEADER2(
-                Span(
-                    "=== ", "asciidoc-h3", false
-                )
-            ),
-            HEADER3(Span("==== ", "asciidoc-h4", false)), HEADER4(Span("===== ", "asciidoc-h5", false)), TITLE(
-                Span(
-                    ".", "asciidoc-title", false
-                )
-            ),
-            bullet1(Span("()(^--$)()", "asciidoc-bullet1", true)), bullet2(
-                Span(
-                    "()(^----$)()", "asciidoc-bullet2", true
-                )
-            ),
-            bullet3(Span("()(^------$)()", "asciidoc-bullet3", true)), META(
-                Span(
-                    "()(^\\[[^[\\]]*\\]$)()", "asciidoc-meta", true
-                )
-            ),
-            UNORDERED_LIST1(Span("* ", "asciidoc-b1", false)), UNORDERED_LIST2(
-                Span(
-                    "** ", "asciidoc-b2", false
-                )
-            ),
-            UNORDERED_LIST3(Span("*** ", "asciidoc-b3", false)),
-
-            UNCONSTRAINED_BOLD(
-                Span(
-                    "([^*]?)(\\*\\*[^*]*\\*\\*)([^*]?)", "asciidoc-bold", true, true
-                )
-            ),
-            UNCONSTRAINED_ITALIC(
-                Span(
-                    "([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", true
-                )
-            ),
-            UNCONSTRAINED_MONO(
-                Span(
-                    "[^`]``([^`]*)``[^`]", "asciidoc-mono", true
-                )
-            ),
-            CONSTRAINED_BOLD(Span("([^\\w\\d*])(\\*[^*]+\\*)([^\\w\\d*]?)", "asciidoc-bold", true, true)),
-
-            //            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", true)),
-            CONSTRAINED_ITALIC(
-                Span(
-                    "([^\\w\\d_])(_[^_]+_)([^\\w\\d_]?)", "asciidoc-italic", true, true
-                )
-            ),
-            CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)), HIGHLIGHT(
-                Span(
-                    "[^`]``([^`]*)``[^`]", "asciidoc-highlight", true
-                )
-            ),
-            UNDERLINE(
-                Span(
-                    "([^\\w\\d]?)(\\[.underline\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-underline", true, true
-                )
-            ),
-            STRIKETHROUGH(
-                Span(
-                    "([^\\w\\d]?)(\\[.line-through\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-line-through", true
-                )
-            ),
-            SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)), APOSTROPHES(
-                Span(
-                    "'`#([^'`]*)`'", "asciidoc-apostrophe", true
-                )
-            ),
-            URL(
-                Span(
-                    "([^\\w\\d]?)(http[s]?://[^[]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-url", true
-                )
-            ),
-            IMAGE(
-                Span(
-                    "()(^image::[^[:]*\\[[^\\]]*\\]$)()", "asciidoc-image", true
-                )
-            ),
-            IMAGE_INLINE(Span("([^\\w\\d]?)(image:[^[:]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-inline-image", true)),
-        }
-    }
+    data class Span(
+        val pattern: String, val className: String, val inlined: Boolean, val delimiter: Boolean = false
+    )
+    
+    val styles: MutableList<Span> = mutableListOf()
 
     var focus: Int? = 0
     var currentLine: HTMLDivElement? = currentLineComputed
@@ -246,7 +158,6 @@ class MainContentEditable(
         val compressedOptions = text.getAttribute("editoroption")
         if (compressedOptions != null && compressedOptions.isNotEmpty()) {
             decompress(compressedOptions)
-
         }
 
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
@@ -288,15 +199,6 @@ class MainContentEditable(
 
         divHolder.classList.add(ClassName("cm-editor"), ClassName("ͼ1"), ClassName("ͼ2"))
         divHolder.appendChild(divScroll)
-
-        if (text.textContent?.length == 0) {
-            text.textContent = "\n"
-        }
-
-        text.textContent?.split("\n")?.forEach {
-            if (it.isNotEmpty()) asciidocToHtml(createCmdLine(it, 0)!!)
-            else createCmdLine("<br>", 0)
-        }
 
         divContent.onpaste = EventHandler { e ->
             e.clipboardData?.files?.length?.let {
@@ -377,17 +279,17 @@ class MainContentEditable(
             return
         }
         if (txt != null) {
-            var hasStart: CmdLine.SpanStyle? = null
-            var inlineMatchSequence: List<Pair<CmdLine.SpanStyle, MatchResult>> =
-                mutableListOf<Pair<CmdLine.SpanStyle, MatchResult>>()
-            for (entry in CmdLine.SpanStyle.entries) {
-                if (!entry.span.inlined && hasStart == null) {
-                    if (txt.startsWith(entry.span.pattern)) {
+            var hasStart: Span? = null
+            var inlineMatchSequence: List<Pair<Span, MatchResult>> =
+                mutableListOf<Pair<Span, MatchResult>>()
+            for (entry in styles) {
+                if (!entry.inlined && hasStart == null) {
+                    if (txt.startsWith(entry.pattern)) {
                         println("Has Prefix")
                         hasStart = entry
                     }
-                } else if (entry.span.inlined) {
-                    val pattern = entry.span.pattern
+                } else if (entry.inlined) {
+                    val pattern = entry.pattern
                     println("Pattern: $pattern")
                     val regex = Regex(pattern)
                     if (regex.containsMatchIn(txt)) {
@@ -402,12 +304,12 @@ class MainContentEditable(
 
             var i = 0
             for (c in sorted) {
-                val spanStyle: CmdLine.SpanStyle = c.first
+                val spanStyle: Span = c.first
                 val match: MatchResult = c.second
                 val start = match.range.first
                 val ends = match.range.endInclusive
                 val replace =
-                    """${match.groupValues[1]}<span class="${spanStyle.span.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
+                    """${match.groupValues[1]}<span class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
                 result += txt.substring(i..start - 1) + replace
                 i = ends + 1
             }
@@ -417,7 +319,7 @@ class MainContentEditable(
             println("result: $result")
 
             if (hasStart != null) {
-                val cn = hasStart.span.className
+                val cn = hasStart.className
                 result = """<span class="${cn}">$result</span>"""
             }
 
@@ -470,9 +372,6 @@ class MainContentEditable(
     }
 
     fun decompress(str: String) {
-        println("Decompress: ...")
-
-//        val b = atob(str)
         val b = Base64.decode(str)
         val uint8Array = b.toUint8Array()
         println(uint8Array.length)
@@ -487,154 +386,35 @@ class MainContentEditable(
             val decoder = TextDecoder()
             val str = decoder.decode(arrayBuffer as AllowSharedBufferSource)
             println(str)//arrayBuffer.unsafeCast<String>())
+            for (line in str.lines()) {
+                if (line.startsWith("§§")) {
+                    var pos1 = 2
+                    var pos2 = line.indexOf("§", pos1)
+                    val cn = line.substring(pos1, pos2)
+                    pos1 = pos2
+                    pos2 = line.indexOf("§", ++pos1)
+                    val pattern = line.substring(pos1, pos2)
+                    pos1 = pos2
+                    pos2 = line.indexOf("§", ++pos1)
+                    val inlined = line.substring(pos1, pos2) == "true"
+                    pos1 = pos2
+                    pos2 = line.indexOf("§", ++pos1)
+                    val delimiter = line.substring(pos1, pos2) == "true"
+                    println("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
+                    styles.add(Span(pattern, cn, inlined, delimiter))
+                } else {
+
+                }
+            }
+
+            if (text.textContent?.length == 0) {
+                text.textContent = "\n"
+            }
+
+            text.textContent?.split("\n")?.forEach {
+                if (it.isNotEmpty()) asciidocToHtml(createCmdLine(it, 0)!!)
+                else createCmdLine("<br>", 0)
+            }
         }
-
-//            .then<ArrayBuffer>(onFulfilled = fun (arrayBuffer: ArrayBuffer) {
-//            println("onFulfilled " + arrayBuffer.toString())
-//        })
-//        res.then({ tt: ReadableStreamReadResult<Uint8Array<ArrayBuffer>> ->
-//            println(tt)
-//            println(tt.toString())
-//            println(tt)
-//
-//        })
-//        res.then(onFulfilled = {
-//            println("onFulfilled " + it)
-        //            val editorOptions = decompress(compressedOptions)
-//            for (line in editorOptions.lines()) {
-//                println("editoroption line: $line")
-//                if (line.startsWith("§§")) {
-//                    var pos1 = 2
-//                    var pos2 = line.indexOf("§", pos1)
-//                    val cn = line.substring(pos1, pos2)
-//                    pos1 = pos2
-//                    pos2 = line.indexOf("§", pos1)
-//                    var pattern = line.substring(pos1, pos2)
-//                    pos1 = pos2
-//                    pos2 = line.indexOf("§", pos1)
-//                    var inlined = line.substring(pos1, pos2) == "true"
-//                    pos1 = pos2
-//                    pos2 = line.indexOf("§", pos1)
-//                    var delimiter = line.substring(pos1, pos2) == "true"
-//                    println("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
-//                } else {
-//
-//                }
-//            }
-
-//        }, onRejected = { println("onRejected " + it.toString()) })
-//        return decodeURIComponent(escape(atob(str)))
-//        return decodeURIComponent(escape(atob(str)))
     }
-
-//    fun decompressOld(str: String): Promise<ArrayBuffer> {
-//        println("CanvasScriptCommon::decompress")
-//        return js("""
-//function decompress(txt, encoding) {
-//    var b = atob(txt)
-//    var byteArray = new ArrayBuffer(b.length);
-//    for(var i = 0; i < b.length; i++) {
-//        byteArray[i] = b[i];
-//    }
-//
-//console.log(b);
-//console.log(byteArray);
-//
-//    var blob = new Blob(byteArray);
-//    var ds = new DecompressionStream(encoding);
-//    var decompressedStream = blob.stream().pipeThrough(ds);
-//    return new Response(decompressedStream).arrayBuffer();
-//////return atob(txt);
-////
-//////    var byteArray = new TextEncoder('utf-8').encode(txt);
-//////    var byteArray = Uint8Array.from(atob(txt), c => c.charCodeAt(0));
-////    var byteArray = atob(txt);
-////
-//////    var b = atob(txt)Window
-//////    var byteArray = new Uint8Array(b.length);
-//////    for(var i = 0; i < b.length; i++) {
-//////        byteArray[i] = b[i];
-//////    }
-////
-////    var cs = new DecompressionStream(encoding);
-////    var writer = cs.writable.getWriter();
-////    writer.write(byteArray);
-////    writer.close();
-////    return new Response(cs.readable).arrayBuffer();
-////
-//////  var ds = new DecompressionStream(encoding);
-//////  var decompressedStream = atob(txt).stream().pipeThrough(ds);
-//////  return new Response(decompressedStream).arrayBuffer();
-//}
-//decompress(str, "gzip");
-////decompress(str, "deflate-raw");
-//"""
-//        )
-//    }
-
-
-    fun compress(str: String): Promise<ArrayBuffer> {
-        println("CanvasScriptCommon::compress: $str")
-        return js(
-            """
-function compress(string, encoding) {
-    var byteArray = new TextEncoder('utf-8').encode(string);
-    var cs = new CompressionStream(encoding);
-    var writer = cs.writable.getWriter();
-    writer.write(byteArray);
-    writer.close();
-    return new Response(cs.readable).arrayBuffer();
-}
-compress(str, "deflate");
-"""
-        )
-    }
-
-//        override val txtScript: String
-//        get() {
-//            if (srcURI != null) {
-//                val txt = txt.substring(srcURI!!.length)
-//                compress(txt).then {
-//                    val bytes = Uint8Array(it)
-//                    val len = bytes.length
-//                    val chars = CharArray(len)
-//                    for (i in 0 until len) {
-//                        chars[i] = bytes[i].toInt().toChar()
-//                    }
-//                    return@then chars.concatToString()
-//                }.then {
-//                    imageSrc =
-//                        "${location.protocol}//${location.hostname}:8000/" + srcURI + "/svg/" + btoa(
-//                            it
-//                        ).replace(Regex("\\+"), "-").replace(Regex("/+"), "_")
-//                    image = CanvasImg(imageSrc!!, srcURI!!, 0)
-//                }
-//            }
-//            return txt
-//        }
-
-
-//    def asciidocRenderScript(String script) {
-//        script = script.replaceAll('-', '+').replaceAll('_', '/')
-//        File cached = Path.of(scriptCachePath.toString(), script).toFile()
-//        if (cached.exists()) {
-//            render cached.text
-//        } else {
-//            byte[] b64 = Base64.getDecoder().decode(script)
-//            Inflater inflater = new Inflater()
-//            inflater.setInput(b64)
-//
-//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-//            byte[] buffer = new byte[1024]
-//
-//            while (!inflater.finished()) {
-//                int decompressedSize = inflater.inflate(buffer)
-//                outputStream.write(buffer, 0, decompressedSize)
-//            }
-//
-//            println(new String(outputStream.toByteArray()))
-//
-//        }
-//    }
-
 }

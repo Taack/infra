@@ -51,27 +51,27 @@ enum Asciidoc {
     bullet1(new SpanRegex("()(^--\$)()", "asciidoc-bullet1", true)),
     bullet2(new SpanRegex("()(^----\$)()", "asciidoc-bullet2", true)),
     bullet3(new SpanRegex("()(^------\$)()", "asciidoc-bullet3", true)),
-    META(new SpanRegex("()(^\\[[^[\\]]*\\]\$)()", "asciidoc-meta", true)),
+    META(new SpanRegex("()(^\\\\[[^[\\\\]]*\\\\]\$)()", "asciidoc-meta", true)),
     UNORDERED_LIST1(new SpanRegex("* ", "asciidoc-b1", false)),
     UNORDERED_LIST2(new SpanRegex("** ", "asciidoc-b2", false)),
     UNORDERED_LIST3(new SpanRegex("*** ", "asciidoc-b3", false)),
 
-    UNCONSTRAINED_BOLD(new SpanRegex("([^*]?)(\\*\\*[^*]*\\*\\*)([^*]?)", "asciidoc-bold", true, true)),
+    UNCONSTRAINED_BOLD(new SpanRegex("([^*]?)(\\\\*\\\\*[^*]*\\\\*\\\\*)([^*]?)", "asciidoc-bold", true, true)),
     UNCONSTRAINED_ITALIC(new SpanRegex("([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", true)),
     UNCONSTRAINED_MONO(new SpanRegex("[^`]``([^`]*)``[^`]", "asciidoc-mono", true)),
-    CONSTRAINED_BOLD(new SpanRegex("([^\\w\\d*])(\\*[^*]+\\*)([^\\w\\d*]?)", "asciidoc-bold", true, true)),
+    CONSTRAINED_BOLD(new SpanRegex("([^\\\\w\\\\d*])(\\\\*[^*]+\\\\*)([^\\\\w\\\\d*]?)", "asciidoc-bold", true, true)),
 
     //            LITERAL_PARAGRAPH(new SpanRegex("^ .*", "asciidoc-literal", true)),
-    CONSTRAINED_ITALIC(new SpanRegex("([^\\w\\d_])(_[^_]+_)([^\\w\\d_]?)", "asciidoc-italic", true, true)),
+    CONSTRAINED_ITALIC(new SpanRegex("([^\\\\w\\\\d_])(_[^_]+_)([^\\\\w\\\\d_]?)", "asciidoc-italic", true, true)),
     CONSTRAINED_MONO(new SpanRegex(" `([^`]*)` ", "asciidoc-mono", true)),
     HIGHLIGHT(new SpanRegex("[^`]``([^`]*)``[^`]", "asciidoc-highlight", true)),
-    UNDERLINE(new SpanRegex("([^\\w\\d]?)(\\[.underline\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-underline", true, true)),
-    STRIKETHROUGH(new SpanRegex("([^\\w\\d]?)(\\[.line-through\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-line-through", true)),
+    UNDERLINE(new SpanRegex("([^\\\\w\\\\d]?)(\\\\[.underline\\\\]#[^#]*#)([^\\\\w\\\\d]?)", "asciidoc-underline", true, true)),
+    STRIKETHROUGH(new SpanRegex("([^\\\\w\\\\d]?)(\\\\[.line-through\\\\]#[^#]*#)([^\\\\w\\\\d]?)", "asciidoc-line-through", true)),
     SMART_QUOTES(new SpanRegex("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)),
     APOSTROPHES(new SpanRegex("'`#([^'`]*)`'", "asciidoc-apostrophe", true)),
-    URL(new SpanRegex("([^\\w\\d]?)(http[s]?://[^[]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-url", true)),
-    IMAGE(new SpanRegex("()(^image::[^[:]*\\[[^\\]]*\\]\$)()", "asciidoc-image", true)),
-    IMAGE_INLINE(new SpanRegex("([^\\w\\d]?)(image:[^[:]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-inline-image", true))
+    URL(new SpanRegex("([^\\\\w\\\\d]?)(http[s]?://[^[]*\\\\[[^\\\\]]*\\\\])([^\\\\w\\\\d]?)", "asciidoc-url", true)),
+    IMAGE(new SpanRegex("()(^image::[^[:]*\\\\[[^\\\\]]*\\\\]\$)()", "asciidoc-image", true)),
+    IMAGE_INLINE(new SpanRegex("([^\\\\w\\\\d]?)(image:[^[:]*\\\\[[^\\\\]]*\\\\])([^\\\\w\\\\d]?)", "asciidoc-inline-image", true))
 
     Asciidoc(SpanRegex span) {
         this.span = span
