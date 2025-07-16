@@ -1,5 +1,6 @@
 package taack.ui.dsl.form.editor
 
+import groovy.json.StringEscapeUtils
 import groovy.transform.CompileStatic
 import jdk.internal.ValueBased
 import org.codehaus.groovy.runtime.MethodClosure
@@ -32,6 +33,10 @@ final class SpanRegex {
             delimiter: ${delimiter ? 'true' : 'false'}
         }
         """.stripIndent()
+    }
+    String serializeString() {
+        String data = "§$className§$pattern§$inlined§$delimiter§"
+        return "§$data\n"
     }
 }
 
@@ -80,6 +85,10 @@ enum Asciidoc {
 
     static String toJson(List<SpanRegex> spanRegexes) {
         '[' + ((spanRegexes ?: values()*.span)*.toJson()).join(', ') + ']'
+    }
+
+    static String serializeString(List<SpanRegex> spanRegexes) {
+        ((spanRegexes ?: values()*.span)*.serializeString()).join('')
     }
 }
 
@@ -140,27 +149,28 @@ final class EditorOption {
         """.stripIndent()
     }
 
-    String compress() {
+    String serializeString() {
+        "${uploadFileAction ? Utils.getControllerName(uploadFileAction) + "/" + uploadFileAction.method : ""}\n\n${Asciidoc.serializeString(spanRegexes)}"
+    }
 
-        String json = toJson()
-        println "AUO1 = $json"
-        println "AUO11 = ${json.getBytes().length}"
+    String compress() {
+        String s = serializeString()
+//        s = StringEscapeUtils.unescapeJava(UriEncoder.encode(s))
+        s = StringEscapeUtils.unescapeJava(s)
+        println s
         Deflater deflater = new Deflater()
-        deflater.setInput(json.getBytes())
+        deflater.setInput(s.getBytes())
         deflater.finish()
-        println "AUO2"
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-        byte[] buffer = new byte[1024]
+        byte[] buffer = new byte[4096]
 
 //        while (!deflater.finished()) {
-        println "AUO21 deflater.bytesRead: ${deflater.bytesRead} deflater.bytesWritten: ${deflater.bytesWritten}"
         int compressedSize = deflater.deflate(buffer)
-        println "AUO22 + $compressedSize"
         outputStream.write(buffer, 0, compressedSize)
 //        }
         String b64 = new String(Base64.encoder.encode(outputStream.toByteArray()))
-        println "AUO3 $b64"
         return b64
+//        return new String(Base64.encoder.encode(StringEscapeUtils.unescapeJava(UriEncoder.encode(s)).bytes))
     }
 }

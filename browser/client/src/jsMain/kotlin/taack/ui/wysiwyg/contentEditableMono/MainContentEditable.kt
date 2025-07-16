@@ -1,19 +1,23 @@
 package taack.ui.wysiwyg.contentEditableMono
 
+import js.buffer.AllowSharedBufferSource
 import js.buffer.ArrayBuffer
 import js.iterable.iterator
+import js.typedarrays.toUint8Array
+import org.w3c.fetch.Response
+import web.compression.CompressionFormat
+import web.compression.DecompressionStream
+import web.compression.deflate
 import web.cssom.ClassName
 import web.dom.ElementId
 import web.dom.Node
 import web.dom.document
+import web.encoding.TextDecoder
 import web.events.EventHandler
-import web.html.AutoCapitalize
-import web.html.HTMLDivElement
-import web.html.HTMLSpanElement
-import web.html.off
+import web.html.*
 import web.selection.Selection
 import web.window.window
-import web.html.HTMLTextAreaElement
+import kotlin.io.encoding.Base64
 import kotlin.js.Promise
 
 class MainContentEditable(
@@ -31,43 +35,91 @@ class MainContentEditable(
     class CmdLine {
 
         data class Span(
-            val pattern: String,
-            val className: String,
-            val inlined: Boolean,
-            val delimiter: Boolean = false
+            val pattern: String, val className: String, val inlined: Boolean, val delimiter: Boolean = false
         )
 
 
         enum class SpanStyle(val span: Span) {
-            DOCUMENT(Span("= ", "asciidoc-h1", false)),
-            HEADER1(Span("== ", "asciidoc-h2", false)),
-            HEADER2(Span("=== ", "asciidoc-h3", false)),
-            HEADER3(Span("==== ", "asciidoc-h4", false)),
-            HEADER4(Span("===== ", "asciidoc-h5", false)),
-            TITLE(Span(".", "asciidoc-title", false)),
-            bullet1(Span("()(^--$)()", "asciidoc-bullet1", true)),
-            bullet2(Span("()(^----$)()", "asciidoc-bullet2", true)),
-            bullet3(Span("()(^------$)()", "asciidoc-bullet3", true)),
-            META(Span("()(^\\[[^[\\]]*\\]$)()", "asciidoc-meta", true)),
-            UNORDERED_LIST1(Span("* ", "asciidoc-b1", false)),
-            UNORDERED_LIST2(Span("** ", "asciidoc-b2", false)),
+            DOCUMENT(Span("= ", "asciidoc-h1", false)), HEADER1(Span("== ", "asciidoc-h2", false)), HEADER2(
+                Span(
+                    "=== ", "asciidoc-h3", false
+                )
+            ),
+            HEADER3(Span("==== ", "asciidoc-h4", false)), HEADER4(Span("===== ", "asciidoc-h5", false)), TITLE(
+                Span(
+                    ".", "asciidoc-title", false
+                )
+            ),
+            bullet1(Span("()(^--$)()", "asciidoc-bullet1", true)), bullet2(
+                Span(
+                    "()(^----$)()", "asciidoc-bullet2", true
+                )
+            ),
+            bullet3(Span("()(^------$)()", "asciidoc-bullet3", true)), META(
+                Span(
+                    "()(^\\[[^[\\]]*\\]$)()", "asciidoc-meta", true
+                )
+            ),
+            UNORDERED_LIST1(Span("* ", "asciidoc-b1", false)), UNORDERED_LIST2(
+                Span(
+                    "** ", "asciidoc-b2", false
+                )
+            ),
             UNORDERED_LIST3(Span("*** ", "asciidoc-b3", false)),
 
-            UNCONSTRAINED_BOLD(Span("([^*]?)(\\*\\*[^*]*\\*\\*)([^*]?)", "asciidoc-bold", true, true)),
-            UNCONSTRAINED_ITALIC(Span("([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", true)),
-            UNCONSTRAINED_MONO(Span("[^`]``([^`]*)``[^`]", "asciidoc-mono", true)),
+            UNCONSTRAINED_BOLD(
+                Span(
+                    "([^*]?)(\\*\\*[^*]*\\*\\*)([^*]?)", "asciidoc-bold", true, true
+                )
+            ),
+            UNCONSTRAINED_ITALIC(
+                Span(
+                    "([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", true
+                )
+            ),
+            UNCONSTRAINED_MONO(
+                Span(
+                    "[^`]``([^`]*)``[^`]", "asciidoc-mono", true
+                )
+            ),
             CONSTRAINED_BOLD(Span("([^\\w\\d*])(\\*[^*]+\\*)([^\\w\\d*]?)", "asciidoc-bold", true, true)),
 
             //            LITERAL_PARAGRAPH(Span("^ .*", "asciidoc-literal", true)),
-            CONSTRAINED_ITALIC(Span("([^\\w\\d_])(_[^_]+_)([^\\w\\d_]?)", "asciidoc-italic", true, true)),
-            CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)),
-            HIGHLIGHT(Span("[^`]``([^`]*)``[^`]", "asciidoc-highlight", true)),
-            UNDERLINE(Span("([^\\w\\d]?)(\\[.underline\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-underline", true, true)),
-            STRIKETHROUGH(Span("([^\\w\\d]?)(\\[.line-through\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-line-through", true)),
-            SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)),
-            APOSTROPHES(Span("'`#([^'`]*)`'", "asciidoc-apostrophe", true)),
-            URL(Span("([^\\w\\d]?)(http[s]?://[^[]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-url", true)),
-            IMAGE(Span("()(^image::[^[:]*\\[[^\\]]*\\]$)()", "asciidoc-image", true)),
+            CONSTRAINED_ITALIC(
+                Span(
+                    "([^\\w\\d_])(_[^_]+_)([^\\w\\d_]?)", "asciidoc-italic", true, true
+                )
+            ),
+            CONSTRAINED_MONO(Span(" `([^`]*)` ", "asciidoc-mono", true)), HIGHLIGHT(
+                Span(
+                    "[^`]``([^`]*)``[^`]", "asciidoc-highlight", true
+                )
+            ),
+            UNDERLINE(
+                Span(
+                    "([^\\w\\d]?)(\\[.underline\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-underline", true, true
+                )
+            ),
+            STRIKETHROUGH(
+                Span(
+                    "([^\\w\\d]?)(\\[.line-through\\]#[^#]*#)([^\\w\\d]?)", "asciidoc-line-through", true
+                )
+            ),
+            SMART_QUOTES(Span("\"`#([^\"`]*)`\"", "asciidoc-smart-quotes", true)), APOSTROPHES(
+                Span(
+                    "'`#([^'`]*)`'", "asciidoc-apostrophe", true
+                )
+            ),
+            URL(
+                Span(
+                    "([^\\w\\d]?)(http[s]?://[^[]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-url", true
+                )
+            ),
+            IMAGE(
+                Span(
+                    "()(^image::[^[:]*\\[[^\\]]*\\]$)()", "asciidoc-image", true
+                )
+            ),
             IMAGE_INLINE(Span("([^\\w\\d]?)(image:[^[:]*\\[[^\\]]*\\])([^\\w\\d]?)", "asciidoc-inline-image", true)),
         }
     }
@@ -191,13 +243,10 @@ class MainContentEditable(
     }
 
     init {
-        val compressedOptions =  text.getAttribute("editoroption")
+        val compressedOptions = text.getAttribute("editoroption")
         if (compressedOptions != null && compressedOptions.isNotEmpty()) {
-            println("editoroption = ${compressedOptions}")
-            decompress(compressedOptions).then { text ->
-                println("editoroption = $text")
-            }.catch { t -> console.error(t.message) }
-//            println("decompressing editoroption = ${decompress(compressedOptions).then()}")
+            decompress(compressedOptions)
+
         }
 
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
@@ -245,8 +294,7 @@ class MainContentEditable(
         }
 
         text.textContent?.split("\n")?.forEach {
-            if (it.isNotEmpty())
-                asciidocToHtml(createCmdLine(it, 0)!!)
+            if (it.isNotEmpty()) asciidocToHtml(createCmdLine(it, 0)!!)
             else createCmdLine("<br>", 0)
         }
 
@@ -304,10 +352,10 @@ class MainContentEditable(
                 if (e != null) {
                     if (e is HTMLSpanElement) {
                         println("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
-                        if (range?.commonAncestorContainer?.parentElement is HTMLDivElement)
-                            range.commonAncestorContainer.parentElement?.innerHTML = "<br>"
-                        else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement)
-                            range.commonAncestorContainer.parentElement?.parentElement?.innerHTML = "<br>"
+                        if (range?.commonAncestorContainer?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.innerHTML =
+                            "<br>"
+                        else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.parentElement?.innerHTML =
+                            "<br>"
                     }
                 }
 
@@ -414,65 +462,121 @@ class MainContentEditable(
             cmd.onchange = EventHandler { event ->
                 println("onchange")
             }
-            if (index == 0)
-                divContent.appendChild(cmd)
-            else
-                divContent.insertBefore(divContent.children[index], cmd)
+            if (index == 0) divContent.appendChild(cmd)
+            else divContent.insertBefore(divContent.children[index], cmd)
             return cmd
         }
         return null
     }
 
+    fun decompress(str: String) {
+        println("Decompress: ...")
 
-    fun decompress(str: String): Promise<ArrayBuffer> {
-        println("CanvasScriptCommon::decompress")
-        return js("""
-function decompress(txt, encoding) {
-    var b = atob(txt)
-    var byteArray = new ArrayBuffer(b.length);
-    for(var i = 0; i < b.length; i++) {
-        byteArray[i] = b[i];
+//        val b = atob(str)
+        val b = Base64.decode(str)
+        val uint8Array = b.toUint8Array()
+        println(uint8Array.length)
+        println(b.size)
+        val ds = DecompressionStream(CompressionFormat.deflate)
+        val writer = ds.writable.getWriter()
+        writer.writeAsync(uint8Array)
+        writer.closeAsync()
+
+        val res = Response(ds.readable).arrayBuffer()
+        res.then { arrayBuffer ->
+            val decoder = TextDecoder()
+            val str = decoder.decode(arrayBuffer as AllowSharedBufferSource)
+            println(str)//arrayBuffer.unsafeCast<String>())
+        }
+
+//            .then<ArrayBuffer>(onFulfilled = fun (arrayBuffer: ArrayBuffer) {
+//            println("onFulfilled " + arrayBuffer.toString())
+//        })
+//        res.then({ tt: ReadableStreamReadResult<Uint8Array<ArrayBuffer>> ->
+//            println(tt)
+//            println(tt.toString())
+//            println(tt)
+//
+//        })
+//        res.then(onFulfilled = {
+//            println("onFulfilled " + it)
+        //            val editorOptions = decompress(compressedOptions)
+//            for (line in editorOptions.lines()) {
+//                println("editoroption line: $line")
+//                if (line.startsWith("§§")) {
+//                    var pos1 = 2
+//                    var pos2 = line.indexOf("§", pos1)
+//                    val cn = line.substring(pos1, pos2)
+//                    pos1 = pos2
+//                    pos2 = line.indexOf("§", pos1)
+//                    var pattern = line.substring(pos1, pos2)
+//                    pos1 = pos2
+//                    pos2 = line.indexOf("§", pos1)
+//                    var inlined = line.substring(pos1, pos2) == "true"
+//                    pos1 = pos2
+//                    pos2 = line.indexOf("§", pos1)
+//                    var delimiter = line.substring(pos1, pos2) == "true"
+//                    println("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
+//                } else {
+//
+//                }
+//            }
+
+//        }, onRejected = { println("onRejected " + it.toString()) })
+//        return decodeURIComponent(escape(atob(str)))
+//        return decodeURIComponent(escape(atob(str)))
     }
 
-console.log(b);
-console.log(byteArray);
-
-    var blob = new Blob(byteArray);
-    var ds = new DecompressionStream(encoding);
-    var decompressedStream = blob.stream().pipeThrough(ds);
-    return new Response(decompressedStream).arrayBuffer();
-////return atob(txt);
+//    fun decompressOld(str: String): Promise<ArrayBuffer> {
+//        println("CanvasScriptCommon::decompress")
+//        return js("""
+//function decompress(txt, encoding) {
+//    var b = atob(txt)
+//    var byteArray = new ArrayBuffer(b.length);
+//    for(var i = 0; i < b.length; i++) {
+//        byteArray[i] = b[i];
+//    }
 //
-////    var byteArray = new TextEncoder('utf-8').encode(txt);
-////    var byteArray = Uint8Array.from(atob(txt), c => c.charCodeAt(0));
-//    var byteArray = atob(txt);
+//console.log(b);
+//console.log(byteArray);
 //
-////    var b = atob(txt)
-////    var byteArray = new Uint8Array(b.length);
-////    for(var i = 0; i < b.length; i++) {
-////        byteArray[i] = b[i];
-////    }
-//
-//    var cs = new DecompressionStream(encoding);
-//    var writer = cs.writable.getWriter();
-//    writer.write(byteArray);
-//    writer.close();
-//    return new Response(cs.readable).arrayBuffer();
-//
-////  var ds = new DecompressionStream(encoding);
-////  var decompressedStream = atob(txt).stream().pipeThrough(ds);
-////  return new Response(decompressedStream).arrayBuffer();
-}
-decompress(str, "gzip");
-//decompress(str, "deflate-raw");
-"""
-        )
-    }
+//    var blob = new Blob(byteArray);
+//    var ds = new DecompressionStream(encoding);
+//    var decompressedStream = blob.stream().pipeThrough(ds);
+//    return new Response(decompressedStream).arrayBuffer();
+//////return atob(txt);
+////
+//////    var byteArray = new TextEncoder('utf-8').encode(txt);
+//////    var byteArray = Uint8Array.from(atob(txt), c => c.charCodeAt(0));
+////    var byteArray = atob(txt);
+////
+//////    var b = atob(txt)Window
+//////    var byteArray = new Uint8Array(b.length);
+//////    for(var i = 0; i < b.length; i++) {
+//////        byteArray[i] = b[i];
+//////    }
+////
+////    var cs = new DecompressionStream(encoding);
+////    var writer = cs.writable.getWriter();
+////    writer.write(byteArray);
+////    writer.close();
+////    return new Response(cs.readable).arrayBuffer();
+////
+//////  var ds = new DecompressionStream(encoding);
+//////  var decompressedStream = atob(txt).stream().pipeThrough(ds);
+//////  return new Response(decompressedStream).arrayBuffer();
+//}
+//decompress(str, "gzip");
+////decompress(str, "deflate-raw");
+//"""
+//        )
+//    }
 
 
     fun compress(str: String): Promise<ArrayBuffer> {
         println("CanvasScriptCommon::compress: $str")
-        return js("""
+        return js(
+            """
 function compress(string, encoding) {
     var byteArray = new TextEncoder('utf-8').encode(string);
     var cs = new CompressionStream(encoding);
