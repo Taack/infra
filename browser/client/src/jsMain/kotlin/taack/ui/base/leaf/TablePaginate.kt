@@ -41,6 +41,7 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
     private val n = 5 // number of items in start/end section (If large of pages)
 
     init {
+        d.innerHTML = ""
         trace("TablePaginate1 max: $max, offset: $offset, count: $count")
         trace("TablePaginate2 currentPage: $currentPage, numberOfPage: $numberOfPage")
 
