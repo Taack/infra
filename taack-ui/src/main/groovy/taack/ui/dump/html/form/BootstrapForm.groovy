@@ -294,7 +294,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value, EditorOption editorOption = null) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLTextarea input = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses(formControl).setId(qualifiedName)/*.putAttribute('editorOption', editorOption?.compress())*/.build() as HTMLTextarea
+        HTMLElementBuilder inputBuilder = new HTMLTextarea(value, qualifiedName, null, disable).builder
+                .addClasses(formControl).setId(qualifiedName)
+        if (editorOption) inputBuilder.putAttribute('editorOption', editorOption.compress())
+        HTMLTextarea input = inputBuilder.build() as HTMLTextarea
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
