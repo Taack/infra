@@ -7,7 +7,7 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
-import web.dom.document
+import kotlinx.browser.document
 import web.events.Event
 import web.events.EventHandler
 import web.form.FormData
@@ -67,7 +67,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
             val t = xhr.responseText
             if (t.substring(0, min(20, t.length)).contains("<!DOCTYPE html>", false)) {
                 location.href = b.formAction
-                document.textContent = t
+                document.write(t)
                 document.close()
             } else {
                 val callback: CloseModalPostProcessing = { key, value, otherField ->
