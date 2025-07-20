@@ -23,17 +23,6 @@ final class SpanRegex {
         this.delimiter = delimiter
     }
 
-    String toJson() {
-        """\
-        {
-            pattern: "$pattern";
-            className: "$className";
-            pattern: "$pattern";
-            inlined: ${inlined ? 'true' : 'false'}
-            delimiter: ${delimiter ? 'true' : 'false'}
-        }
-        """.stripIndent()
-    }
     String serializeString() {
         String data = "§$className§$pattern§$inlined§$delimiter§"
         return "§$data\n"
@@ -81,10 +70,6 @@ enum Asciidoc {
 
     static SpanRegex[] getSpans() {
         values()*.span.toArray() as SpanRegex[]
-    }
-
-    static String toJson(List<SpanRegex> spanRegexes) {
-        '[' + ((spanRegexes ?: values()*.span)*.toJson()).join(', ') + ']'
     }
 
     static String serializeString(List<SpanRegex> spanRegexes) {
@@ -139,14 +124,6 @@ final class EditorOption {
         EditorOption build() {
             editorOption
         }
-    }
-
-    String toJson() {
-        """\
-        {
-            ${uploadFileAction ? """uploadFileAction: "${Utils.getControllerName(uploadFileAction) + "/" + uploadFileAction.method}";""" : ''}${spanRegexes ? """spanRegexes: ${Asciidoc.toJson(spanRegexes)};""" : ''}
-        }
-        """.stripIndent()
     }
 
     String serializeString() {

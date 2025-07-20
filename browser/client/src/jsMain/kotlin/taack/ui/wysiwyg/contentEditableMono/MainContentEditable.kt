@@ -3,6 +3,7 @@ package taack.ui.wysiwyg.contentEditableMono
 import js.buffer.AllowSharedBufferSource
 import js.iterable.iterator
 import js.typedarrays.toUint8Array
+import org.w3c.dom.HTMLBRElement
 import org.w3c.fetch.Response
 import web.compression.CompressionFormat
 import web.compression.DecompressionStream
@@ -14,6 +15,7 @@ import web.dom.document
 import web.encoding.TextDecoder
 import web.events.EventHandler
 import web.html.*
+import web.keyboard.KeyCode
 import web.selection.Selection
 import web.window.window
 import kotlin.io.encoding.Base64
@@ -40,7 +42,9 @@ class MainContentEditable(
     var currentLine: HTMLDivElement? = currentLineComputed
     val currentLineComputed: HTMLDivElement?
         get() {
-            if (selectedElement?.parentElement is HTMLDivElement) {
+            if (selectedElement is HTMLDivElement && selectedElement!!.textContent == "") {
+                return selectedElement as HTMLDivElement
+            } else if (selectedElement?.parentElement is HTMLDivElement) {
                 return selectedElement?.parentElement as HTMLDivElement
             } else if (selectedElement?.parentElement?.parentElement is HTMLDivElement) {
                 return selectedElement?.parentElement?.parentElement as HTMLDivElement
@@ -55,28 +59,26 @@ class MainContentEditable(
 
 
     fun initSelection() {
-        selection = window.getSelection()
+        val winSelection = window.getSelection()
+        selection = winSelection
         focus = selection?.focusOffset
         selectedElement = selection?.focusNode
 
-        println("selection: $selection")
-        println("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}")
-        println("focus: $focus")
+        println("selection: $selection, currentLine: $currentLine (${currentLine?.className} ${currentLine?.innerHTML})")
+        println("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}, focus: $focus")
 
         // position in chars in parent container
         currentLine = currentLineComputed
 
-        println("currentLine: $currentLine (${currentLine?.innerHTML})")
         if (currentLine != null) {
             position = 0
             for (child in currentLine!!.childNodes.iterator()) {
-                println("child: $child (${child.textContent})")
 
                 if (child == selectedElement || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
                     position += focus ?: 0
-                    println("child == selectedElement $focus $position")
+                    println("child == selectedElement $focus $position $child ${child is HTMLBRElement}")
                     break
-                } else {
+                } else if (child is HTMLSpanElement) {
                     position += child.textContent?.length ?: 0
                 }
             }
@@ -98,17 +100,17 @@ class MainContentEditable(
         )
 
         val top = e?.getBoundingClientRect()?.top
-        if (top != null) {
+        val left = e?.getBoundingClientRect()?.left
+        if (top != null && left != null) {
             val visibleElement = divContent.parentElement?.parentElement?.parentElement?.parentElement
             if (visibleElement != null) {
-
                 val scrollTop = document.body.getBoundingClientRect().top
                 val bottomVisible = visibleElement.getBoundingClientRect().bottom
                 val topVisible = visibleElement.getBoundingClientRect().top
-                println("topVisible: $topVisible, bottomVisible: $bottomVisible")
+                println("topVisible: $topVisible, bottomVisible: $bottomVisible, position: $position, top: $top, left: $left")
                 if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
-                    divAutocomplete.style.left = "${e.getBoundingClientRect().left + position * 10}px"
-                    divAutocomplete.style.top = "${e.getBoundingClientRect().top - scrollTop + 19}px"
+                    divAutocomplete.style.left = "${left + position * 10}px"
+                    divAutocomplete.style.top = "${top - scrollTop + 19}px"
                     divAutocomplete.innerHTML = ""
 
 
@@ -230,8 +232,8 @@ class MainContentEditable(
         }
 
         divContent.onkeydown = EventHandler { event ->
-            println("event.key: ${event.key}, event.ctrlKey: ${event.ctrlKey}")
-            if (event.key == " " && event.ctrlKey) {
+            println("event.code: ${event.code}, event.ctrlKey: ${event.ctrlKey}")
+            if (event.code == "Space" as KeyCode && event.ctrlKey) {
                 println("autocomplete ...")
                 autocomplete(currentLine)
                 event.preventDefault()
@@ -273,7 +275,6 @@ class MainContentEditable(
 
     fun asciidocToHtml(e: HTMLDivElement) {
         val txt = e.textContent
-        println("txt: $txt")
         if (txt?.isEmpty() == true) {
             e.innerHTML = "<br>"
             return
@@ -285,12 +286,10 @@ class MainContentEditable(
             for (entry in styles) {
                 if (!entry.inlined && hasStart == null) {
                     if (txt.startsWith(entry.pattern)) {
-                        println("Has Prefix")
                         hasStart = entry
                     }
                 } else if (entry.inlined) {
                     val pattern = entry.pattern
-                    println("Pattern: $pattern")
                     val regex = Regex(pattern)
                     if (regex.containsMatchIn(txt)) {
                         for (s in regex.findAll(txt)) {
@@ -313,14 +312,11 @@ class MainContentEditable(
                 result += txt.substring(i..start - 1) + replace
                 i = ends + 1
             }
-            println("result: $result, i: $i, txt.length: ${txt.length}")
             result += txt.substring(i)
-
-            println("result: $result")
 
             if (hasStart != null) {
                 val cn = hasStart.className
-                result = """<span class="${cn}">$result</span>"""
+                result = """<span class="$cn">$result</span>"""
             }
 
             if (e.innerHTML != result) {
