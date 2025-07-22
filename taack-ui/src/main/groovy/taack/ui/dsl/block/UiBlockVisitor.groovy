@@ -254,6 +254,16 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
+
+    }
+
+    @Override
+    void visitMenuIconWithClosureEnd(Style style) {
+
+    }
+
+    @Override
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
 
     }

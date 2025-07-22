@@ -5,6 +5,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
 import taack.ui.dump.html.element.IHTMLElement
 
 interface IUiMenuVisitor extends IHTMLElement {
@@ -28,6 +29,10 @@ interface IUiMenuVisitor extends IHTMLElement {
     void visitMenuSectionEnd()
 
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ? extends Object> params, final boolean isModal)
+
+    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon)
+
+    void visitMenuIconWithClosureEnd(Style style)
 
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params)
 

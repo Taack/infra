@@ -1,6 +1,7 @@
 package taack.ui.dump.html.menu
 
 import groovy.transform.CompileStatic
+import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
@@ -67,10 +68,15 @@ final class BootstrapMenu implements IHTMLElement {
         }
     }
 
-    IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
+    IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false, boolean insideSection = false) {
         topElement.addChildren(
-                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                        new HTMLAnchor(isAjax && !isMail, url).builder.addClasses("nav-link${active ? ' active' : ''}", 'taackMenu').putAttributeIfNotNull('ajaxBlockId', ajaxBlockId).addChildren(new HTMLTxtContent(i18n)).build()
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown', insideSection ? 'section-item' : '').addChildren(
+                        new HTMLAnchor((insideSection || isAjax) && !isMail, url).builder
+                                .addClasses("nav-link${active ? ' active' : ''}", 'taackMenu')
+                                .putAttributeIfNotNull('ajaxBlockId', ajaxBlockId)
+                                .putAttribute('title', insideSection ? TaackUiEnablerService.sanitizeStringWithAllowing(i18n) : '')
+                                .addChildren(new HTMLTxtContent(i18n))
+                                .build()
                 ).build()
         )
         topElement
@@ -78,7 +84,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     static IHTMLElement section(IHTMLElement topElement, String i18n) {
         topElement.builder.addChildren(
-                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown', 'section-header').addChildren(
                         new HTMLSpan().builder.addClasses('navbar-text').addChildren(new HTMLTxtContent('<b>' + i18n + '</b>')).build()
                 ).build()
         ).build()
@@ -86,7 +92,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     IHTMLElement menuIcon(IHTMLElement topElement, String iconHtml, String url, boolean isAjax) {
         topElement.addChildren(
-                new HTMLLi().builder.addClasses().addChildren(
+                new HTMLLi().builder.addClasses('nav-icon', 'dropdown').addChildren(
                         new HTMLAnchor(isAjax && !isMail, url).builder.addClasses('nav-link').addChildren(new HTMLTxtContent(iconHtml)).build()
                 ).build()
         )

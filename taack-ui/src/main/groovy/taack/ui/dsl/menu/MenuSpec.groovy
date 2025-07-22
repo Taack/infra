@@ -7,6 +7,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
 
 @CompileStatic
@@ -28,6 +29,15 @@ final class MenuSpec {
 
     enum MenuPosition {
         TOP_LEFT, BOTTOM_RIGHT
+    }
+
+    static Closure<MenuSpec> buildMenuSpec(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure) {
+        closure
+    }
+
+    void inline(final Closure<MenuSpec> menuSpecClosure) {
+        menuSpecClosure.delegate = this
+        menuSpecClosure.call()
     }
 
     /**
@@ -88,6 +98,13 @@ final class MenuSpec {
      */
     void menuIcon(final ActionIcon icon, final MethodClosure action, Map<String, ? extends Object> params) {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
+    }
+
+    void menuIcon(final String i18n, final ActionIcon icon, final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
+        menuVisitor.visitMenuIconWithClosure(i18n, icon)
+        closure.delegate = subMenuSpec
+        closure.call()
+        menuVisitor.visitMenuIconWithClosureEnd(style)
     }
 
     /**

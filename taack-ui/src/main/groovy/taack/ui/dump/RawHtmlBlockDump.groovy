@@ -449,6 +449,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     BootstrapMenu menu
+    boolean insideMenuSection = false
 
     @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
@@ -533,33 +534,49 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
                 }
             }
         }
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId != null && !futurCurrentAjaxBlockId.empty, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)))
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && (!params || params.equals(cp)), insideMenuSection)
     }
 
     @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
         enterBlock('visitMenuSection ' + i18n)
+        insideMenuSection = true
         menu.section(blockLog.topElement, i18n)
     }
 
     @Override
     void visitMenuSectionEnd() {
         exitBlock('visitMenuSectionEnd')
-
+        insideMenuSection = false
     }
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
         blockLog.stayBlock('visitSubMenuIcon ' + i18n)
-        if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT)) {
+        if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT, TaackTag.MENU_COL)) {
             splitMenu()
         }
 
         if (parameter.target != Parameter.RenderingTarget.MAIL)
-            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 30), parameter.urlMapped(controller, action, params, isModal), isModal)
         else
             menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
+    }
+
+    @Override
+    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
+        enterBlock('visitMenuIconWithClosure ' + i18n)
+        blockLog.topElement.setTaackTag(TaackTag.MENU_COL)
+
+        blockLog.topElement = menu.label(blockLog.topElement, actionIcon.getHtml(i18n, 30), true).builder.build()
+    }
+
+    @Override
+    void visitMenuIconWithClosureEnd(Style style) {
+        exitBlock('visitMenuIconWithClosureEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_COL)
+        if (Style) blockLog.topElement.children.last().setStyleDescriptor(style)
     }
 
     @Override
@@ -628,5 +645,4 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     void getOutput(OutputStream out) {
         blockLog.topElement.getOutput(out)
     }
-
 }
