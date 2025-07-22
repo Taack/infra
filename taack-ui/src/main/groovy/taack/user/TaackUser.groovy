@@ -7,7 +7,7 @@ import groovy.transform.ToString
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'username')
 @ToString(includes = 'username', includeNames = true, includePackage = false)
-abstract class TaackUser implements Serializable, IUserNotification {
+abstract class TaackUser implements Serializable {
 
     private static final long serialVersionUID = 1
 

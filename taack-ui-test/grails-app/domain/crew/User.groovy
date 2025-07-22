@@ -7,7 +7,6 @@ import attachment.Attachment
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import grails.compiler.GrailsCompileStatic
-import org.grails.datastore.gorm.GormEntity
 import taack.ast.annotation.TaackFieldEnum
 import taack.user.TaackUser
 
@@ -93,20 +92,5 @@ class User extends TaackUser {
             cursor = m
         }
         res
-    }
-
-    @Override
-    Map<GormEntity, Date> getNotificationRelatedDataList(Boolean unread) {
-        return null
-    }
-
-    @Override
-    void addToUnreadRelatedDataList(GormEntity gormEntity) {
-
-    }
-
-    @Override
-    void markRelatedDataAsRead(GormEntity gormEntity) {
-
     }
 }
