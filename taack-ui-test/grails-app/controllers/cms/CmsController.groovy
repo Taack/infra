@@ -10,6 +10,7 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
+import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackAttachmentService
@@ -157,7 +158,11 @@ class CmsController implements WebAttributes {
                         tabLabel "${language.label}", {
                             fieldFromMap cmsPage.title_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.hatContent_, language.toString().toLowerCase()
-                            fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), EditorOption.getBuilder().addSpanRegexes(Asciidoc.spans).build()
+
+                            EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+                            editor.addSpanRegexes(Asciidoc.spans)
+                            editor.uploadFileAction(CmsController.&dropFileEditor as MethodClosure, [id: cmsPage.id, l: language.toString()])
+                            fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
                     }
@@ -306,6 +311,10 @@ class CmsController implements WebAttributes {
                 }
             }
         }
+    }
+
+    def dropFileEditor() {
+        println "dropFileEditor $params"
     }
 
     @Transactional
