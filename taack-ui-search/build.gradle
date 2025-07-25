@@ -11,8 +11,8 @@ dependencies {
     implementation "org.apache.tika:tika-parser-ocr-module:${tika}"
     implementation "org.apache.tika:tika-parser-html-module:${tika}"
 
-    implementation "org.apache.grails:grails-data-hibernate5"
-    implementation "org.apache.grails:grails-gsp"
+//    implementation "org.apache.grails:grails-data-hibernate5"
+//    implementation "org.apache.grails:grails-gsp"
 }
 
 
