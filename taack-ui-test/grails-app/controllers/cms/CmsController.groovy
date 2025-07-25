@@ -28,6 +28,7 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.form.editor.Asciidoc
 import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dsl.form.editor.SpanRegex
+import taack.ui.dsl.form.editor.TaackMarkdown
 
 import static grails.async.Promises.task
 /*
@@ -157,7 +158,7 @@ class CmsController implements WebAttributes {
                         tabLabel "${language.label}", {
                             fieldFromMap cmsPage.title_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.hatContent_, language.toString().toLowerCase()
-                            fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), EditorOption.getBuilder().addSpanRegexes(Asciidoc.spans).build()
+                            fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), EditorOption.getBuilder().addSpanRegexes(TaackMarkdown.spans).build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
                     }

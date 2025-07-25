@@ -78,6 +78,41 @@ enum Asciidoc {
 }
 
 @CompileStatic
+enum TaackMarkdown {
+    DOCUMENT(new SpanRegex("# ", "asciidoc-h1", false)),
+    HEADER1(new SpanRegex("## ", "asciidoc-h2", false)),
+    HEADER2(new SpanRegex("### ", "asciidoc-h3", false)),
+    HEADER3(new SpanRegex("#### ", "asciidoc-h4", false)),
+    HEADER4(new SpanRegex("##### ", "asciidoc-h5", false)),
+    TITLE(new SpanRegex(".", "asciidoc-title", false)),
+    UNORDERED_LIST1(new SpanRegex("* ", "asciidoc-b1", false)),
+    UNORDERED_LIST2(new SpanRegex("  * ", "asciidoc-b2", false)),
+    UNORDERED_LIST3(new SpanRegex("    * ", "asciidoc-b3", false)),
+
+    UNCONSTRAINED_BOLD(new SpanRegex("([^*]?)(\\\\*\\\\*[^*]*\\\\*\\\\*)([^*]?)", "asciidoc-bold", true, true)),
+    UNCONSTRAINED_ITALIC(new SpanRegex("([^_]?)(_[^_]*_)([^_]?)", "asciidoc-italic", true)),
+    UNCONSTRAINED_MONO(new SpanRegex("[^`]`([^`]*)`[^`]", "asciidoc-mono", true)),
+    HIGHLIGHT(new SpanRegex("[^#]#([^#]*)#[^#]", "asciidoc-highlight", true)),
+    UNDERLINE(new SpanRegex("([^\\\\w\\\\d]?)(<u>.*</u>)([^\\\\w\\\\d]?)", "asciidoc-underline", true, true)),
+    STRIKETHROUGH(new SpanRegex("([^\\\\w\\\\d]?)(<del>.*</del>)([^\\\\w\\\\d]?)", "asciidoc-line-through", true)),
+    URL(new SpanRegex("([^\\\\w\\\\d]?)([^[]*\\\\[[^\\\\]]*\\\\]\\\\(.*\\\\))([^\\\\w\\\\d]?)", "asciidoc-url", true))
+
+    TaackMarkdown(SpanRegex span) {
+        this.span = span
+    }
+
+    SpanRegex span
+
+    static SpanRegex[] getSpans() {
+        values()*.span.toArray() as SpanRegex[]
+    }
+
+    static String serializeString(List<SpanRegex> spanRegexes) {
+        ((spanRegexes ?: values()*.span)*.serializeString()).join('')
+    }
+}
+
+@CompileStatic
 @ValueBased
 final class AutocompleteChoice {
     private final String selection
