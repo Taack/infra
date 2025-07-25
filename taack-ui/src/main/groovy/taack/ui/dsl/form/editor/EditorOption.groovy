@@ -127,6 +127,7 @@ final class AutocompleteChoice {
 @CompileStatic
 final class EditorOption {
     MethodClosure uploadFileAction
+    Map uploadFileActionParams
     List<SpanRegex> spanRegexes = []
     Map<SpanRegex, AutocompleteChoice[]> autocompleteChoices = [:]
 
@@ -141,8 +142,9 @@ final class EditorOption {
             this.editorOption = new EditorOption()
         }
 
-        EditorOptionBuilder uploadFileAction(MethodClosure c) {
+        EditorOptionBuilder uploadFileAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
             editorOption.uploadFileAction = c
+            editorOption.uploadFileActionParams = parameters
             this
         }
 
@@ -162,7 +164,7 @@ final class EditorOption {
     }
 
     String serializeString() {
-        "${uploadFileAction ? Utils.getControllerName(uploadFileAction) + "/" + uploadFileAction.method : ""}\n\n${Asciidoc.serializeString(spanRegexes)}"
+        "${uploadFileAction ? Utils.getControllerName(uploadFileAction) + '/' + uploadFileAction.method : ''}${uploadFileActionParams ? '?' + Utils.paramsString(uploadFileActionParams): ''}\n\n${Asciidoc.serializeString(spanRegexes)}"
     }
 
     String compress() {

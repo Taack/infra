@@ -5,6 +5,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
 
 @CompileStatic
 class UiMenuVisitor implements IUiMenuVisitor {
@@ -56,6 +57,16 @@ class UiMenuVisitor implements IUiMenuVisitor {
 
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal) {
+
+    }
+
+    @Override
+    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
+
+    }
+
+    @Override
+    void visitMenuIconWithClosureEnd(Style style) {
 
     }
 

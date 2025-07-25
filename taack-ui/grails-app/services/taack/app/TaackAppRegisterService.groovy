@@ -18,12 +18,16 @@ final class TaackApp implements Comparable {
         this.svg = svg
     }
 
+    String getControllerName() {
+        Utils.getControllerName(entryPoint)
+    }
+
     String getLabel() {
-        TaackUiService.tr("${Utils.getControllerName(entryPoint)}.app" as String)
+        TaackUiService.tr("${controllerName}.app" as String)
     }
 
     String getDesc() {
-        TaackUiService.tr("${Utils.getControllerName(entryPoint)}.desc" as String)
+        TaackUiService.tr("${controllerName}.desc" as String)
     }
 
     @Override

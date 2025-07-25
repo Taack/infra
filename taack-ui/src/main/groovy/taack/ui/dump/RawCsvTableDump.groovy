@@ -113,14 +113,12 @@ final class RawCsvTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowField(Number value, NumberFormat nf, Style style) {
-        out << sep
         out << nf.format(value)
         out << sep
     }
 
     @Override
     void visitRowField(Date value, DateFormat df, Style style) {
-        out << sep
         out << df.format(value)
         out << sep
     }

@@ -14,10 +14,12 @@ import web.dom.Node
 import web.dom.document
 import web.encoding.TextDecoder
 import web.events.EventHandler
+import web.form.FormData
 import web.html.*
 import web.keyboard.KeyCode
 import web.selection.Selection
 import web.window.window
+import web.xhr.XMLHttpRequest
 import kotlin.io.encoding.Base64
 
 class MainContentEditable(
@@ -218,9 +220,15 @@ class MainContentEditable(
             println("ondrop")
             e.dataTransfer?.files?.length?.let {
                 if (it > 0) {
+                    val fd = FormData()
                     for (f in e.dataTransfer!!.files) {
                         println("f: $f")
+                        println("f: ${f.name}")
+
+                        fd.append("theFiles", f)
                     }
+                    val xhr = XMLHttpRequest()
+//                    xhr.open("POST", "http://www.w3.org/1999/xhr")
                     e.preventDefault()
                     e.stopPropagation()
                 }

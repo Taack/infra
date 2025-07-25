@@ -210,14 +210,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         log.info "constrainedProperties: ${c2 - c1}ms, bindingName: ${c3 - c2}ms, gormEntity.hasChanged: ${c4 - c3}ms, save: ${c5 - c4}ms: ELAPSED:${c5 - c1}ms"
 
-        if (!doNotSave) {
-            if (gormEntity.hasErrors()) {
-                log.error "${gormEntity.errors}"
-            } else if ((!(gormEntity instanceof IDomainHistory) && !id) || (gormEntity instanceof IDomainHistory && !doNotBindParams)) {
-                TaackGormClassRegisterService.getTaackGormClass(gormEntity.class.name)?.notification?.getRecipientsClosure()?.call(gormEntity.ident())?.each { TaackUser u ->
-                    u.addToUnreadRelatedDataList(gormEntity)
-                }
-            }
+        if (!doNotSave && gormEntity.hasErrors()) {
+            log.error "${gormEntity.errors}"
         }
         return gormEntity
     }

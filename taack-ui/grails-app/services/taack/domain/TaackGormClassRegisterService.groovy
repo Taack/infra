@@ -21,7 +21,6 @@ import taack.user.TaackUser
  * @attribute showMethod The action to show when clicking on the object. The access control should be managed from there
  * @attribute showLabel The closure to define the displayed label of this object
  * @attribute typeLabel The closure to define the displayed label of the type of this object
- * @attribute notification The notification to send to certain users when a new object is created
  */
 @CompileStatic
 final class TaackGormClass {
@@ -29,34 +28,9 @@ final class TaackGormClass {
     MethodClosure showMethod
     Closure<String> showLabel
     Closure<String> typeLabel
-    TaackNotification notification
 
     TaackGormClass(Class<? extends GormEntity> c) {
         this.gormClass = c
-    }
-
-    /**
-     * Define the details of the notification when a new object is created
-     *
-     * @attribute recipients The closure to define the users who should receive the notification
-     * @attribute title The closure to define the title/groupName of the notification
-     */
-    final class TaackNotification {
-        final private Closure<List<TaackUser>> recipients
-        final private Closure<String> title
-
-        TaackNotification(Closure<List<TaackUser>> recipients, Closure<String> title) {
-            this.recipients = recipients
-            this.title = title
-        }
-
-        Closure<List<TaackUser>> getRecipientsClosure() {
-            recipients
-        }
-
-        Closure<String> getTitleClosure() {
-            title
-        }
     }
 
     /**
@@ -79,14 +53,13 @@ final class TaackGormClass {
             this
         }
 
-        TaackGormClassBuilder setShowLabel(Closure<String> showLabel, Closure<String> typeLabel = null) {
+        TaackGormClassBuilder setShowLabel(Closure<String> showLabel) {
             taackGormClass.showLabel = showLabel
-            taackGormClass.typeLabel = typeLabel
             this
         }
 
-        TaackGormClassBuilder setNotification(Closure recipients, Closure title) {
-            taackGormClass.notification = new TaackNotification(recipients, title)
+        TaackGormClassBuilder setTypeLabel(Closure<String> typeLabel) {
+            taackGormClass.typeLabel = typeLabel
             this
         }
 
@@ -125,21 +98,21 @@ class TaackGormClassRegisterService {
         }
     }
 
-    static void registerShowLabel(Class<? extends GormEntity> gormClass, Closure<String> showLabel, Closure<String> typeLabel = null) {
+    static void registerShowLabel(Class<? extends GormEntity> gormClass, Closure<String> showLabel) {
         TaackGormClass c = getTaackGormClass(gormClass.name)
         if (!c) {
-            taackGormClasses.add(new TaackGormClass(gormClass).builder.setShowLabel(showLabel, typeLabel).build())
+            taackGormClasses.add(new TaackGormClass(gormClass).builder.setShowLabel(showLabel).build())
         } else {
             c.builder.setShowLabel(showLabel)
         }
     }
 
-    static void registerNotification(Class<? extends GormEntity> gormClass, Closure<List<TaackUser>> recipients, Closure<String> title) {
+    static void registerTypeLabel(Class<? extends GormEntity> gormClass, Closure<String> typeLabel) {
         TaackGormClass c = getTaackGormClass(gormClass.name)
         if (!c) {
-            taackGormClasses.add(new TaackGormClass(gormClass).builder.setNotification(recipients, title).build())
+            taackGormClasses.add(new TaackGormClass(gormClass).builder.setTypeLabel(typeLabel).build())
         } else {
-            c.builder.setNotification(recipients, title)
+            c.builder.setTypeLabel(typeLabel)
         }
     }
 

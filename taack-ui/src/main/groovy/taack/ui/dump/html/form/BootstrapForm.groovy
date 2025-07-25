@@ -48,9 +48,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
     }
 
-    private IHTMLElement themeStartInputs(IHTMLElement topElement) {
+    private IHTMLElement themeStartInputs(IHTMLElement topElement, boolean localFloating = true) {
         IHTMLElement ret = topElement
-        if (floating) {
+        if (floating && localFloating) {
             ret = new HTMLDiv().builder.addClasses('form-floating', 'mb-1').build() as IHTMLElement
             topElement.builder.addChildren(ret)
         }
@@ -293,7 +293,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement textareaInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value, EditorOption editorOption = null) {
-        IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = themeStartInputs(topElement, editorOption == null)
         HTMLElementBuilder inputBuilder = new HTMLTextarea(value, qualifiedName, null, disable).builder
                 .addClasses(formControl).setId(qualifiedName)
         if (editorOption) inputBuilder.putAttribute('editorOption', editorOption.compress())

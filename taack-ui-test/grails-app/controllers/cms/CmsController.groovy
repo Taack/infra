@@ -10,6 +10,7 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
+import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
 import taack.domain.TaackAttachmentService
@@ -28,7 +29,6 @@ import taack.ui.dsl.common.Style
 import taack.ui.dsl.form.editor.Asciidoc
 import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dsl.form.editor.SpanRegex
-import taack.ui.dsl.form.editor.TaackMarkdown
 
 import static grails.async.Promises.task
 /*
@@ -158,7 +158,11 @@ class CmsController implements WebAttributes {
                         tabLabel "${language.label}", {
                             fieldFromMap cmsPage.title_, language.toString().toLowerCase()
                             fieldFromMap cmsPage.hatContent_, language.toString().toLowerCase()
-                            fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), EditorOption.getBuilder().addSpanRegexes(TaackMarkdown.spans).build()
+
+                            EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
+                            editor.addSpanRegexes(Asciidoc.spans)
+                            editor.uploadFileAction(CmsController.&dropFileEditor as MethodClosure, [id: cmsPage.id, l: language.toString()])
+                            fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
                     }
@@ -307,6 +311,10 @@ class CmsController implements WebAttributes {
                 }
             }
         }
+    }
+
+    def dropFileEditor() {
+        println "dropFileEditor $params"
     }
 
     @Transactional

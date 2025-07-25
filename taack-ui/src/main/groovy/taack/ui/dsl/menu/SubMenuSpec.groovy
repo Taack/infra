@@ -1,12 +1,17 @@
 package taack.ui.dsl.menu
 
+import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.render.TaackUiEnablerService
+import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.helper.Utils
 
 @CompileStatic
 final class SubMenuSpec {
     final IUiMenuVisitor menuVisitor
+
+    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
 
     SubMenuSpec(final IUiMenuVisitor menuVisitor) {
         this.menuVisitor = menuVisitor
@@ -19,7 +24,7 @@ final class SubMenuSpec {
      * @param params
      */
     void subMenu(String i18n, final MethodClosure action, final Map<String, ? extends Object> params = null) {
-        menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
     }
 
     /**
@@ -28,7 +33,11 @@ final class SubMenuSpec {
      * @param params
      */
     void subMenu(final MethodClosure action, final Map<String, ? extends Object> params = null) {
-        menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method, params)
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method, params)
+    }
+
+    void subMenuIcon(final ActionIcon icon, final MethodClosure action, Map<String, ? extends Object> params) {
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
     }
 
     /**
