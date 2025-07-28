@@ -7,7 +7,7 @@ import jakarta.annotation.PostConstruct
 import org.apache.solr.client.solrj.SolrClient
 import org.apache.solr.client.solrj.SolrQuery
 import org.apache.solr.client.solrj.SolrRequest
-import org.apache.solr.client.solrj.impl.Http2SolrClient
+import org.apache.solr.client.solrj.impl.HttpJdkSolrClient
 import org.apache.solr.client.solrj.request.schema.AnalyzerDefinition
 import org.apache.solr.client.solrj.request.schema.FieldTypeDefinition
 import org.apache.solr.client.solrj.request.schema.SchemaRequest
@@ -36,8 +36,6 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 
-
-
 @GrailsCompileStatic
 final class TaackSolrSearchService implements WebAttributes {
 
@@ -50,7 +48,7 @@ final class TaackSolrSearchService implements WebAttributes {
 
     @PostConstruct
     void init() {
-        solrClient = new Http2SolrClient.Builder(taackUiConfiguration.solrUrl).build()
+        solrClient = new HttpJdkSolrClient.Builder(taackUiConfiguration.solrUrl).build()
     }
 
     final UiBlockSpecifier search(String q, MC search, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, Class<? extends GormEntity>... classes) {
