@@ -154,8 +154,8 @@ grails:
                 - # Stateless chain
                   pattern: /contact
                   filters: JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter
-                - pattern: /root/*
-                  filters: JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter
+#                - pattern: /root/*
+#                  filters: JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter
                 - # Traditional Chain
                   pattern: /**
                   filters: JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter
