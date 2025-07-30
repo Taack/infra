@@ -33,12 +33,28 @@ class MainContentEditable(
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
 
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
+    private var currentContext: Span? = null
+
+    enum class SpanMode {
+        INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, META;
+
+        companion object {
+            fun from(v: String): SpanMode {
+                if (v == "INLINED") return INLINED
+                else if (v == "CONTEXT_START") return CONTEXT_START
+                else if (v == "CONTEXT_END") return CONTEXT_END
+                else if (v == "START") return START
+                else if (v == "INLINED_BREAK") return INLINED_BREAK
+                else return META
+            }
+        }
+    }
 
     data class Span(
-        val pattern: String, val className: String, val inlined: Boolean, val delimiter: Boolean = false
+        val pattern: String, val className: String, val inlined: SpanMode
     )
-    
-    val styles: MutableList<Span> = mutableListOf()
+
+    val styles: MutableMap<Span?, MutableList<Span>> = mutableMapOf()
 
     var focus: Int? = 0
     var currentLine: HTMLDivElement? = currentLineComputed
@@ -287,27 +303,43 @@ class MainContentEditable(
             e.innerHTML = "<br>"
             return
         }
+
         if (txt != null) {
             var hasStart: Span? = null
             var inlineMatchSequence: List<Pair<Span, MatchResult>> =
                 mutableListOf<Pair<Span, MatchResult>>()
-            for (entry in styles) {
-                if (!entry.inlined && hasStart == null) {
+
+            println("asciidocToHtml (currentContext: $currentContext): $txt")
+
+            var entries = styles[currentContext]!!
+
+            for (entry in entries) {
+                if (entry.inlined == SpanMode.START && hasStart == null) {
                     if (txt.startsWith(entry.pattern)) {
                         hasStart = entry
                     }
-                } else if (entry.inlined) {
+                } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
                     val pattern = entry.pattern
                     val regex = Regex(pattern)
                     if (regex.containsMatchIn(txt)) {
                         for (s in regex.findAll(txt)) {
                             inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
                         }
+                        if (entry.inlined == SpanMode.INLINED_BREAK) break
+                        if (entry.inlined == SpanMode.CONTEXT_START && currentContext == null) {
+                            currentContext = entry
+                            break
+                        } else if (entry.inlined == SpanMode.CONTEXT_END && currentContext != null) {
+                            currentContext = null
+                            break
+                        }
                     }
                 }
             }
             var result = ""
             val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
+
+            println("Sorted: $sorted")
 
             var i = 0
             for (c in sorted) {
@@ -390,6 +422,9 @@ class MainContentEditable(
             val decoder = TextDecoder()
             val str = decoder.decode(arrayBuffer as AllowSharedBufferSource)
             println(str)//arrayBuffer.unsafeCast<String>())
+
+            var currentContext: Span? = null
+
             for (line in str.lines()) {
                 if (line.startsWith("§§")) {
                     var pos1 = 2
@@ -400,16 +435,25 @@ class MainContentEditable(
                     val pattern = line.substring(pos1, pos2)
                     pos1 = pos2
                     pos2 = line.indexOf("§", ++pos1)
-                    val inlined = line.substring(pos1, pos2) == "true"
-                    pos1 = pos2
-                    pos2 = line.indexOf("§", ++pos1)
-                    val delimiter = line.substring(pos1, pos2) == "true"
-                    println("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
-                    styles.add(Span(pattern, cn, inlined, delimiter))
+                    val inlined = SpanMode.from(line.substring(pos1, pos2))
+                    println("cn: $cn, pattern: $pattern, inline: $inlined")
+
+                    val s = Span(pattern, cn, inlined)
+
+                    var l = styles[currentContext]
+                    if (l == null) {
+                        l = mutableListOf()
+                    }
+                    l.add(s)
+                    styles[currentContext] = l
+                    if (s.inlined == SpanMode.CONTEXT_START) currentContext = s
+                    if (s.inlined == SpanMode.CONTEXT_END) currentContext = null
                 } else {
 
                 }
             }
+
+            println("styles: $styles")
 
             if (text.textContent?.length == 0) {
                 text.textContent = "\n"
