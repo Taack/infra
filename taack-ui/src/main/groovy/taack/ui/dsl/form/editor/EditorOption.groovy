@@ -81,10 +81,11 @@ enum TaackAsciidoc {
 
 @CompileStatic
 enum TaackAsciidocTable {
-    TABLE_DELIM_START(new SpanRegex("^()(\\\\|===)()\$", "asciidoc-table-begin", SpanRegex.Mode.CONTEXT_START)),
-    CELL(new SpanRegex("^()(\\\\|[^|=][^|]*)()\$", "asciidoc-table-cell", SpanRegex.Mode.INLINED_BREAK)),
-    HEADER_INLINE(new SpanRegex("^()(\\\\|[^|=].*)()\$", "asciidoc-table-header", SpanRegex.Mode.INLINED)),
-    TABLE_DELIM_END(new SpanRegex("^()(\\\\|===)()\$", "asciidoc-table-end", SpanRegex.Mode.CONTEXT_END))
+    TABLE_DELIM_START(new SpanRegex("^()(\\\\|===)()\$", "asciidoc-table-sep", SpanRegex.Mode.CONTEXT_START)),
+    CELL_SEP(new SpanRegex("()(\\\\|)([^=])", "asciidoc-table-cell-sep", SpanRegex.Mode.INLINED)),
+    TABLE_DELIM_END(new SpanRegex("^()(\\\\|===)()\$", "asciidoc-table-sep", SpanRegex.Mode.CONTEXT_END))
+//    CELL(new SpanRegex("^()(\\\\|[^|=][^|]*)()\$", "asciidoc-table-cell", SpanRegex.Mode.INLINED_BREAK)),
+//    HEADER_INLINE(new SpanRegex("^()(\\\\|[^|=].*)()\$", "asciidoc-table-header", SpanRegex.Mode.INLINED)),
 
     TaackAsciidocTable(SpanRegex span) {
         this.span = span

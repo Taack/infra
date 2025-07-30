@@ -58,12 +58,14 @@
 .cm-editor .asciidoc-line-through {text-decoration: line-through;}
 .cm-editor .asciidoc-url {color: blue;}
 .cm-editor .asciidoc-meta {color: grey;font-weight: bold;}
-.cm-editor .asciidoc-title {color: #900;font-weight: bold;}
+.cm-editor .asciidoc-title {color: #900;font-style: italic;}
 .cm-editor .asciidoc-bullet1 {color: #990073;}
 .cm-editor .asciidoc-bullet2 {color: #990073;}
 .cm-editor .asciidoc-bullet3 {color: #990073;}
 .cm-editor .asciidoc-image {color: #990073;font-weight: bold;}
 .cm-editor .asciidoc-inline-image {color: #990073;font-weight: bold;font-style: italic;}
+.cm-editor .asciidoc-table-sep {color: #6bab82;font-weight: bold;}
+.cm-editor .asciidoc-table-cell-sep {color: #6bab82;}
 
 .cm-editor [contenteditable="true"] {
     caret-color: red;
