@@ -73,7 +73,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : '') : ''
         blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(
-                formThemed.builder.addClasses('row', 'taackForm').addChildren(
+                formThemed.builder.addClasses('taackForm').addChildren(
                         new HTMLInput(InputType.HIDDEN, id, 'id'),
                         new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),

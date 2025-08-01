@@ -81,7 +81,7 @@ class BootstrapLayout {
     }
 
     static IHTMLElement row(IHTMLElement topElement) {
-        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('row', 'g-2').build())
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('row', 'gx-2').build())
         topElement.children.last()
     }
 

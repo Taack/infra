@@ -112,6 +112,10 @@ form .bootstrap legend {
     font-size: small;
 }
 
+form.taackForm legend {
+    margin-top: 1rem;
+}
+
 .grid-title {
     line-height: 48px;
     /* text-align: center; */
