@@ -105,6 +105,7 @@ class Modal(val parent: Block) : BaseElement {
         traceDeIndent("Modal::close $mId")
         dModal.style.display = "none"
         dModalBody.innerHTML = ""
+        if (dModalBody.nextElementSibling != null) dModalBody.nextElementSibling!!.remove()
         document.removeEventListener("keydown", escModalCallback)
         document.body!!.classList.remove("modal-open")
         document.body!!.style.removeProperty("padding-right")
