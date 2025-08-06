@@ -2,6 +2,7 @@ package taack.ui.base.leaf
 
 import js.array.asList
 import taack.ui.base.Helper
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.Form
@@ -64,6 +65,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         }
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
+            checkLogin(xhr)
             val t = xhr.responseText
             parent.parent.d.innerHTML = t
             parent.parent.refresh()

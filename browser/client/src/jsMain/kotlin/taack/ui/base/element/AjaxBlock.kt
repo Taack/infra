@@ -3,6 +3,7 @@ package taack.ui.base.element
 import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.leaf.ActionLink
 import taack.ui.base.leaf.AnchorHref
 import taack.ui.base.leaf.ContextualLink
@@ -51,6 +52,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.trace("AjaxBlock::onPoll")
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
+            checkLogin(xhr)
             Helper.processAjaxLink(null, xhr.responseText, parent)
         }
         xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true", true)

@@ -2,6 +2,7 @@ package taack.ui.base.leaf
 
 import js.array.asList
 import taack.ui.base.Helper
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
@@ -66,6 +67,7 @@ class TableGroupableColumn(private val parent: Table, s: HTMLSpanElement) : Leaf
         fd.append("isAjax", "true")
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
+            checkLogin(xhr)
             Helper.mapAjaxBlock(xhr.responseText).map { me ->
                 parent.parent.d.innerHTML = me.value
             }

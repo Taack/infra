@@ -1,6 +1,7 @@
 package taack.ui.base.leaf
 
 import js.array.asList
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
@@ -52,6 +53,7 @@ class TableMultiSelectButton(private val parent: Table, private val b: HTMLButto
                 xhr.responseType = XMLHttpRequestResponseType.blob
             }
             xhr.onloadend = EventHandler {
+                checkLogin(xhr)
                 if (xhr.responseType == XMLHttpRequestResponseType.blob) {
                     val contentDispo = xhr.getResponseHeader("Content-Disposition")
                     if (contentDispo != null) {

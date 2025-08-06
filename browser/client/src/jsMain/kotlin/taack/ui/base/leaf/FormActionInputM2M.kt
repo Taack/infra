@@ -3,6 +3,7 @@ package taack.ui.base.leaf
 import js.array.asList
 import taack.ui.base.CloseModalPostProcessing2
 import taack.ui.base.Helper
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.ModalCloseProcessing
@@ -60,6 +61,7 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
 
         xhr.onloadend = EventHandler {
+            checkLogin(xhr)
             val callback: CloseModalPostProcessing2 = { idValueMap, otherField ->
                 modalReturnSelect(idValueMap, otherField)
             }

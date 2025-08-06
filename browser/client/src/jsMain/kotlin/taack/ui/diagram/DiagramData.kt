@@ -1,6 +1,7 @@
 package taack.ui.diagram
 
 import js.array.asList
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -174,6 +175,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         val xhr = XMLHttpRequest()
 
         xhr.onloadend = EventHandler { ev ->
+            checkLogin(xhr)
             ev.preventDefault()
             trace("DiagramData::onClickShape: Load End, action: $action responseType: '${xhr.responseType}'")
             loader?.classList?.add(ClassName("tck-hidden"))

@@ -3,6 +3,7 @@ package taack.ui.base.leaf
 import js.array.asList
 import js.uri.encodeURIComponent
 import kotlinx.browser.window
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
@@ -106,6 +107,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
             val xhr = XMLHttpRequest()
             xhr.open(RequestMethod.GET, "/taackContextMenu/index?className=$className&fieldName=$fieldName&id=$id", true)
             xhr.onload = EventHandler {
+                checkLogin(xhr)
                 if (xhr.status == 200.toShort()) {
                     val parser = DOMParser()
                     val response = parser.parseFromString(xhr.responseText, DOMParserSupportedType.textHtml)

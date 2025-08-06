@@ -3,6 +3,7 @@ package taack.ui.base.leaf
 import js.array.asList
 import taack.ui.base.CloseModalPostProcessing
 import taack.ui.base.Helper
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
 import taack.ui.base.ModalCloseProcessing
@@ -55,6 +56,7 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         // TODO: change to Post (see FilterActionButton.kt)
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
+            checkLogin(xhr)
             val callback: CloseModalPostProcessing = { key, value, otherField ->
                 modalReturnSelect(key, value, otherField)
             }

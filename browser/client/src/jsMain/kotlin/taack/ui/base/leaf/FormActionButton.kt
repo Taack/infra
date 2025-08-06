@@ -8,6 +8,7 @@ import taack.ui.base.LeafElement
 import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import kotlinx.browser.document
+import taack.ui.base.Helper.Companion.checkLogin
 import web.events.Event
 import web.events.EventHandler
 import web.form.FormData
@@ -62,6 +63,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         }
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
+            checkLogin(xhr)
             b.disabled = false
             b.innerText = innerText
             val t = xhr.responseText

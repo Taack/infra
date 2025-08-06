@@ -1,6 +1,7 @@
 package taack.ui.base.leaf
 
 import taack.ui.base.BaseElement
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
@@ -72,6 +73,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
 
         xhr.onloadend = EventHandler { ev ->
             trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}' status: '${xhr.status}'")
+            checkLogin(xhr)
             if (xhr.status == 200.toShort()) {
                 ev.preventDefault()
                 loader?.classList?.add(ClassName("tck-hidden"))

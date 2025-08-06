@@ -2,6 +2,7 @@ package taack.ui.base.leaf
 
 import js.array.asList
 import taack.ui.base.BaseElement
+import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
@@ -50,6 +51,7 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
             fd.set("tabId", tabId)
             val xhr = XMLHttpRequest()
             xhr.onloadend = EventHandler {
+                checkLogin(xhr)
                 // Make new parser to parse xhr.responseText
                 val parser = DOMParser()
                 // Parse to a DOM document to allow query selection

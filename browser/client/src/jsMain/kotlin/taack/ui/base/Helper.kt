@@ -120,6 +120,7 @@ class Helper {
             val xhr = XMLHttpRequest()
             xhr.onloadend = EventHandler {
                 //Filter used saved to historyState
+                checkLogin(xhr)
                 historyState = fd.entries().asSequence().map { it: Tuple2<String, Any> ->
                     it.component1() to it.component2()
                 }.toMap() as HashMap<String, FormDataEntryValue>
@@ -323,5 +324,11 @@ class Helper {
             }
         }
 
+        fun checkLogin(xhr: XMLHttpRequest) {
+            if (xhr.status == 401.toShort()) {
+                location.href = (Block.href ?: "")
+                throw Error("Not authenticated")
+            }
+        }
     }
 }
