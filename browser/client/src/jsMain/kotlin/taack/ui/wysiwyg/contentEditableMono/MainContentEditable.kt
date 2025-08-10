@@ -1,6 +1,7 @@
 package taack.ui.wysiwyg.contentEditableMono
 
 import js.buffer.AllowSharedBufferSource
+import js.date.Date
 import js.iterable.iterator
 import js.typedarrays.toUint8Array
 import org.w3c.dom.HTMLBRElement
@@ -26,8 +27,8 @@ class MainContentEditable(
     internal val text: HTMLTextAreaElement,
     private val divHolder: HTMLDivElement,
 ) {
-
     private var line = 0
+    private var rescanContent = false
     private val divAutocomplete = document.createElement("div") as HTMLDivElement
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
@@ -59,6 +60,13 @@ class MainContentEditable(
     var selectedElement: Node? = null
     var position = 0
 
+    private var timeMs = Date.now()
+
+    fun trace(str: String) {
+        val t = Date.now()
+        println("${t - timeMs} $str")
+        timeMs = t
+    }
 
     fun initSelection() {
         val winSelection = window.getSelection()
@@ -66,8 +74,8 @@ class MainContentEditable(
         focus = selection?.focusOffset
         selectedElement = selection?.focusNode
 
-        println("selection: $selection, currentLine: $currentLine (${currentLine?.className} ${currentLine?.innerHTML})")
-        println("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}, focus: $focus")
+        trace("selection: $selection, currentLine: $currentLine (${currentLine?.className} ${currentLine?.innerHTML})")
+        trace("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}, focus: $focus")
 
         // position in chars in parent container
         currentLine = currentLineComputed
@@ -78,14 +86,14 @@ class MainContentEditable(
 
                 if (child == selectedElement || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
                     position += focus ?: 0
-                    println("child == selectedElement $focus $position $child ${child is HTMLBRElement}")
+                    trace("child == selectedElement $focus $position $child ${child is HTMLBRElement}")
                     break
                 } else if (child is HTMLSpanElement) {
                     position += child.textContent?.length ?: 0
                 }
             }
         } else position = focus ?: 0
-        println("position: $position")
+        trace("position: $position")
     }
 
     fun autocomplete(e: HTMLDivElement?) {
@@ -109,7 +117,7 @@ class MainContentEditable(
                 val scrollTop = document.body.getBoundingClientRect().top
                 val bottomVisible = visibleElement.getBoundingClientRect().bottom
                 val topVisible = visibleElement.getBoundingClientRect().top
-                println("topVisible: $topVisible, bottomVisible: $bottomVisible, position: $position, top: $top, left: $left")
+                trace("topVisible: $topVisible, bottomVisible: $bottomVisible, position: $position, top: $top, left: $left")
                 if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
                     divAutocomplete.style.left = "${left + position * 10}px"
                     divAutocomplete.style.top = "${top - scrollTop + 19}px"
@@ -139,11 +147,11 @@ class MainContentEditable(
     }
 
     fun repairSelection() {
-        println("repairSelection currentLine: $currentLine (${currentLine?.textContent}), ${currentLine?.childElementCount}, ${currentLine?.childNodes?.length}")
+        trace("repairSelection currentLine: $currentLine (${currentLine?.textContent}), ${currentLine?.childElementCount}, ${currentLine?.childNodes?.length}")
         if (currentLine != null) {
             var currentPosition = 0
             for (child in currentLine!!.childNodes.iterator()) {
-                println("child: $child (${child.textContent})")
+                trace("child: $child (${child.textContent})")
 
                 val childLength = child.textContent?.length
 
@@ -208,22 +216,24 @@ class MainContentEditable(
             e.clipboardData?.files?.length?.let {
                 if (it > 0) {
                     for (f in e.clipboardData!!.files) {
-                        println("f: $f")
+                        trace("f: $f")
                     }
                     e.preventDefault()
                     e.stopPropagation()
                 }
             }
+            trace("divContent.onpaste $e ${e.target} ${e.clipboardData?.items}")
+            rescanContent = true
         }
 
         divContent.ondrop = EventHandler { e ->
-            println("ondrop")
+            trace("ondrop")
             e.dataTransfer?.files?.length?.let {
                 if (it > 0) {
                     val fd = FormData()
                     for (f in e.dataTransfer!!.files) {
-                        println("f: $f")
-                        println("f: ${f.name}")
+                        trace("f: $f")
+                        trace("f: ${f.name}")
 
                         fd.append("theFiles", f)
                     }
@@ -240,14 +250,20 @@ class MainContentEditable(
         }
 
         divContent.onkeydown = EventHandler { event ->
-            println("event.code: ${event.code}, event.ctrlKey: ${event.ctrlKey}")
+            trace("event.code: ${event.code}, event.ctrlKey: ${event.ctrlKey}")
             if (event.code == "Space" as KeyCode && event.ctrlKey) {
-                println("autocomplete ...")
+                trace("autocomplete ...")
                 autocomplete(currentLine)
                 event.preventDefault()
                 event.stopPropagation()
                 return@EventHandler
+            } else if (event.code == "KeyV" as KeyCode && event.ctrlKey) {
+                trace("past something ...")
+//                event.preventDefault()
+//                event.stopPropagation()
+                return@EventHandler
             }
+            trace("event.code: ${event.code} ends")
         }
 
         divContent.onkeyup = EventHandler { event ->
@@ -263,7 +279,7 @@ class MainContentEditable(
 
                 if (e != null) {
                     if (e is HTMLSpanElement) {
-                        println("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
+                        trace("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
                         if (range?.commonAncestorContainer?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.innerHTML =
                             "<br>"
                         else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.parentElement?.innerHTML =
@@ -273,15 +289,28 @@ class MainContentEditable(
 
                 return@EventHandler
             }
+
             text.textContent = ""
+            var txtToSave = ""
+            trace("textContent empty")
             for (c in divContent.children.iterator()) {
-                asciidocToHtml(c as HTMLDivElement)
-                text.textContent += c.textContent + "\n"
+                if (currentLine == null || currentLine == c) {
+                    asciidocToHtml(c as HTMLDivElement)
+                }
+                txtToSave += c.textContent + "\n"
+            }
+            text.textContent = txtToSave
+            trace("textContent full")
+
+            if (rescanContent) {
+                rescanTextarea()
+                rescanContent = false
             }
         }
     }
 
     fun asciidocToHtml(e: HTMLDivElement) {
+        trace("asciidocToHtml +++")
         val txt = e.textContent
         if (txt?.isEmpty() == true) {
             e.innerHTML = "<br>"
@@ -328,14 +357,16 @@ class MainContentEditable(
             }
 
             if (e.innerHTML != result) {
-                println("selection?.focusOffset: ${selection?.focusOffset}")
-                println("selection?.focusNode: ${selection?.focusNode}")
+                trace("selection?.focusOffset: ${selection?.focusOffset} ${e.innerHTML}||${result}")
+                trace("selection?.focusNode: ${selection?.focusNode}")
 
 
                 e.innerHTML = result
-                repairSelection()
+                if (!rescanContent)
+                    repairSelection()
             }
         }
+        trace("asciidocToHtml ---")
     }
 
     fun createCmdLine(s: String?, index: Int): HTMLDivElement? {
@@ -366,7 +397,7 @@ class MainContentEditable(
 
             cmd.innerHTML = s
             cmd.onchange = EventHandler { event ->
-                println("onchange")
+                trace("onchange")
             }
             if (index == 0) divContent.appendChild(cmd)
             else divContent.insertBefore(divContent.children[index], cmd)
@@ -378,8 +409,6 @@ class MainContentEditable(
     fun decompress(str: String) {
         val b = Base64.decode(str)
         val uint8Array = b.toUint8Array()
-        println(uint8Array.length)
-        println(b.size)
         val ds = DecompressionStream(CompressionFormat.deflate)
         val writer = ds.writable.getWriter()
         writer.writeAsync(uint8Array)
@@ -389,7 +418,7 @@ class MainContentEditable(
         res.then { arrayBuffer ->
             val decoder = TextDecoder()
             val str = decoder.decode(arrayBuffer as AllowSharedBufferSource)
-            println(str)//arrayBuffer.unsafeCast<String>())
+            trace(str)//arrayBuffer.unsafeCast<String>())
             for (line in str.lines()) {
                 if (line.startsWith("§§")) {
                     var pos1 = 2
@@ -404,21 +433,27 @@ class MainContentEditable(
                     pos1 = pos2
                     pos2 = line.indexOf("§", ++pos1)
                     val delimiter = line.substring(pos1, pos2) == "true"
-                    println("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
+                    trace("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
                     styles.add(Span(pattern, cn, inlined, delimiter))
                 } else {
 
                 }
             }
 
-            if (text.textContent?.length == 0) {
-                text.textContent = "\n"
-            }
+            rescanTextarea()        }
+    }
 
-            text.textContent?.split("\n")?.forEach {
-                if (it.isNotEmpty()) asciidocToHtml(createCmdLine(it, 0)!!)
-                else createCmdLine("<br>", 0)
-            }
+    fun rescanTextarea() {
+        trace("rescanTextarea")
+        divContent.innerHTML = ""
+        if (text.textContent?.length == 0) {
+            text.textContent = "\n"
         }
+
+        text.textContent?.split("\n")?.forEach {
+            if (it.isNotEmpty()) asciidocToHtml(createCmdLine(it, 0)!!)
+            else createCmdLine("<br>", 0)
+        }
+
     }
 }
