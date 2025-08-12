@@ -17,6 +17,8 @@ import web.encoding.TextDecoder
 import web.events.EventHandler
 import web.form.FormData
 import web.html.*
+import web.http.POST
+import web.http.RequestMethod
 import web.keyboard.KeyCode
 import web.selection.Selection
 import web.window.window
@@ -38,7 +40,9 @@ class MainContentEditable(
     data class Span(
         val pattern: String, val className: String, val inlined: Boolean, val delimiter: Boolean = false
     )
-    
+
+    private var upLoadUrl: String? = null
+
     val styles: MutableList<Span> = mutableListOf()
 
     var focus: Int? = 0
@@ -228,17 +232,23 @@ class MainContentEditable(
 
         divContent.ondrop = EventHandler { e ->
             trace("ondrop")
-            e.dataTransfer?.files?.length?.let {
+            if (upLoadUrl != null) e.dataTransfer?.files?.length?.let {
                 if (it > 0) {
                     val fd = FormData()
                     for (f in e.dataTransfer!!.files) {
                         trace("f: $f")
                         trace("f: ${f.name}")
 
-                        fd.append("theFiles", f)
+                        fd.append("filePath", f)
                     }
                     val xhr = XMLHttpRequest()
-//                    xhr.open("POST", "http://www.w3.org/1999/xhr")
+                    xhr.onloadend = EventHandler {
+                        if (currentLine != null) {
+                            currentLine?.innerText += xhr.responseText
+                        }
+                    }
+                    xhr.open(RequestMethod.POST, upLoadUrl!!)
+                    xhr.send(fd)
                     e.preventDefault()
                     e.stopPropagation()
                 }
@@ -318,8 +328,7 @@ class MainContentEditable(
         }
         if (txt != null) {
             var hasStart: Span? = null
-            var inlineMatchSequence: List<Pair<Span, MatchResult>> =
-                mutableListOf<Pair<Span, MatchResult>>()
+            var inlineMatchSequence: List<Pair<Span, MatchResult>> = mutableListOf<Pair<Span, MatchResult>>()
             for (entry in styles) {
                 if (!entry.inlined && hasStart == null) {
                     if (txt.startsWith(entry.pattern)) {
@@ -362,8 +371,7 @@ class MainContentEditable(
 
 
                 e.innerHTML = result
-                if (!rescanContent)
-                    repairSelection()
+                if (!rescanContent) repairSelection()
             }
         }
         trace("asciidocToHtml ---")
@@ -435,12 +443,13 @@ class MainContentEditable(
                     val delimiter = line.substring(pos1, pos2) == "true"
                     trace("cn: $cn, pattern: $pattern, inline: $inlined, delimiter: $delimiter")
                     styles.add(Span(pattern, cn, inlined, delimiter))
-                } else {
-
+                } else if (line.isNotEmpty()) {
+                    upLoadUrl = line
                 }
             }
 
-            rescanTextarea()        }
+            rescanTextarea()
+        }
     }
 
     fun rescanTextarea() {

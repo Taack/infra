@@ -127,3 +127,4 @@
 * More Secured TQL
 * inlineForms custom in show and tables (row or cells)
 * PoC form PDF …
+* Collapsable forms

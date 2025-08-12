@@ -1,6 +1,8 @@
 package cms
 
 import attachment.Attachment
+import attachment.DocumentAccess
+import attachment.DocumentCategory
 import cms.config.CmsSubsidiary
 import crew.User
 import crew.config.SupportedLanguage
@@ -161,7 +163,7 @@ class CmsController implements WebAttributes {
 
                             EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
                             editor.addSpanRegexes(Asciidoc.spans)
-                            editor.uploadFileAction(CmsController.&dropFileEditor as MethodClosure, [id: cmsPage.id, l: language.toString()])
+                            editor.uploadFileAction(CmsController.&dropFileEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
                             fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
@@ -313,8 +315,15 @@ class CmsController implements WebAttributes {
         }
     }
 
+    @Transactional
     def dropFileEditor() {
-        println "dropFileEditor $params"
+        CmsPage page = CmsPage.get(params.long('cmsPage'))
+        params.remove('cmsPage')
+        CmsImage cmsImage = taackSaveService.save(CmsImage)
+        if (cmsImage && page) {
+            cmsImage.cmsPage = page
+        }
+        render "image::${cmsImage.originalName}[]"
     }
 
     @Transactional
@@ -519,12 +528,17 @@ class CmsController implements WebAttributes {
     }
 
     def downloadBinBodyContentFiles(CmsPage page, String path) {
-        Attachment a = page.bodyContentAttachmentList.find {
-            it.originalName == path
-        }
+        CmsImage cmsImage = CmsImage.findByCmsPageAndOriginalName(page, path.substring(1))
 
-        if (a) {
-            taackAttachmentService.downloadAttachment(a)
+        if (cmsImage) {
+            File f = new File(cmsFileRoot + '/' + cmsImage.filePath)
+            if (f.exists()) {
+                response.setContentType(cmsImage.contentType)
+                response.setHeader('Content-disposition', "attachment;filename=${URLEncoder.encode(cmsImage.originalName, 'UTF-8')}")
+                response.outputStream << f.bytes
+            } else {
+                log.error "No file: ${f.path}"
+            }
         }
         return false
     }

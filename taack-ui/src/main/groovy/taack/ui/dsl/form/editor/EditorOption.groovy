@@ -164,7 +164,7 @@ final class EditorOption {
     }
 
     String serializeString() {
-        "${uploadFileAction ? Utils.getControllerName(uploadFileAction) + '/' + uploadFileAction.method : ''}${uploadFileActionParams ? '?' + Utils.paramsString(uploadFileActionParams): ''}\n\n${Asciidoc.serializeString(spanRegexes)}"
+        "${uploadFileAction ? '/' + Utils.getControllerName(uploadFileAction) + '/' + uploadFileAction.method : ''}${uploadFileActionParams ? '?' + Utils.paramsString(uploadFileActionParams): ''}\n\n${Asciidoc.serializeString(spanRegexes)}"
     }
 
     String compress() {
