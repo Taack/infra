@@ -489,8 +489,6 @@ final class TaackFilter<T extends GormEntity<T>> {
                             where << ("$aliasKey >= '${DateFormat.format(dates.aValue, 'yyyy-MM-dd')}'" as String)
                         if (dates.bValue)
                             where << ("$aliasKey < '${DateFormat.format(dates.bValue, 'yyyy-MM-dd')}'" as String)
-                    } else if (f && (f.type == BigDecimal || f.type == Float || f.type == Double)) {
-                        where << ("$aliasKey = $entry.value" as String)
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
                         boolean entryValue = entry.value instanceof String ? entry.value == '1' : entry.value as Boolean
                         where << ("$aliasKey = $entryValue" as String)
@@ -525,9 +523,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                                 namedParams.put('np' + occ, entry.value)
                             }
                         }
-                    } else if (entry.value instanceof Long || (f && f.type == Integer)) {
-                        Long entryValue = entry.value as Long
-                        where << ("$aliasKey = $entryValue" as String)
+                    } else if (f && Number.isAssignableFrom(f.type)) {
+                        where << ("$aliasKey = $entry.value" as String)
                     } else if (entry.value instanceof String) {
                         String entryValue = entry.value as String
                         if (entryKey.contains('active')) {
