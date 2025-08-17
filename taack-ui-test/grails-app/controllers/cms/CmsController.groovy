@@ -14,6 +14,8 @@ import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 import taack.domain.TaackAttachmentService
 import taack.domain.TaackFilterService
 import taack.render.TaackEditorService
@@ -322,15 +324,19 @@ class CmsController implements WebAttributes {
         if (params.get('onpaste')) {
             render "${convertersToAsciidocService.convertFromHtml(params.get('onpaste') as String)}"
         } else {
-            CmsImage cmsImage = taackSaveService.save(CmsImage)
-            if (cmsImage && page) {
-                cmsImage.cmsPage = page
-            }
-            if ([AttachmentContentType.SHEET_ODS.mimeType, AttachmentContentType.LO_TEXT.mimeType].contains(cmsImage.contentType)) {
-                File f = new File(cmsFileRoot + '/' + cmsImage.filePath)
-                render convertersToAsciidocService.convert(f)
-            } else
+
+            final List<MultipartFile> mfl = (request as MultipartHttpServletRequest).getFiles('filePath')
+            final mf = mfl.first()
+
+            if ([AttachmentContentType.SHEET_ODS.mimeType, AttachmentContentType.LO_TEXT.mimeType].contains(mf.contentType)) {
+                render convertersToAsciidocService.convert(page, mf.inputStream)
+            } else {
+                CmsImage cmsImage = taackSaveService.save(CmsImage)
+                if (cmsImage && page) {
+                    cmsImage.cmsPage = page
+                }
                 render "image::${cmsImage.originalName}[]"
+            }
         }
     }
 

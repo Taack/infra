@@ -33,21 +33,21 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
 
     static Map<String, File> filePaths = [:]
 
-    String intranetRoot = TaackUiConfiguration.root
+    static String intranetRoot = TaackUiConfiguration.root
 
-    String getStorePath() {
+    static String getStorePath() {
         intranetRoot + '/attachment/store'
     }
 
-    String getAttachmentTmpPath() {
+    static String getAttachmentTmpPath() {
         intranetRoot + '/attachment/tmp'
     }
 
-    String getAttachmentTxtPath() {
+    static String getAttachmentTxtPath() {
         intranetRoot + '/attachment/txt'
     }
 
-    String getAttachmentStorePath() {
+    static String getAttachmentStorePath() {
         intranetRoot + '/attachment/store'
     }
 

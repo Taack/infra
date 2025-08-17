@@ -1,6 +1,11 @@
 package attachement
 
+import cms.CmsController
+import cms.CmsImage
+import cms.CmsPage
+import crew.User
 import grails.compiler.GrailsCompileStatic
+import grails.plugin.springsecurity.SpringSecurityService
 import org.apache.xerces.dom.TextImpl
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -21,18 +26,33 @@ import org.odftoolkit.odfdom.incubator.doc.text.OdfTextHeading
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextList
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextParagraph
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextSpan
+import org.odftoolkit.odfdom.pkg.OdfPackage
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+import taack.domain.TaackAttachmentService
+
+import javax.imageio.ImageIO
+import javax.imageio.ImageReader
+import javax.imageio.stream.FileImageInputStream
+import javax.imageio.stream.ImageInputStream
+import java.nio.file.Files
+import java.security.MessageDigest
 
 @GrailsCompileStatic
 class ConvertersToAsciidocService {
 
-    final private boolean debug = false
+    SpringSecurityService springSecurityService
 
-    static String traverseNodeBefore(Node node, Node... parents) {
+    final private boolean debug = true
+
+    String traverseNodeBefore(CmsPage page, OdfPackage odfPackage, Node node, Node... parents) {
         if (node instanceof OdfDrawImage) {
+
+            byte[] imageBytes = odfPackage.getBytes(node.imageUri.path)
+            CmsImage cmsImage = saveImage(page, node.imageUri.path, imageBytes)
+
             boolean softBreakAfter = (parents.findAll { it instanceof OdfTextParagraph }?.last()?.childNodes?.find { it instanceof TextSoftPageBreakElement }) != null
-            return (softBreakAfter ? '' : '\n') + 'image:' + (softBreakAfter ? '' : ':') + node.imageUri + '[]' + (softBreakAfter ? ' ' : '\n')
+            return (softBreakAfter ? '' : '\n') + 'image:' + (softBreakAfter ? '' : ':') + cmsImage.originalName + '[]' + (softBreakAfter ? ' ' : '\n')
         } else if (node instanceof OdfTextParagraph) {
             int numberOfParent = (int) parents.length
             return numberOfParent == 3 ? '\n' : ''
@@ -90,7 +110,50 @@ class ConvertersToAsciidocService {
         ''
     }
 
-    void treeNode(NodeList entry, StringBuffer asciidoc, Node... parents) {
+    final CmsImage saveImage(CmsPage page, String path, byte[] image) {
+        final String sha1ContentSum = MessageDigest.getInstance('SHA1').digest(image).encodeHex().toString()
+        CmsImage cmsImage = CmsImage.findByContentShaOne(sha1ContentSum)
+        if (cmsImage) return cmsImage
+        final String name = path.substring(path.lastIndexOf('/') + 1)
+        final String p = sha1ContentSum + '.' + (name.substring(name.lastIndexOf('.') + 1) ?: 'NONE')
+        File target = new File(CmsController.cmsFileRoot + '/' + p)
+        target << image
+
+        cmsImage = new CmsImage()
+        cmsImage.cmsPage = page
+        cmsImage.dateCreated = new Date()
+        cmsImage.lastUpdated = cmsImage.dateCreated
+        cmsImage.filePath = p
+        cmsImage.contentType = Files.probeContentType(target.toPath())
+        cmsImage.originalName = name
+        cmsImage.contentShaOne = sha1ContentSum
+
+        final String suffix = name.substring(name.lastIndexOf('.') + 1)
+        Iterator<ImageReader> iter = ImageIO.getImageReadersBySuffix(suffix)
+        while (iter.hasNext()) {
+            ImageReader reader = iter.next()
+            try {
+                ImageInputStream stream = new FileImageInputStream(target)
+                reader.setInput(stream)
+                int width = reader.getWidth(reader.getMinIndex())
+                int height = reader.getHeight(reader.getMinIndex())
+                cmsImage.width = width
+                cmsImage.height = height
+                break
+            } catch (IOException e) {
+                log.error("Error reading: $name, $e")
+            } finally {
+                reader.dispose()
+            }
+        }
+        cmsImage.userCreated = springSecurityService.currentUser as User
+        cmsImage.userUpdated = springSecurityService.currentUser as User
+        cmsImage.save(flush: true)
+        if (cmsImage.hasErrors()) log.error("${cmsImage.errors}")
+        cmsImage
+    }
+
+    void treeNode(CmsPage page, OdfPackage odfPackage, NodeList entry, StringBuffer asciidoc, Node... parents) {
         int indent = parents ? parents.size() : 0
         for (int i = 0; i < entry.length; i++) {
             Node n = entry.item(i)
@@ -130,28 +193,28 @@ class ConvertersToAsciidocService {
                 if (n instanceof OdfTextParagraph && n.childNodes.find({ it instanceof TextSequenceElement })) {
                     asciidoc.append('.')
                     asciidoc.append(n.textContent.substring(n.textContent.indexOf(':') + 2))
-                    asciidoc.append('\n')
                     OdfDrawFrame frame = n.childNodes.find { it instanceof OdfDrawFrame } as OdfDrawFrame
                     if (frame) {
-                        asciidoc.append(traverseNodeBefore(frame, parents + frame))
-                        treeNode(frame.childNodes, asciidoc, parents + frame)
+                        asciidoc.append(traverseNodeBefore(page, odfPackage, frame, parents + frame))
+                        treeNode(page, odfPackage, frame.childNodes, asciidoc, parents + frame)
                         asciidoc.append(traverseNodeAfter(frame, parents + frame))
                     }
                 } else {
-                    asciidoc.append(traverseNodeBefore(n, parents + n))
-                    treeNode(n.childNodes, asciidoc, parents + n)
+                    asciidoc.append(traverseNodeBefore(page, odfPackage, n, parents + n))
+                    treeNode(page, odfPackage, n.childNodes, asciidoc, parents + n)
                     asciidoc.append(traverseNodeAfter(n, parents + n))
                 }
             } else {
-                asciidoc.append(traverseNodeBefore(n, parents + n))
+                asciidoc.append(traverseNodeBefore(page, odfPackage, n, parents + n))
             }
         }
     }
 
-    String convert(File file) {
-        OdfDocument d = OdfDocument.loadDocument(file)
+    String convert(CmsPage page, InputStream inputStream) {
+        OdfDocument d = OdfDocument.loadDocument(inputStream)
+        OdfPackage pack = d.package
         StringBuffer r = new StringBuffer()
-        treeNode(d.contentDom.rootElement.childNodes, r)
+        treeNode(page, pack, d.contentDom.rootElement.childNodes, r)
 
         if (debug) println r
 
