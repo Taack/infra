@@ -10,6 +10,7 @@ import web.compression.CompressionFormat
 import web.compression.DecompressionStream
 import web.compression.deflate
 import web.cssom.ClassName
+import web.data.DataTransferItemList
 import web.dom.ElementId
 import web.dom.Node
 import web.dom.document
@@ -227,6 +228,37 @@ class MainContentEditable(
                 }
             }
             trace("divContent.onpaste $e ${e.target} ${e.clipboardData?.items}")
+            if (e.clipboardData?.items is DataTransferItemList) {
+                val list = e.clipboardData?.items
+                for (item in list!!) {
+                    if (item.kind == "string" && item.type =="text/html") {
+                        item.getAsString({
+                            trace("item: $it")
+                            val fd = FormData()
+                            fd.append("onpaste", it)
+                            val xhr = XMLHttpRequest()
+                            xhr.onloadend = EventHandler {
+                                if (currentLine != null) {
+                                    var txtToSave = ""
+                                    for (c in divContent.children.iterator()) {
+                                        if (currentLine == c) {
+                                            txtToSave += xhr.responseText + "\n"
+                                        } else txtToSave += c.textContent + "\n"
+                                    }
+                                    text.textContent = txtToSave
+
+                                    rescanTextarea()
+                                }
+                            }
+                            xhr.open(RequestMethod.POST, upLoadUrl!!)
+                            xhr.send(fd)
+
+                        })
+                        e.preventDefault()
+                        e.stopPropagation()
+                    }
+                }
+            }
             rescanContent = true
         }
 
@@ -244,7 +276,16 @@ class MainContentEditable(
                     val xhr = XMLHttpRequest()
                     xhr.onloadend = EventHandler {
                         if (currentLine != null) {
-                            currentLine?.innerText += xhr.responseText
+                            var txtToSave = ""
+                            for (c in divContent.children.iterator()) {
+                                if (currentLine == c) {
+                                    txtToSave += xhr.responseText + "\n"
+                                } else txtToSave += c.textContent + "\n"
+                            }
+                            currentLine = null
+                            text.textContent = txtToSave
+
+                            rescanTextarea()
                         }
                     }
                     xhr.open(RequestMethod.POST, upLoadUrl!!)

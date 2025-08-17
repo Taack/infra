@@ -1,8 +1,7 @@
 package cms
 
-import attachment.Attachment
-import attachment.DocumentAccess
-import attachment.DocumentCategory
+import attachement.ConvertersToAsciidocService
+import attachment.config.AttachmentContentType
 import cms.config.CmsSubsidiary
 import crew.User
 import crew.config.SupportedLanguage
@@ -30,7 +29,6 @@ import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.form.editor.Asciidoc
 import taack.ui.dsl.form.editor.EditorOption
-import taack.ui.dsl.form.editor.SpanRegex
 
 import static grails.async.Promises.task
 /*
@@ -56,6 +54,8 @@ class CmsController implements WebAttributes {
     SpringSecurityService springSecurityService
     TaackUiProgressBarService taackUiProgressBarService
     TaackEditorService taackEditorService
+    ConvertersToAsciidocService convertersToAsciidocService
+
     @Value('${intranet.root}')
     String rootPath
     static String cmsFileRoot
@@ -163,7 +163,7 @@ class CmsController implements WebAttributes {
 
                             EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
                             editor.addSpanRegexes(Asciidoc.spans)
-                            editor.uploadFileAction(CmsController.&dropFileEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
+                            editor.uploadFileAction(CmsController.&dropEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
                             fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
@@ -316,14 +316,22 @@ class CmsController implements WebAttributes {
     }
 
     @Transactional
-    def dropFileEditor() {
+    def dropEditor() {
         CmsPage page = CmsPage.get(params.long('cmsPage'))
         params.remove('cmsPage')
-        CmsImage cmsImage = taackSaveService.save(CmsImage)
-        if (cmsImage && page) {
-            cmsImage.cmsPage = page
+        if (params.get('onpaste')) {
+            render "${convertersToAsciidocService.convertFromHtml(params.get('onpaste') as String)}"
+        } else {
+            CmsImage cmsImage = taackSaveService.save(CmsImage)
+            if (cmsImage && page) {
+                cmsImage.cmsPage = page
+            }
+            if ([AttachmentContentType.SHEET_ODS.mimeType, AttachmentContentType.LO_TEXT.mimeType].contains(cmsImage.contentType)) {
+                File f = new File(cmsFileRoot + '/' + cmsImage.filePath)
+                render convertersToAsciidocService.convert(f)
+            } else
+                render "image::${cmsImage.originalName}[]"
         }
-        render "image::${cmsImage.originalName}[]"
     }
 
     @Transactional
