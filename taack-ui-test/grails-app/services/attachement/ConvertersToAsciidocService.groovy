@@ -10,6 +10,7 @@ import org.apache.xerces.dom.TextImpl
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 import org.odftoolkit.odfdom.doc.OdfDocument
 import org.odftoolkit.odfdom.dom.element.draw.DrawTextBoxElement
@@ -35,6 +36,7 @@ import javax.imageio.ImageIO
 import javax.imageio.ImageReader
 import javax.imageio.stream.FileImageInputStream
 import javax.imageio.stream.ImageInputStream
+import javax.swing.text.html.HTML
 import java.nio.file.Files
 import java.security.MessageDigest
 
@@ -225,23 +227,52 @@ class ConvertersToAsciidocService {
 
     String convertFromHtml(String html) {
         Document doc = Jsoup.parse(html)
-        Elements newsHeadlines = doc.select("h1,h2,h3,h4,p,table,tr,td")
+        Elements newsHeadlines = doc.select("h1,h2,h3,h4,p,table,tr,td,li,ol,ul,br,b,i,span")
         StringBuffer asciidoc = new StringBuffer()
         Element table = null
+        Iterator<TextNode> pWithStyle = null
         for (Element headline : newsHeadlines) {
             log.info(headline.class.simpleName + " " + headline.tag())
             switch (headline.tag()) {
                 case 'p':
-                    asciidoc.append("\n${headline.text()}\n")
+                    pWithStyle = null
+                    if (headline.textNodes().empty) {
+                        asciidoc.append("${headline.text()}")
+                    } else {
+                        pWithStyle = headline.textNodes().iterator()
+                        asciidoc.append("${pWithStyle.next().text()}")
+                    }
+                    break
+                case 'span':
+                    asciidoc.append(headline.text())
+                    if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
+                    break
+                case 'b':
+                    asciidoc.append('**' + headline.text() + '**')
+                    if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
+                    break
+                case 'i':
+                    asciidoc.append('_' + headline.text() + '_')
+                    if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
+                    break
+                case 'br':
+                    asciidoc.append('\n')
                     break
                 case 'h1':
-                    asciidoc.append("\n= ${headline.text()}\n")
+                    asciidoc.append("\n\n= ${headline.text()}\n")
                     break
                 case 'h2':
-                    asciidoc.append("\n== ${headline.text()}\n")
+                    asciidoc.append("\n\n== ${headline.text()}\n")
                     break
                 case 'h3':
-                    asciidoc.append("\n=== ${headline.text()}\n")
+                    asciidoc.append("\n\n=== ${headline.text()}\n")
+                    break
+                case 'ul':
+                    if (headline.parents().count { it.tag().toString() == 'ul'} == 0)
+                        asciidoc.append("\n")
+                    break
+                case 'li':
+                    asciidoc.append("\n${'*' * headline.parents().count { it.tag().toString() == 'ul'}}${'1.' * headline.parents().count { it.tag().toString() == 'ol'}} ")
                     break
                 case 'h4':
                     asciidoc.append("\n==== ${headline.text()}\n")
@@ -254,7 +285,7 @@ class ConvertersToAsciidocService {
                     asciidoc.append('\n')
                     break
                 case 'td':
-                    asciidoc.append("| ${headline.text()}")
+                    asciidoc.append("| ")
                     break
             }
             if (table && headline != table && !headline.parents().contains(table)) {
