@@ -59,7 +59,8 @@ class ConvertersToAsciidocService {
         } else if (node instanceof TextImpl) {
             return node.textContent
         } else if (node instanceof OdfTextSpan) {
-            String s = node.attributes.getNamedItem('style-name')
+            String s = node.attributes.getNamedItem('text:style-name').nodeValue
+
             if (s == 'T1') {
                 return '**'
             } else if (s == 'T2') {
@@ -93,7 +94,8 @@ class ConvertersToAsciidocService {
 
     static String traverseNodeAfter(Node node, Node... parents) {
         if (node instanceof OdfTextSpan) {
-            String s = node.attributes.getNamedItem('style-name')
+            String s = node.attributes.getNamedItem('text:style-name').nodeValue
+
             if (s == 'T1') {
                 return '**'
             } else if (s == 'T2') {
