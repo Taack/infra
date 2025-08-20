@@ -252,9 +252,10 @@ class Helper {
                     }
 
                     if (text.endsWith(RELOAD)) {
-                        block.modal.open(text.substring(OPEN_MODAL.length).dropLast(RELOAD.length), true)
+                        block.modal.open(text.substring(OPEN_MODAL.length).dropLast(RELOAD.length))
+                        block.modal.reloadPageWhenCloseModal()
                     } else {
-                        block.modal.open(text.substring(OPEN_MODAL.length), false)
+                        block.modal.open(text.substring(OPEN_MODAL.length))
                     }
                     val s = block.modal.dModalBody.getElementsByTagName("script")
                     trace("Executing $s")
@@ -301,7 +302,12 @@ class Helper {
                 else -> {
                     if (text.isNotEmpty()) {
                         trace("Helper::update current block $text")
-                        block.updateContent(text)
+                        if (text.endsWith(RELOAD)) {
+                            block.updateContent(text.dropLast(RELOAD.length))
+                            block.parent?.reloadPageWhenCloseModal()
+                        } else {
+                            block.updateContent(text)
+                        }
                     }
                 }
 

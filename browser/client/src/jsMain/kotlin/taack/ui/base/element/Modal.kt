@@ -80,7 +80,7 @@ class Modal(val parent: Block) : BaseElement {
         parent.d.parentElement?.appendChild(dModal)
     }
 
-    fun open(htmlContent: String, reloadWhenClose: Boolean = false) {
+    fun open(htmlContent: String) {
         traceIndent("Modal::open $mId")
         dModalBody.innerHTML = htmlContent
         dModal.style.display = "block"
@@ -92,12 +92,12 @@ class Modal(val parent: Block) : BaseElement {
         modalBackdrop.id = ElementId("modal-backdrop-$mId")
         modalBackdrop.classList.add(ClassName("modal-backdrop"), ClassName("fade"), ClassName("show"))
         parent.d.parentElement!!.appendChild(modalBackdrop)
+    }
 
-        if (reloadWhenClose) {
-            closeButton.onclick = EventHandler { e ->
-                e.preventDefault()
-                processAjaxLink(null, RELOAD, parent)
-            }
+    fun reloadPageWhenCloseModal() {
+        closeButton.onclick = EventHandler { e ->
+            e.preventDefault()
+            processAjaxLink(null, RELOAD, parent)
         }
     }
 

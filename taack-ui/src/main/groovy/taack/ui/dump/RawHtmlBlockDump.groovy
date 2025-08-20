@@ -190,7 +190,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true
         }
-        blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering)
+        blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering, parameter.isRefresh)
     }
 
     @Override
