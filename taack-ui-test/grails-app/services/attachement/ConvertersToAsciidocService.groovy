@@ -227,7 +227,7 @@ class ConvertersToAsciidocService {
 
     String convertFromHtml(String html) {
         Document doc = Jsoup.parse(html)
-        Elements newsHeadlines = doc.select("h1,h2,h3,h4,p,table,tr,td,li,ol,ul,br,b,i,span")
+        Elements newsHeadlines = doc.select("h1,h2,h3,h4,p,table,tr,td,li,ol,ul,br,b,i,span,font")
         StringBuffer asciidoc = new StringBuffer()
         Element table = null
         Iterator<TextNode> pWithStyle = null
@@ -247,6 +247,10 @@ class ConvertersToAsciidocService {
                     asciidoc.append(headline.text())
                     if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
                     break
+                case 'font':
+                    asciidoc.append(headline.text())
+                    if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
+                    break
                 case 'b':
                     asciidoc.append('**' + headline.text() + '**')
                     if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
@@ -256,7 +260,7 @@ class ConvertersToAsciidocService {
                     if (pWithStyle?.hasNext()) asciidoc.append(pWithStyle.next().text())
                     break
                 case 'br':
-                    asciidoc.append('\n')
+                    if (!table) asciidoc.append('\n')
                     break
                 case 'h1':
                     asciidoc.append("\n\n= ${headline.text()}\n")
@@ -285,7 +289,7 @@ class ConvertersToAsciidocService {
                     asciidoc.append('\n')
                     break
                 case 'td':
-                    asciidoc.append("| ")
+                    asciidoc.append("| ${headline.textNodes().empty ? '' : headline.textNodes()*.text().join(' ')}")
                     break
             }
             if (table && headline != table && !headline.parents().contains(table)) {
