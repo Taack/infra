@@ -6,7 +6,6 @@ import js.iterable.iterator
 import js.typedarrays.toUint8Array
 import org.w3c.dom.HTMLBRElement
 import org.w3c.fetch.Response
-import taack.ui.base.Helper.Companion.trace
 import web.compression.CompressionFormat
 import web.compression.DecompressionStream
 import web.compression.deflate
@@ -22,6 +21,9 @@ import web.html.*
 import web.http.POST
 import web.http.RequestMethod
 import web.keyboard.KeyCode
+import web.keyboard.KeyV
+import web.keyboard.KeyW
+import web.keyboard.Space
 import web.selection.Selection
 import web.window.window
 import web.xhr.XMLHttpRequest
@@ -29,15 +31,52 @@ import kotlin.io.encoding.Base64
 
 class MainContentEditable(
     internal val text: HTMLTextAreaElement,
-    private val divHolder: HTMLDivElement,
+    divHolder: HTMLDivElement,
 ) {
     private var line = 0
     private var rescanContent = false
     private val divAutocomplete = document.createElement("div") as HTMLDivElement
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
-
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
+
+    private data class Mod(val letter: String, val pos: Int)
+
+    private val modifications = mutableListOf<Mod>()
+    private val undo = mutableListOf<Mod>()
+    private var textContent: String
+        get() {
+            return text.textContent ?: ""
+        }
+        set(value) {
+            undo.removeAll(undo)
+            var doBreak = false
+            if (value.length >= textContent.length) {
+                var i = 0
+                for (c in value) {
+                    if (textContent[i] != c) {
+                        modifications.add(Mod(c.toString(), i))
+                        break
+                    }
+                    i++
+                }
+            } else {
+                var i = 0
+                var j = textContent.length - value.length
+                for (c in textContent) {
+                    if (value[i] != c) {
+                        var seq = ""
+                        for(p in 0..j) {
+                            seq += textContent[i + p]
+                        }
+                        modifications.add(Mod(seq, -i))
+                        break
+                    }
+                    i++
+                }
+            }
+            text.textContent = value
+        }
 
     data class Span(
         val pattern: String, val className: String, val inlined: SpanMode
@@ -89,6 +128,28 @@ class MainContentEditable(
         val t = Date.now()
         println("${t - timeMs} $str")
         timeMs = t
+    }
+
+    fun undoLetter() {
+        val m = modifications.removeLast()
+        undo.add(m)
+        trace("undo ${m.letter} ${m.pos} ${text.textContent?.length}")
+        if (m.pos >= 0) {
+            text.textContent = text.textContent?.removeRange(m.pos, m.pos + 1)
+        } else {
+            text.textContent = text.textContent?.substring(0, -m.pos) + m.letter + text.textContent?.substring( -m.pos)
+        }
+    }
+
+    fun redoLetter() {
+        val m = undo.removeLast()
+        modifications.add(m)
+        trace("redo ${m.letter} ${m.pos} ${text.textContent?.length}")
+        if (m.pos >= 0) {
+            text.textContent = text.textContent?.substring(0, m.pos) + m.letter + text.textContent?.substring( m.pos)
+        } else {
+            text.textContent = text.textContent?.removeRange(-m.pos, -m.pos + 1)
+        }
     }
 
     fun initSelection() {
@@ -180,7 +241,8 @@ class MainContentEditable(
 
                 childLength?.plus(currentPosition)?.let {
                     if (it >= position) {
-                        selection?.setPosition(child, 1)
+                        val o = if (child.childNodes.length == 0) 0 else 1
+                        selection?.setPosition(child, o)
                         return
                     }
                 }
@@ -263,7 +325,7 @@ class MainContentEditable(
                                             txtToSave += xhr.responseText + "\n"
                                         } else txtToSave += c.textContent + "\n"
                                     }
-                                    text.textContent = txtToSave
+                                    textContent = txtToSave
 
                                     rescanTextarea()
                                 }
@@ -301,7 +363,7 @@ class MainContentEditable(
                                 } else txtToSave += c.textContent + "\n"
                             }
                             currentLine = null
-                            text.textContent = txtToSave
+                            textContent = txtToSave
 
                             rescanTextarea()
                         }
@@ -315,23 +377,38 @@ class MainContentEditable(
             }
         }
 
-        divContent.onclick = EventHandler { e ->
+        divContent.onclick = EventHandler {
             initSelection()
         }
 
         divContent.onkeydown = EventHandler { event ->
             trace("event.code: ${event.code}, event.ctrlKey: ${event.ctrlKey}")
-            if (event.code == "Space" as KeyCode && event.ctrlKey) {
+            if (event.code == KeyCode.Space && event.ctrlKey) {
                 trace("autocomplete ...")
                 autocomplete(currentLine)
                 event.preventDefault()
                 event.stopPropagation()
                 return@EventHandler
-            } else if (event.code == "KeyV" as KeyCode && event.ctrlKey) {
+            } else if (event.code == KeyCode.KeyV && event.ctrlKey) {
                 trace("past something ...")
 //                event.preventDefault()
 //                event.stopPropagation()
                 return@EventHandler
+            } else if (event.code == KeyCode.KeyW && event.ctrlKey) {
+                if (event.shiftKey) {
+                    trace("redo ...")
+                    if (undo.isNotEmpty())
+                        redoLetter()
+                } else {
+                    trace("undo ... $modifications")
+                    if(modifications.isNotEmpty())
+                        undoLetter()
+                }
+                rescanTextarea()
+                event.preventDefault()
+                event.stopPropagation()
+                return@EventHandler
+
             }
             trace("event.code: ${event.code} ends")
         }
@@ -360,21 +437,21 @@ class MainContentEditable(
                 return@EventHandler
             }
 
-            text.textContent = ""
-            var txtToSave = ""
-            trace("textContent empty")
-            for (c in divContent.children.iterator()) {
-                if (currentLine == null || currentLine == c) {
-                    asciidocToHtml(c as HTMLDivElement)
+            if (!(event.code == KeyCode.KeyW && event.ctrlKey)) {
+                var txtToSave = ""
+                for (c in divContent.children.iterator()) {
+                    if (currentLine == null || currentLine == c) {
+                        asciidocToHtml(c as HTMLDivElement)
+                    }
+                    txtToSave += c.textContent + "\n"
                 }
-                txtToSave += c.textContent + "\n"
-            }
-            text.textContent = txtToSave
-            trace("textContent full")
+                textContent = txtToSave
+                trace("textContent full")
 
-            if (rescanContent) {
-                rescanTextarea()
-                rescanContent = false
+                if (rescanContent) {
+                    rescanTextarea()
+                    rescanContent = false
+                }
             }
         }
     }
@@ -478,7 +555,7 @@ class MainContentEditable(
             cmd.contentEditable = "true"
 
             cmd.innerHTML = s
-            cmd.onchange = EventHandler { event ->
+            cmd.onchange = EventHandler {
                 trace("onchange")
             }
             if (index == 0) divContent.appendChild(cmd)
