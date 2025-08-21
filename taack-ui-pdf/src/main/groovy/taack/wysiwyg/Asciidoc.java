@@ -2,15 +2,12 @@ package taack.wysiwyg;
 
 
 import org.asciidoctor.*;
-import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.Document;
-import org.asciidoctor.ast.StructuralNode;
+import taack.ui.TaackUiConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Translate Markdown to HTML using flexmark
@@ -18,15 +15,21 @@ import java.util.Map;
 public class Asciidoc {
 
     private static Asciidoctor asciidoctor = null;
+    public static final String pathAsciidocGenerated = TaackUiConfiguration.getRoot() + "/asciidoc";
 
     private static void initAsciidoctorJ() {
-        if (asciidoctor == null)
-            try {
-                asciidoctor = Asciidoctor.Factory.create();
-            } catch (Throwable t) {
-                System.out.println("Asciidoc::initAsciidoctorJ " + t.getMessage());
-                t.printStackTrace();
-            }
+        try {
+            Files.createDirectories(Path.of(pathAsciidocGenerated));
+            asciidoctor = Asciidoctor.Factory.create();
+            asciidoctor.requireLibrary("asciidoctor-diagram", "asciidoctor-revealjs");
+        } catch (Throwable t) {
+            System.out.println("Asciidoc::initAsciidoctorJ " + t.getMessage());
+            t.printStackTrace();
+        }
+    }
+
+    public static String getContentHtml(String content, String urlFileRoot) {
+        return getContentHtml(content, urlFileRoot, null);
     }
 
     /**
@@ -36,17 +39,18 @@ public class Asciidoc {
      * @param urlFileRoot url prefix for external resources
      * @return The HTML results
      */
-    public static String getContentHtml(String content, String urlFileRoot) {
+    public static String getContentHtml(String content, String urlFileRoot, SafeMode safeMode) {
         if (content != null) {
             initAsciidoctorJ();
             OptionsBuilder optionHasToc = Options.builder()
-                    .attributes(Attributes.builder().imagesDir(urlFileRoot + "?path=").build())
+                    .safe(safeMode != null ? safeMode : SafeMode.SERVER)
+                    .attributes(Attributes.builder().attribute("imagesoutdir", pathAsciidocGenerated).imagesDir(urlFileRoot + "?path=").build())
                     .option("parse_header_only", false);
 
             Document document = asciidoctor.load(content, optionHasToc.build());
             String html = document.convert();
 //            asciidoctor.shutdown();
-            System.out.println(html);
+//            System.out.println(html);
             return html;
         }
         return "";
@@ -60,6 +64,10 @@ public class Asciidoc {
      * @return The HTML results
      */
     public static String getContentHtml(File file, String urlFileRoot) {
+        return getContentHtml(file, urlFileRoot, null);
+    }
+
+    public static String getContentHtml(File file, String urlFileRoot, SafeMode safeMode) {
         if (file != null && file.exists()) {
             initAsciidoctorJ();
             OptionsBuilder option = Options.builder()
@@ -70,7 +78,7 @@ public class Asciidoc {
                             .attribute("icons", "font")
                             .build())
                     .option("parse_header_only", false)
-                    .safe(SafeMode.SERVER)
+                    .safe(safeMode != null ? safeMode : SafeMode.SERVER)
                     .toFile(false);
             //            asciidoctor.shutdown();
             return asciidoctor.convertFile(file, option.build());
