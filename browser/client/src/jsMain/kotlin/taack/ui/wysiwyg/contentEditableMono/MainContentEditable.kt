@@ -360,9 +360,13 @@ class MainContentEditable(
         }
     }
 
+    fun escapeHtml(str: String?): String? {
+        return str?.replace("&", "&amp;")?.replace("<", "&lt;")?.replace(">", "&gt;")
+    }
+
     fun asciidocToHtml(e: HTMLDivElement) {
         trace("asciidocToHtml +++")
-        val txt = e.textContent
+        val txt = escapeHtml(e.textContent)
         if (txt?.isEmpty() == true) {
             e.innerHTML = "<br>"
             return
@@ -501,7 +505,7 @@ class MainContentEditable(
         }
 
         text.textContent?.split("\n")?.forEach {
-            if (it.isNotEmpty()) asciidocToHtml(createCmdLine(it, 0)!!)
+            if (it.isNotEmpty()) asciidocToHtml(createCmdLine(escapeHtml(it), 0)!!)
             else createCmdLine("<br>", 0)
         }
 
