@@ -30,7 +30,9 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
-import taack.ui.dsl.form.editor.Asciidoc
+import taack.ui.dsl.form.editor.TaackAsciidocPlantUML
+import taack.ui.dsl.form.editor.TaackAsciidocTable
+import taack.ui.dsl.form.editor.TaackBaseAsciidocSpans
 import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.Parameter
 import taack.wysiwyg.Markdown
@@ -167,7 +169,9 @@ class CmsController implements WebAttributes {
                             fieldFromMap cmsPage.hatContent_, language.toString().toLowerCase()
 
                             EditorOption.EditorOptionBuilder editor = EditorOption.getBuilder()
-                            editor.addSpanRegexes(Asciidoc.spans)
+                            editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)
+                            editor.addSpanRegexes(TaackAsciidocTable.spans)
+                            editor.addSpanRegexes(TaackAsciidocPlantUML.spans)
                             editor.uploadFileAction(CmsController.&dropEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
                             fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]

@@ -84,7 +84,7 @@ class ConvertersToAsciidocService {
         } else if (node instanceof DrawTextBoxElement) {
         } else if (node instanceof TextSequenceElement) {
         } else if (node instanceof TableTableElement) {
-            return '\n|===='
+            return '\n|==='
         } else if (node instanceof TableTableColumnElement) {
         } else if (node instanceof TableTableRowElement) {
             return '\n'
@@ -109,7 +109,7 @@ class ConvertersToAsciidocService {
         } else if (node instanceof OdfTextHeading) {
             return '\n'
         } else if (node instanceof TableTableElement) {
-            return '\n|====\n'
+            return '\n|===\n'
         }
         ''
     }
