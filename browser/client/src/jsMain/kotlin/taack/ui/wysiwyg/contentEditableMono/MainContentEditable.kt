@@ -20,6 +20,7 @@ import web.form.FormData
 import web.html.*
 import web.http.POST
 import web.http.RequestMethod
+import web.keyboard.Enter
 import web.keyboard.KeyCode
 import web.keyboard.KeyV
 import web.keyboard.KeyW
@@ -40,22 +41,26 @@ class MainContentEditable(
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
 
-    private data class Mod(val letter: String, val pos: Int)
+    private data class Mod(val letters: String, val pos: Int)
 
     private val modifications = mutableListOf<Mod>()
     private val undo = mutableListOf<Mod>()
     private var textContent: String
         get() {
-            return text.textContent ?: ""
+            return text.textContent ?: "\n"
         }
         set(value) {
             undo.removeAll(undo)
-            var doBreak = false
             if (value.length >= textContent.length) {
                 var i = 0
+                var j = value.length - textContent.length
                 for (c in value) {
                     if (textContent[i] != c) {
-                        modifications.add(Mod(c.toString(), i))
+                        var seq = ""
+                        for(p in 0..<j) {
+                            seq += value[i + p]
+                        }
+                        modifications.add(Mod(seq, i))
                         break
                     }
                     i++
@@ -133,22 +138,22 @@ class MainContentEditable(
     fun undoLetter() {
         val m = modifications.removeLast()
         undo.add(m)
-        trace("undo ${m.letter} ${m.pos} ${text.textContent?.length}")
+        trace("undo ${m.letters} ${m.pos} ${text.textContent?.length}")
         if (m.pos >= 0) {
-            text.textContent = text.textContent?.removeRange(m.pos, m.pos + 1)
+            text.textContent = text.textContent?.removeRange(m.pos, m.pos + m.letters.length)
         } else {
-            text.textContent = text.textContent?.substring(0, -m.pos) + m.letter + text.textContent?.substring( -m.pos)
+            text.textContent = text.textContent?.substring(0, -m.pos) + m.letters + text.textContent?.substring( -m.pos)
         }
     }
 
     fun redoLetter() {
         val m = undo.removeLast()
         modifications.add(m)
-        trace("redo ${m.letter} ${m.pos} ${text.textContent?.length}")
+        trace("redo ${m.letters} ${m.pos} ${text.textContent?.length}")
         if (m.pos >= 0) {
-            text.textContent = text.textContent?.substring(0, m.pos) + m.letter + text.textContent?.substring( m.pos)
+            text.textContent = text.textContent?.substring(0, m.pos) + m.letters + text.textContent?.substring( m.pos)
         } else {
-            text.textContent = text.textContent?.removeRange(-m.pos, -m.pos + 1)
+            text.textContent = text.textContent?.removeRange(-m.pos, -m.pos + m.letters.length)
         }
     }
 
@@ -158,8 +163,8 @@ class MainContentEditable(
         focus = selection?.focusOffset
         selectedElement = selection?.focusNode
 
-        trace("selection: $selection, currentLine: $currentLine (${currentLine?.className} ${currentLine?.innerHTML})")
-        trace("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}, focus: $focus")
+//        trace("selection: $selection, currentLine: $currentLine (${currentLine?.className} ${currentLine?.innerHTML})")
+//        trace("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}, focus: $focus")
 
         // position in chars in parent container
         currentLine = currentLineComputed
@@ -266,7 +271,6 @@ class MainContentEditable(
         divContent.contentEditable = "true"
         divContent.autocorrect = false
         divContent.autocapitalize = AutoCapitalize.off
-        divContent.contentEditable = "true"
         divContent.translate = false
         divContent.spellcheck = true
         divContent.style.tabSize = "4"
@@ -415,11 +419,12 @@ class MainContentEditable(
 
         divContent.onkeyup = EventHandler { event ->
             initSelection()
+            trace("divContent.onkeyup ${event.key}")
             if (event.key.startsWith("Arrow")) {
                 return@EventHandler
             }
 
-            if (event.key == "Enter") {
+            if (event.code == KeyCode.Enter) {
                 createCmdLine(null, 0)
                 val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
                 var e = range?.commonAncestorContainer
