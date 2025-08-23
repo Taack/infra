@@ -177,13 +177,15 @@ final class TaackSolrSearchService implements WebAttributes {
                                     row {
                                         rowColumn(2) {
                                             TaackGormClass c = TaackGormClassRegisterService.getTaackGormClass(solrSpecifier.type.name)
-                                            String label = c.showLabel.call(id)
-                                            String prefix = c.typeLabel?.call(id)
-                                            if (prefix) {
-                                                label = prefix + ': ' + label
+                                            if (c) {
+                                                String label = c.showLabel.call(id)
+                                                String prefix = c.typeLabel?.call(id)
+                                                if (prefix) {
+                                                    label = prefix + ': ' + label
+                                                }
+                                                rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, c.showMethod, id)
+                                                rowField label
                                             }
-                                            rowAction(ActionIcon.SELECT * IconStyle.SCALE_DOWN, c.showMethod, id)
-                                            rowField label
                                         }
                                     }
                                     for (def hli in hl) {

@@ -3,7 +3,6 @@ package taack.app
 import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import org.grails.datastore.gorm.GormEntity
 import taack.render.TaackUiService
 import taack.ui.EnumOption
 import taack.ui.dsl.helper.Utils
