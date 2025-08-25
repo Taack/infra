@@ -7,3 +7,7 @@ dependencies {
     api project(':taack-jdbc-common')
     implementation project(':taack-ui')
 }
+
+groovydoc {
+    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
+}

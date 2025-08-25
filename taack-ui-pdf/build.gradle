@@ -12,6 +12,10 @@ dependencies {
 
 }
 
+groovydoc {
+    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
+}
+
 // ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar
 // ~/.jdks/graalvm-jdk-24.0.1/bin/native-image -O3 --link-at-build-time -H:ConfigurationFileDirectories=test -jar taack-ui-test.jar
 // ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --pgo-instrument --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-ui-test.jar

@@ -15,5 +15,6 @@ dependencies {
 //    implementation "org.apache.grails:grails-gsp"
 }
 
-
-
+groovydoc {
+    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
+}

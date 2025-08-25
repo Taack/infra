@@ -15,3 +15,7 @@ dependencies {
     implementation "org.apache.sshd:sshd-cli:${minaSshd}"
 
 }
+
+groovydoc {
+    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
+}

@@ -28,3 +28,7 @@ generateGrammarSource {
 
 //sourcesJar.dependsOn generateGrammarSource
 assemble.dependsOn generateGrammarSource
+
+javadoc {
+    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
+}

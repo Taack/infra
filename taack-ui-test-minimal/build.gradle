@@ -97,4 +97,6 @@ bootBuildImage {
 // docker save docker.io/library/taack-ui-test-minimal > taack-ui-test-minimal.tar
 
 
-//
+groovydoc {
+    enabled = false
+}
