@@ -11,7 +11,6 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
-import org.asciidoctor.SafeMode
 import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.springframework.beans.factory.annotation.Value
@@ -30,11 +29,12 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
-import taack.ui.dsl.form.editor.TaackAsciidocPlantUML
-import taack.ui.dsl.form.editor.TaackAsciidocTable
-import taack.ui.dsl.form.editor.TaackBaseAsciidocSpans
 import taack.ui.dsl.form.editor.EditorOption
+import taack.wysiwyg.TaackAsciidocPlantUML
+import taack.wysiwyg.TaackAsciidocTable
+import taack.wysiwyg.TaackBaseAsciidocSpans
 import taack.ui.dump.Parameter
+import taack.wysiwyg.Asciidoc
 import taack.wysiwyg.Markdown
 
 import static grails.async.Promises.task
@@ -578,7 +578,7 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         String urlFileRoot = new Parameter().urlMapped(this.&downloadBinBodyContentFiles as MC, [id: params.long('id')])
         String toPreviewBody = params['bodyContent'][previewLanguage] as String
-        String htmlBody = asciidoc ? taack.wysiwyg.Asciidoc.getContentHtml(toPreviewBody, urlFileRoot, SafeMode.UNSAFE): Markdown.getContentHtml(toPreviewBody)
+        String htmlBody = asciidoc ? Asciidoc.getContentHtml(toPreviewBody, urlFileRoot, false): Markdown.getContentHtml(toPreviewBody)
 
         String html = """\
             <div class=${asciidoc ? '"asciidocMain"': '"markdown-body"'}>

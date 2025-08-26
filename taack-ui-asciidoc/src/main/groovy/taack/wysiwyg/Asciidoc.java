@@ -28,10 +28,6 @@ public class Asciidoc {
         }
     }
 
-    public static String getContentHtml(String content, String urlFileRoot) {
-        return getContentHtml(content, urlFileRoot, null);
-    }
-
     /**
      * Translate Asciidoctor string content to HTML, no inline
      *
@@ -39,11 +35,11 @@ public class Asciidoc {
      * @param urlFileRoot url prefix for external resources
      * @return The HTML results
      */
-    public static String getContentHtml(String content, String urlFileRoot, SafeMode safeMode) {
+    public static String getContentHtml(String content, String urlFileRoot, boolean server) {
         if (content != null) {
             initAsciidoctorJ();
             OptionsBuilder optionHasToc = Options.builder()
-                    .safe(safeMode != null ? safeMode : SafeMode.SERVER)
+                    .safe(server ? SafeMode.SERVER : SafeMode.UNSAFE)
                     .attributes(Attributes.builder().attribute("imagesoutdir", pathAsciidocGenerated).imagesDir(urlFileRoot + "?path=").build())
                     .option("parse_header_only", false);
 
@@ -56,18 +52,7 @@ public class Asciidoc {
         return "";
     }
 
-    /**
-     * Translate Asciidoctor file content to HTML, can inline other content
-     *
-     * @param file        The Asciidoc File
-     * @param urlFileRoot url prefix for external resources
-     * @return The HTML results
-     */
-    public static String getContentHtml(File file, String urlFileRoot) {
-        return getContentHtml(file, urlFileRoot, null);
-    }
-
-    public static String getContentHtml(File file, String urlFileRoot, SafeMode safeMode) {
+    public static String getContentHtml(File file, String urlFileRoot, boolean server) {
         if (file != null && file.exists()) {
             initAsciidoctorJ();
             OptionsBuilder option = Options.builder()
@@ -78,7 +63,7 @@ public class Asciidoc {
                             .attribute("icons", "font")
                             .build())
                     .option("parse_header_only", false)
-                    .safe(safeMode != null ? safeMode : SafeMode.SERVER)
+                    .safe(server ? SafeMode.SERVER : SafeMode.UNSAFE)
                     .toFile(false);
             //            asciidoctor.shutdown();
             return asciidoctor.convertFile(file, option.build());

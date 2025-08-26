@@ -5,13 +5,12 @@ import crew.User
 import crew.config.SupportedLanguage
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
-import org.asciidoctor.*
-import org.asciidoctor.ast.Document
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.app.TaackApp
 import taack.app.TaackAppRegisterService
 import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
+import taack.render.TaackEditorService
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.ActionIcon
@@ -27,13 +26,14 @@ class CmsUiService implements WebAttributes {
 
     static lazyInit = false
 
+    TaackEditorService taackEditorService
+
     CmsHtmlGeneratorService cmsHtmlGeneratorService
     enum CmsTableMode {
         NONE,
         MANY_2_MANY
     }
     static CmsUiService INSTANCE
-    private Asciidoctor asciidoctor
 
     @PostConstruct
     void init() {
@@ -191,7 +191,6 @@ class CmsUiService implements WebAttributes {
             f2.join(filter)
 
             println taackFilterService.getBuilder(User).setInnerDomain(User).build().list()
-
 
             iterate(taackFilterService.getBuilder(CmsPage)
                     .setMaxNumberOfLine(20)
@@ -572,106 +571,6 @@ class CmsUiService implements WebAttributes {
     }
 
     String bodySlideshow(CmsPage slideshow, SupportedLanguage language) {
-        bodySlideshow(slideshow.controls, slideshow.progress, slideshow.autoSlide, slideshow.height, slideshow.bodyContent[language.iso2], language, slideshow.id)
+        taackEditorService.bodySlideshow(slideshow.controls, slideshow.progress, slideshow.autoSlide, slideshow.height, slideshow.bodyContent[language.iso2], slideshow.id)
     }
-
-    String bodySlideshow(boolean controls, boolean progress, int autoSlide, int height, String content, SupportedLanguage language, Long id = null) {
-        StringBuffer innerHtml = new StringBuffer(4096)
-        innerHtml.append """
-:revealjs_controls: ${controls}
-:revealjs_progress: ${progress}
-:revealjs_slidenumber: true
-:revealjs_history: true
-:revealjs_keyboard: true
-:revealjs_overview: true
-:revealjs_center: true
-:revealjs_touch: true
-:revealjs_loop: false
-:revealjs_rtl: false
-:revealjs_fragments: true
-:revealjs_embedded: false
-:revealjs_autoslide: ${autoSlide}
-:revealjs_autoslidestoppable: true
-:revealjs_mousewheel: true
-:revealjs_hideaddressbar: true
-:revealjs_previewlinks: false
-
-:revealjs_transition: default
-:revealjs_transitionspeed: default
-:revealjs_backgroundtransition: default
-:revealjs_viewdistance: 3
-:revealjs_parallaxbackgroundimage:
-:revealjs_parallaxbackgroundsize:
-:revealjs_customtheme: reveal.js/css/theme/solarized.css
-//:revealjs_customtheme: reveal.js/css/theme/solarized.css
-:revealjs_theme: serif
-
-:source-highlighter: highlightjs
-:highlightjs-languages: groovy, gnuplot
-:title-slide-transition: zoom
-:title-slide-transition-speed: fast
-:icons: font
-:docinfo: shared
-:customcss: custom.css
-:revealjs_height: ${height}
-
-"""
-        innerHtml.append this.cmsHtmlGeneratorService.translateExpression(content, language.iso2)
-        AttributesBuilder attributes = Attributes.builder()
-                .docType('article')
-                .backend('revealjs')
-                .title('Test')
-        OptionsBuilder options = Options.builder()
-                .safe(SafeMode.UNSAFE)
-                .attributes(attributes.build())
-
-//        Asciidoctor asciidoctor = Asciidoctor.Factory.create()
-//        asciidoctor.requireLibrary('asciidoctor-diagram', 'asciidoctor-revealjs')
-        Document document = asciidoctor.load(innerHtml.toString(), options.build())
-        String slideshowContent = document.convert()
-//        asciidoctor.shutdown()
-
-        """
-            <div style="height: ${height}px;">
-                <div class="reveal deck${id ?: 1}">
-                    <div class='slides'>
-                        ${slideshowContent}
-                    </div>
-                </div>
-            </div>
-<script postExecute='true'>
-    // More info about initialization & config:
-    // - https://revealjs.com/initialization/
-    // - https://revealjs.com/config/
-    if (typeof Reveal != 'undefined' && document.querySelector( '.deck${id ?: 1}' )) {
-        let deck1 = Reveal(document.querySelector( '.deck${id ?: 1}' ), {
-            embedded: true,
-            keyboardCondition: 'focused' // only react to keys when focused
-        })
-        deck1.initialize({
-            hash: false,
-            fragments: true,
-            fragmentInURL: false,
-            loop: true,
-            transition: 'default',
-            transitionSpeed: 'default',
-            backgroundTransition: 'default',
-            viewDistance: 3,
-            
-            width: 960,
-height: ${height},
-controls: ${controls},
-progress: ${progress},
-autoSlide: ${autoSlide},
-
-            
-
-            plugins: [RevealHighlight, RevealZoom]
-        });
-    }
-    
-</script>
-        """
-    }
-
 }

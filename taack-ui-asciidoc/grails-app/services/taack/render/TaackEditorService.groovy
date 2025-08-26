@@ -4,6 +4,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import org.apache.xerces.dom.TextImpl
+import org.asciidoctor.*
 import org.grails.core.io.ResourceLocator
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
@@ -20,6 +21,7 @@ import org.odftoolkit.odfdom.dom.element.table.TableTableElement
 import org.odftoolkit.odfdom.dom.element.table.TableTableRowElement
 import org.odftoolkit.odfdom.dom.element.text.TextListItemElement
 import org.odftoolkit.odfdom.dom.element.text.TextSequenceElement
+import org.odftoolkit.odfdom.dom.element.text.TextSoftPageBreakElement
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawFrame
 import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawImage
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextHeading
@@ -27,9 +29,9 @@ import org.odftoolkit.odfdom.incubator.doc.text.OdfTextList
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextParagraph
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextSpan
 import org.odftoolkit.odfdom.pkg.OdfPackage
-import org.springframework.core.io.Resource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.Resource
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import taack.ui.dsl.UiBlockSpecifier
@@ -37,19 +39,21 @@ import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.block.BlockSpec
 import taack.wysiwyg.Asciidoc
 
-import javax.imageio.ImageIO
-import javax.imageio.ImageReader
-import javax.imageio.stream.FileImageInputStream
-import javax.imageio.stream.ImageInputStream
-import java.nio.file.Files
 import java.nio.file.Path
-import java.security.MessageDigest
-
 /**
  * Service providing TQL support to scripts in the editor
  */
 @GrailsCompileStatic
 final class TaackEditorService implements WebAttributes, DataBinder {
+
+    private Asciidoctor asciidoctor
+
+    /**
+     * Interface containing a callback to save images contained in an ODF doc
+     */
+    interface ISaveImage {
+        String saveImage(String imagePath, byte[] image)
+    }
 
     enum ImageExtension {
         png('png'), jpg('jpeg'), svg('svg+xml')
@@ -67,36 +71,9 @@ final class TaackEditorService implements WebAttributes, DataBinder {
     @Autowired
     ResourceLocator assetResourceLocator
 
-//    private Path getScriptCachePath() {
-//        Path.of(TaackUiConfiguration.root, 'cache', 'asciidoc', 'script')
-//    }
-
     private Path getAsciidocCachePath() {
         Path.of(rootPath, 'cache', 'asciidoc', 'content')
     }
-
-//    def asciidocRenderScript(String script) {
-//        script = script.replaceAll('-', '+').replaceAll('_', '/')
-//        File cached = Path.of(scriptCachePath.toString(), script).toFile()
-//        if (cached.exists()) {
-//            render cached.text
-//        } else {
-//            byte[] b64 = Base64.getDecoder().decode(script)
-//            Inflater inflater = new Inflater()
-//            inflater.setInput(b64)
-//
-//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-//            byte[] buffer = new byte[1024]
-//
-//            while (!inflater.finished()) {
-//                int decompressedSize = inflater.inflate(buffer)
-//                outputStream.write(buffer, 0, decompressedSize)
-//            }
-//
-//            println(new String(outputStream.toByteArray()))
-//
-//        }
-//    }
 
     UiBlockSpecifier asciidocBlockSpecifier(Class cl, String fileName) {
         String path = params['path']
@@ -134,7 +111,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
             }
             resourceFile.text = resource.text
             StringBuffer out = new StringBuffer()
-            out.append Asciidoc.getContentHtml(resourceFile, '')
+            out.append Asciidoc.getContentHtml(resourceFile, '', false)
             Resource r = assetResourceLocator.findResourceForURI('asciidoc.js')
             if (r?.exists()) {
                 out.append('\n')
@@ -164,14 +141,14 @@ final class TaackEditorService implements WebAttributes, DataBinder {
 
     final private boolean debug = true
 
-    String traverseNodeBefore(CmsPage page, OdfPackage odfPackage, Node node, Node... parents) {
+    private String traverseNodeBefore(ISaveImage iSaveImage, OdfPackage odfPackage, Node node, Node... parents) {
         if (node instanceof OdfDrawImage) {
 
             byte[] imageBytes = odfPackage.getBytes(node.imageUri.path)
-            CmsImage cmsImage = saveImage(page, node.imageUri.path, imageBytes)
+            String originalName = iSaveImage.saveImage(node.imageUri.path, imageBytes)
 
             boolean softBreakAfter = (parents.findAll { it instanceof OdfTextParagraph }?.last()?.childNodes?.find { it instanceof TextSoftPageBreakElement }) != null
-            return (softBreakAfter ? '' : '\n') + 'image:' + (softBreakAfter ? '' : ':') + cmsImage.originalName + '[]' + (softBreakAfter ? ' ' : '\n')
+            return (softBreakAfter ? '' : '\n') + 'image:' + (softBreakAfter ? '' : ':') + originalName + '[]' + (softBreakAfter ? ' ' : '\n')
         } else if (node instanceof OdfTextParagraph) {
             int numberOfParent = (int) parents.length
             return numberOfParent == 3 ? '\n' : ''
@@ -211,7 +188,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         return ''
     }
 
-    static String traverseNodeAfter(Node node, Node... parents) {
+    private static String traverseNodeAfter(Node node, Node... parents) {
         if (node instanceof OdfTextSpan) {
             String s = node.attributes.getNamedItem('text:style-name').nodeValue
 
@@ -231,50 +208,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         ''
     }
 
-    final CmsImage saveImage(CmsPage page, String path, byte[] image) {
-        final String sha1ContentSum = MessageDigest.getInstance('SHA1').digest(image).encodeHex().toString()
-        CmsImage cmsImage = CmsImage.findByContentShaOne(sha1ContentSum)
-        if (cmsImage) return cmsImage
-        final String name = path.substring(path.lastIndexOf('/') + 1)
-        final String p = sha1ContentSum + '.' + (name.substring(name.lastIndexOf('.') + 1) ?: 'NONE')
-        File target = new File(CmsController.cmsFileRoot + '/' + p)
-        target << image
-
-        cmsImage = new CmsImage()
-        cmsImage.cmsPage = page
-        cmsImage.dateCreated = new Date()
-        cmsImage.lastUpdated = cmsImage.dateCreated
-        cmsImage.filePath = p
-        cmsImage.contentType = Files.probeContentType(target.toPath())
-        cmsImage.originalName = name
-        cmsImage.contentShaOne = sha1ContentSum
-
-        final String suffix = name.substring(name.lastIndexOf('.') + 1)
-        Iterator<ImageReader> iter = ImageIO.getImageReadersBySuffix(suffix)
-        while (iter.hasNext()) {
-            ImageReader reader = iter.next()
-            try {
-                ImageInputStream stream = new FileImageInputStream(target)
-                reader.setInput(stream)
-                int width = reader.getWidth(reader.getMinIndex())
-                int height = reader.getHeight(reader.getMinIndex())
-                cmsImage.width = width
-                cmsImage.height = height
-                break
-            } catch (IOException e) {
-                log.error("Error reading: $name, $e")
-            } finally {
-                reader.dispose()
-            }
-        }
-        cmsImage.userCreated = springSecurityService.currentUser as User
-        cmsImage.userUpdated = springSecurityService.currentUser as User
-        cmsImage.save(flush: true)
-        if (cmsImage.hasErrors()) log.error("${cmsImage.errors}")
-        cmsImage
-    }
-
-    void treeNode(CmsPage page, OdfPackage odfPackage, NodeList entry, StringBuffer asciidoc, Node... parents) {
+    private void treeNode(ISaveImage iSaveImage, OdfPackage odfPackage, NodeList entry, StringBuffer asciidoc, Node... parents) {
         int indent = parents ? parents.size() : 0
         for (int i = 0; i < entry.length; i++) {
             Node n = entry.item(i)
@@ -316,26 +250,26 @@ final class TaackEditorService implements WebAttributes, DataBinder {
                     asciidoc.append(n.textContent.substring(n.textContent.indexOf(':') + 2))
                     OdfDrawFrame frame = n.childNodes.find { it instanceof OdfDrawFrame } as OdfDrawFrame
                     if (frame) {
-                        asciidoc.append(traverseNodeBefore(page, odfPackage, frame, parents + frame))
-                        treeNode(page, odfPackage, frame.childNodes, asciidoc, parents + frame)
+                        asciidoc.append(traverseNodeBefore(iSaveImage, odfPackage, frame, parents + frame))
+                        treeNode(iSaveImage, odfPackage, frame.childNodes, asciidoc, parents + frame)
                         asciidoc.append(traverseNodeAfter(frame, parents + frame))
                     }
                 } else {
-                    asciidoc.append(traverseNodeBefore(page, odfPackage, n, parents + n))
-                    treeNode(page, odfPackage, n.childNodes, asciidoc, parents + n)
+                    asciidoc.append(traverseNodeBefore(iSaveImage, odfPackage, n, parents + n))
+                    treeNode(iSaveImage, odfPackage, n.childNodes, asciidoc, parents + n)
                     asciidoc.append(traverseNodeAfter(n, parents + n))
                 }
             } else {
-                asciidoc.append(traverseNodeBefore(page, odfPackage, n, parents + n))
+                asciidoc.append(traverseNodeBefore(iSaveImage, odfPackage, n, parents + n))
             }
         }
     }
 
-    String convert(CmsPage page, InputStream inputStream) {
+    String convert(ISaveImage iSaveImage, InputStream inputStream) {
         OdfDocument d = OdfDocument.loadDocument(inputStream)
         OdfPackage pack = d.package
         StringBuffer r = new StringBuffer()
-        treeNode(page, pack, d.contentDom.rootElement.childNodes, r)
+        treeNode(iSaveImage, pack, d.contentDom.rootElement.childNodes, r)
 
         if (debug) println r
 
@@ -419,4 +353,100 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         return asciidoc.toString()
     }
 
+    String bodySlideshow(boolean controls, boolean progress, int autoSlide, int height, String content, Long id = null) {
+        StringBuffer innerHtml = new StringBuffer(4096)
+        innerHtml.append """
+:revealjs_controls: ${controls}
+:revealjs_progress: ${progress}
+:revealjs_slidenumber: true
+:revealjs_history: true
+:revealjs_keyboard: true
+:revealjs_overview: true
+:revealjs_center: true
+:revealjs_touch: true
+:revealjs_loop: false
+:revealjs_rtl: false
+:revealjs_fragments: true
+:revealjs_embedded: false
+:revealjs_autoslide: ${autoSlide}
+:revealjs_autoslidestoppable: true
+:revealjs_mousewheel: true
+:revealjs_hideaddressbar: true
+:revealjs_previewlinks: false
+
+:revealjs_transition: default
+:revealjs_transitionspeed: default
+:revealjs_backgroundtransition: default
+:revealjs_viewdistance: 3
+:revealjs_parallaxbackgroundimage:
+:revealjs_parallaxbackgroundsize:
+:revealjs_customtheme: reveal.js/css/theme/solarized.css
+//:revealjs_customtheme: reveal.js/css/theme/solarized.css
+:revealjs_theme: serif
+
+:source-highlighter: highlightjs
+:highlightjs-languages: groovy, gnuplot
+:title-slide-transition: zoom
+:title-slide-transition-speed: fast
+:icons: font
+:docinfo: shared
+:customcss: custom.css
+:revealjs_height: ${height}
+
+"""
+        innerHtml.append content
+        AttributesBuilder attributes = Attributes.builder()
+                .docType('article')
+                .backend('revealjs')
+                .title('Test')
+        OptionsBuilder options = Options.builder()
+                .safe(SafeMode.UNSAFE)
+                .attributes(attributes.build())
+
+//        Asciidoctor asciidoctor = Asciidoctor.Factory.create()
+//        asciidoctor.requireLibrary('asciidoctor-diagram', 'asciidoctor-revealjs')
+        def document = asciidoctor.load(innerHtml.toString(), options.build())
+        String slideshowContent = document.convert()
+//        asciidoctor.shutdown()
+
+        """
+            <div style="height: ${height}px;">
+                <div class="reveal deck${id ?: 1}">
+                    <div class='slides'>
+                        ${slideshowContent}
+                    </div>
+                </div>
+            </div>
+<script postExecute='true'>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    if (typeof Reveal != 'undefined' && document.querySelector( '.deck${id ?: 1}' )) {
+        let deck1 = Reveal(document.querySelector( '.deck${id ?: 1}' ), {
+            embedded: true,
+            keyboardCondition: 'focused' // only react to keys when focused
+        })
+        deck1.initialize({
+            hash: false,
+            fragments: true,
+            fragmentInURL: false,
+            loop: true,
+            transition: 'default',
+            transitionSpeed: 'default',
+            backgroundTransition: 'default',
+            viewDistance: 3,
+            
+            width: 960,
+height: ${height},
+controls: ${controls},
+progress: ${progress},
+autoSlide: ${autoSlide},
+
+            plugins: [RevealHighlight, RevealZoom]
+        });
+    }
+    
+</script>
+        """
+    }
 }

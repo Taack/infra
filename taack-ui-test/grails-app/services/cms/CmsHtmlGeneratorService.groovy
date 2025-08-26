@@ -6,7 +6,6 @@ import cms.dsl.parser.exception.TokenizerException
 import cms.dsl.parser.exception.WrongDataException
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
-import org.asciidoctor.SafeMode
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dump.Parameter
 import taack.wysiwyg.Asciidoc
@@ -55,7 +54,7 @@ class CmsHtmlGeneratorService {
     static String translateNoMatcher(String body, boolean asciidoc = false, MethodClosure fileRoot = null, Long id = null) {
         try {
             String urlFileRoot = fileRoot && id ? new Parameter().urlMapped(fileRoot, [id: id]) : null
-            return asciidoc ? Asciidoc.getContentHtml(body, urlFileRoot, SafeMode.SERVER): Markdown.getContentHtml(body)
+            return asciidoc ? Asciidoc.getContentHtml(body, urlFileRoot, false): Markdown.getContentHtml(body)
         } catch (ignored) {
             return "Grr ${ignored}"
         }

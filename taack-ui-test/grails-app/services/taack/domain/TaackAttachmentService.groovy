@@ -9,7 +9,6 @@ import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import jakarta.annotation.PostConstruct
-import org.apache.commons.io.FileUtils
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -169,11 +168,11 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
     @PostConstruct
     void init() {
         log.info 'init'
-        FileUtils.forceMkdir(new File(storePath))
-        FileUtils.forceMkdir(new File(attachmentTmpPath))
-        FileUtils.forceMkdir(new File(attachmentTxtPath))
+        (new File(storePath))
+        new File(attachmentTmpPath).mkdirs()
+        new File(attachmentTxtPath).mkdirs()
         for (PreviewFormat f : PreviewFormat.values()) {
-            FileUtils.forceMkdir(new File(previewPath(f)))
+            new File(previewPath(f)).mkdirs()
         }
 
         TaackSaveService.registerFieldCustomSavingClosure('filePath', { GormEntity gormEntity, Map params ->
