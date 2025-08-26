@@ -66,6 +66,7 @@ def publishedProjects = [
         'taack-ui',
         'taack-ui-ssh',
         'taack-ui-pdf',
+        'taack-ui-asciidoc',
         'taack-ui-search',
         'taack-jdbc-common',
         'taack-ui-jdbc',

@@ -29,6 +29,7 @@ include 'taack-ui-jdbc'
 include 'taack-ui-ssh'
 include 'taack-ui-search'
 include 'taack-ui-pdf'
+include 'taack-ui-asciidoc'
 include 'taack-ui'
 
 include 'taack-ui-test'

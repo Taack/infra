@@ -8,14 +8,14 @@ group = "taack.ui.test"
 dependencies {
     implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
 
-    implementation 'commons-io:commons-io:2.18.0'
-    implementation 'org.asciidoctor:asciidoctorj:3.0.0'
-    implementation 'org.asciidoctor:asciidoctorj-pdf:2.3.19'
-    implementation 'org.asciidoctor:asciidoctorj-diagram:2.3.1'
-    implementation 'org.asciidoctor:asciidoctorj-revealjs:5.1.0'
-
-    implementation 'org.jsoup:jsoup:1.21.1'
-    implementation 'org.odftoolkit:odfdom-java:0.12.0'
+//    implementation 'commons-io:commons-io:2.18.0'
+//    implementation 'org.asciidoctor:asciidoctorj:3.0.0'
+//    implementation 'org.asciidoctor:asciidoctorj-pdf:2.3.19'
+//    implementation 'org.asciidoctor:asciidoctorj-diagram:2.3.1'
+//    implementation 'org.asciidoctor:asciidoctorj-revealjs:5.1.0'
+//
+//    implementation 'org.jsoup:jsoup:1.21.1'
+//    implementation 'org.odftoolkit:odfdom-java:0.12.0'
 }
 
 grails {
@@ -24,6 +24,7 @@ grails {
     plugins {
         implementation project(':taack-ui')
         implementation project(':taack-ui-pdf')
+        implementation project(':taack-ui-asciidoc')
         implementation project(':taack-ui-jdbc')
         implementation project(':taack-ui-search')
     }
