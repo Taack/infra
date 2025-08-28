@@ -65,6 +65,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     static lazyInit = false
 
+    private final int bufferSize = 65_536
+
     ThemeService themeService
     SpringSecurityService springSecurityService
 
@@ -470,7 +472,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
         RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
         blockSpecifier.visitBlock(htmlPdf)
-        ByteArrayOutputStream output = new ByteArrayOutputStream(4096)
+        ByteArrayOutputStream output = new ByteArrayOutputStream(bufferSize)
         htmlPdf.getOutput(output)
         String html = g.render template: '/taackUi/block-mail', model: [
                 block: output.toString(),
