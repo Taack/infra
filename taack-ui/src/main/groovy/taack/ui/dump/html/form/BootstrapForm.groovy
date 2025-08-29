@@ -168,7 +168,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         el.addChildren(s)
         if (disable) {
             options.currents?.each { IEnumOption it ->
-                el.addChildren(new HTMLInput(InputType.HIDDEN, it.key, qualifiedName))
+                el.addChildren(new HTMLInput(InputType.HIDDEN, it?.key, qualifiedName))
             }
         }
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
