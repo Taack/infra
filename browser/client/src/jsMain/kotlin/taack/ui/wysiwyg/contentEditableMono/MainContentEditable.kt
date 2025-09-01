@@ -549,7 +549,7 @@ class MainContentEditable(
             val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
             if (line == 1) number.style.marginTop = "4px"
             number.classList.add(ClassName("cm-gutterElement"))
-            number.style.height = "22.4px"
+//            number.style.height = "22.4px"
             number.textContent = line.toString()
             divLineNumberContainer.appendChild(number)
         }
