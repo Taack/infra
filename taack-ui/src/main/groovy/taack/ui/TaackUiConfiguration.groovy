@@ -21,7 +21,7 @@ class TaackUiConfiguration {
     static String taack = home + '/taack'
     static String resources = taack + '/resources'
     static String javaPath = '/usr/bin/java'
-    static String plantUmlPath = home + '/plantuml-1.2022.7.jar'
+    static String plantUmlPath = home + '/plantuml-gplv2-1.2025.4.jar'
     static String solrUrl = 'http://localhost:8983/solr/taack'
     static Boolean disableSecurity = false
 }

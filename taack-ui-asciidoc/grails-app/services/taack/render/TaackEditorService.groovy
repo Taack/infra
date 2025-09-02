@@ -3,6 +3,7 @@ package taack.render
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
+import jakarta.annotation.PostConstruct
 import org.apache.xerces.dom.TextImpl
 import org.asciidoctor.*
 import org.grails.core.io.ResourceLocator
@@ -30,10 +31,10 @@ import org.odftoolkit.odfdom.incubator.doc.text.OdfTextParagraph
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextSpan
 import org.odftoolkit.odfdom.pkg.OdfPackage
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
+import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.block.BlockSpec
@@ -65,31 +66,42 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         final String mimeImage
     }
 
-    @Value('${intranet.root}')
-    String rootPath
-
     @Autowired
     ResourceLocator assetResourceLocator
 
-    private Path getAsciidocCachePath() {
-        Path.of(rootPath, 'cache', 'asciidoc', 'content')
+    private static Path getAsciidocCachePath() {
+        Path.of(TaackUiConfiguration.root, 'cache', 'asciidoc', 'content')
+    }
+
+    @PostConstruct
+    void init() {
+        new File(asciidocCachePath.toString()).deleteDir()
     }
 
     UiBlockSpecifier asciidocBlockSpecifier(Class cl, String fileName) {
         String path = params['path']
         String fnPath = '/' + fileName.split('/')[1]
         if (path) {
-            ImageExtension imageExtension = path[-3..-1] as ImageExtension
             GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
-            webUtils.currentResponse.setContentType("image/${imageExtension.mimeImage}")
-            webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${fileName.split('/')[-1]}")
-            webUtils.currentResponse.outputStream << cl.getResourceAsStream(fnPath + path)
-            try {
-                webUtils.currentResponse.outputStream.flush()
-                webUtils.currentResponse.outputStream.close()
-                webRequest.renderView = false
-            } catch (e) {
-                log.error "${e.message}"
+            if (path.startsWith('/diag-')) {
+                File f = new File(Asciidoc.pathAsciidocGenerated + '/' + path)
+                if (f.exists()) {
+                    webUtils.currentResponse.setContentType('image/svg+xml')
+                    webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${URLEncoder.encode(path, 'UTF-8')}")
+                    webUtils.currentResponse.outputStream << f.bytes
+                }
+            } else {
+                ImageExtension imageExtension = path[-3..-1] as ImageExtension
+                webUtils.currentResponse.setContentType("image/${imageExtension.mimeImage}")
+                webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${fileName.split('/')[-1]}")
+                webUtils.currentResponse.outputStream << cl.getResourceAsStream(fnPath + path)
+                try {
+                    webUtils.currentResponse.outputStream.flush()
+                    webUtils.currentResponse.outputStream.close()
+                    webRequest.renderView = false
+                } catch (e) {
+                    log.error "${e.message}"
+                }
             }
             return null
         } else {
@@ -108,10 +120,11 @@ final class TaackEditorService implements WebAttributes, DataBinder {
             if (!resourceFile.exists()) {
                 resourceFile.getParentFile().mkdirs()
                 resourceFile.createNewFile()
+                resourceFile.text = Asciidoc.getContentHtml(resource.text, '', false)
             }
-            resourceFile.text = resource.text
             StringBuffer out = new StringBuffer()
-            out.append Asciidoc.getContentHtml(resourceFile, '', false)
+            out.append resourceFile.text
+
             Resource r = assetResourceLocator.findResourceForURI('asciidoc.js')
             if (r?.exists()) {
                 out.append('\n')
@@ -323,11 +336,11 @@ final class TaackEditorService implements WebAttributes, DataBinder {
                     asciidoc.append("\n\n=== ${headline.text()}\n")
                     break
                 case 'ul':
-                    if (headline.parents().count { it.tag().toString() == 'ul'} == 0)
+                    if (headline.parents().count { it.tag().toString() == 'ul' } == 0)
                         asciidoc.append("\n")
                     break
                 case 'li':
-                    asciidoc.append("\n${'*' * headline.parents().count { it.tag().toString() == 'ul'}}${'1.' * headline.parents().count { it.tag().toString() == 'ol'}} ")
+                    asciidoc.append("\n${'*' * headline.parents().count { it.tag().toString() == 'ul' }}${'1.' * headline.parents().count { it.tag().toString() == 'ol' }} ")
                     break
                 case 'h4':
                     asciidoc.append("\n==== ${headline.text()}\n")
@@ -449,4 +462,5 @@ autoSlide: ${autoSlide},
 </script>
         """
     }
+
 }
