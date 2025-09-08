@@ -61,7 +61,7 @@ final class EditorOption {
             this.editorOption = new EditorOption()
         }
 
-        EditorOptionBuilder uploadFileAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
+        EditorOptionBuilder onDropAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
             editorOption.uploadFileAction = c
             editorOption.uploadFileActionParams = parameters
             this

@@ -172,7 +172,7 @@ class CmsController implements WebAttributes {
                             editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)
                             editor.addSpanRegexes(TaackAsciidocTable.spans)
                             editor.addSpanRegexes(TaackAsciidocPlantUML.spans)
-                            editor.uploadFileAction(CmsController.&dropEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
+                            editor.onDropAction(CmsController.&dropEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
                             fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
