@@ -6,6 +6,7 @@ import js.iterable.iterator
 import js.typedarrays.toUint8Array
 import org.w3c.dom.HTMLBRElement
 import org.w3c.fetch.Response
+import taack.ui.base.Helper
 import web.compression.CompressionFormat
 import web.compression.DecompressionStream
 import web.compression.deflate
@@ -57,7 +58,7 @@ class MainContentEditable(
                 for (c in value) {
                     if (textContent[i] != c) {
                         var seq = ""
-                        for(p in 0..<j) {
+                        for (p in 0..<j) {
                             seq += value[i + p]
                         }
                         modifications.add(Mod(seq, i))
@@ -71,7 +72,7 @@ class MainContentEditable(
                 for (c in textContent) {
                     if (value[i] != c) {
                         var seq = ""
-                        for(p in 0..j) {
+                        for (p in 0..j) {
                             seq += textContent[i + p]
                         }
                         modifications.add(Mod(seq, -i))
@@ -142,7 +143,7 @@ class MainContentEditable(
         if (m.pos >= 0) {
             text.textContent = text.textContent?.removeRange(m.pos, m.pos + m.letters.length)
         } else {
-            text.textContent = text.textContent?.substring(0, -m.pos) + m.letters + text.textContent?.substring( -m.pos)
+            text.textContent = text.textContent?.substring(0, -m.pos) + m.letters + text.textContent?.substring(-m.pos)
         }
     }
 
@@ -151,7 +152,7 @@ class MainContentEditable(
         modifications.add(m)
         trace("redo ${m.letters} ${m.pos} ${text.textContent?.length}")
         if (m.pos >= 0) {
-            text.textContent = text.textContent?.substring(0, m.pos) + m.letters + text.textContent?.substring( m.pos)
+            text.textContent = text.textContent?.substring(0, m.pos) + m.letters + text.textContent?.substring(m.pos)
         } else {
             text.textContent = text.textContent?.removeRange(-m.pos, -m.pos + m.letters.length)
         }
@@ -302,83 +303,37 @@ class MainContentEditable(
         divHolder.appendChild(divScroll)
 
         divContent.onpaste = EventHandler { e ->
-            e.clipboardData?.files?.length?.let {
-                if (it > 0) {
-                    for (f in e.clipboardData!!.files) {
-                        trace("f: $f")
+            Helper.onpaste(e, upLoadUrl!!, { xhr: XMLHttpRequest ->
+                if (currentLine != null) {
+                    var txtToSave = ""
+                    for (c in divContent.children.iterator()) {
+                        if (currentLine == c) {
+                            txtToSave += xhr.responseText + "\n"
+                        } else txtToSave += c.textContent + "\n"
                     }
-                    e.preventDefault()
-                    e.stopPropagation()
-                }
-            }
-            trace("divContent.onpaste $e ${e.target} ${e.clipboardData?.items}")
-            if (e.clipboardData?.items is DataTransferItemList) {
-                val list = e.clipboardData?.items
-                for (item in list!!) {
-                    if (item.kind == "string" && item.type =="text/html") {
-                        item.getAsString({
-                            trace("item: $it")
-                            val fd = FormData()
-                            fd.append("onpaste", it)
-                            val xhr = XMLHttpRequest()
-                            xhr.onloadend = EventHandler {
-                                if (currentLine != null) {
-                                    var txtToSave = ""
-                                    for (c in divContent.children.iterator()) {
-                                        if (currentLine == c) {
-                                            txtToSave += xhr.responseText + "\n"
-                                        } else txtToSave += c.textContent + "\n"
-                                    }
-                                    textContent = txtToSave
+                    textContent = txtToSave
 
-                                    rescanTextarea()
-                                }
-                            }
-                            xhr.open(RequestMethod.POST, upLoadUrl!!)
-                            xhr.send(fd)
-
-                        })
-                        e.preventDefault()
-                        e.stopPropagation()
-                    }
+                    rescanTextarea()
                 }
-            }
+            })
             rescanContent = true
         }
 
         divContent.ondrop = EventHandler { e ->
-            trace("ondrop $upLoadUrl")
-            if (upLoadUrl != null) e.dataTransfer?.files?.length?.let {
-                if (it > 0) {
-                    val fd = FormData()
-                    for (f in e.dataTransfer!!.files) {
-                        trace("f: $f")
-                        trace("f: ${f.name}")
-
-                        fd.append("filePath", f)
+            Helper.ondrop(e, upLoadUrl!!, { xhr: XMLHttpRequest ->
+                if (currentLine != null) {
+                    var txtToSave = ""
+                    for (c in divContent.children.iterator()) {
+                        if (currentLine == c) {
+                            txtToSave += xhr.responseText + "\n"
+                        } else txtToSave += c.textContent + "\n"
                     }
-                    val xhr = XMLHttpRequest()
-                    xhr.onloadend = EventHandler {
-                        if (currentLine != null) {
-                            var txtToSave = ""
-                            for (c in divContent.children.iterator()) {
-                                if (currentLine == c) {
-                                    txtToSave += xhr.responseText + "\n"
-                                } else txtToSave += c.textContent + "\n"
-                            }
-                            currentLine = null
-                            textContent = txtToSave
+                    currentLine = null
+                    textContent = txtToSave
 
-                            rescanTextarea()
-                        }
-                    }
-                    trace("xhr.open $upLoadUrl")
-                    xhr.open(RequestMethod.POST, upLoadUrl!!)
-                    xhr.send(fd)
-                    e.preventDefault()
-                    e.stopPropagation()
+                    rescanTextarea()
                 }
-            }
+            })
         }
 
         divContent.onclick = EventHandler {
@@ -405,7 +360,7 @@ class MainContentEditable(
                         redoLetter()
                 } else {
                     trace("undo ... $modifications")
-                    if(modifications.isNotEmpty())
+                    if (modifications.isNotEmpty())
                         undoLetter()
                 }
                 rescanTextarea()

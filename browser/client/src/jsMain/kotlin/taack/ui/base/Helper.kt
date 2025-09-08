@@ -4,13 +4,18 @@ import js.array.Tuple2
 import js.array.component1
 import js.array.component2
 import js.iterable.asSequence
+import js.iterable.iterator
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
 import taack.ui.base.element.Form
 import web.blob.Blob
+import web.clipboard.ClipboardEvent
+import web.data.DataTransferItemList
 import web.dom.document
+import web.events.Event
 import web.events.EventHandler
 import web.events.EventType
+import web.events.ProgressEvent
 import web.form.FormData
 import web.form.FormDataEntryValue
 import web.history.history
@@ -20,10 +25,12 @@ import web.http.POST
 import web.http.RequestMethod
 import web.location.location
 import web.storage.localStorage
+import web.uievents.DragEvent
 import web.uievents.MouseEvent
 import web.url.URL
 import web.window.window
 import web.xhr.XMLHttpRequest
+import kotlin.collections.iterator
 
 typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
 typealias CloseModalPostProcessing2 = ((Map<String, String>, Map<String, String>) -> Unit)
@@ -334,6 +341,69 @@ class Helper {
             if (xhr.status == 401.toShort()) {
                 location.href = (Block.href ?: "")
                 throw Error("Not authenticated")
+            }
+        }
+
+        fun onpaste(e: ClipboardEvent, url: String, onLoadend: (xml: XMLHttpRequest) ->  Unit) {
+            e.clipboardData?.files?.length?.let {
+                if (it > 0) {
+                    val fd = FormData()
+                    for (f in e.clipboardData!!.files) {
+                        trace("f: $f")
+                        fd.append("filePath", f)
+                    }
+                    val xhr = XMLHttpRequest()
+                    xhr.onloadend = EventHandler {
+                        onLoadend(xhr)
+                    }
+                    xhr.open(RequestMethod.POST, url)
+                    xhr.send(fd)
+                    e.preventDefault()
+                    e.stopPropagation()
+                    return
+                }
+            }
+            trace("divContent.onpaste $e ${e.target} ${e.clipboardData?.items}")
+            if (e.clipboardData?.items is DataTransferItemList) {
+                val list = e.clipboardData?.items
+                for (item in list!!) {
+                    if (item.kind == "string" && item.type =="text/html") {
+                        item.getAsString({
+                            trace("item: $it")
+                            val fd = FormData()
+                            fd.append("onpaste", it)
+                            val xhr = XMLHttpRequest()
+                            xhr.onloadend = EventHandler {
+                                onLoadend(xhr)
+                            }
+                            xhr.open(RequestMethod.POST, url)
+                            xhr.send(fd)
+                        })
+                        e.preventDefault()
+                        e.stopPropagation()
+                    }
+                }
+            }
+        }
+
+        fun ondrop(e: DragEvent, url: String, onLoadend: (xml: XMLHttpRequest) ->  Unit) {
+            e.dataTransfer?.files?.length?.let {
+                if (it > 0) {
+                    val fd = FormData()
+                    for (f in e.dataTransfer!!.files) {
+                        trace("f: $f")
+                        fd.append("filePath", f)
+                    }
+                    val xhr = XMLHttpRequest()
+                    xhr.onloadend = EventHandler {
+                        onLoadend(xhr)
+                    }
+                    xhr.open(RequestMethod.POST, url)
+                    xhr.send(fd)
+                    e.preventDefault()
+                    e.stopPropagation()
+                    return
+                }
             }
         }
     }
