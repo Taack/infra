@@ -1,6 +1,7 @@
 package taack.ui.dsl
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.table.TableOption
 import taack.ui.dsl.table.TableSpec
 import taack.ui.dsl.table.IUiTableVisitor
 
@@ -14,6 +15,7 @@ import taack.ui.dsl.table.IUiTableVisitor
 final class UiTableSpecifier {
 
     Closure closure
+    TableOption tableOption
 
     /**
      * Describe the table to display with an added column with select input per line.
@@ -47,8 +49,9 @@ final class UiTableSpecifier {
      * @param closure The table specification
      * @return Itself
      */
-    UiTableSpecifier ui(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure closure) {
+    UiTableSpecifier ui(TableOption tableOption = null, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure closure) {
         this.closure = closure
+        this.tableOption = tableOption
         this
     }
 
@@ -59,8 +62,8 @@ final class UiTableSpecifier {
      */
     void visitTable(final IUiTableVisitor tableVisitor) {
         if (tableVisitor && closure) {
+            closure.delegate = new TableSpec(tableVisitor, tableOption)
             tableVisitor.visitTable()
-            closure.delegate = new TableSpec(tableVisitor)
             closure.call()
             tableVisitor.visitTableEnd()
         }
@@ -68,8 +71,8 @@ final class UiTableSpecifier {
 
     void visitTableWithNoFilter(final IUiTableVisitor tableVisitor) {
         if (tableVisitor && closure) {
+            closure.delegate = new TableSpec(tableVisitor, tableOption)
             tableVisitor.visitTableWithoutFilter()
-            closure.delegate = new TableSpec(tableVisitor)
             closure.call()
             tableVisitor.visitTableEnd()
         }

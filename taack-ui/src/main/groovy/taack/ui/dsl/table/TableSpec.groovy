@@ -2,6 +2,7 @@ package taack.ui.dsl.table
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.domain.TaackFilter
 import taack.ui.dsl.common.Style
@@ -13,8 +14,10 @@ import taack.ui.dsl.common.Style
 final class TableSpec {
     final IUiTableVisitor tableVisitor
 
-    TableSpec(IUiTableVisitor tableVisitor) {
+    TableSpec(IUiTableVisitor tableVisitor, TableOption tableOption = null) {
         this.tableVisitor = tableVisitor
+        if (tableOption)
+            tableVisitor.visitTableOption(tableOption)
     }
 
     /**
@@ -85,5 +88,4 @@ final class TableSpec {
         }
         res.bValue
     }
-
 }

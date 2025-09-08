@@ -2,11 +2,13 @@ package taack.ui.dump
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
+import taack.ui.dsl.table.TableOption
 
 import java.text.DateFormat
 import java.text.NumberFormat
@@ -205,6 +207,21 @@ final class RawCsvTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowSelect(String value, boolean isSelectable) {
+
+    }
+
+    @Override
+    void visitTableOption(TableOption tableOption) {
+
+    }
+
+    @Override
+    void visitRowDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
+
+    }
+
+    @Override
+    void visitCellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
 
     }
 

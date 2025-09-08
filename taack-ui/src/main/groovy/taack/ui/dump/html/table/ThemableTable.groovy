@@ -1,6 +1,8 @@
 package taack.ui.dump.html.table
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.table.TableOption
+import taack.ui.dump.Parameter
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.theme.ThemeMode
@@ -31,10 +33,20 @@ final class ThemableTable {
         }
     }
 
-    IHTMLElement table(IHTMLElement topElement, String blockId) {
-        HTMLTable htmlTable = new HTMLTable()
-        htmlTable.putClass "$tableSized table-striped table-hover table-bordered pure-table pure-table-bordered"
-        htmlTable.putAttr('taackTableId', blockId)
+    IHTMLElement table(IHTMLElement topElement, String blockId, TableOption tableOption) {
+        IHTMLElement.HTMLElementBuilder htmlTableBuilder = new HTMLTable().builder.addClasses( "$tableSized table-striped table-hover table-bordered pure-table pure-table-bordered")
+        println("sdfqsdfgqsdfqsdf $tableOption")
+        if (tableOption) {
+        println("ZEFAZEFZEFGZEF")
+            if (tableOption.headerThemeColor) {
+                htmlTableBuilder.addClasses(tableOption.headerThemeColor.cssClassesString)
+            }
+            if (tableOption.uploadFileAction) {
+                htmlTableBuilder.putAttribute('taackDropAction', new Parameter().urlMapped(tableOption.uploadFileAction, tableOption.uploadFileActionParams))
+            }
+        }
+        htmlTableBuilder.putAttribute('taackTableId', blockId)
+        HTMLTable htmlTable = htmlTableBuilder.build() as HTMLTable
         topElement.addChildren(
                 htmlTable
         )

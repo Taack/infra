@@ -30,6 +30,7 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.form.editor.EditorOption
+import taack.ui.dsl.table.TableOption
 import taack.wysiwyg.TaackAsciidocPlantUML
 import taack.wysiwyg.TaackAsciidocTable
 import taack.wysiwyg.TaackBaseAsciidocSpans
@@ -299,7 +300,10 @@ class CmsController implements WebAttributes {
     private UiTableSpecifier buildBlockTable() {
         CmsBlock cb = new CmsBlock()
 
-        new UiTableSpecifier().ui {
+        TableOption tableOption = new TableOption.TableOptionBuilder()
+                .onDropAction(this.&testDrop as MC).build()
+
+        new UiTableSpecifier().ui tableOption, {
             header {
                 sortableFieldHeader cb.position_
                 sortableFieldHeader cb.subsidiary_
@@ -322,6 +326,10 @@ class CmsController implements WebAttributes {
                 }
             }
         }
+    }
+
+    def testDrop() {
+        render 'OK'
     }
 
     @Transactional

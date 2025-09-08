@@ -100,4 +100,8 @@ class RowColumnFieldSpec implements BranchingSpec {
     void rowSelect(final String value, final boolean isSelectable = true) {
         tableVisitor.visitRowSelect(value, isSelectable)
     }
+
+    void cellDropAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
+        tableVisitor.visitCellDropAction(c, parameters)
+    }
 }

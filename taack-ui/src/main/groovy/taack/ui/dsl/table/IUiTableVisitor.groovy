@@ -2,6 +2,7 @@ package taack.ui.dsl.table
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
@@ -85,6 +86,10 @@ interface IUiTableVisitor {
     void visitColumnSelectEnd()
 
     void visitRowSelect(String value, boolean isSelectable)
+
+    void visitTableOption(TableOption tableOption)
+    void visitRowDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters)
+    void visitCellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters)
 
     String getSelectColumnParamsKey()
 }

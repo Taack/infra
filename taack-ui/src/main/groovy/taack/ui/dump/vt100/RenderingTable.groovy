@@ -2,11 +2,13 @@ package taack.ui.dump.vt100
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
+import taack.ui.dsl.table.TableOption
 import taack.ui.dump.vt100.DisplayManager as DM
 
 import java.text.DateFormat
@@ -221,6 +223,21 @@ final class RenderingTable implements IUiTableVisitor {
 
     @Override
     void visitRowSelect(String value, boolean isSelectable) {
+
+    }
+
+    @Override
+    void visitTableOption(TableOption tableOption) {
+
+    }
+
+    @Override
+    void visitRowDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
+
+    }
+
+    @Override
+    void visitCellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
 
     }
 

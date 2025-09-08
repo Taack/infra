@@ -2,6 +2,7 @@ package taack.ui.dump
 
 import grails.util.Pair
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
@@ -11,6 +12,7 @@ import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
+import taack.ui.dsl.table.TableOption
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.form.BootstrapForm
@@ -47,7 +49,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private Pair<Date, String> initialLastReadingDate
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
     private String selectColumnParamsKey
-
+    private TableOption tableOption
     protected final BlockLog blockLog
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
@@ -261,13 +263,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitTable() {
         blockLog.enterBlock('visitTable')
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
-        blockLog.topElement = themableTable.table(blockLog.topElement, blockId)
+        blockLog.topElement = themableTable.table(blockLog.topElement, blockId, tableOption)
     }
 
     @Override
     void visitTableWithoutFilter() {
         blockLog.enterBlock('visitTableWithoutFilter')
-        IHTMLElement table = themableTable.table(blockLog.topElement, blockId)
+        IHTMLElement table = themableTable.table(blockLog.topElement, blockId, tableOption)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
 
 //        List<HTMLInput> inputList = []
@@ -514,6 +516,22 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                         .builder.putAttribute('paramsKey', selectColumnParamsKey).build()
         )
         if (addColumn) visitColumnEnd()
+    }
+
+    @Override
+    void visitTableOption(TableOption tableOption) {
+
+        this.tableOption = tableOption
+    }
+
+    @Override
+    void visitRowDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
+
+    }
+
+    @Override
+    void visitCellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
+
     }
 
     @Override
