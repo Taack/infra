@@ -11,16 +11,12 @@ import web.compression.CompressionFormat
 import web.compression.DecompressionStream
 import web.compression.deflate
 import web.cssom.ClassName
-import web.data.DataTransferItemList
 import web.dom.ElementId
 import web.dom.Node
 import web.dom.document
 import web.encoding.TextDecoder
 import web.events.EventHandler
-import web.form.FormData
 import web.html.*
-import web.http.POST
-import web.http.RequestMethod
 import web.keyboard.Enter
 import web.keyboard.KeyCode
 import web.keyboard.KeyV
@@ -109,8 +105,8 @@ class MainContentEditable(
         }
     var selection: Selection? = null
     var selectedElement: Node? = null
-    var position = 0
-
+    var selectedElementPosition = 0
+    var currentLinePosition = 0
     private var timeMs = Date.now()
 
     private var currentContext: Span? = null
@@ -164,26 +160,25 @@ class MainContentEditable(
         focus = selection?.focusOffset
         selectedElement = selection?.focusNode
 
-//        trace("selection: $selection, currentLine: $currentLine (${currentLine?.className} ${currentLine?.innerHTML})")
-//        trace("selectedElement: $selectedElement, parent: ${selectedElement?.parentElement}, focus: $focus")
-
         // position in chars in parent container
         currentLine = currentLineComputed
 
         if (currentLine != null) {
-            position = 0
+            selectedElementPosition = 0
+            currentLinePosition = selectedElementPosition
             for (child in currentLine!!.childNodes.iterator()) {
-
-                if (child == selectedElement || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
-                    position += focus ?: 0
-                    trace("child == selectedElement $focus $position $child ${child is HTMLBRElement}")
+                if (child == selectedElement) { // || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
+                    selectedElementPosition += focus ?: 0
+                    currentLinePosition += selectedElementPosition
+                    trace("child == selectedElement $focus $selectedElementPosition $child ${child is HTMLBRElement}")
                     break
-                } else if (child is HTMLSpanElement) {
-                    position += child.textContent?.length ?: 0
+                } else {
+                    trace("child == selectedElement ELSE for ($currentLine)")
+                    currentLinePosition += child.textContent?.length ?: 0
                 }
             }
-        } else position = focus ?: 0
-        trace("position: $position")
+        } else selectedElementPosition = focus ?: 0
+        trace("selectedElementPosition: $selectedElementPosition, currentLinePosition: $currentLinePosition")
     }
 
     fun autocomplete(e: HTMLDivElement?) {
@@ -207,9 +202,9 @@ class MainContentEditable(
                 val scrollTop = document.body.getBoundingClientRect().top
                 val bottomVisible = visibleElement.getBoundingClientRect().bottom
                 val topVisible = visibleElement.getBoundingClientRect().top
-                trace("topVisible: $topVisible, bottomVisible: $bottomVisible, position: $position, top: $top, left: $left")
+                trace("topVisible: $topVisible, bottomVisible: $bottomVisible, position: $selectedElementPosition, top: $top, left: $left")
                 if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
-                    divAutocomplete.style.left = "${left + position * 10}px"
+                    divAutocomplete.style.left = "${left + selectedElementPosition * 10}px"
                     divAutocomplete.style.top = "${top - scrollTop + 19}px"
                     divAutocomplete.innerHTML = ""
 
@@ -220,10 +215,12 @@ class MainContentEditable(
                         d.textContent = text
                         d.onclick = EventHandler {
                             e.textContent =
-                                e.textContent?.substring(0, position) + text + e.textContent?.substring(position)
-                            position = 1
+                                e.textContent?.substring(0, selectedElementPosition) + text + e.textContent?.substring(
+                                    selectedElementPosition
+                                )
+                            selectedElementPosition = 1
                             divAutocomplete.style.display = "none"
-                            selection?.setPosition(e, position)
+                            selection?.setPosition(e, selectedElementPosition)
                         }
                         divAutocomplete.appendChild(d)
                     }
@@ -241,13 +238,13 @@ class MainContentEditable(
         if (currentLine != null) {
             var currentPosition = 0
             for (child in currentLine!!.childNodes.iterator()) {
-                trace("child: $child (${child.textContent})")
 
                 val childLength = child.textContent?.length
+                trace("child: $child (${child.textContent}), childLength = $childLength, currentPosition: $currentPosition, selectedElementPosition: $selectedElementPosition, currentLinePosition: $currentLinePosition)")
 
                 childLength?.plus(currentPosition)?.let {
-                    if (it >= position) {
-                        val o = if (child.childNodes.length == 0) 0 else 1
+                    if (it >= currentLinePosition) {
+                        val o = if (child.textContent?.length == 0) 0 else 1
                         selection?.setPosition(child, o)
                         return
                     }
