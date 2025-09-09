@@ -4,6 +4,10 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dsl.common.Style
 
+
+/**
+ * Hold Global Table Options
+ */
 @CompileStatic
 final class TableOption {
     MethodClosure uploadFileAction
@@ -14,6 +18,9 @@ final class TableOption {
         return new TableOptionBuilder()
     }
 
+    /**
+     * Hold Global Table Options Builder
+     */
     static final class TableOptionBuilder {
         private TableOption tableOption
 
@@ -21,9 +28,16 @@ final class TableOption {
             tableOption = new TableOption()
         }
 
-        TableOptionBuilder onDropAction(MethodClosure c, Map<String, ? extends Serializable> parameters = null) {
-            tableOption.uploadFileAction = c
-            tableOption.uploadFileActionParams = parameters
+        /**
+         * Specify Drop Action
+         *
+         * @param dropAction
+         * @param dropActionParams
+         * @return
+         */
+        TableOptionBuilder onDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> dropActionParams = null) {
+            tableOption.uploadFileAction = dropAction
+            tableOption.uploadFileActionParams = dropActionParams
             this
         }
 

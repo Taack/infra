@@ -101,7 +101,13 @@ class RowColumnFieldSpec implements BranchingSpec {
         tableVisitor.visitRowSelect(value, isSelectable)
     }
 
-    void cellDropAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
-        tableVisitor.visitCellDropAction(c, parameters)
+    /**
+     * Call drop action when an Item is dropped into the next sibling column
+     *
+     * @param dropAction
+     * @param dropActionParams
+     */
+    void cellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> dropActionParams = null) {
+        tableVisitor.visitCellDropAction(dropAction, dropActionParams)
     }
 }

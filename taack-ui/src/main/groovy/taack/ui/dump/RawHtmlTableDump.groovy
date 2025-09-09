@@ -50,6 +50,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
     private String selectColumnParamsKey
     private TableOption tableOption
+    private TableOption cellOption
     protected final BlockLog blockLog
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
@@ -250,11 +251,17 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
         blockLog.enterBlock('visitRowColumn')
         isInCol = true
-        HTMLTd td = new HTMLTd(colSpan, rowSpan)
-        if (style?.cssClassesString) td.addClasses(style.cssClassesString)
-        if (style?.cssStyleString) td.putAttr('style', style.cssStyleString)
-        if (firstInCol) td.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
+        IHTMLElement.HTMLElementBuilder tdBuilder = new HTMLTd(colSpan, rowSpan).builder
+        if (style?.cssClassesString) tdBuilder.addClasses(style.cssClassesString)
+        if (style?.cssStyleString) tdBuilder.putAttribute('style', style.cssStyleString)
+        if (cellOption) {
+            if (cellOption.uploadFileAction) {
+                tdBuilder.putAttribute('taackDropAction', new Parameter().urlMapped(cellOption.uploadFileAction, cellOption.uploadFileActionParams))
+            }
+        }
+        if (firstInCol) tdBuilder.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
         firstInCol = false
+        HTMLTd td = tdBuilder.build() as HTMLTd
         blockLog.topElement.builder.addChildren(td)
         blockLog.topElement = td
     }
@@ -327,6 +334,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowColumnEnd() {
+        this.cellOption = null
         blockLog.exitBlock('visitRowColumnEnd')
         isInCol = false
     }
@@ -520,7 +528,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitTableOption(TableOption tableOption) {
-
         this.tableOption = tableOption
     }
 
@@ -531,7 +538,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitCellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters) {
-
+        cellOption = new TableOption()
+        cellOption.uploadFileAction = dropAction
+        cellOption.uploadFileActionParams = parameters
     }
 
     @Override

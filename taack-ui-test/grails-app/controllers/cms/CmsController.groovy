@@ -328,8 +328,12 @@ class CmsController implements WebAttributes {
         }
     }
 
+    def testCellDrop() {
+        render 'OK testCellDrop'
+    }
+
     def testDrop() {
-        render 'OK'
+        render 'OK testDrop'
     }
 
     @Transactional

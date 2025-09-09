@@ -35,9 +35,7 @@ final class ThemableTable {
 
     IHTMLElement table(IHTMLElement topElement, String blockId, TableOption tableOption) {
         IHTMLElement.HTMLElementBuilder htmlTableBuilder = new HTMLTable().builder.addClasses( "$tableSized table-striped table-hover table-bordered pure-table pure-table-bordered")
-        println("sdfqsdfgqsdfqsdf $tableOption")
         if (tableOption) {
-        println("ZEFAZEFZEFGZEF")
             if (tableOption.headerThemeColor) {
                 htmlTableBuilder.addClasses(tableOption.headerThemeColor.cssClassesString)
             }

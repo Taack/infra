@@ -218,8 +218,10 @@ class CmsUiService implements WebAttributes {
                     rowField cp.subsidiary.toString()
                     rowField cp.pageType.toString()
                 }
+                cellDropAction(CmsController.&testCellDrop as MC)
                 rowColumn {
                     rowField cp.title_
+                    rowField 'test drop'
                 }
             }
         }

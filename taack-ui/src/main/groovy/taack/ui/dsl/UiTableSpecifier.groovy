@@ -18,34 +18,11 @@ final class UiTableSpecifier {
     TableOption tableOption
 
     /**
-     * Describe the table to display with an added column with select input per line.
-     *
-     * You must add the object to each row, like in the code sample below:
-     *
-     * <pre>{@code
-     *      row o, {
-     *          rowColumn {
-     *              rowField o.dateCreated
-     *              rowField o.lastUpdated
-     *          }
-     *      }
-     * }</pre>
-     *
-     * <p>You also need a table footer to call an action on the selection:
-     *
-     * <pre>{@code
-     *      row {
-     *          rowColumn 4, {
-     *              footerButton('Merge', Bp2Controller.&mergeValuesSave as MethodClosure, valueToMerge.id)
-     *          }
-     *      }
-     * }</pre>
+     * Table Specifier Builder
      *
      * See {@link TableSpec} for more information
      *
-     * @param aClass Class of the object displayed in the table
-     * @param action
-     * @param selectMode
+     * @param tableOption Global Table Options
      * @param closure The table specification
      * @return Itself
      */

@@ -8,7 +8,7 @@ import web.events.EventHandler
 import web.html.HTMLTableCellElement
 import web.html.HTMLTableRowElement
 
-class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
+class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     BaseElement {
     companion object {
         fun getSiblingRows(p: Table): List<TableRow> {
@@ -21,6 +21,7 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
 
     private val rowGroup: Int? = r.attributes.getNamedItem("taackTableRowGroup")?.value?.toInt()
     private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
+    private val cells = TableRowCell.getSiblingRowCells(this)
 
     init {
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")
@@ -34,6 +35,7 @@ class TableRow(val parent: Table, private val r: HTMLTableRowElement) :
                 }
             }
         }
+
         traceDeIndent("TableRow::init ---")
     }
 

@@ -7,8 +7,7 @@ import org.grails.datastore.gorm.GormEntity
 import taack.domain.TaackFilter
 import taack.ui.dsl.common.Style
 /**
- *
- * <p>This class allows to draw a table. A table is composed of a header and rows.
+ * Table Drawing DSL Spec. A table is composed of a header and rows.
  */
 @CompileStatic
 final class TableSpec {
@@ -21,9 +20,7 @@ final class TableSpec {
     }
 
     /**
-     * Draw the header of the table. Should only contains {@link ColumnHeaderFieldSpec#label(java.lang.String)},
-     * {@link ColumnHeaderFieldSpec#sortableFieldHeader(java.lang.String, taack.ast.type.FieldInfo[])} or
-     * {@link ColumnHeaderSpec#column(groovy.lang.Closure)}
+     * Draw the header of the table. Should only contains:
      *
      * @param Closure header content
      */
