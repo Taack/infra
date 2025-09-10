@@ -190,7 +190,10 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
                     if (gormEntity.hasProperty('contentType')) {
                         gormEntity['contentType'] = mf.contentType
                         if (gormEntity.hasProperty('contentTypeEnum')) {
-                            gormEntity['contentTypeEnum'] = AttachmentContentType.fromMimeType(mf.contentType)
+                            AttachmentContentType attachmentContentType = AttachmentContentType.fromMimeType(mf.contentType)
+                            gormEntity['contentTypeEnum'] = attachmentContentType
+                            if (gormEntity.hasProperty('contentTypeCategoryEnum'))
+                                gormEntity['contentTypeCategoryEnum'] = attachmentContentType.category
                         }
                     }
                     if (gormEntity.hasProperty('originalName')) {
@@ -325,10 +328,15 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
 
     String attachmentContent(Attachment attachment) {
         if (!attachment.originalName) return null
+        println "AUO1 ${attachment.originalName}"
         File txt = new File(attachmentTxtPath(attachment))
         if (txt.exists()) return txt.text
         File a = new File(attachmentPath(attachment))
+
+        println "AUO2 ${a.path}"
+
         if (a.exists()) {
+            println "AUO3 ${a.path}"
 
             try (InputStream stream = new FileInputStream(a)) {
                 if (attachment.contentTypeCategoryEnum == AttachmentContentTypeCategory.IMAGE) {
