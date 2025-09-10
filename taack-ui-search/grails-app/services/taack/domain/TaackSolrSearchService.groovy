@@ -285,4 +285,7 @@ final class TaackSolrSearchService implements WebAttributes {
         handler.toString()
     }
 
+    SolrClient getSolrClient() {
+        return this.solrClient
+    }
 }
