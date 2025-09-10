@@ -328,16 +328,11 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
 
     String attachmentContent(Attachment attachment) {
         if (!attachment.originalName) return null
-        println "AUO1 ${attachment.originalName}"
         File txt = new File(attachmentTxtPath(attachment))
         if (txt.exists()) return txt.text
         File a = new File(attachmentPath(attachment))
 
-        println "AUO2 ${a.path}"
-
         if (a.exists()) {
-            println "AUO3 ${a.path}"
-
             try (InputStream stream = new FileInputStream(a)) {
                 if (attachment.contentTypeCategoryEnum == AttachmentContentTypeCategory.IMAGE) {
                     log.info "creating ${txt.path} with OCR"
