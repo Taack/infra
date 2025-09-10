@@ -296,6 +296,14 @@ class Helper {
                 else -> {
                     if (text.isNotEmpty()) {
                         trace("Helper::update current block $text")
+                        if (url != null) {
+                            urlStack.removeLast()
+                            urlStack.addLast(url)
+                        }
+
+                        if (process != null) {
+                            processingStack.add(process)
+                        }
                         if (text.endsWith(RELOAD)) {
                             block.updateContent(text.dropLast(RELOAD.length))
                             block.parent?.reloadPageWhenCloseModal()

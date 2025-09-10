@@ -73,6 +73,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         }
         val targetUrl = Helper.urlStack.last()
         targetUrl.searchParams.delete("isAjax")
+        targetUrl.searchParams.delete("refresh")
         xhr.open(RequestMethod.POST, targetUrl)
         xhr.send(fd)
     }
