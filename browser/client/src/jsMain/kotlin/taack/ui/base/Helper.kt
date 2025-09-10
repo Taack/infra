@@ -51,12 +51,14 @@ class Helper {
         var historyState = HashMap<String, FormDataEntryValue>()
         var traceEnabled = true
         val traceTime = true
-
+        var previousDateNow = 0.0
         fun trace(level: Int, message: String) {
             if (traceEnabled) {
                 var s = ""
                 if (traceTime) {
-                    s = Date.now().toString()
+                    val ts = Date.now()
+                    s = "$ts ${(ts - previousDateNow)}"
+                    previousDateNow = ts
                 }
 
                 for (i in 0..level) {
