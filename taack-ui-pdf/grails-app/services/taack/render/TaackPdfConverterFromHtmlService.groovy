@@ -5,8 +5,6 @@ import com.itextpdf.html2pdf.HtmlConverter
 import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider
 import com.itextpdf.io.font.FontProgram
 import com.itextpdf.io.font.FontProgramFactory
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.font.FontProvider
 import grails.compiler.GrailsCompileStatic
 
@@ -30,11 +28,8 @@ class TaackPdfConverterFromHtmlService {
             fontProvider.addFont(fontProgram)
             fontProvider.addFont(fontProgramCn)
             properties.setFontProvider(fontProvider)
-            PdfWriter writer = new PdfWriter(outputStream)
-            PdfDocument pdfDocument = new PdfDocument(writer)
-            pdfDocument.setTagged()
 
-            HtmlConverter.convertToPdf(new ByteArrayInputStream(html.bytes), pdfDocument, properties)
+            HtmlConverter.convertToPdf(new ByteArrayInputStream(html.bytes), outputStream, properties)
         } catch (Throwable e) {
             log.error("${e.message}")
         }
