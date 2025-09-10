@@ -30,6 +30,7 @@ import web.uievents.MouseEvent
 import web.url.URL
 import web.window.window
 import web.xhr.XMLHttpRequest
+import kotlin.js.Date
 
 typealias CloseModalPostProcessing = ((Map<String, String>, Map<String, String>) -> Unit)
 
@@ -49,9 +50,15 @@ class Helper {
         const val RELOAD = "__reload__"
         var historyState = HashMap<String, FormDataEntryValue>()
         var traceEnabled = true
+        val traceTime = true
+
         fun trace(level: Int, message: String) {
             if (traceEnabled) {
                 var s = ""
+                if (traceTime) {
+                    s = Date.now().toString()
+                }
+
                 for (i in 0..level) {
                     s += "    "
                 }

@@ -15,7 +15,7 @@ import taack.ui.dsl.table.IUiTableVisitor
 final class UiTableSpecifier {
 
     Closure closure
-    TableOption tableOption
+    private TableOption tableOption
 
     /**
      * Table Specifier Builder
