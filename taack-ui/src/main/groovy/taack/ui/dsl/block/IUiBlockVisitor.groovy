@@ -60,8 +60,6 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitDiagramFilter(UiDiagramSpecifier diagramSpecifier, UiFilterSpecifier filterSpecifier)
 
-    void visitCloseModal(String id, String value, FieldInfo[] fields)
-
     void visitCloseModal(Map<String, String> idValueMap, FieldInfo[] fields)
 
     void visitBlockTab(String i18n)

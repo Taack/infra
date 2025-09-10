@@ -30,15 +30,8 @@ import web.uievents.MouseEvent
 import web.url.URL
 import web.window.window
 import web.xhr.XMLHttpRequest
-import kotlin.collections.iterator
 
-typealias CloseModalPostProcessing = ((String, String, Map<String, String>) -> Unit)
-typealias CloseModalPostProcessing2 = ((Map<String, String>, Map<String, String>) -> Unit)
-
-sealed class ModalCloseProcessing {
-    data class Type1(val fn: CloseModalPostProcessing) : ModalCloseProcessing()
-    data class Type2(val fn: CloseModalPostProcessing2) : ModalCloseProcessing()
-}
+typealias CloseModalPostProcessing = ((Map<String, String>, Map<String, String>) -> Unit)
 
 class Helper {
     companion object {
@@ -160,10 +153,10 @@ class Helper {
             return m
         }
 
-        private val processingStack: ArrayDeque<ModalCloseProcessing> = ArrayDeque()
+        private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
         val urlStack: ArrayDeque<URL> = ArrayDeque()
 
-        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: ModalCloseProcessing? = null) {
+        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
                 text.startsWith(RELOAD) -> {
@@ -196,14 +189,8 @@ class Helper {
                         }
                         if (processingStack.isNotEmpty()) {
                             trace("Helper::process")
-                            when (val f = processingStack.removeLast()) {
-                                is ModalCloseProcessing.Type1 -> {
-                                    f.fn(idValueMap.keys.first(), idValueMap.values.first(), otherField)
-                                }
-                                is ModalCloseProcessing.Type2 -> {
-                                    f.fn(idValueMap, otherField)
-                                }
-                            }
+                            val f = processingStack.removeLast()
+                            f(idValueMap, otherField)
                         }
                     } else {
                         if (text.length > CLOSE_LAST_MODAL.length + 1 && text.substring(CLOSE_LAST_MODAL.length + 1)

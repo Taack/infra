@@ -1,21 +1,15 @@
 package taack.ui.base.element
 
 import js.array.asList
-import js.iterable.iterator
 import kotlinx.browser.document
 import taack.ui.base.BaseElement
-import taack.ui.base.CloseModalPostProcessing
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
-import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.leaf.*
 import web.events.EventHandler
 import web.html.HTMLTableElement
-import web.location.location
-import web.window.Window
-import web.window.window
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
 

@@ -1,11 +1,9 @@
 package taack.ui.base.leaf
 
 import js.array.asList
-import taack.ui.base.CloseModalPostProcessing
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import kotlinx.browser.document
 import taack.ui.base.Helper.Companion.checkLogin
@@ -38,8 +36,8 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
         }
     }
 
-    private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionButton::modalReturnSelect $key $value $otherField")
+    private fun modalReturnSelect(idValueMap: Map<String, String>, otherField: Map<String, String>) {
+        trace("FormActionButton::modalReturnSelect $idValueMap $otherField")
         for (field in otherField) {
             val taOrI = parent.f.querySelector("#${field.key}")
             if (taOrI is HTMLInputElement) taOrI.value = field.value
@@ -72,10 +70,7 @@ class FormActionButton(private val parent: Form, private val b: HTMLButtonElemen
                 document.write(t)
                 document.close()
             } else {
-                val callback: CloseModalPostProcessing = { key, value, otherField ->
-                    modalReturnSelect(key, value, otherField)
-                }
-                Helper.processAjaxLink(null, t, parent, ModalCloseProcessing.Type1(callback))
+                Helper.processAjaxLink(null, t, parent, ::modalReturnSelect)
             }
         }
         xhr.open(RequestMethod.POST, b.formAction)

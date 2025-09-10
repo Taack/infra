@@ -223,7 +223,7 @@ class BlockLeafSpec extends BlockBase {
      * @param fields allow to update the form from which ajaxField has been called with the values of the fields listed
      */
     void closeModal(final String id, final String value, final FieldInfo[] fields = null) {
-        blockVisitor.visitCloseModal(id, value, fields)
+        blockVisitor.visitCloseModal([(id): value], fields)
     }
 
     /**
@@ -235,7 +235,18 @@ class BlockLeafSpec extends BlockBase {
      * @param fields allow to update the form from which ajaxField has been called with the values of the fields listed
      */
     void closeModal(final Long id, final String value, final FieldInfo[] fields = null) {
-        blockVisitor.visitCloseModal(id?.toString(), value, fields)
+        blockVisitor.visitCloseModal([(id?.toString()): value], fields)
+    }
+
+    /**
+     * Close the topmost modal. Usually, it passes an ID and a label to a form in a many to many relationship, if you open a modal using
+     * {@link taack.ui.dsl.form.FormSpec#ajaxField(taack.ast.type.FieldInfo, org.codehaus.groovy.runtime.MethodClosure)}.
+     *
+     * @param idValueMap map containing ID and value to be passed back to the form
+     * @param fields allow to update the form from which ajaxField has been called with the values of the fields listed
+     */
+    void closeModal(final Map<String, String> idValueMap, final FieldInfo[] fields = null) {
+        blockVisitor.visitCloseModal(idValueMap, fields)
     }
 
     /**
@@ -245,8 +256,19 @@ class BlockLeafSpec extends BlockBase {
      * @param fields allow to update the form from which ajaxField has been called with the values of the fields listed
      */
     void closeModal(final FieldInfo[] fields) {
-        blockVisitor.visitCloseModal(null, null, fields)
+        blockVisitor.visitCloseModal([:], fields)
     }
 
-
+    /**
+     * Generic close. Close the topmost modal, and update the block of the pages.
+     *
+     * @param closure describe how to update the page. This closure must not target elements that are in the current modal.
+     */
+    void closeModalAndUpdateBlock(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        blockVisitor.visitCloseModalAndUpdateBlock()
+        closure.delegate = this
+        closure.call()
+        counter++
+        blockVisitor.visitCloseModalAndUpdateBlockEnd()
+    }
 }

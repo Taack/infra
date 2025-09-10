@@ -329,13 +329,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitCloseModal(final String id, final String value, FieldInfo[] fields = null) {
-        Map<String, String> idValueMap = [:]
-        idValueMap.put(id, value)
-        visitCloseModal(idValueMap, fields)
-    }
-
-    @Override
     void visitCloseModal(final Map<String, String> idValueMap, FieldInfo[] fields = null) {
         blockLog.stayBlock('visitCloseModal')
         blockLog.topElement.addChildren(new HTMLAjaxCloseLastModal(idValueMap))

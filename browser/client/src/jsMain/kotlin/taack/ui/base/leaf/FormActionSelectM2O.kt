@@ -6,7 +6,6 @@ import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import web.dom.document
 import web.events.Event
@@ -58,20 +57,18 @@ class FormActionSelectM2O(private val parent: Form, private val sel: HTMLSelectE
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             checkLogin(xhr)
-            val callback: CloseModalPostProcessing = { key, value, otherField ->
-                modalReturnSelect(key, value, otherField)
-            }
-            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ModalCloseProcessing.Type1(callback))
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
     }
 
-    private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionSelectM2O::modalReturnSelect $key $value $otherField")
+    private fun modalReturnSelect(idValueMap: Map<String, String>, otherField: Map<String, String>) {
+        trace("FormActionSelectM2O::modalReturnSelect $idValueMap $otherField")
+        val key = idValueMap.keys.first()
         val opt = document.createElement("option") as HTMLOptionElement
         opt.value = key
-        opt.text = value
+        opt.text = idValueMap[key]!!
         opt.selected = true
         sel.options.add(opt, 0)
         for (field in otherField) {

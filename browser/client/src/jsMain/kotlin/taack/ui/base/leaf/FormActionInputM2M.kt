@@ -1,12 +1,10 @@
 package taack.ui.base.leaf
 
 import js.array.asList
-import taack.ui.base.CloseModalPostProcessing2
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import web.cssom.ClassName
 import web.dom.Node
@@ -62,17 +60,14 @@ class FormActionInputM2M(private val parent: Form, private val i: HTMLInputEleme
 
         xhr.onloadend = EventHandler {
             checkLogin(xhr)
-            val callback: CloseModalPostProcessing2 = { idValueMap, otherField ->
-                modalReturnSelect(idValueMap, otherField)
-            }
-            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ModalCloseProcessing.Type2(callback))
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
     }
 
     private fun modalReturnSelect(idValueMap: Map<String, String>, otherField: Map<String, String>) {
-        trace("FormActionInputM2M::modalReturnSelect $idValueMap")
+        trace("FormActionInputM2M::modalReturnSelect $idValueMap $otherField")
         var currentInput = i
         idValueMap.entries.forEachIndexed { index, (key, value) ->
             trace("AUO $index $key $value")

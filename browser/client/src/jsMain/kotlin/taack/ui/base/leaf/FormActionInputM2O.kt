@@ -1,12 +1,10 @@
 package taack.ui.base.leaf
 
 import js.array.asList
-import taack.ui.base.CloseModalPostProcessing
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import taack.ui.base.ModalCloseProcessing
 import taack.ui.base.element.Form
 import web.events.Event
 import web.events.EventHandler
@@ -57,18 +55,16 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             checkLogin(xhr)
-            val callback: CloseModalPostProcessing = { key, value, otherField ->
-                modalReturnSelect(key, value, otherField)
-            }
-            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ModalCloseProcessing.Type1(callback))
+            Helper.processAjaxLink(url, xhr.responseText, parent.parent.parent, ::modalReturnSelect)
         }
         xhr.open(RequestMethod.GET, url)
         xhr.send()
     }
 
-    private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormActionInputM2O::modalReturnSelect $key $value $otherField")
-        i.value = value
+    private fun modalReturnSelect(idValueMap: Map<String, String>, otherField: Map<String, String>) {
+        trace("FormActionInputM2O::modalReturnSelect $idValueMap $otherField")
+        val key = idValueMap.keys.first()
+        i.value = idValueMap[key]!!
         val i2 = i.parentElement!!.querySelector("input[type=hidden]")!! as HTMLInputElement
         i2.value = key
         for (field in otherField) {
