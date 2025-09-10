@@ -168,7 +168,7 @@ class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttrib
     @PostConstruct
     void init() {
         log.info 'init'
-        (new File(storePath))
+        new File(storePath).mkdirs()
         new File(attachmentTmpPath).mkdirs()
         new File(attachmentTxtPath).mkdirs()
         for (PreviewFormat f : PreviewFormat.values()) {
