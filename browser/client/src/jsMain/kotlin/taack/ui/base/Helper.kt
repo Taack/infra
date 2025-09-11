@@ -12,10 +12,8 @@ import web.blob.Blob
 import web.clipboard.ClipboardEvent
 import web.data.DataTransferItemList
 import web.dom.document
-import web.events.Event
 import web.events.EventHandler
 import web.events.EventType
-import web.events.ProgressEvent
 import web.form.FormData
 import web.form.FormDataEntryValue
 import web.history.history
@@ -247,8 +245,10 @@ class Helper {
 
                 text.startsWith(OPEN_MODAL) -> {
                     trace("Helper::opening modal ...")
-                    if (url != null)
+                    if (url != null) {
                         urlStack.addLast(url)
+                        block.modal.removeLastUrlWhenCloseModal()
+                    }
 
                     if (process != null) {
                         processingStack.add(process)
@@ -309,7 +309,6 @@ class Helper {
                             urlStack.removeLast()
                             urlStack.addLast(url)
                         }
-
                         if (process != null) {
                             processingStack.add(process)
                         }

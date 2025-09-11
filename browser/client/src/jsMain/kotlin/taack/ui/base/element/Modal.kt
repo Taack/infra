@@ -4,6 +4,7 @@ import kotlinx.browser.document
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import taack.ui.base.BaseElement
+import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.RELOAD
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
@@ -98,6 +99,16 @@ class Modal(val parent: Block) : BaseElement {
         closeButton.onclick = EventHandler { e ->
             e.preventDefault()
             processAjaxLink(null, RELOAD, parent)
+        }
+    }
+
+    fun removeLastUrlWhenCloseModal() {
+        if (Helper.urlStack.isNotEmpty()) {
+            closeButton.onclick = EventHandler { e ->
+                e.preventDefault()
+                close()
+                Helper.urlStack.removeLast()
+            }
         }
     }
 
