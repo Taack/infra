@@ -25,7 +25,7 @@ class RowColumnSpec extends RowColumnFieldSpec {
         tableVisitor.visitRowColumnEnd()
     }
 
-    void dropAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
-        tableVisitor.visitRowDropAction(c, parameters)
-    }
+//    void dropAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
+//        tableVisitor.visitRowDropAction(c, parameters)
+//    }
 }
