@@ -91,7 +91,14 @@ class TaackSearchService {
     }
 
     final void indexAllOnly(String name) {
-        taackSolrSearchService.indexAll(mapSolrSpecifier)
+        taackSolrSearchService.indexAllOnly(name, mapSolrSpecifier)
+    }
+
+    final void indexOnlyEntity(GormEntity... entities) {
+        if (entities != null) {
+            Class entityClass = entities.first().class
+            taackSolrSearchService.indexOnlyEntity(mapSolrSpecifier[entityClass].bValue, entities)
+        }
     }
 
     String fileContentToStringWithoutOcr(InputStream stream) {

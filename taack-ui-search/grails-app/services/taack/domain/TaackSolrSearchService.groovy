@@ -239,6 +239,24 @@ final class TaackSolrSearchService implements WebAttributes {
         }
     }
 
+    final void indexOnlyEntity(SolrSpecifier solrSpecifier, GormEntity... entity) {
+        try {
+            entity.each {
+                SolrInputDocument d = new SolrInputDocument([:])
+                try {
+                    solrSpecifier.visitSolr(new SolrIndexerVisitor(d, it), it)
+                } catch (e) {
+                    log.error("Cannot index object: ${e.message}")
+                }
+                solrClient.add d
+            }
+        } catch (e) {
+            log.error("Cannot index: ${e.message}")
+        }
+        log.info("index all $entity")
+        solrClient.commit()
+    }
+
     private void createSolrSchemas() {
         try {
             def deleteDynamicFieldQuery = new SchemaRequest.DeleteDynamicField('*_noAccent')
