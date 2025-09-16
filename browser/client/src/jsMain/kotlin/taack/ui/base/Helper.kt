@@ -172,7 +172,7 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL) -> {
-                    if (url != null && urlStack.isNotEmpty()) urlStack.removeLast()
+                    if (urlStack.isNotEmpty()) urlStack.removeLast()
                     if (text[CLOSE_LAST_MODAL.length] != ':' || text.subSequence(
                             text.length - FIELD_INFO_END.length,
                             text.length
