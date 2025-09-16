@@ -36,6 +36,8 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 
+import javax.management.BadAttributeValueExpException
+
 @GrailsCompileStatic
 final class TaackSolrSearchService implements WebAttributes {
 
@@ -44,11 +46,10 @@ final class TaackSolrSearchService implements WebAttributes {
 
     private SolrClient solrClient
 
-    TaackUiConfiguration taackUiConfiguration
-
     @PostConstruct
     void init() {
-        solrClient = new HttpJdkSolrClient.Builder(taackUiConfiguration.solrUrl).build()
+        solrClient = new HttpJdkSolrClient.Builder(TaackUiConfiguration.solrUrl)
+                .build()
     }
 
     final UiBlockSpecifier search(String q, MC search, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, Class<? extends GormEntity>... classes) {
@@ -263,23 +264,99 @@ final class TaackSolrSearchService implements WebAttributes {
             deleteDynamicFieldQuery.process(solrClient)
             def deleteFieldTypeQuery = new SchemaRequest.DeleteFieldType('text_noAccents')
             deleteFieldTypeQuery.process(solrClient)
+            def deleteDynamicFieldTag = new SchemaRequest.DeleteDynamicField('*_tag')
+            deleteDynamicFieldTag.process(solrClient)
+            def deleteFieldTypeTag = new SchemaRequest.DeleteFieldType('name_tag')
+            deleteFieldTypeTag.process(solrClient)
             solrClient.commit()
         } catch (e) {
             log.error "${e.message}"
         }
 
-        def definition = new FieldTypeDefinition()
-        def analyzer = new AnalyzerDefinition()
+        AnalyzerDefinition analyzer = new AnalyzerDefinition()
         analyzer.charFilters = [['class': 'solr.MappingCharFilterFactory', 'mapping': 'mapping-ISOLatin1Accent.txt'] as Map<String, Object>]
         analyzer.tokenizer = ['class': 'solr.StandardTokenizerFactory'] as Map<String, Object>
         analyzer.filters = [['class': 'solr.LowerCaseFilterFactory'] as Map<String, Object>, ['class': 'solr.DoubleMetaphoneFilterFactory', 'inject': 'false'] as Map<String, Object>]
+        FieldTypeDefinition definition = new FieldTypeDefinition()
         definition.analyzer = analyzer
         definition.attributes = [name: 'text_noAccents', 'class': 'solr.TextField'] as Map<String, Object>
-        def fieldTypeRequest = new SchemaRequest.AddFieldType(definition)
+        SchemaRequest.AddFieldType fieldTypeRequest = new SchemaRequest.AddFieldType(definition)
         fieldTypeRequest.process(solrClient)
-        def dynamicFieldRequest = new SchemaRequest.AddDynamicField([name: '*_noAccent', type: 'text_noAccents'] as Map<String, Object>)
+        SchemaRequest.AddDynamicField dynamicFieldRequest = new SchemaRequest.AddDynamicField([name: '*_noAccent', type: 'text_noAccents'] as Map<String, Object>)
         dynamicFieldRequest.process(solrClient)
+
         solrClient.commit()
+
+//        analyzer = new AnalyzerDefinition()
+//        analyzer.tokenizer = ['class': 'solr.StandardTokenizerFactory'] as Map<String, Object>
+//        analyzer.filters = [['class': 'solr.EnglishPossessiveFilterFactory'] as Map<String, Object>, ['class': 'solr.ASCIIFoldingFilterFactory'] as Map<String, Object>, ['class': 'solr.LowerCaseFilterFactory'] as Map<String, Object>]
+//        definition = new FieldTypeDefinition()
+//        definition.analyzer = analyzer
+//        definition.attributes = [name: 'name_tag', 'class': 'solr.TextField', 'omitNorms': 'true', 'omitTermFreqAndPositions': 'true'] as Map<String, Object>
+//        fieldTypeRequest = new SchemaRequest.AddFieldType(definition)
+//        fieldTypeRequest.process(solrClient)
+//        dynamicFieldRequest = new SchemaRequest.AddDynamicField([name: '*_tag', type: 'name_tag'] as Map<String, Object>)
+//        dynamicFieldRequest.process(solrClient)
+//        def nameField = new SchemaRequest.AddField([name: 'name', type: 'text_general'])
+//        nameField.process(solrClient)
+//        def nameTagField = new SchemaRequest.AddField([name: 'name_tag', type: 'tag', stored: false])
+//        nameTagField.process(solrClient)
+//        def copyField = new SchemaRequest.AddCopyField('name', ['name_tag'])
+//        copyField.process(solrClient)
+
+        String jsonReq = """\
+        {
+          "add-field-type":{
+            "name":"tag",
+            "class":"solr.TextField",
+            "postingsFormat":"FST50",
+            "omitNorms":true,
+            "omitTermFreqAndPositions":true,
+            "indexAnalyzer":{
+              "tokenizer":{
+                 "class":"solr.StandardTokenizerFactory" },
+              "filters":[
+                {"class":"solr.EnglishPossessiveFilterFactory"},
+                {"class":"solr.ASCIIFoldingFilterFactory"},
+                {"class":"solr.LowerCaseFilterFactory"},
+                {"class":"solr.ConcatenateGraphFilterFactory", "preservePositionIncrements":false }
+              ]},
+            "queryAnalyzer":{
+              "tokenizer":{
+                 "class":"solr.StandardTokenizerFactory" },
+              "filters":[
+                {"class":"solr.EnglishPossessiveFilterFactory"},
+                {"class":"solr.ASCIIFoldingFilterFactory"},
+                {"class":"solr.LowerCaseFilterFactory"}
+              ]}
+            },
+        
+          "add-field":{"name":"name", "type":"text_general"},
+        
+          "add-field":{"name":"name_tag", "type":"tag", "stored":false },
+        
+          "add-copy-field":{"source":"name", "dest":["name_tag"]}
+        }
+        """.stripIndent()
+
+        log.info "Configure solr tag ..."
+        println jsonRequest(jsonReq, '/schema')
+
+
+
+        String jsonReq2 = """\
+        {
+          "update-requesthandler" : {
+            "name": "/tag",
+            "class":"solr.TaggerRequestHandler",
+            "defaults":{"field":"name_tag"}
+          }
+        }
+        """.stripIndent()
+
+        log.info "Configure solr tag request Handler ..."
+        println jsonRequest(jsonReq2)
+
     }
 
     String fileContentToStringWithoutOcr(InputStream stream) {
@@ -305,5 +382,90 @@ final class TaackSolrSearchService implements WebAttributes {
 
     SolrClient getSolrClient() {
         return this.solrClient
+    }
+
+    SolrClient getSolrTagClient() {
+        return this.solrTagClient
+    }
+
+    void tagCsv(String type, ArrayList<String[]> csv, String sep = ',') {
+        if (!csv[0][0] || csv[0][0] != 'id')
+            throw new BadAttributeValueExpException("First field in lines[0][0] is not an 'id' field (lines[0][0] = ${csv?[0]?[0]})")
+
+        boolean first = true
+        String[] h
+        for (String[] l : csv) {
+            if (first) {
+                first = false
+                h = l
+            } else if (l) {
+                SolrInputDocument d = new SolrInputDocument([:])
+                for (int i = 0; i < l.length && i < h.length; i++) {
+                    d.addField(h[i], l[i].replaceAll('[",]', ''))
+                }
+                d.addField('type_s', 'TagCSV')
+                d.addField('tag_s', type)
+                try {
+                    solrClient.add d
+                } catch (e) {
+                    log.error("Error indexing line $l")
+                    log.error(e.message)
+                }
+            }
+        }
+        solrClient.commit()
+    }
+
+    String jsonRequest(String jsonString, String requestHandler = '/config') {
+        String solrCoreUrl = TaackUiConfiguration.solrUrl + requestHandler
+
+        URL url = new URL(solrCoreUrl)
+        HttpURLConnection con = (HttpURLConnection) url.openConnection()
+        con.setRequestMethod("POST")
+        con.setRequestProperty("Content-type", "application/json")
+        con.setRequestProperty("Accept", "application/json")
+        con.setDoOutput(true)
+        try (OutputStream os = con.getOutputStream()) {
+            byte[] input = jsonString.getBytes("utf-8")
+            os.write(input, 0, input.length)
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+            StringBuilder response = new StringBuilder()
+            String responseLine = null
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim())
+            }
+            return "response.toString(): " + response.toString()
+        } catch (e) {
+            log.error(e.message)
+            e.printStackTrace()
+        }
+
+    }
+
+    List<String> tagRequest(String text, String fields) {
+        String solrCoreUrl = TaackUiConfiguration.solrUrl + "/tag?overlaps=NO_SUB&tagsLimit=5000&&wt=csv&fl=$fields"
+
+        URL url = new URL(solrCoreUrl)
+        HttpURLConnection con = (HttpURLConnection) url.openConnection()
+        con.setRequestMethod("POST")
+        con.setRequestProperty("Content-type", "text/plain")
+        con.setRequestProperty("Accept", "text/csv")
+        con.setDoOutput(true)
+        try (OutputStream os = con.getOutputStream()) {
+            byte[] input = text.getBytes("utf-8")
+            os.write(input, 0, input.length)
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+            return br.readLines()
+        } catch (e) {
+            log.error(e.message)
+            e.printStackTrace()
+        }
+
     }
 }

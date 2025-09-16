@@ -7,6 +7,7 @@ group = "taack.ui.test"
 
 dependencies {
     implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+    implementation "org.apache.solr:solr-solrj:${solrj}"
 
 //    implementation 'commons-io:commons-io:2.18.0'
 //    implementation 'org.asciidoctor:asciidoctorj:3.0.0'

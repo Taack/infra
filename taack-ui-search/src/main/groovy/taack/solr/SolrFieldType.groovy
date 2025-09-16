@@ -11,6 +11,7 @@ enum SolrFieldType {
     POINT_STRING('_s', 'Str'), // for strings
     POINT_LONG('_l', 'Long'),   // ... long
     TXT_UNIQ('_t', 'TxtKey'),
+    TXT_TAG('_tag', 'tag'),
     TXT_GENERAL('_t', 'GenTxt'),  // lower case
     TXT_GENERAL_MULTI('_txt', 'GenTxtMulti'),  // lower case
     TXT_NO_ACCENT('_noAccent', 'NoAccentTxt'),  // lower case
