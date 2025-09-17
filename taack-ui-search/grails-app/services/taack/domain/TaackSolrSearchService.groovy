@@ -44,13 +44,13 @@ final class TaackSolrSearchService implements WebAttributes {
     @Autowired
     MessageSource messageSource
 
-    private SolrClient solrClient
+//    private SolrClient solrClient
 
-    @PostConstruct
-    void init() {
-        solrClient = new HttpJdkSolrClient.Builder(TaackUiConfiguration.solrUrl)
-                .build()
-    }
+//    @PostConstruct
+//    void init() {
+//        solrClient = new HttpJdkSolrClient.Builder(TaackUiConfiguration.solrUrl)
+//                .build()
+//    }
 
     final UiBlockSpecifier search(String q, MC search, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, Class<? extends GormEntity>... classes) {
         List<String> facetsClicked = params.list('facetsClicked')
@@ -110,6 +110,8 @@ final class TaackSolrSearchService implements WebAttributes {
         }
         sq.addHighlightField(highlightFields.join(' '))
         sq.add('qf', queryFields.join(' '))
+        SolrClient solrClient = newSolrClient
+
         QueryResponse queryResponse = solrClient.query(sq, SolrRequest.METHOD.POST)
         GroupResponse groupResponse = queryResponse.groupResponse
         List<FacetField> facets = queryResponse.facetFields
@@ -205,6 +207,7 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     private final void indexAllClass(Class<? extends GormEntity> aClass, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier, TaackSearchService.IIndexService toIndex, SolrSpecifier solrSpecifier) {
+        SolrClient solrClient = newSolrClient
         log.info "indexAll ${aClass}"
         try {
             toIndex.indexThose(aClass).each {
@@ -225,6 +228,7 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     final void indexAll(Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier) {
+        SolrClient solrClient = newSolrClient
         solrClient.deleteByQuery('*:*')
         createSolrSchemas()
         mapSolrSpecifier.each {
@@ -233,6 +237,7 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     final void indexAllOnly(String name, Map<Class<? extends GormEntity>, Pair<TaackSearchService.IIndexService, SolrSpecifier>> mapSolrSpecifier) {
+        SolrClient solrClient = newSolrClient
         solrClient.deleteByQuery('*:*')
         createSolrSchemas()
         mapSolrSpecifier.each {
@@ -241,6 +246,7 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     final void indexOnlyEntity(SolrSpecifier solrSpecifier, GormEntity... entity) {
+        SolrClient solrClient = newSolrClient
         try {
             entity.each {
                 SolrInputDocument d = new SolrInputDocument([:])
@@ -259,6 +265,8 @@ final class TaackSolrSearchService implements WebAttributes {
     }
 
     private void createSolrSchemas() {
+        SolrClient solrClient = newSolrClient
+
         try {
             def deleteDynamicFieldQuery = new SchemaRequest.DeleteDynamicField('*_noAccent')
             deleteDynamicFieldQuery.process(solrClient)
@@ -380,18 +388,15 @@ final class TaackSolrSearchService implements WebAttributes {
         handler.toString()
     }
 
-    SolrClient getSolrClient() {
-        return this.solrClient
-    }
-
-    SolrClient getSolrTagClient() {
-        return this.solrTagClient
+    SolrClient getNewSolrClient() {
+        new HttpJdkSolrClient.Builder(TaackUiConfiguration.solrUrl).build()
     }
 
     void tagCsv(String type, ArrayList<String[]> csv, String sep = ',') {
         if (!csv[0][0] || csv[0][0] != 'id')
             throw new BadAttributeValueExpException("First field in lines[0][0] is not an 'id' field (lines[0][0] = ${csv?[0]?[0]})")
 
+        SolrClient solrClient = newSolrClient
         boolean first = true
         String[] h
         for (String[] l : csv) {
