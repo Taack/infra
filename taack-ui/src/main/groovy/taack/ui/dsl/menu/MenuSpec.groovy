@@ -87,7 +87,7 @@ final class MenuSpec {
      * @param id
      */
     void menuIcon(final ActionIcon icon, final MethodClosure action, Long id = null) {
-        if (taackUiEnablerService.hasAccess(action, id)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), [id: id], true)
+        if (taackUiEnablerService.hasAccess(action, id)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), id ? [id: id] : null, true)
     }
 
     /**
