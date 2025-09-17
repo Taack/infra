@@ -150,7 +150,9 @@ final class Parameter implements WebAttributes {
             Pair p = actionTrParams(action)
             String trClass = tr('default.' + p.bValue?.uncapitalize() + '.label')
             if (p.aValue == 'edit' && !hasId) {
-                rv = tr('default' + '.' + 'create' + '.label', null, trClass ?: p.bValue)
+                rv = tr('default.create.label', null, trClass ?: p.bValue)
+            } else if (p.aValue == 'delete') {
+                rv = tr('default.delete.label', null, trClass ?: p.bValue)
             } else {
                 rv = tr('default' + '.' + p.aValue + '.label', null, trClass ?: p.bValue)
             }
