@@ -5,8 +5,10 @@ import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Pair
 import grails.util.Triple
+import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
@@ -61,7 +63,7 @@ import taack.user.TaackUser
  * @since taack-ui 0.1
  */
 @GrailsCompileStatic
-final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinder {
+final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinder, ServletAttributes {
 
     static lazyInit = false
 
@@ -572,7 +574,18 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (conf.hasMenuLogin) {
             TaackUser currentUser = getCurrentUser()
             if (currentUser) {
-                bout << """
+                String switchedUsername = SpringSecurityUtils.getSwitchedUserOriginalUsername()
+                if (switchedUsername)
+                    bout << """
+                    <li class="nav-item dropdown">
+                        <form action='${request.contextPath}/logout/impersonate' method='POST'>
+                            <input type='submit'
+                                   value="Resume as ${switchedUsername}"/>
+                        </form>
+                    </li>
+                """
+                else
+                    bout << """
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
