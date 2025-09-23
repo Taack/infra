@@ -209,23 +209,23 @@ td.firstCellInGroup-0 {
 }
 
 td.firstCellInGroup-1 {
-    padding-left: calc(20px * 2) !important;
+    padding-left: 40px !important;
 }
 
 td.firstCellInGroup-2 {
-    padding-left: calc(20px * 3) !important;
+    padding-left: 60px !important;
 }
 
 td.firstCellInGroup-3 {
-    padding-left: calc(20px * 4) !important;
+    padding-left: 80px !important;
 }
 
 td.firstCellInGroup-4 {
-    padding-left: calc(20px * 5) !important;
+    padding-left: 100px !important;
 }
 
 td.firstCellInGroup-5 {
-    padding-left: calc(20px * 6) !important;
+    padding-left: 120px !important;
 }
 
 td.firstCellInGroup {
