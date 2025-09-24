@@ -61,8 +61,8 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
         menuDiv
     }
 
-    static IHTMLElement blockAjax(IHTMLElement topElement, String blockId, boolean isAjax, boolean isModalRefresh) {
-        IHTMLElement e = isAjax && !isModalRefresh ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).build()
+    static IHTMLElement blockAjax(IHTMLElement topElement, String blockId, boolean isAjax) {
+        IHTMLElement e = isAjax ? new HTMLAjaxBlock(blockId).builder.build() : new HTMLDiv().builder.putAttribute('ajaxBlockId', blockId).build()
         topElement.addChildren(e)
         e
     }
