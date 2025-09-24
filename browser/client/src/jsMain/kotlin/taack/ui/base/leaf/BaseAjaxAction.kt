@@ -62,44 +62,46 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
         lastUrlClicked = createUrl(!isHref, action)
         val targetUrl = lastUrlClicked.toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
-        //Display load spinner
-        val loader = document.getElementById(ElementId("taack-load-spinner"))
-        loader?.classList?.remove(ClassName("tck-hidden"))
+
         val xhr = XMLHttpRequest()
         if (action?.contains("downloadBin") == true) {
             trace("Binary Action ... $action")
             xhr.responseType = XMLHttpRequestResponseType.blob
         }
-
-        xhr.onloadend = EventHandler { ev ->
-            trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}' status: '${xhr.status}'")
-            checkLogin(xhr)
-            if (xhr.status == 200.toShort()) {
-                ev.preventDefault()
-                loader?.classList?.add(ClassName("tck-hidden"))
-                if (xhr.responseType == XMLHttpRequestResponseType.blob) {
-                    val contentDispo = xhr.getResponseHeader("Content-Disposition")
-                    if (contentDispo != null) {
-                        val fileName =
-                            Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
-                        if (fileName != null) {
-                            trace("saveOrOpenBlog $fileName")
-                            saveOrOpenBlob(xhr.response as Blob, fileName)
+        val loader = document.getElementById(ElementId("taack-load-spinner"))
+        xhr.onreadystatechange = EventHandler { ev ->
+            if (xhr.readyState == xhr.DONE) {
+                trace("BaseAjaxAction::onclickBaseAjaxAction: Load End, action: $action responseType: '${xhr.responseType}' status: '${xhr.status}'")
+                checkLogin(xhr)
+                if (xhr.status == 200.toShort()) {
+                    ev.preventDefault()
+                    loader?.classList?.add(ClassName("tck-hidden"))
+                    if (xhr.responseType == XMLHttpRequestResponseType.blob) {
+                        val contentDispo = xhr.getResponseHeader("Content-Disposition")
+                        if (contentDispo != null) {
+                            val fileName =
+                                Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
+                            if (fileName != null) {
+                                trace("saveOrOpenBlog $fileName")
+                                saveOrOpenBlob(xhr.response as Blob, fileName)
+                            }
+                        }
+                    } else {
+                        val text = xhr.responseText
+                        if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
+                            trace("Full webpage ...|$action|${document.title}|${document.documentURI}|${xhr.responseURL}")
+                            history.pushState("{}", document.title, xhr.responseURL)
+                            location.href = xhr.responseURL
+                            document.textContent = text
+                            document.close()
+                        } else {
+                            trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
+                            processAjaxLink(lastUrlClicked, text, parent)
                         }
                     }
-                } else {
-                    val text = xhr.responseText
-                    if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
-                        trace("Full webpage ...|$action|${document.title}|${document.documentURI}|${xhr.responseURL}")
-                        history.pushState("{}", document.title, xhr.responseURL)
-                        location.href = xhr.responseURL
-                        document.textContent = text
-                        document.close()
-                    } else {
-                        trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
-                        processAjaxLink(lastUrlClicked, text, parent)
-                    }
                 }
+            } else if (xhr.readyState == xhr.LOADING) {
+                loader?.classList?.remove(ClassName("tck-hidden"))
             }
         }
 
