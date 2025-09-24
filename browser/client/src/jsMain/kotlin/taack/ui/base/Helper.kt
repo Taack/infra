@@ -267,7 +267,7 @@ class Helper {
                 text.startsWith(REFRESH_MODAL) -> {
                     trace("Helper::refresh modal $text")
                     if (url != null) {
-                        urlStack.removeLast()
+                        if (urlStack.isNotEmpty()) urlStack.removeLast()
                         urlStack.addLast(url)
                     }
 
@@ -306,7 +306,7 @@ class Helper {
                     if (text.isNotEmpty()) {
                         trace("Helper::update current block $text")
                         if (url != null) {
-                            urlStack.removeLast()
+                            if (urlStack.isNotEmpty()) urlStack.removeLast()
                             urlStack.addLast(url)
                         }
                         if (process != null) {
