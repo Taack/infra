@@ -183,10 +183,23 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         enterBlock('visitAjaxBlock id: ' + id + ' parameter.isAjaxRendering: ' + parameter.isAjaxRendering + ' parameter.ajaxBlockId: ' + parameter.ajaxBlockId)
         if (!id) id = parameter.ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.AJAX_BLOCK)
-        // if many blocks in the same response, only redraw current block
-        // further the first block must be in ajaxMode until current block ends
-        boolean doAjaxRendering = (parameter.tabIndex == null || parameter.ajaxBlockId) && (parameter.isRefresh && isModal || !isModal) && parameter.isAjaxRendering && (id == theCurrentExplicitAjaxBlockId || id == currentAjaxBlockId)
+
+        // doAjaxRendering == true : to ajax refresh the content of an existing block
+        boolean doAjaxRendering = parameter.isAjaxRendering // must be in ajaxMode
+        if (id != theCurrentExplicitAjaxBlockId && id != currentAjaxBlockId) {
+            // if many blocks in the same response, only redraw current block
+            doAjaxRendering = false
+        }
+        if (parameter.tabIndex != null && !parameter.ajaxBlockId) {
+            // insert content to an empty tab, so not for the refresh of an existing block
+            doAjaxRendering = false
+        }
+        if (isModal && !isRefreshing) {
+            // Open a new modal (Not refreshing an existing modal), so not for the refresh of an existing block
+            doAjaxRendering = false
+        }
         if (!doAjaxRendering && parameter.targetAjaxBlockId) {
+            // a highest priority interface to force the refresh of a target block
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true
         }
