@@ -186,7 +186,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
         // doAjaxRendering == true : to ajax refresh the content of an existing block
         boolean doAjaxRendering = parameter.isAjaxRendering // must be in ajaxMode
-        if (id != theCurrentExplicitAjaxBlockId && id != currentAjaxBlockId) {
+        if ((id != theCurrentExplicitAjaxBlockId || isModal) && id != currentAjaxBlockId) {
             // if many blocks in the same response, only redraw current block
             doAjaxRendering = false
         }
@@ -203,7 +203,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true
         }
-        blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering, parameter.isRefresh)
+        blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering)
     }
 
     @Override
