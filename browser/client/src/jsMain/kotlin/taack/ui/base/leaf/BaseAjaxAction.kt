@@ -75,7 +75,6 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                 checkLogin(xhr)
                 if (xhr.status == 200.toShort()) {
                     ev.preventDefault()
-                    loader?.classList?.add(ClassName("tck-hidden"))
                     if (xhr.responseType == XMLHttpRequestResponseType.blob) {
                         val contentDispo = xhr.getResponseHeader("Content-Disposition")
                         if (contentDispo != null) {
@@ -100,6 +99,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                         }
                     }
                 }
+                loader?.classList?.add(ClassName("tck-hidden"))
             } else if (xhr.readyState == xhr.LOADING) {
                 loader?.classList?.remove(ClassName("tck-hidden"))
             }
