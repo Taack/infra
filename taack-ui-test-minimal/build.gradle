@@ -12,17 +12,17 @@ version = "0.7.0"
 dependencies {
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
 //    implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-tomcat"
-    implementation "org.apache.grails:grails-web-boot"
-    implementation "org.apache.grails:grails-url-mappings"
-    implementation "org.apache.grails:grails-rest-transforms"
+//    implementation "org.springframework.boot:spring-boot-starter-actuator"
+//    implementation "org.springframework.boot:spring-boot-starter-tomcat"
+//    implementation "org.apache.grails:grails-web-boot"
+//    implementation "org.apache.grails:grails-url-mappings"
+//    implementation "org.apache.grails:grails-rest-transforms"
 
     profile "org.apache.grails.profiles:web"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "com.zaxxer:HikariCP"
     runtimeOnly "cloud.wondrify:asset-pipeline-grails"
-    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
+//    implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
 
 }
 
