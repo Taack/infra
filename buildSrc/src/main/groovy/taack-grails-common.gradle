@@ -28,7 +28,6 @@ repositories {
 dependencies {
     profile "org.apache.grails.profiles:plugin"
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation "org.apache.grails:grails-core"
     implementation "org.apache.grails:grails-data-hibernate5"
     implementation "org.apache.grails:grails-databinding"
