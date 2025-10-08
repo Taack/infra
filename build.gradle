@@ -21,7 +21,14 @@ buildscript {
         classpath "org.apache.grails:grails-gradle-plugins"
         classpath "org.apache.grails:grails-data-hibernate5"
         classpath "cloud.wondrify:asset-pipeline-gradle"
+        classpath 'com.netflix.nebula:gradle-lint-plugin:20.6.2'
     }
+}
+
+apply plugin: 'nebula.lint'
+
+gradleLint {
+    rules=['unused-dependency']
 }
 
 ext.projectVersion = taackReleaseVersion
@@ -71,6 +78,7 @@ def publishedProjects = [
 ]
 
 subprojects {
+
     if (name in publishedProjects) {
         version releaseVersion
         group "org.taack"
@@ -84,7 +92,10 @@ subprojects {
             mavenLocal()
             mavenCentral()
             maven { url "https://repo.grails.org/grails/core" }
+
         }
+
+        apply plugin: 'nebula.lint'
 
         publishing {
             publications {
