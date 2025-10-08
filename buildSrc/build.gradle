@@ -2,13 +2,12 @@ plugins {
     id 'groovy-gradle-plugin'
 }
 
-Properties properties = new Properties()
-FileInputStream input = new FileInputStream(file('../gradle.properties'))
-properties.load(input)
-input.close()
-
-for (String key : properties.stringPropertyNames()) {
-    ext.set(key, properties.getProperty(key))
+def props = new Properties()
+file('../gradle.properties').withInputStream { props.load(it) }
+props.each { key, val ->
+    if (!project.hasProperty(key)) {
+        project.ext."$key" = val
+    }
 }
 
 repositories {
@@ -22,6 +21,6 @@ repositories {
 dependencies {
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
     implementation "org.apache.grails:grails-gradle-plugins"
-    implementation "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:${graalvmBuildtoolsVersion}"
-    implementation "org.gradle.crypto.checksum:org.gradle.crypto.checksum.gradle.plugin:${gradleChecksumPluginVersion}"
+//    implementation "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:${graalvmBuildtoolsVersion}"
+//    implementation "org.gradle.crypto.checksum:org.gradle.crypto.checksum.gradle.plugin:${gradleChecksumPluginVersion}"
 }
