@@ -13,10 +13,14 @@ import taack.ui.base.Helper.Companion.traceIndent
 import web.cssom.ClassName
 import web.dom.ElementId
 import web.events.EventHandler
+import web.events.EventType
+import web.events.addEventListener
 import web.html.ButtonType
 import web.html.HTMLButtonElement
 import web.html.HTMLDivElement
 import web.html.button
+import web.uievents.MouseEvent
+import web.window.window
 
 class Modal(val parent: Block) : BaseElement {
     companion object {
@@ -59,6 +63,7 @@ class Modal(val parent: Block) : BaseElement {
         fullscreenButton.className = ClassName("btn-fullscreen")
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
+            cleanModalPosition()
             toggleFullscreen()
         }
         closeButton = document.createElement("button") as HTMLButtonElement
@@ -79,6 +84,7 @@ class Modal(val parent: Block) : BaseElement {
         dModalDialog.appendChild(dModalContent)
         dModal.appendChild(dModalDialog)
         parent.d.parentElement?.appendChild(dModal)
+        enableModalDraggable(dClose)
     }
 
     fun open(htmlContent: String) {
@@ -93,6 +99,7 @@ class Modal(val parent: Block) : BaseElement {
         modalBackdrop.id = ElementId("modal-backdrop-$mId")
         modalBackdrop.classList.add(ClassName("modal-backdrop"), ClassName("fade"), ClassName("show"))
         parent.d.parentElement!!.appendChild(modalBackdrop)
+        cleanModalPosition()
     }
 
     fun reloadPageWhenCloseModal() {
@@ -131,6 +138,68 @@ class Modal(val parent: Block) : BaseElement {
         } else {
             dModalDialog.classList.add(ClassName("modal-fullscreen"))
         }
+    }
+
+    private fun enableModalDraggable(header: HTMLDivElement) {
+        var isDragging = false
+        var startX = 0
+        var startY = 0
+        var maxLeft = 0.0
+        var maxRight = 0.0
+        var maxTop = 0.0
+        var maxBottom = 0.0
+        var initialOffsetLeft = 0.0
+        var initialOffsetTop = 0.0
+        header.addEventListener(EventType("mousedown"), EventHandler { e: MouseEvent ->
+            isDragging = true
+            startX = e.clientX
+            startY = e.clientY
+            maxLeft = dModalContent.getBoundingClientRect().left
+            maxRight = window.innerWidth - dModalContent.getBoundingClientRect().right
+            maxTop = dModalContent.getBoundingClientRect().top
+            maxBottom = window.innerHeight - dModalContent.getBoundingClientRect().bottom
+            initialOffsetLeft = dModalContent.offsetLeft.toDouble()
+            initialOffsetTop = dModalContent.offsetTop.toDouble()
+
+            web.dom.document.body.style.userSelect = "none"
+            header.style.cursor = "move"
+        })
+        web.dom.document.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
+            if (!isDragging) return@EventHandler
+            val dx = e.clientX - startX
+            val dy = e.clientY - startY
+            var newLeft = initialOffsetLeft
+            var newTop = initialOffsetTop
+
+            if (dx > maxRight) {
+                newLeft += maxRight
+            } else if (dx < -maxLeft) {
+                newLeft -= maxLeft
+            } else {
+                newLeft += dx
+            }
+
+            if (dy > maxBottom) {
+                newTop += maxBottom
+            } else if (dy < -maxTop) {
+                newTop -= maxTop
+            } else {
+                newTop += dy
+            }
+
+            dModalContent.style.position = "absolute"
+            dModalContent.style.left = "${newLeft}px"
+            dModalContent.style.top = "${newTop}px"
+        })
+        web.dom.document.addEventListener(EventType("mouseup"), EventHandler {
+            isDragging = false
+            web.dom.document.body.style.userSelect = ""
+            header.style.cursor = ""
+        })
+    }
+
+    private fun cleanModalPosition() {
+        dModalContent.removeAttribute("style")
     }
 
     override fun getParentBlock(): Block {
