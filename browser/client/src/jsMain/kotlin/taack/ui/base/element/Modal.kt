@@ -66,12 +66,19 @@ class Modal(val parent: Block) : BaseElement {
             cleanModalPosition()
             toggleFullscreen()
         }
+        fullscreenButton.onmousedown = EventHandler { e ->
+            e.stopPropagation()
+        }
         closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
         closeButton.className = ClassName("btn-close")
         closeButton.onclick = EventHandler { e ->
+            e.stopPropagation()
             e.preventDefault()
             close()
+        }
+        closeButton.onmousedown = EventHandler { e ->
+            e.stopPropagation()
         }
         document.addEventListener("keydown", escModalCallback)
 
@@ -168,30 +175,27 @@ class Modal(val parent: Block) : BaseElement {
             if (!isDragging) return@EventHandler
             val dx = e.clientX - startX
             val dy = e.clientY - startY
-            var newLeft = initialOffsetLeft
-            var newTop = initialOffsetTop
-
-            if (dx > maxRight) {
-                newLeft += maxRight
-            } else if (dx < -maxLeft) {
-                newLeft -= maxLeft
-            } else {
-                newLeft += dx
-            }
-
-            if (dy > maxBottom) {
-                newTop += maxBottom
-            } else if (dy < -maxTop) {
-                newTop -= maxTop
-            } else {
-                newTop += dy
-            }
 
             dModalContent.style.position = "absolute"
-            dModalContent.style.left = "${newLeft}px"
-            dModalContent.style.top = "${newTop}px"
+            dModalContent.style.left = "${initialOffsetLeft + dx}px"
+            dModalContent.style.top = "${initialOffsetTop + dy}px"
         })
-        web.dom.document.addEventListener(EventType("mouseup"), EventHandler {
+        web.dom.document.addEventListener(EventType("mouseup"), EventHandler { e: MouseEvent ->
+            if (isDragging) {
+                val dx = e.clientX - startX
+                val dy = e.clientY - startY
+                if (dx > maxRight) {
+                    dModalContent.style.left = "${initialOffsetLeft + maxRight}px"
+                } else if (dx < -maxLeft) {
+                    dModalContent.style.left = "${initialOffsetLeft - maxLeft}px"
+                }
+
+                if (dy > maxBottom) {
+                    dModalContent.style.top = "${initialOffsetTop + maxBottom}px"
+                } else if (dy < -maxTop) {
+                    dModalContent.style.top = "${initialOffsetTop - maxTop}px"
+                }
+            }
             isDragging = false
             web.dom.document.body.style.userSelect = ""
             header.style.cursor = ""
