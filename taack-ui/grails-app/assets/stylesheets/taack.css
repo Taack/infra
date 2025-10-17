@@ -370,6 +370,10 @@ svg text {
     opacity: var(--bs-btn-close-opacity);
 }
 
+.modal-fullscreen .btn-fullscreen {
+    --bs-btn-close-bg: url(/assets/taack/icons/actions/fullscreen-exit.svg);
+}
+
 [data-bs-theme=dark] .btn-fullscreen {
     filter: var(--bs-btn-close-white-filter);
 }
