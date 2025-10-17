@@ -58,9 +58,21 @@ class Modal(val parent: Block) : BaseElement {
         dModalContent.classList.add(ClassName("modal-content"))
         dModalContent.classList.add(ClassName("taackModal"))
         val dClose = document.createElement("div") as HTMLDivElement
+        val minimiseButton = document.createElement("button") as HTMLButtonElement
+        minimiseButton.type = ButtonType.button
+        minimiseButton.classList.add(ClassName("btn"), ClassName("btn-minimise"))
+        minimiseButton.innerHTML = "&#128469;"
+        minimiseButton.onclick = EventHandler { e ->
+            e.preventDefault()
+            // todo
+        }
+        minimiseButton.onmousedown = EventHandler { e ->
+            e.stopPropagation()
+        }
         val fullscreenButton = document.createElement("button") as HTMLButtonElement
         fullscreenButton.type = ButtonType.button
-        fullscreenButton.className = ClassName("btn-fullscreen")
+        fullscreenButton.classList.add(ClassName("btn"), ClassName("btn-fullscreen"))
+        fullscreenButton.innerHTML = "&#128470;"
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
             cleanModalPosition()
@@ -84,6 +96,7 @@ class Modal(val parent: Block) : BaseElement {
 
         dClose.classList.add(ClassName("taack-close"))
         dClose.classList.add(ClassName("modal-header"))
+        dClose.appendChild(minimiseButton)
         dClose.appendChild(fullscreenButton)
         dClose.appendChild(closeButton)
         dModalContent.appendChild(dClose)
