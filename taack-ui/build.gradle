@@ -1,5 +1,4 @@
 plugins {
-    id 'taack-grails-plugin'
     id 'taack-grails-assets-plugin'
 }
 

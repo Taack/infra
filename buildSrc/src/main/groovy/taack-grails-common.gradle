@@ -1,7 +1,6 @@
 plugins {
     id 'groovy'
     id 'war'
-    id 'org.apache.grails.gradle.grails-plugin'
 }
 
 group = 'org.taack'
@@ -26,7 +25,6 @@ repositories {
 }
 
 dependencies {
-    profile "org.apache.grails.profiles:plugin"
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
     implementation "org.apache.grails:grails-core"
     implementation "org.apache.grails:grails-data-hibernate5"

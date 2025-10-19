@@ -2,7 +2,7 @@ plugins {
     id 'taack-grails-common'
     id 'org.apache.grails.gradle.grails-app'
     id 'war'
-    id 'org.apache.grails.gradle.grails-web'
+//    id 'org.apache.grails.gradle.grails-web'
     id 'cloud.wondrify.asset-pipeline'
 }
 
