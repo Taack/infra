@@ -37,6 +37,20 @@ bootJar {
 }
 
 bootRun {
+    doFirst {
+        def taackPlugins = ['taack-ui', 'taack-ui-pdf', 'taack-ui-asciidoc', 'taack-ui-jdbc', 'taack-ui-search']
+        classpath = classpath.filter { file ->
+            boolean r = true
+            taackPlugins.each { p ->
+                r = r && !file.path.contains(p + '-' + version + '.jar')  // Exclude the JAR to avoid duplicates
+            }
+            r
+        }
+        taackPlugins.each { p ->
+            classpath = classpath + project(':' + p).sourceSets.main.output  // Add classes and resources output
+        }
+    }
+
     ignoreExitValue true
     jvmArgs(
             '-Dspring.output.ansi.enabled=always',
