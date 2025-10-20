@@ -170,18 +170,20 @@ class Modal(val parent: Block) : BaseElement {
         var initialOffsetLeft = 0.0
         var initialOffsetTop = 0.0
         header.addEventListener(EventType("mousedown"), EventHandler { e: MouseEvent ->
-            isDragging = true
-            startX = e.clientX
-            startY = e.clientY
-            maxLeft = dModalContent.getBoundingClientRect().left
-            maxRight = window.innerWidth - dModalContent.getBoundingClientRect().right
-            maxTop = dModalContent.getBoundingClientRect().top
-            maxBottom = window.innerHeight - dModalContent.getBoundingClientRect().bottom
-            initialOffsetLeft = dModalContent.offsetLeft.toDouble()
-            initialOffsetTop = dModalContent.offsetTop.toDouble()
+            if (!dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
+                isDragging = true
+                startX = e.clientX
+                startY = e.clientY
+                maxLeft = dModalContent.getBoundingClientRect().left
+                maxRight = window.innerWidth - dModalContent.getBoundingClientRect().right
+                maxTop = dModalContent.getBoundingClientRect().top
+                maxBottom = window.innerHeight - dModalContent.getBoundingClientRect().bottom
+                initialOffsetLeft = dModalContent.offsetLeft.toDouble()
+                initialOffsetTop = dModalContent.offsetTop.toDouble()
 
-            web.dom.document.body.style.userSelect = "none"
-            header.style.cursor = "move"
+                web.dom.document.body.style.userSelect = "none"
+                header.style.cursor = "move"
+            }
         })
         web.dom.document.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
             if (!isDragging) return@EventHandler
