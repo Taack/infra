@@ -354,10 +354,15 @@ svg text {
     justify-content: right;
 }
 
-.modal-header .btn-close, .modal-header .btn-fullscreen, .modal-header .btn-minimise {
-    padding: .25em .25em;
+.btn-taack-close, .btn-taack-fullscreen, .btn-taack-minimise {
+    font-size: larger;
+    padding: 0 .15em;
     margin: 0;
     opacity: 0.5;
+}
+
+.btn-taack-close:hover, .btn-taack-fullscreen:hover, .btn-taack-minimise:hover {
+    opacity: 0.75;
 }
 
 /*CONTEXT MENU*/

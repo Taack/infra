@@ -60,7 +60,7 @@ class Modal(val parent: Block) : BaseElement {
         val dClose = document.createElement("div") as HTMLDivElement
         val minimiseButton = document.createElement("button") as HTMLButtonElement
         minimiseButton.type = ButtonType.button
-        minimiseButton.classList.add(ClassName("btn"), ClassName("btn-minimise"))
+        minimiseButton.classList.add(ClassName("btn"), ClassName("btn-taack-minimise"))
         minimiseButton.innerHTML = "&#128469;"
         minimiseButton.onclick = EventHandler { e ->
             e.preventDefault()
@@ -71,19 +71,27 @@ class Modal(val parent: Block) : BaseElement {
         }
         val fullscreenButton = document.createElement("button") as HTMLButtonElement
         fullscreenButton.type = ButtonType.button
-        fullscreenButton.classList.add(ClassName("btn"), ClassName("btn-fullscreen"))
+        fullscreenButton.classList.add(ClassName("btn"), ClassName("btn-taack-fullscreen"))
         fullscreenButton.innerHTML = "&#128470;"
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
             cleanModalPosition()
-            toggleFullscreen()
+            trace("Modal::fullscreen $mId")
+            if (dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
+                dModalDialog.classList.remove(ClassName("modal-fullscreen"))
+                fullscreenButton.innerHTML = "&#128470;"
+            } else {
+                dModalDialog.classList.add(ClassName("modal-fullscreen"))
+                fullscreenButton.innerHTML = "&#128471;"
+            }
         }
         fullscreenButton.onmousedown = EventHandler { e ->
             e.stopPropagation()
         }
         closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
-        closeButton.className = ClassName("btn-close")
+        closeButton.classList.add(ClassName("btn"), ClassName("btn-taack-close"))
+        closeButton.innerHTML = "&#128473;"
         closeButton.onclick = EventHandler { e ->
             e.stopPropagation()
             e.preventDefault()
@@ -149,15 +157,6 @@ class Modal(val parent: Block) : BaseElement {
         document.body!!.style.removeProperty("padding-right")
         document.body!!.style.removeProperty("overflow-y")
         document.getElementById("modal-backdrop-$mId")?.remove()
-    }
-
-    private fun toggleFullscreen() {
-        trace("Modal::fullscreen $mId")
-        if (dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
-            dModalDialog.classList.remove(ClassName("modal-fullscreen"))
-        } else {
-            dModalDialog.classList.add(ClassName("modal-fullscreen"))
-        }
     }
 
     private fun enableModalDraggable(header: HTMLDivElement) {
