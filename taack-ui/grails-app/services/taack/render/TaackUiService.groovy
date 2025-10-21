@@ -632,8 +632,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 <div id="taack-main-block">"""
         htmlBlock.getOutput(bout)
         bout << """\
-    <div id="taack-load-spinner" class="tck-hidden"></div>
 </div>
+<div id="taack-load-spinner" class="tck-hidden"></div>
 ${bootstrapJsTag}
 """
         if (clientJsPath != null && !clientJsPath.empty)
