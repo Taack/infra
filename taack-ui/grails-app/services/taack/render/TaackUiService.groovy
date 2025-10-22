@@ -634,6 +634,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         bout << """\
 </div>
 <div id="taack-load-spinner" class="tck-hidden"></div>
+<div id="taack-modal-minimize-items"></div>
 ${bootstrapJsTag}
 """
         if (clientJsPath != null && !clientJsPath.empty)

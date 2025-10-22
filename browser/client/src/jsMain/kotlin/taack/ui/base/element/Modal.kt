@@ -22,10 +22,10 @@ import web.html.button
 import web.uievents.MouseEvent
 import web.window.window
 
-class Modal(val parent: Block) : BaseElement {
+class Modal(val parent: Block, htmlContent: String) : BaseElement {
     companion object {
-        fun buildModal(p: Block): Modal {
-            return Modal(p)
+        fun buildModal(p: Block, htmlContent: String): Modal {
+            return Modal(p, htmlContent)
         }
 
         var id: Int = 0
@@ -47,26 +47,28 @@ class Modal(val parent: Block) : BaseElement {
     val mId = id++
 
     init {
-        trace("Modal::init $mId")
+        traceIndent("Modal::open $mId")
+        parent.modals.addLast(this)
         dModal = document.createElement("div") as HTMLDivElement
         dModal.classList.add(ClassName("modal"))
+        dModal.style.display = "block"
         dModalDialog = document.createElement("div") as HTMLDivElement
         dModalDialog.classList.add(ClassName("modal-dialog"), ClassName("modal-xl"), ClassName("modal-dialog-scrollable"), ClassName("modal-dialog-centered"))
-        dModalContent = document.createElement("div") as HTMLDivElement
         dModalBody = document.createElement("div") as HTMLDivElement
         dModalBody.classList.add(ClassName("modal-body"), ClassName("overflow-y-auto"))
+        dModalBody.innerHTML = htmlContent
+        dModalContent = document.createElement("div") as HTMLDivElement
         dModalContent.classList.add(ClassName("modal-content"))
         dModalContent.classList.add(ClassName("taackModal"))
-        val dClose = document.createElement("div") as HTMLDivElement
-        val minimiseButton = document.createElement("button") as HTMLButtonElement
-        minimiseButton.type = ButtonType.button
-        minimiseButton.classList.add(ClassName("btn"), ClassName("btn-taack-minimise"))
-        minimiseButton.innerHTML = "&#128469;"
-        minimiseButton.onclick = EventHandler { e ->
+        val minimizeButton = document.createElement("button") as HTMLButtonElement
+        minimizeButton.type = ButtonType.button
+        minimizeButton.classList.add(ClassName("btn"), ClassName("btn-taack-minimize"))
+        minimizeButton.innerHTML = "&#128469;"
+        minimizeButton.onclick = EventHandler { e ->
             e.preventDefault()
-            // todo
+            minimize()
         }
-        minimiseButton.onmousedown = EventHandler { e ->
+        minimizeButton.onmousedown = EventHandler { e ->
             e.stopPropagation()
         }
         val fullscreenButton = document.createElement("button") as HTMLButtonElement
@@ -75,8 +77,8 @@ class Modal(val parent: Block) : BaseElement {
         fullscreenButton.innerHTML = "&#128470;"
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
-            cleanModalPosition()
             trace("Modal::fullscreen $mId")
+            dModalContent.removeAttribute("style")
             if (dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
                 dModalDialog.classList.remove(ClassName("modal-fullscreen"))
                 fullscreenButton.innerHTML = "&#128470;"
@@ -100,63 +102,69 @@ class Modal(val parent: Block) : BaseElement {
         closeButton.onmousedown = EventHandler { e ->
             e.stopPropagation()
         }
-        document.addEventListener("keydown", escModalCallback)
-
-        dClose.classList.add(ClassName("taack-close"))
-        dClose.classList.add(ClassName("modal-header"))
-        dClose.appendChild(minimiseButton)
-        dClose.appendChild(fullscreenButton)
-        dClose.appendChild(closeButton)
-        dModalContent.appendChild(dClose)
+        val dModalHeader = document.createElement("div") as HTMLDivElement
+        dModalHeader.classList.add(ClassName("modal-header"))
+        dModalHeader.appendChild(minimizeButton)
+        dModalHeader.appendChild(fullscreenButton)
+        dModalHeader.appendChild(closeButton)
+        dModalContent.appendChild(dModalHeader)
         dModalContent.appendChild(dModalBody)
         dModalDialog.appendChild(dModalContent)
         dModal.appendChild(dModalDialog)
         parent.d.parentElement?.appendChild(dModal)
-        enableModalDraggable(dClose)
-    }
-
-    fun open(htmlContent: String) {
-        traceIndent("Modal::open $mId")
-        dModalBody.innerHTML = htmlContent
-        dModal.style.display = "block"
-        Block.getSiblingBlock(this)
-        document.body!!.classList.add("modal-open")
-        document.body!!.style.paddingRight = "15px"
-        document.body!!.style.overflowY = "hidden"
         val modalBackdrop = document.createElement("div") as HTMLDivElement
         modalBackdrop.id = ElementId("modal-backdrop-$mId")
         modalBackdrop.classList.add(ClassName("modal-backdrop"), ClassName("fade"), ClassName("show"))
-        parent.d.parentElement!!.appendChild(modalBackdrop)
-        cleanModalPosition()
+        parent.d.parentElement?.appendChild(modalBackdrop)
+
+        document.body!!.classList.add("modal-open")
+        document.addEventListener("keydown", escModalCallback)
+        enableModalDraggable(dModalHeader)
+        Block.getSiblingBlock(this)
     }
 
     fun reloadPageWhenCloseModal() {
-        closeButton.onclick = EventHandler { e ->
-            e.preventDefault()
+        closeButton.addEventListener(EventType("click"), fun(_) {
             processAjaxLink(null, RELOAD, parent)
-        }
+        })
     }
 
     fun removeLastUrlWhenCloseModal() {
-        if (Helper.urlStack.isNotEmpty()) {
-            closeButton.onclick = EventHandler { e ->
-                e.preventDefault()
-                close()
-                Helper.urlStack.removeLast()
-            }
-        }
+        closeButton.addEventListener(EventType("click"), fun(_) {
+            if (Helper.urlStack.isNotEmpty()) Helper.urlStack.removeLast()
+        })
     }
 
     fun close() {
         traceDeIndent("Modal::close $mId")
-        dModal.style.display = "none"
-        dModalBody.innerHTML = ""
-        if (dModalBody.nextElementSibling != null) dModalBody.nextElementSibling!!.remove()
+        parent.modals.remove(this)
+        dModal.remove()
         document.removeEventListener("keydown", escModalCallback)
         document.body!!.classList.remove("modal-open")
-        document.body!!.style.removeProperty("padding-right")
-        document.body!!.style.removeProperty("overflow-y")
         document.getElementById("modal-backdrop-$mId")?.remove()
+    }
+
+    private fun minimize() {
+        var rootModal = this
+        while (rootModal.getParentBlock().parent != null) {
+            rootModal = rootModal.getParentBlock().parent!!
+        }
+        rootModal.dModal.style.display = "none"
+        (document.getElementById("modal-backdrop-${rootModal.mId}") as HTMLDivElement?)?.style?.display = "none"
+        document.body!!.classList.remove("modal-open")
+
+        val minimizeItem = document.createElement("button") as HTMLButtonElement
+        minimizeItem.id = ElementId("modal-minimize-item-$mId")
+        minimizeItem.classList.add(ClassName("btn"), ClassName("btn-primary"))
+        minimizeItem.innerHTML = dModalBody.querySelector("ul[taacktag='LABEL']")?.textContent ?: "Modal $mId"
+        minimizeItem.onclick = EventHandler { e ->
+            e.preventDefault()
+            rootModal.dModal.style.display = "block"
+            (document.getElementById("modal-backdrop-${rootModal.mId}") as HTMLDivElement?)?.style?.display = ""
+            minimizeItem.remove()
+            document.body!!.classList.add("modal-open")
+        }
+        document.getElementById("taack-modal-minimize-items")!!.append(minimizeItem)
     }
 
     private fun enableModalDraggable(header: HTMLDivElement) {
@@ -214,10 +222,6 @@ class Modal(val parent: Block) : BaseElement {
             web.dom.document.body.style.userSelect = ""
             header.style.cursor = ""
         })
-    }
-
-    private fun cleanModalPosition() {
-        dModalContent.removeAttribute("style")
     }
 
     override fun getParentBlock(): Block {

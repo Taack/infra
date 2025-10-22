@@ -350,19 +350,38 @@ svg text {
     fill: var(--bs-body-color);
 }
 
-.modal-header {
-    justify-content: right;
+.modal-open {
+    padding-right: 15px;
+    overflow-y: hidden;
 }
 
-.btn-taack-close, .btn-taack-fullscreen, .btn-taack-minimise {
+.modal-header {
+    justify-content: right;
+    padding: 10px 20px 20px 0;
+    border-bottom: none;
+}
+
+.btn-taack-close, .btn-taack-fullscreen, .btn-taack-minimize {
     font-size: larger;
     padding: 0 .15em;
     margin: 0;
     opacity: 0.5;
 }
 
-.btn-taack-close:hover, .btn-taack-fullscreen:hover, .btn-taack-minimise:hover {
+.btn-taack-close:hover, .btn-taack-fullscreen:hover, .btn-taack-minimize:hover {
     opacity: 0.75;
+}
+
+#taack-modal-minimize-items {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+#taack-modal-minimize-items button {
+    margin: 0 0.2em;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2);
 }
 
 /*CONTEXT MENU*/

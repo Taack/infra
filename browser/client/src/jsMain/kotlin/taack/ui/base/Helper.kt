@@ -210,9 +210,9 @@ class Helper {
                             }
                         }
                     }
-                    trace("Helper::closing Modal ${block.modal.mId}")
+                    trace("Helper::closing Modal")
                     if (block.parent != null) block.parent.close()
-                    else block.modal.close()
+                    else block.closeModal()
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK) -> {
@@ -220,9 +220,9 @@ class Helper {
                         urlStack.removeLast()
                         urlStack.addLast(url)
                     }
-                    trace("Helper::CLOSE_LAST_MODAL_AND_UPDATE_BLOCK ${block.modal.mId}")
+                    trace("Helper::CLOSE_LAST_MODAL_AND_UPDATE_BLOCK")
                     if (block.parent != null) block.parent.close()
-                    else block.modal.close()
+                    else block.closeModal()
                     val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
                     processAjaxLink(url, innerText, block.parent ?: base, process)
                 }
@@ -247,21 +247,15 @@ class Helper {
                     trace("Helper::opening modal ...")
                     if (url != null) {
                         urlStack.addLast(url)
-                        block.modal.removeLastUrlWhenCloseModal()
                     }
-
                     if (process != null) {
                         processingStack.add(process)
                     }
-
                     if (text.endsWith(RELOAD)) {
-                        block.modal.open(text.substring(OPEN_MODAL.length).dropLast(RELOAD.length))
-                        block.modal.reloadPageWhenCloseModal()
+                        block.openModal(text.substring(OPEN_MODAL.length).dropLast(RELOAD.length), true, url != null)
                     } else {
-                        block.modal.open(text.substring(OPEN_MODAL.length))
+                        block.openModal(text.substring(OPEN_MODAL.length), false, url != null)
                     }
-                    val s = block.modal.dModalBody.getElementsByTagName("script")
-                    trace("Executing $s")
                 }
 
                 text.startsWith(REFRESH_MODAL) -> {
@@ -274,9 +268,7 @@ class Helper {
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    block.modal.dModalBody.innerHTML = text
-                    val s = block.modal.dModalBody.getElementsByTagName("script")
-                    trace("Executing $s")
+                    block.modals.last().dModalBody.innerHTML = text
                 }
 
                 text.startsWith(REDIRECT) -> {

@@ -21,7 +21,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     }
 
     val ajaxBlockElements = mutableMapOf<String, AjaxBlock>()
-    val modal: Modal
+    val modals: ArrayDeque<Modal> = ArrayDeque()
     private var tabs: List<Tab>
     val blockId: String
     private var modalNumber = 0
@@ -40,7 +40,6 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
         }
         tabs = Tab.getSiblingTab(this)
         AjaxBlock.getSiblingAjaxBlock(this)
-        modal = Modal.buildModal(this)
 
 //        AjaxBlock(this, d)
         traceDeIndent("Block::init --- ${d.id}")
@@ -61,5 +60,15 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
             d.children[i].remove()
         }
         AjaxBlock.getSiblingAjaxBlock(this)
+    }
+
+    fun openModal(htmlContent: String, reloadPageWhenCloseModal: Boolean = false, removeLastUrlWhenCloseModal: Boolean = false) {
+        val modal = Modal.buildModal(this, htmlContent)
+        if (reloadPageWhenCloseModal) modal.reloadPageWhenCloseModal()
+        if (removeLastUrlWhenCloseModal) modal.removeLastUrlWhenCloseModal()
+    }
+
+    fun closeModal() {
+        if (modals.isNotEmpty()) modals.last().close()
     }
 }

@@ -120,6 +120,7 @@
     ${raw(block)}
 </div>
 <div id="taack-load-spinner" class="tck-hidden"></div>
+<div id="taack-modal-minimize-items"></div>
 
 ${raw(bootstrapJsTag)}
 <g:if test="${clientJsPath != null}">
