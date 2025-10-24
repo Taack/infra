@@ -334,8 +334,9 @@ td[taacktag] em {
     background-size: 250px;
     z-index: 101;
 }
-#taack-load-spinner.tck-hidden {
-    display: none;
+
+.tck-hidden {
+    display: none !important;
 }
 
 .taack-tab-load {

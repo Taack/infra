@@ -31,25 +31,24 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         var id: Int = 0
     }
 
-    private var dModal: HTMLDivElement
+    private var dModal: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private var dModalDialog: HTMLDivElement
     var dModalBody: HTMLDivElement
-    private val dModalContent: HTMLDivElement
+    private val dModalContent = document.createElement("div") as HTMLDivElement
     private val closeButton: HTMLButtonElement
     private val escModalCallback = { event: Event ->
         val e = event as KeyboardEvent
-        if (e.key == "Escape") {
+        if (e.key == "Escape" && dModal.closest("div.modal.tck-hidden") == null && dModalContent.querySelector("div.modal") == null) {
             e.preventDefault()
             close()
         }
     }
 
-    val mId = id++
+    private val mId = id++
 
     init {
         traceIndent("Modal::open $mId")
         parent.modals.addLast(this)
-        dModal = document.createElement("div") as HTMLDivElement
         dModal.classList.add(ClassName("modal"))
         dModal.style.display = "block"
         dModalDialog = document.createElement("div") as HTMLDivElement
@@ -57,7 +56,6 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         dModalBody = document.createElement("div") as HTMLDivElement
         dModalBody.classList.add(ClassName("modal-body"), ClassName("overflow-y-auto"))
         dModalBody.innerHTML = htmlContent
-        dModalContent = document.createElement("div") as HTMLDivElement
         dModalContent.classList.add(ClassName("modal-content"))
         dModalContent.classList.add(ClassName("taackModal"))
         val minimizeButton = document.createElement("button") as HTMLButtonElement
@@ -149,8 +147,8 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         while (rootModal.getParentBlock().parent != null) {
             rootModal = rootModal.getParentBlock().parent!!
         }
-        rootModal.dModal.style.display = "none"
-        (document.getElementById("modal-backdrop-${rootModal.mId}") as HTMLDivElement?)?.style?.display = "none"
+        rootModal.dModal.classList.add(ClassName("tck-hidden"))
+        document.getElementById("modal-backdrop-${rootModal.mId}")?.classList?.add("tck-hidden")
         document.body!!.classList.remove("modal-open")
 
         val minimizeItem = document.createElement("button") as HTMLButtonElement
@@ -159,8 +157,8 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         minimizeItem.innerHTML = dModalBody.querySelector("ul[taacktag='LABEL']")?.textContent ?: "Modal $mId"
         minimizeItem.onclick = EventHandler { e ->
             e.preventDefault()
-            rootModal.dModal.style.display = "block"
-            (document.getElementById("modal-backdrop-${rootModal.mId}") as HTMLDivElement?)?.style?.display = ""
+            rootModal.dModal.classList.remove(ClassName("tck-hidden"))
+            document.getElementById("modal-backdrop-${rootModal.mId}")?.classList?.remove("tck-hidden")
             minimizeItem.remove()
             document.body!!.classList.add("modal-open")
         }
