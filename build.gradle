@@ -28,44 +28,12 @@ buildscript {
 apply plugin: 'nebula.lint'
 
 gradleLint {
-    rules=['unused-dependency']
+    rules = ['unused-dependency']
 }
 
 ext.projectVersion = taackReleaseVersion
 ext.releaseVersion = taackReleaseVersion
 ext.isReleaseVersion = { -> !releaseVersion.endsWith('SNAPSHOT') }
-
-//if (isReleaseVersion()) {
-//    version releaseVersion
-//    group "org.taack"
-//
-//    ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
-//    ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
-//    ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
-//
-//    apply plugin: 'io.github.gradle-nexus.publish-plugin'
-//
-//    nexusPublishing {
-//        repositories {
-//            sonatype {
-//                def ossUser = System.getenv("SONATYPE_USERNAME") ?: project.hasProperty("sonatypeOssUsername") ? project.sonatypeOssUsername : ''
-//                def ossPass = System.getenv("SONATYPE_PASSWORD") ?: project.hasProperty("sonatypeOssPassword") ? project.sonatypeOssPassword : ''
-//                def ossStagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID") ?: project.hasProperty("sonatypeOssStagingProfileId") ? project.sonatypeOssStagingProfileId : ''
-//                nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
-//                snapshotRepositoryUrl = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
-//                username = ossUser
-//                password = ossPass
-//                stagingProfileId = ossStagingProfileId
-//            }
-//        }
-//
-//        transitionCheckOptions {
-//            maxRetries.set(40)
-//            delayBetween.set(Duration.ofMillis(2000))
-//        }
-//    }
-//
-//
 
 def publishedProjects = [
         'taack-ui',
@@ -76,6 +44,33 @@ def publishedProjects = [
         'taack-jdbc-common',
         'taack-ui-jdbc',
 ]
+
+if (isReleaseVersion)
+    gradle.rootProject {
+        apply plugin: 'io.github.gradle-nexus.publish-plugin'
+
+
+        nexusPublishing {
+            repositories {
+                sonatype {
+                    def ossUser = System.getenv("SONATYPE_USERNAME") ?: project.hasProperty("sonatypeOssUsername") ? project.sonatypeOssUsername : ''
+                    def ossPass = System.getenv("SONATYPE_PASSWORD") ?: project.hasProperty("sonatypeOssPassword") ? project.sonatypeOssPassword : ''
+                    def ossStagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID") ?: project.hasProperty("sonatypeOssStagingProfileId") ? project.sonatypeOssStagingProfileId : ''
+                    nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
+                    snapshotRepositoryUrl = uri('https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/')
+                    username = ossUser
+                    password = ossPass
+                    stagingProfileId = ossStagingProfileId
+                }
+            }
+
+            transitionCheckOptions {
+                maxRetries.set(40)
+                delayBetween.set(Duration.ofMillis(2000))
+            }
+        }
+    }
+
 
 subprojects {
 
@@ -104,7 +99,25 @@ subprojects {
                 }
             }
         }
+
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(17)
+            }
+            withJavadocJar()
+            withSourcesJar()
+        }
+
         if (isReleaseVersion()) {
+
+            version releaseVersion
+            group "org.taack"
+
+            ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
+            ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
+            ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
+
+
             println "isReleaseVersion() ${isReleaseVersion()}"
             println "isReleaseVersion ${isReleaseVersion}"
             afterEvaluate {
