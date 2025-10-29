@@ -35,17 +35,53 @@ ext.projectVersion = taackReleaseVersion
 ext.releaseVersion = taackReleaseVersion
 ext.isReleaseVersion = { -> !releaseVersion.endsWith('SNAPSHOT') }
 
-def publishedProjects = [
-        'taack-ui',
-        'taack-ui-ssh',
-        'taack-ui-pdf',
-        'taack-ui-asciidoc',
-        'taack-ui-search',
-        'taack-jdbc-common',
-        'taack-ui-jdbc',
-]
+ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
+ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
+ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
 
-if (isReleaseVersion)
+enum Licence {
+    APACHE('The Apache License, Version 2.0', 'http://www.apache.org/licenses/LICENSE-2.0.txt'),
+    AGPL('GNU Affero General Public License', 'https://www.gnu.org/licenses/agpl-3.0.html')
+
+    Licence(String name, String url) {
+        this.name = name
+        this.url = url
+    }
+
+    String name
+    String url
+}
+
+enum TaackUiPublished {
+    TAACK_UI('Taack UI Framework', 'Taack UI Framework'),
+    TAACK_UI_SSH('Taack UI SSH', 'Manage SSH connection'),
+    TAACK_UI_PDF('Taack UI PDF', 'Printing DSL', Licence.AGPL),
+    TAACK_UI_ASCIIDOC('Taack UI Asciidoc', 'Add Asciidoc rendering to forms and shows DSL'),
+    TAACK_UI_SEARCH('Taack UI Search', 'Domain Solr Search'),
+    TAACK_UI_JDBC('Taack UI PDF', ''),
+    TAACK_JDBC_COMMON('Taack JDBC Common', 'Taack JDBC Common')
+
+    TaackUiPublished(String name, String desc, Licence licence = Licence.APACHE) {
+        this.name = name
+        this.desc = desc
+        this.licence = licence
+    }
+
+    final String name
+    final String desc
+    final Licence licence
+
+    String getProject() {
+        toString().replace('_', '-').toLowerCase()
+    }
+
+    static TaackUiPublished fromName(String name) {
+        values().find {it.project == name }
+    }
+}
+
+
+if (isReleaseVersion) {
     gradle.rootProject {
         apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
@@ -70,11 +106,12 @@ if (isReleaseVersion)
             }
         }
     }
+}
 
 
 subprojects {
-
-    if (name in publishedProjects) {
+    TaackUiPublished taackUiPublished = TaackUiPublished.fromName(name)
+    if (taackUiPublished) {
         version releaseVersion
         group "org.taack"
 
@@ -92,14 +129,6 @@ subprojects {
 
         apply plugin: 'nebula.lint'
 
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    from components.java
-                }
-            }
-        }
-
         java {
             toolchain {
                 languageVersion = JavaLanguageVersion.of(17)
@@ -109,13 +138,51 @@ subprojects {
         }
 
         if (isReleaseVersion()) {
+            publishing {
+                publications {
+                    maven(MavenPublication) {
+                        from components.java
+//                        afterEvaluate {
+//                            artifact source: sourcesJar, classifier: "sources"
+//                            artifact source: javadocJar, classifier: "javadoc"
+//                        }
+                        versionMapping {
+                            usage('java-api') {
+                                fromResolutionOf('runtimeClasspath')
+                            }
+                            usage('java-runtime') {
+                                fromResolutionResult()
+                            }
+                        }
+                        pom {
+                            name = taackUiPublished.name
+                            description = taackUiPublished.desc
+                            url = 'http://taack.org'
+                            licenses {
+                                license {
+                                    name = taackUiPublished.licence.name
+                                    url = taackUiPublished.licence.url
+                                }
+                            }
+                            scm {
+                                url = 'scm:git@github.com:Taack/infra.git'
+                                connection = 'scm:git@github.com:Taack/infra.git'
+                                developerConnection = 'scm:git@github.com:Taack/infra.git'
+                            }
+                            developers {
+                                developer {
+                                    id = 'org.taack'
+                                    name = 'Adrien Guichard'
+                                    email = 'adrien.guichard@taack.org'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             version releaseVersion
             group "org.taack"
-
-            ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signing.keyId") ? project.getProperty('signing.keyId') : null
-            ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
-            ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
 
 
             println "isReleaseVersion() ${isReleaseVersion()}"
