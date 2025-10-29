@@ -1,6 +1,7 @@
 plugins {
     id 'groovy'
     id 'war'
+    id 'java-library'
 }
 
 group = 'org.taack'
@@ -52,4 +53,12 @@ dependencies {
     implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
 
 //    testImplementation "org.apache.grails:grails-testing-support-datamapping"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withJavadocJar()
+    withSourcesJar()
 }

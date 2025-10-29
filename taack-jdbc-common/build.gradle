@@ -26,9 +26,18 @@ generateGrammarSource {
     outputDirectory outputDir
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withJavadocJar()
+    withSourcesJar()
+}
+
 //sourcesJar.dependsOn generateGrammarSource
 assemble.dependsOn generateGrammarSource
 sourcesJar.dependsOn generateGrammarSource
+
 javadoc {
     destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
 }

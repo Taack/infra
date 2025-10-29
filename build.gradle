@@ -21,15 +21,15 @@ buildscript {
         classpath "org.apache.grails:grails-gradle-plugins"
         classpath "org.apache.grails:grails-data-hibernate5"
         classpath "cloud.wondrify:asset-pipeline-gradle"
-        classpath 'com.netflix.nebula:gradle-lint-plugin:20.6.2'
+//        classpath 'com.netflix.nebula:gradle-lint-plugin:20.6.2'
     }
 }
 
-apply plugin: 'nebula.lint'
-
-gradleLint {
-    rules = ['unused-dependency']
-}
+//apply plugin: 'nebula.lint'
+//
+//gradleLint {
+//    rules = ['unused-dependency']
+//}
 
 ext.projectVersion = taackReleaseVersion
 ext.releaseVersion = taackReleaseVersion
@@ -39,172 +39,172 @@ ext."signing.keyId" = System.getenv("SIGNING_KEY") ?: project.hasProperty("signi
 ext."signing.password" = System.getenv("SIGNING_PASSPHRASE") ?: project.hasProperty("signing.password") ? project.getProperty('signing.password') : null
 ext."signing.secretKeyRingFile" = project.hasProperty("signing.secretKeyRingFile") ? project.getProperty('signing.secretKeyRingFile') : null
 
-enum Licence {
-    APACHE('The Apache License, Version 2.0', 'http://www.apache.org/licenses/LICENSE-2.0.txt'),
-    AGPL('GNU Affero General Public License', 'https://www.gnu.org/licenses/agpl-3.0.html')
-
-    Licence(String name, String url) {
-        this.name = name
-        this.url = url
-    }
-
-    String name
-    String url
-}
-
-enum TaackUiPublished {
-    TAACK_UI('Taack UI Framework', 'Taack UI Framework'),
-    TAACK_UI_SSH('Taack UI SSH', 'Manage SSH connection'),
-    TAACK_UI_PDF('Taack UI PDF', 'Printing DSL', Licence.AGPL),
-    TAACK_UI_ASCIIDOC('Taack UI Asciidoc', 'Add Asciidoc rendering to forms and shows DSL'),
-    TAACK_UI_SEARCH('Taack UI Search', 'Domain Solr Search'),
-    TAACK_UI_JDBC('Taack UI PDF', ''),
-    TAACK_JDBC_COMMON('Taack JDBC Common', 'Taack JDBC Common')
-
-    TaackUiPublished(String name, String desc, Licence licence = Licence.APACHE) {
-        this.name = name
-        this.desc = desc
-        this.licence = licence
-    }
-
-    final String name
-    final String desc
-    final Licence licence
-
-    String getProject() {
-        toString().replace('_', '-').toLowerCase()
-    }
-
-    static TaackUiPublished fromName(String name) {
-        values().find {it.project == name }
-    }
-}
-
-
-if (isReleaseVersion) {
-    gradle.rootProject {
-        apply plugin: 'io.github.gradle-nexus.publish-plugin'
+//enum Licence {
+//    APACHE('The Apache License, Version 2.0', 'http://www.apache.org/licenses/LICENSE-2.0.txt'),
+//    AGPL('GNU Affero General Public License', 'https://www.gnu.org/licenses/agpl-3.0.html')
+//
+//    Licence(String name, String url) {
+//        this.name = name
+//        this.url = url
+//    }
+//
+//    String name
+//    String url
+//}
+//
+//enum TaackUiPublished {
+//    TAACK_UI('Taack UI Framework', 'Taack UI Framework'),
+//    TAACK_UI_SSH('Taack UI SSH', 'Manage SSH connection'),
+//    TAACK_UI_PDF('Taack UI PDF', 'Printing DSL', Licence.AGPL),
+//    TAACK_UI_ASCIIDOC('Taack UI Asciidoc', 'Add Asciidoc rendering to forms and shows DSL'),
+//    TAACK_UI_SEARCH('Taack UI Search', 'Domain Solr Search'),
+//    TAACK_UI_JDBC('Taack UI PDF', ''),
+//    TAACK_JDBC_COMMON('Taack JDBC Common', 'Taack JDBC Common')
+//
+//    TaackUiPublished(String name, String desc, Licence licence = Licence.APACHE) {
+//        this.name = name
+//        this.desc = desc
+//        this.licence = licence
+//    }
+//
+//    final String name
+//    final String desc
+//    final Licence licence
+//
+//    String getProject() {
+//        toString().replace('_', '-').toLowerCase()
+//    }
+//
+//    static TaackUiPublished fromName(String name) {
+//        values().find {it.project == name }
+//    }
+//}
 
 
-        nexusPublishing {
-            repositories {
-                sonatype {
-                    def ossUser = System.getenv("SONATYPE_USERNAME") ?: project.hasProperty("sonatypeOssUsername") ? project.sonatypeOssUsername : ''
-                    def ossPass = System.getenv("SONATYPE_PASSWORD") ?: project.hasProperty("sonatypeOssPassword") ? project.sonatypeOssPassword : ''
-                    def ossStagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID") ?: project.hasProperty("sonatypeOssStagingProfileId") ? project.sonatypeOssStagingProfileId : ''
-                    nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
-                    snapshotRepositoryUrl = uri('https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/')
-                    username = ossUser
-                    password = ossPass
-                    stagingProfileId = ossStagingProfileId
-                }
-            }
+//if (isReleaseVersion) {
+//    gradle.rootProject {
+//        apply plugin: 'io.github.gradle-nexus.publish-plugin'
+//
+//
+//        nexusPublishing {
+//            repositories {
+//                sonatype {
+//                    def ossUser = System.getenv("SONATYPE_USERNAME") ?: project.hasProperty("sonatypeOssUsername") ? project.sonatypeOssUsername : ''
+//                    def ossPass = System.getenv("SONATYPE_PASSWORD") ?: project.hasProperty("sonatypeOssPassword") ? project.sonatypeOssPassword : ''
+//                    def ossStagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID") ?: project.hasProperty("sonatypeOssStagingProfileId") ? project.sonatypeOssStagingProfileId : ''
+//                    nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
+//                    snapshotRepositoryUrl = uri('https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/')
+//                    username = ossUser
+//                    password = ossPass
+//                    stagingProfileId = ossStagingProfileId
+//                }
+//            }
+//
+//            transitionCheckOptions {
+//                maxRetries.set(40)
+//                delayBetween.set(Duration.ofMillis(2000))
+//            }
+//        }
+//    }
+//}
 
-            transitionCheckOptions {
-                maxRetries.set(40)
-                delayBetween.set(Duration.ofMillis(2000))
-            }
-        }
-    }
-}
 
-
-subprojects {
-    TaackUiPublished taackUiPublished = TaackUiPublished.fromName(name)
-    if (taackUiPublished) {
-        version releaseVersion
-        group "org.taack"
-
-        apply plugin: 'maven-publish'
-        apply plugin: 'signing'
-        apply plugin: 'java'
-        apply plugin: 'java-library'
-
-        repositories {
-            mavenLocal()
-            mavenCentral()
-            maven { url "https://repo.grails.org/grails/core" }
-
-        }
-
-        apply plugin: 'nebula.lint'
-
-        java {
-            toolchain {
-                languageVersion = JavaLanguageVersion.of(17)
-            }
-            withJavadocJar()
-            withSourcesJar()
-        }
-
-        if (isReleaseVersion()) {
-            publishing {
-                publications {
-                    maven(MavenPublication) {
-                        from components.java
-//                        afterEvaluate {
-//                            artifact source: sourcesJar, classifier: "sources"
-//                            artifact source: javadocJar, classifier: "javadoc"
+//subprojects {
+//    TaackUiPublished taackUiPublished = TaackUiPublished.fromName(name)
+//    if (taackUiPublished) {
+//        version releaseVersion
+//        group "org.taack"
+//
+//        apply plugin: 'maven-publish'
+//        apply plugin: 'signing'
+//        apply plugin: 'java'
+//        apply plugin: 'java-library'
+//
+//        repositories {
+//            mavenLocal()
+//            mavenCentral()
+//            maven { url "https://repo.grails.org/grails/core" }
+//
+//        }
+//
+//        apply plugin: 'nebula.lint'
+//
+//        java {
+//            toolchain {
+//                languageVersion = JavaLanguageVersion.of(17)
+//            }
+//            withJavadocJar()
+//            withSourcesJar()
+//        }
+//
+//        if (isReleaseVersion()) {
+//            publishing {
+//                publications {
+//                    maven(MavenPublication) {
+//                        from components.java
+////                        afterEvaluate {
+////                            artifact source: sourcesJar, classifier: "sources"
+////                            artifact source: javadocJar, classifier: "javadoc"
+////                        }
+//                        versionMapping {
+//                            usage('java-api') {
+//                                fromResolutionOf('runtimeClasspath')
+//                            }
+//                            usage('java-runtime') {
+//                                fromResolutionResult()
+//                            }
 //                        }
-                        versionMapping {
-                            usage('java-api') {
-                                fromResolutionOf('runtimeClasspath')
-                            }
-                            usage('java-runtime') {
-                                fromResolutionResult()
-                            }
-                        }
-                        pom {
-                            name = taackUiPublished.name
-                            description = taackUiPublished.desc
-                            url = 'http://taack.org'
-                            licenses {
-                                license {
-                                    name = taackUiPublished.licence.name
-                                    url = taackUiPublished.licence.url
-                                }
-                            }
-                            scm {
-                                url = 'scm:git@github.com:Taack/infra.git'
-                                connection = 'scm:git@github.com:Taack/infra.git'
-                                developerConnection = 'scm:git@github.com:Taack/infra.git'
-                            }
-                            developers {
-                                developer {
-                                    id = 'org.taack'
-                                    name = 'Adrien Guichard'
-                                    email = 'adrien.guichard@taack.org'
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            version releaseVersion
-            group "org.taack"
-
-
-            println "isReleaseVersion() ${isReleaseVersion()}"
-            println "isReleaseVersion ${isReleaseVersion}"
-            afterEvaluate {
-                artifacts {
-                    archives javadocJar, sourcesJar
-                }
-
-                signing {
-                    required { isReleaseVersion() && gradle.taskGraph.hasTask("publish") }
-                    sign publishing.publications.maven
-                }
-            }
-
-            tasks.withType(Sign).configureEach {
-                onlyIf { isReleaseVersion() }
-            }
-            //do not generate extra load on Nexus with new staging repository if signing fails
-            tasks.withType(InitializeNexusStagingRepository).configureEach {
-                shouldRunAfter(tasks.withType(Sign))
-            }
-        }
-    }
-}
+//                        pom {
+//                            name = taackUiPublished.name
+//                            description = taackUiPublished.desc
+//                            url = 'http://taack.org'
+//                            licenses {
+//                                license {
+//                                    name = taackUiPublished.licence.name
+//                                    url = taackUiPublished.licence.url
+//                                }
+//                            }
+//                            scm {
+//                                url = 'scm:git@github.com:Taack/infra.git'
+//                                connection = 'scm:git@github.com:Taack/infra.git'
+//                                developerConnection = 'scm:git@github.com:Taack/infra.git'
+//                            }
+//                            developers {
+//                                developer {
+//                                    id = 'org.taack'
+//                                    name = 'Adrien Guichard'
+//                                    email = 'adrien.guichard@taack.org'
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            version releaseVersion
+//            group "org.taack"
+//
+//
+//            println "isReleaseVersion() ${isReleaseVersion()}"
+//            println "isReleaseVersion ${isReleaseVersion}"
+//            afterEvaluate {
+//                artifacts {
+//                    archives javadocJar, sourcesJar
+//                }
+//
+//                signing {
+//                    required { isReleaseVersion() && gradle.taskGraph.hasTask("publish") }
+//                    sign publishing.publications.maven
+//                }
+//            }
+//
+//            tasks.withType(Sign).configureEach {
+//                onlyIf { isReleaseVersion() }
+//            }
+//            //do not generate extra load on Nexus with new staging repository if signing fails
+//            tasks.withType(InitializeNexusStagingRepository).configureEach {
+//                shouldRunAfter(tasks.withType(Sign))
+//            }
+//        }
+//    }
+//}

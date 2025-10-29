@@ -1,10 +1,25 @@
 plugins {
     id 'taack-grails-assets-plugin'
+    id 'com.vanniktech.maven.publish' version '0.34.0'
 }
 
 dependencies {
     api 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1'
 }
+
+//tasks.register('generateMetadataFileForMavenPublication') {
+////    inputs.files plainJavadocJar
+//}
+
+//tasks.named('plainJavadocJar', Javadoc) {
+//
+//}
+//
+//tasks.named('generateMetadataFileForMavenPublication') {
+//    inputs.files plainJavadocJar
+//    dependsOn plainJavadocJar
+//    mustRunAfter plainJavadocJar
+//}
 
 groovydoc {
     destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
@@ -17,3 +32,34 @@ groovydoc {
 // ~/.jdks/graalvm-jdk-24.0.1/bin/native-image --gc=G1 -march=native -O3 --link-at-build-time -H:ConfigurationFileDirectories=/home/auo/dev/taack-edge/taack-edge-client/graalvm -jar taack-ui-test.jar
 // ~/.jdks/openjdk-24.0.1/bin/java -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -Xmx100M -jar taack-ui-test.jar --test
 
+mavenPublishing {
+    publishToMavenCentral(true)
+
+    coordinates('org.taack', 'taack-ui', '0.7.0')
+
+    pom {
+        name = "Taack UI Framework"
+        description = "Describe Interfaces via DSL."
+//        inceptionYear = "2025"
+        url = "http://taack.org"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = 'Taack'
+                name = 'Adrien Guichard'
+                url = "https://github.com/taack/"
+            }
+        }
+        scm {
+            url = "scm:git@github.com:Taack/infra.git/"
+            connection = "scm:git@github.com:Taack/infra.git"
+            developerConnection = "scm:git@github.com:Taack/infra.git"
+        }
+    }
+}
