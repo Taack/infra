@@ -17,11 +17,14 @@ package taack.render
 
 import com.itextpdf.html2pdf.ConverterProperties
 import com.itextpdf.html2pdf.HtmlConverter
-import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider
 import com.itextpdf.io.font.FontProgram
 import com.itextpdf.io.font.FontProgramFactory
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.kernel.pdf.event.PdfDocumentEvent
 import com.itextpdf.layout.font.FontProvider
 import grails.compiler.GrailsCompileStatic
+import taack.ui.pdf.watermark.Watermark
 
 /**
  * Convert HTML code to PDF (WiP).
@@ -34,17 +37,24 @@ class TaackPdfConverterFromHtmlService {
     static final String FONT_REG = 'fonts/Roboto-Regular.ttf'
     static final String FONT_REG_CN = 'fonts/NotoSansSC-Regular.ttf'
 
-    void generatePdfFromHtmlIText(OutputStream outputStream, final String html) {
+    void generatePdfFromHtmlIText(OutputStream outputStream, final String html, String watermarkText = null) {
         try {
             ConverterProperties properties = new ConverterProperties()
-            FontProvider fontProvider = new DefaultFontProvider()
+            FontProvider fontProvider = new FontProvider()
             FontProgram fontProgram = FontProgramFactory.createFont(FONT_REG)
             FontProgram fontProgramCn = FontProgramFactory.createFont(FONT_REG_CN)
             fontProvider.addFont(fontProgram)
             fontProvider.addFont(fontProgramCn)
             properties.setFontProvider(fontProvider)
 
-            HtmlConverter.convertToPdf(new ByteArrayInputStream(html.bytes), outputStream, properties)
+            PdfWriter writer = new PdfWriter(outputStream)
+            PdfDocument pdfDocument = new PdfDocument(writer)
+            if (watermarkText) {
+                Watermark watermark = new Watermark(watermarkText)
+                pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, watermark)
+            }
+            HtmlConverter.convertToPdf(new ByteArrayInputStream(html.bytes), pdfDocument, properties)
+            pdfDocument.close()
         } catch (Throwable e) {
             log.error("${e.message}")
         }
