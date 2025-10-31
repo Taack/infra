@@ -11,11 +11,13 @@ import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent
 import com.itextpdf.kernel.pdf.extgstate.PdfExtGState
 import com.itextpdf.layout.Canvas
+import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.VerticalAlignment
 
 class Watermark extends AbstractPdfDocumentEventHandler {
+    static final String FONT_REG_CN = 'fonts/NotoSansSC-Regular.ttf'
     String watermarkText
 
     Watermark(String watermarkText) {
@@ -31,10 +33,12 @@ class Watermark extends AbstractPdfDocumentEventHandler {
         PdfCanvas pdfCanvas = new PdfCanvas(page.getLastContentStream(), page.getResources(), pdf)
         Canvas canvas = new Canvas(pdfCanvas, pageSize)
         PdfExtGState state = new PdfExtGState()
-        state.setFillOpacity(.4f)
+        state.setFillOpacity(.2f)
         pdfCanvas.setExtGState(state)
         float heightWidthRadio = page.getPageSize().getHeight() / page.getPageSize().getWidth() as Float
+        PdfFont font = PdfFontFactory.createFont(FontProgramFactory.createFont(FONT_REG_CN))
         Paragraph watermarkParagraph = new Paragraph(watermarkText)
+                .setFont(font)
                 .setFontSize(40f)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
