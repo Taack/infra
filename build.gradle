@@ -117,6 +117,7 @@ subprojects {
 
         apply plugin: 'java'
         apply plugin: 'java-library'
+        apply plugin: 'maven-publish'
 
         repositories {
             mavenLocal()
@@ -136,7 +137,6 @@ subprojects {
         }
 
         if (isReleaseVersion()) {
-            apply plugin: 'maven-publish'
             apply plugin: 'signing'
 
             publishing {
