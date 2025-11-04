@@ -76,7 +76,7 @@ enum TaackUiPublished {
     }
 
     static TaackUiPublished fromName(String name) {
-        values().find {it.project == name }
+        values().find { it.project == name }
     }
 }
 
@@ -136,62 +136,60 @@ subprojects {
             withSourcesJar()
         }
 
-        if (isReleaseVersion()) {
-            apply plugin: 'signing'
-
-            publishing {
-                publications {
-                    maven(MavenPublication) {
-                        from components.java
+        publishing {
+            publications {
+                maven(MavenPublication) {
+                    from components.java
 //                        afterEvaluate {
 //                            artifact source: sourcesJar, classifier: "sources"
 //                            artifact source: javadocJar, classifier: "javadoc"
 //                        }
-                        versionMapping {
-                            usage('java-api') {
-                                fromResolutionOf('runtimeClasspath')
-                            }
-                            usage('java-runtime') {
-                                fromResolutionResult()
+                    versionMapping {
+                        usage('java-api') {
+                            fromResolutionOf('runtimeClasspath')
+                        }
+                        usage('java-runtime') {
+                            fromResolutionResult()
+                        }
+                    }
+                    pom {
+                        name = taackUiPublished.name
+                        description = taackUiPublished.desc
+                        url = 'http://taack.org'
+                        licenses {
+                            license {
+                                name = taackUiPublished.licence.name
+                                url = taackUiPublished.licence.url
                             }
                         }
-                        pom {
-                            name = taackUiPublished.name
-                            description = taackUiPublished.desc
-                            url = 'http://taack.org'
-                            licenses {
-                                license {
-                                    name = taackUiPublished.licence.name
-                                    url = taackUiPublished.licence.url
-                                }
-                            }
-                            scm {
-                                url = 'scm:git@github.com:Taack/infra.git'
-                                connection = 'scm:git@github.com:Taack/infra.git'
-                                developerConnection = 'scm:git@github.com:Taack/infra.git'
-                            }
-                            developers {
-                                developer {
-                                    id = 'org.taack'
-                                    name = 'Adrien Guichard'
-                                    email = 'adrien.guichard@taack.org'
-                                }
+                        scm {
+                            url = 'scm:git@github.com:Taack/infra.git'
+                            connection = 'scm:git@github.com:Taack/infra.git'
+                            developerConnection = 'scm:git@github.com:Taack/infra.git'
+                        }
+                        developers {
+                            developer {
+                                id = 'org.taack'
+                                name = 'Adrien Guichard'
+                                email = 'adrien.guichard@taack.org'
                             }
                         }
                     }
                 }
+            }
+            if (isReleaseVersion())
                 repositories {
                     maven {
                         name = 'myRepo'
                         url = parent.layout.projectDirectory.dir("repo")
                     }
                 }
-            }
+        }
+        version releaseVersion
+        if (isReleaseVersion()) {
+            apply plugin: 'signing'
 
-
-            version releaseVersion
             group "org.taack"
-
 
             println "isReleaseVersion() ${isReleaseVersion()}"
             println "isReleaseVersion ${isReleaseVersion}"
