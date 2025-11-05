@@ -105,6 +105,9 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         dModalHeader.appendChild(minimizeButton)
         dModalHeader.appendChild(fullscreenButton)
         dModalHeader.appendChild(closeButton)
+        dModalHeader.onmouseover = EventHandler {
+            dModalHeader.style.cursor = "move"
+        }
         dModalContent.appendChild(dModalHeader)
         dModalContent.appendChild(dModalBody)
         dModalDialog.appendChild(dModalContent)
@@ -186,9 +189,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
                 maxBottom = window.innerHeight - dModalContent.getBoundingClientRect().bottom
                 initialOffsetLeft = dModalContent.offsetLeft.toDouble()
                 initialOffsetTop = dModalContent.offsetTop.toDouble()
-
                 web.dom.document.body.style.userSelect = "none"
-                header.style.cursor = "move"
             }
         })
         web.dom.document.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
@@ -217,8 +218,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
                 }
             }
             isDragging = false
-            web.dom.document.body.style.userSelect = ""
-            header.style.cursor = ""
+            web.dom.document.body.style.userSelect = "none"
         })
     }
 
