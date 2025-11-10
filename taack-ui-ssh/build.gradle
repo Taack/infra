@@ -6,7 +6,8 @@ plugins {
 dependencies {
     implementation project(':taack-ui')
 
-    implementation 'net.i2p.crypto:eddsa:0.3.0'
+//    implementation 'net.i2p.crypto:eddsa:0.3.0'
+//    implementation 'io.moatwel.crypto:eddsa:0.8.1'
     implementation "org.apache.sshd:sshd:${minaSshd}"
     implementation "org.apache.sshd:sshd-core:${minaSshd}"
     implementation "org.apache.sshd:sshd-common:${minaSshd}"
