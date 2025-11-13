@@ -218,7 +218,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
                 }
             }
             isDragging = false
-            web.dom.document.body.style.userSelect = "none"
+            web.dom.document.body.style.userSelect = ""
         })
     }
 
