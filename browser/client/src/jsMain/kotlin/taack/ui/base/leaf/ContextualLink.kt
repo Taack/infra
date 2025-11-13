@@ -167,7 +167,6 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                 val filter: Filter? = parent.ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)
                 if (filter != null) {
                     formData = FormData(filter.f)
-                    formData.set("offset", "0")
                     formData.set("refresh", "true")
                     formData.set("filterTableId", filter.filterId)
                     formData.set("ajaxBlockId", filter.parent.blockId)
