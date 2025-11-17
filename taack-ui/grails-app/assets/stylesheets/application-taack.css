@@ -9,6 +9,7 @@
 *
 *= require first
 *= require wysiwyg
+*= require github-asciidoctor
 *= require taack
 *= require taack-asciidoc
 *= require custom

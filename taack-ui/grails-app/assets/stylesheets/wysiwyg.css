@@ -150,6 +150,23 @@
     margin: 0 !important;
 }
 
+.wysiwyg-kbd-form-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    caret-color: transparent;
+    width: 100%;
+    min-height: 60px;
+    border: 1px solid black;
+    border-radius: .2rem;
+    padding: .5rem;
+}
+
+.wysiwyg-kbd-form-input:focus {
+    background-color: #3333331c;
+}
+
 .wysiwyg-table-unit {
     display: inline-block;
     height: 15px;
