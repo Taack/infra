@@ -5,6 +5,7 @@ import js.iterable.iterator
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.leaf.*
+import taack.ui.wysiwyg.canvasStyled.MainCanvas
 import taack.ui.wysiwyg.contentEditableMono.MainContentEditable
 //import taack.ui.wysiwyg.canvasMono.MainCanvas
 import web.dom.document
