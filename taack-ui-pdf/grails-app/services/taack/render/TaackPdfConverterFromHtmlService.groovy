@@ -17,12 +17,14 @@ package taack.render
 
 import com.itextpdf.html2pdf.ConverterProperties
 import com.itextpdf.html2pdf.HtmlConverter
+import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider
 import com.itextpdf.io.font.FontProgram
 import com.itextpdf.io.font.FontProgramFactory
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent
 import com.itextpdf.layout.font.FontProvider
+import com.itextpdf.styledxmlparser.resolver.font.BasicFontProvider
 import grails.compiler.GrailsCompileStatic
 import taack.ui.pdf.watermark.Watermark
 
@@ -40,7 +42,7 @@ class TaackPdfConverterFromHtmlService {
     void generatePdfFromHtmlIText(OutputStream outputStream, final String html, String watermarkText = null) {
         try {
             ConverterProperties properties = new ConverterProperties()
-            FontProvider fontProvider = new FontProvider()
+            FontProvider fontProvider = new BasicFontProvider()
             FontProgram fontProgram = FontProgramFactory.createFont(FONT_REG)
             FontProgram fontProgramCn = FontProgramFactory.createFont(FONT_REG_CN)
             fontProvider.addFont(fontProgram)

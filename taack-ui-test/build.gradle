@@ -28,6 +28,7 @@ grails {
         implementation project(':taack-ui-asciidoc')
         implementation project(':taack-ui-jdbc')
         implementation project(':taack-ui-search')
+        implementation project(':taack-ui-ssh')
     }
 }
 
