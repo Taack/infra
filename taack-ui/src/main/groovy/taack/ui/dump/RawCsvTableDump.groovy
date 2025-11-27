@@ -132,17 +132,18 @@ final class RawCsvTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowAction(String i18n, ActionIcon actionIcon, String key, String label) {
+        out << surroundCell(i18n)
 
     }
 
     @Override
     void visitRowAction(String i18n, ActionIcon actionIcon, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
-
+        out << surroundCell(i18n)
     }
 
     @Override
     void visitRowAction(String i18n, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax) {
-
+        out << surroundCell(i18n)
     }
 
     @Override
