@@ -14,17 +14,19 @@ import java.nio.file.Path;
  */
 public class Asciidoc {
 
-    private static Asciidoctor asciidoctor = null;
     public static final String pathAsciidocGenerated = TaackUiConfiguration.getRoot() + "/asciidoc";
+    private static final Asciidoctor asciidoctor = initAsciidoctorJ();
 
-    private static void initAsciidoctorJ() {
+    private static Asciidoctor initAsciidoctorJ() {
         try {
             Files.createDirectories(Path.of(pathAsciidocGenerated));
-            asciidoctor = Asciidoctor.Factory.create();
+            Asciidoctor asciidoctor = Asciidoctor.Factory.create();
             asciidoctor.requireLibrary("asciidoctor-diagram", "asciidoctor-revealjs");
+            return asciidoctor;
         } catch (Throwable t) {
             System.out.println("Asciidoc::initAsciidoctorJ " + t.getMessage());
             t.printStackTrace();
+            return null;
         }
     }
 
@@ -36,11 +38,10 @@ public class Asciidoc {
      * @return The HTML results
      */
     public static String getContentHtml(String content, String urlFileRoot, boolean server) {
-        if (content != null) {
-            initAsciidoctorJ();
+        if (content != null && asciidoctor != null) {
             OptionsBuilder optionHasToc = Options.builder()
                     .safe(server ? SafeMode.SERVER : SafeMode.UNSAFE)
-                    .attributes(Attributes.builder().attribute("imagesoutdir", pathAsciidocGenerated).imagesDir(urlFileRoot + "?path=").build())
+                    .attributes(Attributes.builder().attribute("imagesoutdir", pathAsciidocGenerated).imagesDir(urlFileRoot + "?path=").experimental(true).showTitle(true).build())
                     .option("parse_header_only", false);
 
             Document document = asciidoctor.load(content, optionHasToc.build());
@@ -53,8 +54,7 @@ public class Asciidoc {
     }
 
     public static String getContentHtml(File file, String urlFileRoot, boolean server) {
-        if (file != null && file.exists()) {
-            initAsciidoctorJ();
+        if (file != null && file.exists() && asciidoctor != null) {
             OptionsBuilder option = Options.builder()
                     .attributes(Attributes.builder()
                             .imagesDir(urlFileRoot + "?path=")
