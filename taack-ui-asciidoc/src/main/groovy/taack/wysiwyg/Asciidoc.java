@@ -40,7 +40,7 @@ public class Asciidoc {
             initAsciidoctorJ();
             OptionsBuilder optionHasToc = Options.builder()
                     .safe(server ? SafeMode.SERVER : SafeMode.UNSAFE)
-                    .attributes(Attributes.builder().attribute("imagesoutdir", pathAsciidocGenerated).imagesDir(urlFileRoot + "?path=").build())
+                    .attributes(Attributes.builder().attribute("imagesoutdir", pathAsciidocGenerated).imagesDir(urlFileRoot + "?path=").experimental(true).showTitle(true).build())
                     .option("parse_header_only", false);
 
             Document document = asciidoctor.load(content, optionHasToc.build());
