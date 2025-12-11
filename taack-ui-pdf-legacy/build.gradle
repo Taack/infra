@@ -21,8 +21,9 @@ plugins {
 dependencies {
     implementation project(':taack-ui')
 
-    // LGPL 2.1
-    implementation 'org.xhtmlrenderer:flying-saucer-pdf:10.0.6'
+    // AGPL 3.0
+    implementation "com.itextpdf:html2pdf:${html2pdf}"
+
 }
 
 groovydoc {
