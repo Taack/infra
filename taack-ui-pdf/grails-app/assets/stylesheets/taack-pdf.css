@@ -375,7 +375,7 @@ a {
 }
 
 .taackTable {
-    width: 100%;
+    width: 18.4cm;
 }
 
 div#header {
@@ -442,15 +442,15 @@ body {
 div.pure-u-1 {
     /*border: 1px red solid;*/
 
-    page-break-before: avoid;
+    page-break-before: auto;
     page-break-inside: auto;
-    page-break-after: avoid;
+    page-break-after: auto;
 }
 
 table {
     -fs-table-paginate: paginate;
-    width: 100%;
-    page-break-before: avoid;
+    width: 18.4cm;
+    page-break-before: auto;
     page-break-inside: auto;
     page-break-after: auto;
     /*margin-left: 1mm;*/
@@ -476,7 +476,7 @@ table {
 
 tr, td {
     page-break-before: auto;
-    page-break-inside: avoid;
+    page-break-inside: auto;
     page-break-after: auto;
 }
 

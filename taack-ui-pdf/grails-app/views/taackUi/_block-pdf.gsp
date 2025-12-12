@@ -54,6 +54,12 @@ ${raw(css)}
     vertical-align: top;
 }
 
+.pure-u-1-2 {
+    width: 90mm;
+    display: inline-block;
+    vertical-align: top;
+}
+
 th, td {
     border-bottom: 1px solid #d5d5d5;
 }

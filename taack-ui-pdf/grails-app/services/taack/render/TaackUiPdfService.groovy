@@ -107,7 +107,7 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
                 css.append('\n/*! ' + it.toString() + '---- */\n')
             }
         }
-
+println "css+++$css---css"
         String html = g.render template: '/taackUi/block-pdf', model: [
                 block          : blockStream.toString(),
                 css            : css.toString(),
