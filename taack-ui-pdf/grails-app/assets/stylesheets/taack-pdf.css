@@ -3,10 +3,6 @@ html {
     -webkit-text-size-adjust: 100%
 }
 
-body {
-    margin: 0
-}
-
 main {
     display: block
 }
@@ -242,7 +238,7 @@ html {
 }
 
 .pure-u-1-2, .pure-u-12-24 {
-    width: 50%
+    width: 49%
 }
 
 .pure-u-13-24 {
@@ -375,7 +371,7 @@ a {
 }
 
 .taackTable {
-    width: 18.4cm;
+    width: 96%;
 }
 
 div#header {
@@ -442,17 +438,17 @@ body {
 div.pure-u-1 {
     /*border: 1px red solid;*/
 
-    page-break-before: auto;
+    page-break-before: avoid;
     page-break-inside: auto;
-    page-break-after: auto;
+    page-break-after: avoid;
 }
 
 table {
     -fs-table-paginate: paginate;
-    width: 18.4cm;
-    page-break-before: auto;
+    width: 96%;
+    page-break-before: avoid;
     page-break-inside: auto;
-    page-break-after: auto;
+    page-break-after: avoid;
     /*margin-left: 1mm;*/
     margin-top: 6mm;
     border-collapse: collapse;

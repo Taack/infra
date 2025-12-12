@@ -107,7 +107,7 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
                 css.append('\n/*! ' + it.toString() + '---- */\n')
             }
         }
-println "css+++$css---css"
+
         String html = g.render template: '/taackUi/block-pdf', model: [
                 block          : blockStream.toString(),
                 css            : css.toString(),
@@ -123,8 +123,7 @@ println "css+++$css---css"
         html = html.replaceAll('<grailsLayout:captureTitle/>', '')
         html = html.replaceAll('<metadata.*metadata>', '')
         html = html.replaceAll('<\\?xml version="1.0" encoding="UTF-8"\\?>', '')
-        println '|' + html
-//html = new File('/home/auo/test2.html').text
+
         if (outputStream) {
             taackPdfConverterFromHtmlService.generatePdfFromHtmlIText(outputStream, html)
         }
