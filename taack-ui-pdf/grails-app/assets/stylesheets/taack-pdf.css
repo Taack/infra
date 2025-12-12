@@ -375,7 +375,7 @@ a {
 }
 
 .taackTable {
-    width: 18.4cm;
+    width: 100%;
 }
 
 div#header {
@@ -449,7 +449,7 @@ div.pure-u-1 {
 
 table {
     -fs-table-paginate: paginate;
-    width: 18.4cm;
+    width: 100%;
     page-break-before: avoid;
     page-break-inside: auto;
     page-break-after: auto;
