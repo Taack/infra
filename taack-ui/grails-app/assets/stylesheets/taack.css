@@ -229,7 +229,7 @@ td.firstCellInGroup-5 {
 }
 
 td.firstCellInGroup {
-    position: relative;
+   /* position: relative;*/
 }
 
 tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup:before {

@@ -164,7 +164,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitHeaderEnd() {
         blockLog.exitBlock('visitHeaderEnd')
         isInHeader = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD).parent
         HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
         blockLog.topElement.builder.addChildren(tb)
         blockLog.topElement = tb
@@ -174,7 +174,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitColumnEnd() {
         blockLog.exitBlock('visitColumnEnd')
         isInCol = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL).parent
     }
 
     @Override
@@ -205,7 +205,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowEnd() {
         blockLog.exitBlock('visitRowEnd')
         rowStyle = null
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_ROW)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_ROW).parent
     }
 
     @Override
@@ -261,9 +261,18 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         }
         if (firstInCol) tdBuilder.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
         firstInCol = false
+        tdBuilder.taackTag = TaackTag.TABLE_COL
         HTMLTd td = tdBuilder.build() as HTMLTd
         blockLog.topElement.builder.addChildren(td)
         blockLog.topElement = td
+    }
+
+    @Override
+    void visitRowColumnEnd() {
+        this.cellOption = null
+        blockLog.exitBlock('visitRowColumnEnd')
+        isInCol = false
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL).parent
     }
 
     @Override
@@ -330,13 +339,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitFieldHeader(FieldInfo[] fields) {
         visitFieldHeader parameter.trField(fields)
-    }
-
-    @Override
-    void visitRowColumnEnd() {
-        this.cellOption = null
-        blockLog.exitBlock('visitRowColumnEnd')
-        isInCol = false
     }
 
     @Override
@@ -512,7 +514,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitColumnSelectEnd() {
         blockLog.exitBlock('visitColumnSelectEnd')
         isInCol = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL)
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL).parent
     }
 
     @Override
