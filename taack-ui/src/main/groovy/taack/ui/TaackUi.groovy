@@ -35,6 +35,14 @@ final class TaackUi {
         }
     }
 
+    static UiBlockSpecifier createModalForm(final Object aObject, final FieldInfo[] lockedFields = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSpec) final Closure closure) {
+        new UiBlockSpecifier().ui {
+            modal {
+                form createForm(aObject, lockedFields, closure)
+            }
+        }
+    }
+
     static UiFormSpecifier createForm(final Object aObject, final FieldInfo[] lockedFields = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormSpec) final Closure closure) {
         new UiFormSpecifier().ui(aObject, lockedFields, closure)
     }
@@ -57,5 +65,18 @@ final class TaackUi {
         new UiBlockSpecifier().ui {
             tableFilter(new UiFilterSpecifier().ui(aClass, cFilter), new UiTableSpecifier().ui(cTable), cMenu)
         }
+    }
+
+    static UiBlockSpecifier createBlock(boolean isModal, final Class aClass,
+                                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FilterSpec) final Closure cFilter,
+                                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure cTable,
+                                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure cMenu = null) {
+        if (isModal) {
+            new UiBlockSpecifier().ui {
+                modal {
+                    tableFilter(new UiFilterSpecifier().ui(aClass, cFilter), new UiTableSpecifier().ui(cTable), cMenu)
+                }
+            }
+        } else createBlock(aClass, cFilter, cTable, cMenu)
     }
 }
