@@ -2,11 +2,14 @@ package taack.ui
 
 import grails.compiler.GrailsCompileStatic
 import taack.ast.type.FieldInfo
+import taack.domain.TaackFilter
 import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.filter.FilterSpec
 import taack.ui.dsl.form.FormSpec
 import taack.ui.dsl.menu.MenuSpec
 import taack.ui.dsl.table.TableSpec
@@ -15,7 +18,7 @@ import taack.ui.dsl.table.TableSpec
 final class TaackUi {
 
     static UiMenuSpecifier createMenu(
-            @DelegatesTo(strategy = Closure. DELEGATE_ONLY, value = MenuSpec) Closure closure
+            @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = MenuSpec) Closure closure
     ) {
         new UiMenuSpecifier().ui(closure)
     }
@@ -38,5 +41,21 @@ final class TaackUi {
 
     static UiTableSpecifier createTable(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure closure) {
         new UiTableSpecifier().ui(closure)
+    }
+
+    /**
+     * Create filter table block
+     * @param aClass
+     * @param cFilter
+     * @param tFilter
+     * @return
+     */
+    static UiBlockSpecifier createBlock(final Class aClass,
+                                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = FilterSpec) final Closure cFilter,
+                                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = TableSpec) final Closure cTable,
+                                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure cMenu = null) {
+        new UiBlockSpecifier().ui {
+            tableFilter(new UiFilterSpecifier().ui(aClass, cFilter), new UiTableSpecifier().ui(cTable), cMenu)
+        }
     }
 }
