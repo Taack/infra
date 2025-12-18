@@ -2,6 +2,7 @@ package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
+import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.Color
@@ -74,5 +75,13 @@ abstract class DiagramScene {
         }
         diagramMarginTop += height
         return height
+    }
+
+    void setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
+
+    }
+
+    void draw(boolean alwaysShowFullInfo = false) {
+
     }
 }

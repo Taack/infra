@@ -159,6 +159,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
+    @Override
     void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
