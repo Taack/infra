@@ -128,7 +128,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     void visitScatterDiagram(String... pointImageHref) {
         createDiagramRender(0.5)
         scene = new ScatterDiagramScene(render, dataPerKey, diagramOption, pointImageHref.toList())
-        scene.setXLabelDateFormat(xLabelDateFormat)
+        if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
         scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
 

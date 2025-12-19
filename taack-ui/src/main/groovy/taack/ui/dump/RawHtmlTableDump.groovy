@@ -85,7 +85,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (cell && style) {
             displayBlock += style
         }
-        HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: '<br></br>')
+        HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: '<br/>')
         if (!url) return new HTMLSpan().builder
                 .setStyle(displayBlock)//.putAttribute('title', cell ?: '')
                 .addChildren(cellHTML).build()
@@ -98,7 +98,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             displayBlock += style
         }
         String content = TaackUiEnablerService.sanitizeString(fieldInfo.value.toString())
-        HTMLTxtContent cellHTML = new HTMLTxtContent(content ?: '<br></br>')
+        HTMLTxtContent cellHTML = new HTMLTxtContent(content ?: '<br/>')
 
         UiMenuSpecifier menu = TaackUiService.contextualMenuClosureFromField(fieldInfo)
         IHTMLElement.HTMLElementBuilder htmlBuilder = new HTMLSpan().builder.setStyle(displayBlock).putAttribute('title', content).addChildren(cellHTML)
