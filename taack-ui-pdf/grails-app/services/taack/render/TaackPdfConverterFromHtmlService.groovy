@@ -12,34 +12,53 @@ import taack.ui.pdf.watermark.Watermark
  */
 @GrailsCompileStatic
 class TaackPdfConverterFromHtmlService {
-    static final String FONT_BOLD = 'fonts/Roboto-Bold.ttf'
-    static final String FONT_ITALIC = 'fonts/Roboto-Italic.ttf'
-    static final String FONT_REG = 'fonts/Roboto-Regular.ttf'
-    static final String FONT_REG_CN = 'fonts/NotoSansSC-Regular.ttf'
+    static final String FONT_BOLD = TaackPdfConverterFromHtmlService.getClassLoader().getResource('fonts/Roboto-Bold.ttf').toString()
+    static final String FONT_ITALIC = TaackPdfConverterFromHtmlService.getClassLoader().getResource('fonts/Roboto-Italic.ttf').toString()
+    static final String FONT_REG = TaackPdfConverterFromHtmlService.getClassLoader().getResource('fonts/Roboto-Regular.ttf').toString()
+    static final String FONT_REG_CN = TaackPdfConverterFromHtmlService.getClassLoader().getResource('fonts/NotoSansSC-Regular.ttf').toString()
 
-    void generatePdfFromHtmlIText(OutputStream outputStream, final String html, String watermarkText = null) {
+    void generatePdfFromHtmlIText(OutputStream outputStream, String html, String watermarkText = null) {
         ITextRenderer renderer = new ITextRenderer()
+
+        boolean hasWatermark = watermarkText != null && !watermarkText.isEmpty()
+
         SharedContext sharedContext = renderer.getSharedContext()
         sharedContext.setPrint(true)
         sharedContext.setInteractive(false)
-        renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_BOLD).toString(), true)
-        renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_ITALIC).toString(), true)
-        renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_REG).toString(), true)
-        renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_REG_CN).toString(), true)
-        renderer.setDocumentFromString(html)
+
+
+        renderer.getFontResolver().addFont(FONT_BOLD, BaseFont.IDENTITY_H, true)
+        renderer.getFontResolver().addFont(FONT_ITALIC, BaseFont.IDENTITY_H, true)
+        renderer.getFontResolver().addFont(FONT_REG, BaseFont.IDENTITY_H, true)
+        renderer.getFontResolver().addFont(FONT_REG_CN, BaseFont.IDENTITY_H, true)
+        String html2 = html.replace(
+                '<style type="text/css">', """
+<style type="text/css">
+@font-face {
+    font-family: NotoSansSC sans-serif;
+    src: url(${FONT_REG_CN.replace('file:', 'file://')}));
+    -fs-pdf-font-embed: embed;
+    -fs-pdf-font-encoding: Identity-H;
+    font-weight: normal;  font-style: normal;
+}
+                """
+        )
+
+        renderer.setDocumentFromString(html2)
+
         renderer.layout()
-        renderer.createPDF(outputStream, false)
+        renderer.createPDF(outputStream, !hasWatermark)
 
         // Add watermark
-        if (watermarkText != null && !watermarkText.isEmpty()) {
+        if (hasWatermark) {
             BaseFont watermarkFont = BaseFont.createFont(
                     getClass().getClassLoader().getResource(FONT_REG_CN).toString(),
                     BaseFont.IDENTITY_H,
                     BaseFont.EMBEDDED
             )
             renderer.getWriter().setPageEvent(new Watermark(watermarkText, watermarkFont))
+            renderer.finishPDF()
         }
 
-        renderer.finishPDF()
     }
 }
