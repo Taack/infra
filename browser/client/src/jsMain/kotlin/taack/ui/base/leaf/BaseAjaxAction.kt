@@ -100,7 +100,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                     }
                 }
                 loader?.classList?.add(ClassName("tck-hidden"))
-            } else if (xhr.readyState == xhr.LOADING) {
+            } else if (xhr.readyState == xhr.OPENED) {
                 loader?.classList?.remove(ClassName("tck-hidden"))
             }
         }

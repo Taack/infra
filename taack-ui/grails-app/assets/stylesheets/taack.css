@@ -332,7 +332,7 @@ td[taacktag] em {
     background-repeat: no-repeat;
     background-position: center;
     background-size: 250px;
-    z-index: 101;
+    z-index: 9999;
 }
 
 .tck-hidden {
