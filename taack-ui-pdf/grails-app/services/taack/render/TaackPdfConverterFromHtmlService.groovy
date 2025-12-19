@@ -1,8 +1,10 @@
 package taack.render
 
 import grails.compiler.GrailsCompileStatic
+import org.openpdf.text.pdf.BaseFont
 import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.ITextRenderer
+import taack.ui.pdf.watermark.Watermark
 
 /**
  * Convert HTML code to PDF (WiP).
@@ -20,12 +22,24 @@ class TaackPdfConverterFromHtmlService {
         SharedContext sharedContext = renderer.getSharedContext()
         sharedContext.setPrint(true)
         sharedContext.setInteractive(false)
-        renderer.setDocumentFromString(html)
-        renderer.layout()
         renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_BOLD).toString(), true)
         renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_ITALIC).toString(), true)
         renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_REG).toString(), true)
         renderer.getFontResolver().addFont(getClass().getClassLoader().getResource(FONT_REG_CN).toString(), true)
-        renderer.createPDF(outputStream)
+        renderer.setDocumentFromString(html)
+        renderer.layout()
+        renderer.createPDF(outputStream, false)
+
+        // Add watermark
+        if (watermarkText != null && !watermarkText.isEmpty()) {
+            BaseFont watermarkFont = BaseFont.createFont(
+                    getClass().getClassLoader().getResource(FONT_REG_CN).toString(),
+                    BaseFont.IDENTITY_H,
+                    BaseFont.EMBEDDED
+            )
+            renderer.getWriter().setPageEvent(new Watermark(watermarkText, watermarkFont))
+        }
+
+        renderer.finishPDF()
     }
 }
