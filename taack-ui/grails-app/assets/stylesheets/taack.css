@@ -228,8 +228,8 @@ td.firstCellInGroup-5 {
     padding-left: 120px !important;
 }
 
-td.firstCellInGroup {
-   /* position: relative;*/
+tr[taacktablerowgrouphaschildren] td.firstCellInGroup {
+    position: relative;
 }
 
 tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup:before {
