@@ -78,6 +78,18 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         new File(asciidocCachePath.toString()).deleteDir()
     }
 
+    void asciidocDiagrams(String path) {
+        GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
+        if (path.startsWith('/diag-')) {
+            File f = new File(Asciidoc.pathAsciidocGenerated + '/' + path)
+            if (f.exists()) {
+                webUtils.currentResponse.setContentType('image/svg+xml')
+                webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${URLEncoder.encode(path, 'UTF-8')}")
+                webUtils.currentResponse.outputStream << f.bytes
+            }
+        }
+    }
+
     UiBlockSpecifier asciidocBlockSpecifier(Class cl, String fileName) {
         String path = params['path']
         String fnPath = '/' + fileName.split('/')[1]
