@@ -11,6 +11,7 @@ class LineDiagramScene extends ScatterDiagramScene {
         this.dataPointRadius /= 4
     }
 
+    @Override
     void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return

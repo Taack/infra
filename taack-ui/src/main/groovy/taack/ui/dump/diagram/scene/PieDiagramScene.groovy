@@ -45,7 +45,8 @@ class PieDiagramScene extends DiagramScene {
         this.pieDataPerKey = pieDataPerKey
     }
 
-    void draw() {
+    @Override
+    void draw(boolean alwaysShowFullInfo = false) {
         drawTitle()
 
         render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-max-y': height])

@@ -29,7 +29,7 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
             (r.querySelector(".firstCellInGroup")!! as HTMLTableCellElement).onclick = EventHandler { e ->
                 if (e.target is HTMLTableCellElement) {
                     val offsetX = e.clientX - (e.target as HTMLTableCellElement).getBoundingClientRect().left
-                    if (offsetX in (5.0 + 20.0 * rowGroup)..(15.0 + 20.0 * rowGroup)) {
+                    if (offsetX in (5.0 + 30.0 * rowGroup)..(15.0 + 30.0 * rowGroup)) {
                         onclick()
                     }
                 }

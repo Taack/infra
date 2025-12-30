@@ -310,6 +310,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         render.renderGroupEnd()
     }
 
+    @Override
     void setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
         this.xLabelDateFormat = xLabelDateFormat
     }

@@ -10,6 +10,7 @@ import taack.ui.dump.Parameter
 import taack.ui.dump.RawHtmlDiagramDump
 import taack.ui.dump.RawHtmlTableDump
 import taack.ui.dump.common.BlockLog
+import taack.ui.dump.diagram.scene.PieDiagramScene
 import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
@@ -58,10 +59,11 @@ class RawHtmlPrintableDump implements IUiPrintableVisitor {
     void visitDiagram(UiDiagramSpecifier uiDiagramSpecifier, BlockSpec.Width width) {
         visitInnerBlock(width)
         ByteArrayOutputStream outb = new ByteArrayOutputStream(4096)
-//        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.PNG)
-//        this.out << """<img width="720" height="360" src='data:image/png;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
-        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.SVG_PDF)
-        this.out << """<img src="data:image/svg+xml;base64, ${Base64.getEncoder().encodeToString(outb.toByteArray())}"/>"""
+        RawHtmlDiagramDump d = new RawHtmlDiagramDump(outb)
+        uiDiagramSpecifier.visitDiagram(d, UiDiagramSpecifier.DiagramBase.PNG)
+        this.out << """<img width="680" height="${d.scene instanceof PieDiagramScene ? 680 : 340}" src='data:image/png;base64,${Base64.getEncoder().encodeToString(outb.toByteArray())}'/>"""
+//        uiDiagramSpecifier.visitDiagram(new RawHtmlDiagramDump(outb), UiDiagramSpecifier.DiagramBase.SVG_PDF)
+//        this.out << """<img src="data:image/svg+xml;base64,${Base64.getEncoder().encodeToString(outb.toByteArray())}"/>"""
         visitInnerBlockEnd()
     }
 

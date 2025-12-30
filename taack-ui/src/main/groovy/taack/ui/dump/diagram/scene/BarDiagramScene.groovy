@@ -117,6 +117,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
+    @Override
     void draw(boolean alwaysShowFullInfo = false) {
         if (!buildXLabelList()) {
             return
