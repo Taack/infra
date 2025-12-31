@@ -83,9 +83,12 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         if (path.startsWith('/diag-')) {
             File f = new File(Asciidoc.pathAsciidocGenerated + '/' + path)
             if (f.exists()) {
-                webUtils.currentResponse.setContentType('image/svg+xml')
+                String contentType = path.endsWith('png') ? 'image/png':'image/svg+xml'
+                webUtils.currentResponse.setContentType(contentType)
                 webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${URLEncoder.encode(path, 'UTF-8')}")
                 webUtils.currentResponse.outputStream << f.bytes
+            } else {
+                log.warn("Path: $path does not exists")
             }
         }
     }
