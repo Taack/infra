@@ -34,7 +34,7 @@ class TaackPdfConverterFromHtmlService {
         // Add watermark
         if (hasWatermark) {
             BaseFont watermarkFont = BaseFont.createFont(
-                    getClass().getClassLoader().getResource(FONT_REG_CN).toString(),
+                    FONT_REG_CN.toString(),
                     BaseFont.IDENTITY_H,
                     BaseFont.EMBEDDED
             )
