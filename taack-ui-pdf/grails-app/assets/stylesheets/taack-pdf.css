@@ -173,7 +173,7 @@ html {
 }
 
 .pure-u {
-    /*display: inline-block;*/
+    display: inline-block;
     vertical-align: top
 }
 
@@ -444,20 +444,9 @@ body {
 /*    }*/
 /*}*/
 
-div.pure-u-1 {
-    /*border: 1px red solid;*/
-
-    page-break-before: avoid;
-    page-break-inside: auto;
-    page-break-after: avoid;
-}
-
 table {
     -fs-table-paginate: paginate;
     width: 96%;
-    page-break-before: avoid;
-    page-break-inside: auto;
-    page-break-after: avoid;
     /*margin-left: 1mm;*/
     margin-top: 6mm;
     border-collapse: collapse;
@@ -479,22 +468,8 @@ table {
     border-bottom: 0.3mm solid black;
 }
 
-tr, td {
-    page-break-before: auto;
-    page-break-inside: auto;
-    page-break-after: auto;
-}
-
-tbody {
-    page-break-before: auto;
-    page-break-inside: auto;
-    page-break-after: auto;
-}
 
 thead {
-    page-break-before: auto;
-    page-break-inside: auto;
-    page-break-after: auto;
     display: table-header-group;
 }
 
