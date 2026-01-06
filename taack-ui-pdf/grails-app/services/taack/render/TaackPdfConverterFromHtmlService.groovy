@@ -1,6 +1,7 @@
 package taack.render
 
 import grails.compiler.GrailsCompileStatic
+import grails.util.Environment
 import org.openpdf.text.pdf.BaseFont
 import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -25,6 +26,10 @@ class TaackPdfConverterFromHtmlService {
         SharedContext sharedContext = renderer.getSharedContext()
         sharedContext.setPrint(true)
         sharedContext.setInteractive(false)
+
+        if (Environment.isDevelopmentMode()) {
+            println html
+        }
 
         renderer.setDocumentFromString(html)
 
