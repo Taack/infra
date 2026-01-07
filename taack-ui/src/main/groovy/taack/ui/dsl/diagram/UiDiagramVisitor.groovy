@@ -81,6 +81,16 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
+    void timelinePeriodData(String key, Date startDate, Date endDate, String title) {
+
+    }
+
+    @Override
+    void visitTimelineDiagram() {
+
+    }
+
+    @Override
     void visitDiagramEnd() {
 
     }

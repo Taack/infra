@@ -35,6 +35,10 @@ interface IUiDiagramVisitor {
 
     void visitWhiskersDiagram()
 
+    void timelinePeriodData(String key, Date startDate, Date endDate, String title)
+
+    void visitTimelineDiagram()
+
     void visitDiagramEnd()
 
     void visitDiagramOption(DiagramOption diagramOption)

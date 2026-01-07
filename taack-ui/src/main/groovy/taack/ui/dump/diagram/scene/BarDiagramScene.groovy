@@ -99,14 +99,14 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     render.translateTo(barX, barY - barHeight)
                     render.fillStyle(keyColor)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
-
-                    if (diagramOption?.showDataCount) {
-                        // label
-                        render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
-                        render.renderLabel(yDataLabel)
-                    }
                 }
                 render.renderGroupEnd()
+
+                // label
+                if (yData > startLabelY && diagramOption?.showDataCount) {
+                    render.translateTo(barX + (barWidth - render.measureText(yDataLabel)) / 2, isStacked ? barY - barHeight / 2 - fontSize / 2 : barY - barHeight - fontSize - 2.0)
+                    render.renderLabel(yDataLabel)
+                }
 
                 if (isStacked) {
                     barY -= barHeight

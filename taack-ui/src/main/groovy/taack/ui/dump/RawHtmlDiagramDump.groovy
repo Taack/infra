@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Triple
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.diagram.DiagramOption
@@ -33,7 +34,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Object[] xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
-    private DiagramOption diagramOption
+    private Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey // [key1: [Triple(startDate, endDate, title), Triple(startDate2, endDate2, title2), Pair...], key2 : [...], ...]
+    private DiagramOption diagramOption = new DiagramOption()
     private DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
     @Override
@@ -44,11 +46,13 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitDiagramDataInitialization() {
         this.out.reset()
+        this.scene = null
         this.xDataList = []
         this.dataPerKey = [:]
         this.whiskersYDataListPerKey = [:]
-        this.diagramOption = null
-        this.scene = null
+        this.timelineDataPerKey = [:]
+        this.diagramOption = new DiagramOption()
+        this.xLabelDateFormat = DiagramXLabelDateFormat.DAY
     }
 
     @Override
@@ -103,22 +107,24 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         dataPerKey.put(key, dataMap)
     }
 
-    void createDiagramRender(BigDecimal heightWidthRadio) {
-        if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG) {
-            BigDecimal width = diagramOption?.resolution?.width ?: 960.0
-            this.render = new SvgDiagramRender(width, diagramOption?.resolution?.height ?: (width * heightWidthRadio), true, diagramOption?.resolution?.fontSizePercentage ?: 1.0)
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.SVG_PDF) {
-            BigDecimal width = diagramOption?.resolution?.width ?: 720.0
-            this.render = new SvgDiagramRender(width, diagramOption?.resolution?.height ?: (width * heightWidthRadio), false, diagramOption?.resolution?.fontSizePercentage ?: 1.0)
-        } else if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            BigDecimal width = diagramOption?.resolution?.width ?: (720.0 * 3)
-            this.render = new PngDiagramRender(width, diagramOption?.resolution?.height ?: (width * heightWidthRadio), diagramOption?.resolution?.fontSizePercentage ?: (1.0 * 3))
+    void initDiagramResolution(boolean squareResolution = false) {
+        diagramOption ?= new DiagramOption()
+        if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
+            if (!diagramOption.resolution) {
+                diagramOption.setResolution(squareResolution ? DiagramOption.DiagramResolution.SQUARE_HIGH : DiagramOption.DiagramResolution.DEFAULT_2K)
+            }
+            render = new PngDiagramRender(diagramOption.resolution)
+        } else {
+            if (!diagramOption.resolution) {
+                diagramOption.setResolution(squareResolution ? DiagramOption.DiagramResolution.SQUARE : DiagramOption.DiagramResolution.DEFAULT_540P)
+            }
+            render = new SvgDiagramRender(diagramOption.resolution, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         }
     }
 
     @Override
     void visitBarDiagram(boolean isStacked) {
-        createDiagramRender(0.5)
+        initDiagramResolution()
         scene = new BarDiagramScene(render, dataPerKey, diagramOption, isStacked)
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
         scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
@@ -126,7 +132,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitScatterDiagram(String... pointImageHref) {
-        createDiagramRender(0.5)
+        initDiagramResolution()
         scene = new ScatterDiagramScene(render, dataPerKey, diagramOption, pointImageHref.toList())
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
         scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
@@ -134,7 +140,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitLineDiagram() {
-        createDiagramRender(0.5)
+        initDiagramResolution()
         scene = new LineDiagramScene(render, dataPerKey, diagramOption)
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
         scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
@@ -142,7 +148,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitAreaDiagram() {
-        createDiagramRender(0.5)
+        initDiagramResolution()
         scene = new AreaDiagramScene(render, dataPerKey, diagramOption)
         if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
         scene.draw(false)
@@ -150,7 +156,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitPieDiagram(boolean hasSlice) {
-        createDiagramRender(1.0)
+        initDiagramResolution(true)
         scene = new PieDiagramScene(render, dataPerKey, diagramOption, hasSlice)
         scene.draw()
     }
@@ -167,11 +173,32 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitWhiskersDiagram() {
         if (xDataList) {
-            createDiagramRender(0.5)
+            initDiagramResolution()
             scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramOption)
             if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
             scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         }
+    }
+
+    @Override
+    void timelinePeriodData(String key, Date startDate, Date endDate, String title) {
+        if (startDate && endDate) {
+            Triple<Date, Date, String> info = startDate.before(endDate) ? new Triple(startDate, endDate, title) : new Triple(endDate, startDate, title)
+            if (timelineDataPerKey.containsKey(key)) {
+                timelineDataPerKey[key].add(info)
+            } else {
+                timelineDataPerKey.put(key, [info])
+            }
+        }
+    }
+
+    @Override
+    void visitTimelineDiagram() {
+        initDiagramResolution()
+        if (xDataList) timelineDataPerKey.put(null, xDataList.collect { new Triple<Date, Date, String>(it as Date, null, null) })
+        scene = new TimelineDiagramScene(render, timelineDataPerKey, diagramOption)
+        scene.setXLabelDateFormat(DiagramXLabelDateFormat.DAY)
+        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
 
     @Override

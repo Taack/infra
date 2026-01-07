@@ -13,10 +13,10 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     private BigDecimal LEGEND_RECT_WIDTH = 40.0
     private BigDecimal LEGEND_RECT_TEXT_SPACING = 5.0
     private BigDecimal LEGEND_MARGIN = 10.0
-    private BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
-    private BigDecimal AXIS_LABEL_MARGIN = 10.0
+    protected BigDecimal BACKGROUND_LINE_EXCEED_DIAGRAM = 5.0
+    protected BigDecimal AXIS_LABEL_MARGIN = 10.0
     protected BigDecimal MIN_GAP_WIDTH = 5.0
-    private final BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
+    protected BigDecimal LABEL_ROTATE_ANGLE_WHEN_MASSIVE = -20.0
 
     protected Set<Object> xLabelList = []
     protected BigDecimal startLabelY
@@ -135,19 +135,21 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal totalLength = 0.0
             Map<Integer, Map<String, BigDecimal>> keyMapPerLine = [:] // [line1: [key1: length1, key2: length2, key3: length3], line2: [...], line3: [...], ...]
             dataPerKey.keySet().eachWithIndex { String key, int i ->
-                BigDecimal length = (i < pointImageHref.size() ? LEGEND_IMAGE_WIDTH : LEGEND_RECT_WIDTH) + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
-                if (totalLength + length > width) {
-                    line++
-                    totalLength = 0.0
+                if (key != null) {
+                    BigDecimal length = (i < pointImageHref.size() ? LEGEND_IMAGE_WIDTH : LEGEND_RECT_WIDTH) + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
+                    if (totalLength + length > width) {
+                        line++
+                        totalLength = 0.0
+                    }
+                    if (keyMapPerLine.keySet().contains(line)) {
+                        keyMapPerLine[line].put(key, length)
+                    } else {
+                        Map<String, BigDecimal> m = [:]
+                        m.put(key, length)
+                        keyMapPerLine.put(line, m)
+                    }
+                    totalLength += length + LEGEND_MARGIN
                 }
-                if (keyMapPerLine.keySet().contains(line)) {
-                    keyMapPerLine[line].put(key, length)
-                } else {
-                    Map<String, BigDecimal> m = [:]
-                    m.put(key, length)
-                    keyMapPerLine.put(line, m)
-                }
-                totalLength += length + LEGEND_MARGIN
             }
 
             diagramMarginTop += (LEGEND_MARGIN + fontSize) * line
@@ -286,8 +288,8 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         String id = 'clipSection' + ThreadLocalRandom.current().nextInt(0, 1_000_000).toString()
 
         render.translateTo(0.0, 0.0)
-        render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, 0.0,
-                                  width - DIAGRAM_MARGIN_RIGHT + 1, 0.0,
+        render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
+                                  width - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
                                   width - DIAGRAM_MARGIN_RIGHT + 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
                                   width, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
                                   width, height,
@@ -302,6 +304,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                             'shape-max-width': shapeMaxWidth,
                             'area-min-x': DIAGRAM_MARGIN_LEFT,
                             'area-max-x': width - DIAGRAM_MARGIN_RIGHT,
+                            'area-min-y': diagramMarginTop,
                             'area-max-y': height - DIAGRAM_MARGIN_BOTTOM])
     }
 

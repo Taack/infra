@@ -71,6 +71,14 @@ final class DiagramTypeSpec {
         diagramVisitor.visitDiagramEnd()
     }
 
+    void timeline(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramTimelineDatasetSpec) Closure closure) {
+        diagramVisitor.visitDiagramDataInitialization()
+        closure.delegate = new DiagramTimelineDatasetSpec(diagramVisitor)
+        closure.call()
+        diagramVisitor.visitTimelineDiagram()
+        diagramVisitor.visitDiagramEnd()
+    }
+
     void custom(String html) {
         diagramVisitor.visitDiagramDataInitialization()
         diagramVisitor.visitCustom(html)

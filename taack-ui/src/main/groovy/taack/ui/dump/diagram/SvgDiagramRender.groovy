@@ -1,6 +1,7 @@
 package taack.ui.dump.diagram
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 
 import java.awt.Color
 import java.awt.Font
@@ -24,9 +25,22 @@ class SvgDiagramRender implements IDiagramRender {
     private BigDecimal LABEL_MARGIN = 2.0
     private BigDecimal ARROW_LENGTH = 8.0
 
+    // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params 'width/height' will be used to do ZOOM
+    // if isViewBox == false, the diagramWidth/diagramHeight will be fixed to params 'width/height'
+    SvgDiagramRender(DiagramOption.DiagramResolution resolution, boolean isViewBox = false) {
+        this.svgWidth = resolution.width
+        this.svgHeight = resolution.height
+        this.isViewBox = isViewBox
+        this.fontSizePercentage = resolution.fontSizePercentage
+        this.fontSize = (this.fontSize * fontSizePercentage).toInteger()
+        this.lineWidth *= fontSizePercentage
+        this.fm = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
+
+        this.LABEL_MARGIN *= fontSizePercentage
+        this.ARROW_LENGTH *= fontSizePercentage
+    }
+
     SvgDiagramRender(BigDecimal width, BigDecimal height, boolean isViewBox = false, BigDecimal fontSizePercentage = 1.0) {
-        // if isViewBox == true, the diagramWidth/diagramHeight will be auto-fit (It always equals to 100%), and the params 'width/height' will be used to do ZOOM
-        // if isViewBox == false, the diagramWidth/diagramHeight will be fixed to params 'width/height'
         this.svgWidth = width
         this.svgHeight = height
         this.isViewBox = isViewBox
@@ -67,10 +81,17 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void renderLine(BigDecimal toX, BigDecimal toY) {
-        outStr.append(
-                """
-            <line x1="${trX}" y1="${trY}" x2="${toX + trX}" y2="${toY + trY}" style="stroke:${fillStyle};stroke-width:${lineWidth}" />
+        outStr.append("""
+            <line x1="${trX}" y1="${trY}" x2="${toX + trX}" y2="${toY + trY}" style="stroke:${fillStyle};stroke-width:${lineWidth};" />
         """.stripIndent())
+    }
+
+    @Override
+    void renderHiddenLine(BigDecimal toX, BigDecimal toY) {
+        outStr.append("""
+                <line x1="${trX}" y1="${trY}" x2="${toX + trX}" y2="${toY + trY}" style="stroke:${fillStyle};stroke-width:${lineWidth};display: none;" />
+        """.stripIndent()
+        )
     }
 
     @Override
@@ -309,6 +330,11 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     BigDecimal measureText(String text) {
         return fm.stringWidth(text)
+    }
+
+    @Override
+    BigDecimal measureSmallText(String text) {
+        return new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
     @Override

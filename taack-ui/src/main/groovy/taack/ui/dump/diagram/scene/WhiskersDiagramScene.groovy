@@ -103,13 +103,13 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                         if (lowerExtreme > startLabelY) {
                             String yDataLabel = numberToString(upperExtreme)
                             render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor), style: 'pointer-events: bounding-box;'])
-                            // line from upperExtreme to upperQuartile
-                            render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
-                            render.fillStyle(BLACK_COLOR)
-                            render.renderLine(0.0, (upperExtreme - upperQuartile) / gapY * gapHeight)
                             // upperExtreme line
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
+                            render.fillStyle(BLACK_COLOR)
                             render.renderLine(boxWidth, 0.0)
+                            // line from upperExtreme to upperQuartile
+                            render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
+                            render.renderLine(0.0, (upperExtreme - upperQuartile) / gapY * gapHeight)
                             render.renderGroupEnd()
 
                             yDataLabel = numberToString(upperQuartile)
@@ -134,12 +134,12 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
 
                             yDataLabel = numberToString(lowerQuartile)
                             render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor), style: 'pointer-events: bounding-box;'])
-                            // line from lowerQuartile to lowerExtreme
-                            render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
-                            render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
                             // lowerQuartile line
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
                             render.renderLine(boxWidth, 0.0)
+                            // line from lowerQuartile to lowerExtreme
+                            render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
+                            render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
                             render.renderGroupEnd()
 
                             yDataLabel = numberToString(lowerExtreme)

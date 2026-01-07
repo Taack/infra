@@ -78,7 +78,10 @@ final class DiagramOption {
         DEFAULT_1080P(1920.0, 1080.0, 2.0),
         DEFAULT_2K(2048.0, 1080.0, 2.1333),
         DEFAULT_1440P(2560.0, 1440.0, 2.6667),
-        DEFAULT_4K(3840.0, 2160.0, 4.0)
+        DEFAULT_4K(3840.0, 2160.0, 4.0),
+
+        SQUARE(960.0, 960.0, 1.0),
+        SQUARE_HIGH(2048.0, 2048.0, 2.1333)
 
         DiagramResolution(BigDecimal width, BigDecimal height, BigDecimal fontSizePercentage) {
             this.width = width
