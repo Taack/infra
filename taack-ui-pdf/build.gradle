@@ -23,6 +23,7 @@ dependencies {
 
     // LGPL 2.1
     implementation 'org.xhtmlrenderer:flying-saucer-pdf:10.0.6'
+    implementation 'org.apache.commons:commons-text:1.15.0'
 }
 
 groovydoc {
