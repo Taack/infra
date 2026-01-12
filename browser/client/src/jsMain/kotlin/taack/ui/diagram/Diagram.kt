@@ -1,6 +1,7 @@
 package taack.ui.diagram
 
 import js.array.asList
+import kotlinx.browser.window
 import taack.ui.base.BaseElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
@@ -22,8 +23,6 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     }
 
     private val fontSizePercentage: Double = s.attributes.getNamedItem("font-size-percentage")?.value?.toDouble() ?: 1.0
-    private var isScrolling: Boolean = false
-    private var previousMouseX: Double? = null
     val transformArea: DiagramTransformArea? = DiagramTransformArea.getSiblingDiagramTransformArea(this)
 
     init {
@@ -32,44 +31,100 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
 
         if (transformArea != null && s.querySelector("clipPath[id^='clipSection']") != null) {
             // Scroll
+            var isScrollingX = false
+            var previousMousePosition: Double? = null
             s.onmousedown = EventHandler { e ->
                 if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
-                    isScrolling = true
-                    previousMouseX = translateX(e.clientX.toDouble())
+                    isScrollingX = true
+                    previousMousePosition = translateX(e.clientX.toDouble())
                 }
             }
             s.onmousemove = EventHandler { e ->
-                if (isScrolling && previousMouseX != null) {
+                if (isScrollingX && previousMousePosition != null) {
                     val currentMouseX = translateX(e.clientX.toDouble())
-                    transformArea.scrollBy(currentMouseX - previousMouseX!!)
-                    previousMouseX = currentMouseX
+                    transformArea.horizontalScrollBy(currentMouseX - previousMousePosition!!)
+                    previousMousePosition = currentMouseX
                 }
             }
             s.onmouseup = EventHandler {
-                isScrolling = false
+                isScrollingX = false
             }
             s.onmouseleave = EventHandler {
-                isScrolling = false
+                isScrollingX = false
+            }
+
+            var isWheeling = false
+            var wheelTimer: Int? = null
+            fun tryToReleaseWheelDefaultBehavior(e: WheelEvent) { // Release Wheel default behavior only after the wheeling has been stopped for >0.5s
+                if (isWheeling) {
+                    e.preventDefault()
+
+                    if (wheelTimer != null) {
+                        window.clearTimeout(wheelTimer!!)
+                    }
+                    wheelTimer = window.setTimeout({
+                        isWheeling = false
+                    }, 500)
+                }
             }
 
             // Zoom
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
-                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
-                    e.preventDefault()
-                    transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)
+                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble(), e.clientY.toDouble())) {
+                    // possible to execute Zoom : Stop the page scroll
+                    // no possible anymore to Zoom and has stopped the Wheel for >0.5s : Release the page scroll
+                    if (transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)) {
+                        e.preventDefault()
+                        isWheeling = true
+                    } else {
+                        tryToReleaseWheelDefaultBehavior(e)
+                    }
                 }
             }
 
+            // Vertical scroll for TIMELINE diagram
+            if (transformArea.getShapeType() == "timeline") {
+                s.addEventListener(EventType("wheel"), EventHandler { e: WheelEvent ->
+                    if (transformArea.isClientMouseInYAxisLabelArea(e.clientX.toDouble(), e.clientY.toDouble())) {
+                        if (transformArea.verticalScroll(e.deltaY < 0)) {
+                            e.preventDefault()
+                            isWheeling = true
+                        } else {
+                            tryToReleaseWheelDefaultBehavior(e)
+                        }
+                    }
+                })
+
+                var isScrollingY = false
+                s.addEventListener(EventType("mousedown"), EventHandler { e: MouseEvent ->
+                    if (transformArea.isClientMouseInYAxisLabelArea(e.clientX.toDouble())) {
+                        isScrollingY = true
+                        previousMousePosition = translateY(e.clientY.toDouble())
+                    }
+                })
+                s.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
+                    if (isScrollingY && previousMousePosition != null) {
+                        val currentMouseY = translateY(e.clientY.toDouble())
+                        transformArea.verticalScrollBy(currentMouseY - previousMousePosition!!)
+                        previousMousePosition = currentMouseY
+                    }
+                })
+                s.addEventListener(EventType("mouseup"), EventHandler { isScrollingY = false })
+                s.addEventListener(EventType("mouseleave"), EventHandler { isScrollingY = false })
+            }
+
             // HoverLine and tooltip for LINE diagram
-            s.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
-                transformArea.refreshCurrentHoverLineAndDataToolTip(e.clientX.toDouble(), e.clientY.toDouble())
-            })
-            s.addEventListener(EventType("mouseleave"), EventHandler {
-                if (transformArea.currentHoverLine != null) {
-                    transformArea.currentHoverLine!!.remove()
-                    s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
-                }
-            })
+            if (transformArea.getShapeType() == "line") {
+                s.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
+                    transformArea.refreshCurrentHoverLineAndDataToolTip(e)
+                })
+                s.addEventListener(EventType("mouseleave"), EventHandler {
+                    if (transformArea.currentHoverLine != null) {
+                        transformArea.currentHoverLine!!.remove()
+                        s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
+                    }
+                })
+            }
         }
     }
 
@@ -77,6 +132,12 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
         val pt = s.createSVGPoint()
         pt.x = x
         return pt.matrixTransform(s.getScreenCTM()!!.inverse()).x
+    }
+
+    fun translateY(y: Double): Double {
+        val pt = s.createSVGPoint()
+        pt.y = y
+        return pt.matrixTransform(s.getScreenCTM()!!.inverse()).y
     }
 
     fun getFontSizePercentage(): Double {

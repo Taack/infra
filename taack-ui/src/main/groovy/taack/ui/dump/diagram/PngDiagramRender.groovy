@@ -1,6 +1,7 @@
 package taack.ui.dump.diagram
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.diagram.DiagramOption
 
 import javax.imageio.ImageIO
 import java.awt.*
@@ -29,12 +30,29 @@ class PngDiagramRender implements IDiagramRender {
     private BigDecimal LABEL_MARGIN = 2.0
     private BigDecimal ARROW_LENGTH = 8.0
 
+    PngDiagramRender(DiagramOption.DiagramResolution resolution) {
+        pngWidth = resolution.width
+        pngHeight = resolution.height
+        fontSize = (fontSize * resolution.fontSizePercentage).toInteger()
+        lineWidth *= resolution.fontSizePercentage
+        bi = new BufferedImage(pngWidth.toInteger(), pngHeight.toInteger(), BufferedImage.TYPE_INT_ARGB)
+        ig2 = bi.createGraphics()
+        ig2.setPaint(fillStyle)
+        Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
+        ig2.setFont(f)
+        fm = ig2.getFontMetrics(f)
+        initialTransform = ig2.getTransform()
+
+        this.LABEL_MARGIN *= resolution.fontSizePercentage
+        this.ARROW_LENGTH *= resolution.fontSizePercentage
+    }
+
     PngDiagramRender(BigDecimal width, BigDecimal height, BigDecimal fontSizePercentage = 1.0) {
         pngWidth = width
         pngHeight = height
         fontSize = (fontSize * fontSizePercentage).toInteger()
         lineWidth *= fontSizePercentage
-        bi = new BufferedImage(width.toInteger(), height.toInteger(), BufferedImage.TYPE_INT_ARGB)
+        bi = new BufferedImage(pngWidth.toInteger(), pngHeight.toInteger(), BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
         ig2.setPaint(fillStyle)
         Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
@@ -79,6 +97,11 @@ class PngDiagramRender implements IDiagramRender {
         ig2.setPaint(fillStyle)
         ig2.setStroke(new BasicStroke(lineWidth.toFloat()))
         ig2.draw(new Line2D.Double(trX.toDouble(), trY.toDouble(), (toX + trX).toDouble(), (toY + trY).toDouble()))
+    }
+
+    @Override
+    void renderHiddenLine(BigDecimal toX, BigDecimal toY) {
+
     }
 
     @Override
@@ -293,6 +316,11 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     BigDecimal measureText(String text) {
         return fm.stringWidth(text)
+    }
+
+    @Override
+    BigDecimal measureSmallText(String text) {
+        return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
     @Override

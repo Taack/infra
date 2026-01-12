@@ -29,6 +29,7 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
+import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dsl.table.TableOption
 import taack.wysiwyg.TaackAsciidocPlantUML
@@ -37,6 +38,8 @@ import taack.wysiwyg.TaackBaseAsciidocSpans
 import taack.ui.dump.Parameter
 import taack.wysiwyg.Asciidoc
 import taack.wysiwyg.Markdown
+
+import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 /*
@@ -1446,6 +1449,21 @@ class CmsController implements WebAttributes {
                         boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
                         boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
                         boxData 0.5, 1.0, 1.1, 1.2, 1.3, 2.0, 5.5
+                    }
+                })
+            })
+            // ------- Timeline diagram -------
+            diagram new UiDiagramSpecifier().ui({
+                timeline({
+                    SimpleDateFormat d = new SimpleDateFormat('yyyy-MM-dd')
+                    dataset 'CLEO', {
+                        periodData d.parse('2024-04-01'), d.parse('2024-04-10'), 'step 1'
+                        periodData d.parse('2024-04-10'), d.parse('2024-05-01'), 'step 2'
+                        periodData d.parse('2024-05-01'), d.parse('2024-06-01'), 'step 3'
+                    }
+                    dataset 'MLP', {
+                        periodData d.parse('2024-05-15'), d.parse('2024-05-20'), 'step 1'
+                        periodData d.parse('2024-05-20'), d.parse('2024-05-29'), 'step 2'
                     }
                 })
             })

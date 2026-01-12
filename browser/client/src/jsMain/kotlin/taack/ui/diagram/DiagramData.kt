@@ -9,11 +9,13 @@ import web.cssom.ClassName
 import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
+import web.geometry.DOMRect
 import web.history.history
 import web.http.GET
 import web.http.RequestMethod
 import web.location.location
 import web.svg.*
+import web.uievents.MouseEvent
 import web.url.URL
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
@@ -31,6 +33,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
     val dataset: String = g.attributes.getNamedItem("dataset")!!.value
     val gapIndex = g.attributes.getNamedItem("gap-index")?.value?.toInt()
     private val shapes: List<SVGElement> = g.children.asList().filter { it.tagName != "text" }.unsafeCast<List<SVGElement>>()
+    private val dataLabel: SVGTextElement? = g.nextElementSibling?.let { if (it.tagName == "text") return@let it as SVGTextElement else null }
     private val keyColor: String = g.attributes.getNamedItem("key-color")?.value ?: "rgb(0, 0, 0)"
     private val tooltip: SVGGElement?
 
@@ -41,15 +44,19 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             val fontSizePercentage = diagramRoot.getFontSizePercentage()
             tooltip = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
             tooltip.classList.add(ClassName("diagram-tooltip"))
+            tooltip.style.pointerEvents = "none"
 
             val background: SVGPolygonElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon") as SVGPolygonElement
             background.style.fill = "#00000090"
             tooltip.appendChild(background)
 
             val legend: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
+            val datasetSuffix: String? = g.attributes.getNamedItem("dataset-suffix")?.value
             legend.innerHTML = """
                 <rect x="0.0" y="0.0" width="${40 * fontSizePercentage}" height="${13 * fontSizePercentage}" style="fill:${keyColor};"></rect>
-                <text x="${45 * fontSizePercentage}" y="${11 * fontSizePercentage}" text-rendering="optimizeLegibility" style="font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif; pointer-events: none;">${dataset}</text>
+                <text x="${45 * fontSizePercentage}" y="${11 * fontSizePercentage}" text-rendering="optimizeLegibility" style="font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif; pointer-events: none;">
+                ${if (datasetSuffix.isNullOrBlank()) dataset else "$dataset : $datasetSuffix"}
+                </text>
             """.trimIndent()
             legend.querySelectorAll("text").forEach { (it as SVGTextElement).style.fill = "white" }
             legend.setAttribute("transform", "translate(0,-${15 * fontSizePercentage})")
@@ -63,8 +70,8 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             tooltip.appendChild(value)
 
             if (parent.currentHoverLine == null) {
-                g.onmouseenter = EventHandler {
-                    showTooltip()
+                g.onmouseenter = EventHandler { e: MouseEvent ->
+                    showTooltip(e)
                 }
                 g.onmouseleave = EventHandler {
                     if (diagramRoot.s.contains(tooltip)) {
@@ -100,6 +107,9 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
 
     fun hideOrShow(toShow: Boolean) {
         g.style.display = if (toShow) "" else "none"
+        if (dataLabel != null) {
+            dataLabel.style.display = if (toShow) "" else "none"
+        }
     }
 
     fun moveShapeHorizontally(startX: Double, shapeWidth: Double) {
@@ -108,9 +118,15 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                 "rect" -> {
                     shape.setAttribute("x", startX.toString())
                     shape.setAttribute("width", shapeWidth.toString())
+                    dataLabel?.setAttribute("x", (startX + (shapeWidth - dataLabel.getAttribute("label-width")!!.toDouble()) / 2).toString())
                 }
                 "circle" -> {
                     shape.setAttribute("cx", startX.toString())
+                    if (parent.getShapeType() == "line") {
+                        dataLabel?.setAttribute("x", (startX - dataLabel.getAttribute("label-width")!!.toDouble() / 2).toString())
+                    } else if (parent.getShapeType() == "scatter") {
+                        dataLabel?.setAttribute("x", (startX + shape.getAttribute("r")!!.toDouble() + 2.0).toString())
+                    }
                 }
                 "line" -> {
                     val x1 = shape.getAttribute("x1")
@@ -138,6 +154,10 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                     }
                     y = startY - shape.getAttribute("height")!!.toDouble()
                     shape.setAttribute("y", y.toString())
+                    if (dataLabel != null) {
+                        val fontSize = dataLabel.style.fontSize.let { it.substring(0, it.indexOf("px")) }.toDouble()
+                        dataLabel.setAttribute("y", (y + shape.getAttribute("height")!!.toDouble() / 2 + fontSize / 2 - 2.0).toString())
+                    }
                 }
                 "circle" -> {
                     shape.setAttribute("cy", startY.toString())
@@ -197,7 +217,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         xhr.send()
     }
 
-    fun showTooltip() {
+    fun showTooltip(e: MouseEvent) {
         if (tooltip != null) {
             val diagramRoot = parent.parent
             diagramRoot.s.appendChild(tooltip)
@@ -218,12 +238,27 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             }
 
             val diagramScrollX = diagramRoot.transformArea?.g?.getAttribute("scroll-x")?.toDouble() ?: 0.0
-            if (g.getBBox().x + g.getBBox().width + background.getBBox().width + diagramScrollX < diagramRoot.s.viewBox.baseVal.x + diagramRoot.s.viewBox.baseVal.width) {
+            val diagramScrollY = diagramRoot.transformArea?.g?.getAttribute("scroll-y")?.toDouble() ?: 0.0
+            val diagramMinX = diagramRoot.s.viewBox.baseVal.x
+            val diagramMaxX = diagramMinX + diagramRoot.s.viewBox.baseVal.width
+            val mouseX = parent.parent.translateX(e.clientX.toDouble())
+            val bBox: DOMRect = g.getBBox()
+            if (bBox.x + bBox.width + background.getBBox().width + diagramScrollX < diagramMaxX) {
+                // shape right
                 background.setAttribute("transform", "translate(${(background.getBBox().width - margin * 3) / 2},0)")
-                tooltip.setAttribute("transform", "translate(${g.getBBox().x + g.getBBox().width + margin * 2 + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
-            } else {
+                tooltip.setAttribute("transform", "translate(${bBox.x + bBox.width + margin * 2 + diagramScrollX},${bBox.y + (if (shapes.firstOrNull()?.tagName == "circle") bBox.height / 2.0 else 0.0) + diagramScrollY})")
+            } else if (bBox.x - background.getBBox().width + diagramScrollX > diagramMinX) {
+                // shape left
                 background.setAttribute("transform", "scale(-1,1) translate(${-(background.getBBox().width - margin * 3) / 2},0)")
-                tooltip.setAttribute("transform", "translate(${g.getBBox().x - (tooltip.getBBox().width - margin) + diagramScrollX},${g.getBBox().y + (if (shapes.firstOrNull()?.tagName == "circle") g.getBBox().height / 2.0 else 0.0)})")
+                tooltip.setAttribute("transform", "translate(${bBox.x - (tooltip.getBBox().width - margin) + diagramScrollX},${bBox.y + (if (shapes.firstOrNull()?.tagName == "circle") bBox.height / 2.0 else 0.0) + diagramScrollY})")
+            } else if (mouseX + margin * 2 + background.getBBox().width < diagramMaxX) {
+                // mouse right (But keep margin*2 away)
+                background.setAttribute("transform", "translate(${(background.getBBox().width - margin * 3) / 2},0)")
+                tooltip.setAttribute("transform", "translate(${mouseX + margin * 2 + margin * 2},${bBox.y + (if (shapes.firstOrNull()?.tagName == "circle") bBox.height / 2.0 else 0.0) + diagramScrollY})")
+            } else {
+                // mouse left (But keep margin*2 away)
+                background.setAttribute("transform", "scale(-1,1) translate(${-(background.getBBox().width - margin * 3) / 2},0)")
+                tooltip.setAttribute("transform", "translate(${mouseX - margin * 2 - (tooltip.getBBox().width - margin)},${bBox.y + (if (shapes.firstOrNull()?.tagName == "circle") bBox.height / 2.0 else 0.0) + diagramScrollY})")
             }
         }
     }

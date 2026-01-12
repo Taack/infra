@@ -23,6 +23,8 @@ interface IDiagramRender {
 
     void renderLine(BigDecimal toX, BigDecimal toY)
 
+    void renderHiddenLine(BigDecimal toX, BigDecimal toY)
+
     void renderHorizontalStrip(BigDecimal height)
 
     void renderVerticalStrip(BigDecimal width)
@@ -66,6 +68,8 @@ interface IDiagramRender {
     BigDecimal getDiagramHeight()
 
     BigDecimal measureText(String text)
+
+    BigDecimal measureSmallText(String text)
 
     BigDecimal measureEmphasizedText(String text)
 }

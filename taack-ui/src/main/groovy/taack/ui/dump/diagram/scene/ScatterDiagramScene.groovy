@@ -61,6 +61,15 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         }
                         render.renderGroupEnd()
                     }
+                    // data label
+                    if (diagramOption?.showDataCount && gapWidth >= MIN_GAP_WIDTH) {
+                        if (dataPointRadius > 5) { // put label at right
+                            render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
+                        } else { // put label at top
+                            render.translateTo(xWidth - render.measureText(dataLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
+                        }
+                        render.renderLabel(dataLabel)
+                    }
                     // line to next circle
                     if (hasLineBetweenPoints && j < xList.size() - 1) {
                         render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i]])
@@ -72,15 +81,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.fillStyle(keyColor)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
-                    }
-                    if (diagramOption?.showDataCount && gapWidth >= MIN_GAP_WIDTH) {
-                        // data label
-                        if (dataPointRadius > 5) { // put label at right
-                            render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
-                        } else { // put label at top
-                            render.translateTo(xWidth - render.measureText(dataLabel) / 2, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
-                        }
-                        render.renderLabel(dataLabel)
                     }
                 }
             }
@@ -113,6 +113,17 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         }
                         render.renderGroupEnd()
                     }
+                    // data label
+                    if (diagramOption?.showDataCount && gapWidth >= MIN_GAP_WIDTH) {
+                        if (y > startLabelY) {
+                            if (dataPointRadius > 5) { // put label at right
+                                render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
+                            } else { // put label at top
+                                render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
+                            }
+                            render.renderLabel(yDataLabel)
+                        }
+                    }
                     // line to next circle
                     if (hasLineBetweenPoints && i < xLabelList.size() - 1) {
                         render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j]])
@@ -122,17 +133,6 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.fillStyle(keyColor)
                         render.renderLine(nextXWidth - xWidth, yHeight - nextYHeight)
                         render.renderGroupEnd()
-                    }
-                    if (diagramOption?.showDataCount && gapWidth >= MIN_GAP_WIDTH) {
-                        // data label
-                        if (y > startLabelY) {
-                            if (dataPointRadius > 5) { // put label at right
-                                render.translateTo(xWidth + dataPointRadius + 2.0, height - DIAGRAM_MARGIN_BOTTOM - yHeight - fontSize / 2)
-                            } else { // put label at top
-                                render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius - fontSize - 2.0)
-                            }
-                            render.renderLabel(yDataLabel)
-                        }
                     }
                 }
             }

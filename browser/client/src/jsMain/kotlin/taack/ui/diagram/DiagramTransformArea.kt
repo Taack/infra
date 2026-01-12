@@ -6,6 +6,7 @@ import taack.ui.base.BaseElement
 import taack.ui.base.element.Block
 import web.dom.document
 import web.svg.*
+import web.uievents.MouseEvent
 import kotlin.math.*
 
 class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement {
@@ -21,13 +22,21 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     private val maxShapeWidth: Double = g.attributes.getNamedItem("shape-max-width")!!.value.toDouble()
     private val areaMinX: Double = g.attributes.getNamedItem("area-min-x")!!.value.toDouble()
     private val areaMaxX: Double = g.attributes.getNamedItem("area-max-x")!!.value.toDouble()
-    private val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
-
-    private val verticalBackground = g.querySelector("g[element-type='VERTICAL_BACKGROUND']")
+    private val verticalBackground = parent.s.querySelector("g[element-type='VERTICAL_BACKGROUND']")
     private val verticalBackgroundLines = verticalBackground?.querySelectorAll("line")?.asList() ?: listOf()
     private val verticalBackgroundTexts = verticalBackground?.querySelectorAll("text")?.asList() ?: listOf()
+    private var gapWidth: Double = if (verticalBackgroundLines.size > 1)
+        verticalBackgroundLines[1].getAttribute("x1")!!.toDouble() - verticalBackgroundLines[0].getAttribute("x1")!!.toDouble()
+    else (areaMaxX - areaMinX)
 
-    private var gapWidth: Double = (areaMaxX - areaMinX) / (verticalBackgroundLines.size - 1)
+    private val areaMinY: Double = g.attributes.getNamedItem("area-min-y")!!.value.toDouble()
+    private val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
+    private val horizontalBackground = parent.s.querySelector("g[element-type='HORIZONTAL_BACKGROUND']")
+    private val horizontalBackgroundLines = horizontalBackground?.querySelectorAll("line")?.asList() ?: listOf()
+    private val gapHeight: Double = if (horizontalBackgroundLines.size > 1)
+        horizontalBackgroundLines[1].getAttribute("y1")!!.toDouble() - horizontalBackgroundLines[0].getAttribute("y1")!!.toDouble()
+    else (areaMaxY - areaMinY)
+
     var currentHoverLine: SVGLineElement? = null
 
     init {
@@ -43,10 +52,12 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    fun refreshCurrentHoverLineAndDataToolTip(mouseClientX: Double, mouseClientY: Double) {
+    fun refreshCurrentHoverLineAndDataToolTip(e: MouseEvent) {
         if (currentHoverLine != null) {
             var showToolTipData: DiagramData? = null
-            if (isClientMouseInTransformArea(mouseClientX)) {
+            val mouseClientX: Double = e.clientX.toDouble()
+            val mouseClientY: Double = e.clientY.toDouble()
+            if (parent.translateX(mouseClientX) in areaMinX..(parent.s.viewBox.baseVal.x + parent.s.viewBox.baseVal.width)) {
                 var minGapX: Double = Double.MAX_VALUE
                 val datasetMap = dataList.filter { it.g.hasAttribute("data-label") && it.g.style.display != "none" }.groupBy { it.dataset }
                 datasetMap.forEach {
@@ -86,7 +97,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 currentHoverLine!!.remove()
             }
             parent.s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
-            showToolTipData?.showTooltip()
+            showToolTipData?.showTooltip(e)
         }
     }
 
@@ -97,26 +108,57 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         refreshDataShape()
     }
 
-    fun scrollBy(movingDistance: Double) {
-        scrollTo((g.getAttribute("scroll-x")?.toDouble() ?: 0.0) + movingDistance)
+    fun horizontalScrollBy(movingDistance: Double) {
+        horizontalScrollTo((g.getAttribute("scroll-x")?.toDouble() ?: 0.0) + movingDistance)
     }
 
-    private fun scrollTo(x: Double) {
+    private fun horizontalScrollTo(x: Double) {
         if (verticalBackgroundLines.isNotEmpty()) {
-            val minX = areaMaxX - gapWidth - round(verticalBackgroundLines.last().getAttribute("x1")!!.toDouble())
-            val maxX = areaMinX + gapWidth - round(verticalBackgroundLines.first().getAttribute("x1")!!.toDouble())
+            val minX = areaMaxX - (round(verticalBackgroundLines.last().getAttribute("x1")!!.toDouble()) + gapWidth)
+            val maxX = gapWidth
             val adjustedX = min(maxX, max(minX, x))
             g.setAttribute("scroll-x", adjustedX.toString())
-            g.setAttribute("transform", "translate(${adjustedX},0.0)")
+            g.setAttribute("transform", "translate(${adjustedX},${g.getAttribute("scroll-y") ?: "0.0"})")
+
+            // the VERTICAL_BACKGROUND of Timeline diagram is out of TRANSFORM_AREA, so should transform it manually in this case
+            if (verticalBackground != null && verticalBackground.closest("g[element-type='TRANSFORM_AREA']") == null) {
+                verticalBackground.setAttribute("transform", "translate(${adjustedX},0.0)")
+            }
         }
+    }
+
+    fun verticalScroll(isUp: Boolean): Boolean { // move a fixed distance "gapHeight" each time
+        return verticalScrollBy(if (isUp) gapHeight else -gapHeight)
+    }
+
+    fun verticalScrollBy(movingDistance: Double): Boolean {
+        if (horizontalBackgroundLines.isNotEmpty()) {
+            val currentY = g.getAttribute("scroll-y")?.toDouble() ?: 0.0
+            val y = currentY + movingDistance
+            val minY = areaMaxY - round(horizontalBackgroundLines.last().getAttribute("y1")!!.toDouble())
+            val maxY = 0.0
+            val adjustedY = min(maxY, max(minY, y))
+            if (adjustedY != currentY) {
+                g.setAttribute("scroll-y", adjustedY.toString())
+                g.setAttribute("transform", "translate(${g.getAttribute("scroll-x") ?: "0.0"},${adjustedY})")
+
+                // the HORIZONTAL_BACKGROUND of Timeline diagram is out of TRANSFORM_AREA, so should transform it manually in this case
+                if (horizontalBackground != null && horizontalBackground.closest("g[element-type='TRANSFORM_AREA']") == null) {
+                    horizontalBackground.setAttribute("transform", "translate(0.0,${adjustedY})")
+                }
+                return true
+            }
+        }
+        return false
     }
 
     private var zoomUpTimer: Int? = null
     private var zoomUpTargetCenterLineIndex: Int? = null
-    fun zoom(mouseX: Double, isUp: Boolean) {
+    fun zoom(mouseX: Double, isUp: Boolean): Boolean {
         if (verticalBackgroundLines.isNotEmpty()) {
-            val currentMinLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= areaMinX } ?: verticalBackgroundLines.first())
-            val currentMaxLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.findLast { line -> round(parent.translateX(line.getBoundingClientRect().x)) <= areaMaxX } ?: verticalBackgroundLines.last())
+            val currentScrollX = g.getAttribute("scroll-x")?.toDouble() ?: 0.0
+            val currentMinLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) >= areaMinX } ?: verticalBackgroundLines.first())
+            val currentMaxLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.findLast { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) <= areaMaxX } ?: verticalBackgroundLines.last())
             val changeGap = max(1, (currentMaxLineIndex - currentMinLineIndex) / 10)
 
             val newMinLineIndex: Int // will move this line as new first background vertical line
@@ -124,7 +166,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
             if (isUp) { // zoom-up to a target area
                 // the target area should always keep same (Around the line which is chosen at first)
                 if (zoomUpTargetCenterLineIndex == null) {
-                    zoomUpTargetCenterLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(parent.translateX(line.getBoundingClientRect().x)) >= mouseX } ?: verticalBackgroundLines.last())
+                    zoomUpTargetCenterLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) >= mouseX } ?: verticalBackgroundLines.last())
                 }
                 if (zoomUpTimer != null) {
                     window.clearTimeout(zoomUpTimer!!)
@@ -178,9 +220,11 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 refreshBackgroundXLabelsPosition(zoomRadio)
                 refreshBackgroundXLabelsDisplay(zoomRadio)
                 refreshDataShape(zoomRadio)
-                scrollTo(areaMinX - newMinLine.x1.baseVal.value)
+                horizontalScrollTo(areaMinX - newMinLine.x1.baseVal.value)
+                return true
             }
         }
+        return false
     }
 
     private var zoomTimer: Int? = null
@@ -197,6 +241,13 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 (text as SVGTextElement).style.display = if (index % ceil(round(showLabelEveryX * 100) / 100).toInt() == 0) "" else "none"
             }
         }, if (zoomRadio == 1.0) 0 else 500)
+
+        // The lines of Timeline diagram are always in DAY unit, and will be hidden/displayed when Zoom (Sames as Texts)
+        if (shapeType == "timeline") {
+            verticalBackgroundLines.forEachIndexed { index, line ->
+                (line as SVGLineElement).style.display = if (index % ceil(round(showLabelEveryX * 100) / 100).toInt() == 0) "" else "none"
+            }
+        }
     }
 
     private fun refreshBackgroundXLabelsPosition(zoomRadio: Double) {
@@ -216,7 +267,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    private fun refreshDataShape(zoomRadio: Double = 1.0) { // todo: should also move the data counts (vertically and horizontally)
+    private fun refreshDataShape(zoomRadio: Double = 1.0) {
         gapWidth *= zoomRadio
         when (shapeType) {
             in listOf("bar", "whiskers") -> {
@@ -291,12 +342,29 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                     }
                 }
             }
+            "timeline" -> {
+                if (zoomRadio != 1.0) {
+                    dataList.forEach {
+                        val targetX = (it.getShapeAttribute("x")!!.toDouble() - areaMinX) * zoomRadio + areaMinX
+                        val targetWidth = it.getShapeAttribute("width")!!.toDouble() * zoomRadio
+                        it.moveShapeHorizontally(targetX, targetWidth)
+                    }
+                }
+            }
             else -> {}
         }
     }
 
-    fun isClientMouseInTransformArea(mouseClientX: Double): Boolean {
-        return parent.translateX(mouseClientX) in areaMinX..(parent.s.viewBox.baseVal.x + parent.s.viewBox.baseVal.width)
+    fun isClientMouseInTransformArea(mouseClientX: Double, mouseClientY: Double? = null): Boolean {
+        return parent.translateX(mouseClientX) in areaMinX..areaMaxX && (mouseClientY == null || parent.translateY(mouseClientY) in areaMinY..areaMaxY)
+    }
+
+    fun isClientMouseInYAxisLabelArea(mouseClientX: Double, mouseClientY: Double? = null): Boolean {
+        return parent.translateX(mouseClientX) in 0.0..areaMinX && (mouseClientY == null || parent.translateY(mouseClientY) in areaMinY..areaMaxY)
+    }
+
+    fun getShapeType(): String {
+        return shapeType
     }
 
     override fun getParentBlock(): Block {
