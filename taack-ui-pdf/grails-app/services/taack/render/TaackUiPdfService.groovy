@@ -124,7 +124,7 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
         html = html.replaceAll('<grailsLayout:captureTitle/>', '')
         html = html.replaceAll('<metadata.*metadata>', '')
         html = html.replaceAll('<\\?xml version="1.0" encoding="UTF-8"\\?>', '')
-        html = StringEscapeUtils.escapeXml11(html).replaceAll('& ', '&amp; ')
+        html = /*StringEscapeUtils.escapeXml11(html)*/html.replaceAll('& ', '&amp; ')
 
         if (outputStream) {
             taackPdfConverterFromHtmlService.generatePdfFromHtmlIText(outputStream, html)
