@@ -20,7 +20,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
-import org.apache.commons.text.StringEscapeUtils
+//import org.apache.commons.text.StringEscapeUtils
 import org.grails.core.io.ResourceLocator
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
@@ -124,7 +124,7 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
         html = html.replaceAll('<grailsLayout:captureTitle/>', '')
         html = html.replaceAll('<metadata.*metadata>', '')
         html = html.replaceAll('<\\?xml version="1.0" encoding="UTF-8"\\?>', '')
-        html = /*StringEscapeUtils.escapeXml11(html)*/html.replaceAll('& ', '&amp; ')
+//        html = /*StringEscapeUtils.escapeXml11(html)html.replaceAll('& ', '&amp; ')*/
 
         if (outputStream) {
             taackPdfConverterFromHtmlService.generatePdfFromHtmlIText(outputStream, html)
@@ -165,5 +165,9 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
         } catch (e) {
             log.error "${e.message}"
         }
+    }
+
+    static String escape(String input) {
+        input.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;').replace('\'', '&apos;')
     }
 }
