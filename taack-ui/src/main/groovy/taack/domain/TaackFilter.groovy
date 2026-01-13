@@ -399,6 +399,17 @@ final class TaackFilter<T extends GormEntity<T>> {
     }
 
     /**
+     *  Given number string like '1 - 10' to get numMin and numMax for filter.
+     *  @return String list
+     */
+    final List<String> parseNumber(final String numString) {
+        if (!(numString ==~ /.*\s+-\s+.*/)) {
+            return null
+        }
+        return numString.split(/\s+-\s+/, 2).collect { it.trim() }
+    }
+
+    /**
      * list entities and number of results
      *
      * @param aClass type we want to list
@@ -524,7 +535,17 @@ final class TaackFilter<T extends GormEntity<T>> {
                             }
                         }
                     } else if (f && Number.isAssignableFrom(f.type)) {
-                        where << ("$aliasKey = $entry.value" as String)
+                        List<String> numStrs = parseNumber(entry.value as String)
+                        if (numStrs == null) {
+                            where << ("$aliasKey = $entry.value" as String)
+                        } else {
+                            if (numStrs[0] != "") {
+                                where << ("$aliasKey >= ${numStrs[0]}" as String)
+                            }
+                            if (numStrs[1] != "") {
+                                where << ("$aliasKey <= ${numStrs[1]}" as String)
+                            }
+                        }
                     } else if (entry.value instanceof String) {
                         String entryValue = entry.value as String
                         if (entryKey.contains('active')) {
