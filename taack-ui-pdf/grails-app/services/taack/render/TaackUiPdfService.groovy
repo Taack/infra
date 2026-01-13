@@ -168,6 +168,7 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
     }
 
     static String escape(String input) {
-        input.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;').replace('\'', '&apos;')
+        if (input) input.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;').replace('\'', '&apos;')
+        else null
     }
 }
