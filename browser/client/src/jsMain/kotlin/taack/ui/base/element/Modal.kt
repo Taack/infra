@@ -29,6 +29,11 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         }
 
         var id: Int = 0
+
+        private const val SVG_MINIMIZE = """<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 8a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H1a1 1 0 0 1-1-1z"/></svg>"""
+        private const val SVG_MAXIMIZE = """<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/></svg>"""
+        private const val SVG_RESTORE = """<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z"/></svg>"""
+        private const val SVG_CLOSE = """<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M14 3.41L12.59 2 8 6.59 3.41 2 2 3.41 6.59 8 2 12.59 3.41 14 8 9.41 12.59 14 14 12.59 9.41 8z"/></svg>"""
     }
 
     private var dModal: HTMLDivElement = document.createElement("div") as HTMLDivElement
@@ -61,7 +66,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         val minimizeButton = document.createElement("button") as HTMLButtonElement
         minimizeButton.type = ButtonType.button
         minimizeButton.classList.add(ClassName("btn"), ClassName("btn-taack-minimize"))
-        minimizeButton.innerHTML = "&#128469;"
+        minimizeButton.innerHTML = SVG_MINIMIZE
         minimizeButton.onclick = EventHandler { e ->
             e.preventDefault()
             minimize()
@@ -72,17 +77,17 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         val fullscreenButton = document.createElement("button") as HTMLButtonElement
         fullscreenButton.type = ButtonType.button
         fullscreenButton.classList.add(ClassName("btn"), ClassName("btn-taack-fullscreen"))
-        fullscreenButton.innerHTML = "&#128470;"
+        fullscreenButton.innerHTML = SVG_MAXIMIZE
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
             trace("Modal::fullscreen $mId")
             dModalContent.removeAttribute("style")
             if (dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
                 dModalDialog.classList.remove(ClassName("modal-fullscreen"))
-                fullscreenButton.innerHTML = "&#128470;"
+                fullscreenButton.innerHTML = SVG_MAXIMIZE
             } else {
                 dModalDialog.classList.add(ClassName("modal-fullscreen"))
-                fullscreenButton.innerHTML = "&#128471;"
+                fullscreenButton.innerHTML = SVG_RESTORE
             }
         }
         fullscreenButton.onmousedown = EventHandler { e ->
@@ -91,7 +96,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
         closeButton.classList.add(ClassName("btn"), ClassName("btn-taack-close"))
-        closeButton.innerHTML = "&#128473;"
+        closeButton.innerHTML = SVG_CLOSE
         closeButton.onclick = EventHandler { e ->
             e.stopPropagation()
             e.preventDefault()
