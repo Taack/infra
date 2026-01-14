@@ -575,25 +575,14 @@ class CmsController implements WebAttributes {
             } else {
                 log.error "No file: ${f.path}"
             }
-        } else if (path.startsWith('/diag-')) {
-            File f = new File(taack.wysiwyg.Asciidoc.pathAsciidocGenerated + '/' + path)
-            if (f.exists()) {
-                response.setContentType('image/svg+xml')
-                response.setHeader('Content-disposition', "attachment;filename=${URLEncoder.encode(path, 'UTF-8')}")
-                response.outputStream << f.bytes
-            } else {
-                log.error "No file: ${f.path}"
-            }
-
         }
         return false
     }
 
     def previewBody(String previewLanguage, boolean asciidoc) {
         UiBlockSpecifier b = new UiBlockSpecifier()
-        String urlFileRoot = new Parameter().urlMapped(this.&downloadBinBodyContentFiles as MC, [id: params.long('id')])
         String toPreviewBody = params['bodyContent'][previewLanguage] as String
-        String htmlBody = asciidoc ? Asciidoc.getContentHtml(toPreviewBody, urlFileRoot, false): Markdown.getContentHtml(toPreviewBody)
+        String htmlBody = asciidoc ? Asciidoc.getContentHtml(toPreviewBody): Markdown.getContentHtml(toPreviewBody)
 
         String html = """\
             <div class=${asciidoc ? '"asciidocMain"': '"markdown-body"'}>
