@@ -53,6 +53,10 @@ public class Asciidoc {
         return "";
     }
 
+    public static String getContentHtml(String content) {
+        return getContentHtml(content, "/taackAsciidoc/renderDiagram", false);
+    }
+
     public static String getContentHtml(File file, String urlFileRoot, boolean server) {
         if (file != null && file.exists() && asciidoctor != null) {
             OptionsBuilder option = Options.builder()
