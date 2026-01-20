@@ -19,6 +19,16 @@ final class UiFilterSpecifier {
     Class aClass
     Map<String, ? extends Object> additionalParams
     boolean hasSec = false
+    FieldInfo[] leftField
+
+    /**
+     * Append leftField to filter fields to allow reusing filter.
+     *
+     * @param leftField
+     */
+    UiFilterSpecifier(FieldInfo... leftField) {
+        this.leftField = leftField
+    }
 
     /**
      * Allow to draw the filter
@@ -78,7 +88,7 @@ final class UiFilterSpecifier {
         if (filterVisitor && closure) {
             filterVisitor.visitFilter(aClass, additionalParams)
             if (hasSec) closure.delegate = new FilterCommon(filterVisitor)
-            else closure.delegate = new FilterSpec(filterVisitor)
+            else closure.delegate = new FilterSpec(filterVisitor, leftField)
             closure.call()
             filterVisitor.visitFilterEnd()
         }

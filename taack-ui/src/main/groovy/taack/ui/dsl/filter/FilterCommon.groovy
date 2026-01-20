@@ -6,6 +6,12 @@ import taack.ui.dsl.filter.expression.FilterExpression
 
 class FilterCommon {
     final IUiFilterVisitor filterVisitor
+    final FieldInfo[] leftField
+
+    FilterCommon(IUiFilterVisitor filterVisitor, FieldInfo[] leftField) {
+        this.filterVisitor = filterVisitor
+        this.leftField = leftField
+    }
 
     void section(boolean collapse,
                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
@@ -15,13 +21,9 @@ class FilterCommon {
     void section(final String i18n = null, boolean collapse = false,
                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
         filterVisitor.visitSection(i18n, collapse)
-        closure.delegate = new SectionSpec(filterVisitor)
+        closure.delegate = new SectionSpec(filterVisitor, leftField)
         closure.call()
         filterVisitor.visitSectionEnd()
-    }
-
-    FilterCommon(IUiFilterVisitor filterVisitor) {
-        this.filterVisitor = filterVisitor
     }
 
     void filterFieldExpressionBool(final FilterExpression filterExpression) {
@@ -37,7 +39,6 @@ class FilterCommon {
         closure.delegate = new SectionSpec(filterVisitor)
         closure.call()
         filterVisitor.visitOrOpEnd()
-
     }
 
     void andOp(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FilterCommon) final Closure closure) {
