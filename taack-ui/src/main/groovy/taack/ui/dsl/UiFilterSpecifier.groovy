@@ -99,7 +99,8 @@ final class UiFilterSpecifier {
      *
      * @param filter filter to append
      */
-    void join(UiFilterSpecifier filter) {
+    UiFilterSpecifier join(UiFilterSpecifier filter) {
         if (filter) closure = closure << filter.closure
+        this
     }
 }
