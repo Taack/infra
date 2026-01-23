@@ -85,6 +85,12 @@ class BootstrapLayout {
         topElement.children.last()
     }
 
+    static IHTMLElement rowCols(IHTMLElement topElement, int cols) {
+        String c = cols == 0 ? 'auto' : cols.toString()
+        topElement.builder.addChildren(new HTMLDiv().builder.addClasses('row', 'row-cols-' + c, 'gx-2').build())
+        topElement.children.last()
+    }
+
     void setTabIdAndCounter(int i) {
         tabIds = i
         tabIdsConter = tabIds

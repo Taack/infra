@@ -55,6 +55,10 @@ interface IUiFormVisitor {
 
     void visitRowEnd()
 
+    void visitRowCols(int cols)
+
+    void visitRowColsEnd()
+
     void visitFormTabs(List<String> names, BlockSpec.Width width)
 
     void visitFormTabsEnd()

@@ -319,6 +319,17 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
+    void visitRowCols(int cols) {
+        blockLog.topElement.setTaackTag(TaackTag.ROW)
+        blockLog.topElement = layout.rowCols(blockLog.topElement, cols)
+    }
+
+    @Override
+    void visitRowColsEnd() {
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ROW)
+    }
+
+    @Override
     void visitFormHiddenField(FieldInfo fieldInfo) {
         final String qualifiedName = fieldInfo.fieldName
         final boolean isListOrSet = Collection.isAssignableFrom(fieldInfo.fieldConstraint.field.type)

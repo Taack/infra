@@ -17,6 +17,13 @@ class FormRowSpec extends FormAjaxFieldSpec {
         formVisitor.visitRowEnd()
     }
 
+    void rowCols(int cols = 0, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormColSpec) final Closure closure) {
+        formVisitor.visitRowCols(cols)
+        closure.delegate = new FormColSpec(formVisitor)
+        closure.call()
+        formVisitor.visitRowEnd()
+    }
+
     /**
      * Add a section to enclose fields to display. Can be nested.
      *
