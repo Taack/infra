@@ -20,6 +20,8 @@ interface IUiFilterVisitor  {
 
     void visitSection(final String i18n, boolean initiallyCollapsed)
 
+    void visitSection(final Class type, boolean initiallyCollapsed)
+
     void visitSectionEnd()
 
     void visitFilterField(final String i18n, IEnumOption[] enumOptions, final FieldInfo... fields)

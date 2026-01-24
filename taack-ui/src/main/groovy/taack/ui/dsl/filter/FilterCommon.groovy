@@ -26,6 +26,14 @@ class FilterCommon {
         filterVisitor.visitSectionEnd()
     }
 
+    void section(Class type, boolean collapse = false,
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
+        filterVisitor.visitSection(type, collapse)
+        closure.delegate = new SectionSpec(filterVisitor, leftField)
+        closure.call()
+        filterVisitor.visitSectionEnd()
+    }
+
     void filterFieldExpressionBool(final FilterExpression filterExpression) {
         filterVisitor.visitFilterFieldExpressionBool(filterExpression)
     }

@@ -191,6 +191,16 @@ final class Parameter implements WebAttributes {
         return keys.join(',')
     }
 
+    String trField(final Class type) {
+        String cn = classNameUncap(type) + '.label'
+        String rv = tr cn
+        if (rv) {
+            if (!testI18n)
+                return rv
+        }
+        return cn
+    }
+
     final String urlMapped(MethodClosure action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         urlMapped(Utils.getControllerName(action), action.method, params, isAjax)
     }

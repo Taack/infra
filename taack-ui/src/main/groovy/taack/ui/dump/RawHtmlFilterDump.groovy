@@ -110,9 +110,16 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitSection(String i18n, boolean initiallyCollapsed = false) {
-
         uncollapseSection = false
         if (innerFilterName) i18n = i18n ?: parameter.trField(innerFieldInfos)
+        blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
+    }
+
+    @Override
+    void visitSection(Class type, boolean initiallyCollapsed = false) {
+        uncollapseSection = false
+        String i18n = null
+        if (type) i18n = parameter.trField(type)
         blockLog.topElement = formThemed.section(blockLog.topElement, i18n, initiallyCollapsed)
     }
 

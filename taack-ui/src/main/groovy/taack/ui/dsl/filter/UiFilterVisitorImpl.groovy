@@ -87,6 +87,11 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
+    void visitSection(Class type, boolean initiallyCollapsed) {
+
+    }
+
+    @Override
     void visitSectionEnd() {
 
     }
