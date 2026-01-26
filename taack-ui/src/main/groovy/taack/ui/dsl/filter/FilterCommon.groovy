@@ -1,9 +1,12 @@
 package taack.ui.dsl.filter
 
+
+import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.filter.expression.FilterExpression
 
+@CompileStatic
 class FilterCommon {
     final IUiFilterVisitor filterVisitor
     final FieldInfo[] leftField
@@ -13,12 +16,16 @@ class FilterCommon {
         this.leftField = leftField
     }
 
-    void section(boolean collapse,
-                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
-        section(null, collapse, closure)
+    void section(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
+        section((String)null, false, closure)
     }
 
-    void section(final String i18n = null, boolean collapse = false,
+    void section(boolean collapse,
+                 @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
+        section((String)null, collapse, closure)
+    }
+
+    void section(final String i18n, boolean collapse = false,
                  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SectionSpec) final Closure closure) {
         filterVisitor.visitSection(i18n, collapse)
         closure.delegate = new SectionSpec(filterVisitor, leftField)

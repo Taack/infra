@@ -1,10 +1,8 @@
 package taack.solr
 
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import org.hibernate.proxy.HibernateProxy
-
 /**
  * Specify how to index a domain
  *
