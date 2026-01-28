@@ -39,18 +39,18 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-bootRun {
-    ignoreExitValue true
-    jvmArgs(
-            '-Dspring.output.ansi.enabled=always',
-//            '-noverify',
-//            '-XX:TieredStopAtLevel=1',
-//            '-XX:+UnlockExperimentalVMOptions',
-//            '-XX:+UseCompactObjectHeaders',
-//            '-XX:+UseEpsilonGC',
-            '-Xmx256m'
-    )
-}
+//bootRun {
+//    ignoreExitValue true
+//    jvmArgs(
+//            '-Dspring.output.ansi.enabled=always',
+////            '-noverify',
+////            '-XX:TieredStopAtLevel=1',
+////            '-XX:+UnlockExperimentalVMOptions',
+////            '-XX:+UseCompactObjectHeaders',
+////            '-XX:+UseEpsilonGC',
+////            '-Xmx512m'
+//    )
+//}
 
 // ~/.jdks/openjdk-24.0.1/bin/java -Xmx256m  -XX:+UseStringDeduplication -XX:+UnlockExperimentalVMOptions -XX:+UseSerialGC -XX:+UseCompactObjectHeaders -jar taack-ui-test-minimal-0.7.0.jar
 

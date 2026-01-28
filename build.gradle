@@ -25,11 +25,10 @@ buildscript {
     }
 }
 
-apply plugin: 'nebula.lint'
-
-gradleLint {
-    rules = ['unused-dependency']
-}
+//apply plugin: 'nebula.lint'
+//gradleLint {
+//    rules = ['unused-dependency']
+//}
 
 ext.projectVersion = taackReleaseVersion
 ext.releaseVersion = taackReleaseVersion
@@ -126,7 +125,7 @@ subprojects {
 
         }
 
-        apply plugin: 'nebula.lint'
+//        apply plugin: 'nebula.lint'
 
         java {
             toolchain {

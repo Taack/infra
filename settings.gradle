@@ -9,19 +9,19 @@
 
 rootProject.name = 'infra'
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://repository.apache.org/content/groups/public" }
-        maven { url "https://repo.grails.org/grails/restricted" }
-
-    }
-    dependencies {
-        classpath platform("org.apache.grails:grails-bom:$grailsVersion")
-        classpath "org.apache.grails:grails-gradle-plugins"
-    }
-}
+//buildscript {
+//    repositories {
+//        mavenLocal()
+//        mavenCentral()
+//        maven { url "https://repository.apache.org/content/groups/public" }
+//        maven { url "https://repo.grails.org/grails/restricted" }
+//
+//    }
+//    dependencies {
+//        classpath platform("org.apache.grails:grails-bom:$grailsVersion")
+//        classpath "org.apache.grails:grails-gradle-plugins"
+//    }
+//}
 
 //include 'taack-jdbc-common'
 include 'taack-jdbc-common'

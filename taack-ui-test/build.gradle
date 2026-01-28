@@ -37,29 +37,15 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-bootRun {
-    doFirst {
-        def taackPlugins = ['taack-ui', 'taack-ui-pdf', 'taack-ui-asciidoc', 'taack-ui-jdbc', 'taack-ui-search']
-        classpath = classpath.filter { file ->
-            boolean r = true
-            taackPlugins.each { p ->
-                r = r && !file.path.contains(p + '-' + version + '.jar')  // Exclude the JAR to avoid duplicates
-            }
-            r
-        }
-        taackPlugins.each { p ->
-            classpath = classpath + project(':' + p).sourceSets.main.output  // Add classes and resources output
-        }
-    }
-
-    ignoreExitValue true
-    jvmArgs(
-            '-Dspring.output.ansi.enabled=always',
-//            '-XX:+UnlockExperimentalVMOptions',
-//            '-XX:+UseCompactObjectHeaders', // Java 24, comment for Java 17
-            '-Xmx1024m'
-    )
-}
+//bootRun {
+//    ignoreExitValue true
+//    jvmArgs(
+//            '-Dspring.output.ansi.enabled=always',
+////            '-XX:+UnlockExperimentalVMOptions',
+////            '-XX:+UseCompactObjectHeaders', // Java 24, comment for Java 17
+//            '-Xmx1024m'
+//    )
+//}
 
 assets {
     minifyJs = true
