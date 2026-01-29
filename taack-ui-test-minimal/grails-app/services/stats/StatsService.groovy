@@ -28,13 +28,21 @@ class StatsService implements WebAttributes {
         }
     }
 
-    UiDiagramSpecifier buildChart() {
+    UiDiagramSpecifier buildChart1() {
+        buildChart(1)
+    }
+
+    UiDiagramSpecifier buildChart2() {
+        buildChart(2)
+    }
+
+    UiDiagramSpecifier buildChart(int index) {
         List<Integer> years = 2020..2025
         List<Integer> months = 1..12
         Set<String> origins = ['tutu', 'titi']
         UiDiagramSpecifier chart = new UiDiagramSpecifier()
-        boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
-        boolean groupPerMonth = params.boolean('groupPerMonth')
+        boolean showMonthlyGraph = params.boolean('showMonthlyGraph' + index)
+        boolean groupPerMonth = params.boolean('groupPerMonth' + index)
 
         println "buildChart called $showMonthlyGraph $groupPerMonth"
 

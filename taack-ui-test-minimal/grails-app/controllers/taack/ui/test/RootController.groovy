@@ -31,7 +31,7 @@ class RootController {
 
     def index() {
         UiBlockSpecifier b = new UiBlockSpecifier().ui {
-            diagram this.statsService.buildChart()
+            diagram this.statsService.buildChart1()
             show new UiShowSpecifier().ui {
                 field('''couo''')
             }
