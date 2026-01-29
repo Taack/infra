@@ -32,8 +32,8 @@ class StatsController {
         boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
         boolean groupPerMonth = params.boolean('groupPerMonth')
 
-        boolean p1 = params.int('v') == 1 || params.get('v') == null
-        boolean p2 = params.int('v') == 2 || params.get('v') == null
+        boolean p1 = params.int('v') == 1
+        boolean p2 = params.int('v') == 2
 
         taackUiService.show(new UiBlockSpecifier().ui {
             table statsService.buildTable()
@@ -78,6 +78,7 @@ class StatsController {
 //        })
 //        }, buildMenu())
         }, params.boolean('isAjax') ? null : buildMenu())
+//        })
     }
 
 }
