@@ -85,4 +85,25 @@ final class TableSpec {
         }
         res.bValue
     }
+
+    final<T extends GormEntity> Long iterate(Pair<List<T>, Long> builtFilterPair, boolean showPaginate = true, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
+        c.delegate = new RowColumnSpec(tableVisitor)
+        Date lastReadingDate = tableVisitor.getLastReadingDate()
+        String readingDateField = tableVisitor.getReadingDateFieldString()
+        for (T t in builtFilterPair.aValue) {
+            if (lastReadingDate && readingDateField
+                    && t.hasProperty(readingDateField) && t[readingDateField] instanceof Date
+                    && (t[readingDateField] as Date) > lastReadingDate) {
+                tableVisitor.visitRow(Style.BOLD, false) // mark the row as unread
+            } else {
+                tableVisitor.visitRow(null, false)
+            }
+            c.call(t)
+            tableVisitor.visitRowEnd()
+        }
+        if (showPaginate) {
+            tableVisitor.visitPaginate(builtFilterPair.aValue.size(), builtFilterPair.bValue)
+        }
+        builtFilterPair.bValue
+    }
 }
