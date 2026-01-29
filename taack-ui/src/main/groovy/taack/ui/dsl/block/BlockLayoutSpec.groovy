@@ -68,11 +68,10 @@ class BlockLayoutSpec extends BlockLeafSpec {
     }
 
     void poke(Boolean update, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockTabSpec) final Closure closure) {
-        if (update) {
-            poke = true
-            closure.delegate = this
-            closure.call()
-            poke = false
-        }
+        blockVisitor.visitBlockPoke(update)
+        closure.delegate = this
+        closure.call()
+        counter++
+        blockVisitor.visitBlockPokeEnd()
     }
 }

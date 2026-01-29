@@ -22,9 +22,6 @@ import taack.ui.dsl.menu.MenuSpec
 @CompileStatic
 class BlockLeafSpec extends BlockBase {
 
-
-    boolean poke = false
-
     static void simpleLog(String toPrint) {
         if (debug) println(BlockLeafSpec.simpleName + '::' + toPrint)
     }
@@ -63,7 +60,7 @@ class BlockLeafSpec extends BlockBase {
     void form(final UiFormSpecifier formSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('form')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("form $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -85,7 +82,7 @@ class BlockLeafSpec extends BlockBase {
     void show(final UiShowSpecifier showSpecifier,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('show')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("show $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -98,7 +95,7 @@ class BlockLeafSpec extends BlockBase {
     void table(final UiTableSpecifier tableSpecifier,
                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('table')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("table $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -121,7 +118,7 @@ class BlockLeafSpec extends BlockBase {
                      final UiTableSpecifier tableSpecifier,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('tableFilter')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("tableFilter $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -142,7 +139,7 @@ class BlockLeafSpec extends BlockBase {
      */
     void diagram(final UiDiagramSpecifier diagramSpecifier, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("diagram $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -161,7 +158,7 @@ class BlockLeafSpec extends BlockBase {
     void diagram(final MethodClosure action,
                  @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chart')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("diagramMc $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -175,7 +172,7 @@ class BlockLeafSpec extends BlockBase {
                        final UiDiagramSpecifier diagramSpecifier,
                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('chartFilter')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("diagramFilter $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)
@@ -197,7 +194,7 @@ class BlockLeafSpec extends BlockBase {
     void custom(final String html, final Style style = null,
                 @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('custom')
-        boolean doRender = poke || blockVisitor.doRenderElement(aId)
+        boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("custom $aId $doRender")
         if (doRender) {
             blockVisitor.visitAjaxBlock(aId)

@@ -35,6 +35,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean renderTab = false
     int poll = 0
 
+    private boolean poke = true
+
     private int tabOccurrence = 0
 
     final BootstrapBlock block
@@ -394,6 +396,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId, p))
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
+    }
+
+    @Override
+    void visitBlockPoke(boolean update) {
+        poke = update
+    }
+
+    @Override
+    void visitBlockPokeEnd() {
+        poke = true
     }
 
     @Override

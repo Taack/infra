@@ -15,16 +15,15 @@ class StatsService implements WebAttributes {
             }
             row {
                 rowColumn {
-                    rowAction  "v11", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
-                    rowField "v12"
+                    rowAction "v11", StatsController.&topCustomerSales2 as MethodClosure, [v: 1, isAjax: true]
                 }
+                rowField "v12"
             }
             row {
                 rowColumn {
-
-                    rowAction  "v21", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
-                    rowField "v32"
+                    rowAction "v21", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
                 }
+                rowField "v32"
             }
         }
     }

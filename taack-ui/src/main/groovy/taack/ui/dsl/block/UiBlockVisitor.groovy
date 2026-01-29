@@ -154,6 +154,16 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitBlockPoke(boolean update) {
+
+    }
+
+    @Override
+    void visitBlockPokeEnd() {
+
+    }
+
+    @Override
     void visitCustom(String html, Style style) {
 
     }
