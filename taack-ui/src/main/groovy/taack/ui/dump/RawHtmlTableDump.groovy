@@ -8,6 +8,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
+import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -111,8 +112,17 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 ident = id
                 className = fieldInfo.fieldConstraint.field.declaringClass.simpleName
             }
-            return htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
-                    .build()
+            htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
+        }
+
+        println "Trying $fieldInfo"
+        if (id) {
+            Pair<MethodClosure, FieldInfo[]> editField = TaackUiService.contextualFieldEdit[fieldInfo.fieldConstraint.field.type]
+            println(editField)
+            if (editField) {
+                println editField.bValue.contains(fieldInfo)
+
+            }
         }
         return htmlBuilder.build()
     }
