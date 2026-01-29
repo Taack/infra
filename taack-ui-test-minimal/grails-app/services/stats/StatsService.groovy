@@ -1,17 +1,48 @@
 package stats
 
 import grails.web.api.WebAttributes
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.UiTableSpecifier
 
 class StatsService implements WebAttributes {
 
-    UiDiagramSpecifier buildChart() {
+    UiTableSpecifier buildTable() {
+        new UiTableSpecifier().ui {
+            header {
+                label "col1"
+                label "col2"
+            }
+            row {
+                rowColumn {
+                    rowAction "v11", StatsController.&topCustomerSales2 as MethodClosure, [v: 1, isAjax: true]
+                }
+                rowField "v12"
+            }
+            row {
+                rowColumn {
+                    rowAction "v21", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
+                }
+                rowField "v32"
+            }
+        }
+    }
+
+    UiDiagramSpecifier buildChart1() {
+        buildChart(1)
+    }
+
+    UiDiagramSpecifier buildChart2() {
+        buildChart(2)
+    }
+
+    UiDiagramSpecifier buildChart(int index) {
         List<Integer> years = 2020..2025
         List<Integer> months = 1..12
         Set<String> origins = ['tutu', 'titi']
         UiDiagramSpecifier chart = new UiDiagramSpecifier()
-        boolean showMonthlyGraph = params.boolean('showMonthlyGraph')
-        boolean groupPerMonth = params.boolean('groupPerMonth')
+        boolean showMonthlyGraph = params.boolean('showMonthlyGraph' + index)
+        boolean groupPerMonth = params.boolean('groupPerMonth' + index)
 
         println "buildChart called $showMonthlyGraph $groupPerMonth"
 

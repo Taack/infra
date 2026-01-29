@@ -48,7 +48,7 @@ final class Parameter implements WebAttributes {
     final String ajaxBlockId
     final String targetAjaxBlockId
     final String fieldName
-    final Map<String, String> paramsToKeep
+    final Map<String, ?> paramsToKeep
     final Long modalId = System.currentTimeMillis()
     final NumberFormat nf
     final MessageSource messageSource
@@ -79,7 +79,7 @@ final class Parameter implements WebAttributes {
         this.fieldName = params.get(P_FIELD_NAME) ?: null
         this.paramsToKeep = [:]
         paramsToKeep.each {
-            this.paramsToKeep.put(it, params[it] as String)
+            this.paramsToKeep.put(it, params[it])
         }
         this.ajaxBlockId = params.get('ajaxBlockId') ?: null
         this.targetAjaxBlockId = params.get('targetAjaxBlockId') ?: null

@@ -35,6 +35,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     boolean renderTab = false
     int poll = 0
 
+    private boolean poke = false
+
     private int tabOccurrence = 0
 
     final BootstrapBlock block
@@ -84,6 +86,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         // if many blocks in the same response, only redraw current block
         // further the first block must be in ajaxMode until current block ends
         if (parameter.target == Parameter.RenderingTarget.MAIL) return true
+        if (poke) return true
         simpleLog("doRenderElement0 :> renderTab: $renderTab, id: $id, theCurrentExplicitAjaxBlockId: ${theCurrentExplicitAjaxBlockId}, isModal: ${isModal}, params: ${parameter.params}")
 
         if (!parameter.isAjaxRendering) {
@@ -103,7 +106,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             simpleLog("doRenderElement1 return ${ret}, because NOT (AJAX OR MODAL) OR AJAX BUT ANOTHER id")
             return ret
         } else if (!id && !parameter.ajaxBlockId) {
-            simpleLog("doRenderElement2 return isModal($isModal)")
+            simpleLog("doRenderElement2 return isModal($isModal && $poke)")
             return isModal
         }
 
@@ -118,7 +121,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         simpleLog("doRenderElement3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
         boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (!currentAjaxBlockId && isModal) //&& !parameter.isRefresh) // || parameter.targetAjaxBlockId //|| (parameter.isAjaxRendering && currentAjaxBlockId == parameter.ajaxBlockId)
-        simpleLog("doRenderElement4 => doRender = $doRender")
+        simpleLog("doRenderElement4 => doRender = $doRender && $poke")
         return doRender
     }
 
@@ -203,6 +206,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             id = parameter.targetAjaxBlockId
             doAjaxRendering = true
         }
+        if (poke) doAjaxRendering = true
         blockLog.topElement = block.blockAjax(blockLog.topElement, id, doAjaxRendering)
     }
 
@@ -394,6 +398,16 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.topElement = block.tabs(oldParent, currentTabNames, parameter.urlMapped(parameter.applicationTagLib.controllerName, parameter.applicationTagLib.actionName, parameter.beanId, p))
         blockLog.topElement.addChildren(tabsContent)
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
+    }
+
+    @Override
+    void visitBlockPoke(boolean update) {
+        poke = update
+    }
+
+    @Override
+    void visitBlockPokeEnd() {
+        poke = false
     }
 
     @Override

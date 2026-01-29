@@ -301,7 +301,13 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 //        List<HTMLInput> inputList = []
 
         parameter.paramsToKeep.each {
-            mapAdditionalHiddenParams.put(it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key))
+            if (it.value instanceof Collection || it.value instanceof String[]) {
+                it.value.eachWithIndex { v, i ->
+                    mapAdditionalHiddenParams.put(it.key + "[$i]", new HTMLInput(InputType.HIDDEN, v, it.key + "[$i]"))
+                }
+            } else {
+                mapAdditionalHiddenParams.put(it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key))
+            }
         }
 
         if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')

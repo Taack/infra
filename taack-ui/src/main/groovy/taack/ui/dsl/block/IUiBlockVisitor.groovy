@@ -70,6 +70,10 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitBlockTabsEnd()
 
+    void visitBlockPoke(boolean update)
+
+    void visitBlockPokeEnd()
+
     void visitCustom(String html, Style style)
 
     void visitCloseModalAndUpdateBlock()
