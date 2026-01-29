@@ -29,6 +29,9 @@ class StatsController {
 
         taackUiService.show(new UiBlockSpecifier().ui {
             row {
+                table statsService.buildTable()
+            }
+            row {
                 col BlockSpec.Width.HALF, {
                     diagram(statsService.&buildChart as MethodClosure) {
                         label 'Sales1'

@@ -1,9 +1,33 @@
 package stats
 
 import grails.web.api.WebAttributes
+import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dsl.UiDiagramSpecifier
+import taack.ui.dsl.UiTableSpecifier
 
 class StatsService implements WebAttributes {
+
+    UiTableSpecifier buildTable() {
+        new UiTableSpecifier().ui {
+            header {
+                label "col1"
+                label "col2"
+            }
+            row {
+                rowColumn {
+                    rowAction  "v11", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
+                    rowField "v12"
+                }
+            }
+            row {
+                rowColumn {
+
+                    rowAction  "v21", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
+                    rowField "v32"
+                }
+            }
+        }
+    }
 
     UiDiagramSpecifier buildChart() {
         List<Integer> years = 2020..2025
