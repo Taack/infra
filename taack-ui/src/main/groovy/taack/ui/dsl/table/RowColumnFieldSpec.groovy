@@ -8,6 +8,7 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
+import taack.ui.IEnumOptions
 import taack.ui.dsl.branching.BranchingSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -52,10 +53,10 @@ class RowColumnFieldSpec implements BranchingSpec {
         tableVisitor.visitRowField(field, format, style)
     }
 
-    void rowFieldEdit(final FieldInfo field, final String format = null, final Style style = null) {
+    void rowFieldEdit(final FieldInfo field, final String format = null, final Style style = null, IEnumOptions eos = null) {
         MethodClosure mc = TaackUiService.registerFieldEditEditMethod(field)
-        if (taackUiEnablerService.hasAccess(mc)) {
-            tableVisitor.visitRowFieldEdit(field, format, style)
+        if (mc && taackUiEnablerService.hasAccess(mc)) {
+            tableVisitor.visitRowFieldEdit(field, format, style, eos)
         } else tableVisitor.visitRowField(field, format, style)
     }
 

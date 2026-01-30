@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
@@ -247,7 +248,7 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style) {
+    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style, IEnumOptions eos) {
 
     }
 

@@ -89,7 +89,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     private static MessageSource staticMs
     protected final static Map<String, UiMenuSpecifier> contextualMenuClosures = [:]
-    final static Map<Class, Triple<MethodClosure, FieldInfo[], MethodClosure>> contextualFieldEdit = [:]
+    final static Map<String, Triple<MethodClosure, FieldInfo[], MethodClosure>> contextualFieldEdit = [:]
 
     static void registerContextualMenuClosure(Class domain, final UiMenuSpecifier menu) {
         contextualMenuClosures.put(domain.simpleName, menu)
@@ -118,16 +118,21 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     }
 
     static void registerFieldEdit(Class domain, MethodClosure edit, MethodClosure save, FieldInfo... fields) {
-        contextualFieldEdit.put(domain, new Triple<>(edit, fields, save))
+        println "contextualFieldEdit $contextualFieldEdit"
+        println "domain $domain fields $fields"
+        contextualFieldEdit.put(domain.simpleName, new Triple<>(edit, fields, save))
     }
 
     static MethodClosure registerFieldEditEditMethod(FieldInfo fieldInfo) {
-        registerFieldEditEditMethod(fieldInfo.fieldConstraint.field.type, fieldInfo)
+        registerFieldEditEditMethod(fieldInfo.fieldConstraint.field.declaringClass, fieldInfo)
     }
 
     static MethodClosure registerFieldEditEditMethod(Class domain, FieldInfo fieldInfo) {
-        Triple<MethodClosure, FieldInfo[], MethodClosure> p = contextualFieldEdit.get(domain)
-        if (p.bValue*.fieldName.contains(fieldInfo.fieldName)) {
+        println "contextualFieldEdit $contextualFieldEdit"
+        println "domain $domain field $fieldInfo"
+
+        Triple<MethodClosure, FieldInfo[], MethodClosure> p = contextualFieldEdit.get(domain.simpleName)
+        if (p?.bValue*.fieldName?.contains(fieldInfo.fieldName)) {
             return p.aValue
         }
         null

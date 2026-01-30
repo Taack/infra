@@ -189,7 +189,7 @@ class StatsController {
                 for (def t in testInlineEditList) {
                     row {
                         rowField t.name_
-                        rowField t.age_
+                        rowFieldEdit t.age_
                         rowField t.city_
                     }
                 }

@@ -1,15 +1,16 @@
 package taack.ui.dump
 
 import grails.util.Pair
-import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.ast.type.WidgetKind
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
-import taack.ui.dsl.UiFormSpecifier
+import taack.ui.EnumOptions
+import taack.ui.IEnumOptions
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -18,11 +19,15 @@ import taack.ui.dsl.table.TableOption
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.form.BootstrapForm
+import taack.ui.dump.html.form.BootstrapTableEdit
+import taack.ui.dump.html.form.IFormTheme
 import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.style.Height2p8rem
 import taack.ui.dump.html.table.*
 
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -54,6 +59,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private TableOption tableOption
     private TableOption cellOption
     protected final BlockLog blockLog
+    final IFormTheme formThemed
+
+
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -61,6 +69,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
         this.blockId = id ?: '' + parameter.modalId
         this.initialForm = new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}")
+        formThemed = new BootstrapTableEdit(blockLog)
+
     }
 
     static final <T> String dataFormat(T value, String format, Locale locale = null) {
@@ -558,12 +568,58 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style) {
+    void visitRowFieldEdit(FieldInfo field, String format, Style style, IEnumOptions eos = null) {
         // TODO
 //        boolean addColumn = !isInCol
 //        if (addColumn) visitColumn(null, null)
 //        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
 ////, firstInCol, isInCol))
 //        if (addColumn) visitColumnEnd()
+
+        final String trI18n = ''
+        final String qualifiedName = field.fieldName
+        final Class type = field.fieldConstraint.field.type
+        final boolean isBoolean = type == boolean || type == Boolean
+
+        final boolean isEnum = field.fieldConstraint.field.type.isEnum()
+        final boolean isListOrSet = Collection.isAssignableFrom(type)
+        final boolean isDate = Date.isAssignableFrom(type)
+        final boolean isNullable = field.fieldConstraint.nullable
+        final boolean isFieldDisabled = false //TODO: isDisabled(field)
+
+
+        if (isBoolean) {
+            blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, trI18n, false, false, field.value as boolean)
+        } else if (eos) {
+            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, false, isNullable)
+        } else if (isEnum || isListOrSet) {
+            if (isEnum) {
+                blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+            } else if (isListOrSet) {
+                // Not yet
+            }
+        } else if (isDate) {
+            blockLog.topElement = formThemed.dateInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date, field.fieldConstraint.widget == WidgetKind.DATETIME.name)
+        } else {
+            if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
+                blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
+            } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
+                blockLog.topElement = formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
+            } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
+                blockLog.topElement = formThemed.markdownInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
+            } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
+                blockLog.topElement = formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
+            } else {
+                String valueString = RawHtmlFormDump.inputEscape(field.value?.toString())
+                if (field.value instanceof Number) {
+                    valueString = parameter.nf.format(field.value)
+                }
+                if (field.fieldConstraint.widget == WidgetKind.PASSWD.name)
+                    blockLog.topElement = formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
+                else
+                    blockLog.topElement = formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
+            }
+        }
+
     }
 }
