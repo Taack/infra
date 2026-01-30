@@ -247,6 +247,11 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
+    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style) {
+
+    }
+
+    @Override
     void visitTable() {
 
     }

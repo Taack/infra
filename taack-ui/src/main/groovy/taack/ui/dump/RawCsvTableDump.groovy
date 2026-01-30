@@ -230,4 +230,9 @@ final class RawCsvTableDump implements IUiTableVisitor {
     String getSelectColumnParamsKey() {
         return null
     }
+
+    @Override
+    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style) {
+        visitRowField(fieldInfo.value?.toString(), null)
+    }
 }

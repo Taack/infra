@@ -565,4 +565,14 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     String getSelectColumnParamsKey() {
         return selectColumnParamsKey
     }
+
+    @Override
+    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style) {
+        // TODO
+//        boolean addColumn = !isInCol
+//        if (addColumn) visitColumn(null, null)
+//        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
+////, firstInCol, isInCol))
+//        if (addColumn) visitColumnEnd()
+    }
 }

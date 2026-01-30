@@ -7,6 +7,7 @@ import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
+import taack.render.TaackUiService
 import taack.ui.dsl.branching.BranchingSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -49,6 +50,13 @@ class RowColumnFieldSpec implements BranchingSpec {
 
     void rowField(final FieldInfo field, final String format = null, final Style style = null) {
         tableVisitor.visitRowField(field, format, style)
+    }
+
+    void rowFieldEdit(final FieldInfo field, final String format = null, final Style style = null) {
+        MethodClosure mc = TaackUiService.registerFieldEditMethod(field)
+        if (taackUiEnablerService.hasAccess(mc)) {
+            tableVisitor.visitRowFieldEdit(field, format, style)
+        } else tableVisitor.visitRowField(field, format, style)
     }
 
     void rowField(final GetMethodReturn field, final String format = null, final Style style = null) {

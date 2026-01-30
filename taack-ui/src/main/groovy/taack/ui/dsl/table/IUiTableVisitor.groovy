@@ -92,4 +92,6 @@ interface IUiTableVisitor {
     void visitCellDropAction(MethodClosure dropAction, Map<String, ? extends Serializable> parameters)
 
     String getSelectColumnParamsKey()
+
+    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style)
 }

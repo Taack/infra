@@ -125,6 +125,18 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         contextualFieldEdit.put(domain, new Pair<>(edit, fields))
     }
 
+    static MethodClosure registerFieldEditMethod(FieldInfo fieldInfo) {
+        registerFieldEditMethod(fieldInfo.fieldConstraint.field.type, fieldInfo)
+    }
+
+    static MethodClosure registerFieldEditMethod(Class domain, FieldInfo fieldInfo) {
+        Pair<MethodClosure, FieldInfo[]> p = contextualFieldEdit.get(domain)
+        if (p.bValue*.fieldName.contains(fieldInfo.fieldName)) {
+            return p.aValue
+        }
+        null
+    }
+
     @PostConstruct
     void init() {
         staticMs = messageSource
