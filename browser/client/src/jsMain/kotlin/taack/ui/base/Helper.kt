@@ -10,7 +10,9 @@ import taack.ui.base.element.Filter
 import taack.ui.base.element.Form
 import web.blob.Blob
 import web.clipboard.ClipboardEvent
+import web.cssom.ClassName
 import web.data.DataTransferItemList
+import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
 import web.events.EventType
@@ -124,19 +126,26 @@ class Helper {
                 else fd.delete("order")
             }
 
+            val loader = document.getElementById(ElementId("taack-load-spinner"))
             val xhr = XMLHttpRequest()
-            xhr.onloadend = EventHandler {
-                //Filter used saved to historyState
-                checkLogin(xhr)
-                historyState = fd.entries().asSequence().map { it: Tuple2<String, Any> ->
-                    it.component1() to it.component2()
-                }.toMap() as HashMap<String, FormDataEntryValue>
-                hydrateStateToUrl(formUrl)
-                history.pushState("{}", document.title, formUrl)
-                processAjaxLink(null, xhr.responseText, filter)
-                b?.disabled = false
-                if (innerText != null) b.innerText = innerText
-
+            xhr.onreadystatechange = EventHandler {
+                if (xhr.readyState == xhr.DONE) {
+                    checkLogin(xhr)
+                    //Filter used saved to historyState
+                    if (filter.parent.parent.parent == null) {
+                        historyState = fd.entries().asSequence().map { it: Tuple2<String, Any> ->
+                            it.component1() to it.component2()
+                        }.toMap() as HashMap<String, FormDataEntryValue>
+                        hydrateStateToUrl(formUrl)
+                        history.pushState("{}", document.title, formUrl)
+                    }
+                    processAjaxLink(null, xhr.responseText, filter)
+                    b?.disabled = false
+                    if (innerText != null) b.innerText = innerText
+                    loader?.classList?.add(ClassName("tck-hidden"))
+                } else if (xhr.readyState == xhr.OPENED) {
+                    loader?.classList?.remove(ClassName("tck-hidden"))
+                }
             }
             xhr.open(RequestMethod.POST, f.action)
             xhr.send(fd)
