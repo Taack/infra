@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import taack.domain.TaackAttachmentService
+import taack.domain.TaackFilter
 import taack.domain.TaackFilterService
 import taack.render.TaackEditorService
 import taack.render.TaackSaveService
@@ -1492,5 +1493,41 @@ class CmsController implements WebAttributes {
                 })
             }
         }), buildMenu())
+    }
+
+    def testKanban() {
+        UiBlockSpecifier b = new UiBlockSpecifier()
+        b.ui {
+            kanbanFilter CmsUiService.buildCmsPageFilter(), new UiKanbanSpecifier().ui {
+                List<CmsPage> pageList = taackFilterService.getBuilder(CmsPage).setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_).build().list().aValue as List<CmsPage>
+                Closure kanbanCol = { MethodClosure action, Map<String, ? extends Object> params, String headerStr, List<CmsPage> pages ->
+                    column action, params, {
+                        header(headerStr)
+                        pages.forEach { CmsPage page ->
+                            card page.selfObject_, { // page.selfObject_ means the id of page
+                                cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, CmsController.&editPage as MethodClosure, page.id
+                                cardField page.title_, null, Style.BOLD
+                                cardField page.dateCreated_
+                                cardFieldRaw ""
+                            }
+                        }
+                    }
+                }
+                kanbanCol(CmsController.&changePageType as MethodClosure, [newType: CmsPageType.PAGE], "Page", pageList.grep { CmsPage p -> p.pageType == CmsPageType.PAGE }.sort { -it.lastUpdated.getTime() })
+                kanbanCol(CmsController.&changePageType as MethodClosure, [newType: CmsPageType.NEWS], "News", pageList.grep { CmsPage p -> p.pageType == CmsPageType.NEWS }.sort { -it.lastUpdated.getTime() })
+            }
+        }
+        taackUiService.show(b, buildMenu())
+    }
+
+    @Transactional
+    def changePageType(String newType) {
+        println(params.toString())
+        CmsPage page = CmsPage.get(params.long('cardId'))
+        if (page) {
+            page.pageType = CmsPageType.valueOf(newType)
+            page.save(flush: true, failOnError: true)
+        }
+        render status: 200
     }
 }
