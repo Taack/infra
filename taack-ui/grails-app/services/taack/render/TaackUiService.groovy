@@ -1,6 +1,6 @@
 package taack.render
 
-import asset.pipeline.grails.AssetResourceLocator
+
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
@@ -24,15 +24,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
-import org.springframework.web.util.HtmlUtils
 import taack.ast.type.FieldInfo
-import taack.domain.TaackGormClass
-import taack.domain.TaackGormClassRegisterService
 import taack.ui.TaackUi
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
-import taack.ui.dsl.common.ActionIcon
 import taack.ui.dump.*
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
@@ -93,7 +89,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     private static MessageSource staticMs
     protected final static Map<String, UiMenuSpecifier> contextualMenuClosures = [:]
-    final static Map<Class, Pair<MethodClosure, FieldInfo[]>> contextualFieldEdit = [:]
+    final static Map<Class, Triple<MethodClosure, FieldInfo[], MethodClosure>> contextualFieldEdit = [:]
 
     static void registerContextualMenuClosure(Class domain, final UiMenuSpecifier menu) {
         contextualMenuClosures.put(domain.simpleName, menu)
@@ -121,16 +117,16 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         contextualMenuClosures.get(className + '::' + fieldName) ?: contextualMenuClosures.get(className)
     }
 
-    static void registerFieldEdit(Class domain, MethodClosure edit, FieldInfo... fields) {
-        contextualFieldEdit.put(domain, new Pair<>(edit, fields))
+    static void registerFieldEdit(Class domain, MethodClosure edit, MethodClosure save, FieldInfo... fields) {
+        contextualFieldEdit.put(domain, new Triple<>(edit, fields, save))
     }
 
-    static MethodClosure registerFieldEditMethod(FieldInfo fieldInfo) {
-        registerFieldEditMethod(fieldInfo.fieldConstraint.field.type, fieldInfo)
+    static MethodClosure registerFieldEditEditMethod(FieldInfo fieldInfo) {
+        registerFieldEditEditMethod(fieldInfo.fieldConstraint.field.type, fieldInfo)
     }
 
-    static MethodClosure registerFieldEditMethod(Class domain, FieldInfo fieldInfo) {
-        Pair<MethodClosure, FieldInfo[]> p = contextualFieldEdit.get(domain)
+    static MethodClosure registerFieldEditEditMethod(Class domain, FieldInfo fieldInfo) {
+        Triple<MethodClosure, FieldInfo[], MethodClosure> p = contextualFieldEdit.get(domain)
         if (p.bValue*.fieldName.contains(fieldInfo.fieldName)) {
             return p.aValue
         }

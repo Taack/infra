@@ -4,7 +4,7 @@ import lodomain.TestInlineEdit
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
-import org.codehaus.groovy.runtime.MethodClosure
+import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackUiService
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiTableSpecifier
@@ -15,7 +15,7 @@ class StatsService implements WebAttributes {
     @PostConstruct
     void init() {
         TestInlineEdit testInlineEdit = new TestInlineEdit()
-        TaackUiService.registerFieldEdit(TestInlineEdit, StatsController.&editTestInlineEdit as MethodClosure, testInlineEdit.name_, testInlineEdit.age_)
+        TaackUiService.registerFieldEdit(TestInlineEdit, StatsController.&editTestInlineEdit as MC, StatsController.&apply as MC, testInlineEdit.name_, testInlineEdit.age_)
     }
 
     UiTableSpecifier buildTable() {
@@ -26,13 +26,13 @@ class StatsService implements WebAttributes {
             }
             row {
                 rowColumn {
-                    rowAction "v11", StatsController.&topCustomerSales2 as MethodClosure, [v: 1, isAjax: true]
+                    rowAction "v11", StatsController.&topCustomerSales2 as MC, [v: 1, isAjax: true]
                 }
                 rowField "v12"
             }
             row {
                 rowColumn {
-                    rowAction "v21", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
+                    rowAction "v21", StatsController.&topCustomerSales2 as MC, [v: 2]
                 }
                 rowField "v32"
             }

@@ -1,6 +1,7 @@
 package taack.ui.dump
 
 import grails.util.Pair
+import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
@@ -113,16 +114,6 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 className = fieldInfo.fieldConstraint.field.declaringClass.simpleName
             }
             htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
-        }
-
-        println "Trying $fieldInfo"
-        if (id) {
-            Pair<MethodClosure, FieldInfo[]> editField = TaackUiService.contextualFieldEdit[fieldInfo.fieldConstraint.field.type]
-            println(editField)
-            if (editField) {
-                println editField.bValue.contains(fieldInfo)
-
-            }
         }
         return htmlBuilder.build()
     }
