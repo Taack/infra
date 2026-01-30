@@ -1,11 +1,22 @@
 package stats
 
+import lodomain.TestInlineEdit
+import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
+import taack.render.TaackUiService
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiTableSpecifier
 
+@GrailsCompileStatic
 class StatsService implements WebAttributes {
+
+    @PostConstruct
+    void init() {
+        TestInlineEdit testInlineEdit = new TestInlineEdit()
+        TaackUiService.registerFieldEdit(TestInlineEdit, StatsController.&editTestInlineEdit as MethodClosure, testInlineEdit.name_, testInlineEdit.age_)
+    }
 
     UiTableSpecifier buildTable() {
         new UiTableSpecifier().ui {
