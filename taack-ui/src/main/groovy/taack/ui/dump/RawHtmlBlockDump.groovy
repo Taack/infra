@@ -13,6 +13,7 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.helper.Utils
+import taack.ui.dsl.kanban.IUiKanbanVisitor
 import taack.ui.dsl.menu.MenuSpec
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dump.common.BlockLog
@@ -308,6 +309,28 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             String paramsKey = tableVisitor.getSelectColumnParamsKey()
             filterVisitor.setAdditionalParams(paramsKey, parameter.applicationTagLib.params[paramsKey]?.toString())
         }
+        filterVisitor.addHiddenInputs()
+        visitColEnd()
+    }
+
+    @Override
+    void visitKanban(String id, UiKanbanSpecifier kanbanSpecifier) {
+        blockLog.stayBlock('visitKanban ' + id)
+        kanbanSpecifier.visitKanban(new RawHtmlKanbanDump(blockLog, id, parameter))
+    }
+
+    @Override
+    void visitKanbanFilter(final String id,
+                           final UiFilterSpecifier filterSpecifier,
+                           final UiKanbanSpecifier kanbanSpecifier) {
+        blockLog.stayBlock('visitKanbanFilter ' + id)
+        visitCol(BlockSpec.Width.QUARTER)
+        IUiKanbanVisitor kanbanVisitor = new RawHtmlKanbanDump(blockLog, id, parameter)
+        IUiFilterVisitor filterVisitor = new RawHtmlFilterDump(blockLog, id, parameter)
+        filterSpecifier.visitFilter(filterVisitor)
+        visitColEnd()
+        visitCol(BlockSpec.Width.THREE_QUARTER)
+        kanbanSpecifier.visitKanban(kanbanVisitor)
         filterVisitor.addHiddenInputs()
         visitColEnd()
     }

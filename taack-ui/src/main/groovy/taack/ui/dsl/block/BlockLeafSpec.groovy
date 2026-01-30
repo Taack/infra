@@ -130,6 +130,34 @@ class BlockLeafSpec extends BlockBase {
         }
     }
 
+    void kanban(final UiKanbanSpecifier kanbanSpecifier,
+                @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+        String aId = theAjaxBlockId('kanban')
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("kanban $aId $doRender")
+        if (doRender) {
+            blockVisitor.visitAjaxBlock(aId)
+            processMenuBlock(aId, closure)
+            blockVisitor.visitKanban(aId, kanbanSpecifier)
+            blockVisitor.visitAjaxBlockEnd()
+        }
+    }
+
+    void kanbanFilter(final UiFilterSpecifier filterSpecifier,
+                      final UiKanbanSpecifier kanbanSpecifier,
+                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+        String aId = theAjaxBlockId('kanbanFilter')
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        simpleLog("kanbanFilter $aId $doRender")
+        if (doRender) {
+            blockVisitor.visitAjaxBlock(aId)
+            processMenuBlock(aId, closure)
+            blockVisitor.visitRow()
+            blockVisitor.visitKanbanFilter(aId, filterSpecifier, kanbanSpecifier)
+            blockVisitor.visitRowEnd()
+            blockVisitor.visitAjaxBlockEnd()
+        }
+    }
 
     /**
      * Add a chart to the block
