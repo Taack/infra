@@ -209,6 +209,16 @@ class UiBlockVisitor implements IUiBlockVisitor {
     }
 
     @Override
+    void visitKanban(String id, UiKanbanSpecifier kanbanSpecifier) {
+
+    }
+
+    @Override
+    void visitKanbanFilter(String aId, UiFilterSpecifier filterSpecifier, UiKanbanSpecifier kanbanSpecifier) {
+
+    }
+
+    @Override
     void visitMenuLabel(String i18n, boolean hasClosure) {
 
     }
