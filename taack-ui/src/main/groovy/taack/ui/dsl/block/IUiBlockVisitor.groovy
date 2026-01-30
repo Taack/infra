@@ -6,6 +6,7 @@ import taack.ast.type.FieldInfo
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
+import taack.ui.dsl.UiKanbanSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
@@ -91,4 +92,8 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     Map getParameterMap()
 
     void setRenderTab(boolean isRender)
+
+    void visitKanban(String id, UiKanbanSpecifier kanbanSpecifier)
+
+    void visitKanbanFilter(String aId, UiFilterSpecifier filterSpecifier, UiKanbanSpecifier kanbanSpecifier)
 }

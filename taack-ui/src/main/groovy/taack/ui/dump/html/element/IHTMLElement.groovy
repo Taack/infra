@@ -29,7 +29,10 @@ enum TaackTag {
     TAB,
     TABS,
     LABEL,
-    SECTION
+    SECTION,
+    KANBAN,
+    KANBAN_COL,
+    CARD,
 }
 
 @CompileStatic
