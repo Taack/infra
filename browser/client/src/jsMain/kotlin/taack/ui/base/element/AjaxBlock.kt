@@ -32,6 +32,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     val blockId = ajaxBlockId
     var filters: Map<String, Filter> = mutableMapOf()
     private var tables: Map<String, Table> = mutableMapOf()
+    private var kanbans: Map<String, Kanban> = mutableMapOf()
     private var forms: List<Form> = mutableListOf()
     private var shows: List<Show> = mutableListOf()
     private var diagrams: List<Diagram> = mutableListOf()
@@ -73,6 +74,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         }
         filters = Filter.getSiblingFilterBlock(this).associateBy { it.filterId + blockId }
         tables = Table.getSiblingTable(this).associateBy { it.tableId + blockId }
+        kanbans = Kanban.getSiblingKanban(this).associateBy { it.kanbanId + blockId }
         forms = Form.getSiblingForm(this)
         shows = Show.getSiblingShow(this)
         diagrams = Diagram.getSiblingDiagram(this)
