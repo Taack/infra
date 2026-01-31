@@ -8,6 +8,7 @@ enum InputType {
     DATE('date'),
     DATETIME('datetime-local'),
     EMAIL('email'),
+    SUBMIT('submit'),
     CHECK('checkbox'),
     RADIO('radio'),
     PASSWD('password'),
@@ -45,6 +46,10 @@ final class HTMLInput implements IHTMLElement {
         HTMLInput ret = new HTMLInput(InputType.RADIO, value, name, null,  disabled)
         if (checked) ret.putAttr('checked', 'checked')
         ret
+    }
+
+    static HTMLInput inputSubmit(String name, String formId) {
+        new HTMLInput(InputType.SUBMIT, name, name, null).builder.putAttribute('form', formId).build() as HTMLInput
     }
 
     @Override

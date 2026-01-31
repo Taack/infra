@@ -18,4 +18,16 @@ class TestInlineEdit implements Validateable {
             else if (i > 38) "age.too.high"
         }
     }
+
+
+    @Override
+    String toString() {
+        return "TestInlineEdit{" +
+                "grails_validation_Validateable__beforeValidateHelper=" + grails_validation_Validateable__beforeValidateHelper +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", city='" + city + '\'' +
+                ", grails_validation_Validateable__errors=" + grails_validation_Validateable__errors +
+                '}';
+    }
 }

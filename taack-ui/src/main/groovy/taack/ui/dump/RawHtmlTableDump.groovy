@@ -20,14 +20,11 @@ import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.form.BootstrapForm
 import taack.ui.dump.html.form.BootstrapTableEdit
-import taack.ui.dump.html.form.IFormTheme
 import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.style.Height2p8rem
 import taack.ui.dump.html.table.*
 
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -59,9 +56,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private TableOption tableOption
     private TableOption cellOption
     protected final BlockLog blockLog
-    final IFormTheme formThemed
-
-
+    final BootstrapTableEdit formThemed
+    private boolean isQuickEdit = false
+    private int formId = 0
+    private IHTMLElement quickEditSubmitPlace = null
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -585,41 +583,53 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         final boolean isListOrSet = Collection.isAssignableFrom(type)
         final boolean isDate = Date.isAssignableFrom(type)
         final boolean isNullable = field.fieldConstraint.nullable
-        final boolean isFieldDisabled = false //TODO: isDisabled(field)
-
+        final boolean isFieldDisabled = !isQuickEdit //TODO: isDisabled(field)
+        final String formId = 'form' + this.formId
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
 
         if (isBoolean) {
-            blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, trI18n, false, false, field.value as boolean)
+            blockLog.topElement = formThemed.booleanInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, false, field.value as boolean)
         } else if (eos) {
-            blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, false, isNullable)
+            blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+                blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
             } else if (isListOrSet) {
                 // Not yet
             }
         } else if (isDate) {
-            blockLog.topElement = formThemed.dateInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date, field.fieldConstraint.widget == WidgetKind.DATETIME.name)
+            blockLog.topElement = formThemed.dateInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date, field.fieldConstraint.widget == WidgetKind.DATETIME.name)
         } else {
-            if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
-                blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
-            } else if (field.fieldConstraint.widget == WidgetKind.FILE_PATH.name) {
-                blockLog.topElement = formThemed.fileInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
-            } else if (field.fieldConstraint.widget == WidgetKind.MARKDOWN.name) {
-                blockLog.topElement = formThemed.markdownInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
-            } else if (field.fieldConstraint.widget == WidgetKind.ASCIIDOC.name) {
-                blockLog.topElement = formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
-            } else {
-                String valueString = RawHtmlFormDump.inputEscape(field.value?.toString())
-                if (field.value instanceof Number) {
-                    valueString = parameter.nf.format(field.value)
-                }
-                if (field.fieldConstraint.widget == WidgetKind.PASSWD.name)
-                    blockLog.topElement = formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
-                else
-                    blockLog.topElement = formThemed.normalInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
+            String valueString = RawHtmlFormDump.inputEscape(field.value?.toString())
+            if (field.value instanceof Number) {
+                valueString = parameter.nf.format(field.value)
             }
-        }
+            blockLog.topElement = formThemed.normalInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
 
+        }
+        quickEditSubmitPlace = blockLog.topElement
+        if (addColumn) visitColumnEnd()
+    }
+
+    @Override
+    void visitRowQuickEdit(Long id, MethodClosure apply) {
+        blockLog.enterBlock('visitRowQuickEdit')
+        HTMLForm f = new HTMLForm(parameter.urlMapped(apply, [id: id]))
+        f.id = 'form' + formId
+//        f.setTaackTag(TaackTag.TABLE_QUICK_EDIT)
+        blockLog.topElement.builder.addChildren(f)
+//        blockLog.topElement = f
+        isQuickEdit = true
+    }
+
+    @Override
+    void visitRowQuickEditEnd() {
+        blockLog.exitBlock('visitRowQuickEditEnd')
+//        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_QUICK_EDIT).parent
+        HTMLInput b = HTMLInput.inputSubmit('s', 'form' + formId)
+        quickEditSubmitPlace.addChildren(b)
+        isQuickEdit = false
+        formId++
     }
 }

@@ -253,6 +253,16 @@ final class RenderingTable implements IUiTableVisitor {
     }
 
     @Override
+    void visitRowQuickEdit(Long id, MethodClosure apply) {
+
+    }
+
+    @Override
+    void visitRowQuickEditEnd() {
+
+    }
+
+    @Override
     void visitTable() {
 
     }

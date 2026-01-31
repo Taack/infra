@@ -95,4 +95,8 @@ interface IUiTableVisitor {
     String getSelectColumnParamsKey()
 
     void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style, IEnumOptions eos)
+
+    void visitRowQuickEdit(Long id, MethodClosure apply)
+
+    void visitRowQuickEditEnd()
 }

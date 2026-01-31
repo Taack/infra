@@ -3,6 +3,7 @@ package stats
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
+import grails.web.api.WebAttributes
 import lodomain.TestInlineEdit
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackSaveService
@@ -16,7 +17,7 @@ import static taack.ui.TaackUi.*
 
 @GrailsCompileStatic
 @Secured(['permitAll'])
-class StatsController {
+class StatsController implements WebAttributes {
 
     TaackUiService taackUiService
     StatsService statsService
@@ -170,9 +171,18 @@ class StatsController {
     List<TestInlineEdit> testInlineEditList = []
     TaackSaveService taackSaveService
 
-    def apply(TestInlineEdit testInlineEdit) {
+    def apply() {
+        println params
+        println "testInlineEditList: $testInlineEditList"
+        Integer id = params.int('id')
+        println id
+        TestInlineEdit testInlineEdit = id != null ? testInlineEditList[id] : new TestInlineEdit()
+        println testInlineEdit
+        bindData(testInlineEdit, params)
+        println testInlineEdit
         if (testInlineEdit.validate()) {
             testInlineEditList << testInlineEdit
+            println testInlineEditList
             taackUiService.ajaxReload()
         } else
             taackSaveService.reloadOrRenderErrors(testInlineEdit)
@@ -186,11 +196,13 @@ class StatsController {
                     label 'Age'
                     label 'City'
                 }
-                for (def t in testInlineEditList) {
+                testInlineEditList.eachWithIndex { t, i ->
                     row {
                         rowField t.name_
-                        rowFieldEdit t.age_
-                        rowField t.city_
+                        rowQuickEdit this.&apply as MC, i, {
+                            rowFieldEdit t.age_
+                            rowFieldEdit t.city_
+                        }
                     }
                 }
             }, {

@@ -12,14 +12,6 @@ import taack.ui.dsl.UiTableSpecifier
 @GrailsCompileStatic
 class StatsService implements WebAttributes {
 
-    static lazyInit = false
-
-    @PostConstruct
-    void init() {
-        TestInlineEdit testInlineEdit = new TestInlineEdit()
-        TaackUiService.registerFieldEdit(TestInlineEdit, StatsController.&editTestInlineEdit as MC, StatsController.&apply as MC, testInlineEdit.name_, testInlineEdit.age_)
-    }
-
     UiTableSpecifier buildTable() {
         new UiTableSpecifier().ui {
             header {

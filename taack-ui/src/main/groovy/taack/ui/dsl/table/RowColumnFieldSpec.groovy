@@ -54,10 +54,7 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowFieldEdit(final FieldInfo field, final String format = null, final Style style = null, IEnumOptions eos = null) {
-        MethodClosure mc = TaackUiService.registerFieldEditEditMethod(field)
-        if (mc && taackUiEnablerService.hasAccess(mc)) {
-            tableVisitor.visitRowFieldEdit(field, format, style, eos)
-        } else tableVisitor.visitRowField(field, format, style)
+        tableVisitor.visitRowFieldEdit(field, format, style, eos)
     }
 
     void rowField(final GetMethodReturn field, final String format = null, final Style style = null) {

@@ -20,6 +20,7 @@ enum TaackTag {
     TABLE_COL,
     TABLE_ROW,
     TABLE_HEAD,
+    TABLE_QUICK_EDIT,
     AJAX_BLOCK,
     FORM,
     FILTER,

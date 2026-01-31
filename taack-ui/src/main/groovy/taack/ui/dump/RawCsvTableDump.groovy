@@ -236,4 +236,14 @@ final class RawCsvTableDump implements IUiTableVisitor {
     void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style, IEnumOptions eos) {
         visitRowField(fieldInfo.value?.toString(), null)
     }
+
+    @Override
+    void visitRowQuickEdit(Long id, MethodClosure apply) {
+
+    }
+
+    @Override
+    void visitRowQuickEditEnd() {
+
+    }
 }
