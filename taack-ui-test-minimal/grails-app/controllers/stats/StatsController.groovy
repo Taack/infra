@@ -172,41 +172,52 @@ class StatsController implements WebAttributes {
     TaackSaveService taackSaveService
 
     def apply() {
-        println params
-        println "testInlineEditList: $testInlineEditList"
         Integer id = params.int('id')
-        println id
-        TestInlineEdit testInlineEdit = id != null ? testInlineEditList[id] : new TestInlineEdit()
-        println testInlineEdit
-        bindData(testInlineEdit, params)
-        println testInlineEdit
-        if (testInlineEdit.validate()) {
-            testInlineEditList << testInlineEdit
-            println testInlineEditList
-            taackUiService.ajaxReload()
-        } else
-            taackSaveService.reloadOrRenderErrors(testInlineEdit)
+        if (id != null) {
+            TestInlineEdit testInlineEdit = id != null ? testInlineEditList[id] : new TestInlineEdit()
+            println testInlineEdit
+            Map ks = [include: params.keySet()]
+            bindData(testInlineEdit, params, ks)
+            println testInlineEdit
+            if (testInlineEdit.validate()) {
+                taackUiService.ajaxReload()
+            } else
+                taackSaveService.reloadOrRenderErrors(testInlineEdit)
+        } else {
+            TestInlineEdit testInlineEdit = new TestInlineEdit()
+            bindData(testInlineEdit, params, [include: params.keySet()])
+            if (testInlineEdit.validate()) {
+                testInlineEditList << testInlineEdit
+                println testInlineEditList
+                taackUiService.ajaxReload()
+            } else
+                taackSaveService.reloadOrRenderErrors(testInlineEdit)
+
+        }
     }
 
     def listTestInlineEdit() {
+        println "params: ${params}"
         taackUiService.show(new UiBlockSpecifier().ui {
-            table createTable {
-                header {
-                    label 'Name'
-                    label 'Age'
-                    label 'City'
-                }
-                testInlineEditList.eachWithIndex { t, i ->
-                    row {
-                        rowField t.name_
-                        rowQuickEdit this.&apply as MC, i, {
-                            rowFieldEdit t.age_
-                            rowFieldEdit t.city_
+            ajaxBlock {
+                table createTable {
+                    header {
+                        label 'Name'
+                        label 'Age'
+                        label 'City'
+                    }
+                    testInlineEditList.eachWithIndex { t, i ->
+                        row {
+                            rowField t.name_
+                            rowQuickEdit this.&apply as MC, i, {
+                                rowFieldEdit t.age_
+                                rowFieldEdit t.city_
+                            }
                         }
                     }
+                }, {
+                    menuIcon ActionIcon.ADD, StatsController.&editTestInlineEdit as MC
                 }
-            }, {
-                menuIcon ActionIcon.ADD, StatsController.&editTestInlineEdit as MC
             }
         }, buildMenu())
     }

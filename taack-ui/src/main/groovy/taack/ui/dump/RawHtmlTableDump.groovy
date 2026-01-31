@@ -615,7 +615,12 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitRowQuickEdit(Long id, MethodClosure apply) {
         blockLog.enterBlock('visitRowQuickEdit')
-        HTMLForm f = new HTMLForm(parameter.urlMapped(apply, [id: id]))
+        HTMLForm f = new HTMLForm(parameter.urlMapped(apply, [id: id, isAjax: true])).builder.addClasses('taackTableInlineForm').addChildren(
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
+                new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
+        ).build() as HTMLForm
+//        f.builder.addChildren(new HTMLInput(InputType.HIDDEN, true, 'isAjax'))
         f.id = 'form' + formId
 //        f.setTaackTag(TaackTag.TABLE_QUICK_EDIT)
         blockLog.topElement.builder.addChildren(f)

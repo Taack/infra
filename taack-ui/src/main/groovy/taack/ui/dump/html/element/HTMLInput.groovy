@@ -49,7 +49,7 @@ final class HTMLInput implements IHTMLElement {
     }
 
     static HTMLInput inputSubmit(String name, String formId) {
-        new HTMLInput(InputType.SUBMIT, name, name, null).builder.putAttribute('form', formId).build() as HTMLInput
+        new HTMLInput(InputType.SUBMIT, name, null, null).builder.putAttribute('form', formId).build() as HTMLInput
     }
 
     @Override
