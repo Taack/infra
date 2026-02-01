@@ -109,10 +109,11 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         final String bindingName = params['fieldName']
         Map includeOrExclude = null
         if (lockedFields) {
-            if (lockedFields[0]) {
+            if (lockedFields.size() == 0) {
                 includeOrExclude = [exclude: lockedFields*.fieldName]
             } else {
-                includeOrExclude = [include: lockedFields[1..<lockedFields.size()]*.fieldName]
+                // includeOrExclude = [include: lockedFields[1..<lockedFields.size()]*.fieldName]
+                includeOrExclude = [include: lockedFields*.fieldName]
             }
         }
 //
