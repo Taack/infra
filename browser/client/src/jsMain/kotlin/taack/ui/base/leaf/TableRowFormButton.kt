@@ -28,7 +28,7 @@ import web.url.URL
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
 
-class TableRowFormButton(val parent: TableRowForm, val b: HTMLInputElement) : LeafElement  {
+class TableRowFormButton(val parent: TableRowForm, val b: HTMLInputElement) : LeafElement {
     companion object {
         fun getSiblingTableRowFormButton(p: TableRowForm): List<TableRowFormButton> {
             val elements: List<*> = p.parent.r.querySelectorAll("input[type='submit']").asList()
@@ -44,6 +44,7 @@ class TableRowFormButton(val parent: TableRowForm, val b: HTMLInputElement) : Le
             onClick(e)
         }
     }
+
 
     private fun onClick(e: Event) {
         b.disabled = true
@@ -61,7 +62,10 @@ class TableRowFormButton(val parent: TableRowForm, val b: HTMLInputElement) : Le
                 location.href = parent.f.action
                 document.write(t)
                 document.close()
+            } else {
+                Helper.processAjaxLink(null, t, parent)
             }
+
         }
         xhr.open(RequestMethod.POST, parent.f.action)
         xhr.send(fd)

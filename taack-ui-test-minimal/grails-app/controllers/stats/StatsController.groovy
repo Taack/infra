@@ -172,6 +172,7 @@ class StatsController implements WebAttributes {
     TaackSaveService taackSaveService
 
     def apply() {
+        println "$params"
         Integer id = params.int('id')
         if (id != null) {
             TestInlineEdit testInlineEdit = id != null ? testInlineEditList[id] : new TestInlineEdit()

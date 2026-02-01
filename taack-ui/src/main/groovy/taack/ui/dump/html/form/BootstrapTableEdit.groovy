@@ -9,6 +9,7 @@ import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.script.CheckboxDisableIsZero
 import taack.ui.dump.html.script.DeleteSiblingInputContent
+import taack.ui.dump.html.style.DisplayInlineBlock
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
@@ -31,6 +32,10 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
         this.themeSize = blockLog.ts.themeSize
         this.floating = floating
         this.noLabel = noLabel
+    }
+
+    private static IHTMLElement divError(String qualifiedName) {
+        new HTMLDiv().builder.putAttribute('taackfielderror', qualifiedName).addClasses('form-text').setStyle(new DisplayInlineBlock()).build()
     }
 
     private static String inputEscape(final String val) {
@@ -63,6 +68,7 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
                             new HTMLLabel(qualifiedName, '?').builder.addClasses('form-check-label').build()
                     ).build(),
             )
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -75,6 +81,7 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
                 el.addChildren(new HTMLInput(InputType.HIDDEN, it?.key, qualifiedName))
             }
         }
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -86,6 +93,7 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
         if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('form', formId).putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
         el.addChildren(inputHidden)
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -98,6 +106,7 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
         if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
         el.addChildren(input)
         el.addChildren(inputHidden)
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -105,6 +114,7 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
         IHTMLElement el = topElement
         HTMLInput input = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value) : null, qualifiedName, inputEscape(trI18n), disable).builder.putAttribute('form', formId).setId(qualifiedName).build() as HTMLInput
         el.addChildren(input)
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 
@@ -114,6 +124,7 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
         HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.putAttribute('form', formId).setId(qualifiedName).build() as HTMLInput
         input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
+        el.addChildren(divError(qualifiedName))
         topElement
     }
 }
