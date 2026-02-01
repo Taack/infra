@@ -20,8 +20,8 @@ class TestInlineEdit implements Validateable {
     static constraints = {
         city nullable: true
         age validator: { Integer i, TestInlineEdit o ->
-            if (i < 18) "age.too.low"
-            else if (i > 38) "age.too.high"
+            if (i < 18) ['ageTooLow']
+            else if (i > 68) ['ageTooHigh']
         }
     }
 
