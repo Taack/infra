@@ -4,7 +4,9 @@ package stats
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import grails.web.api.WebAttributes
+import jakarta.annotation.PostConstruct
 import lodomain.TestInlineEdit
+import lodomain.TestStatus
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackSaveService
 import taack.render.TaackUiService
@@ -21,6 +23,20 @@ class StatsController implements WebAttributes {
 
     TaackUiService taackUiService
     StatsService statsService
+    List<TestInlineEdit> testInlineEditList = []
+    TaackSaveService taackSaveService
+
+    @PostConstruct
+    void init() {
+
+        Calendar calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 100)
+        testInlineEditList.add new TestInlineEdit(name: 'Higgins', age: 58, city: 'Kronenburg', birthday: Date.from(calendar.toInstant()), status: TestStatus.NEW)
+        calendar.add(Calendar.DAY_OF_YEAR, 67)
+        testInlineEditList.add new TestInlineEdit(name: 'Sgt Miclin', age: 68, city: 'Hamburger', birthday: Date.from(calendar.toInstant()), status: TestStatus.NEW)
+        calendar.add(Calendar.DAY_OF_YEAR, -30)
+        testInlineEditList.add new TestInlineEdit(name: 'Magnum', age: 68, city: 'Hawaii', birthday: Date.from(calendar.toInstant()), status: TestStatus.NEW)
+    }
 
     static UiMenuSpecifier buildMenu() {
         new UiMenuSpecifier().ui {
@@ -168,9 +184,6 @@ class StatsController implements WebAttributes {
         }
     }
 
-    List<TestInlineEdit> testInlineEditList = []
-    TaackSaveService taackSaveService
-
     def apply() {
         println "$params"
         Integer id = params.int('id')
@@ -213,6 +226,8 @@ class StatsController implements WebAttributes {
                             rowQuickEdit this.&apply as MC, i, {
                                 rowFieldEdit t.age_
                                 rowFieldEdit t.city_
+                                rowFieldEdit t.birthday_
+                                rowFieldEdit t.status_
                             }
                         }
                     }

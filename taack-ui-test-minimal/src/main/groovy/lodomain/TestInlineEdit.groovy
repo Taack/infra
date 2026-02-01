@@ -4,12 +4,18 @@ import grails.compiler.GrailsCompileStatic
 import grails.validation.Validateable
 import taack.ast.annotation.TaackFieldEnum
 
+enum TestStatus {
+    NEW, STARTED, PAUSED, STOPPED, ENDED
+}
+
 @TaackFieldEnum
 @GrailsCompileStatic
 class TestInlineEdit implements Validateable {
     String name
     Integer age
     String city
+    Date birthday
+    TestStatus status = TestStatus.NEW
 
     static constraints = {
         city nullable: true
