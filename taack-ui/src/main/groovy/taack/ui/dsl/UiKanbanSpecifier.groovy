@@ -42,13 +42,4 @@ final class UiKanbanSpecifier {
         }
     }
 
-    void visitKanbanWithNoFilter(final IUiKanbanVisitor kanbanVisitor) {
-        if (kanbanVisitor && closure) {
-            closure.delegate = new KanbanSpec(kanbanVisitor)
-            kanbanVisitor.visitKanbanWithoutFilter()
-            closure.call()
-            kanbanVisitor.visitKanbanEnd()
-        }
-    }
-
 }
