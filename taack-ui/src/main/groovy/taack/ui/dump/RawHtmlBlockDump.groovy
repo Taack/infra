@@ -684,6 +684,84 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         exitBlock('visitMenuOptions')
     }
 
+    // --- Accordion ---
+
+    private int accordionItemIndex = 0
+    private IHTMLElement currentAccordionElement = null
+
+    @Override
+    void visitBlockAccordion() {
+        enterBlock('visitBlockAccordion')
+        blockLog.topElement.setTaackTag(TaackTag.ACCORDION)
+        currentAccordionElement = block.accordion(blockLog.topElement)
+        blockLog.topElement = currentAccordionElement
+        accordionItemIndex = 0
+    }
+
+    @Override
+    void visitBlockAccordionEnd() {
+        exitBlock('visitBlockAccordionEnd')
+        currentAccordionElement = null
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ACCORDION)
+    }
+
+    @Override
+    void visitBlockAccordionItem(String i18n, boolean openByDefault) {
+        enterBlock('visitBlockAccordionItem ' + i18n)
+        blockLog.topElement.setTaackTag(TaackTag.ACCORDION_ITEM)
+        blockLog.topElement = block.accordionItem(currentAccordionElement, i18n, accordionItemIndex++, openByDefault)
+    }
+
+    @Override
+    void visitBlockAccordionItemEnd() {
+        exitBlock('visitBlockAccordionItemEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ACCORDION_ITEM)
+    }
+
+    // --- Card ---
+
+    private IHTMLElement cardHeaderElement = null
+    private IHTMLElement cardDivElement = null
+
+    @Override
+    void visitBlockCard(String title, boolean hasMenu) {
+        enterBlock('visitBlockCard ' + title)
+        blockLog.topElement.setTaackTag(TaackTag.CARD)
+        cardHeaderElement = block.cardStart(blockLog.topElement, title, hasMenu)
+        // cardStart adds the card div as last child of topElement
+        cardDivElement = blockLog.topElement.children.last()
+        blockLog.topElement = cardHeaderElement
+    }
+
+    @Override
+    void visitBlockCardBody() {
+        blockLog.stayBlock('visitBlockCardBody')
+        blockLog.topElement = block.cardBody(cardDivElement)
+    }
+
+    @Override
+    void visitBlockCardEnd() {
+        exitBlock('visitBlockCardEnd')
+        cardHeaderElement = null
+        cardDivElement = null
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.CARD)
+    }
+
+    // --- ScrollPanel ---
+
+    @Override
+    void visitBlockScrollPanel(String maxHeight) {
+        enterBlock('visitBlockScrollPanel')
+        blockLog.topElement.setTaackTag(TaackTag.SCROLL_PANEL)
+        blockLog.topElement = block.scrollPanel(blockLog.topElement, maxHeight)
+    }
+
+    @Override
+    void visitBlockScrollPanelEnd() {
+        exitBlock('visitBlockScrollPanelEnd')
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SCROLL_PANEL)
+    }
+
     @Override
     void getOutput(OutputStream out) {
         blockLog.topElement.getOutput(out)

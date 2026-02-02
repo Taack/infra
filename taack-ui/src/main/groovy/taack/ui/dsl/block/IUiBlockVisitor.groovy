@@ -93,6 +93,24 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void setRenderTab(boolean isRender)
 
+    void visitBlockAccordion()
+
+    void visitBlockAccordionEnd()
+
+    void visitBlockAccordionItem(String i18n, boolean openByDefault)
+
+    void visitBlockAccordionItemEnd()
+
+    void visitBlockCard(String title, boolean hasMenu)
+
+    void visitBlockCardBody()
+
+    void visitBlockCardEnd()
+
+    void visitBlockScrollPanel(String maxHeight)
+
+    void visitBlockScrollPanelEnd()
+
     void visitKanban(String id, UiKanbanSpecifier kanbanSpecifier)
 
     void visitKanbanFilter(String aId, UiFilterSpecifier filterSpecifier, UiKanbanSpecifier kanbanSpecifier)

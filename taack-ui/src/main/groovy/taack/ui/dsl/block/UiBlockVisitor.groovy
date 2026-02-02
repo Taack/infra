@@ -293,4 +293,49 @@ class UiBlockVisitor implements IUiBlockVisitor {
 
     }
 
+    @Override
+    void visitBlockAccordion() {
+
+    }
+
+    @Override
+    void visitBlockAccordionEnd() {
+
+    }
+
+    @Override
+    void visitBlockAccordionItem(String i18n, boolean openByDefault) {
+
+    }
+
+    @Override
+    void visitBlockAccordionItemEnd() {
+
+    }
+
+    @Override
+    void visitBlockCard(String title, boolean hasMenu) {
+
+    }
+
+    @Override
+    void visitBlockCardBody() {
+
+    }
+
+    @Override
+    void visitBlockCardEnd() {
+
+    }
+
+    @Override
+    void visitBlockScrollPanel(String maxHeight) {
+
+    }
+
+    @Override
+    void visitBlockScrollPanelEnd() {
+
+    }
+
 }

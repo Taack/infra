@@ -21,6 +21,7 @@ import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiMenuSpecifier
+import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
@@ -43,6 +44,7 @@ class CrewController implements WebAttributes {
             menu CrewController.&index as MC
             menu CrewController.&listRoles as MC
             menu CrewController.&hierarchy as MC
+            menu CrewController.&testNewComponents as MC
             menuIcon ActionIcon.CONFIG_USER, this.&editUser as MC
             menuIcon ActionIcon.EXPORT_CSV, this.&downloadBinPdf as MC
             menuIcon ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC
@@ -398,6 +400,64 @@ class CrewController implements WebAttributes {
     @Transactional
     def saveRole() {
         taackSaveService.saveThenRedirectOrRenderErrors(Role, this.&listRoles as MC)
+    }
+
+    def testNewComponents() {
+        User cu = authenticatedUser as User
+        UiShowSpecifier showUser = crewUiService.buildUserShow(cu)
+
+        UiFilterSpecifier f = CrewUiService.buildUserTableFilter(cu)
+        UiTableSpecifier usersTable = crewUiService.buildUserTable(f)
+
+        Role r = new Role()
+        UiTableSpecifier rolesTable = new UiTableSpecifier().ui {
+            header {
+                column {
+                    sortableFieldHeader r.authority_
+                }
+            }
+            iterate(taackFilterService.getBuilder(Role)
+                    .setMaxNumberOfLine(10)
+                    .setSortOrder(TaackFilter.Order.DESC, r.authority_)
+                    .build()) { Role role ->
+                rowColumn {
+                    rowField role.authority_
+                }
+            }
+        }
+
+        UiBlockSpecifier b = new UiBlockSpecifier().ui {
+            row {
+                col {
+                    // Accordion
+                    accordion {
+                        accordionItem('My Profile', true) {
+                            show showUser
+                        }
+                        accordionItem('Roles') {
+                            table rolesTable
+                        }
+                    }
+                }
+                col {
+                    // Card with title
+                    card('Current User') {
+                        show showUser
+                    }
+
+                    // Card with title and menu
+                    card('Users', {
+                        menuIcon ActionIcon.CREATE, CrewController.&editUser as MC
+                    }) {
+                        scrollPanel('300px') {
+                            table usersTable
+                        }
+                    }
+                }
+            }
+        }
+
+        taackUiService.show(b, buildMenu())
     }
 
     def downloadBinPdf() {
