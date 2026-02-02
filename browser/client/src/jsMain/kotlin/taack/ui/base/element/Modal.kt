@@ -42,10 +42,12 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
     private val dModalContent = document.createElement("div") as HTMLDivElement
     private val closeButton: HTMLButtonElement
     private val escModalCallback = { event: Event ->
-        val e = event as KeyboardEvent
-        if (e.key == "Escape" && dModal.closest("div.modal.tck-hidden") == null && dModalContent.querySelector("div.modal") == null) {
-            e.preventDefault()
-            close()
+        if (event is KeyboardEvent) {
+            val e = event
+            if (e.key == "Escape" && dModal.closest("div.modal.tck-hidden") == null && dModalContent.querySelector("div.modal") == null) {
+                e.preventDefault()
+                close()
+            }
         }
     }
 

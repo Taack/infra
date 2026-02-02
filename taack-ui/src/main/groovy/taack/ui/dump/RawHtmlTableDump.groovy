@@ -6,8 +6,11 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.ast.type.WidgetKind
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
+import taack.ui.EnumOptions
+import taack.ui.IEnumOptions
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -16,6 +19,7 @@ import taack.ui.dsl.table.TableOption
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 import taack.ui.dump.html.form.BootstrapForm
+import taack.ui.dump.html.form.BootstrapTableEdit
 import taack.ui.dump.html.style.DisplayBlock
 import taack.ui.dump.html.style.DisplayNone
 import taack.ui.dump.html.style.Height2p8rem
@@ -52,6 +56,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private TableOption tableOption
     private TableOption cellOption
     protected final BlockLog blockLog
+    final BootstrapTableEdit formThemed
+    private boolean isQuickEdit = false
+    private int formId = 0
+    private IHTMLElement quickEditSubmitPlace = null
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -59,6 +67,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         this.themableTable = new ThemableTable(parameter.uiThemeService.themeSelector.themeMode, parameter.uiThemeService.themeSelector.themeSize)
         this.blockId = id ?: '' + parameter.modalId
         this.initialForm = new HTMLForm("/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}")
+        formThemed = new BootstrapTableEdit(blockLog)
+
     }
 
     static final <T> String dataFormat(T value, String format, Locale locale = null) {
@@ -111,8 +121,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 ident = id
                 className = fieldInfo.fieldConstraint.field.declaringClass.simpleName
             }
-            return htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
-                    .build()
+            htmlBuilder.putAttribute('taackContextualMenu', className + ';' + fieldInfo.fieldName + ';' + ident)
         }
         return htmlBuilder.build()
     }
@@ -554,5 +563,78 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     String getSelectColumnParamsKey() {
         return selectColumnParamsKey
+    }
+
+    @Override
+    void visitRowFieldEdit(FieldInfo field, String format, Style style, IEnumOptions eos = null) {
+        // TODO
+//        boolean addColumn = !isInCol
+//        if (addColumn) visitColumn(null, null)
+//        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
+////, firstInCol, isInCol))
+//        if (addColumn) visitColumnEnd()
+
+        final String trI18n = ''
+        final String qualifiedName = field.fieldName
+        final Class type = field.fieldConstraint.field.type
+        final boolean isBoolean = type == boolean || type == Boolean
+
+        final boolean isEnum = field.fieldConstraint.field.type.isEnum()
+        final boolean isListOrSet = Collection.isAssignableFrom(type)
+        final boolean isDate = Date.isAssignableFrom(type)
+        final boolean isNullable = field.fieldConstraint.nullable
+        final boolean isFieldDisabled = !isQuickEdit //TODO: isDisabled(field)
+        final String formId = 'form' + this.formId
+        boolean addColumn = !isInCol
+        if (addColumn) visitColumn(null, null)
+
+        if (isBoolean) {
+            blockLog.topElement = formThemed.booleanInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, false, field.value as boolean)
+        } else if (eos) {
+            blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
+        } else if (isEnum || isListOrSet) {
+            if (isEnum) {
+                blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+            } else if (isListOrSet) {
+                // Not yet
+            }
+        } else if (isDate) {
+            blockLog.topElement = formThemed.dateInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as Date, field.fieldConstraint.widget == WidgetKind.DATETIME.name)
+        } else {
+            String valueString = RawHtmlFormDump.inputEscape(field.value?.toString())
+            if (field.value instanceof Number) {
+                valueString = parameter.nf.format(field.value)
+            }
+            blockLog.topElement = formThemed.normalInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
+
+        }
+        quickEditSubmitPlace = blockLog.topElement
+        if (addColumn) visitColumnEnd()
+    }
+
+    @Override
+    void visitRowQuickEdit(Long id, MethodClosure apply) {
+        blockLog.enterBlock('visitRowQuickEdit')
+        HTMLForm f = new HTMLForm(parameter.urlMapped(apply, [id: id, isAjax: true])).builder.addClasses('taackTableInlineForm').addChildren(
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
+                new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
+                new HTMLInput(InputType.HIDDEN, parameter.brand, 'originBrand')
+        ).build() as HTMLForm
+//        f.builder.addChildren(new HTMLInput(InputType.HIDDEN, true, 'isAjax'))
+        f.id = 'form' + formId
+//        f.setTaackTag(TaackTag.TABLE_QUICK_EDIT)
+        blockLog.topElement.builder.addChildren(f)
+//        blockLog.topElement = f
+        isQuickEdit = true
+    }
+
+    @Override
+    void visitRowQuickEditEnd() {
+        blockLog.exitBlock('visitRowQuickEditEnd')
+//        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_QUICK_EDIT).parent
+        HTMLInput b = HTMLInput.inputSubmit('s', 'form' + formId)
+        quickEditSubmitPlace.addChildren(b)
+        isQuickEdit = false
+        formId++
     }
 }

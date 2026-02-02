@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
+import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
@@ -229,5 +230,20 @@ final class RawCsvTableDump implements IUiTableVisitor {
     @Override
     String getSelectColumnParamsKey() {
         return null
+    }
+
+    @Override
+    void visitRowFieldEdit(FieldInfo fieldInfo, String format, Style style, IEnumOptions eos) {
+        visitRowField(fieldInfo.value?.toString(), null)
+    }
+
+    @Override
+    void visitRowQuickEdit(Long id, MethodClosure apply) {
+
+    }
+
+    @Override
+    void visitRowQuickEditEnd() {
+
     }
 }

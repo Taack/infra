@@ -4,6 +4,7 @@ import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
+import taack.ui.base.leaf.TableRowFormErrorInput
 import web.events.EventHandler
 import web.html.HTMLTableCellElement
 import web.html.HTMLTableRowElement
@@ -22,6 +23,7 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     private val rowGroup: Int? = r.attributes.getNamedItem("taackTableRowGroup")?.value?.toInt()
     private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
     private val cells = TableRowCell.getSiblingRowCells(this)
+    private val forms = TableRowForm.getSiblingForm(this)
 
     init {
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")

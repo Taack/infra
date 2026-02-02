@@ -8,6 +8,7 @@ import js.iterable.iterator
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
 import taack.ui.base.element.Form
+import taack.ui.base.element.TableRowForm
 import web.blob.Blob
 import web.clipboard.ClipboardEvent
 import web.cssom.ClassName
@@ -287,19 +288,37 @@ class Helper {
 
                 text.startsWith(ERROR_START) -> {
                     var hasErrors = false
-                    (base as Form).cleanUpErrors()
-                    val map = mapAjaxErrors(text).map { me ->
-                        hasErrors = true
-                        val d = base.errorPlaceHolders[me.key]?.d
-                        if (d != null) {
-                            d.innerHTML = me.value
-                            d.style.display = "block"
+                    if (base is Form) {
+                        (base).cleanUpErrors()
+                        val map = mapAjaxErrors(text).map { me ->
+                            hasErrors = true
+                            val d = base.errorPlaceHolders[me.key]?.d
+                            if (d != null) {
+                                d.innerHTML = me.value
+                                d.style.display = "block"
+                            }
+                        }
+                        if (!hasErrors) {
+                            trace("FormActionButton::hasNoErrors")
+                        } else {
+                            trace("FormActionButton::hasErrors $map")
                         }
                     }
-                    if (!hasErrors) {
-                        trace("FormActionButton::hasNoErrors")
-                    } else {
-                        trace("FormActionButton::hasErrors $map")
+                    if (base is TableRowForm) {
+                        (base).cleanUpErrors()
+                        val map = mapAjaxErrors(text).map { me ->
+                            hasErrors = true
+                            val d = base.errorInputs[me.key]?.d
+                            if (d != null) {
+                                d.innerHTML = me.value
+                                d.style.display = "block"
+                            }
+                        }
+                        if (!hasErrors) {
+                            trace("FormActionButton::hasNoErrors")
+                        } else {
+                            trace("FormActionButton::hasErrors $map")
+                        }
                     }
                 }
 

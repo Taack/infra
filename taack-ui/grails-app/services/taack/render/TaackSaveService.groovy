@@ -3,6 +3,7 @@ package taack.render
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.SpringSecurityService
+import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBinder
 import org.codehaus.groovy.runtime.MethodClosure as MC
@@ -40,8 +41,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
      *          }
      *      }
      *
-     * @param fieldName: Name of target field
-     * @param closure: Custom saving process
+     * @param fieldName : Name of target field
+     * @param closure : Custom saving process
      */
     static final void registerFieldCustomSavingClosure(String fieldName, Closure closure) {
         fieldCustomSavingClosures.put(fieldName, closure)
@@ -108,10 +109,11 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         final String bindingName = params['fieldName']
         Map includeOrExclude = null
         if (lockedFields) {
-            if (lockedFields[0]) {
+            if (lockedFields.size() == 0) {
                 includeOrExclude = [exclude: lockedFields*.fieldName]
             } else {
-                includeOrExclude = [include: lockedFields[1..<lockedFields.size()]*.fieldName]
+                // includeOrExclude = [include: lockedFields[1..<lockedFields.size()]*.fieldName]
+                includeOrExclude = [include: lockedFields*.fieldName]
             }
         }
 //
@@ -169,7 +171,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 }
             } else {
                 Map p = params as Map
-                p.remove('filePath') // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
+                p.remove('filePath')
+                // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
                 if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
                 else bindData(gormEntity, p)
 
@@ -196,7 +199,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     gormEntity['userLastUpdated'] = currentUser
                 }
             }
-        } catch (ignored) {}
+        } catch (ignored) {
+        }
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
@@ -214,6 +218,28 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             log.error "${gormEntity.errors}"
         }
         return gormEntity
+    }
+
+    def reloadOrRenderErrors(Validateable validateable) {
+        if (validateable.hasErrors()) {
+            Errors errors = validateable.errors
+
+            Map<String, List<String>> fieldErrors = [:]
+            errors.fieldErrors.each {
+                if (fieldErrors.get(it.field)) {
+                    fieldErrors.get(it.field).add(grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale))
+                } else {
+                    fieldErrors.put(it.field, [grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale)])
+                }
+            }
+            return fieldErrors.collect {
+                render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
+            }.join('')
+        } else {
+//            String rs = params.containsKey('recordState') && params['recordState'] ? '?recordState=' + params['recordState'] : ''
+
+            render """__reload__"""
+        }
     }
 
     def redirectOrRenderErrors(final GormEntity gormEntity, final MC redirectAction = null) {

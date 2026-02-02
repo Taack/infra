@@ -1,10 +1,15 @@
 package stats
 
+import lodomain.TestInlineEdit
+import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
-import org.codehaus.groovy.runtime.MethodClosure
+import jakarta.annotation.PostConstruct
+import org.codehaus.groovy.runtime.MethodClosure as MC
+import taack.render.TaackUiService
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiTableSpecifier
 
+@GrailsCompileStatic
 class StatsService implements WebAttributes {
 
     UiTableSpecifier buildTable() {
@@ -15,13 +20,13 @@ class StatsService implements WebAttributes {
             }
             row {
                 rowColumn {
-                    rowAction "v11", StatsController.&topCustomerSales2 as MethodClosure, [v: 1, isAjax: true]
+                    rowAction "v11", StatsController.&topCustomerSales2 as MC, [v: 1, isAjax: true]
                 }
                 rowField "v12"
             }
             row {
                 rowColumn {
-                    rowAction "v21", StatsController.&topCustomerSales2 as MethodClosure, [v: 2]
+                    rowAction "v21", StatsController.&topCustomerSales2 as MC, [v: 2]
                 }
                 rowField "v32"
             }

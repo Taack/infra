@@ -25,7 +25,12 @@ class RowColumnSpec extends RowColumnFieldSpec {
         tableVisitor.visitRowColumnEnd()
     }
 
-//    void dropAction(MethodClosure c, Map<String, ? extends Serializable> parameters) {
-//        tableVisitor.visitRowDropAction(c, parameters)
-//    }
+    void rowQuickEdit(MethodClosure apply, Long id = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure closure) {
+        boolean hasAccess = taackUiEnablerService.hasAccess(apply)
+        if (hasAccess) tableVisitor.visitRowQuickEdit(id, apply)
+        closure.delegate = new RowColumnSpec(tableVisitor)
+        closure.call()
+        if (hasAccess) tableVisitor.visitRowQuickEditEnd()
+    }
 }
+
