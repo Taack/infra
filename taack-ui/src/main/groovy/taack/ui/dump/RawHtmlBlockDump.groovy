@@ -129,7 +129,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     boolean doRenderLayoutElement() {
         simpleLog("doRenderLayoutElement ${parameter.isAjaxRendering}, ${parameter.ajaxBlockId} $currentAjaxBlockId ${parameter.targetAjaxBlockId}")
-        return !parameter.isAjaxRendering
+        return !parameter.isAjaxRendering || renderTab
     }
 
     @Override
