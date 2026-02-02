@@ -537,3 +537,21 @@ li:hover > .nested-dropdown{
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
     transform: translateY(-2px);
 }
+.kanban-column.kanban-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+.kanban-column.kanban-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/taack/spinner_load.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px;
+    z-index: 20;
+}

@@ -19,7 +19,7 @@ import java.text.NumberFormat
  * <p>Specify fields to be drawn in the card
  */
 @CompileStatic
-class CardFieldSpec {
+final class CardFieldSpec {
     final IUiKanbanVisitor kanbanVisitor
 
     TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService

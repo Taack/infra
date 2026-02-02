@@ -35,7 +35,8 @@ enum TaackTag {
     SCROLL_PANEL,
     SECTION,
     KANBAN,
-    KANBAN_COL
+    KANBAN_COL,
+    KANBAN_CARD
 }
 
 @CompileStatic

@@ -1,18 +1,16 @@
 package taack.ui.base.element
 
 import js.array.asList
-import kotlinx.browser.document
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
 import web.cssom.ClassName
-import web.dom.ElementId
 import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLDivElement
-import web.http.POST
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
+import web.http.POST
 
 class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
     BaseElement {
@@ -45,13 +43,14 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
                 e.preventDefault()
                 if (parent.sourceColumn != null && parent.sourceColumn != this) {
                     d.classList.remove(ClassName("drag-over"))
-                    d.insertBefore(parent.draggedItem!!.d, d.firstChild?.nextSibling?.nextSibling)
+                    d.classList.add(ClassName("kanban-loading"))
                     val fd = FormData()
-                    fd.set("cardId", parent.draggedItem?.carId ?: "")
+                    fd.set("cardId", parent.draggedItem?.cardId ?: "")
                     val xhr = XMLHttpRequest()
                     xhr.onreadystatechange = EventHandler {
                         if (xhr.readyState == xhr.DONE) {
                             checkLogin(xhr)
+                            d.classList.remove(ClassName("kanban-loading"))
                             Helper.filterForm(parent.filter, null, null)
                         }
                     }

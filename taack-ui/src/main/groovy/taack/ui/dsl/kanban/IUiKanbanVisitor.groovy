@@ -15,8 +15,6 @@ interface IUiKanbanVisitor {
 
     void visitKanbanEnd()
 
-    void visitKanbanWithoutFilter()
-
     void visitColumn(MethodClosure action, Map<String, ? extends Object> params)
 
     void visitColumnEnd()

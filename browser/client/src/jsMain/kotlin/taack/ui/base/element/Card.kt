@@ -18,11 +18,11 @@ class Card(val parent: KanbanColumn, val d: HTMLDivElement):
         }
     }
 
-    val carId = d.attributes.getNamedItem("cardid")!!.value
+    val cardId = d.attributes.getNamedItem("cardid")!!.value
 
     init {
-        Helper.traceIndent("Card::init +++ cardId: $carId")
-        if (carId != "") {
+        Helper.traceIndent("Card::init +++ cardId: $cardId")
+        if (cardId != "") {
             d.ondragstart = EventHandler {
                 parent.parent.draggedItem = this
                 parent.parent.sourceColumn = this.parent

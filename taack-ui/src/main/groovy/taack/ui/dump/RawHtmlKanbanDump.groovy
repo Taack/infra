@@ -55,14 +55,6 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     }
 
     @Override
-    void visitKanbanWithoutFilter() {
-        blockLog.enterBlock('visitKanbanWithoutFilter')
-        HTMLDiv kanbanDiv = new HTMLDiv().builder.addClasses('row gx-2').setTaackTag(TaackTag.KANBAN).putAttribute('taackKanbanId', blockId).build() as HTMLDiv
-        blockLog.topElement.builder.addChildren(kanbanDiv)
-        blockLog.topElement = kanbanDiv
-    }
-
-    @Override
     void visitColumn(MethodClosure action, Map<String, ? extends Object> params) {
         blockLog.enterBlock('visitColumn')
         HTMLDiv columnDiv = new HTMLDiv().builder.addClasses('kanban-column col m-2')
@@ -89,8 +81,12 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     @Override
     void visitCard(FieldInfo cardId) {
         blockLog.enterBlock('visitCard')
-        HTMLDiv cardDiv = new HTMLDiv().builder.addClasses('kanban-card').setTaackTag(TaackTag.CARD)
-                .putAttribute('cardId', cardId?.fieldName == 'selfObject' ? cardId?.value['id']?.toString() : cardId?.value?.toString())
+        String cardIdValue = null
+        if (cardId?.value != null) {
+            cardIdValue = cardId.fieldName == 'selfObject' ? cardId.value['id']?.toString() : cardId.value.toString()
+        }
+        HTMLDiv cardDiv = new HTMLDiv().builder.addClasses('kanban-card').setTaackTag(TaackTag.KANBAN_CARD)
+                .putAttribute('cardId', cardIdValue ?: '')
                 .putAttribute('draggable', 'true').build() as HTMLDiv
         blockLog.topElement.builder.addChildren(cardDiv)
         blockLog.topElement = cardDiv
@@ -99,7 +95,7 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     @Override
     void visitCardEnd() {
         blockLog.exitBlock('visitCardEnd')
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.CARD).parent
+        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.KANBAN_CARD).parent
     }
 
     @Override
