@@ -1,6 +1,7 @@
 package taack.ui.dsl.block
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.menu.MenuSpec
 
 // TODO: try to remove ajaxBlock
 // TODO: try to remove modal first param
@@ -73,5 +74,57 @@ class BlockLayoutSpec extends BlockLeafSpec {
         closure.call()
         counter++
         blockVisitor.visitBlockPokeEnd()
+    }
+
+    void accordion(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
+        boolean doRender = blockVisitor.doRenderElement()
+        simpleLog("accordion $doRender")
+        if (doRender) blockVisitor.visitBlockAccordion()
+        closure.delegate = this
+        closure.call()
+        counter++
+        if (doRender) blockVisitor.visitBlockAccordionEnd()
+    }
+
+    void accordionItem(final String i18n, final boolean openByDefault = false,
+                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
+        boolean doRender = blockVisitor.doRenderElement()
+        simpleLog("accordionItem $i18n $doRender")
+        if (doRender) blockVisitor.visitBlockAccordionItem(i18n, openByDefault)
+        closure.delegate = this
+        closure.call()
+        counter++
+        if (doRender) blockVisitor.visitBlockAccordionItemEnd()
+    }
+
+    void card(final String title = null,
+              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure menuClosure = null,
+              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure contentClosure) {
+        boolean doRender = blockVisitor.doRenderLayoutElement()
+        simpleLog("card $title $doRender")
+        if (doRender) {
+            blockVisitor.visitBlockCard(title, menuClosure != null)
+            if (menuClosure) {
+                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL, null)
+                menuClosure.delegate = new MenuSpec(blockVisitor)
+                menuClosure.call()
+                blockVisitor.visitMenuStartEnd()
+            }
+            blockVisitor.visitBlockCardBody()
+        }
+        contentClosure.delegate = this
+        contentClosure.call()
+        counter++
+        if (doRender) blockVisitor.visitBlockCardEnd()
+    }
+
+    void scrollPanel(final String maxHeight, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
+        boolean doRender = blockVisitor.doRenderLayoutElement()
+        simpleLog("scrollPanel $maxHeight $doRender")
+        if (doRender) blockVisitor.visitBlockScrollPanel(maxHeight)
+        closure.delegate = this
+        closure.call()
+        counter++
+        if (doRender) blockVisitor.visitBlockScrollPanelEnd()
     }
 }
