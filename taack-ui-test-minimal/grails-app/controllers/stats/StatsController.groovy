@@ -178,6 +178,8 @@ class StatsController implements WebAttributes {
         boolean p1 = params.int('v') == 1
         boolean p2 = params.int('v') == 2
 
+        println "p0: $p0, p1: $p1, p2: $p2"
+
         taackUiService.show(new UiBlockSpecifier().ui {
                 poke p0, { // Needed to refresh links with parameter to keep
                     table statsService.buildTable()
@@ -199,6 +201,7 @@ class StatsController implements WebAttributes {
                                     else menu 'Ungroup', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'false']
                                 } else {
                                     menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0]
+                                    menu 'Yearly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'false', v: 0]
                                 }
                             }, {
                                 println "We pass on diagram1"

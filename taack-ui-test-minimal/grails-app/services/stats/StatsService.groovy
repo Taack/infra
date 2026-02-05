@@ -20,13 +20,13 @@ class StatsService implements WebAttributes {
             }
             row {
                 rowColumn {
-                    rowAction "v11", StatsController.&topCustomerSales2 as MC, [v: 1, isAjax: true]
+                    rowAction "v11", StatsController.&topCustomerSalesCard as MC, [v: 1]
                 }
                 rowField "v12"
             }
             row {
                 rowColumn {
-                    rowAction "v21", StatsController.&topCustomerSales2 as MC, [v: 2]
+                    rowAction "v21", StatsController.&topCustomerSalesCard as MC, [v: 2]
                 }
                 rowField "v32"
             }

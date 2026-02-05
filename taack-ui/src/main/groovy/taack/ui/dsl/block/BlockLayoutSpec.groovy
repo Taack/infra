@@ -106,9 +106,9 @@ class BlockLayoutSpec extends BlockLeafSpec {
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure menuClosure = null,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure contentClosure) {
         String aId = theAjaxBlockId('card')
-        boolean doRender = blockVisitor.doRenderLayoutElement()
-        simpleLog("card $title $doRender")
-        if (doRender) {
+        boolean doRenderLayout = blockVisitor.doRenderLayoutElement()
+        simpleLog("card $title $doRenderLayout")
+        if (doRenderLayout) {
             blockVisitor.visitAjaxBlock(aId)
             blockVisitor.visitBlockCard(title, menuClosure != null)
             if (menuClosure) {
@@ -120,10 +120,13 @@ class BlockLayoutSpec extends BlockLeafSpec {
             }
             blockVisitor.visitBlockCardBody()
         }
+        boolean doRender = blockVisitor.doRenderElement(aId)
+        if (doRender) blockVisitor.visitBlockPoke(!doRenderLayout)
         contentClosure.delegate = this
         contentClosure.call()
         counter++
-        if (doRender) {
+        if (doRender) blockVisitor.visitBlockPokeEnd()
+        if (doRenderLayout) {
             blockVisitor.visitBlockCardEnd()
             blockVisitor.visitAjaxBlockEnd()
         }

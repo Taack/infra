@@ -425,7 +425,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockPoke(boolean update) {
-        poke = update
+        poke = poke || update
     }
 
     @Override
