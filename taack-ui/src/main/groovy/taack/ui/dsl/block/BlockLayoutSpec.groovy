@@ -87,7 +87,7 @@ class BlockLayoutSpec extends BlockLeafSpec {
     }
 
     void accordionItem(final String i18n, final boolean openByDefault = false,
-                        @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
+                       @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure closure) {
         boolean doRender = blockVisitor.doRenderElement()
         simpleLog("accordionItem $i18n $doRender")
         if (doRender) blockVisitor.visitBlockAccordionItem(i18n, openByDefault)
@@ -95,6 +95,11 @@ class BlockLayoutSpec extends BlockLeafSpec {
         closure.call()
         counter++
         if (doRender) blockVisitor.visitBlockAccordionItemEnd()
+    }
+
+    void card(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure menuClosure,
+              @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure contentClosure) {
+        card(null, menuClosure, contentClosure)
     }
 
     void card(final String title = null,
