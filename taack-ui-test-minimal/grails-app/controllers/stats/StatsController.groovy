@@ -170,6 +170,71 @@ class StatsController implements WebAttributes {
 //        })
     }
 
+    def topCustomerSalesCard() {
+
+        println "topCustomerSales3: ${params}"
+
+        boolean p0 = params.int('v') == 0
+        boolean p1 = params.int('v') == 1
+        boolean p2 = params.int('v') == 2
+
+        taackUiService.show(new UiBlockSpecifier().ui {
+            modal {
+                poke p0, { // Needed to refresh links with parameter to keep
+                    table statsService.buildTable()
+                }
+
+                row {
+                    poke p1, {
+                        println "We pass on poke1"
+                        col BlockSpec.Width.HALF, {
+                            println "We pass on col1"
+                            card( {
+                                println "We pass on diagram1"
+                                label 'Sales1'
+                                boolean showMonthlyGraph = params.boolean('showMonthlyGraph1')
+                                boolean groupPerMonth = params.boolean('groupPerMonth1')
+                                if (showMonthlyGraph) {
+                                    menu 'Yearly', StatsController.&topCustomerSales3 as MC, [showMonthlyGraph1: 'false', v: 0]
+                                    if (!groupPerMonth) menu 'Group by month', StatsController.&topCustomerSales2 as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'true']
+                                    else menu 'Ungroup', StatsController.&topCustomerSales3 as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'false']
+                                } else {
+                                    menu 'Monthly', StatsController.&topCustomerSales3 as MC, [showMonthlyGraph1: 'true', v: 0]
+                                }
+                            }, {
+                                diagram(statsService.&buildChart1 as MC)
+                            })
+
+
+                        }
+                    }
+                    poke p2, {
+                        println "We pass on poke2"
+                        col BlockSpec.Width.HALF, {
+                            println "We pass on col2"
+                            diagram(statsService::buildChart2 as MC) {
+                                println "We pass on diagram2"
+                                label 'Sales2'
+                                boolean showMonthlyGraph = params.boolean('showMonthlyGraph2')
+                                boolean groupPerMonth = params.boolean('groupPerMonth2')
+                                if (showMonthlyGraph) {
+                                    menu 'Yearly', StatsController.&topCustomerSales3 as MC, [showMonthlyGraph2: 'false', v: 0]
+                                    if (!groupPerMonth) menu 'Group by month', StatsController.&topCustomerSales2 as MC, [showMonthlyGraph2: 'true', v: 0, groupPerMonth2: 'true']
+                                    else menu 'Ungroup', StatsController.&topCustomerSales3 as MC, [showMonthlyGraph2: 'true', v: 0, groupPerMonth2: 'false']
+                                } else {
+                                    menu 'Monthly', StatsController.&topCustomerSales3 as MC, [showMonthlyGraph2: 'true', v: 0]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+//        })
+//        }, buildMenu())
+        }, 'showMonthlyGraph1', 'groupPerMonth1', 'showMonthlyGraph2', 'groupPerMonth2') // Not working, table is not refreshed
+//        })
+    }
+
     def editTestInlineEdit(TestInlineEdit testInlineEdit) {
         testInlineEdit ?= new TestInlineEdit()
         taackUiService.show createModal {

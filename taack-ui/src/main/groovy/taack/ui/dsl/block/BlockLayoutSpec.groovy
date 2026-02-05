@@ -105,17 +105,17 @@ class BlockLayoutSpec extends BlockLeafSpec {
     void card(final String title = null,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure menuClosure = null,
               @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockLayoutSpec) final Closure contentClosure) {
+        String aId = theAjaxBlockId('card')
+
         boolean doRender = blockVisitor.doRenderLayoutElement()
         simpleLog("card $title $doRender")
         if (doRender) {
+            blockVisitor.visitAjaxBlock(aId)
+            processMenuBlock(aId, menuClosure)
             blockVisitor.visitBlockCard(title, menuClosure != null)
-            if (menuClosure) {
-                blockVisitor.visitMenuStart(MenuSpec.MenuMode.HORIZONTAL, null)
-                menuClosure.delegate = new MenuSpec(blockVisitor)
-                menuClosure.call()
-                blockVisitor.visitMenuStartEnd()
-            }
-            blockVisitor.visitBlockCardBody()
+//            blockVisitor.visitBlockCardBody()
+            blockVisitor.visitBlockCardEnd()
+            blockVisitor.visitAjaxBlockEnd()
         }
         contentClosure.delegate = this
         contentClosure.call()

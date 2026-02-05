@@ -735,13 +735,13 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitBlockCardBody() {
-        blockLog.stayBlock('visitBlockCardBody')
-        blockLog.topElement = block.cardBody(cardDivElement)
+        blockLog.stayBlock('visitBlockCardBody // TO REMOVE')
     }
 
     @Override
     void visitBlockCardEnd() {
         exitBlock('visitBlockCardEnd')
+        blockLog.topElement = block.cardBody(cardDivElement)
         cardHeaderElement = null
         cardDivElement = null
         blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.CARD)
