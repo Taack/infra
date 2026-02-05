@@ -40,7 +40,7 @@ class BlockLeafSpec extends BlockBase {
     }
 
 
-    protected final String theAjaxBlockId(String suffix) {
+    private final String theAjaxBlockId(String suffix) {
         if (blockVisitor.getExplicitAjaxBlockId())
             return blockVisitor.getExplicitAjaxBlockId()
         if (ajaxCounter > 64_000)
