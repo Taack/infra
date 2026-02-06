@@ -580,7 +580,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             }
         }
 
-        boolean isParamsEquals = true
+        boolean isParamsEquals = !params && cp.isEmpty()
+
         if (params) {
             Map<String, ?> p = [:]
             cp?.each {
@@ -590,7 +591,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             params.each {
                 p.remove(it.key, it.value?.toString())
             }
-
             isParamsEquals = p.isEmpty() && !cp.isEmpty()
         }
 
