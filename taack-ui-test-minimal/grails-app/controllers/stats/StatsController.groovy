@@ -68,7 +68,7 @@ class StatsController implements WebAttributes {
                             card( { // Menu not refresh
                                 label 'Sales1'
                                 menu 'Yearly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'false', v: 0]
-                                menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0]
+                                menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'false']
                                 menu 'Group by month', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'true']
 
                             }, {
@@ -82,7 +82,7 @@ class StatsController implements WebAttributes {
                                 label 'Sales2'
                                     menu 'Yearly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'false', v: 0, groupPerMonth2: 'false']
                                     menu 'Group by month', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'true', v: 0, groupPerMonth2: 'true']
-                                    menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'true', v: 0]
+                                    menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'true', v: 0, groupPerMonth2: 'false']
                             }
                         }
                     }
