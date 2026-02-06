@@ -79,7 +79,7 @@ final class Parameter implements WebAttributes {
         this.fieldName = params.get(P_FIELD_NAME) ?: null
         this.paramsToKeep = [:]
         paramsToKeep.each {
-            this.paramsToKeep.put(it, params[it])
+            if (params[it] != null) this.paramsToKeep.put(it, params[it])
         }
         this.ajaxBlockId = params.get('ajaxBlockId') ?: null
         this.targetAjaxBlockId = params.get('targetAjaxBlockId') ?: null

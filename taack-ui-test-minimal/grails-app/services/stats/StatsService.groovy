@@ -1,11 +1,8 @@
 package stats
 
-import lodomain.TestInlineEdit
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
-import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure as MC
-import taack.render.TaackUiService
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.UiTableSpecifier
 
@@ -48,8 +45,6 @@ class StatsService implements WebAttributes {
         UiDiagramSpecifier chart = new UiDiagramSpecifier()
         boolean showMonthlyGraph = params.boolean('showMonthlyGraph' + index)
         boolean groupPerMonth = params.boolean('groupPerMonth' + index)
-
-        println "buildChart called $showMonthlyGraph $groupPerMonth"
 
         if (showMonthlyGraph) {
             List<String> labelStrings = []
@@ -106,5 +101,4 @@ class StatsService implements WebAttributes {
         }
         chart
     }
-
 }
