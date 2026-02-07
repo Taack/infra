@@ -22,8 +22,6 @@ import taack.ui.dump.html.element.*
 import taack.ui.dump.html.layout.HTMLEmpty
 import taack.ui.dump.html.menu.BootstrapMenu
 
-import javax.swing.RowFilter
-
 @CompileStatic
 final class RawHtmlBlockDump implements IUiBlockVisitor {
     private String currentAjaxBlockId = null
