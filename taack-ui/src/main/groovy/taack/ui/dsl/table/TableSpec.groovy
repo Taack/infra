@@ -86,7 +86,7 @@ final class TableSpec {
         res.bValue
     }
 
-    final<T extends GormEntity> Long iterate(Pair<List<T>, Long> builtFilterPair, boolean showPaginate = true, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
+    final<T extends GormEntity> Long iterate(Pair<List<T>, Long> builtFilterPair, Long maxNumberOfLine, boolean showPaginate = true, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure c) {
         c.delegate = new RowColumnSpec(tableVisitor)
         Date lastReadingDate = tableVisitor.getLastReadingDate()
         String readingDateField = tableVisitor.getReadingDateFieldString()
@@ -102,7 +102,7 @@ final class TableSpec {
             tableVisitor.visitRowEnd()
         }
         if (showPaginate) {
-            tableVisitor.visitPaginate(builtFilterPair.aValue.size(), builtFilterPair.bValue)
+            tableVisitor.visitPaginate(maxNumberOfLine, builtFilterPair.bValue)
         }
         builtFilterPair.bValue
     }
