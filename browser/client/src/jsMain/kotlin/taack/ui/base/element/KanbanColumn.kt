@@ -5,14 +5,12 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
 import web.cssom.ClassName
-import web.dom.document
 import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLDivElement
-import web.html.HTMLFormElement
+import web.http.POST
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
-import web.http.POST
 
 class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
     BaseElement {
