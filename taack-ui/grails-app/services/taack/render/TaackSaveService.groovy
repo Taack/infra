@@ -220,46 +220,33 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         return gormEntity
     }
 
+
+    def renderErrors(Errors errors) {
+        Map<String, List<String>> fieldErrors = [:]
+        errors.fieldErrors.each {
+            if (fieldErrors.get(it.field)) {
+                fieldErrors.get(it.field).add(grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale))
+            } else {
+                fieldErrors.put(it.field, [grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale)])
+            }
+        }
+        return fieldErrors.collect {
+            render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
+        }.join('')
+    }
+
     def reloadOrRenderErrors(Validateable validateable) {
         if (validateable.hasErrors()) {
-            Errors errors = validateable.errors
-
-            Map<String, List<String>> fieldErrors = [:]
-            errors.fieldErrors.each {
-                if (fieldErrors.get(it.field)) {
-                    fieldErrors.get(it.field).add(grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale))
-                } else {
-                    fieldErrors.put(it.field, [grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale)])
-                }
-            }
-            return fieldErrors.collect {
-                render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
-            }.join('')
+            return renderErrors(validateable.errors)
         } else {
-//            String rs = params.containsKey('recordState') && params['recordState'] ? '?recordState=' + params['recordState'] : ''
-
             render """__reload__"""
         }
     }
 
     def redirectOrRenderErrors(final GormEntity gormEntity, final MC redirectAction = null) {
         if (gormEntity.hasErrors()) {
-            Errors errors = gormEntity.errors
-
-            Map<String, List<String>> fieldErrors = [:]
-            errors.fieldErrors.each {
-                if (fieldErrors.get(it.field)) {
-                    fieldErrors.get(it.field).add(grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale))
-                } else {
-                    fieldErrors.put(it.field, [grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale)])
-                }
-            }
-            return fieldErrors.collect {
-                render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
-            }.join('')
+            return renderErrors(gormEntity.errors)
         } else {
-//            String rs = params.containsKey('recordState') && params['recordState'] ? '?recordState=' + params['recordState'] : ''
-
             if (redirectAction) {
                 render """__redirect__${urlMapped(Utils.getControllerName(redirectAction), redirectAction.method)}/${params.id ?: gormEntity.ident() ?: ''}"""
             } else render """__reload__"""
@@ -277,19 +264,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
     def displayBlockOrRenderErrors(final GormEntity gormEntity, final UiBlockSpecifier blockSpecifier) {
         if (gormEntity.hasErrors()) {
-            Errors errors = gormEntity.errors
-
-            Map<String, List<String>> fieldErrors = [:]
-            errors.fieldErrors.each {
-                if (fieldErrors.get(it.field)) {
-                    fieldErrors.get(it.field).add(grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale))
-                } else {
-                    fieldErrors.put(it.field, [grailsAttributes.messageSource.getMessage(it, LocaleContextHolder.locale)])
-                }
-            }
-            fieldErrors.collect {
-                render """__ErrorKeyStart__${it.key}:<ul class="errorKey">${it.value.collect { """<li class="errorEntry">$it</li>""" }.join('')}</ul>__ErrorKeyEnd__"""
-            }.join('')
+            return renderErrors(gormEntity.errors)
         } else {
             taackUiService.visit(blockSpecifier)
         }
