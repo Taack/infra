@@ -578,7 +578,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             }
         }
 
-        boolean isParamsEquals = !params && cp.isEmpty()
+        boolean isParamsEquals = cp.isEmpty()
 
         if (params) {
             Map<String, ?> p = [:]
