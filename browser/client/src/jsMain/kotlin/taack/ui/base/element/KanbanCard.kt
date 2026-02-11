@@ -7,13 +7,13 @@ import taack.ui.base.Helper
 import web.events.EventHandler
 import web.html.HTMLDivElement
 
-class Card(val parent: KanbanColumn, val d: HTMLDivElement):
+class KanbanCard(val parent: KanbanColumn, val d: HTMLDivElement):
     BaseElement {
     companion object {
-        fun getSiblingCard(p: KanbanColumn): List<Card> {
+        fun getSiblingCard(p: KanbanColumn): List<KanbanCard> {
             val elements: List<*> = p.d.querySelectorAll("div.kanban-card").asList()
             return elements.map {
-                Card(p, it as HTMLDivElement)
+                KanbanCard(p, it as HTMLDivElement)
             }
         }
     }
@@ -21,7 +21,7 @@ class Card(val parent: KanbanColumn, val d: HTMLDivElement):
     val cardId = d.attributes.getNamedItem("cardid")!!.value
 
     init {
-        Helper.traceIndent("Card::init +++ cardId: $cardId")
+        Helper.traceIndent("KanbanCard::init +++ cardId: $cardId")
         if (cardId != "") {
             d.ondragstart = EventHandler {
                 parent.parent.draggedItem = this
@@ -39,6 +39,7 @@ class Card(val parent: KanbanColumn, val d: HTMLDivElement):
                 }, 0)
             }
         }
+        Helper.traceDeIndent("KanbanCard::init --- cardId: $cardId")
     }
 
     override fun getParentBlock(): Block {

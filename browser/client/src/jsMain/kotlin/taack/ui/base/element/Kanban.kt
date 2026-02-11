@@ -19,13 +19,14 @@ class Kanban(val parent: AjaxBlock, val d: HTMLDivElement):
     private val kanbanColumns: List<KanbanColumn>?
     val kanbanId = d.attributes.getNamedItem("taackKanbanid")!!.value
     val filter: Filter
-    var draggedItem: Card? = null
+    var draggedItem: KanbanCard? = null
     var sourceColumn: KanbanColumn? = null
 
     init {
         Helper.traceIndent("Kanban::init +++ kanbanId: $kanbanId")
         kanbanColumns = KanbanColumn.getSiblingKanbanColumn(this)
         filter = parent.filters[kanbanId + parent.blockId]!!
+        Helper.traceDeIndent("Kanban::init --- kanbanId: $kanbanId")
     }
 
     override fun getParentBlock(): Block {

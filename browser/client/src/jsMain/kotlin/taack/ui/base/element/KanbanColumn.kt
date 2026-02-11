@@ -23,12 +23,12 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
         }
     }
 
-    private var cards: List<Card>?
+    private var kanbanCards: List<KanbanCard>?
     private val dropAction = d.attributes.getNamedItem("taackDropAction")!!.value
 
     init {
         Helper.traceIndent("KanbanColumn::init +++")
-        cards = Card.getSiblingCard(this)
+        kanbanCards = KanbanCard.getSiblingCard(this)
         if (dropAction != "") {
             d.ondragover = EventHandler { e ->
                 e.preventDefault()
@@ -59,6 +59,7 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
                 }
             }
         }
+        Helper.traceDeIndent("KanbanColumn::init ---")
     }
 
     override fun getParentBlock(): Block {
