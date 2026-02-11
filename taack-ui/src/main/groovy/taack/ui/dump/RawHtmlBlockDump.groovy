@@ -316,7 +316,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitKanban(String id, UiKanbanSpecifier kanbanSpecifier) {
         blockLog.stayBlock('visitKanban ' + id)
-        kanbanSpecifier.visitKanban(new RawHtmlKanbanDump(blockLog, id, parameter))
+        kanbanSpecifier.visitKanbanWithoutFilter(new RawHtmlKanbanDump(blockLog, id, parameter))
     }
 
     @Override

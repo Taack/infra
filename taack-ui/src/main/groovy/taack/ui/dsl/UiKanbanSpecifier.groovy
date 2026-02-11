@@ -42,4 +42,18 @@ final class UiKanbanSpecifier {
         }
     }
 
+    /**
+     * Allow to visit the kanban.
+     *
+     * @param kanbanVisitor
+     */
+    void visitKanbanWithoutFilter(final IUiKanbanVisitor kanbanVisitor) {
+        if (kanbanVisitor && closure) {
+            closure.delegate = new KanbanSpec(kanbanVisitor)
+            kanbanVisitor.visitKanbanWithoutFilter()
+            closure.call()
+            kanbanVisitor.visitKanbanEnd()
+        }
+    }
+
 }

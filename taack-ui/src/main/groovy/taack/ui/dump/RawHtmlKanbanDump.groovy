@@ -55,6 +55,40 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     }
 
     @Override
+    void visitKanbanWithoutFilter() {
+        blockLog.enterBlock('visitKanban')
+        HTMLDiv kanbanDiv = new HTMLDiv().builder.addClasses('row gx-2').setTaackTag(TaackTag.KANBAN).putAttribute('taackKanbanId', blockId).build() as HTMLDiv
+        blockLog.topElement.builder.addChildren(kanbanDiv)
+        blockLog.topElement = kanbanDiv
+
+//        List<HTMLInput> inputList = []
+
+        parameter.paramsToKeep.each {
+            if (it.value instanceof Collection || it.value instanceof String[]) {
+                it.value.eachWithIndex { v, i ->
+                    mapAdditionalHiddenParams.put(it.key + "[$i]", new HTMLInput(InputType.HIDDEN, v, it.key + "[$i]"))
+                }
+            } else {
+                mapAdditionalHiddenParams.put(it.key, new HTMLInput(InputType.HIDDEN, it.value, it.key))
+            }
+        }
+
+        if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
+        if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
+        if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
+        if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
+        if (parameter.beanId) mapAdditionalHiddenParams.put 'id', new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id')
+        if (parameter.applicationTagLib.params['grouping']) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping')
+        if (parameter.fieldName) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
+        if (parameter.tabIndex != null) mapAdditionalHiddenParams.put 'tabIndex', new HTMLInput(InputType.HIDDEN, parameter.tabIndex, 'tabIndex')
+
+        initialForm.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()
+
+        blockLog.topElement.builder.addChildren(initialForm)
+        blockLog.topElement = kanbanDiv
+    }
+
+    @Override
     void visitColumn(MethodClosure action, Map<String, ? extends Object> params) {
         blockLog.enterBlock('visitColumn')
         HTMLDiv columnDiv = new HTMLDiv().builder.addClasses('kanban-column col m-2')

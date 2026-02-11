@@ -13,6 +13,8 @@ import java.text.NumberFormat
 interface IUiKanbanVisitor {
     void visitKanban()
 
+    void visitKanbanWithoutFilter()
+
     void visitKanbanEnd()
 
     void visitColumn(MethodClosure action, Map<String, ? extends Object> params)

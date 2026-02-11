@@ -5,9 +5,11 @@ import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
 import web.cssom.ClassName
+import web.dom.document
 import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLDivElement
+import web.html.HTMLFormElement
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
 import web.http.POST
@@ -51,7 +53,7 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
                         if (xhr.readyState == xhr.DONE) {
                             checkLogin(xhr)
                             d.classList.remove(ClassName("kanban-loading"))
-                            if (parent.filter != null) Helper.filterForm(parent.filter, null, null)
+                            Helper.filterForm(parent.filter, null, null)
                         }
                     }
                     xhr.open(RequestMethod.POST, dropAction)
