@@ -51,7 +51,7 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
                         if (xhr.readyState == xhr.DONE) {
                             checkLogin(xhr)
                             d.classList.remove(ClassName("kanban-loading"))
-                            Helper.filterForm(parent.filter, null, null)
+                            if (parent.filter != null) Helper.filterForm(parent.filter, null, null)
                         }
                     }
                     xhr.open(RequestMethod.POST, dropAction)
