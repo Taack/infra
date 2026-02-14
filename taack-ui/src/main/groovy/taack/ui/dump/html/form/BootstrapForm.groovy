@@ -164,7 +164,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, (multiple || !nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, (!nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
         el.addChildren(s)
         if (disable) {
             options.currents?.each { IEnumOption it ->

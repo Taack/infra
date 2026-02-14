@@ -131,7 +131,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+                blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, isNullable)
             } else if (isListOrSet) {
                 if (field.fieldConstraint.field.genericType instanceof ParameterizedType) {
                     final ParameterizedType parameterizedType = field.fieldConstraint.field.genericType as ParameterizedType
@@ -139,10 +139,10 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                     final Class actualClass = Class.forName(actualType.typeName)
                     final boolean isEnumListOrSet = actualClass.isEnum()
                     if (isEnumListOrSet) {
-                        blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(actualClass as Class<Enum>, qualifiedName, field.value as Enum[]), true, isFieldDisabled, field.fieldConstraint.nullable)
+                        blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(actualClass as Class<Enum>, qualifiedName, field.value as Enum[]), true, isFieldDisabled, isNullable)
                     } else {
                         String[] values = actualClass.invokeMethod(ST_LIST, null)[ST_ID] as String[]
-                        blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+                        blockLog.topElement = formThemed.selects(blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, values), isListOrSet, isFieldDisabled, isNullable)
                     }
                 }
             }
