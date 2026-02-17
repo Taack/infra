@@ -7,6 +7,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.hibernate.SessionFactory
 import org.hibernate.query.Query
 import org.springframework.beans.factory.annotation.Value
+import taack.ast.type.FieldInfo
 
 import java.nio.file.Files
 
@@ -188,4 +189,29 @@ final class TaackMetaModelService {
         def p = "${exeDotPath} -Tsvg ${f.path}".execute()
         p.text
     }
+
+    /**
+     * List Embedding Objects From Field Info List, where the Field Info Value is not null
+     *
+     * @param fields
+     * @param constrainedIds: Constraints on Field Info Values
+     * @return List of Embedding Objects
+     */
+    Collection<? extends GormEntity> listEmbeddingObjectsFromFieldInfoListNotNull(Collection<FieldInfo<? extends GormEntity>> fields, Collection<Long> constrainedIds = null) {
+        List<? extends GormEntity> res = []
+        fields.each {
+            final boolean isListOrSet = Collection.isAssignableFrom(it.fieldConstraint.field.type)
+            def q = "from ${it.fieldConstraint.field.declaringClass.typeName} as c where ${isListOrSet ? "c.${it.fieldName} is not empty" : "c.${it.fieldName} <> null"}"
+
+            if (constrainedIds && !constrainedIds.empty) {
+                q += " and c.${it.fieldName} in (${constrainedIds.join(',')}) "
+            }
+            Query<? extends GormEntity> query = sessionFactory.currentSession.createQuery(q, it.fieldConstraint.field.declaringClass) as Query<? extends GormEntity>
+            query.list()
+
+            res.addAll(query.list())
+        }
+        res
+    }
+
 }
