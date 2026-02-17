@@ -201,13 +201,14 @@ final class TaackMetaModelService {
         List<? extends GormEntity> res = []
         fields.each {
             final boolean isListOrSet = Collection.isAssignableFrom(it.fieldConstraint.field.type)
-            def q = "from ${it.fieldConstraint.field.declaringClass.typeName} as c where ${isListOrSet ? "c.${it.fieldName} is not empty" : "c.${it.fieldName} <> null"}"
 
+            String q = "from ${it.fieldConstraint.field.declaringClass.typeName} as c where ${isListOrSet ? "c.${it.fieldName} is not empty" : "c.${it.fieldName} <> null"}"
             if (constrainedIds && !constrainedIds.empty) {
-                q += " and c.${it.fieldName} in (${constrainedIds.join(',')}) "
+                q = "select c from ${it.fieldConstraint.field.declaringClass.typeName} as c inner join c.${it.fieldName} as r where r.id in (?1)"
             }
+
             Query<? extends GormEntity> query = sessionFactory.currentSession.createQuery(q, it.fieldConstraint.field.declaringClass) as Query<? extends GormEntity>
-            query.list()
+            if (constrainedIds && !constrainedIds.empty) query = query.setParameter(1, constrainedIds)
 
             res.addAll(query.list())
         }
