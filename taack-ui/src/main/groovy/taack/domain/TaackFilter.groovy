@@ -294,7 +294,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                         where << ("sc.${filterExpression.fieldName} IS NULL" as String)
                         occ++
                     } else {
-                        if (filterExpression.value instanceof Long || filterExpression.value instanceof Boolean) {
+                        if (filterExpression.value instanceof Boolean || filterExpression.value instanceof Number) {
                             where << ("sc.${filterExpression.fieldName} = ${filterExpression.value}" as String)
                             occ++
                         } else if (filterExpression.value) {
