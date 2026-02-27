@@ -107,16 +107,16 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         dataPerKey.put(key, dataMap)
     }
 
-    void initDiagramResolution(boolean squareResolution = false) {
+    void initDiagramResolution() {
         diagramOption ?= new DiagramOption()
         if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
             if (!diagramOption.resolution) {
-                diagramOption.setResolution(squareResolution ? DiagramOption.DiagramResolution.SQUARE_HIGH : DiagramOption.DiagramResolution.DEFAULT_2K)
+                diagramOption.setResolution(DiagramOption.DiagramResolution.DEFAULT_2K)
             }
             render = new PngDiagramRender(diagramOption.resolution)
         } else {
             if (!diagramOption.resolution) {
-                diagramOption.setResolution(squareResolution ? DiagramOption.DiagramResolution.SQUARE : DiagramOption.DiagramResolution.DEFAULT_540P)
+                diagramOption.setResolution(DiagramOption.DiagramResolution.DEFAULT_540P)
             }
             render = new SvgDiagramRender(diagramOption.resolution, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         }
@@ -156,7 +156,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitPieDiagram(boolean hasSlice) {
-        initDiagramResolution(true)
+        initDiagramResolution()
         scene = new PieDiagramScene(render, dataPerKey, diagramOption, hasSlice)
         scene.draw()
     }
