@@ -113,7 +113,7 @@ class CalendarController {
 
                                     rowTree(true) {
                                         rowColumn(2) {
-                                            rowField(dayNames[dowIt] + " (${c.get(Calendar.MONTH)}/${c.get(Calendar.DAY_OF_MONTH)})")
+                                            rowField(dayNames[dowIt] + " (${c.get(Calendar.MONTH) + 1}/${c.get(Calendar.DAY_OF_MONTH)})")
                                         }
                                     }
                                     c.set(Calendar.DAY_OF_WEEK, dowIt)
@@ -128,8 +128,26 @@ class CalendarController {
                                             if (eventIt.fromDate >= dayStart && eventIt.fromDate <= dayEnd || eventIt.toDate >= dayStart && eventIt.toDate <= dayEnd)
                                                 rowTree(false) {
                                                     rowColumn {
-                                                        rowField eventIt.fromDate, null, Style.ALIGN_RIGHT
-                                                        rowField eventIt.toDate, null, Style.ALIGN_RIGHT
+                                                        Calendar displayDate = Calendar.getInstance()
+                                                        displayDate.setTime(eventIt.fromDate)
+                                                        int m1 = displayDate.get(Calendar.MINUTE)
+                                                        int mo1 = displayDate.get(Calendar.MONTH)
+                                                        int h1 = displayDate.get(Calendar.HOUR_OF_DAY)
+                                                        int d1 = displayDate.get(Calendar.DAY_OF_YEAR)
+                                                        int dm1 = displayDate.get(Calendar.DAY_OF_MONTH)
+                                                        int y1 = displayDate.get(Calendar.YEAR)
+                                                        displayDate.setTime(eventIt.toDate)
+                                                        int m2 = displayDate.get(Calendar.MINUTE)
+                                                        int mo2 = displayDate.get(Calendar.MONTH)
+                                                        int h2 = displayDate.get(Calendar.HOUR_OF_DAY)
+                                                        int d2 = displayDate.get(Calendar.DAY_OF_YEAR)
+                                                        int dm2 = displayDate.get(Calendar.DAY_OF_MONTH)
+                                                        int y2 = displayDate.get(Calendar.YEAR)
+                                                        if (y2 == y1 && d2 == d1) {
+                                                            rowField "$h1:$m1 -> $h2:$m2"
+                                                        } else {
+                                                            rowField "${String.format('%02d', mo1)}/${String.format('%02d', dm1)} ${String.format('%02d', h1)}:${String.format('%02d', m1)} -> ${String.format('%02d', mo2)}/${String.format('%02d', dm2)} ${String.format('%02d', h2)}:${String.format('%02d', m2)}"
+                                                        }
                                                     }
                                                     rowField eventIt.title, Style.BOLD
                                                 }
