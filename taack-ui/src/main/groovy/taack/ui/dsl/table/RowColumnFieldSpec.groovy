@@ -37,7 +37,7 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowField(final Date value, DateFormat locale = null, final Style style = null) {
-        tableVisitor.visitRowField(value, locale, style)
+        tableVisitor.visitRowField(value, locale ?: DateFormat.getInstance(), style)
     }
 
     void rowField(final Number value, NumberFormat nf, final Style style = Style.ALIGN_RIGHT) {
