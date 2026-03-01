@@ -20,8 +20,6 @@
     int paddingAfter = (7 - (totalCells % 7)) % 7
     totalCells += paddingAfter
 
-    System.out.println("AUO 111")
-
     // Previous month info for padding
     Calendar prevCal = Calendar.getInstance()
     prevCal.set(Calendar.YEAR, calendarParams.year)

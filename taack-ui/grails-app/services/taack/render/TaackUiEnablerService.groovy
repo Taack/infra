@@ -2,7 +2,9 @@ package taack.render
 
 import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
+import grails.validation.Validateable
 import grails.web.api.WebAttributes
+import grails.web.databinding.DataBinder
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
@@ -13,6 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.helper.Utils
+
+import java.lang.reflect.Constructor
+import java.lang.reflect.Method
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.
@@ -38,7 +43,7 @@ import taack.ui.dsl.helper.Utils
  * }</pre>
  */
 @GrailsCompileStatic
-class TaackUiEnablerService implements WebAttributes {
+class TaackUiEnablerService implements WebAttributes, DataBinder {
 
     static lazyInit = false
 
@@ -78,6 +83,23 @@ class TaackUiEnablerService implements WebAttributes {
         }
     }
 
+    private boolean checkValidateableValidity(final String controller, final String action, Map params) {
+        if (!params?.isEmpty()) {
+            Class controllerClass = grailsApplication.getArtefactByLogicalPropertyName("Controller", controllerName).clazz
+            Method m = controllerClass.getDeclaredMethods().find { it.name == actionName}
+            if (m.parameters.size() == 1) {
+                java.lang.reflect.Parameter p = m.parameters[0]
+                if (Validateable.isAssignableFrom(p.type)) {
+                    Constructor c = p.type.getDeclaredConstructor()
+                    Validateable v = c.newInstance() as Validateable
+                    bindData(v, params)
+                    return v.validate()
+                }
+            }
+        }
+        return true
+    }
+
     /**
      * Check if the action is allowed
      *
@@ -87,7 +109,10 @@ class TaackUiEnablerService implements WebAttributes {
      * @param params
      * @return true if allowed, false if not
      */
-    boolean hasAccess(final String controller, final String action, final Long id, Map params) {
+    boolean hasAccess(final String controller, final String action, final Long id, Map params, boolean fromWeb = true) {
+
+        if (fromWeb && !id && !checkValidateableValidity(controller, action, params)) return false
+
         Authentication authContext = SecurityContextHolder.getContext().getAuthentication()
         if (!authContext?.authenticated) {
             return true
@@ -128,7 +153,7 @@ class TaackUiEnablerService implements WebAttributes {
      * @return
      */
     boolean hasAccess(final MethodClosure methodClosure, Long id = null, Map params = null) {
-        hasAccess(Utils.getControllerName(methodClosure), methodClosure.method, id, params)
+        hasAccess(Utils.getControllerName(methodClosure), methodClosure.method, id, params, false)
     }
 
     /**
@@ -138,7 +163,7 @@ class TaackUiEnablerService implements WebAttributes {
      * @return
      */
     boolean hasAccess(final MethodClosure methodClosure, Map params) {
-        hasAccess(Utils.getControllerName(methodClosure), methodClosure.method, null, params)
+        hasAccess(Utils.getControllerName(methodClosure), methodClosure.method, null, params, false)
     }
 
     /**

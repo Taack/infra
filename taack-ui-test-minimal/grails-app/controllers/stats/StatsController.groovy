@@ -25,6 +25,21 @@ class StatsParams implements Validateable {
     Boolean groupPerMonth1 = true
     Boolean groupPerMonth2 = true
     Integer v = null
+
+    static constraints = {
+        v nullable: true, min: 0, max: 2
+    }
+
+    @Override
+    String toString() {
+        return "StatsParams{" +
+                "showMonthlyGraph1=" + showMonthlyGraph1 +
+                ", showMonthlyGraph2=" + showMonthlyGraph2 +
+                ", groupPerMonth1=" + groupPerMonth1 +
+                ", groupPerMonth2=" + groupPerMonth2 +
+                ", v=" + v +
+                '}'
+    }
 }
 
 @GrailsCompileStatic
@@ -67,9 +82,9 @@ class StatsController implements WebAttributes {
                     col BlockSpec.Width.HALF, {
                         card({ // Menu not refresh
                             label 'Sales1'
-                            menu 'Yearly', StatsController.&topCustomerSalesCard as MC, new StatsParams(showMonthlyGraph1: false)
-                            menu 'Monthly', StatsController.&topCustomerSalesCard as MC, new StatsParams(groupPerMonth1: false)
-                            menu 'Group by month', StatsController.&topCustomerSalesCard as MC, new StatsParams()
+                            menu 'Yearly', StatsController.&topCustomerSalesCard as MC, new StatsParams(showMonthlyGraph1: false, v: 1)
+                            menu 'Monthly', StatsController.&topCustomerSalesCard as MC, new StatsParams(groupPerMonth1: false, v: 1)
+                            menu 'Group by month', StatsController.&topCustomerSalesCard as MC, new StatsParams(v: 1)
                         }, {
                             diagram(statsService::buildChart1 as MC)
                         })

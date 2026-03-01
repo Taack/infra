@@ -83,8 +83,10 @@ final class MenuSpec {
     }
 
     void menu(String i18n = null, final MethodClosure action, Validateable validateable) {
-        Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
+        if (validateable?.validate()) {
+            Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
+            if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
+        }
     }
 
     /**
