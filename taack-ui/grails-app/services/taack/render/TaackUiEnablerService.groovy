@@ -18,6 +18,8 @@ import taack.ui.dsl.helper.Utils
 
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
+import java.lang.reflect.Parameter
+
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.
@@ -88,12 +90,14 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
             Class controllerClass = grailsApplication.getArtefactByLogicalPropertyName("Controller", controllerName).clazz
             Method m = controllerClass.getDeclaredMethods().find { it.name == actionName}
             if (m.parameters.size() == 1) {
-                java.lang.reflect.Parameter p = m.parameters[0]
+                Parameter p = m.parameters[0]
                 if (Validateable.isAssignableFrom(p.type)) {
                     Constructor c = p.type.getDeclaredConstructor()
                     Validateable v = c.newInstance() as Validateable
                     bindData(v, params)
-                    return v.validate()
+                    boolean ret = v.validate()
+                    if (!ret) log.warn("${v.errors}")
+                    return ret
                 }
             }
         }

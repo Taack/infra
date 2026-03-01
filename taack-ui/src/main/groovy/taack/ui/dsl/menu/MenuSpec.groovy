@@ -109,6 +109,15 @@ final class MenuSpec {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
     }
 
+    void menuIcon(final ActionIcon icon, final MethodClosure action, Validateable validateable) {
+        if (validateable?.validate()) {
+            Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
+            if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
+        } else {
+            println validateable?.errors
+        }
+    }
+
     void menuIcon(final String i18n, final ActionIcon icon, final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
         menuVisitor.visitMenuIconWithClosure(i18n, icon)
         closure.delegate = subMenuSpec

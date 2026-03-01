@@ -5,6 +5,7 @@ import grails.validation.Validateable
 import grails.web.api.WebAttributes
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -229,7 +230,7 @@ final class Parameter implements WebAttributes {
     final static <T extends Validateable> List<String> validateableToParamsToKeep(T validateable) {
         List<String> ret = []
         validateable.class.getDeclaredFields().each {
-            if (!it.name.contains('_') && ([Boolean, String, Date, Integer].contains(it.type) || it.type.isEnum())) {
+            if (!it.name.contains('_') && !it.name.contains('$') && ([Boolean, String, Date, Integer, Long].contains(it.type) || it.type.isEnum() || GormEntity.isAssignableFrom(it.type) || Collection.isAssignableFrom(it.type))) {
                 ret.add(it.name)
             }
         }

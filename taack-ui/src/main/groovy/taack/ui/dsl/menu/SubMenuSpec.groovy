@@ -1,11 +1,13 @@
 package taack.ui.dsl.menu
 
 import grails.util.Holders
+import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.render.TaackUiEnablerService
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.Parameter
 
 @CompileStatic
 final class SubMenuSpec {
@@ -25,6 +27,15 @@ final class SubMenuSpec {
      */
     void subMenu(String i18n, final MethodClosure action, final Map<String, ? extends Object> params = null) {
         if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
+    }
+
+    void subMenu(String i18n = null, final MethodClosure action, Validateable validateable) {
+        if (validateable?.validate()) {
+            Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
+            if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
+        } else {
+            println validateable?.errors
+        }
     }
 
     /**
