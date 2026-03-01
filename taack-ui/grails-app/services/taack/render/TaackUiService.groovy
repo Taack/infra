@@ -8,6 +8,7 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Pair
 import grails.util.Triple
+import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
@@ -253,6 +254,24 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     private final static Object decodeCookie(String encoded) {
         if (encoded) new JsonSlurper().parseText(URLDecoder.decode(new String(Base64.getDecoder().decode(encoded)), 'UTF-8'))
         else null
+    }
+
+    /**
+     * Render the block to the browser. Either the page is updated with the block content, either the
+     * full page is rendered if 'isAjax' params is true.
+     *
+     * @param block page descriptor
+     * @param menu menu descriptor
+     * @return
+     */
+    final void show(UiBlockSpecifier block, UiMenuSpecifier menu = null, Validateable validateable) {
+        if (!block) return
+        if (menu && !params.containsKey('refresh') && !params.containsKey('targetAjaxBlockId')) params.remove('isAjax')
+        if (params.boolean('isAjax')) {
+            visit(block, Parameter.validateableToParamsToKeep(validateable) as String[])
+        } else {
+            visitAndRender(menu, block, Parameter.validateableToParamsToKeep(validateable) as String[])
+        }
     }
 
     /**

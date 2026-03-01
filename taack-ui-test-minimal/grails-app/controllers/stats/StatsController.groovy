@@ -1,8 +1,8 @@
 package stats
 
-
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
+import grails.validation.Validateable
 import grails.web.api.WebAttributes
 import jakarta.annotation.PostConstruct
 import lodomain.TestInlineEdit
@@ -11,13 +11,21 @@ import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.block.BlockBase
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.test.RootController
 
 import static taack.ui.TaackUi.*
+
+@GrailsCompileStatic
+class StatsParams implements Validateable {
+    Boolean showMonthlyGraph1 = true
+    Boolean showMonthlyGraph2 = true
+    Boolean groupPerMonth1 = true
+    Boolean groupPerMonth2 = true
+    Integer v = null
+}
 
 @GrailsCompileStatic
 @Secured(['permitAll'])
@@ -40,46 +48,46 @@ class StatsController implements WebAttributes {
         testInlineEditList.add new TestInlineEdit(name: 'Magnum', age: 68, city: 'Hawaii', birthday: Date.from(calendar.toInstant()), status: TestStatus.NEW)
     }
 
-    def topCustomerSalesCard() {
-        boolean p0 = params.int('v') == 0
-        boolean p1 = params.int('v') == 1
-        boolean p2 = params.int('v') == 2
+    def topCustomerSalesCard(StatsParams statsParams) {
 
-        println "p0: $p0, p1: $p1, p2: $p2 $params"
-        BlockBase.debug = true
+        println params
+
+        boolean p0 = statsParams.v == 0
+        boolean p1 = statsParams.v == 1
+        boolean p2 = statsParams.v == 2
+
+        BlockBase.debug = false
 
         taackUiService.show(new UiBlockSpecifier().ui {
-                poke p0, { // Needed to refresh links with parameter to keep
-                    table statsService.buildTable()
-                }
-
-                row {
-                    poke p1, {
-                        col BlockSpec.Width.HALF, {
-                            card( { // Menu not refresh
-                                label 'Sales1'
-                                menu 'Yearly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'false', v: 0]
-                                menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'false']
-                                menu 'Group by month', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph1: 'true', v: 0, groupPerMonth1: 'true']
-
-                            }, {
-                                diagram(statsService::buildChart1 as MC)
-                            })
-                        }
+            poke p0, { // Needed to refresh links with parameter to keep
+                table statsService.buildTable()
+            }
+            row {
+                poke p1, {
+                    col BlockSpec.Width.HALF, {
+                        card({ // Menu not refresh
+                            label 'Sales1'
+                            menu 'Yearly', StatsController.&topCustomerSalesCard as MC, new StatsParams(showMonthlyGraph1: false)
+                            menu 'Monthly', StatsController.&topCustomerSalesCard as MC, new StatsParams(groupPerMonth1: false)
+                            menu 'Group by month', StatsController.&topCustomerSalesCard as MC, new StatsParams()
+                        }, {
+                            diagram(statsService::buildChart1 as MC)
+                        })
                     }
-                    poke p2, {
-                        col BlockSpec.Width.HALF, {
-                            diagram(statsService::buildChart2 as MC) {
-                                label 'Sales2'
-                                    menu 'Yearly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'false', v: 0, groupPerMonth2: 'false']
-                                    menu 'Group by month', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'true', v: 0, groupPerMonth2: 'true']
-                                    menu 'Monthly', StatsController.&topCustomerSalesCard as MC, [showMonthlyGraph2: 'true', v: 0, groupPerMonth2: 'false']
-                            }
+                }
+                poke p2, {
+                    col BlockSpec.Width.HALF, {
+                        diagram(statsService::buildChart2 as MC) {
+                            label 'Sales2'
+                            menu 'Yearly', StatsController.&topCustomerSalesCard as MC, new StatsParams(showMonthlyGraph2: false)
+                            menu 'Group by month', StatsController.&topCustomerSalesCard as MC, new StatsParams(groupPerMonth2: false)
+                            menu 'Monthly', StatsController.&topCustomerSalesCard as MC, new StatsParams()
                         }
                     }
                 }
+            }
             BlockBase.debug = false
-        }, RootController.buildMenu(),'showMonthlyGraph1', 'groupPerMonth1', 'showMonthlyGraph2', 'groupPerMonth2')
+        }, RootController.buildMenu(), statsParams)
     }
 
     def editTestInlineEdit(TestInlineEdit testInlineEdit) {
