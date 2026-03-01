@@ -67,6 +67,14 @@ class CalendarParams implements Validateable {
         new CalendarParams(year: year, month: CalendarMonth.values()[month.ordinal() + 1])
     }
 
+    @Override
+    String toString() {
+        return "CalendarParams{" +
+                "year=" + year +
+                ", month=" + month +
+                ", weekOfYear=" + weekOfYear +
+                '}'
+    }
 }
 
 @GrailsCompileStatic
@@ -109,7 +117,7 @@ class CalendarController {
         calendarParams ?= new CalendarParams()
         UiBlockSpecifier calendar = new UiBlockSpecifier().ui {
             custom(groovyPageRenderer.render(
-                    template: '/calendar/monthView2',
+                    template: '/calendar/monthView',
                     model: [
                             events        : calendarEvents,
                             calendarParams: calendarParams,
@@ -118,7 +126,6 @@ class CalendarController {
                 menu 'Prev', CalendarController.&fromCustom as MC, calendarParams.computePrevMonth()
                 menu 'Today', CalendarController.&fromCustom as MC, new CalendarParams()
                 menu 'Next', CalendarController.&fromCustom as MC, calendarParams.computeNextMonth()
-
             }
         }
 

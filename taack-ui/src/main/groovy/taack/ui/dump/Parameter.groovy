@@ -230,7 +230,7 @@ final class Parameter implements WebAttributes {
     final static <T extends Validateable> Map<String, ?> validateableToMap(T validateable) {
         Map<String, ? extends Object> ret = [:]
         validateable.class.getDeclaredFields().each {
-            if (!it.name.startsWith('_') && [String, Date].contains(it.type)) {
+            if (!it.name.contains('_') && ([String, Date, Integer].contains(it.type) || it.type.isEnum())) {
                 Object vo = validateable[it.name]
                 ret.put(it.name, vo)
             }
