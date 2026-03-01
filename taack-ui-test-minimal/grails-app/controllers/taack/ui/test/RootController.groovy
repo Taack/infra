@@ -1,8 +1,10 @@
 package taack.ui.test
 
+import calendar.CalendarController
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.runtime.MethodClosure as MC
+import stats.StatsController
 import stats.StatsService
 import taack.app.TaackApp
 import taack.app.TaackAppRegisterService
@@ -21,10 +23,14 @@ class RootController {
     TaackUiService taackUiService
     StatsService statsService
 
-    private static UiMenuSpecifier buildMenu() {
+    static UiMenuSpecifier buildMenu() {
         UiMenuSpecifier m = new UiMenuSpecifier()
         m.ui {
             menu this.&index as MC
+            menu StatsController.&topCustomerSalesCard as MC
+            menu StatsController.&listTestInlineEdit as MC
+            menu CalendarController.&fromCustom as MC
+            menu CalendarController.&fromUiTable as MC
         }
         m
     }

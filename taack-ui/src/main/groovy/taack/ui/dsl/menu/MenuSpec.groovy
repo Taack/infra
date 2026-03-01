@@ -1,6 +1,7 @@
 package taack.ui.dsl.menu
 
 import grails.util.Holders
+import grails.validation.Validateable
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
@@ -9,6 +10,7 @@ import taack.ui.IEnumOptions
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.Parameter
 
 @CompileStatic
 final class MenuSpec {
@@ -78,6 +80,11 @@ final class MenuSpec {
 
     void menu(String i18n = null, final MethodClosure action, Long id) {
         if (taackUiEnablerService.hasAccess(action, id)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), [id: id])
+    }
+
+    void menu(String i18n = null, final MethodClosure action, Validateable validateable) {
+        Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
+        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
     }
 
     /**

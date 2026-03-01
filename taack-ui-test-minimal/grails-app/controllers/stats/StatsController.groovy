@@ -15,6 +15,7 @@ import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.block.BlockBase
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.test.RootController
 
 import static taack.ui.TaackUi.*
 
@@ -39,16 +40,6 @@ class StatsController implements WebAttributes {
         testInlineEditList.add new TestInlineEdit(name: 'Magnum', age: 68, city: 'Hawaii', birthday: Date.from(calendar.toInstant()), status: TestStatus.NEW)
     }
 
-    static UiMenuSpecifier buildMenu() {
-        new UiMenuSpecifier().ui {
-            menu StatsController.&topCustomerSalesCard as MC
-            menu StatsController.&listTestInlineEdit as MC
-        }
-    }
-
-    def index() {
-        redirect(action: 'topCustomerSalesCard')
-    }
     def topCustomerSalesCard() {
         boolean p0 = params.int('v') == 0
         boolean p1 = params.int('v') == 1
@@ -88,7 +79,7 @@ class StatsController implements WebAttributes {
                     }
                 }
             BlockBase.debug = false
-        }, buildMenu(),'showMonthlyGraph1', 'groupPerMonth1', 'showMonthlyGraph2', 'groupPerMonth2')
+        }, RootController.buildMenu(),'showMonthlyGraph1', 'groupPerMonth1', 'showMonthlyGraph2', 'groupPerMonth2')
     }
 
     def editTestInlineEdit(TestInlineEdit testInlineEdit) {
@@ -151,7 +142,7 @@ class StatsController implements WebAttributes {
                     menuIcon ActionIcon.ADD, StatsController.&editTestInlineEdit as MC
                 }
             }
-        }, buildMenu())
+        }, RootController.buildMenu())
     }
 }
 

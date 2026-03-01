@@ -1,14 +1,18 @@
 package calendar
 
 import grails.compiler.GrailsCompileStatic
+import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.Validateable
+import groovy.transform.CompileStatic
 import jakarta.annotation.PostConstruct
+import org.codehaus.groovy.runtime.MethodClosure as MC
+import taack.ast.annotation.TaackFieldEnum
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
-
+import taack.ui.test.RootController
 
 @GrailsCompileStatic
 class CalendarEvent implements Validateable {
@@ -27,12 +31,51 @@ class CalendarEvent implements Validateable {
     }
 }
 
+@CompileStatic
+enum CalendarDow {
+    MON, TUE, WED, THU, FRI, SAT, SUN
+}
+
+@CompileStatic
+enum CalendarMonth {
+    JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
+}
+
+@TaackFieldEnum
+@GrailsCompileStatic
+class CalendarParams implements Validateable {
+
+    CalendarParams() {
+        Calendar now = Calendar.getInstance()
+        now.setFirstDayOfWeek(Calendar.MONDAY)
+        year = now.get(Calendar.YEAR)
+        month = CalendarMonth.values()[now.get(Calendar.MONTH)]
+        weekOfYear = now.get(Calendar.WEEK_OF_YEAR)
+    }
+
+    Integer year
+    CalendarMonth month
+    Integer weekOfYear
+
+    CalendarParams computePrevMonth() {
+        if (month.ordinal() == 0) return new CalendarParams(year: year - 1, month: CalendarMonth.values()[11])
+        new CalendarParams(year: year, month: CalendarMonth.values()[month.ordinal() - 1])
+    }
+
+    CalendarParams computeNextMonth() {
+        if (month.ordinal() == 11) return new CalendarParams(year: year + 1, month: CalendarMonth.values()[0])
+        new CalendarParams(year: year, month: CalendarMonth.values()[month.ordinal() + 1])
+    }
+
+}
+
 @GrailsCompileStatic
 @Secured(['permitAll'])
 class CalendarController {
 
     TaackUiService taackUiService
     List<CalendarEvent> calendarEvents = []
+    PageRenderer groovyPageRenderer
 
     static final Map<Integer, String> dayNames = [1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday']
 
@@ -44,10 +87,10 @@ class CalendarController {
         rightNow.set(Calendar.MINUTE, 0)
         rightNow.set(Calendar.SECOND, 0)
         Date today8 = rightNow.time
-        rightNow.set(Calendar.HOUR, 10)
+        rightNow.set(Calendar.HOUR_OF_DAY, 10)
         Date today10 = rightNow.time
         rightNow.add(Calendar.DAY_OF_WEEK, 1)
-        rightNow.add(Calendar.HOUR, -1)
+        rightNow.set(Calendar.HOUR_OF_DAY, 9)
         Date tomorrow9 = rightNow.time
         rightNow.add(Calendar.MINUTE, 30)
         Date tomorrow930 = rightNow.time
@@ -62,7 +105,27 @@ class CalendarController {
         println calendarEvents
     }
 
-    def index() {
+    def fromCustom(CalendarParams calendarParams) {
+        calendarParams ?= new CalendarParams()
+        UiBlockSpecifier calendar = new UiBlockSpecifier().ui {
+            custom(groovyPageRenderer.render(
+                    template: '/calendar/monthView2',
+                    model: [
+                            events        : calendarEvents,
+                            calendarParams: calendarParams,
+                    ]), null) {
+                label("${calendarParams.month} ${calendarParams.year}")
+                menu 'Prev', CalendarController.&fromCustom as MC, calendarParams.computePrevMonth()
+                menu 'Today', CalendarController.&fromCustom as MC, new CalendarParams()
+                menu 'Next', CalendarController.&fromCustom as MC, calendarParams.computeNextMonth()
+
+            }
+        }
+
+        taackUiService.show(calendar, RootController.buildMenu())
+    }
+
+    def fromUiTable() {
         taackUiService.show new UiBlockSpecifier().ui {
             table new UiTableSpecifier().ui {
                 header {
@@ -113,7 +176,7 @@ class CalendarController {
 
                                     rowTree(true) {
                                         rowColumn(2) {
-                                            rowField(dayNames[dowIt] + " (${c.get(Calendar.MONTH) + 1}/${c.get(Calendar.DAY_OF_MONTH)})")
+                                            rowField(this.dayNames[dowIt] + " (${c.get(Calendar.MONTH) + 1}/${c.get(Calendar.DAY_OF_MONTH)})")
                                         }
                                     }
                                     c.set(Calendar.DAY_OF_WEEK, dowIt)
@@ -161,6 +224,6 @@ class CalendarController {
                 }
 
             }
-        }
+        }, RootController.buildMenu()
     }
 }

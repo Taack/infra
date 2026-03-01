@@ -1,6 +1,7 @@
 package taack.ui.dump
 
 import grails.util.Pair
+import grails.validation.Validateable
 import grails.web.api.WebAttributes
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
@@ -223,5 +224,17 @@ final class Parameter implements WebAttributes {
 
     final String urlMapped() {
         urlMapped(controllerName, actionName)
+    }
+
+
+    final static <T extends Validateable> Map<String, ?> validateableToMap(T validateable) {
+        Map<String, ? extends Object> ret = [:]
+        validateable.class.getDeclaredFields().each {
+            if (!it.name.startsWith('_') && [String, Date].contains(it.type)) {
+                Object vo = validateable[it.name]
+                ret.put(it.name, vo)
+            }
+        }
+        ret
     }
 }

@@ -1,6 +1,7 @@
 /*
 *= require_self
 *= require custom-gantt
+*= require custom-calendar
 */
 
 a[ajaxaction], .nav-link, .table-link, .page-link, .sortColumn, input[taackajaxformm2maction], input[taackajaxformm2oaction] {
