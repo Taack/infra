@@ -15,7 +15,7 @@ import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
 import web.history.history
-import web.html.HTMLDivElement
+import web.html.HTMLSpanElement
 import web.http.GET
 import web.http.RequestMethod
 import web.location.location
@@ -24,13 +24,13 @@ import web.xhr.XMLHttpRequestResponseType
 import web.xhr.blob
 import kotlin.math.min
 
-class KanbanCard(val parent: KanbanColumn, val d: HTMLDivElement):
+class KanbanCard(val parent: KanbanColumn, val d: HTMLSpanElement):
     BaseElement {
     companion object {
         fun getSiblingCard(p: KanbanColumn): List<KanbanCard> {
-            val elements: List<*> = p.d.querySelectorAll("div.kanban-card").asList()
+            val elements: List<*> = p.d.querySelectorAll("span.kanban-card").asList()
             return elements.map {
-                KanbanCard(p, it as HTMLDivElement)
+                KanbanCard(p, it as HTMLSpanElement)
             }
         }
     }
