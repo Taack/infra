@@ -64,6 +64,20 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         grailsApplication.mainContext.getBean(ApplicationTagLib).createLink(controller: controller, action: action, params: p)
     }
 
+    final String urlMapped(String controller, String action, Validateable validateable, boolean isAjax = false) {
+        def p = params
+        if (isAjax && params && !params.containsKey('isAjax')) {
+            p = new HashMap<String, Object>()
+            validateable.class.getDeclaredFields().each {
+                params.containsKey(it.name)
+                p.put(it.name, params[it.name])
+            }
+//            p.remove('recordState')
+            p.put('isAjax', true)
+        }
+        grailsApplication.mainContext.getBean(ApplicationTagLib).createLink(controller: controller, action: action, params: p)
+    }
+
     static Class beanRealClass(Object entity) {
         beanReal(entity).class
     }
@@ -240,6 +254,16 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             return renderErrors(validateable.errors)
         } else {
             render """__reload__"""
+        }
+    }
+
+    def redirectOrRenderErrors(Validateable validateable, final MC redirectAction = null) {
+        if (validateable.hasErrors()) {
+            return renderErrors(validateable.errors)
+        } else {
+            if (redirectAction) {
+                render """__redirect__${urlMapped(Utils.getControllerName(redirectAction), redirectAction.method, validateable)}"""
+            } else render """__reload__"""
         }
     }
 
