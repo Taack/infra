@@ -59,6 +59,7 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
                 }
             }
         }
+        d.oncontextmenu = EventHandler { e -> e.preventDefault() }
         Helper.traceDeIndent("KanbanColumn::init ---")
     }
 

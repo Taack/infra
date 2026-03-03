@@ -505,6 +505,7 @@ li:hover > .nested-dropdown{
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 .kanban-card {
+    display: block;
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     margin-bottom: 1rem;
@@ -556,6 +557,6 @@ li:hover > .nested-dropdown{
     z-index: 20;
 }
 
-span[taackcontextualmenu] {
+span[taackcontextualmenu]:not(.kanban-card) {
     cursor: pointer;
 }
