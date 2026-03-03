@@ -25,6 +25,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
     private var tabs: List<Tab>
     val blockId: String
     private var modalNumber = 0
+    var activeContextMenu: HTMLDivElement? = null
 
     init {
         val tmpBlockId = d.attributes.getNamedItem("blockId")?.value

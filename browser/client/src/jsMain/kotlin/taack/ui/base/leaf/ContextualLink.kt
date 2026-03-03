@@ -8,17 +8,15 @@ import taack.ui.base.LeafElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
 import taack.ui.base.element.Filter
+import web.components.HTMLTemplateElement
 import web.cssom.ClassName
-import web.dom.Document
+import web.dom.DocumentFragment
 import web.dom.document
 import web.events.EventHandler
 import web.form.FormData
 import web.html.*
 import web.http.GET
 import web.http.RequestMethod
-import web.parsing.DOMParser
-import web.parsing.DOMParserSupportedType
-import web.parsing.textHtml
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
 
@@ -47,15 +45,14 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
         }
     }
 
-    private var activeContextMenu: HTMLDivElement? = null
     private val contextCloseCallback = EventHandler {
         closeContextMenu()
     }
     private fun closeContextMenu() {
         console.log("close")
-        activeContextMenu?.let { document.body.removeChild(it) }
+        parent.activeContextMenu?.let { document.body.removeChild(it) }
         (document.asDynamic()).removeEventListener("click", contextCloseCallback)
-        activeContextMenu = null
+        parent.activeContextMenu = null
     }
 
     private fun buildCopyDropdown(a: HTMLElement): HTMLElement? {
@@ -102,6 +99,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
 
     init {
         a.oncontextmenu = EventHandler { e ->
+            e.stopPropagation()
             e.preventDefault() //Block default context menu
             closeContextMenu() // Close context if already opened
             val xhr = XMLHttpRequest()
@@ -109,28 +107,25 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
             xhr.onload = EventHandler {
                 checkLogin(xhr)
                 if (xhr.status == 200.toShort()) {
-                    val parser = DOMParser()
-                    val response = parser.parseFromString(xhr.responseText, DOMParserSupportedType.textHtml)
-                    buildCopyDropdown(a)?.let { response.querySelector("ul")?.append(it) }
+                    val template = document.createElement("template") as HTMLTemplateElement
+                    template.innerHTML = xhr.responseText
+                    val fragment = template.content
+                    buildCopyDropdown(a)?.let { fragment.querySelector("ul")?.append(it) }
                     val contextMenu = document.createElement("div") as HTMLDivElement
                     contextMenu.className = ClassName("custom-context-menu")
                     contextMenu.style.apply {
                         position = "absolute"
-                        document.body.appendChild(contextMenu)
                         val maxX = window.innerWidth + window.scrollX - contextMenu.offsetWidth
                         val maxY = window.innerHeight + window.scrollY - contextMenu.offsetHeight
                         left = "${min(e.pageX, maxX)}px"
                         top = "${min(e.pageY, maxY)}px"
                         zIndex = "9999"
                     }
-                    addIdToAnchors(response, id, getFilterFormDataOrNull(a))
-                    contextMenu.append(response.body)
-                    activeContextMenu = contextMenu
-                    document.body.appendChild(activeContextMenu!!)
+                    addIdToAnchors(fragment, id, getFilterFormDataOrNull(a))
+                    contextMenu.appendChild(fragment)
+                    parent.activeContextMenu = contextMenu
+                    document.body.appendChild(parent.activeContextMenu!!)
                     (document.asDynamic()).addEventListener("click", contextCloseCallback)
-                    activeContextMenu?.onmouseleave = EventHandler {
-                        closeContextMenu()
-                    }
                     ContextualLinkEntry.getDropdownMenu(parent)
                 }
             }
@@ -139,8 +134,8 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
     }
 
 
-    private fun addIdToAnchors(doc: Document, id: Long, formData: FormData?) {
-        doc.querySelectorAll("a").asList().forEach { anchor ->
+    private fun addIdToAnchors(fragment: DocumentFragment, id: Long, formData: FormData?) {
+        fragment.querySelectorAll("a").asList().forEach { anchor ->
             val anchorElement = anchor as HTMLAnchorElement
             val currentHref = anchorElement.href
             if (currentHref.isNotEmpty()) {
@@ -158,10 +153,10 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
 
     private fun getFilterFormDataOrNull(span: HTMLSpanElement): FormData? { // If span is in a table with filter, return the formData of the filter
         var formData: FormData? = null
-        val t = span.closest("table[taacktableid]") as HTMLTableElement?
+        val t = span.closest("[taacktableid], [taackkanbanid]")
         val div = span.closest("div[ajaxblockid]") as HTMLDivElement?
         if (t != null && div != null) {
-            val tId = t.getAttribute("taacktableid")!!
+            val tId = t.getAttribute("taacktableid") ?: t.getAttribute("taackkanbanid")
             val ajaxBlockId = div.getAttribute("ajaxblockid")!!
             if (t.nextElementSibling == null) { // Exclude the case where the table has no filter
                 val filter: Filter? = parent.ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)

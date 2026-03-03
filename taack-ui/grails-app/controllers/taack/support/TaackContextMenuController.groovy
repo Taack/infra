@@ -12,6 +12,6 @@ class TaackContextMenuController implements WebAttributes {
 
     def index() {
         UiMenuSpecifier m = TaackUiService.contextualMenuClosureFromClassName(params.get('className') as String, params.get('fieldName') as String)
-        TaackUiService.visitContextualMenu(response.outputStream, m, params.long('id'))
+        if (m) TaackUiService.visitContextualMenu(response.outputStream, m, params.long('id')) else render "<ul></ul>"
     }
 }
