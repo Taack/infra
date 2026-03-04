@@ -2,6 +2,7 @@ package taack.ui.dsl.kanban
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
@@ -23,7 +24,7 @@ interface IUiKanbanVisitor {
 
     void visitColumnHeader(String i18n, Style style)
 
-    void visitCard(FieldInfo cardId, MethodClosure action, Map<String, ? extends Object> params)
+    void visitCard(GormEntity gorm, MethodClosure action, Map<String, ? extends Object> params)
 
     void visitCardEnd()
 

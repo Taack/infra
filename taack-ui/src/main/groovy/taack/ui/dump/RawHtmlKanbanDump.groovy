@@ -2,6 +2,7 @@ package taack.ui.dump
 
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
@@ -113,17 +114,13 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     }
 
     @Override
-    void visitCard(FieldInfo cardId, MethodClosure action, Map<String, ? extends Object> params) {
+    void visitCard(GormEntity gorm, MethodClosure action, Map<String, ? extends Object> params) {
         blockLog.enterBlock('visitCard')
-        String cardIdValue = null
-        if (cardId?.value != null) {
-            cardIdValue = cardId.fieldName == 'selfObject' ? cardId.value['id']?.toString() : cardId.value.toString()
-        }
         HTMLSpan cardSpan = new HTMLSpan().builder.addClasses('kanban-card').setTaackTag(TaackTag.KANBAN_CARD)
                 .putAttribute('taackDbClickAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
-                .putAttribute('cardId', cardIdValue ?: '')
+                .putAttribute('cardId', gorm ? gorm.ident().toString() : '')
                 .putAttribute('draggable', 'true').build() as HTMLSpan
-        if (cardIdValue) cardSpan.builder.putAttribute('taackcontextualmenu', "${cardId.fieldConstraint.field.declaringClass.simpleName};${cardId.fieldName};$cardIdValue").build()
+        if (gorm) cardSpan.builder.putAttribute('taackcontextualmenu', "${gorm.class.simpleName};null;${gorm.ident()}").build()
         blockLog.topElement.builder.addChildren(cardSpan)
         blockLog.topElement = cardSpan
     }
