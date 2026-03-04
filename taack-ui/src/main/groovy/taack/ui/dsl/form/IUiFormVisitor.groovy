@@ -67,4 +67,5 @@ interface IUiFormVisitor {
 
     void visitFormTabEnd()
 
+    void visitReadOnly(String i18n, FieldInfo fieldInfo)
 }

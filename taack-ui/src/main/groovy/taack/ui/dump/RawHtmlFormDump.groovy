@@ -228,6 +228,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
+    void visitReadOnly(String i18n, FieldInfo field) {
+        final String trI18n = i18n ?: parameter.trField(field)
+        blockLog.topElement = formThemed.normalInput(blockLog.topElement, field.fieldName, trI18n, true, true, field.value?.toString())
+    }
+
+    @Override
     void visitFormAction(String i18n, String url, ButtonStyle style) {
         formActions.add new Triple<String, ButtonStyle, String>(i18n, style, url)
     }

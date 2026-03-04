@@ -138,6 +138,11 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
+    void visitReadOnly(String i18n, FieldInfo fieldInfo) {
+
+    }
+
+    @Override
     void visitReadOnly(String i18n, String value) {
 
     }

@@ -77,6 +77,10 @@ class FormAjaxFieldSpec extends FormVisitable {
         formVisitor.visitReadOnly(i18n, value)
     }
 
+    void readOnly(final String i18n = null, final FieldInfo field) {
+        formVisitor.visitReadOnly(i18n, field)
+    }
+
     void field(final String i18n = null, final FieldInfo field) {
         formVisitor.visitFormField(i18n, field)
     }
