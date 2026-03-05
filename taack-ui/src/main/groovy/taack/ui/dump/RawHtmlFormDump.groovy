@@ -13,6 +13,7 @@ import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.ButtonStyle
 import taack.ui.dump.html.element.HTMLInput
+import taack.ui.dump.html.element.HTMLTxtContent
 import taack.ui.dump.html.element.InputType
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.form.BootstrapForm
@@ -367,6 +368,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     @Override
     void visitReadOnly(String i18n, String value) {
         blockLog.topElement = formThemed.normalInput(blockLog.topElement, '', i18n, true, true, value)
+    }
+
+
+    @Override
+    void visitCustom(String value) {
+        blockLog.topElement.addChildren(new HTMLTxtContent(value))
     }
 
     @Override

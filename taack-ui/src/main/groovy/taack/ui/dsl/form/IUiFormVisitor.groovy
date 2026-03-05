@@ -15,6 +15,8 @@ interface IUiFormVisitor {
 
     void visitReadOnly(String i18n, String value)
 
+    void visitCustom(String value)
+
     void visitTriggerUpdate(FieldInfo<?>... fieldInfos)
 
     void visitForm(Object aObject, FieldInfo[] lockedFields)
