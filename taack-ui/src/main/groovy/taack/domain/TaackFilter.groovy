@@ -483,21 +483,9 @@ final class TaackFilter<T extends GormEntity<T>> {
                 void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo... fieldInfos) {
                     FieldInfo fieldInfo = fieldInfos.last()
                     final String qualifiedName = RawHtmlFilterDump.getQualifiedName(fieldInfos)
-                    if (theParams.containsKey(qualifiedName) || fieldInfo.value == null) return
+
+                    if (theParams.containsKey(qualifiedName) || (Boolean == fieldInfo.fieldConstraint.field.type && fieldInfo.value == null) || (Boolean != fieldInfo.fieldConstraint.field.type && !fieldInfo.value)) return
                     filter.put(qualifiedName, fieldInfo.value)
-//                    final Class type = fieldInfo?.fieldConstraint?.field?.type
-//                    final boolean isEnum = type?.isEnum()
-//                    if (enumOptions) {
-//                        EnumOptions eos = value != null ? new EnumOptions(enumOptions, qualifiedName, value) : isEnum ? new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value as Enum) : new EnumOptions(enumOptions, qualifiedName, fieldInfo?.value?.toString())
-//                    } else if (isEnum) {
-//                        EnumOptions eos = value != null ? new EnumOptions(type as Class<Enum>, qualifiedName, value) : new EnumOptions(type as Class<Enum>, qualifiedName, fieldInfo?.value as Enum)
-//                    } else if (type == boolean || type == Boolean) {
-//                        Boolean isChecked = value != null ? (value == '1' ? true : value == '0' ? false : null) : (fieldInfo?.value as Boolean)
-//                    } else if (type == Date) {
-//                        Date date = (value != null ? parseDate(value) : fieldInfo?.value) as Date
-//                    } else {
-//                        String s = value != null ? value : fieldInfo.value
-//                    }
 
                 }
 
@@ -572,12 +560,15 @@ final class TaackFilter<T extends GormEntity<T>> {
                     final String targetField = t[4]
                     where << ("sc.id IN (select auo.${reverseFieldName}.id from ${reverseClassName} auo where auo.${targetField} like '${escapeHqlParameter(entry.value as String)}')" as String)
                 } else {
+                    Field f = getTheField(aClass, entryKey)
+                    if (([String, Map, Collection].contains(f.type) || f.type.isEnum()) && (entry.value as String).empty) {
+                        return
+                    }
                     addJoinEntity(entryKey)
                     JoinEntity joinEntity = getJoinEntity(entryKey)
 
                     String aliasKey = joinEntity ? "sc${joinEntity.order}${entryKey - joinEntity.joinName}" : "sc.${entryKey}"
 
-                    Field f = getTheField(aClass, entryKey)
 
                     if (f && f.type == Date) {
                         def dates = parseDate(entry.value as String)
@@ -671,7 +662,6 @@ final class TaackFilter<T extends GormEntity<T>> {
                 }
             }
         }
-
 
         join = buildJoinClause() ? buildJoinClause().append(join) : join
         String simpleOrder = filter['order'] ?: order?.toString()
