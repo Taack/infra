@@ -484,7 +484,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                 void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo... fieldInfos) {
                     FieldInfo fieldInfo = fieldInfos.last()
                     final String qualifiedName = RawHtmlFilterDump.getQualifiedName(fieldInfos)
-                    if (theParams.containsKey(qualifiedName) || !fieldInfo.value) return
+                    if (theParams.containsKey(qualifiedName) || fieldInfo.value != null) return
                     filter.put(qualifiedName, fieldInfo.value)
 //                    final Class type = fieldInfo?.fieldConstraint?.field?.type
 //                    final boolean isEnum = type?.isEnum()
