@@ -1504,7 +1504,7 @@ class CmsController implements WebAttributes {
                     column action, params, {
                         header(headerStr)
                         pages.forEach { CmsPage page ->
-                            card page.selfObject_, { // page.selfObject_ means the id of page
+                            card page, { // page.selfObject_ means the id of page
                                 cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, CmsController.&editPage as MethodClosure, page.id
                                 cardField page.title_, null, Style.BOLD
                                 cardField page.dateCreated_

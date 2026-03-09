@@ -472,7 +472,6 @@ final class TaackFilter<T extends GormEntity<T>> {
         StringBuffer join = new StringBuffer()
         int occ = 0
 
-        println filter
         Map<String, Object> namedParams = [:]
 
         if (filterSpecifier) {
@@ -484,7 +483,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                 void visitFilterField(String i18n, IEnumOption[] enumOptions, FieldInfo... fieldInfos) {
                     FieldInfo fieldInfo = fieldInfos.last()
                     final String qualifiedName = RawHtmlFilterDump.getQualifiedName(fieldInfos)
-                    if (theParams.containsKey(qualifiedName) || fieldInfo.value != null) return
+                    if (theParams.containsKey(qualifiedName) || fieldInfo.value == null) return
                     filter.put(qualifiedName, fieldInfo.value)
 //                    final Class type = fieldInfo?.fieldConstraint?.field?.type
 //                    final boolean isEnum = type?.isEnum()
@@ -559,9 +558,8 @@ final class TaackFilter<T extends GormEntity<T>> {
             })
         }
 
-
         filter?.each { Map.Entry<String, Object> entry ->
-            if (entry.value && !filterMeta.contains(entry.key) && !entry.key.contains('filterExpression')) {
+            if (entry.value != null && !filterMeta.contains(entry.key) && !entry.key.contains('filterExpression')) {
                 final String entryKey = entry.key as String
                 occ++
                 /**
@@ -580,6 +578,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                     String aliasKey = joinEntity ? "sc${joinEntity.order}${entryKey - joinEntity.joinName}" : "sc.${entryKey}"
 
                     Field f = getTheField(aClass, entryKey)
+
                     if (f && f.type == Date) {
                         def dates = parseDate(entry.value as String)
                         if (dates.aValue)
