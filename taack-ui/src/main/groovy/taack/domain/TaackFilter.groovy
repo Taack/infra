@@ -611,15 +611,18 @@ final class TaackFilter<T extends GormEntity<T>> {
                             }
                         }
                     } else if (f && Number.isAssignableFrom(f.type)) {
-                        List<String> numStrs = parseNumber(entry.value as String)
-                        if (numStrs == null) {
-                            where << ("$aliasKey = $entry.value" as String)
-                        } else {
-                            if (numStrs[0] != "") {
-                                where << ("$aliasKey >= ${numStrs[0]}" as String)
-                            }
-                            if (numStrs[1] != "") {
-                                where << ("$aliasKey <= ${numStrs[1]}" as String)
+                        String entryValue = entry.value as String
+                        if (!entryValue.isBlank()) {
+                            List<String> numStrs = parseNumber(entryValue)
+                            if (numStrs == null) {
+                                where << ("$aliasKey = $entry.value" as String)
+                            } else {
+                                if (numStrs[0] != "") {
+                                    where << ("$aliasKey >= ${numStrs[0]}" as String)
+                                }
+                                if (numStrs[1] != "") {
+                                    where << ("$aliasKey <= ${numStrs[1]}" as String)
+                                }
                             }
                         }
                     } else if (entry.value instanceof String) {
