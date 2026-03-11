@@ -50,7 +50,7 @@ class CrewUiService implements WebAttributes {
             }
             section tr('default.role.label'), {
                 UserRole ur = new UserRole(role: new Role())
-//                filterFieldInverse tr('default.role.label'), UserRole, ur.user_, ur.role_, ur.role.authority_
+                filterFieldInverse tr('default.role.label'), UserRole, ur.user_, ur.role_, ur.role.authority_
             }
         }
     }

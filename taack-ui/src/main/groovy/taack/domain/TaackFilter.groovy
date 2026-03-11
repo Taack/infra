@@ -554,6 +554,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                  * We process special filter behaviors that are induced by their key names.
                  */
                 if (entryKey.startsWith('_reverse')) {
+                    if (!entry.value) return
                     String[] t = entryKey.split('_')
                     final String reverseClassName = t[2].substring(t[2].lastIndexOf('.') + 1)
                     final String reverseFieldName = t[3]
