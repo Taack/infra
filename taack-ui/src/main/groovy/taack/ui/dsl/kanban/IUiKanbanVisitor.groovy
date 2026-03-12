@@ -43,4 +43,6 @@ interface IUiKanbanVisitor {
     void visitCardAction(String linkText, String controller, String action, Long id, Map<String, ?> params, Boolean isAjax)
 
     void visitCardAction(String i18n, ActionIcon actionIcon, String key, String label)
+
+    void visitCustom(String html, Style style)
 }

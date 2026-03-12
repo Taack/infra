@@ -50,4 +50,8 @@ final class ColumnSpec {
         closure.call()
         kanbanVisitor.visitCardEnd()
     }
+
+    void custom(final String html, final Style style = null) {
+        kanbanVisitor.visitCustom(html, style)
+    }
 }

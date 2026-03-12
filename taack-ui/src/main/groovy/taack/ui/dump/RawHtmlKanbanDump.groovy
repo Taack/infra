@@ -190,4 +190,13 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     void visitCardAction(String i18n, ActionIcon actionIcon, String key, String label) {
         visitCardAction(i18n, actionIcon, 'progress', 'echoSelect', null, [key: key, label: label], true)
     }
+
+    @Override
+    void visitCustom(String html, Style style) {
+        blockLog.topElement.addChildren(
+                new HTMLDiv().builder.addClasses(style?.cssClassesString).putAttribute('style', style?.cssStyleString).addChildren(
+                        new HTMLTxtContent(html)
+                ).build()
+        )
+    }
 }
