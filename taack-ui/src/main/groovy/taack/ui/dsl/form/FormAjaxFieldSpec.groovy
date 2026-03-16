@@ -29,15 +29,11 @@ class FormAjaxFieldSpec extends FormVisitable {
     void tabs(BlockSpec.Width width = BlockSpec.Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
         List<String> tabNames = []
 
-        UiFormVisitorImpl tabNameVisitor = new UiFormVisitorImpl() {
-            @Override
-            void visitFormTab(String i18n) {
-                tabNames << i18n
-            }
-        }
-        closure.delegate = new FormTabSpec(tabNameVisitor)
+        // Lightweight first pass: collect tab names WITHOUT executing inner closures
+        closure.delegate = new FormTabNameCollector(tabNames)
         closure.call()
 
+        // Second pass: real rendering with names already known
         formVisitor.visitFormTabs(tabNames, width)
         closure.delegate = new FormTabSpec(formVisitor)
         closure.call()

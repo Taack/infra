@@ -3,7 +3,7 @@ package taack.ui.dsl.form
 import groovy.transform.CompileStatic
 
 @CompileStatic
-final class FormTabSpec {
+class FormTabSpec {
 
     final IUiFormVisitor formVisitor
 

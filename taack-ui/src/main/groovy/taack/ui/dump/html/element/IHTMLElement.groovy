@@ -43,9 +43,9 @@ enum TaackTag {
 trait IHTMLElement {
     TaackTag taackTag
     String id
-    private String classes
-    private String attr
-    Vector<IHTMLElement> children = new Vector<>()
+    private StringBuilder classes = new StringBuilder()
+    private StringBuilder attr = new StringBuilder()
+    List<IHTMLElement> children = new ArrayList<>()
     IHTMLElement parent
 
     String getTag() {
@@ -53,17 +53,17 @@ trait IHTMLElement {
     }
 
     void putAttr(String key, String value) {
-        if (attr && !attr.empty) attr += ' ' + key + '="' + (value?:'') + '" '
-        else attr = key + '="' + (value?:'') + '" '
+        if (attr.length() > 0) attr.append(' ')
+        attr.append(key).append('="').append(value ?: '').append('" ')
     }
 
     void resetClasses() {
-        classes = ''
+        classes.setLength(0)
     }
 
     void putClass(String value) {
-        if (classes && !classes.empty) classes += ' ' + value
-        else classes = value
+        if (classes.length() > 0) classes.append(' ')
+        classes.append(value)
     }
 
     void setOnClick(IJavascriptDescriptor onc) {
@@ -113,7 +113,7 @@ trait IHTMLElement {
 
     @Override
     String toString() {
-        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attr}"""
+        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attr.toString()}"""
     }
 
     String indent() {
@@ -131,8 +131,8 @@ trait IHTMLElement {
             out << '\n<' + tag
             if (taackTag) out << ' taackTag="' + taackTag.name() + '"'
             if (id) out << ' id="' + id + '"'
-            if (classes) out << ' class="' + classes + '"'
-            if (attr) out << ' ' + attr.trim()
+            if (classes.length() > 0) out << ' class="' + classes.toString() + '"'
+            if (attr.length() > 0) out << ' ' + attr.toString().trim()
             out << '>'
         }
 
