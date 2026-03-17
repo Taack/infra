@@ -562,7 +562,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                     where << ("sc.id IN (select auo.${reverseFieldName}.id from ${reverseClassName} auo where auo.${targetField} like '${escapeHqlParameter(entry.value as String)}')" as String)
                 } else {
                     Field f = getTheField(aClass, entryKey)
-                    if (([String, Map, Collection].contains(f.type) || f.type.isEnum()) && (entry.value as String).empty) {
+
+                    if (([String, Map].contains(f.type) || Collection.isAssignableFrom(f.type) || f.type.isEnum()) && (entry.value as String).empty) {
                         return
                     }
                     addJoinEntity(entryKey)
