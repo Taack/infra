@@ -42,7 +42,8 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitKanban() {
-        blockLog.enterBlock('visitKanban')
+        blockLog.logEnterBlock('visitKanban')
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.KANBAN)
         HTMLDiv kanbanDiv = new HTMLDiv().builder.addClasses('row gx-2').putAttribute('taackKanbanId', blockId).build() as HTMLDiv
         blockLog.topElement.builder.addChildren(kanbanDiv)
@@ -51,19 +52,18 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitKanbanEnd() {
-        blockLog.exitBlock('visitKanbanEnd')
+        blockLog.logExitBlock('visitKanbanEnd')
         initialForm.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.KANBAN)
+        blockLog.restorePosition()
     }
 
     @Override
     void visitKanbanWithoutFilter() {
-        blockLog.enterBlock('visitKanban')
+        blockLog.logEnterBlock('visitKanban')
         HTMLDiv kanbanDiv = new HTMLDiv().builder.addClasses('row gx-2').setTaackTag(TaackTag.KANBAN).putAttribute('taackKanbanId', blockId).build() as HTMLDiv
         blockLog.topElement.builder.addChildren(kanbanDiv)
         blockLog.topElement = kanbanDiv
-
-//        List<HTMLInput> inputList = []
+        blockLog.savePosition()
 
         parameter.paramsToKeep.each {
             if (it.value instanceof Collection || it.value instanceof String[]) {
@@ -92,7 +92,8 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitColumn(MethodClosure action, Map<String, ? extends Object> params) {
-        blockLog.enterBlock('visitColumn')
+        blockLog.logEnterBlock('visitColumn')
+        blockLog.savePosition()
         HTMLDiv columnDiv = new HTMLDiv().builder.addClasses('kanban-column col m-2')
                 .putAttribute('taackDropAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
                 .setTaackTag(TaackTag.KANBAN_COL).build() as HTMLDiv
@@ -102,8 +103,8 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitColumnEnd() {
-        blockLog.exitBlock('visitColumnEnd')
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.KANBAN_COL).parent
+        blockLog.logExitBlock('visitColumnEnd')
+        blockLog.restorePosition()
     }
 
     @Override
@@ -116,7 +117,8 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitCard(GormEntity gorm, MethodClosure action, Map<String, ? extends Object> params) {
-        blockLog.enterBlock('visitCard')
+        blockLog.logEnterBlock('visitCard')
+        blockLog.savePosition()
         HTMLSpan cardSpan = new HTMLSpan().builder.addClasses('kanban-card').setTaackTag(TaackTag.KANBAN_CARD)
                 .putAttribute('taackDbClickAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
                 .putAttribute('cardId', gorm ? gorm.ident().toString() : '')
@@ -128,8 +130,8 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitCardEnd() {
-        blockLog.exitBlock('visitCardEnd')
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.KANBAN_CARD).parent
+        blockLog.logExitBlock('visitCardEnd')
+        blockLog.restorePosition()
     }
 
     @Override

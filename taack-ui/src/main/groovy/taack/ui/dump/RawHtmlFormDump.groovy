@@ -72,6 +72,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         this.lockedFields = lockedFields
         this.aObject = aObject
         String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : '') : ''
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(
                 formThemed.builder.addClasses('taackForm').addChildren(
@@ -92,11 +93,12 @@ final class RawHtmlFormDump implements IUiFormVisitor {
             formThemed.addFormAction(blockLog.topElement, it.cValue, it.aValue, it.bValue)
         }
 
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.FORM)
+        blockLog.restorePosition()
     }
 
     @Override
     void visitFormSection(String i18n, boolean initiallyCollapsed) {
+        blockLog.savePosition()
         uncollapseSection = false
 
         i18n ?= parameter.trField(parameter.controllerName, parameter.actionName, false)
@@ -107,7 +109,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitFormSectionEnd() {
         uncollapseSection = false
 
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.SECTION).parent
+        blockLog.restorePosition()
     }
 
     @Override
@@ -206,6 +208,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabs(List<String> names, Width width = Width.QUARTER) {
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.TABS)
         blockLog.topElement = layout.tabs(blockLog.topElement, names)
         tabOccurrence = 0
@@ -213,19 +216,20 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormTabsEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABS)
+        blockLog.restorePosition()
         layout.setTabIdAndCounter(layout.tabIds + 1)
     }
 
     @Override
     void visitFormTab(String name) {
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.TAB)
         blockLog.topElement = layout.tab(blockLog.topElement, tabOccurrence++)
     }
 
     @Override
     void visitFormTabEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TAB)
+        blockLog.restorePosition()
     }
 
     @Override
@@ -309,35 +313,38 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitCol(Width width) {
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.COL)
         blockLog.topElement = layout.col(blockLog.topElement, width)
     }
 
     @Override
     void visitColEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.COL)
+        blockLog.restorePosition()
     }
 
     @Override
     void visitRow() {
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.ROW)
         blockLog.topElement = layout.row(blockLog.topElement)
     }
 
     @Override
     void visitRowEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ROW)
+        blockLog.restorePosition()
     }
 
     @Override
     void visitRowCols(int cols) {
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.ROW)
         blockLog.topElement = layout.rowCols(blockLog.topElement, cols)
     }
 
     @Override
     void visitRowColsEnd() {
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.ROW)
+        blockLog.restorePosition()
     }
 
     @Override

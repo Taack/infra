@@ -28,12 +28,12 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
         blockLog.topElement.setTaackTag(TaackTag.MENU_BLOCK)
     }
 
-    void enterBlock(String toPrint) {
-        blockLog.enterBlock(RawHtmlDropdownMenuDump.simpleName + '::' + toPrint)
+    void logEnterBlock(String toPrint) {
+        blockLog.logEnterBlock(RawHtmlDropdownMenuDump.simpleName + '::' + toPrint)
     }
 
-    void exitBlock(String toPrint) {
-        blockLog.exitBlock(RawHtmlDropdownMenuDump.simpleName + '::' + toPrint)
+    void logExitBlock(String toPrint) {
+        blockLog.logExitBlock(RawHtmlDropdownMenuDump.simpleName + '::' + toPrint)
     }
 
     @Override
@@ -46,7 +46,8 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId) {
-        enterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
+        logEnterBlock('visitMenuStart futurCurrentAjaxBlockId: ' + ajaxBlockId)
+        blockLog.savePosition()
         futurCurrentAjaxBlockId = ajaxBlockId
         blockLog.topElement.setTaackTag(TaackTag.MENU_CONTEXTUAL)
         menu = new DropdownMenu(parameter.target == Parameter.RenderingTarget.MAIL, blockLog)
@@ -55,14 +56,14 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     @Override
     void visitMenuStartEnd() {
-        exitBlock('visitMenuStartEnd')
+        logExitBlock('visitMenuStartEnd')
         futurCurrentAjaxBlockId = null
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.MENU_CONTEXTUAL)
+        blockLog.restorePosition()
     }
 
     @Override
     void visitMenu(String controller, String action, Map<String, ?> params) {
-        blockLog.stayBlock('visitMenu')
+        blockLog.logStayBlock('visitMenu')
         visitLabeledSubMenu(null, controller, action, params)
     }
 
@@ -75,7 +76,7 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
-        blockLog.stayBlock('visitLabeledSubContextualMenu ' + i18n)
+        blockLog.logStayBlock('visitLabeledSubContextualMenu ' + i18n)
         Map cp = parameter.params
         if (params) {
             if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
@@ -106,7 +107,7 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     @Override
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
-        blockLog.stayBlock('visitSubMenuIcon ' + i18n)
+        blockLog.logStayBlock('visitSubMenuIcon ' + i18n)
 
         if (parameter.target != Parameter.RenderingTarget.MAIL)
             menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)

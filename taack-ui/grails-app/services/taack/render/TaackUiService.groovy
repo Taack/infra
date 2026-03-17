@@ -525,7 +525,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
 //        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
 
-        BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, 4096)
+        BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, bufferSize)
 
         TaackUiConfiguration conf
         bout << """\

@@ -37,6 +37,12 @@ enum TaackTag {
     KANBAN,
     KANBAN_COL,
     KANBAN_CARD
+
+    final String attrFragment
+
+    TaackTag() {
+        this.attrFragment = ' taackTag="' + this.name() + '"'
+    }
 }
 
 @CompileStatic
@@ -54,7 +60,7 @@ trait IHTMLElement {
 
     void putAttr(String key, String value) {
         if (attr.length() > 0) attr.append(' ')
-        attr.append(key).append('="').append(value ?: '').append('" ')
+        attr.append(key).append('="').append(value ?: '').append('"')
     }
 
     void resetClasses() {
@@ -128,20 +134,21 @@ trait IHTMLElement {
 
     void getOutput(OutputStream out) {
         if (tag) {
-            out << '\n<' + tag
-            if (taackTag) out << ' taackTag="' + taackTag.name() + '"'
-            if (id) out << ' id="' + id + '"'
-            if (classes.length() > 0) out << ' class="' + classes.toString() + '"'
-            if (attr.length() > 0) out << ' ' + attr.toString().trim()
-            out << '>'
+            StringBuilder sb = new StringBuilder(128)
+            sb.append('\n<').append(tag)
+            if (taackTag) sb.append(taackTag.attrFragment)
+            if (id) sb.append(' id="').append(id).append('"')
+            if (classes.length() > 0) sb.append(' class="').append(classes).append('"')
+            if (attr.length() > 0) sb.append(' ').append(attr)
+            sb.append('>')
+            out << sb
         }
 
         for (IHTMLElement c : children) {
             c.getOutput(out)
         }
 
-        if (tag)
-            out << '</' + tag + '>'
+        if (tag) out << '</' + tag + '>'
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {
