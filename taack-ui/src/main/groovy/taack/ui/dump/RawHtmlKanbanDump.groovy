@@ -19,10 +19,12 @@ import java.text.NumberFormat
 @CompileStatic
 final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
+    static final String SVG_MINIMIZE = """<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 8a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H1a1 1 0 0 1-1-1z"/></svg>"""
     final String blockId
     final Parameter parameter
     private final IHTMLElement initialForm
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
+    private int columnIndex = 0
     protected final BlockLog blockLog
 
     RawHtmlKanbanDump(final BlockLog blockLog, final String id, final Parameter parameter) {
@@ -94,6 +96,7 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     void visitColumn(MethodClosure action, Map<String, ? extends Object> params) {
         blockLog.enterBlock('visitColumn')
         HTMLDiv columnDiv = new HTMLDiv().builder.addClasses('kanban-column col m-2')
+                .putAttribute('kanbanColumnIndex', "column${columnIndex++}")
                 .putAttribute('taackDropAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
                 .setTaackTag(TaackTag.KANBAN_COL).build() as HTMLDiv
         blockLog.topElement.builder.addChildren(columnDiv)
@@ -111,7 +114,12 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
         IHTMLElement.HTMLElementBuilder chBuilder = new HTMLDiv().builder
         chBuilder.addClasses(style?.cssClassesString ?: 'kanban-column-header')
         if (style?.cssStyleString) chBuilder.putAttribute('style', style.cssStyleString)
-        blockLog.topElement.builder.addChildren(chBuilder.addChildren(new HTMLTxtContent(i18n)).build())
+        chBuilder.addChildren(new HTMLDiv().builder.addChildren(new HTMLTxtContent(i18n)).build())
+        if (i18n) chBuilder.addChildren(new HTMLButton(SVG_MINIMIZE).builder.addClasses('close-btn').build())
+        blockLog.topElement.builder.addChildren(chBuilder.build())
+        IHTMLElement.HTMLElementBuilder cardDivBuilder = new HTMLDiv().builder
+        blockLog.topElement.builder.addChildren(cardDivBuilder.addClasses('kanban-column-body').build())
+        blockLog.topElement = cardDivBuilder.build()
     }
 
     @Override
