@@ -579,8 +579,10 @@ final class TaackFilter<T extends GormEntity<T>> {
                         if (dates.bValue)
                             where << ("$aliasKey < '${DateFormat.format(dates.bValue, 'yyyy-MM-dd')}'" as String)
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
-                        boolean entryValue = entry.value instanceof String ? entry.value == '1' : entry.value as Boolean
-                        where << ("$aliasKey = $entryValue" as String)
+                        if (!entry.value.toString().isBlank()) {
+                            boolean entryValue = entry.value instanceof String ? entry.value == '1' : entry.value as Boolean
+                            where << ("$aliasKey = $entryValue" as String)
+                        }
                     } else if (f && f.type == Map) {
                         if (entry.value instanceof String) {
                             join.append(" join ${aliasKey} as j${occ}")
