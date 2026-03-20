@@ -35,6 +35,9 @@ import static taack.render.TaackUiService.tr
 @CompileStatic
 final class RawHtmlTableDump implements IUiTableVisitor {
 
+    private static final Style DISPLAY_BLOCK_STYLE = new Style(null, 'display: block;')
+    private static final DisplayBlock DISPLAY_BLOCK_DESCRIPTOR = new DisplayBlock()
+
     final String blockId
     final Parameter parameter
     final ThemableTable themableTable
@@ -91,10 +94,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     static final IHTMLElement displayCell(final String cell, final Style style, final String url) {
-        Style displayBlock = new Style(null, 'display: block;')
-        if (cell && style) {
-            displayBlock += style
-        }
+        Style displayBlock = (cell && style) ? DISPLAY_BLOCK_STYLE + style : DISPLAY_BLOCK_STYLE
         HTMLTxtContent cellHTML = new HTMLTxtContent(cell ?: '<br/>')
         if (!url) {
             HTMLSpan speedSpan = new HTMLSpan()
@@ -132,8 +132,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitTableEnd() {
         initialForm.builder.addChildren(mapAdditionalHiddenParams.values() as IHTMLElement[])
-        blockLog.exitBlock('visitTableEnd')
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE)
+        blockLog.logExitBlock('visitTableEnd')
+        blockLog.restorePosition()
 
         if (initialSortingOrder) {
             blockLog.topElement.children[0].getBuilder().putAttribute('initialSortField', initialSortingOrder.aValue)
@@ -142,7 +142,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitColumn(Integer colSpan, Integer rowSpan) {
-        blockLog.enterBlock('visitColumn')
+        blockLog.logEnterBlock('visitColumn')
+        blockLog.savePosition()
         colCount++
         isInCol = true
         if (isInHeader) {
@@ -160,7 +161,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitHeader() {
-        blockLog.enterBlock('visitHeader')
+        blockLog.logEnterBlock('visitHeader')
+        blockLog.savePosition()
         isInHeader = true
         HTMLTr tr = new HTMLTr()
         tr.addClasses('align-middle')
@@ -174,9 +176,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitHeaderEnd() {
-        blockLog.exitBlock('visitHeaderEnd')
+        blockLog.logExitBlock('visitHeaderEnd')
         isInHeader = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_HEAD).parent
+        blockLog.restorePosition()
         HTMLTBody tb = new HTMLTBody().builder.setTaackTag(TaackTag.TABLE_HEAD).build() as HTMLTBody
         blockLog.topElement.builder.addChildren(tb)
         blockLog.topElement = tb
@@ -184,14 +186,15 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitColumnEnd() {
-        blockLog.exitBlock('visitColumnEnd')
+        blockLog.logExitBlock('visitColumnEnd')
         isInCol = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL).parent
+        blockLog.restorePosition()
     }
 
     @Override
     void visitRow(Style style, boolean hasChildren) {
-        blockLog.enterBlock('visitRow')
+        blockLog.logEnterBlock('visitRow')
+        blockLog.savePosition()
         rowStyle = style
         stripped++
         HTMLTr tr = new HTMLTr()
@@ -215,21 +218,21 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowEnd() {
-        blockLog.exitBlock('visitRowEnd')
+        blockLog.logExitBlock('visitRowEnd')
         rowStyle = null
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_ROW).parent
+        blockLog.restorePosition()
     }
 
     @Override
     void visitRowIndent(Boolean isExpended = false) {
-        blockLog.enterBlock('visitRowIndent')
+        blockLog.logEnterBlock('visitRowIndent')
         indent++
         rowIndentIsExpended[indent] = rowIndentIsExpended[indent - 1] == false ? false : isExpended
     }
 
     @Override
     void visitRowIndentEnd() {
-        blockLog.exitBlock('visitRowIndentEnd')
+        blockLog.logExitBlock('visitRowIndentEnd')
         indent--
     }
 
@@ -261,7 +264,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowColumn(Integer colSpan, Integer rowSpan, Style style) {
-        blockLog.enterBlock('visitRowColumn')
+        blockLog.logEnterBlock('visitRowColumn')
+        blockLog.savePosition()
         isInCol = true
         IHTMLElement.HTMLElementBuilder tdBuilder = new HTMLTd(colSpan, rowSpan).builder
         if (style?.cssClassesString) tdBuilder.addClasses(style.cssClassesString)
@@ -282,21 +286,23 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     @Override
     void visitRowColumnEnd() {
         this.cellOption = null
-        blockLog.exitBlock('visitRowColumnEnd')
+        blockLog.logExitBlock('visitRowColumnEnd')
         isInCol = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL).parent
+        blockLog.restorePosition()
     }
 
     @Override
     void visitTable() {
-        blockLog.enterBlock('visitTable')
+        blockLog.logEnterBlock('visitTable')
+        blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
         blockLog.topElement = themableTable.table(blockLog.topElement, blockId, tableOption)
     }
 
     @Override
     void visitTableWithoutFilter() {
-        blockLog.enterBlock('visitTableWithoutFilter')
+        blockLog.logEnterBlock('visitTableWithoutFilter')
+        blockLog.savePosition()
         IHTMLElement table = themableTable.table(blockLog.topElement, blockId, tableOption)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
 
@@ -334,7 +340,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
-                new HTMLSpan().builder.addClasses('sortColumn').setStyle(new DisplayBlock()).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
+                new HTMLSpan().builder.addClasses('sortColumn').setStyle(DISPLAY_BLOCK_DESCRIPTOR).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
                         new HTMLTxtContent(i18n)
                 ).build()
         )
@@ -347,7 +353,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
-                new HTMLSpan().builder.setStyle(new DisplayBlock()).addChildren(
+                new HTMLSpan().builder.setStyle(DISPLAY_BLOCK_DESCRIPTOR).addChildren(
                         new HTMLTxtContent("${i18n}")
                 ).build()
         )
@@ -484,7 +490,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitColumnSelect(String paramsKey) {
-        blockLog.enterBlock('visitColumnSelect')
+        blockLog.logEnterBlock('visitColumnSelect')
+        blockLog.savePosition()
         isInCol = true
         selectColumnParamsKey = paramsKey ?: 'selectedItems'
         BootstrapForm f = new BootstrapForm(blockLog).builder.addChildren(
@@ -533,9 +540,9 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitColumnSelectEnd() {
-        blockLog.exitBlock('visitColumnSelectEnd')
+        blockLog.logExitBlock('visitColumnSelectEnd')
         isInCol = false
-        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_COL).parent
+        blockLog.restorePosition()
     }
 
     @Override
@@ -620,7 +627,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowQuickEdit(Long id, MethodClosure apply) {
-        blockLog.enterBlock('visitRowQuickEdit')
+        blockLog.logEnterBlock('visitRowQuickEdit')
         HTMLForm f = new HTMLForm(parameter.urlMapped(apply, [id: id, isAjax: true])).builder.addClasses('taackTableInlineForm').addChildren(
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
                 new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
@@ -636,7 +643,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowQuickEditEnd() {
-        blockLog.exitBlock('visitRowQuickEditEnd')
+        blockLog.logExitBlock('visitRowQuickEditEnd')
 //        blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.TABLE_QUICK_EDIT).parent
         HTMLInput b = HTMLInput.inputSubmit('s', 'form' + formId)
         quickEditSubmitPlace.addChildren(b)

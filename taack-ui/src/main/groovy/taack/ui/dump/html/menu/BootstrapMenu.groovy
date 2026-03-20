@@ -20,7 +20,7 @@ final class BootstrapMenu implements IHTMLElement {
 
     IHTMLElement menuStart(IHTMLElement topElement = null) {
         IHTMLElement bootstrapMenu = this//new BootstrapMenu(themeMode, themeSize)
-        children.removeAllElements()
+        children.clear()
         topElement.addChildren(
                 bootstrapMenu.builder.addChildren(
                         new HTMLUl().builder.addClasses('navbar-nav', 'me-auto', 'mb-2', 'mb-lg-0').build()

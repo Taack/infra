@@ -37,15 +37,21 @@ enum TaackTag {
     KANBAN,
     KANBAN_COL,
     KANBAN_CARD
+
+    final String attrFragment
+
+    TaackTag() {
+        this.attrFragment = ' taackTag="' + this.name() + '"'
+    }
 }
 
 @CompileStatic
 trait IHTMLElement {
     TaackTag taackTag
     String id
-    private String classes
-    private String attr
-    Vector<IHTMLElement> children = new Vector<>()
+    private StringBuilder classes = new StringBuilder()
+    private StringBuilder attr = new StringBuilder()
+    List<IHTMLElement> children = new ArrayList<>()
     IHTMLElement parent
 
     String getTag() {
@@ -53,17 +59,17 @@ trait IHTMLElement {
     }
 
     void putAttr(String key, String value) {
-        if (attr && !attr.empty) attr += ' ' + key + '="' + (value?:'') + '" '
-        else attr = key + '="' + (value?:'') + '" '
+        if (attr.length() > 0) attr.append(' ')
+        attr.append(key).append('="').append(value ?: '').append('"')
     }
 
     void resetClasses() {
-        classes = ''
+        classes.setLength(0)
     }
 
     void putClass(String value) {
-        if (classes && !classes.empty) classes += ' ' + value
-        else classes = value
+        if (classes.length() > 0) classes.append(' ')
+        classes.append(value)
     }
 
     void setOnClick(IJavascriptDescriptor onc) {
@@ -113,7 +119,7 @@ trait IHTMLElement {
 
     @Override
     String toString() {
-        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attr}"""
+        """IHTMLElement ${this.taackTag?.toString() + ':' + this.attr.toString()}"""
     }
 
     String indent() {
@@ -128,20 +134,21 @@ trait IHTMLElement {
 
     void getOutput(OutputStream out) {
         if (tag) {
-            out << '\n<' + tag
-            if (taackTag) out << ' taackTag="' + taackTag.name() + '"'
-            if (id) out << ' id="' + id + '"'
-            if (classes) out << ' class="' + classes + '"'
-            if (attr) out << ' ' + attr.trim()
-            out << '>'
+            StringBuilder sb = new StringBuilder(128)
+            sb.append('\n<').append(tag)
+            if (taackTag) sb.append(taackTag.attrFragment)
+            if (id) sb.append(' id="').append(id).append('"')
+            if (classes.length() > 0) sb.append(' class="').append(classes).append('"')
+            if (attr.length() > 0) sb.append(' ').append(attr)
+            sb.append('>')
+            out << sb
         }
 
         for (IHTMLElement c : children) {
             c.getOutput(out)
         }
 
-        if (tag)
-            out << '</' + tag + '>'
+        if (tag) out << '</' + tag + '>'
     }
 
     <T extends IHTMLElement> HTMLElementBuilder<T> getBuilder() {
