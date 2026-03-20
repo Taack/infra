@@ -17,7 +17,7 @@ final class KanbanSpec {
     }
 
     /**
-     * Draw the header of the Kanban. Should contains:
+     * Draw the column of the Kanban. Should contains:
      *
      * @param MethodClosure drop action
      * @param action params

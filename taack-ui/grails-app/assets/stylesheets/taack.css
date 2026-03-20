@@ -490,12 +490,12 @@ li:hover > .nested-dropdown{
 }
 
 .kanban-column {
+    position: relative;
     min-height: 400px;
     max-height: 85vh;
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
-    padding: 1rem;
-    overflow-y: auto;
+    padding: 0.5rem;
     transition: box-shadow 0.2s ease;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
@@ -523,14 +523,32 @@ li:hover > .nested-dropdown{
     transform: translateY(-3px) scale(1.015);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     border-color: #cbd5e1;
-    z-index: 10;
 }
 .kanban-card:active {
     cursor: grabbing;
 }
 .kanban-column-header {
     font-weight: bold;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+}
+.kanban-column-header .close-btn {
+    position: absolute;
+    right: 0.4rem;
+    top: 0.3rem;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+.kanban-column-header .close-btn:hover {
+    background: rgba(0,0,0,0.06);
+    color: #374151;
+}
+.kanban-column-body {
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 75vh;
 }
 .kanban-column.drag-over {
     border: 2px dashed #0d6efd;
@@ -555,6 +573,15 @@ li:hover > .nested-dropdown{
     background-position: center;
     background-size: 50px;
     z-index: 20;
+}
+.kanban-hidden-column {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    margin: 0.75rem 0;
+    background: #f1f5f9;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 span[taackcontextualmenu]:not(.kanban-card) {
