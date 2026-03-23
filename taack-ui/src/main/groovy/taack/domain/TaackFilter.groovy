@@ -158,7 +158,8 @@ final class TaackFilter<T extends GormEntity<T>> {
         try {
             for (String token in removeBrackets(key).tokenize('.')) {
                 f = aClass.declaredFields.find { it.name == token }
-                if (f.type == Map) return f
+
+                if (f?.type == Map) return f
                 if (f == null) {
                     f = aClass.superclass.declaredFields.find { it.name == token }
                 }
