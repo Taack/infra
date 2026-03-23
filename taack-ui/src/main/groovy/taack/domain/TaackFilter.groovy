@@ -156,8 +156,9 @@ final class TaackFilter<T extends GormEntity<T>> {
     private final static Field getTheField(Class aClass, String key) {
         Field f = null
         try {
-            removeBrackets(key).tokenize('.').each { token ->
+            for (String token in removeBrackets(key).tokenize('.')) {
                 f = aClass.declaredFields.find { it.name == token }
+                if (f.type == Map) return f
                 if (f == null) {
                     f = aClass.superclass.declaredFields.find { it.name == token }
                 }
@@ -562,7 +563,6 @@ final class TaackFilter<T extends GormEntity<T>> {
                     where << ("sc.id IN (select auo.${reverseFieldName}.id from ${reverseClassName} auo where auo.${targetField} like '${escapeHqlParameter(entry.value as String)}')" as String)
                 } else {
                     Field f = getTheField(aClass, entryKey)
-
                     if (([String, Map].contains(f.type) || Collection.isAssignableFrom(f.type) || f.type.isEnum()) && (entry.value as String).empty) {
                         return
                     }
