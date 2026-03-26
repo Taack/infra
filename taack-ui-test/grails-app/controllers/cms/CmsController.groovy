@@ -1501,8 +1501,7 @@ class CmsController implements WebAttributes {
             kanbanFilter CmsUiService.buildCmsPageFilter(), new UiKanbanSpecifier().ui {
                 List<CmsPage> pageList = taackFilterService.getBuilder(CmsPage).setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_).build().list().aValue as List<CmsPage>
                 Closure kanbanCol = { MethodClosure action, Map<String, ? extends Object> params, String headerStr, List<CmsPage> pages ->
-                    column action, params, {
-                        header(headerStr)
+                    column headerStr, Style.ALIGN_CENTER, action, params, {
                         pages.forEach { CmsPage page ->
                             card page, { // page.selfObject_ means the id of page
                                 cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, CmsController.&editPage as MethodClosure, page.id
