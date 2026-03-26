@@ -18,11 +18,9 @@ interface IUiKanbanVisitor {
 
     void visitKanbanEnd()
 
-    void visitColumn(MethodClosure action, Map<String, ? extends Object> params)
+    void visitColumn(String i18n, Style style, MethodClosure action, Map<String, ? extends Object> params)
 
     void visitColumnEnd()
-
-    void visitColumnHeader(String i18n, Style style)
 
     void visitCard(GormEntity gorm, MethodClosure action, Map<String, ? extends Object> params)
 

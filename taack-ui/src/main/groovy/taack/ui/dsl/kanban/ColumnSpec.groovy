@@ -21,15 +21,6 @@ final class ColumnSpec {
         this.kanbanVisitor = kanbanVisitor
     }
 
-    /**
-     * Display kanban column header
-     *
-     * @param closure
-     */
-    void header(final String i18n, final Style style = null) {
-        kanbanVisitor.visitColumnHeader(i18n, style)
-    }
-
     void card(GormEntity gorm, @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = CardFieldSpec) Closure closure) {
         kanbanVisitor.visitCard(gorm, null, null)
         closure.delegate = new CardFieldSpec(kanbanVisitor)
