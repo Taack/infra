@@ -55,7 +55,7 @@ enum Licence {
 enum TaackUiPublished {
     TAACK_UI('Taack UI Framework', 'Taack UI Framework'),
     TAACK_UI_SSH('Taack UI SSH', 'Manage SSH connection'),
-    TAACK_UI_PDF('Taack UI PDF', 'Printing DSL', Licence.AGPL),
+    TAACK_UI_PDF('Taack UI PDF', 'Printing DSL'),
     TAACK_UI_ASCIIDOC('Taack UI Asciidoc', 'Add Asciidoc rendering to forms and shows DSL'),
     TAACK_UI_SEARCH('Taack UI Search', 'Domain Solr Search'),
     TAACK_UI_JDBC('Taack UI JDBC', 'JDBC Driver allowing to access domain from Jdbc'),
