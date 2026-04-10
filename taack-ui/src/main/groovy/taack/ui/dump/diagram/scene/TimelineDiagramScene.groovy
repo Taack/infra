@@ -184,10 +184,10 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                 String periodLabel = dateFormat.format(info.aValue) + ' -> ' + dateFormat.format(info.bValue)
                 Color keyColor = getKeyColor(index)
                 render.renderGroup(['element-type': ElementType.DATA,
-                                    dataset: key,
-                                    'dataset-suffix': periodTitle,
-                                    'data-x': periodTitle,
-                                    'data-y': periodLabel,
+                                    dataset: periodTitle,
+                                    'dataset-suffix': key,
+                                    'data-x': periodLabel,
+                                    'data-y': key,
                                     'data-label': periodLabel + ' : ' + period.toString(),
                                     'key-color': KeyColor.colorToString(keyColor)])
                 BigDecimal x = diagramMarginLeft + (objectToNumber(info.aValue) - minX) / (maxX - minX) * totalWidth
