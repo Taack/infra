@@ -25,6 +25,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     private val verticalBackground = parent.s.querySelector("g[element-type='VERTICAL_BACKGROUND']")
     private val verticalBackgroundLines = verticalBackground?.querySelectorAll("line")?.asList() ?: listOf()
     private val verticalBackgroundTexts = verticalBackground?.querySelectorAll("text")?.asList() ?: listOf()
+    private val verticalBackgroundTodayLine = verticalBackground?.querySelector("rect")
     private var gapWidth: Double = if (verticalBackgroundLines.size > 1)
         verticalBackgroundLines[1].getAttribute("x1")!!.toDouble() - verticalBackgroundLines[0].getAttribute("x1")!!.toDouble()
     else (areaMaxX - areaMinX)
@@ -214,6 +215,10 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                     val targetX = ((line.getAttribute("x1")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
                     line.setAttribute("x1", targetX.toString())
                     line.setAttribute("x2", targetX.toString())
+                }
+                if (verticalBackgroundTodayLine != null) {
+                    val targetX = ((verticalBackgroundTodayLine.getAttribute("x")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
+                    verticalBackgroundTodayLine.setAttribute("x", targetX.toString())
                 }
                 refreshBackgroundXLabelsPosition(zoomRadio)
                 refreshBackgroundXLabelsDisplay(zoomRadio)
