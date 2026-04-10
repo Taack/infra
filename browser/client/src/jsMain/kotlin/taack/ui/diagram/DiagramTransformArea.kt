@@ -127,11 +127,11 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    fun verticalScroll(isUp: Boolean): Boolean { // move a fixed distance "gapHeight" each time
-        return verticalScrollBy(if (isUp) gapHeight else -gapHeight)
+    fun verticalScroll(isUp: Boolean) { // move a fixed distance "gapHeight" each time
+        verticalScrollBy(if (isUp) gapHeight else -gapHeight)
     }
 
-    fun verticalScrollBy(movingDistance: Double): Boolean {
+    fun verticalScrollBy(movingDistance: Double) {
         if (horizontalBackgroundLines.isNotEmpty()) {
             val currentY = g.getAttribute("scroll-y")?.toDouble() ?: 0.0
             val y = currentY + movingDistance
@@ -146,15 +146,13 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 if (horizontalBackground != null && horizontalBackground.closest("g[element-type='TRANSFORM_AREA']") == null) {
                     horizontalBackground.setAttribute("transform", "translate(0.0,${adjustedY})")
                 }
-                return true
             }
         }
-        return false
     }
 
     private var zoomUpTimer: Int? = null
     private var zoomUpTargetCenterLineIndex: Int? = null
-    fun zoom(mouseX: Double, isUp: Boolean): Boolean {
+    fun zoom(mouseX: Double, isUp: Boolean) {
         if (verticalBackgroundLines.isNotEmpty()) {
             val currentScrollX = g.getAttribute("scroll-x")?.toDouble() ?: 0.0
             val currentMinLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) >= areaMinX } ?: verticalBackgroundLines.first())
@@ -221,10 +219,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 refreshBackgroundXLabelsDisplay(zoomRadio)
                 refreshDataShape(zoomRadio)
                 horizontalScrollTo(areaMinX - newMinLine.x1.baseVal.value)
-                return true
             }
         }
-        return false
     }
 
     private var zoomTimer: Int? = null

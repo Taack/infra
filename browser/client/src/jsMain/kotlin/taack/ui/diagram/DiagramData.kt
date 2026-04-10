@@ -1,6 +1,7 @@
 package taack.ui.diagram
 
 import js.array.asList
+import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
@@ -205,9 +206,10 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                 trace("Full webpage ...|$action|${document.title}|${document.documentURI}")
                 history.pushState("{}", document.title, targetUrl)
                 trace("Setting location.href: $targetUrl")
-                location.href = targetUrl
-                document.textContent = text
-                document.close()
+                window.open(targetUrl, "_blank")
+//                location.href = targetUrl
+//                document.textContent = text
+//                document.close()
             } else {
                 trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
                 processAjaxLink(null, text, parent)
