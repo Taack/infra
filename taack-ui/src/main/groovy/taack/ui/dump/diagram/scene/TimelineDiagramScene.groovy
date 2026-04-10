@@ -153,13 +153,14 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         BigDecimal maxX = objectToNumber(xLabelList.last())
         BigDecimal totalWidth = width - diagramMarginLeft - DIAGRAM_MARGIN_RIGHT
         Set<String> keys = timelineDataPerKey.keySet()
+        DiagramXLabelDateFormat dateFormat = DiagramXLabelDateFormat.DAY
         for (int i = 0; i < keys.size(); i++) {
             // data timeline periods
             String key = keys[i]
             timelineDataPerKey[key].eachWithIndex { Triple<Date, Date, String> info, int index ->
                 String periodTitle = info.cValue ?: ''
                 Integer period = ((info.bValue.getTime() - info.aValue.getTime()) / (1000 * 60 * 60 * 24)).toInteger()
-                String periodLabel = xLabelDateFormat.format(info.aValue) + ' -> ' + xLabelDateFormat.format(info.bValue)
+                String periodLabel = dateFormat.format(info.aValue) + ' -> ' + dateFormat.format(info.bValue)
                 Color keyColor = getKeyColor(index)
                 render.renderGroup(['element-type': ElementType.DATA,
                                     dataset: key,

@@ -197,7 +197,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         initDiagramResolution()
         if (xDataList) timelineDataPerKey.put(null, xDataList.collect { new Triple<Date, Date, String>(it as Date, null, null) })
         scene = new TimelineDiagramScene(render, timelineDataPerKey, diagramOption)
-        scene.setXLabelDateFormat(DiagramXLabelDateFormat.DAY)
+        if (xLabelDateFormat) scene.setXLabelDateFormat(xLabelDateFormat)
         scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
 
