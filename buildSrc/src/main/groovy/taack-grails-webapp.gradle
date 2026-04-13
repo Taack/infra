@@ -33,7 +33,7 @@ dependencies {
     runtimeOnly "org.fusesource.jansi:jansi"
 }
 
-compileJava.options.release = 17
+//compileJava.options.release = 17
 
 tasks.withType(Test) {
     useJUnitPlatform()

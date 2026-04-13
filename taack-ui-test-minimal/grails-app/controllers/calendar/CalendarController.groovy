@@ -6,14 +6,17 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import jakarta.annotation.PostConstruct
+import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.ast.annotation.TaackFieldEnum
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
 import taack.ui.test.RootController
 
+@TaackFieldEnum
 @GrailsCompileStatic
 class CalendarEvent implements Validateable {
     String title
@@ -23,6 +26,9 @@ class CalendarEvent implements Validateable {
 
     static constraints = {
         body nullable: true
+        toDate validator: {Date d, CalendarEvent c ->
+            if (d <= fromDate) return 'toDate must be greater than fromDate'
+        }
     }
 
     @Override
@@ -111,6 +117,26 @@ class CalendarController {
         calendarEvents << new CalendarEvent(title: 'Test3', fromDate: today8, toDate: tomorrow930)
 
         println calendarEvents
+    }
+
+    def createEvent(CalendarEvent event) {
+        event ?= new CalendarEvent()
+
+        taackUiService.show(new UiBlockSpecifier().ui {
+            modal {
+                form(new UiFormSpecifier().ui(event) {
+                    field event.title_
+                    field event.fromDate_
+                    field event.toDate_
+                    field event.body_
+                    formAction(this.&saveEvent as MethodClosure)
+                })
+            }
+        })
+    }
+
+    def saveEvent() {
+
     }
 
     def fromCustom(CalendarParams calendarParams) {

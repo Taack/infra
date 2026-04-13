@@ -11,16 +11,40 @@ props.each { key, val ->
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    gradlePluginPortal() // so that external plugins can be resolved in dependencies section
-    maven { url "https://repo.grails.org/grails/restricted" }
+    maven {
+        url = 'https://repo.grails.org/grails/restricted'
+    }
+    maven {
+        url = 'https://repository.apache.org/content/groups/snapshots'
+        content {
+            includeVersionByRegex('org[.]apache[.]grails.*', '.*', '.*-SNAPSHOT')
+        }
+        content {
+            includeVersionByRegex('org[.]apache[.]groovy.*', 'groovy.*', '.*-SNAPSHOT')
+        }
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+    maven {
+        url = 'https://repository.apache.org/content/groups/staging'
+        content {
+            includeVersionByRegex('org[.]apache[.]grails[.]gradle', 'grails-publish', '.*')
+        }
+        content {
+            includeVersionByRegex('org[.]apache[.]groovy.*', 'groovy.*', '.*')
+        }
+        mavenContent {
+            releasesOnly()
+        }
+    }
 }
 
 
 dependencies {
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
+    implementation "cloud.wondrify:asset-pipeline-gradle"
+    implementation "org.apache.grails:grails-data-hibernate5"
     implementation "org.apache.grails:grails-gradle-plugins"
-//    implementation "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:${graalvmBuildtoolsVersion}"
-//    implementation "org.gradle.crypto.checksum:org.gradle.crypto.checksum.gradle.plugin:${gradleChecksumPluginVersion}"
 }
