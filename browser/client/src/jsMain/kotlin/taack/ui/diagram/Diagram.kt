@@ -53,45 +53,19 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
                 isScrollingX = false
             }
 
-            var isWheeling = false
-            var wheelTimer: Int? = null
-            fun tryToReleaseWheelDefaultBehavior(e: WheelEvent) { // Release Wheel default behavior only after the wheeling has been stopped for >0.5s
-                if (isWheeling) {
-                    e.preventDefault()
-
-                    if (wheelTimer != null) {
-                        window.clearTimeout(wheelTimer!!)
-                    }
-                    wheelTimer = window.setTimeout({
-                        isWheeling = false
-                    }, 500)
-                }
-            }
-
             // Zoom
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
-                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble(), e.clientY.toDouble())) {
-                    // possible to execute Zoom : Stop the page scroll
-                    // no possible anymore to Zoom and has stopped the Wheel for >0.5s : Release the page scroll
-                    if (transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)) {
-                        e.preventDefault()
-                        isWheeling = true
-                    } else {
-                        tryToReleaseWheelDefaultBehavior(e)
-                    }
+                if (e.ctrlKey) {
+                    e.preventDefault()
+                    transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)
                 }
             }
 
             // Vertical scroll for TIMELINE diagram
             if (transformArea.getShapeType() == "timeline") {
                 s.addEventListener(EventType("wheel"), EventHandler { e: WheelEvent ->
-                    if (transformArea.isClientMouseInYAxisLabelArea(e.clientX.toDouble(), e.clientY.toDouble())) {
-                        if (transformArea.verticalScroll(e.deltaY < 0)) {
-                            e.preventDefault()
-                            isWheeling = true
-                        } else {
-                            tryToReleaseWheelDefaultBehavior(e)
-                        }
+                    if (!e.ctrlKey) {
+                        transformArea.verticalScroll(e.deltaY < 0)
                     }
                 })
 

@@ -1,6 +1,7 @@
 package taack.ui.diagram
 
 import js.array.asList
+import kotlinx.browser.window
 import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.processAjaxLink
 import taack.ui.base.Helper.Companion.trace
@@ -55,7 +56,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             legend.innerHTML = """
                 <rect x="0.0" y="0.0" width="${40 * fontSizePercentage}" height="${13 * fontSizePercentage}" style="fill:${keyColor};"></rect>
                 <text x="${45 * fontSizePercentage}" y="${11 * fontSizePercentage}" text-rendering="optimizeLegibility" style="font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif; pointer-events: none;">
-                ${if (datasetSuffix.isNullOrBlank()) dataset else "$dataset : $datasetSuffix"}
+                ${if (datasetSuffix.isNullOrBlank()) dataset else "$dataset ($datasetSuffix)"}
                 </text>
             """.trimIndent()
             legend.querySelectorAll("text").forEach { (it as SVGTextElement).style.fill = "white" }
@@ -203,11 +204,12 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
             val text = xhr.responseText
             if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
                 trace("Full webpage ...|$action|${document.title}|${document.documentURI}")
-                history.pushState("{}", document.title, targetUrl)
-                trace("Setting location.href: $targetUrl")
-                location.href = targetUrl
-                document.textContent = text
-                document.close()
+                window.open(targetUrl, "_blank")
+//                history.pushState("{}", document.title, targetUrl)
+//                trace("Setting location.href: $targetUrl")
+//                location.href = targetUrl
+//                document.textContent = text
+//                document.close()
             } else {
                 trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
                 processAjaxLink(null, text, parent)
