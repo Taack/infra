@@ -160,9 +160,15 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
-    void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
+    void filterFieldInverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
         final String qualifiedName = getQualifiedName(reverseClass, reverseField, fields)
         filterField(i18n, qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString())
+    }
+
+    @Override
+    void filterFieldInverse(String i18n, Class reverseClass, FieldInfo reverseField, IEnumOption[] enumOptions, FieldInfo... fields) {
+        final String qualifiedName = getQualifiedName(reverseClass, reverseField, fields)
+        filterField(i18n, qualifiedName, parameter.applicationTagLib.params[qualifiedName]?.toString(), fields?.last(), enumOptions)
     }
 
     @Override
