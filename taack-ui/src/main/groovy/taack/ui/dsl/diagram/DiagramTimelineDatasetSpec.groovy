@@ -19,6 +19,10 @@ class DiagramTimelineDatasetSpec {
         closure.call()
     }
 
+    void dataset(final String key, Date startDate, Date endDate) {
+        diagramVisitor.timelinePeriodData(key, startDate, endDate, '')
+    }
+
     void option(DiagramOption option) {
         diagramVisitor.visitDiagramOption(option)
     }

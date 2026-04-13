@@ -18,6 +18,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     final private Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey
     private BigDecimal timelineHeight
     private BigDecimal diagramMarginLeft = DIAGRAM_MARGIN_LEFT
+    private static boolean multiPeriods = true
 
     static Map<String, Map<Object, BigDecimal>> translateTimelineData(Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey) {
         // make a tmp data so that diagram has correct X axe and correct legends
@@ -28,8 +29,8 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                     legends = it
                 }
             }
-            Map<String, Map<Object, BigDecimal>> result = legends.collectEntries { [(it): [:]] }
-
+            multiPeriods = legends.find { !it.isBlank() }
+            Map<String, Map<Object, BigDecimal>> result = (multiPeriods ? legends.collectEntries { [(it): [:]] } : timelineDataPerKey.collectEntries { [(it.key): [:]] }) as Map<String, Map<Object, BigDecimal>>
             List<Date> xDataList = timelineDataPerKey.collect { [it.value*.aValue + it.value*.bValue] }.flatten().grep() as List<Date>
             result.put(null, xDataList.collectEntries { date -> [(date): 0.0] })
             return result
@@ -186,10 +187,10 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                 String periodTitle = info.cValue ?: ''
                 Integer period = ((info.bValue.getTime() - info.aValue.getTime()) / (1000 * 60 * 60 * 24)).toInteger()
                 String periodLabel = dateFormat.format(info.aValue) + ' -> ' + dateFormat.format(info.bValue)
-                Color keyColor = getKeyColor(index)
+                Color keyColor = getKeyColor(multiPeriods ? index : i)
                 render.renderGroup(['element-type': ElementType.DATA,
-                                    dataset: periodTitle,
-                                    'dataset-suffix': key,
+                                    dataset: multiPeriods ? periodTitle : key,
+                                    'dataset-suffix': multiPeriods ? key : '',
                                     'data-x': periodLabel,
                                     'data-y': key,
                                     'data-label': periodLabel + ' : ' + period.toString(),
