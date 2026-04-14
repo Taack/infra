@@ -14,6 +14,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     private BigDecimal MIN_TIMELINE_HEIGHT = 10.0
     private BigDecimal MAX_TIMELINE_HEIGHT = 20.0
     private BigDecimal TIMELINE_HEIGHT_RATE = 0.395
+    private BigDecimal MAX_DIAGRAM_MARGIN_LEFT = DIAGRAM_MARGIN_LEFT * 2
 
     final private Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey
     private BigDecimal timelineHeight
@@ -48,6 +49,9 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                 diagramMarginLeft = keyLabelLength + AXIS_LABEL_MARGIN
             }
         }
+        if (diagramMarginLeft > MAX_DIAGRAM_MARGIN_LEFT) {
+            diagramMarginLeft = MAX_DIAGRAM_MARGIN_LEFT
+        }
 
         BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
         if (rate && rate != 1) {
@@ -56,7 +60,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void initGapAndTimelineHeight() { // The timeline's height should normally be 61% of gap height, but limited by min and max
+    void initGapAndTimelineHeight() { // The timeline's height should normally be x% of gap height, but limited by min and max
         gapHeight = (height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / timelineDataPerKey.size()
         if (alwaysShowFullInfo && gapHeight * TIMELINE_HEIGHT_RATE < MIN_TIMELINE_HEIGHT) { // Limited by min only when diagram is dynamic (Allowing scroll to have full view)
             timelineHeight = MIN_TIMELINE_HEIGHT
@@ -87,8 +91,16 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             // key label
             if (i < keys.size()) {
                 String key = keys[i]
-                render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize / 2)
-                render.renderLabel(key)
+                if (render.measureText(key) <= diagramMarginLeft - AXIS_LABEL_MARGIN) {
+                    render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize / 2)
+                    render.renderLabel(key)
+                } else {
+                    while (render.measureSmallText(key) > diagramMarginLeft - AXIS_LABEL_MARGIN) {
+                        key = key.substring(0, key.size() - 6) + '...'
+                    }
+                    render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureSmallText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize * render.SMALL_LABEL_RATE / 2)
+                    render.renderSmallLabel(key)
+                }
             }
         }
         render.renderGroupEnd()
