@@ -15,6 +15,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     private BigDecimal MAX_TIMELINE_HEIGHT = 20.0
     private BigDecimal TIMELINE_HEIGHT_RATE = 0.395
     private BigDecimal MAX_DIAGRAM_MARGIN_LEFT = DIAGRAM_MARGIN_LEFT * 2
+    private BigDecimal SCROLL_BAR_WIDTH = 10.0
 
     final private Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey
     private BigDecimal timelineHeight
@@ -170,6 +171,17 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         render.renderGroupEnd()
     }
 
+    void drawVerticalScrollBar() {
+        BigDecimal diagramHeight = height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM
+        if ((gapHeight * timelineDataPerKey.size() * 100).toInteger() / 100 > diagramHeight) {
+            render.renderGroup(['element-type': ElementType.VERTICAL_SCROLL_BAR])
+            render.translateTo(width - (DIAGRAM_MARGIN_RIGHT - SCROLL_BAR_WIDTH) / 2 - SCROLL_BAR_WIDTH, diagramMarginTop)
+            render.fillStyle(GREY_COLOR)
+            render.renderRect(SCROLL_BAR_WIDTH, diagramHeight * (diagramHeight / (gapHeight * timelineDataPerKey.size())), IDiagramRender.DiagramStyle.fill)
+            render.renderGroupEnd()
+        }
+    }
+
     void drawDataTimeline() {
         String id = 'clipSection' + ThreadLocalRandom.current().nextInt(2, 1_000_000).toString()
         render.translateTo(0.0, 0.0)
@@ -240,6 +252,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         initGapAndTimelineHeight()
         drawHorizontalBackground()
         drawVerticalBackground()
+        drawVerticalScrollBar()
         drawDataTimeline()
     }
 }
