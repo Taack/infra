@@ -161,10 +161,11 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                 }
             }
         }
-        // today
-        render.translateTo(diagramMarginLeft + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
-        render.fillStyle(Color.RED)
-        render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+        if (diagramOption.showTodayLine && xLabelList.every { it instanceof Date }) {
+            render.translateTo(diagramMarginLeft + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
+            render.fillStyle(Color.RED)
+            render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+        }
 
         render.renderGroupEnd()
         render.renderGroupEnd()

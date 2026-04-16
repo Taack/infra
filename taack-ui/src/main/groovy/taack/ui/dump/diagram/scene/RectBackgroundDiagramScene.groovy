@@ -2,9 +2,9 @@ package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
-import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dump.diagram.IDiagramRender
 
+import java.awt.Color
 import java.util.concurrent.ThreadLocalRandom
 
 @CompileStatic
@@ -279,6 +279,11 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         if (isXLabelInsideGap) {
             render.translateTo(width - DIAGRAM_MARGIN_RIGHT, diagramMarginTop)
             render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
+        }
+        if (diagramOption.showTodayLine && xLabelList.every { it instanceof Date }) {
+            render.translateTo(DIAGRAM_MARGIN_LEFT + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
+            render.fillStyle(Color.RED)
+            render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
         }
         render.renderGroupEnd()
     }

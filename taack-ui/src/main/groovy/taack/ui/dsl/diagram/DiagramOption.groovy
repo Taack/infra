@@ -14,6 +14,7 @@ final class DiagramOption {
     String title
     boolean showDataCount = false
     boolean hideLegend = false
+    boolean showTodayLine = false
     List<Color> keyColors
     DiagramResolution resolution
     String clickActionUrl
@@ -37,6 +38,11 @@ final class DiagramOption {
 
         DiagramOptionBuilder hideLegend() {
             diagramOption.hideLegend = true
+            this
+        }
+
+        DiagramOptionBuilder showTodayLine() {
+            diagramOption.showTodayLine = true
             this
         }
 
