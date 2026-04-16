@@ -10,10 +10,6 @@ class DiagramTimelineDatasetSpec {
         this.diagramVisitor = diagramVisitor
     }
 
-    void dateFormat(DiagramXLabelDateFormat dateFormat) {
-        diagramVisitor.visitLabels(dateFormat)
-    }
-
     void dataset(final String key, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramTimelinePeriodDataSpec) Closure closure) {
         closure.delegate = new DiagramTimelinePeriodDataSpec(key, diagramVisitor)
         closure.call()

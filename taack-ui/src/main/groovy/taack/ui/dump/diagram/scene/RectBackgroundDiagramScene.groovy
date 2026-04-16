@@ -25,7 +25,6 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     protected Map<String, Map<Object, BigDecimal>> dataPerKey
     protected boolean alwaysShowFullInfo = false
     protected boolean isXLabelInsideGap = false
-    protected DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
     BigDecimal getGreatestCommonDivisor(BigDecimal a, BigDecimal b) {
         if (a < b) {
@@ -107,19 +106,19 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             xDataList = xDataList.sort() as Set<Object>
             Calendar cal = Calendar.getInstance()
             cal.setTime(xDataList.last() as Date)
-            cal.set(xLabelDateFormat.subUnit, cal.getActualMaximum(xLabelDateFormat.subUnit))
+            cal.set(diagramOption.xLabelDateFormat.subUnit, cal.getActualMaximum(diagramOption.xLabelDateFormat.subUnit))
             if (!isXLabelInsideGap) {
-                cal.add(xLabelDateFormat.unit, 1)
+                cal.add(diagramOption.xLabelDateFormat.unit, 1)
             }
             Date dateMax = cal.getTime()
 
             cal.setTime(xDataList.first() as Date)
-            cal.set(xLabelDateFormat.subUnit, cal.getActualMinimum(xLabelDateFormat.subUnit))
+            cal.set(diagramOption.xLabelDateFormat.subUnit, cal.getActualMinimum(diagramOption.xLabelDateFormat.subUnit))
             Date dateMin = cal.getTime()
 
             while (dateMin.before(dateMax)) {
                 this.xLabelList.add(dateMin)
-                cal.add(xLabelDateFormat.unit, 1)
+                cal.add(diagramOption.xLabelDateFormat.unit, 1)
                 dateMin = cal.getTime()
             }
         } else {  // discrete X axis
@@ -235,7 +234,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
         boolean isDate = xLabelList.every { it instanceof Date }
-        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? xLabelDateFormat.format(it as Date) : it.toString() }.join(''))
+        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? diagramOption.xLabelDateFormat.format(it as Date) : it.toString() }.join(''))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)).toDouble()).toInteger()
 
         render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND, 'show-label-every-x': xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)])
@@ -259,7 +258,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
             // x axis label
             BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
-            String xLabel = isDate ? xLabelDateFormat.format(xLabelList[i * showGapEveryX] as Date) : xLabelList[i * showGapEveryX].toString()
+            String xLabel = isDate ? diagramOption.xLabelDateFormat.format(xLabelList[i * showGapEveryX] as Date) : xLabelList[i * showGapEveryX].toString()
             BigDecimal labelLength = render.measureText(xLabel)
             if (gapWidth >= labelLength) {
                 render.translateTo(coordX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
@@ -311,10 +310,5 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
     void buildTransformAreaEnd() {
         render.renderGroupEnd()
         render.renderGroupEnd()
-    }
-
-    @Override
-    void setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
-        this.xLabelDateFormat = xLabelDateFormat
     }
 }

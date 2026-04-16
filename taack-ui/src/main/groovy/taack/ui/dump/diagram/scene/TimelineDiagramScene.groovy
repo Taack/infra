@@ -124,7 +124,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         int displayedXLabelListNumber = xLabelList.size()
         BigDecimal diagramWidth = width - diagramMarginLeft - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1)
-        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { xLabelDateFormat.format(it as Date) }.join(''))
+        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { diagramOption.xLabelDateFormat.format(it as Date) }.join(''))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / (diagramWidth * 0.8)).toDouble()).toInteger()
         render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND, 'show-label-every-x': xLabelTotalLength / (diagramWidth * 0.8)])
         render.fillStyle(GREY_COLOR)
@@ -143,7 +143,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             }
 
             // x axis label
-            String xLabel = xLabelDateFormat.format(xLabelList[i] as Date)
+            String xLabel = diagramOption.xLabelDateFormat.format(xLabelList[i] as Date)
             BigDecimal labelLength = render.measureText(xLabel)
             if (gapWidth >= labelLength) {
                 render.translateTo(coordX - labelLength / 2, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)

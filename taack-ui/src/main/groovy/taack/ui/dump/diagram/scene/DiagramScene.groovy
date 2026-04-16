@@ -78,10 +78,6 @@ abstract class DiagramScene {
         return height
     }
 
-    void setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
-
-    }
-
     void draw(boolean alwaysShowFullInfo = false) {
 
     }

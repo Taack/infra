@@ -52,7 +52,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
     }
 
     String objectToString(Object o) {
-        return o instanceof Date ? xLabelDateFormat.format(o) : o.toString()
+        return o instanceof Date ? diagramOption.xLabelDateFormat.format(o) : o.toString()
     }
 
     void drawVerticalBackgroundAndDataWhiskersBox() {

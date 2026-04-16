@@ -13,7 +13,7 @@ interface IUiDiagramVisitor {
 
     void visitLabels(String... labels)
 
-    void visitLabels(DiagramXLabelDateFormat dateFormat, Date... dates)
+    void visitLabels(Date... dates)
 
     void dataset(String key, BigDecimal[] yDataList)
 
