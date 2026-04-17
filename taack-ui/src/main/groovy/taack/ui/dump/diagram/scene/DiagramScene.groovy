@@ -2,7 +2,6 @@ package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
-import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.Color
@@ -12,6 +11,7 @@ enum ElementType {
     LEGEND,
     HORIZONTAL_BACKGROUND,
     VERTICAL_BACKGROUND,
+    VERTICAL_SCROLL_BAR,
     TRANSFORM_AREA,
     DATA
 }
@@ -75,10 +75,6 @@ abstract class DiagramScene {
         }
         diagramMarginTop += height
         return height
-    }
-
-    void setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
-
     }
 
     void draw(boolean alwaysShowFullInfo = false) {
