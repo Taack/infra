@@ -128,11 +128,11 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    fun verticalScroll(isUp: Boolean) { // move a fixed distance "gapHeight" each time
-        verticalScrollBy(if (isUp) gapHeight else -gapHeight)
+    fun verticalScroll(isUp: Boolean): Boolean { // move a fixed distance "gapHeight" each time
+        return verticalScrollBy(if (isUp) gapHeight else -gapHeight)
     }
 
-    fun verticalScrollBy(movingDistance: Double) {
+    fun verticalScrollBy(movingDistance: Double): Boolean {
         if (horizontalBackgroundLines.isNotEmpty()) {
             val currentY = g.getAttribute("scroll-y")?.toDouble() ?: 0.0
             val y = currentY + movingDistance
@@ -147,11 +147,15 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 if (horizontalBackground != null && horizontalBackground.closest("g[element-type='TRANSFORM_AREA']") == null) {
                     horizontalBackground.setAttribute("transform", "translate(0.0,${adjustedY})")
                 }
+
+                if (parent.scrollBar != null) {
+                    parent.scrollBar.scrollBy(-movingDistance)
+                }
+
+                return true
             }
         }
-        if (parent.scrollBar != null) {
-            parent.scrollBar.scrollBy(-movingDistance)
-        }
+        return false
     }
 
     private var zoomUpTimer: Int? = null

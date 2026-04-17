@@ -35,7 +35,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             var isScrollingX = false
             var previousMousePosition: Double? = null
             s.onmousedown = EventHandler { e ->
-                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
+                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble(), e.clientY.toDouble())) {
                     isScrollingX = true
                     previousMousePosition = translateX(e.clientX.toDouble())
                 }
@@ -56,8 +56,8 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
 
             // Zoom
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
-                e.preventDefault()
                 if (e.ctrlKey) {
+                    e.preventDefault()
                     transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)
                 }
             }
@@ -66,7 +66,9 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             if (transformArea.getShapeType() == "timeline") {
                 s.addEventListener(EventType("wheel"), EventHandler { e: WheelEvent ->
                     if (!e.ctrlKey) {
-                        transformArea.verticalScroll(e.deltaY < 0)
+                        if (transformArea.verticalScroll(e.deltaY < 0)) {
+                            e.preventDefault()
+                        }
                     }
                 })
 
