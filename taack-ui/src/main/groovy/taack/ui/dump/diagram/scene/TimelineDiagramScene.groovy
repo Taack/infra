@@ -208,6 +208,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         for (int i = 0; i < keys.size(); i++) {
             // data timeline periods
             String key = keys[i]
+            BigDecimal y = diagramMarginTop + gapHeight * (i + 0.5) // center Y inside gap
             timelineDataPerKey[key].eachWithIndex { Triple<Date, Date, String> info, int index ->
                 String periodTitle = info.cValue ?: ''
                 Integer period = ((info.bValue.getTime() - info.aValue.getTime()) / (1000 * 60 * 60 * 24)).toInteger()
@@ -221,7 +222,6 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                                     'data-label': periodLabel + ' : ' + period.toString(),
                                     'key-color': KeyColor.colorToString(keyColor)])
                 BigDecimal x = diagramMarginLeft + (objectToNumber(info.aValue) - minX) / (maxX - minX) * totalWidth
-                BigDecimal y = diagramMarginTop + gapHeight * (i + 0.5)
                 BigDecimal width = (objectToNumber(info.bValue) - objectToNumber(info.aValue)) / (maxX - minX) * totalWidth
 
                 // period rect
@@ -231,10 +231,23 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
 
                 render.renderGroupEnd()
 
-                // period label
                 if (diagramOption?.showDataCount) {
+                    // period label
                     render.translateTo(x + (width - render.measureText(period.toString())) / 2, y - fontSize / 2)
                     render.renderLabel(period.toString())
+
+                    // startDate
+                    if (index == 0) {
+                        String dateLabel = dateFormat.format(info.aValue)
+                        render.translateTo(x - AXIS_LABEL_MARGIN - render.measureText(dateLabel), y - fontSize / 2)
+                        render.renderLabel(dateLabel)
+                    }
+
+                    // endDate
+                    if (index == timelineDataPerKey[key].size() - 1) {
+                        render.translateTo(x + width + AXIS_LABEL_MARGIN, y - fontSize / 2)
+                        render.renderLabel(dateFormat.format(info.bValue))
+                    }
                 }
             }
         }

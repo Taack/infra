@@ -34,11 +34,16 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
     val dataset: String = g.attributes.getNamedItem("dataset")!!.value
     val gapIndex = g.attributes.getNamedItem("gap-index")?.value?.toInt()
     private val shapes: List<SVGElement> = g.children.asList().filter { it.tagName != "text" }.unsafeCast<List<SVGElement>>()
-    private val dataLabel: SVGTextElement? = g.nextElementSibling?.let { if (it.tagName == "text") return@let it as SVGTextElement else null }
+    private val dataLabels: MutableList<SVGTextElement> = mutableListOf()
     private val keyColor: String = g.attributes.getNamedItem("key-color")?.value ?: "rgb(0, 0, 0)"
     private val tooltip: SVGGElement?
 
     init {
+        var dataLabel = g.nextElementSibling
+        while (dataLabel?.tagName == "text") {
+            dataLabels.add(dataLabel as SVGTextElement)
+            dataLabel = dataLabel.nextElementSibling
+        }
         val tooltipLabel = g.getAttribute("data-label")
         if (!tooltipLabel.isNullOrBlank()) {
             val diagramRoot = parent.parent
@@ -108,7 +113,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
 
     fun hideOrShow(toShow: Boolean) {
         g.style.display = if (toShow) "" else "none"
-        if (dataLabel != null) {
+        dataLabels.forEach { dataLabel ->
             dataLabel.style.display = if (toShow) "" else "none"
         }
     }
@@ -117,16 +122,30 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         shapes.forEach { shape ->
             when (shape.tagName) {
                 "rect" -> {
+                    val oldX = shape.getAttribute("x")!!.toDouble()
+                    val oldWidth = shape.getAttribute("width")!!.toDouble()
                     shape.setAttribute("x", startX.toString())
                     shape.setAttribute("width", shapeWidth.toString())
-                    dataLabel?.setAttribute("x", (startX + (shapeWidth - dataLabel.getAttribute("label-width")!!.toDouble()) / 2).toString())
+                    dataLabels.forEach { dataLabel ->
+                        val labelX = dataLabel.getAttribute("x")!!.toDouble()
+                        val labelWidth = dataLabel.getAttribute("label-width")!!.toDouble()
+                        if (labelX + labelWidth < oldX) { // startDate at left
+                            dataLabel.setAttribute("x", (startX + (labelX + labelWidth - oldX) - labelWidth).toString())
+                        } else if (labelX > oldX + oldWidth) { // endDate at right
+                            dataLabel.setAttribute("x", (startX + shapeWidth + (labelX - oldX - oldWidth)).toString())
+                        } else { // data inside at middle
+                            dataLabel.setAttribute("x", (startX + (shapeWidth - labelWidth) / 2).toString())
+                        }
+                    }
                 }
                 "circle" -> {
                     shape.setAttribute("cx", startX.toString())
-                    if (parent.getShapeType() == "line") {
-                        dataLabel?.setAttribute("x", (startX - dataLabel.getAttribute("label-width")!!.toDouble() / 2).toString())
-                    } else if (parent.getShapeType() == "scatter") {
-                        dataLabel?.setAttribute("x", (startX + shape.getAttribute("r")!!.toDouble() + 2.0).toString())
+                    dataLabels.forEach { dataLabel ->
+                        if (parent.getShapeType() == "line") {
+                            dataLabel.setAttribute("x", (startX - dataLabel.getAttribute("label-width")!!.toDouble() / 2).toString())
+                        } else if (parent.getShapeType() == "scatter") {
+                            dataLabel.setAttribute("x", (startX + shape.getAttribute("r")!!.toDouble() + 2.0).toString())
+                        }
                     }
                 }
                 "line" -> {
@@ -155,7 +174,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                     }
                     y = startY - shape.getAttribute("height")!!.toDouble()
                     shape.setAttribute("y", y.toString())
-                    if (dataLabel != null) {
+                    dataLabels.forEach { dataLabel ->
                         val fontSize = dataLabel.style.fontSize.let { it.substring(0, it.indexOf("px")) }.toDouble()
                         dataLabel.setAttribute("y", (y + shape.getAttribute("height")!!.toDouble() / 2 + fontSize / 2 - 2.0).toString())
                     }
