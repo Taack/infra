@@ -30,8 +30,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         verticalBackgroundLines[1].getAttribute("x1")!!.toDouble() - verticalBackgroundLines[0].getAttribute("x1")!!.toDouble()
     else (areaMaxX - areaMinX)
 
-    private val areaMinY: Double = g.attributes.getNamedItem("area-min-y")!!.value.toDouble()
-    private val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
+    val areaMinY: Double = g.attributes.getNamedItem("area-min-y")!!.value.toDouble()
+    val areaMaxY: Double = g.attributes.getNamedItem("area-max-y")!!.value.toDouble()
     private val horizontalBackground = parent.s.querySelector("g[element-type='HORIZONTAL_BACKGROUND']")
     private val horizontalBackgroundLines = horizontalBackground?.querySelectorAll("line")?.asList() ?: listOf()
     private val gapHeight: Double = if (horizontalBackgroundLines.size > 1)
@@ -128,11 +128,11 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
     }
 
-    fun verticalScroll(isUp: Boolean) { // move a fixed distance "gapHeight" each time
-        verticalScrollBy(if (isUp) gapHeight else -gapHeight)
+    fun verticalScroll(isUp: Boolean): Boolean { // move a fixed distance "gapHeight" each time
+        return verticalScrollBy(if (isUp) gapHeight else -gapHeight)
     }
 
-    fun verticalScrollBy(movingDistance: Double) {
+    fun verticalScrollBy(movingDistance: Double): Boolean {
         if (horizontalBackgroundLines.isNotEmpty()) {
             val currentY = g.getAttribute("scroll-y")?.toDouble() ?: 0.0
             val y = currentY + movingDistance
@@ -147,8 +147,15 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 if (horizontalBackground != null && horizontalBackground.closest("g[element-type='TRANSFORM_AREA']") == null) {
                     horizontalBackground.setAttribute("transform", "translate(0.0,${adjustedY})")
                 }
+
+                if (parent.scrollBar != null) {
+                    parent.scrollBar.scrollBy(-movingDistance)
+                }
+
+                return true
             }
         }
+        return false
     }
 
     private var zoomUpTimer: Int? = null

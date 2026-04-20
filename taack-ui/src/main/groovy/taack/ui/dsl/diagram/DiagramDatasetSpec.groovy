@@ -18,8 +18,8 @@ class DiagramDatasetSpec {
         diagramVisitor.visitLabels(labels)
     }
 
-    void labels(DiagramXLabelDateFormat dateFormat = DiagramXLabelDateFormat.DAY, Date... dates) {
-        diagramVisitor.visitLabels(dateFormat, dates)
+    void labels(Date... dates) {
+        diagramVisitor.visitLabels(dates)
     }
 
     void dataset(final String key, final BigDecimal... yDataList) {
@@ -38,7 +38,7 @@ class DiagramDatasetSpec {
      * Group the given dates according to DiagramXLabelDateFormat, then count every group and put the result as data to draw.
      *
      * For example:
-     *      Knowing DiagramXLabelDateFormat.MONTH (Defined by {@link #labels(DiagramXLabelDateFormat dateFormat)}),
+     *      Knowing DiagramXLabelDateFormat.MONTH (Defined by {@link #option(DiagramOption option)}),
      *      and being given dates: 2025-01-01, 2025-01-10, 2025-01-20, 2025-02-01, 2025-02-10, 2025-03-01.
      *
      *      So they are divided to 3 groups with their own count: [2025-01: 3, 2025-02: 2, 2025-03: 1].

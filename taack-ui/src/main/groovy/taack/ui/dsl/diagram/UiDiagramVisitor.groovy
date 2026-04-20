@@ -26,7 +26,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitLabels(DiagramXLabelDateFormat dateFormat, Date... dates) {
+    void visitLabels(Date... dates) {
 
     }
 

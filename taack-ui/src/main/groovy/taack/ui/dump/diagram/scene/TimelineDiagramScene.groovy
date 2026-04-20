@@ -14,6 +14,8 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     private BigDecimal MIN_TIMELINE_HEIGHT = 10.0
     private BigDecimal MAX_TIMELINE_HEIGHT = 20.0
     private BigDecimal TIMELINE_HEIGHT_RATE = 0.395
+    private BigDecimal MAX_DIAGRAM_MARGIN_LEFT = DIAGRAM_MARGIN_LEFT * 2
+    private BigDecimal SCROLL_BAR_WIDTH = 10.0
 
     final private Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey
     private BigDecimal timelineHeight
@@ -48,6 +50,9 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                 diagramMarginLeft = keyLabelLength + AXIS_LABEL_MARGIN
             }
         }
+        if (diagramMarginLeft > MAX_DIAGRAM_MARGIN_LEFT) {
+            diagramMarginLeft = MAX_DIAGRAM_MARGIN_LEFT
+        }
 
         BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
         if (rate && rate != 1) {
@@ -56,7 +61,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void initGapAndTimelineHeight() { // The timeline's height should normally be 61% of gap height, but limited by min and max
+    void initGapAndTimelineHeight() { // The timeline's height should normally be x% of gap height, but limited by min and max
         gapHeight = (height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / timelineDataPerKey.size()
         if (alwaysShowFullInfo && gapHeight * TIMELINE_HEIGHT_RATE < MIN_TIMELINE_HEIGHT) { // Limited by min only when diagram is dynamic (Allowing scroll to have full view)
             timelineHeight = MIN_TIMELINE_HEIGHT
@@ -87,8 +92,16 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             // key label
             if (i < keys.size()) {
                 String key = keys[i]
-                render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize / 2)
-                render.renderLabel(key)
+                if (render.measureText(key) <= diagramMarginLeft - AXIS_LABEL_MARGIN) {
+                    render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize / 2)
+                    render.renderLabel(key)
+                } else {
+                    while (render.measureSmallText(key) > diagramMarginLeft - AXIS_LABEL_MARGIN) {
+                        key = key.substring(0, key.size() - 6) + '...'
+                    }
+                    render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureSmallText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize * render.SMALL_LABEL_RATE / 2)
+                    render.renderSmallLabel(key)
+                }
             }
         }
         render.renderGroupEnd()
@@ -111,7 +124,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         int displayedXLabelListNumber = xLabelList.size()
         BigDecimal diagramWidth = width - diagramMarginLeft - DIAGRAM_MARGIN_RIGHT
         BigDecimal gapWidth = diagramWidth / (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1)
-        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { xLabelDateFormat.format(it as Date) }.join(''))
+        BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { diagramOption.xLabelDateFormat.format(it as Date) }.join(''))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / (diagramWidth * 0.8)).toDouble()).toInteger()
         render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND, 'show-label-every-x': xLabelTotalLength / (diagramWidth * 0.8)])
         render.fillStyle(GREY_COLOR)
@@ -130,7 +143,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             }
 
             // x axis label
-            String xLabel = xLabelDateFormat.format(xLabelList[i] as Date)
+            String xLabel = diagramOption.xLabelDateFormat.format(xLabelList[i] as Date)
             BigDecimal labelLength = render.measureText(xLabel)
             if (gapWidth >= labelLength) {
                 render.translateTo(coordX - labelLength / 2, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
@@ -148,14 +161,26 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                 }
             }
         }
-        // today
-        render.translateTo(diagramMarginLeft + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
-        render.fillStyle(Color.RED)
-        render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+        if (diagramOption.showTodayLine && xLabelList.every { it instanceof Date }) {
+            render.translateTo(diagramMarginLeft + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
+            render.fillStyle(Color.RED)
+            render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+        }
 
         render.renderGroupEnd()
         render.renderGroupEnd()
         render.renderGroupEnd()
+    }
+
+    void drawVerticalScrollBar() {
+        BigDecimal diagramHeight = height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM
+        if ((gapHeight * timelineDataPerKey.size() * 100).toInteger() / 100 > diagramHeight) {
+            render.renderGroup(['element-type': ElementType.VERTICAL_SCROLL_BAR])
+            render.translateTo(width - (DIAGRAM_MARGIN_RIGHT - SCROLL_BAR_WIDTH) / 2 - SCROLL_BAR_WIDTH, diagramMarginTop)
+            render.fillStyle(GREY_COLOR)
+            render.renderRect(SCROLL_BAR_WIDTH, diagramHeight * (diagramHeight / (gapHeight * timelineDataPerKey.size())), IDiagramRender.DiagramStyle.fill)
+            render.renderGroupEnd()
+        }
     }
 
     void drawDataTimeline() {
@@ -228,6 +253,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         initGapAndTimelineHeight()
         drawHorizontalBackground()
         drawVerticalBackground()
+        drawVerticalScrollBar()
         drawDataTimeline()
     }
 }

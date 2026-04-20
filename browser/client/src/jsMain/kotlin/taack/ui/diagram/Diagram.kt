@@ -1,10 +1,10 @@
 package taack.ui.diagram
 
 import js.array.asList
-import kotlinx.browser.window
 import taack.ui.base.BaseElement
 import taack.ui.base.element.AjaxBlock
 import taack.ui.base.element.Block
+import web.dom.document
 import web.events.EventHandler
 import web.events.EventType
 import web.events.addEventListener
@@ -24,6 +24,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
 
     private val fontSizePercentage: Double = s.attributes.getNamedItem("font-size-percentage")?.value?.toDouble() ?: 1.0
     val transformArea: DiagramTransformArea? = DiagramTransformArea.getSiblingDiagramTransformArea(this)
+    val scrollBar: DiagramScrollBar? = DiagramScrollBar.getSiblingDiagramScrollBar(this)
 
     init {
         s.style.userSelect = "none"
@@ -34,7 +35,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             var isScrollingX = false
             var previousMousePosition: Double? = null
             s.onmousedown = EventHandler { e ->
-                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble())) {
+                if (transformArea.isClientMouseInTransformArea(e.clientX.toDouble(), e.clientY.toDouble())) {
                     isScrollingX = true
                     previousMousePosition = translateX(e.clientX.toDouble())
                 }
@@ -65,26 +66,41 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             if (transformArea.getShapeType() == "timeline") {
                 s.addEventListener(EventType("wheel"), EventHandler { e: WheelEvent ->
                     if (!e.ctrlKey) {
-                        transformArea.verticalScroll(e.deltaY < 0)
+                        if (transformArea.verticalScroll(e.deltaY < 0)) {
+                            e.preventDefault()
+                        }
                     }
                 })
 
                 var isScrollingY = false
+                var isScrollingByBar = false
                 s.addEventListener(EventType("mousedown"), EventHandler { e: MouseEvent ->
                     if (transformArea.isClientMouseInYAxisLabelArea(e.clientX.toDouble())) {
                         isScrollingY = true
+                        isScrollingByBar = false
                         previousMousePosition = translateY(e.clientY.toDouble())
                     }
                 })
-                s.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
+                scrollBar?.g?.onmousedown = EventHandler { e ->
+                    isScrollingY = true
+                    isScrollingByBar = true
+                    previousMousePosition = translateY(e.clientY.toDouble())
+                }
+                document.addEventListener(EventType("mousemove"), EventHandler { e: MouseEvent ->
                     if (isScrollingY && previousMousePosition != null) {
                         val currentMouseY = translateY(e.clientY.toDouble())
-                        transformArea.verticalScrollBy(currentMouseY - previousMousePosition!!)
+                        if (isScrollingByBar) {
+                            transformArea.verticalScrollBy((previousMousePosition!! - currentMouseY) / scrollBar!!.rate)
+                        } else {
+                            transformArea.verticalScrollBy(currentMouseY - previousMousePosition!!)
+                        }
                         previousMousePosition = currentMouseY
                     }
                 })
-                s.addEventListener(EventType("mouseup"), EventHandler { isScrollingY = false })
-                s.addEventListener(EventType("mouseleave"), EventHandler { isScrollingY = false })
+                document.addEventListener(EventType("mouseup"), EventHandler {
+                    isScrollingY = false
+                    isScrollingByBar = false
+                })
             }
 
             // HoverLine and tooltip for LINE diagram

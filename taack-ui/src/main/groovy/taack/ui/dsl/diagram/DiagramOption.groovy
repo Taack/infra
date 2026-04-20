@@ -14,9 +14,11 @@ final class DiagramOption {
     String title
     boolean showDataCount = false
     boolean hideLegend = false
+    boolean showTodayLine = false
     List<Color> keyColors
     DiagramResolution resolution
     String clickActionUrl
+    DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
     static DiagramOptionBuilder getBuilder() {
         return new DiagramOptionBuilder()
@@ -36,6 +38,11 @@ final class DiagramOption {
 
         DiagramOptionBuilder hideLegend() {
             diagramOption.hideLegend = true
+            this
+        }
+
+        DiagramOptionBuilder showTodayLine() {
+            diagramOption.showTodayLine = true
             this
         }
 
@@ -65,6 +72,11 @@ final class DiagramOption {
 
         DiagramOptionBuilder setClickAction(MethodClosure action, Map params) {
             setClickAction(action, null, params)
+        }
+
+        DiagramOptionBuilder setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
+            diagramOption.xLabelDateFormat = xLabelDateFormat
+            this
         }
 
         DiagramOption build() {
