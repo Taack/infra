@@ -18,8 +18,8 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
     }
 
-    static String objectToString(Object o) {
-        return o instanceof Date ? new SimpleDateFormat('yyyy-MM-dd HH:mm').format(o) : o instanceof Number ? numberToString(o.toBigDecimal()) : o.toString()
+    String objectToString(Object o) {
+        return o instanceof Date ? diagramOption.xLabelDateFormat.format(o) : o instanceof Number ? numberToString(o.toBigDecimal()) : o.toString()
     }
 
     void drawDataPoint(Boolean hasLineBetweenPoints) {

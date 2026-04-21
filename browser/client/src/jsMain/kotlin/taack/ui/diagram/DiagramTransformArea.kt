@@ -246,7 +246,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         }
         zoomTimer = window.setTimeout({
             verticalBackgroundTexts.forEachIndexed { index, text ->
-                (text as SVGTextElement).style.display = if (index % ceil(round(showLabelEveryX * 100) / 100).toInt() == 0) "" else "none"
+                (text as SVGTextElement).style.display = if (index % ceil(round(showLabelEveryX * 100) / 100).toInt() == 0 || text.previousElementSibling == verticalBackgroundTodayLine) "" else "none"
             }
         }, if (zoomRadio == 1.0) 0 else 500)
 

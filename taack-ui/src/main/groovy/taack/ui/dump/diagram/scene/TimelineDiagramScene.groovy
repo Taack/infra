@@ -111,8 +111,8 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     void drawVerticalBackground() {
         String id = 'clipSection' + ThreadLocalRandom.current().nextInt(1, 1_000_000).toString()
         render.translateTo(0.0, 0.0)
-        render.renderClipSection(id, [diagramMarginLeft - 1, diagramMarginTop,
-                                      width - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop,
+        render.renderClipSection(id, [diagramMarginLeft - 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
+                                      width - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
                                       width - DIAGRAM_MARGIN_RIGHT + 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
                                       width, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
                                       width, height,
@@ -162,9 +162,18 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             }
         }
         if (diagramOption.showTodayLine && xLabelList.every { it instanceof Date }) {
-            render.translateTo(diagramMarginLeft + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
+            // red vertical line for TODAY
+            BigDecimal todayX = diagramMarginLeft + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth
+            render.translateTo(todayX, diagramMarginTop)
             render.fillStyle(Color.RED)
             render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+
+            // date label for TODAY
+            if (diagramOption.showDataCount) {
+                String dateLabel = DiagramXLabelDateFormat.DAY.format(new Date())
+                render.translateTo(todayX - render.measureText(dateLabel) / 2, diagramMarginTop - fontSize)
+                render.renderLabel(dateLabel)
+            }
         }
 
         render.renderGroupEnd()
