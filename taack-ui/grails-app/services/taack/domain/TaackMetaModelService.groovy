@@ -206,7 +206,7 @@ final class TaackMetaModelService {
 
             String q = "from ${it.fieldConstraint.field.declaringClass.typeName} as c where ${isListOrSet ? "c.${it.fieldName} is not empty" : "c.${it.fieldName} <> null"}"
             if (constrainedIds && !constrainedIds.empty) {
-                q = "select c from ${it.fieldConstraint.field.declaringClass.typeName} as c inner join c.${it.fieldName} as r where r.id in (?1)"
+                q = "select distinct c from ${it.fieldConstraint.field.declaringClass.typeName} as c inner join c.${it.fieldName} as r where r.id in (?1)"
             }
 
             Query<? extends GormEntity> query = sessionFactory.currentSession.createQuery(q, it.fieldConstraint.field.declaringClass) as Query<? extends GormEntity>
