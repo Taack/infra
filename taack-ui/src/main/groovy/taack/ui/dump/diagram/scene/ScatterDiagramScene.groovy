@@ -39,18 +39,20 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
                     String xLabel = objectToString(xList[j])
                     String yLabel = numberToString(y)
-                    String dataLabel = xList[j] instanceof Date ? "${xLabel}: ${yLabel}" : "($xLabel, $yLabel)"
+                    String dataLabel = xList[j] instanceof Date ? "${xLabel} : ${yLabel}" : "($xLabel, $yLabel)"
                     Color keyColor = getKeyColor(i)
                     render.fillStyle(keyColor)
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
+                        render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                            'key-label': keys[i],
+                                            'key-color': KeyColor.colorToString(keyColor),
+                                            'key-description': dataLabel])
                         render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[i],
                                             'data-x': xLabel,
                                             'data-y': yLabel,
-                                            'data-label': dataLabel,
-                                            'key-color': KeyColor.colorToString(keyColor),
                                             style: 'pointer-events: bounding-box;'])
                         if (i < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
@@ -59,6 +61,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - yHeight)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
+                        render.renderGroupEnd()
                         render.renderGroupEnd()
                     }
                     // data label
@@ -96,12 +99,14 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
 
                     // data point
                     if (dataPointRadius > 0 && (!hasLineBetweenPoints || alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH)) {
+                        render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                            'key-label': keys[j],
+                                            'key-color': KeyColor.colorToString(keyColor),
+                                            'key-description': "${xLabelList[i]}: ${yDataLabel}"])
                         render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[j],
                                             'data-x': xLabelList[i],
                                             'data-y': yDataLabel,
-                                            'data-label': "${xLabelList[i]}: ${yDataLabel}",
-                                            'key-color': KeyColor.colorToString(keyColor),
                                             style: 'pointer-events: bounding-box;'])
                         if (j < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, height - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
@@ -111,6 +116,7 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                             render.fillStyle(keyColor)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
                         }
+                        render.renderGroupEnd()
                         render.renderGroupEnd()
                     }
                     // data label

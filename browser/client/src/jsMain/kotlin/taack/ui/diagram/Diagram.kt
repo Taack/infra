@@ -23,6 +23,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     }
 
     private val fontSizePercentage: Double = s.attributes.getNamedItem("font-size-percentage")?.value?.toDouble() ?: 1.0
+    val tooltips: List<DiagramTooltip> = DiagramTooltip.getSiblingDiagramTooltip(this)
     val transformArea: DiagramTransformArea? = DiagramTransformArea.getSiblingDiagramTransformArea(this)
     val scrollBar: DiagramScrollBar? = DiagramScrollBar.getSiblingDiagramScrollBar(this)
 

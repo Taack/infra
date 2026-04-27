@@ -102,7 +102,11 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                         Color keyColor = getKeyColor(j)
                         if (lowerExtreme > startLabelY) {
                             String yDataLabel = numberToString(upperExtreme)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor), style: 'pointer-events: bounding-box;'])
+                            render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                'key-label': keys[j],
+                                                'key-color': KeyColor.colorToString(keyColor),
+                                                'key-description': "${xLabel}: ${yDataLabel}"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, style: 'pointer-events: bounding-box;'])
                             // upperExtreme line
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
                             render.fillStyle(BLACK_COLOR)
@@ -111,9 +115,14 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
                             render.renderLine(0.0, (upperExtreme - upperQuartile) / gapY * gapHeight)
                             render.renderGroupEnd()
+                            render.renderGroupEnd()
 
                             yDataLabel = numberToString(upperQuartile)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor)])
+                            render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                'key-label': keys[j],
+                                                'key-color': KeyColor.colorToString(keyColor),
+                                                'key-description': "${xLabel}: ${yDataLabel}"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel])
                             // rect from upperQuartile to median
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
                             render.fillStyle(keyColor)
@@ -121,9 +130,14 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.fillStyle(BLACK_COLOR)
                             render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
                             render.renderGroupEnd()
+                            render.renderGroupEnd()
 
                             yDataLabel = numberToString(median)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor)])
+                            render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                'key-label': keys[j],
+                                                'key-color': KeyColor.colorToString(keyColor),
+                                                'key-description': "${xLabel}: ${yDataLabel}"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel])
                             // rect from median to lowerQuartile
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (median - startLabelY) / gapY * gapHeight)
                             render.fillStyle(keyColor)
@@ -131,9 +145,14 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.fillStyle(BLACK_COLOR)
                             render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
                             render.renderGroupEnd()
+                            render.renderGroupEnd()
 
                             yDataLabel = numberToString(lowerQuartile)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor), style: 'pointer-events: bounding-box;'])
+                            render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                'key-label': keys[j],
+                                                'key-color': KeyColor.colorToString(keyColor),
+                                                'key-description': "${xLabel}: ${yDataLabel}"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, style: 'pointer-events: bounding-box;'])
                             // lowerQuartile line
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
                             render.renderLine(boxWidth, 0.0)
@@ -141,12 +160,18 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                             render.translateTo(xWidth + boxWidth / 2, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
                             render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
                             render.renderGroupEnd()
+                            render.renderGroupEnd()
 
                             yDataLabel = numberToString(lowerExtreme)
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel, 'data-label': "${xLabel}: ${yDataLabel}", 'key-color': KeyColor.colorToString(keyColor)])
+                            render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                'key-label': keys[j],
+                                                'key-color': KeyColor.colorToString(keyColor),
+                                                'key-description': "${xLabel}: ${yDataLabel}"])
+                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, 'data-x': xLabel, 'data-y': yDataLabel])
                             // lowerExtreme line
                             render.translateTo(xWidth, height - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
                             render.renderLine(boxWidth, 0.0)
+                            render.renderGroupEnd()
                             render.renderGroupEnd()
                         }
                     } else {

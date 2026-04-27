@@ -41,7 +41,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     var currentHoverLine: SVGLineElement? = null
 
     init {
-        if (shapeType == "line" && dataList.any { it.g.hasAttribute("data-label") }) {
+        if (shapeType == "line" && dataList.any { it.getTooltip() != null }) {
             currentHoverLine = document.createElementNS("http://www.w3.org/2000/svg", "line") as SVGLineElement
             currentHoverLine!!.setAttribute("y1", verticalBackgroundLines.firstOrNull()?.getAttribute("y1") ?: "43.0")
             currentHoverLine!!.setAttribute("y2", verticalBackgroundLines.firstOrNull()?.getAttribute("y2") ?: "425.0")
@@ -60,7 +60,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
             val mouseClientY: Double = e.clientY.toDouble()
             if (parent.translateX(mouseClientX) in areaMinX..(parent.s.viewBox.baseVal.x + parent.s.viewBox.baseVal.width)) {
                 var minGapX: Double = Double.MAX_VALUE
-                val datasetMap = dataList.filter { it.g.hasAttribute("data-label") && it.g.style.display != "none" }.groupBy { it.dataset }
+                val datasetMap = dataList.filter { it.getTooltip() != null && it.g.style.display != "none" }.groupBy { it.dataset }
                 datasetMap.forEach {
                     val dataList = it.value.filter { data -> round(parent.translateX(data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2) * 100) / 100 in areaMinX..areaMaxX }
                     val diagramDataIndex = dataList.indexOf(dataList.findLast { data -> data.g.getBoundingClientRect().x + data.g.getBoundingClientRect().width / 2 <= mouseClientX })
@@ -98,7 +98,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
                 currentHoverLine!!.remove()
             }
             parent.s.querySelectorAll(".diagram-tooltip").forEach { it.remove() }
-            showToolTipData?.showTooltip(e)
+            showToolTipData?.getTooltip()?.showTooltip(e)
         }
     }
 

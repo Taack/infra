@@ -87,19 +87,22 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 String yDataLabel = numberToString(yData)
                 BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
                 Color keyColor = getKeyColor(j)
+                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                    'key-label': keys[j],
+                                    'key-color': KeyColor.colorToString(keyColor),
+                                    'key-description': "${xLabel}: ${yDataLabel}"])
                 render.renderGroup(['element-type': ElementType.DATA,
                                     dataset: keys[j],
                                     'gap-index': i,
                                     'data-x': xLabel,
-                                    'data-y': yDataLabel,
-                                    'data-label': "${xLabel}: ${yDataLabel}",
-                                    'key-color': KeyColor.colorToString(keyColor)])
+                                    'data-y': yDataLabel])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)
                     render.fillStyle(keyColor)
                     render.renderRect(barWidth, barHeight, IDiagramRender.DiagramStyle.fill)
                 }
+                render.renderGroupEnd()
                 render.renderGroupEnd()
 
                 // label

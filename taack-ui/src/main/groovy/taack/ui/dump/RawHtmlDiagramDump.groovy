@@ -4,7 +4,6 @@ import grails.util.Triple
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
 import taack.ui.dsl.diagram.DiagramOption
-import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dsl.diagram.IUiDiagramVisitor
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.diagram.IDiagramRender
@@ -34,7 +33,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Object[] xDataList
     private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
-    private Map<String, List<Triple<Date, Date, String>>> timelineDataPerKey // [key1: [Triple(startDate, endDate, title), Triple(startDate2, endDate2, title2), Pair...], key2 : [...], ...]
+    private Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey // [Triple(key, keyDescription, keyImageHref): [Triple(startDate, endDate, title), Triple(startDate2, endDate2, title2), Pair...], Triple() : [...], ...]
     private DiagramOption diagramOption = new DiagramOption()
 
     @Override
@@ -172,13 +171,14 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     @Override
-    void timelinePeriodData(String key, Date startDate, Date endDate, String title) {
+    void timelinePeriodData(String key, String keyDescription, String keyImageHref, Date startDate, Date endDate, String title) {
         if (startDate && endDate) {
             Triple<Date, Date, String> info = startDate.before(endDate) ? new Triple(startDate, endDate, title) : new Triple(endDate, startDate, title)
-            if (timelineDataPerKey.containsKey(key)) {
-                timelineDataPerKey[key].add(info)
+            Triple<String, String, String> k = timelineDataPerKey.keySet().find { it.aValue == key }
+            if (k) {
+                timelineDataPerKey[k].add(info)
             } else {
-                timelineDataPerKey.put(key, [info])
+                timelineDataPerKey.put(new Triple(key, keyDescription, keyImageHref), [info])
             }
         }
     }
