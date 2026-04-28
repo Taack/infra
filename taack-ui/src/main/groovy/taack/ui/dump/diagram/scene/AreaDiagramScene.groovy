@@ -61,7 +61,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 Map<BigDecimal, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
                 Set<BigDecimal> xDataSet = dataMap.keySet()
                 Color keyColor = getKeyColor(i)
-                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': '', 'key-color': KeyColor.colorToString(keyColor)])
+                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': ''])
                 List<BigDecimal> coordsToDraw = [] // x1, y1, x2, y2, ...
                 for (int j = 0; j < xDataSet.size(); j++) {
                     BigDecimal xWidth = (xDataSet[j] - minX) / (maxX - minX) * totalWidth

@@ -2,6 +2,7 @@ package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
 import taack.ui.dsl.diagram.DiagramOption
+import taack.ui.dsl.diagram.DiagramXLabelDateFormat
 import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.Color
@@ -281,9 +282,16 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
         }
         if (diagramOption.showTodayLine && xLabelList.every { it instanceof Date }) {
-            render.translateTo(DIAGRAM_MARGIN_LEFT + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth, diagramMarginTop)
+            BigDecimal todayX = DIAGRAM_MARGIN_LEFT + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth
+            render.translateTo(todayX, diagramMarginTop)
             render.fillStyle(Color.RED)
             render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+
+            if (diagramOption.showDataCount) {
+                String dateLabel = DiagramXLabelDateFormat.DAY.format(new Date())
+                render.translateTo(todayX - render.measureText(dateLabel) / 2, diagramMarginTop - fontSize)
+                render.renderLabel(dateLabel)
+            }
         }
         render.renderGroupEnd()
     }

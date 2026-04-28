@@ -58,16 +58,20 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
     }
 
     private fun onclickBaseAjaxAction(e: MouseEvent) {
+        if (action?.contains("downloadBin") == true) {
+            trace("Binary Action ... $action")
+            return
+        }
         e.preventDefault()
         lastUrlClicked = createUrl(!isHref, action)
         val targetUrl = lastUrlClicked.toString()
         trace("BaseAjaxAction::onclickBaseAjaxAction")
 
         val xhr = XMLHttpRequest()
-        if (action?.contains("downloadBin") == true) {
-            trace("Binary Action ... $action")
-            xhr.responseType = XMLHttpRequestResponseType.blob
-        }
+//        if (action?.contains("downloadBin") == true) {
+//            trace("Binary Action ... $action")
+//            xhr.responseType = XMLHttpRequestResponseType.blob
+//        }
         val loader = document.getElementById(ElementId("taack-load-spinner"))
         xhr.onreadystatechange = EventHandler { ev ->
             if (xhr.readyState == xhr.DONE) {
@@ -75,17 +79,17 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                 checkLogin(xhr)
                 if (xhr.status == 200.toShort()) {
                     ev.preventDefault()
-                    if (xhr.responseType == XMLHttpRequestResponseType.blob) {
-                        val contentDispo = xhr.getResponseHeader("Content-Disposition")
-                        if (contentDispo != null) {
-                            val fileName =
-                                Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
-                            if (fileName != null) {
-                                trace("saveOrOpenBlog $fileName")
-                                saveOrOpenBlob(xhr.response as Blob, fileName)
-                            }
-                        }
-                    } else {
+//                    if (xhr.responseType == XMLHttpRequestResponseType.blob) {
+//                        val contentDispo = xhr.getResponseHeader("Content-Disposition")
+//                        if (contentDispo != null) {
+//                            val fileName =
+//                                Regex("filename[^;=\n]*=((['\"]).*?\\2|[^;\n]*)").find(contentDispo)?.groupValues?.get(1)
+//                            if (fileName != null) {
+//                                trace("saveOrOpenBlog $fileName")
+//                                saveOrOpenBlob(xhr.response as Blob, fileName)
+//                            }
+//                        }
+//                    } else {
                         val text = xhr.responseText
                         if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
                             trace("Full webpage ...|$action|${document.title}|${document.documentURI}|${xhr.responseURL}")
@@ -97,7 +101,7 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                             trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
                             processAjaxLink(lastUrlClicked, text, parent)
                         }
-                    }
+//                    }
                 }
                 loader?.classList?.add(ClassName("tck-hidden"))
             } else if (xhr.readyState == xhr.OPENED) {
