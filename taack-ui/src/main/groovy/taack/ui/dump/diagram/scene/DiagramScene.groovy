@@ -47,8 +47,6 @@ abstract class DiagramScene {
     protected BigDecimal TITLE_MARGIN = 10.0
 
     protected BigDecimal fontSize
-    protected BigDecimal width
-    protected BigDecimal height
     protected IDiagramRender render
     protected DiagramOption diagramOption
     protected BigDecimal diagramMarginTop = DIAGRAM_MARGIN_TOP
@@ -68,7 +66,7 @@ abstract class DiagramScene {
     BigDecimal drawTitle() {
         BigDecimal height
         if (diagramOption?.title?.size() > 0) {
-            render.translateTo((width - render.measureEmphasizedText(diagramOption.title)) / 2, TITLE_MARGIN)
+            render.translateTo((render.getDiagramWidth() - render.measureEmphasizedText(diagramOption.title)) / 2, TITLE_MARGIN)
             render.renderEmphasizedLabel(diagramOption.title)
             height = TITLE_MARGIN + (fontSize * render.EMPHASIZED_LABEL_RATE).toInteger() + TITLE_MARGIN / 2
         } else {

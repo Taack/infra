@@ -12,6 +12,8 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
     private BigDecimal MAX_BAR_WIDTH = 200.0
 
     final private boolean isStacked
+    private BigDecimal gapWidth
+    private int showGapEveryX = 1
 
     BarDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, boolean isStacked) {
         super(render, dataPerKey, diagramOption)
@@ -27,6 +29,40 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
 
     String objectToString(Object o) {
         return o instanceof Date ? diagramOption.xLabelDateFormat.format(o) : o.toString()
+    }
+
+    void initData() {
+        dataPerKey = dataPerKey.collectEntries { Map.Entry<String, Map<Object, BigDecimal>> keyDataMap -> // format xLabels from Date to String
+            Map<Object, BigDecimal> formattedDataMap = [:]
+            keyDataMap.value.each { Map.Entry<Object, BigDecimal> dataEntry ->
+                String formattedLabel = objectToString(dataEntry.key)
+                if (formattedDataMap.containsKey(formattedLabel) && dataEntry.key instanceof Date) { // sum the value of dates which are in same group
+                    formattedDataMap[formattedLabel] += dataEntry.value
+                } else {
+                    formattedDataMap.put(formattedLabel, dataEntry.value)
+                }
+            }
+            return [(keyDataMap.key): formattedDataMap]
+        }
+    }
+
+    void initGapWidth() {
+        gapWidth = (render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / xLabelList.size()
+        if (!alwaysShowFullInfo || diagramOption.resolution == DiagramOption.DiagramResolution.FIT_CONTENT) {
+            // bar width should be bigger than a min value (In the case of 'smaller', we will combine several gaps to get enough space and only draw bars of the first gap. It means 'showGapEveryX'.)
+            int barNumber = isStacked ? 1 : dataPerKey.keySet().size()
+            BigDecimal singleBarWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
+            if (singleBarWidth < MIN_BAR_WIDTH) {
+                BigDecimal minGapWidth = barNumber > 1 ? MIN_BAR_WIDTH * barNumber / 0.8 / 0.8 : MIN_BAR_WIDTH / 0.8
+                if (diagramOption.resolution == DiagramOption.DiagramResolution.FIT_CONTENT) {
+                    gapWidth = minGapWidth
+                    render.setDiagramWidth(gapWidth * xLabelList.size() + DIAGRAM_MARGIN_LEFT + DIAGRAM_MARGIN_RIGHT)
+                } else {
+                    showGapEveryX = Math.ceil((minGapWidth / gapWidth).toDouble()).toInteger()
+                    gapWidth = gapWidth * showGapEveryX
+                }
+            }
+        }
     }
 
     void drawHorizontalBackground() {
@@ -50,23 +86,9 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         }
     }
 
-    void drawVerticalBackgroundAndDataBar() {
-        Set<String> keys = dataPerKey.keySet()
-        int showGapEveryX = 1
-        BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / xLabelList.size()
-        if (!alwaysShowFullInfo) {
-            // bar width should be bigger than a min value (In the case of 'smaller', we will combine several gaps to get enough space and only draw bars of the first gap. It means 'showGapEveryX'.)
-            int barNumber = isStacked ? 1 : keys.size()
-            BigDecimal singleBarWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
-            if (singleBarWidth < MIN_BAR_WIDTH) {
-                BigDecimal minGapWidth = barNumber > 1 ? MIN_BAR_WIDTH * barNumber / 0.8 / 0.8 : MIN_BAR_WIDTH / 0.8
-                showGapEveryX = Math.ceil((minGapWidth / gapWidth).toDouble()).toInteger()
-                gapWidth = gapWidth * showGapEveryX
-            }
-        }
-        super.drawVerticalBackground(showGapEveryX)
-
+    void drawDataBar() {
         // calculate true value of bar width
+        Set<String> keys = dataPerKey.keySet()
         BigDecimal gapHorizontalPadding = gapWidth * 0.2 / 2
         int barNumber = isStacked ? 1 : keys.size()
         BigDecimal barWidth = barNumber > 1 ? (gapWidth * 0.8) * 0.8 / barNumber : gapWidth * 0.8
@@ -79,7 +101,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
         // data bar
         for (int i = 0; i < (xLabelList.size() / showGapEveryX).toInteger(); i++) {
             BigDecimal barX = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
-            BigDecimal barY = height - DIAGRAM_MARGIN_BOTTOM
+            BigDecimal barY = render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM
             for (int j = 0; j < keys.size(); j++) {
                 Map<String, BigDecimal> data = dataPerKey[keys[j]] as Map<String, BigDecimal>
                 String xLabel = objectToString(xLabelList[i * showGapEveryX])
@@ -126,22 +148,13 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
             return
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
-        dataPerKey = dataPerKey.collectEntries { Map.Entry<String, Map<Object, BigDecimal>> keyDataMap -> // format xLabels from Date to String
-            Map<Object, BigDecimal> formattedDataMap = [:]
-            keyDataMap.value.each { Map.Entry<Object, BigDecimal> dataEntry ->
-                String formattedLabel = objectToString(dataEntry.key)
-                if (formattedDataMap.containsKey(formattedLabel) && dataEntry.key instanceof Date) { // sum the value of dates which are in same group
-                    formattedDataMap[formattedLabel] += dataEntry.value
-                } else {
-                    formattedDataMap.put(formattedLabel, dataEntry.value)
-                }
-            }
-            return [(keyDataMap.key): formattedDataMap]
-        }
+        initData()
+        initGapWidth()
         drawLegend()
         drawHorizontalBackground()
         buildTransformAreaStart(isStacked ? 'stackedBar' : 'bar', MAX_BAR_WIDTH)
-        drawVerticalBackgroundAndDataBar()
+        drawVerticalBackground(showGapEveryX, gapWidth)
+        drawDataBar()
         buildTransformAreaEnd()
     }
 }

@@ -11,8 +11,8 @@ import java.awt.image.BufferedImage
 @CompileStatic
 class SvgDiagramRender implements IDiagramRender {
     private StringBuilder outStr = new StringBuilder()
-    private final BigDecimal svgWidth
-    private final BigDecimal svgHeight
+    private BigDecimal svgWidth
+    private BigDecimal svgHeight
     private final boolean isViewBox
     private final BigDecimal fontSizePercentage
     private final FontMetrics fm
@@ -325,6 +325,16 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     BigDecimal getDiagramHeight() {
         return svgHeight
+    }
+
+    @Override
+    void setDiagramWidth(BigDecimal width) {
+        svgWidth = width
+    }
+
+    @Override
+    void setDiagramHeight(BigDecimal height) {
+        svgHeight = height
     }
 
     @Override

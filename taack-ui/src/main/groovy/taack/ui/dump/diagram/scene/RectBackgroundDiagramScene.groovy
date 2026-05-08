@@ -40,8 +40,6 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
     RectBackgroundDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
         this.fontSize = render.getFontSize()
-        this.width = render.getDiagramWidth()
-        this.height = render.getDiagramHeight()
         this.render = render
         this.dataPerKey = dataPerKey
         this.diagramOption = diagramOption
@@ -137,7 +135,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             dataPerKey.keySet().eachWithIndex { String key, int i ->
                 if (key != null) {
                     BigDecimal length = (i < pointImageHref.size() ? LEGEND_IMAGE_WIDTH : LEGEND_RECT_WIDTH) + LEGEND_RECT_TEXT_SPACING + render.measureText(key)
-                    if (totalLength + length > width) {
+                    if (totalLength + length > render.getDiagramWidth()) {
                         line++
                         totalLength = 0.0
                     }
@@ -158,7 +156,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             Integer legendIndex = 0
             keyMapPerLine.each {
                 Map<String, BigDecimal> keyMap = it.value
-                BigDecimal startX = (width - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
+                BigDecimal startX = (render.getDiagramWidth() - (keyMap.values().sum() as BigDecimal) - LEGEND_MARGIN * (keyMap.size() - 1)) / 2
                 keyMap.each { Map.Entry<String, BigDecimal> keyEntry ->
                     // image or rect, with text
                     render.renderGroup(['element-type': ElementType.LEGEND, 'dataset': keyEntry.key, 'transform': "translate(${startX},${startY})", style: "pointer-events: bounding-box;"])
@@ -211,12 +209,12 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             gapNumberY = 10
         }
         BigDecimal endLabelY = startLabelY + gapY * gapNumberY
-        gapHeight = (height - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / gapNumberY
+        gapHeight = (render.getDiagramHeight() - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / gapNumberY
         render.fillStyle(GREY_COLOR)
         for (int i = 0; i <= gapNumberY; i++) {
             // background horizontal line
             render.translateTo(DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM, diagramMarginTop + gapHeight * i)
-            render.renderLine(width - (DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM) - DIAGRAM_MARGIN_RIGHT, 0.0)
+            render.renderLine(render.getDiagramWidth() - (DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM) - DIAGRAM_MARGIN_RIGHT, 0.0)
 
             // y axis label
             String yLabel = "${gapY < 1 ? (endLabelY - gapY * i).round(1) : (endLabelY - gapY * i).toInteger()}"
@@ -230,10 +228,10 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
         return o instanceof Date ? o.getTime() : o instanceof Number ? o : 0.0
     }
 
-    void drawVerticalBackground(int showGapEveryX = 1) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
+    void drawVerticalBackground(int showGapEveryX = 1, BigDecimal gapWidth = null) { // showGapEveryX: combine several gaps and only draw the content of first gap (Be used to assure enough space)
         int displayedXLabelListNumber = (xLabelList.size() / showGapEveryX).toInteger()
-        BigDecimal diagramWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
-        BigDecimal gapWidth = diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
+        BigDecimal diagramWidth = render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
+        gapWidth ?= diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
         boolean isDate = xLabelList.every { it instanceof Date }
         BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? diagramOption.xLabelDateFormat.format(it as Date) : it.toString() }.join(''))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / showGapEveryX / (diagramWidth * 0.8)).toDouble()).toInteger()
@@ -254,7 +252,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             // background vertical line
             if (alwaysShowFullInfo || gapWidth >= MIN_GAP_WIDTH || i % showLabelEveryX == 0) {
                 render.translateTo(coordX, diagramMarginTop)
-                render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
+                render.renderLine(0.0, render.getDiagramHeight() - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
             }
 
             // x axis label
@@ -262,30 +260,30 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             String xLabel = isDate ? diagramOption.xLabelDateFormat.format(xLabelList[i * showGapEveryX] as Date) : xLabelList[i * showGapEveryX].toString()
             BigDecimal labelLength = render.measureText(xLabel)
             if (gapWidth >= labelLength) {
-                render.translateTo(coordX - labelLength / 2 + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                render.translateTo(coordX - labelLength / 2 + xOffset, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 if (i % showLabelEveryX == 0) {
                     render.renderLabel(xLabel)
                 } else if (alwaysShowFullInfo) {
                     render.renderHiddenLabel(xLabel)
                 }
             } else {
-                render.translateTo(coordX - labelLength + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                render.translateTo(coordX - labelLength + xOffset, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 if (i % showLabelEveryX == 0) {
-                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, coordX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, coordX + xOffset, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 } else if (alwaysShowFullInfo) {
-                    render.renderHiddenRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, coordX + xOffset, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
+                    render.renderHiddenRotatedLabel(xLabel, LABEL_ROTATE_ANGLE_WHEN_MASSIVE, coordX + xOffset, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 }
             }
         }
         if (isXLabelInsideGap) {
-            render.translateTo(width - DIAGRAM_MARGIN_RIGHT, diagramMarginTop)
-            render.renderLine(0.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
+            render.translateTo(render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, diagramMarginTop)
+            render.renderLine(0.0, render.getDiagramHeight() - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM))
         }
         if (diagramOption.showTodayLine && xLabelList.every { it instanceof Date }) {
             BigDecimal todayX = DIAGRAM_MARGIN_LEFT + (objectToNumber(new Date()) - minX) / (maxX - minX) * diagramWidth
             render.translateTo(todayX, diagramMarginTop)
             render.fillStyle(Color.RED)
-            render.renderRect(3.0, height - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
+            render.renderRect(3.0, render.getDiagramHeight() - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
 
             if (diagramOption.showDataCount) {
                 String dateLabel = DiagramXLabelDateFormat.DAY.format(new Date())
@@ -301,13 +299,13 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [DIAGRAM_MARGIN_LEFT - 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
-                                  width - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
-                                  width - DIAGRAM_MARGIN_RIGHT + 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
-                                  width, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
-                                  width, height,
-                                  DIAGRAM_MARGIN_LEFT / 2, height,
-                                  DIAGRAM_MARGIN_LEFT / 2, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
-                                  DIAGRAM_MARGIN_LEFT - 1, height - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
+                                      render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
+                                      render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT + 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
+                                      render.getDiagramWidth(), render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
+                                      render.getDiagramWidth(), render.getDiagramHeight(),
+                                      DIAGRAM_MARGIN_LEFT / 2, render.getDiagramHeight(),
+                                      DIAGRAM_MARGIN_LEFT / 2, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
+                                      DIAGRAM_MARGIN_LEFT - 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
 
         render.renderGroup(['clip-path': "url(#${id})"])
         render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
@@ -315,9 +313,9 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                             'shape-type': shapeType,
                             'shape-max-width': shapeMaxWidth,
                             'area-min-x': DIAGRAM_MARGIN_LEFT,
-                            'area-max-x': width - DIAGRAM_MARGIN_RIGHT,
+                            'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT,
                             'area-min-y': diagramMarginTop,
-                            'area-max-y': height - DIAGRAM_MARGIN_BOTTOM])
+                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
     }
 
     void buildTransformAreaEnd() {

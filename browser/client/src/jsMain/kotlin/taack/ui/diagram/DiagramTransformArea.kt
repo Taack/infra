@@ -158,80 +158,24 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         return false
     }
 
-    private var zoomUpTimer: Int? = null
-    private var zoomUpTargetCenterLineIndex: Int? = null
     fun zoom(mouseX: Double, isUp: Boolean) {
-        if (verticalBackgroundLines.isNotEmpty()) {
+        if (verticalBackgroundLines.isNotEmpty() && ((isUp && gapWidth * 2 < areaMaxX - areaMinX) || (!isUp && verticalBackgroundLines.last().getAttribute("x1")!!.toDouble().toInt() >= areaMaxX))) {
+            val zoomRadio = if (isUp) 1.1 else 0.9
+            verticalBackgroundLines.forEach { line ->
+                val targetX = ((line.getAttribute("x1")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
+                line.setAttribute("x1", targetX.toString())
+                line.setAttribute("x2", targetX.toString())
+            }
+            if (verticalBackgroundTodayLine != null) {
+                val targetX = ((verticalBackgroundTodayLine.getAttribute("x")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
+                verticalBackgroundTodayLine.setAttribute("x", targetX.toString())
+            }
+            refreshBackgroundXLabelsPosition(zoomRadio)
+            refreshBackgroundXLabelsDisplay(zoomRadio)
+            refreshDataShape(zoomRadio)
+
             val currentScrollX = g.getAttribute("scroll-x")?.toDouble() ?: 0.0
-            val currentMinLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) >= areaMinX } ?: verticalBackgroundLines.first())
-            val currentMaxLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.findLast { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) <= areaMaxX } ?: verticalBackgroundLines.last())
-            val changeGap = max(1, (currentMaxLineIndex - currentMinLineIndex) / 10)
-
-            val newMinLineIndex: Int // will move this line as new first background vertical line
-            val newMaxLineIndex: Int // will move this line as new last background vertical line
-            if (isUp) { // zoom-up to a target area
-                // the target area should always keep same (Around the line which is chosen at first)
-                if (zoomUpTargetCenterLineIndex == null) {
-                    zoomUpTargetCenterLineIndex = verticalBackgroundLines.indexOf(verticalBackgroundLines.find { line -> round(line.getAttribute("x1")!!.toDouble() + currentScrollX) >= mouseX } ?: verticalBackgroundLines.last())
-                }
-                if (zoomUpTimer != null) {
-                    window.clearTimeout(zoomUpTimer!!)
-                }
-                zoomUpTimer = window.setTimeout({
-                    zoomUpTargetCenterLineIndex = null
-                }, 500)
-
-                val targetCenterLineIndex = zoomUpTargetCenterLineIndex ?: ((currentMinLineIndex + currentMaxLineIndex) / 2)
-                val leftGapNumber = targetCenterLineIndex - currentMinLineIndex
-                val rightGapNumber = currentMaxLineIndex - targetCenterLineIndex
-                if (leftGapNumber != rightGapNumber) { // the line is not centered, so only zoom-up the bigger side
-                    if (abs(leftGapNumber - rightGapNumber) - changeGap >= 0) { // changeGap is not enough to make the line centered, so zoom-up the side fully
-                        if (leftGapNumber > rightGapNumber) {
-                            newMinLineIndex = currentMinLineIndex + changeGap
-                            newMaxLineIndex = currentMaxLineIndex
-                        } else {
-                            newMinLineIndex = currentMinLineIndex
-                            newMaxLineIndex = currentMaxLineIndex - changeGap
-                        }
-                    } else { // changeGap is larger than the distance to make the line centered
-                        val extraChangeGap = max(1, (changeGap - abs(leftGapNumber - rightGapNumber)) / 2)
-                        if (leftGapNumber > rightGapNumber) {
-                            newMaxLineIndex = currentMaxLineIndex - extraChangeGap
-                            newMinLineIndex = max(0, targetCenterLineIndex * 2 - newMaxLineIndex)
-                        } else {
-                            newMinLineIndex = currentMinLineIndex + extraChangeGap
-                            newMaxLineIndex = min(verticalBackgroundLines.size - 1, targetCenterLineIndex * 2 - currentMinLineIndex)
-                        }
-                    }
-                } else { // the line is already centered, so zoom-up averagely
-                    newMinLineIndex = currentMinLineIndex + changeGap
-                    newMaxLineIndex = currentMaxLineIndex - changeGap
-                }
-            } else { // zoom-down averagely
-                newMinLineIndex = max(0, currentMinLineIndex - changeGap)
-                newMaxLineIndex = min(verticalBackgroundLines.size - 1, currentMaxLineIndex + changeGap)
-                zoomUpTargetCenterLineIndex = null
-            }
-
-            if ((!isUp || newMaxLineIndex - newMinLineIndex > 2) && (currentMinLineIndex != newMinLineIndex || currentMaxLineIndex != newMaxLineIndex)) {
-                val newMinLine = verticalBackgroundLines[newMinLineIndex] as SVGLineElement
-                val newMaxLine = verticalBackgroundLines[newMaxLineIndex] as SVGLineElement
-                val zoomRadio = (areaMaxX - areaMinX) / (newMaxLine.x1.baseVal.value - newMinLine.x1.baseVal.value)
-
-                verticalBackgroundLines.forEach { line ->
-                    val targetX = ((line.getAttribute("x1")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
-                    line.setAttribute("x1", targetX.toString())
-                    line.setAttribute("x2", targetX.toString())
-                }
-                if (verticalBackgroundTodayLine != null) {
-                    val targetX = ((verticalBackgroundTodayLine.getAttribute("x")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
-                    verticalBackgroundTodayLine.setAttribute("x", targetX.toString())
-                }
-                refreshBackgroundXLabelsPosition(zoomRadio)
-                refreshBackgroundXLabelsDisplay(zoomRadio)
-                refreshDataShape(zoomRadio)
-                horizontalScrollTo(areaMinX - newMinLine.x1.baseVal.value)
-            }
+            horizontalScrollBy((mouseX - currentScrollX - areaMinX) * (1 - zoomRadio))
         }
     }
 

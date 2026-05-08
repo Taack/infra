@@ -163,8 +163,8 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
 
     @Override
     void visitWhiskersDiagram() {
+        initDiagramResolution()
         if (xDataList) {
-            initDiagramResolution()
             scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramOption)
             scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         }
