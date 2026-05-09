@@ -67,6 +67,10 @@ interface IDiagramRender {
 
     BigDecimal getDiagramHeight()
 
+    void setDiagramWidth(BigDecimal width)
+
+    void setDiagramHeight(BigDecimal height)
+
     BigDecimal measureText(String text)
 
     BigDecimal measureSmallText(String text)

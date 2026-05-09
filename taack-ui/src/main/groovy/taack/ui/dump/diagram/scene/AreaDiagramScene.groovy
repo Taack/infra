@@ -56,7 +56,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             // draw data area from top to lowest, and next one will cover the previous one
             BigDecimal minX = objectToNumber(xLabelList.first())
             BigDecimal maxX = objectToNumber(xLabelList.last())
-            BigDecimal totalWidth = width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
+            BigDecimal totalWidth = render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT
             for (int i = keys.size() - 1; i >= 0; i--) {
                 Map<BigDecimal, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
                 Set<BigDecimal> xDataSet = dataMap.keySet()
@@ -67,9 +67,9 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal xWidth = (xDataSet[j] - minX) / (maxX - minX) * totalWidth
 
                     coordsToDraw.add(DIAGRAM_MARGIN_LEFT + xWidth)
-                    coordsToDraw.add(height - DIAGRAM_MARGIN_BOTTOM)
+                    coordsToDraw.add(render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM)
 
-                    coordsToDraw.add(0, height - DIAGRAM_MARGIN_BOTTOM - (dataMap[xDataSet[j]] - startLabelY) / gapY * gapHeight)
+                    coordsToDraw.add(0, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (dataMap[xDataSet[j]] - startLabelY) / gapY * gapHeight)
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
@@ -96,7 +96,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             super.drawHorizontalBackground(minY, maxY)
 
             // draw data area one by one
-            BigDecimal gapWidth = (width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
+            BigDecimal gapWidth = (render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
             for (int i = 0; i < keys.size(); i++) {
                 Color keyColor = getKeyColor(i)
                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': '', 'key-color': KeyColor.colorToString(keyColor)])
@@ -109,9 +109,9 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                     BigDecimal xWidth = gapWidth * j
 
                     coordsToDraw.add(DIAGRAM_MARGIN_LEFT + xWidth)
-                    coordsToDraw.add(height - DIAGRAM_MARGIN_BOTTOM - (y1List[j] - startLabelY) / gapY * gapHeight)
+                    coordsToDraw.add(render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (y1List[j] - startLabelY) / gapY * gapHeight)
 
-                    coordsToDraw.add(0, height - DIAGRAM_MARGIN_BOTTOM - (y2List[j] - startLabelY) / gapY * gapHeight)
+                    coordsToDraw.add(0, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (y2List[j] - startLabelY) / gapY * gapHeight)
                     coordsToDraw.add(0, DIAGRAM_MARGIN_LEFT + xWidth)
                 }
 
@@ -131,7 +131,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': height - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
         drawVerticalBackground()
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()

@@ -16,8 +16,6 @@ class PieDiagramScene extends DiagramScene {
 
     PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, boolean hasSlice) {
         this.fontSize = render.getFontSize()
-        this.width = render.getDiagramWidth()
-        this.height = render.getDiagramHeight()
         this.render = render
         this.diagramOption = diagramOption
         this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
@@ -49,9 +47,9 @@ class PieDiagramScene extends DiagramScene {
     void draw(boolean alwaysShowFullInfo = false) {
         drawTitle()
 
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': width - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': height])
-        BigDecimal radius = Math.min(((width - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((height - diagramMarginTop) / (2 + slicePositionRate)).toDouble())
-        BigDecimal centerX = width / 2
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight()])
+        BigDecimal radius = Math.min(((render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((render.getDiagramHeight() - diagramMarginTop) / (2 + slicePositionRate)).toDouble())
+        BigDecimal centerX = render.getDiagramWidth() / 2
         BigDecimal centerY = diagramMarginTop + radius * (1 + slicePositionRate)
         if (!pieDataPerKey.isEmpty()) {
             BigDecimal total = pieDataPerKey.values().sum() as BigDecimal
@@ -145,7 +143,7 @@ class PieDiagramScene extends DiagramScene {
                                     lastOutsideLabelY = pointY
                                 } else { // prolong line
                                     BigDecimal marginBetweenLabels = OUTSIDE_LABEL_MARGIN * 5
-                                    if (lastOutsideLabelX + marginBetweenLabels + outsideLineLength <= width) { // prolong line at horizontal direction
+                                    if (lastOutsideLabelX + marginBetweenLabels + outsideLineLength <= render.getDiagramWidth()) { // prolong line at horizontal direction
                                         render.translateTo(pointX, pointY)
                                         render.renderLine(lastOutsideLabelX - pointX + marginBetweenLabels + outsideLineLength, 0.0)
                                         render.translateTo(lastOutsideLabelX + marginBetweenLabels + OUTSIDE_LABEL_MARGIN, pointY - OUTSIDE_LABEL_MARGIN - fontSize)
@@ -161,7 +159,7 @@ class PieDiagramScene extends DiagramScene {
                                         render.renderLine(outsideLineLength, 0.0)
                                         render.translateTo(point2X + OUTSIDE_LABEL_MARGIN, point2Y - OUTSIDE_LABEL_MARGIN - fontSize)
                                         render.renderLabel(valueLabel + ' ' + percentLabel)
-                                        lastOutsideLabelX = width
+                                        lastOutsideLabelX = render.getDiagramWidth()
                                         lastOutsideLabelY = point2Y
                                     }
                                 }

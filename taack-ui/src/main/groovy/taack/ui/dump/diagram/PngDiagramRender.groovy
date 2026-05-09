@@ -17,8 +17,8 @@ import java.util.List
 class PngDiagramRender implements IDiagramRender {
     final BufferedImage bi
     final Graphics2D ig2
-    private final BigDecimal pngWidth
-    private final BigDecimal pngHeight
+    private BigDecimal pngWidth
+    private BigDecimal pngHeight
     private final FontMetrics fm
     private final AffineTransform initialTransform
     private Integer fontSize = 13
@@ -311,6 +311,16 @@ class PngDiagramRender implements IDiagramRender {
     @Override
     BigDecimal getDiagramHeight() {
         return pngHeight
+    }
+
+    @Override
+    void setDiagramWidth(BigDecimal width) {
+        pngWidth = width
+    }
+
+    @Override
+    void setDiagramHeight(BigDecimal height) {
+        pngHeight = height
     }
 
     @Override
