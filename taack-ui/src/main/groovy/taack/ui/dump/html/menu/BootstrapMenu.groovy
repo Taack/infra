@@ -74,7 +74,6 @@ final class BootstrapMenu implements IHTMLElement {
                         new HTMLAnchor((insideSection || isAjax) && !isMail, url).builder
                                 .addClasses("nav-link${active ? ' active' : ''}", 'taackMenu')
                                 .putAttributeIfNotNull('ajaxBlockId', ajaxBlockId)
-                                .putAttribute('title', insideSection ? TaackUiEnablerService.sanitizeStringWithAllowing(i18n) : '')
                                 .addChildren(new HTMLTxtContent(i18n))
                                 .build()
                 ).build()

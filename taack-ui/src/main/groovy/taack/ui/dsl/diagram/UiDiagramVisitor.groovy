@@ -26,7 +26,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitLabels(DiagramXLabelDateFormat dateFormat, Date... dates) {
+    void visitLabels(Date... dates) {
 
     }
 
@@ -81,7 +81,7 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void timelinePeriodData(String key, Date startDate, Date endDate, String title) {
+    void timelinePeriodData(String key, String keyDescription, String keyImageHref, Date startDate, Date endDate, String title) {
 
     }
 

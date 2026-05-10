@@ -26,7 +26,9 @@ interface IUiFilterVisitor  {
 
     void visitFilterField(final String i18n, IEnumOption[] enumOptions, final FieldInfo... fields)
 
-    void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields)
+    void filterFieldInverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields)
+
+    void filterFieldInverse(String i18n, Class reverseClass, FieldInfo reverseField, IEnumOption[] enumOptions, FieldInfo... fields)
 
     void visitFilterFieldExpressionBool(FilterExpression... filterExpression)
 

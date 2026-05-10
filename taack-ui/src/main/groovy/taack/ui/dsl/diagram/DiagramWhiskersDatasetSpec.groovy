@@ -18,8 +18,8 @@ class DiagramWhiskersDatasetSpec {
         diagramVisitor.visitLabels(labels)
     }
 
-    void labels(DiagramXLabelDateFormat dateFormat = DiagramXLabelDateFormat.DAY, Date... dates) {
-        diagramVisitor.visitLabels(dateFormat, dates)
+    void labels(Date... dates) {
+        diagramVisitor.visitLabels(dates)
     }
 
     void dataset(final String key, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersBoxDataSpec) Closure closure) {

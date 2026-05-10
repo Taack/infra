@@ -3,7 +3,6 @@ package taack.ui.dsl.filter
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOption
-import taack.ui.dsl.UiFilterSpecifier
 import taack.ui.dsl.filter.expression.FilterExpression
 
 @CompileStatic
@@ -42,7 +41,12 @@ final class SectionSpec extends FilterCommon {
 
     final <T> void filterFieldInverse(final String i18n, final Class<T> reverseClass, final FieldInfo field, final FieldInfo... fields) {
         if (fields == null || fields.size() == 0) return
-        filterVisitor.visitFilterFieldReverse(i18n, reverseClass, field, addLeftField(fields))
+        filterVisitor.filterFieldInverse(i18n, reverseClass, field, addLeftField(fields))
+    }
+
+    final <T> void filterFieldInverse(final String i18n, final Class<T> reverseClass, final FieldInfo field, final IEnumOption[] enumOptions, final FieldInfo... fields) {
+        if (fields == null || fields.size() == 0) return
+        filterVisitor.filterFieldInverse(i18n, reverseClass, field, enumOptions, addLeftField(fields))
     }
 
 }

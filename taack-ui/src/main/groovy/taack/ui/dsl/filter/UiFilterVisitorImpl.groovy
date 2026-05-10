@@ -12,7 +12,12 @@ import taack.ui.dump.html.element.ButtonStyle
 @CompileStatic
 class UiFilterVisitorImpl implements IUiFilterVisitor {
     @Override
-    void visitFilterFieldReverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
+    void filterFieldInverse(String i18n, Class reverseClass, FieldInfo reverseField, FieldInfo... fields) {
+
+    }
+
+    @Override
+    void filterFieldInverse(String i18n, Class reverseClass, FieldInfo reverseField, IEnumOption[] enumOptions, FieldInfo... fields) {
 
     }
 

@@ -3,6 +3,7 @@ package taack.ui.dump
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
+import org.hibernate.Hibernate
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.TaackUiEnablerService
@@ -124,7 +125,7 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
                 .putAttribute('taackDbClickAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
                 .putAttribute('cardId', gorm ? gorm.ident().toString() : '')
                 .putAttribute('draggable', 'true').build() as HTMLSpan
-        if (gorm) cardSpan.builder.putAttribute('taackcontextualmenu', "${gorm.class.simpleName};null;${gorm.ident()}").build()
+        if (gorm) cardSpan.builder.putAttribute('taackcontextualmenu', "${Hibernate.getClass(gorm).simpleName};null;${gorm.ident()}").build()
         blockLog.topElement.builder.addChildren(cardSpan)
         blockLog.topElement = cardSpan
     }
