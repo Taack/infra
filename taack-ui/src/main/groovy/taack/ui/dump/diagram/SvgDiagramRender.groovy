@@ -292,7 +292,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderGroup(Map attributes) {
         outStr.append("""
-                <g ${attributes.collect { "${it.key}=\"${it.value}\"" }.join(" ")}>
+                <g ${attributes.collect { "${it.key}=\"${it.value?.toString()?.replace('&', '&amp;') ?: ''}\"" }.join(" ")}>
         """.stripIndent()
         )
     }
