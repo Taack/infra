@@ -213,7 +213,7 @@ final class Parameter implements WebAttributes {
 
     final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> p = null, boolean isAjax = false, boolean includeParamsToKeep = true) {
         p ?= [:]
-        p.removeAll { Map.isAssignableFrom(it.value?.class) }
+        p.removeAll { if (it?.value) Map.isAssignableFrom(it.value.class) else false }
         if (isAjax) {
             p.put('isAjax', true)
         }
