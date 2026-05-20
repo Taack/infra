@@ -58,7 +58,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     void visitFilter(Class aClass, Map<String, ? extends Object> additionalParams) {
         if (!visitInner) {
             formThemed = new BootstrapForm(blockLog, false, true)
-            formThemed.putAttr('action', parameter.urlMapped())
+            //formThemed.putAttr('action', parameter.urlMapped())
             blockLog.topElement.setTaackTag(TaackTag.FILTER)
 
             if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
@@ -186,7 +186,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style = ButtonStyle.SUCCESS) {
-        filterActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${action.toString()}/${action.method}" as String)
+        filterActions.add new Triple<String, ButtonStyle, String>(i18n, style, new Parameter().urlMapped(action) as String)
     }
 
     @Override
