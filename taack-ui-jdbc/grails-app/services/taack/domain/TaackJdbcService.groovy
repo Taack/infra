@@ -403,7 +403,7 @@ final class TaackJdbcService {
                 mi.eachWithIndex { index, i ->
                     Long o = line[index] as Long
                     GetMethodReturn mo = m[mi[i]]
-                    def aObject = new GormStaticApi(aClass, datastore, null).read(o)
+                    def aObject = new GormStaticApi(aClass, datastore.mappingContext, null).read(o)
                     String ov = mo.method.invoke(aObject)
                     line[index] = ov
                 }

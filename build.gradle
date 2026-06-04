@@ -44,7 +44,7 @@ buildscript {
     dependencies {
         classpath platform("org.apache.grails:grails-bom:$grailsVersion")
         classpath "org.apache.grails:grails-gradle-plugins"
-        classpath "org.apache.grails:grails-data-hibernate5"
+        classpath "org.apache.grails:grails-data-hibernate7"
         classpath "cloud.wondrify:asset-pipeline-gradle"
 //        classpath 'com.netflix.nebula:gradle-lint-plugin:21.2.0'
     }

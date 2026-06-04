@@ -102,7 +102,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 //    }
 
     private static <D extends GormEntity> D getGorm(Long id, Class<D> classD) {
-        GormEntity gormEntity = ((GormStaticApi<D>) GormEnhancer.findStaticApi(classD)).get(id)
+        GormEntity gormEntity = ((GormStaticApi<D>) GormEnhancer.findEntity(classD)).get(id)
         if (!gormEntity) gormEntity = classD.getDeclaredConstructor().newInstance()
         return gormEntity
     }
