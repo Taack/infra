@@ -7,7 +7,8 @@ import org.springframework.web.util.HtmlUtils
 enum IconStyle {
     SCALE_DOWN('object-fit: scale-down;vertical-align: middle;float: right;max-height: 22px;max-width: 22px;position: relative;z-index: 100'),
     RIGHT('vertical-align: middle;float: right;max-height: 22px;'),
-    LEFT('vertical-align: middle;float: left;max-height: 22px;')
+    LEFT('vertical-align: middle;float: left;max-height: 22px;'),
+    SPACE_BETWEEN('vertical-align: middle;float: left;height: 33px;margin-right: 0.3rem;')
 
     IconStyle(final String inlineStyle) {
         this.inlineStyle = inlineStyle

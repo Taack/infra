@@ -237,17 +237,15 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     }
 
     @Override
-    void visitRowAction(String i18n, final ActionIcon actionIcon, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+    void visitRowAction(String i18n, final ActionIcon actionIcon, final Style style, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
         i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
 
         params ?= [:]
-        blockLog.topElement.builder.addChildren(
-                new HTMLDiv().builder.addChildren(
-                        new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
-                                new HTMLTxtContent(actionIcon.getHtml(i18n))
-                        ).build()
-                ).build()
-        )
+        IHTMLElement.HTMLElementBuilder div = new HTMLDiv().builder.addChildren(
+                new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
+                        new HTMLTxtContent(actionIcon.getHtml(i18n))).build())
+        blockLog.topElement.builder.addChildren(div.build())
+        if (style) div.build().setStyleDescriptor(style)
     }
 
     @Override
@@ -417,7 +415,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowAction(String i18n, ActionIcon actionIcon, String key, String label) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        visitRowAction(i18n, actionIcon, 'progress', 'echoSelect', null, [key: key, label: label], true)
+        visitRowAction(i18n, actionIcon, null, 'progress', 'echoSelect', null, [key: key, label: label], true)
         if (addColumn) visitColumnEnd()
     }
 

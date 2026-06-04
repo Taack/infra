@@ -114,8 +114,9 @@ class Helper {
             val innerText = b?.innerText
             b?.innerText = "Submitting ..."
             val f = filter.f
+            val action = b?.formAction ?: f.action
             val fd = FormData(f)
-            val formUrl = URL(f.action)
+            val formUrl = URL(action)
             fd.set("isAjax", "true")
             fd.set("refresh", "true")
             fd.set("filterTableId", filter.filterId)
@@ -148,7 +149,7 @@ class Helper {
                     loader?.classList?.remove(ClassName("tck-hidden"))
                 }
             }
-            xhr.open(RequestMethod.POST, f.action)
+            xhr.open(RequestMethod.POST, action)
             xhr.send(fd)
         }
 

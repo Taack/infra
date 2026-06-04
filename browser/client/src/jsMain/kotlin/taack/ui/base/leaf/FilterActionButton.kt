@@ -20,7 +20,7 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
     }
 
     init {
-        trace("FilterActionButton::init ${b?.id}")
+        trace("FilterActionButton::init ${b?.formAction}")
         b?.onclick = EventHandler { e ->
             onClick(e)
         }

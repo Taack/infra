@@ -34,7 +34,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     RawHtmlFilterDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
         this.parameter = parameter
-        filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, "/${parameter.applicationTagLib.controllerName}/${parameter.applicationTagLib.actionName}" as String)
+        filterActions.add new Triple<String, ButtonStyle, String>('Filter', ButtonStyle.SUCCESS, parameter.urlMapped())
         this.blockId = id ?: '' + parameter.modalId
 
     }
@@ -186,7 +186,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
 
     @Override
     void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style = ButtonStyle.SUCCESS) {
-        filterActions.add new Triple<String, ButtonStyle, String>(i18n, style, "/${action.toString()}/${action.method}" as String)
+        filterActions.add new Triple<String, ButtonStyle, String>(i18n, style, new Parameter().urlMapped(action) as String)
     }
 
     @Override
