@@ -12,6 +12,9 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.hibernate.LockMode
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.Errors
 import taack.ast.type.FieldInfo
@@ -27,6 +30,7 @@ import taack.user.TaackUser
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
     TaackUiService taackUiService
     SpringSecurityService springSecurityService
+    SessionFactory sessionFactory
 
     private final static Map<String, Closure> fieldCustomSavingClosures = [:]
 
@@ -101,9 +105,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 //        return beanIsOwnerLocking(entity)
 //    }
 
-    private static <D extends GormEntity> D getGorm(Long id, Class<D> classD) {
-        GormEntity gormEntity = ((GormStaticApi<D>) GormEnhancer.findEntity(classD)).get(id)
-        if (!gormEntity) gormEntity = classD.getDeclaredConstructor().newInstance()
+    private static <D extends GormEntity> D getGorm(Long id, Class<D> classD, Session session) {
+//        GormEntity gormEntity = ((GormStaticApi<D>) GormEnhancer.findEntity(classD)).get(id)
+        D gormEntity = id ? session.find(classD, id) : classD.getDeclaredConstructor().newInstance()
+//        if (!gormEntity) gormEntity = classD.getDeclaredConstructor().newInstance()
         return gormEntity
     }
 
@@ -113,7 +118,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
     final <T extends GormEntity> T save(final Class<T> aClass, final FieldInfo[] lockedFields = null, final boolean doNotSave = false) {
         final Long id = params.long('id')
-        T gormEntity = getGorm(id, aClass)
+        T gormEntity = getGorm(id, aClass, sessionFactory.currentSession)
         save(gormEntity, lockedFields, doNotSave)
     }
 
