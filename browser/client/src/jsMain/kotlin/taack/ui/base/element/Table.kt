@@ -66,6 +66,7 @@ class Table(val parent: AjaxBlock, val t: HTMLTableElement) :
         paginate = TablePaginate.getSiblingTablePaginate(this)
         tableSelectCheckboxes = TableSelectCheckbox.getSiblingTableSelectCheckbox(this)
         tableMultiSelectButtons = TableMultiSelectButton.getSiblingTableMultiSelectButton(this)
+        TableStickyColumns.freeze(this)
         traceDeIndent("Table::init --- tableId: $tableId")
     }
 

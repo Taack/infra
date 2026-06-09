@@ -3,6 +3,7 @@ package taack.ui.dump.html.table
 import groovy.transform.CompileStatic
 import taack.ui.dsl.table.TableOption
 import taack.ui.dump.Parameter
+import taack.ui.dump.html.element.HTMLDiv
 import taack.ui.dump.html.element.IHTMLElement
 import taack.ui.dump.html.element.TaackTag
 import taack.ui.dump.html.theme.ThemeMode
@@ -42,12 +43,21 @@ final class ThemableTable {
             if (tableOption.uploadFileAction) {
                 htmlTableBuilder.putAttribute('taackDropAction', new Parameter().urlMapped(tableOption.uploadFileAction, tableOption.uploadFileActionParams))
             }
+            if (tableOption.stickyColumns > 0) {
+                htmlTableBuilder.addClasses('taack-sticky-table')
+                htmlTableBuilder.putAttribute('taackStickyColumns', tableOption.stickyColumns.toString())
+            }
         }
         htmlTableBuilder.putAttribute('taackTableId', blockId)
         HTMLTable htmlTable = htmlTableBuilder.build() as HTMLTable
-        topElement.addChildren(
-                htmlTable
-        )
+        // Sticky columns need a dedicated horizontal scroll container since the block itself only scrolls vertically
+        if (tableOption != null && tableOption.stickyColumns > 0) {
+            IHTMLElement scroller = new HTMLDiv().builder.addClasses('taack-sticky-scroll').build()
+            topElement.addChildren(scroller)
+            scroller.addChildren(htmlTable)
+        } else {
+            topElement.addChildren(htmlTable)
+        }
         htmlTable
     }
 }
