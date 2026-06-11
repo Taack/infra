@@ -696,7 +696,7 @@ pre.rouge {
   text-rendering: optimizeSpeed;
 }
 .asciidocMain pre {
-  color: rgba(0, 0, 0, 0.9);
+  /*color: rgba(0, 0, 0, 0.9);*/
   font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
   line-height: 1.45;
   text-rendering: optimizeSpeed;

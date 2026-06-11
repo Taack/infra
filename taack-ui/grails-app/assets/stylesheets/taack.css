@@ -587,3 +587,52 @@ li:hover > .nested-dropdown{
 span[taackcontextualmenu]:not(.kanban-card) {
     cursor: pointer;
 }
+
+/* Sticky table columns */
+.taack-sticky-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+}
+.taack-sticky-table {
+    /* sticky cells require separated borders to paint their own background */
+    border-collapse: separate;
+    border-spacing: 0;
+    /* max width for a single column width */
+    --taack-sticky-cell-max-width: 12rem;
+}
+.taack-sticky-table .taack-sticky-cell {
+    position: sticky;
+    background-color: var(--bs-table-bg, #fff);
+}
+.taack-sticky-table thead .taack-sticky-cell {
+    z-index: 5;
+}
+.taack-sticky-table tbody .taack-sticky-cell {
+    z-index: 3;
+}
+
+.taack-sticky-table .taack-sticky-cell-last::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 6px;
+    transform: translateX(100%);
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(0, 0, 0, .15), rgba(0, 0, 0, 0));
+}
+
+/* Let the table fit its content width and scroll horizontally instead of squeezing every column into the container */
+.taack-sticky-scroll > .taack-sticky-table {
+    width: max-content;   /* columns size to their content */
+    min-width: 100%;      /* but still fill the container when content is narrow */
+}
+/* Cap each cell so a long free-text value wraps within its column instead of stretching it across the screen*/
+.taack-sticky-table td > span,
+.taack-sticky-table th > span {
+    display: block;
+    max-width: var(--taack-sticky-cell-max-width);
+    white-space: normal;        /* override .text-truncate's nowrap when present */
+    overflow-wrap: break-word;  /* break very long unbroken tokens */
+}

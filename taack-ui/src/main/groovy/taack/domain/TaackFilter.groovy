@@ -367,6 +367,9 @@ final class TaackFilter<T extends GormEntity<T>> {
                     if (filterExpression.value instanceof Long) {
                         where << ("${filterExpression.value} in elements(sc.${filterExpression.fieldName})" as String)
                         occ++
+                    } else if (filterExpression.value instanceof Collection && (filterExpression.value as List).every { it instanceof Long }) {
+                        where << ("exists (select sub${occ} from sc.${filterExpression.fieldName} as sub${occ} where sub${occ}.id in (${(filterExpression.value as List<Long>).join(',')}))" as String)
+                        occ++
                     }
                     break
                 case Operator.IS_EMPTY:
