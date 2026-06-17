@@ -47,11 +47,12 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderGroup(['element-type': ElementType.TOOLTIP,
                                             'key-label': keys[i],
                                             'key-color': KeyColor.colorToString(keyColor),
-                                            'key-description': dataLabel])
+                                            'key-description': dataLabel,
+                                            'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                            'data-x': xLabel,
+                                            'data-y': yLabel])
                         render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[i],
-                                            'data-x': xLabel,
-                                            'data-y': yLabel,
                                             style: 'pointer-events: bounding-box;'])
                         if (i < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)
@@ -101,11 +102,12 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         render.renderGroup(['element-type': ElementType.TOOLTIP,
                                             'key-label': keys[j],
                                             'key-color': KeyColor.colorToString(keyColor),
-                                            'key-description': "${xLabelList[i]}: ${yDataLabel}"])
+                                            'key-description': "${xLabelList[i]}: ${yDataLabel}",
+                                            'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                            'data-x': xLabelList[i],
+                                            'data-y': yDataLabel])
                         render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[j],
-                                            'data-x': xLabelList[i],
-                                            'data-y': yDataLabel,
                                             style: 'pointer-events: bounding-box;'])
                         if (j < pointImageHref.size()) {
                             render.translateTo(xWidth - dataPointRadius, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - yHeight - dataPointRadius)

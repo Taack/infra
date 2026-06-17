@@ -55,8 +55,12 @@ abstract class DiagramScene {
     final protected Color GREY_COLOR = new Color(231, 231, 231)
 
     Color getKeyColor(int i) {
-        List<Color> colors = diagramOption?.keyColors ?: KeyColor.values()*.color
-        return colors[i % colors.size()]
+        if (i >= 0) {
+            List<Color> colors = diagramOption?.keyColors ?: KeyColor.values()*.color
+            return colors[i % colors.size()]
+        } else {
+            return GREY_COLOR
+        }
     }
 
     static String numberToString(BigDecimal n) {

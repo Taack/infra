@@ -1,6 +1,7 @@
 package taack.ui.dump.diagram
 
 import groovy.transform.CompileStatic
+import org.springframework.web.util.HtmlUtils
 import taack.ui.dsl.diagram.DiagramOption
 
 import java.awt.Color
@@ -292,7 +293,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderGroup(Map attributes) {
         outStr.append("""
-                <g ${attributes.collect { "${it.key}=\"${it.value?.toString()?.replace('&', '&amp;') ?: ''}\"" }.join(" ")}>
+                <g ${attributes.collect { "${it.key}=\"${HtmlUtils.htmlEscape(it.value?.toString() ?: '').replace('\'', '&apos;')}\"" }.join(" ")}>
         """.stripIndent()
         )
     }

@@ -115,8 +115,9 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
 
     private fun horizontalScrollTo(x: Double) {
         if (verticalBackgroundLines.isNotEmpty()) {
-            val minX = areaMaxX - (round(verticalBackgroundLines.last().getAttribute("x1")!!.toDouble()) + gapWidth)
-            val maxX = gapWidth
+            val margin = 50.0 * parent.getFontSizePercentage()
+            val minX = areaMaxX - (round(verticalBackgroundLines.last().getAttribute("x1")!!.toDouble()) + margin)
+            val maxX = margin
             val adjustedX = min(maxX, max(minX, x))
             g.setAttribute("scroll-x", adjustedX.toString())
             g.setAttribute("transform", "translate(${adjustedX},${g.getAttribute("scroll-y") ?: "0.0"})")

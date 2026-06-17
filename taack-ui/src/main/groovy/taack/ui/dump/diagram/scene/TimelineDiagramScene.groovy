@@ -25,12 +25,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     static Map<String, Map<Object, BigDecimal>> translateTimelineData(Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey) {
         // make a tmp data so that diagram has correct X axe and correct legends
         if (timelineDataPerKey.size() > 0) {
-            List<String> legends = []
-            timelineDataPerKey.collect { it.value.collect { it.cValue } }.each { List<String> it ->
-                if (it.size() > legends.size()) {
-                    legends = it
-                }
-            }
+            List<String> legends = timelineDataPerKey.collect { it.value.collect { it.cValue } }.flatten().unique() as List<String>
             multiPeriods = legends.find { !it.isBlank() }
             Map<String, Map<Object, BigDecimal>> result = (multiPeriods ? legends.collectEntries { [(it): [:]] } : timelineDataPerKey.collectEntries { [(it.key.aValue): [:]] }) as Map<String, Map<Object, BigDecimal>>
             List<Date> xDataList = timelineDataPerKey.collect { [it.value*.aValue + it.value*.bValue] }.flatten().grep() as List<Date>
@@ -100,6 +95,8 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                                     'key-color': multiPeriods ? '' : KeyColor.colorToString(getKeyColor(i)),
                                     'key-description': keys[i].bValue ?: '',
                                     'key-image-href': keys[i].cValue ?: '',
+                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                    'data-y': key,
                                     'x-scrolled': false])
                 if (render.measureText(key) <= diagramMarginLeft - AXIS_LABEL_MARGIN) {
                     render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize / 2)
@@ -179,11 +176,9 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             render.renderRect(3.0, render.getDiagramHeight() - diagramMarginTop - (DIAGRAM_MARGIN_BOTTOM - BACKGROUND_LINE_EXCEED_DIAGRAM), IDiagramRender.DiagramStyle.fill)
 
             // date label for TODAY
-            if (diagramOption.showDataCount) {
-                String dateLabel = DiagramXLabelDateFormat.DAY.format(new Date())
-                render.translateTo(todayX - render.measureText(dateLabel) / 2, diagramMarginTop - fontSize)
-                render.renderLabel(dateLabel)
-            }
+            String dateLabel = DiagramXLabelDateFormat.DAY.format(new Date())
+            render.translateTo(todayX - render.measureText(dateLabel) / 2, diagramMarginTop - fontSize)
+            render.renderLabel(dateLabel)
         }
 
         render.renderGroupEnd()
@@ -210,7 +205,6 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                                       diagramMarginLeft - 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + BACKGROUND_LINE_EXCEED_DIAGRAM])
         render.renderGroup(['clip-path': "url(#${id})"])
         render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
-                            'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                             'shape-type': 'timeline',
                             'shape-max-width': 0.0,
                             'area-min-x': diagramMarginLeft,
@@ -222,7 +216,6 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         BigDecimal maxX = objectToNumber(xLabelList.last())
         BigDecimal totalWidth = render.getDiagramWidth() - diagramMarginLeft - DIAGRAM_MARGIN_RIGHT
         Set<Triple<String, String, String>> keys = timelineDataPerKey.keySet()
-        DiagramXLabelDateFormat dateFormat = DiagramXLabelDateFormat.DAY
         for (int i = 0; i < keys.size(); i++) {
             // data timeline periods
             Triple<String, String, String> key = keys[i]
@@ -230,16 +223,17 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             timelineDataPerKey[key].eachWithIndex { Triple<Date, Date, String> info, int index ->
                 String periodTitle = info.cValue ?: ''
                 Integer period = ((info.bValue.getTime() - info.aValue.getTime()) / (1000 * 60 * 60 * 24)).toInteger()
-                String periodLabel = dateFormat.format(info.aValue) + ' -> ' + dateFormat.format(info.bValue)
-                Color keyColor = getKeyColor(multiPeriods ? index : i)
+                String periodLabel = diagramOption.xLabelDateFormat.detailFormat(info.aValue) + ' -> ' + diagramOption.xLabelDateFormat.detailFormat(info.bValue)
+                Color keyColor = getKeyColor(multiPeriods ? dataPerKey.keySet().toList().indexOf(periodTitle) : i)
                 render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                    'key-label': multiPeriods ? "${key.aValue} : $periodTitle" : key.aValue,
+                                    'key-label': multiPeriods ? periodTitle : key.aValue,
                                     'key-color': KeyColor.colorToString(keyColor),
-                                    'key-description': periodLabel + ' : ' + period.toString()])
-                render.renderGroup(['element-type': ElementType.DATA,
-                                    dataset: multiPeriods ? periodTitle : key.aValue,
+                                    'key-description': periodLabel + ' : ' + period.toString() + ' days',
+                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                     'data-x': periodLabel,
                                     'data-y': key.aValue])
+                render.renderGroup(['element-type': ElementType.DATA,
+                                    dataset: multiPeriods ? periodTitle : key.aValue])
                 BigDecimal x = diagramMarginLeft + (objectToNumber(info.aValue) - minX) / (maxX - minX) * totalWidth
                 BigDecimal width = (objectToNumber(info.bValue) - objectToNumber(info.aValue)) / (maxX - minX) * totalWidth
 
@@ -258,7 +252,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
 
                     // startDate
                     if (index == 0) {
-                        String dateLabel = dateFormat.format(info.aValue)
+                        String dateLabel = diagramOption.xLabelDateFormat.detailFormat(info.aValue)
                         render.translateTo(x - AXIS_LABEL_MARGIN - render.measureText(dateLabel), y - fontSize / 2)
                         render.renderLabel(dateLabel)
                     }
@@ -266,7 +260,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                     // endDate
                     if (index == timelineDataPerKey[key].size() - 1) {
                         render.translateTo(x + width + AXIS_LABEL_MARGIN, y - fontSize / 2)
-                        render.renderLabel(dateFormat.format(info.bValue))
+                        render.renderLabel(diagramOption.xLabelDateFormat.detailFormat(info.bValue))
                     }
                 }
             }

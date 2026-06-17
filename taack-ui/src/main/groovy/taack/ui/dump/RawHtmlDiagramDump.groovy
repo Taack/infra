@@ -186,7 +186,6 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     @Override
     void visitTimelineDiagram() {
         initDiagramResolution()
-        if (xDataList) timelineDataPerKey.put(null, xDataList.collect { new Triple<Date, Date, String>(it as Date, null, null) })
         scene = new TimelineDiagramScene(render, timelineDataPerKey, diagramOption)
         scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
     }
