@@ -636,3 +636,17 @@ span[taackcontextualmenu]:not(.kanban-card) {
     white-space: normal;        /* override .text-truncate's nowrap when present */
     overflow-wrap: break-word;  /* break very long unbroken tokens */
 }
+
+.diagram-tooltip text, .diagram-tooltip-legend {
+    fill: var(--bs-body-bg);
+}
+
+.diagram-tooltip-background {
+    fill: var(--bs-secondary-color);
+}
+
+.diagram-tooltip-description {
+    display: inline-block;
+    padding: .5em 1em;
+    background: var(--bs-body-bg);
+}

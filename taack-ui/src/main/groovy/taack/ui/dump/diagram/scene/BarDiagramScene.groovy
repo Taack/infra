@@ -112,12 +112,13 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                     'key-label': keys[j],
                                     'key-color': KeyColor.colorToString(keyColor),
-                                    'key-description': "${xLabel}: ${yDataLabel}"])
-                render.renderGroup(['element-type': ElementType.DATA,
-                                    dataset: keys[j],
-                                    'gap-index': i,
+                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                     'data-x': xLabel,
                                     'data-y': yDataLabel])
+                render.renderGroup(['element-type': ElementType.DATA,
+                                    dataset: keys[j],
+                                    'gap-index': i])
                 if (yData > startLabelY) {
                     // rect
                     render.translateTo(barX, barY - barHeight)

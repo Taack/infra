@@ -6,7 +6,7 @@ dependencies {
     implementation project(':taack-ui')
 
     // LGPL 2.1
-    implementation 'org.xhtmlrenderer:flying-saucer-pdf:10.2.0'
+    implementation 'org.xhtmlrenderer:flying-saucer-pdf:10.3.0'
 }
 
 groovydoc {
