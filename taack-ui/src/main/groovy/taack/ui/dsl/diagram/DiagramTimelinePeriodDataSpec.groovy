@@ -6,13 +6,13 @@ import groovy.transform.CompileStatic
 final class DiagramTimelinePeriodDataSpec {
     final String key
     String keyDescription
-    String keyImageHref
+    List<String> keyImageHref
     final IUiDiagramVisitor diagramVisitor
 
     DiagramTimelinePeriodDataSpec(final String key, final IUiDiagramVisitor diagramVisitor) {
         this.key = key
         this.keyDescription = null
-        this.keyImageHref = null
+        this.keyImageHref = []
         this.diagramVisitor = diagramVisitor
     }
 
@@ -21,10 +21,10 @@ final class DiagramTimelinePeriodDataSpec {
     }
 
     void keyImageHref(String keyImageHref) {
-        this.keyImageHref = keyImageHref
+        this.keyImageHref.add(keyImageHref)
     }
 
     void periodData(Date startDate, Date endDate, String title = '') {
-        diagramVisitor.timelinePeriodData(key, keyDescription, keyImageHref, startDate, endDate, title)
+        diagramVisitor.timelinePeriodData(key, keyDescription, keyImageHref.join(','), startDate, endDate, title)
     }
 }

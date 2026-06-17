@@ -47,7 +47,7 @@ class PieDiagramScene extends DiagramScene {
     void draw(boolean alwaysShowFullInfo = false) {
         drawTitle()
 
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight()])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight()])
         BigDecimal radius = Math.min(((render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((render.getDiagramHeight() - diagramMarginTop) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = render.getDiagramWidth() / 2
         BigDecimal centerY = diagramMarginTop + radius * (1 + slicePositionRate)
@@ -58,7 +58,11 @@ class PieDiagramScene extends DiagramScene {
             BigDecimal angle1 = 0.0
             pieDataPerKey.eachWithIndex { Map.Entry<String, BigDecimal> it, int i ->
                 Color keyColor = getKeyColor(i)
-                render.renderGroup(['element-type': ElementType.DATA, dataset: it.key, 'data-x': it.key, 'data-y': it.value, 'key-color': KeyColor.colorToString(keyColor)])
+                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                    'data-x': it.key,
+                                    'data-y': it.value])
+                render.renderGroup(['element-type': ElementType.DATA, dataset: it.key])
                 BigDecimal value = it.value
                 BigDecimal percent = value / total
                 BigDecimal angle2 = angle1 + 360.0 * percent
@@ -72,6 +76,7 @@ class PieDiagramScene extends DiagramScene {
                 }
                 render.fillStyle(keyColor)
                 render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
+                render.renderGroupEnd()
                 render.renderGroupEnd()
 
                 angle1 = angle2

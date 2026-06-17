@@ -61,7 +61,11 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 Map<BigDecimal, BigDecimal> dataMap = stackedDataPerKey[keys[i]]
                 Set<BigDecimal> xDataSet = dataMap.keySet()
                 Color keyColor = getKeyColor(i)
-                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': ''])
+                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                    'key-label': keys[i],
+                                    'key-color': KeyColor.colorToString(keyColor),
+                                    'diagram-action-url': diagramOption?.clickActionUrl ?: ''])
+                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i]])
                 List<BigDecimal> coordsToDraw = [] // x1, y1, x2, y2, ...
                 for (int j = 0; j < xDataSet.size(); j++) {
                     BigDecimal xWidth = (xDataSet[j] - minX) / (maxX - minX) * totalWidth
@@ -77,6 +81,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 render.fillStyle(keyColor)
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
+                render.renderGroupEnd()
                 render.renderGroupEnd()
             }
         } else { // discrete
@@ -99,7 +104,11 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
             BigDecimal gapWidth = (render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / (xLabelList.size() - 1)
             for (int i = 0; i < keys.size(); i++) {
                 Color keyColor = getKeyColor(i)
-                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i], 'data-x': '', 'data-y': '', 'key-color': KeyColor.colorToString(keyColor)])
+                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                    'key-label': keys[i],
+                                    'key-color': KeyColor.colorToString(keyColor),
+                                    'diagram-action-url': diagramOption?.clickActionUrl ?: ''])
+                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i]])
 
                 List<BigDecimal> y1List = i > 0 ? stackedYDataListPerKey[keys[i - 1]] : [minY] * xLabelList.size()
                 List<BigDecimal> y2List = stackedYDataListPerKey[keys[i]]
@@ -120,6 +129,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 render.renderPoly(coordsToDraw, IDiagramRender.DiagramStyle.fill)
 
                 render.renderGroupEnd()
+                render.renderGroupEnd()
             }
         }
     }
@@ -131,7 +141,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'diagram-action-url': diagramOption?.clickActionUrl ?: '', 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
         drawVerticalBackground()
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()

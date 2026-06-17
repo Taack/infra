@@ -309,7 +309,6 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
         render.renderGroup(['clip-path': "url(#${id})"])
         render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
-                            'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                             'shape-type': shapeType,
                             'shape-max-width': shapeMaxWidth,
                             'area-min-x': DIAGRAM_MARGIN_LEFT,

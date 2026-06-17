@@ -17,7 +17,7 @@ class DiagramLegend(private val parent: Diagram, val g: SVGGElement): LeafElemen
         }
     }
 
-    val dataset: String = g.attributes.getNamedItem("dataset")!!.value
+    private val dataset: String = g.attributes.getNamedItem("dataset")!!.value
     private val text: SVGTextElement = g.querySelector("text") as SVGTextElement
     private var isHidden: Boolean = false
 

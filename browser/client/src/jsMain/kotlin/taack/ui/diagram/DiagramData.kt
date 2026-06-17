@@ -1,25 +1,8 @@
 package taack.ui.diagram
 
 import js.array.asList
-import kotlinx.browser.window
-import taack.ui.base.Helper.Companion.checkLogin
-import taack.ui.base.Helper.Companion.processAjaxLink
-import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import web.cssom.ClassName
-import web.dom.ElementId
-import web.dom.document
-import web.events.EventHandler
-import web.geometry.DOMRect
-import web.history.history
-import web.http.GET
-import web.http.RequestMethod
-import web.location.location
 import web.svg.*
-import web.uievents.MouseEvent
-import web.url.URL
-import web.xhr.XMLHttpRequest
-import kotlin.math.min
 
 class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement): LeafElement {
     companion object {
@@ -41,27 +24,6 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         while (dataLabel?.tagName == "text") {
             dataLabels.add(dataLabel as SVGTextElement)
             dataLabel = dataLabel.nextElementSibling
-        }
-
-        val action = parent.g.getAttribute("diagram-action-url")
-        val dataX = g.getAttribute("data-x")
-        val dataY = g.getAttribute("data-y")
-        if (!action.isNullOrBlank() && (dataX != null || dataY != null)) {
-            g.style.cursor = "pointer"
-
-            var isClicked = false
-            g.onmousedown = EventHandler {
-                isClicked = true
-            }
-            g.onmousemove = EventHandler { // avoid conflict with Scroll
-                isClicked = false
-            }
-            g.onmouseup = EventHandler {
-                if (isClicked) {
-                    onClickShape(action, dataset, dataX ?: "", dataY ?: "")
-                    isClicked = false
-                }
-            }
         }
     }
 
@@ -158,38 +120,6 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
 
     fun getShapeAttribute(name: String): String? {
         return shapes.firstOrNull()?.getAttribute(name)
-    }
-
-    private fun onClickShape(action: String, dataset: String, x: String, y: String) {
-        val targetUrl = URL(action + (if (action.contains("?")) "&" else "?") + "dataset=${dataset}&x=${x}&y=${y}&isAjax=true", "${location.protocol}//${location.host}").toString()
-
-        //Display load spinner
-        val loader = document.getElementById(ElementId("taack-load-spinner"))
-        loader?.classList?.remove(ClassName("tck-hidden"))
-        val xhr = XMLHttpRequest()
-
-        xhr.onloadend = EventHandler { ev ->
-            checkLogin(xhr)
-            ev.preventDefault()
-            trace("DiagramData::onClickShape: Load End, action: $action responseType: '${xhr.responseType}'")
-            loader?.classList?.add(ClassName("tck-hidden"))
-
-            val text = xhr.responseText
-            if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
-                trace("Full webpage ...|$action|${document.title}|${document.documentURI}")
-                window.open(targetUrl, "_blank")
-//                history.pushState("{}", document.title, targetUrl)
-//                trace("Setting location.href: $targetUrl")
-//                location.href = targetUrl
-//                document.textContent = text
-//                document.close()
-            } else {
-                trace("BaseAjaxAction::onclickBaseAjaxAction => processAjaxLink $parent")
-                processAjaxLink(null, text, parent)
-            }
-        }
-        xhr.open(RequestMethod.GET, targetUrl)
-        xhr.send()
     }
 
     fun getTooltip(): DiagramTooltip? {
