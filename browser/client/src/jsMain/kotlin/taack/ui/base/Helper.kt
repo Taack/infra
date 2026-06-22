@@ -257,14 +257,11 @@ class Helper {
                         if (!urlStack.isEmpty()) {
                             val xhr = XMLHttpRequest()
                             xhr.onloadend = EventHandler {
-                                println("COUCOUCU0000")
                                 checkLogin(xhr)
                                 val t = xhr.responseText
                                 if (t.startsWith(OPEN_MODAL)) {
-                                    println("COUCOUCU1111")
                                     block.parent?.parent?.parent?.refreshModal(t.substring(OPEN_MODAL.length))
                                 } else {
-                                    println("COUCOUCU22222 ${t}")
                                     block.parent?.parent?.updateContent(t)
                                 }
                             }
@@ -321,7 +318,7 @@ class Helper {
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    block.modals.last().dModalBody.innerHTML = text
+                    block.updateContent(text)
                 }
 
                 text.startsWith(REDIRECT) -> {
