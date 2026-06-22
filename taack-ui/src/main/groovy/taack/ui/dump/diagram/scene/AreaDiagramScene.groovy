@@ -141,7 +141,14 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
         }
         this.alwaysShowFullInfo = alwaysShowFullInfo
         drawLegend()
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'shape-type': 'area', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
+        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
+                            'shape-type': 'area',
+                            'shape-max-width': 0.0,
+                            'area-min-x': DIAGRAM_MARGIN_LEFT,
+                            'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT,
+                            'area-min-y': diagramMarginTop,
+                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM,
+                            'default-scroll-x-number': diagramOption.maxDataNumberToShowByDefault])
         drawVerticalBackground()
         drawHorizontalBackgroundAndDataArea()
         render.renderGroupEnd()

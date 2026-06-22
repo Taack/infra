@@ -650,3 +650,8 @@ span[taackcontextualmenu]:not(.kanban-card) {
     padding: .5em 1em;
     background: var(--bs-body-bg);
 }
+
+.diagram-tooltip-images {
+    display: inline-flex;
+    flex-direction: column;
+}

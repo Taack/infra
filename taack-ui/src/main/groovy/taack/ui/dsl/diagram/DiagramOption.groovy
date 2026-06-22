@@ -18,6 +18,7 @@ final class DiagramOption {
     List<Color> keyColors
     DiagramResolution resolution
     String clickActionUrl
+    Integer maxDataNumberToShowByDefault
     DiagramXLabelDateFormat xLabelDateFormat = DiagramXLabelDateFormat.DAY
 
     static DiagramOptionBuilder getBuilder() {
@@ -72,6 +73,11 @@ final class DiagramOption {
 
         DiagramOptionBuilder setClickAction(MethodClosure action, Map params) {
             setClickAction(action, null, params)
+        }
+
+        DiagramOptionBuilder setMaxDataNumberToShowByDefault(int maxDataNumber) {
+            diagramOption.maxDataNumberToShowByDefault = maxDataNumber
+            this
         }
 
         DiagramOptionBuilder setXLabelDateFormat(DiagramXLabelDateFormat xLabelDateFormat) {
