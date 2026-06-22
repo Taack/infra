@@ -1,11 +1,11 @@
 plugins {
-    kotlin("multiplatform")  version "2.2.20-Beta1"
+    kotlin("multiplatform")  version "2.4.0"
 //    id "org.jetbrains.kotlin.multiplatform" version "1.9.23"
 //    id "org.jetbrains.kotlin.plugin.serialization" version "1.9.23"
 
 }
 
-group = "org.example"
+group = "org.taack"
 version = "1.0-SNAPSHOT"
 
 kotlin {
