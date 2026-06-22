@@ -8,26 +8,14 @@ group = 'org.taack'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url = 'https://repository.apache.org/content/groups/snapshots'
-        content {
-            includeVersionByRegex  'org[.]apache[.]((grails)|(groovy)).*', '.*','.*SNAPSHOT'
-        }
-    }
-    maven { url = 'https://repo.grails.org/grails/restricted' }
-    maven {
-        // This is needed until we have a stable release of cloud.wondrify:asset-pipeline-grails
-        url = 'https://central.sonatype.com/repository/maven-snapshots'
-        content {
-            includeVersionByRegex('cloud[.]wondrify', '.*', '.*-SNAPSHOT')
-        }
-    }
+    maven { url "https://repository.apache.org/content/groups/public" }
+    maven { url "https://repo.grails.org/grails/restricted" }
 }
 
 dependencies {
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
     implementation "org.apache.grails:grails-core"
-    implementation "org.apache.grails:grails-data-hibernate7"
+    implementation "org.apache.grails:grails-data-hibernate5"
     implementation "org.apache.grails:grails-databinding"
     implementation "org.apache.grails:grails-gsp"
 //    implementation "org.apache.grails:grails-i18n"
