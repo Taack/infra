@@ -59,7 +59,7 @@ class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
             s.onwheel = EventHandler { e: WheelEvent -> // e.deltaY < 0 : wheel up
                 if (e.ctrlKey) {
                     e.preventDefault()
-                    transformArea.zoom(translateX(e.clientX.toDouble()), e.deltaY < 0)
+                    transformArea.zoom(if (e.deltaY < 0) 1.1 else 0.9, translateX(e.clientX.toDouble()))
                 }
             }
 

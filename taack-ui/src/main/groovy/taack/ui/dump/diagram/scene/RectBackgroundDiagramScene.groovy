@@ -314,7 +314,8 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
                             'area-min-x': DIAGRAM_MARGIN_LEFT,
                             'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT,
                             'area-min-y': diagramMarginTop,
-                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
+                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM,
+                            'default-scroll-x-number': diagramOption.maxDataNumberToShowByDefault])
     }
 
     void buildTransformAreaEnd() {

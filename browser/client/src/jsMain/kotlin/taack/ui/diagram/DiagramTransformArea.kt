@@ -22,6 +22,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
     private val maxShapeWidth: Double = g.attributes.getNamedItem("shape-max-width")!!.value.toDouble()
     private val areaMinX: Double = g.attributes.getNamedItem("area-min-x")!!.value.toDouble()
     private val areaMaxX: Double = g.attributes.getNamedItem("area-max-x")!!.value.toDouble()
+    private val defaultScrollXNumber: Int = g.attributes.getNamedItem("default-scroll-x-number")?.value?.toIntOrNull() ?: 0
     private val verticalBackground = parent.s.querySelector("g[element-type='VERTICAL_BACKGROUND']")
     private val verticalBackgroundLines = verticalBackground?.querySelectorAll("line")?.asList() ?: listOf()
     private val verticalBackgroundTexts = verticalBackground?.querySelectorAll("text")?.asList() ?: listOf()
@@ -48,7 +49,9 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
             currentHoverLine!!.setAttribute("style", "stroke:rgb(180, 180, 180);stroke-width:1.3")
         }
 
-        if ((verticalBackground?.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
+        if (defaultScrollXNumber != 0 && verticalBackgroundLines.isNotEmpty()) {
+            zoom(max(1.0, verticalBackgroundLines.size.toDouble() / defaultScrollXNumber.toDouble()), if (defaultScrollXNumber > 0) areaMaxX else 0.0) // show last/first N vertical lines
+        } else if ((verticalBackground?.getAttribute("show-label-every-x")?.toDouble() ?: 1.0) > 1) {
             refreshBackgroundXLabelsDisplay()
         }
     }
@@ -159,9 +162,8 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
         return false
     }
 
-    fun zoom(mouseX: Double, isUp: Boolean) {
-        if (verticalBackgroundLines.isNotEmpty() && ((isUp && gapWidth * 2 < areaMaxX - areaMinX) || (!isUp && verticalBackgroundLines.last().getAttribute("x1")!!.toDouble().toInt() >= areaMaxX))) {
-            val zoomRadio = if (isUp) 1.1 else 0.9
+    fun zoom(zoomRadio: Double, mouseX: Double) {
+        if (verticalBackgroundLines.isNotEmpty() && ((zoomRadio > 1 && gapWidth * 2 < areaMaxX - areaMinX) || (zoomRadio < 1 && verticalBackgroundLines.last().getAttribute("x1")!!.toDouble().toInt() >= areaMaxX))) {
             verticalBackgroundLines.forEach { line ->
                 val targetX = ((line.getAttribute("x1")?.toDouble() ?: areaMinX) - areaMinX) * zoomRadio + areaMinX
                 line.setAttribute("x1", targetX.toString())

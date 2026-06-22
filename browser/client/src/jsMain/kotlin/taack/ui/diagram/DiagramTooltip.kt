@@ -136,7 +136,7 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
 
             val fontSizePercentage = parent.getFontSizePercentage()
             val margin = 10 * fontSizePercentage
-            if (keyImageHref.isNotBlank() && tooltip.querySelector(".diagram-tooltip-images") == null) { // todo: show current 1 month by default.
+            if (keyImageHref.isNotBlank() && tooltip.querySelector(".diagram-tooltip-images") == null) {
                 val images: SVGForeignObjectElement = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject") as SVGForeignObjectElement
                 images.style.display = "none"
                 images.setAttribute("transform", "translate(${tooltip.getBBox().width},0)")
