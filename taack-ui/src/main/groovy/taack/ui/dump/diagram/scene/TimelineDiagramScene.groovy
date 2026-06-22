@@ -210,7 +210,8 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                             'area-min-x': diagramMarginLeft,
                             'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT,
                             'area-min-y': diagramMarginTop,
-                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM])
+                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM,
+                            'default-scroll-x-number': diagramOption.maxDataNumberToShowByDefault])
 
         BigDecimal minX = objectToNumber(xLabelList.first())
         BigDecimal maxX = objectToNumber(xLabelList.last())
