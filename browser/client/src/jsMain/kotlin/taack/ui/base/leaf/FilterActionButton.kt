@@ -8,6 +8,7 @@ import taack.ui.base.element.Filter
 import web.events.Event
 import web.events.EventHandler
 import web.html.HTMLButtonElement
+import web.url.URL
 
 class FilterActionButton(private val parent: Filter, private val b: HTMLButtonElement?) : LeafElement {
     companion object {
@@ -21,9 +22,11 @@ class FilterActionButton(private val parent: Filter, private val b: HTMLButtonEl
 
     init {
         trace("FilterActionButton::init ${b?.formAction}")
-        b?.onclick = EventHandler { e ->
-            onClick(e)
-        }
+        if (b != null)
+            b.onclick = EventHandler { e ->
+                Helper.urlStack.addLast(URL(b.formAction))
+                onClick(e)
+            }
     }
 
     private fun onClick(e: Event) {
