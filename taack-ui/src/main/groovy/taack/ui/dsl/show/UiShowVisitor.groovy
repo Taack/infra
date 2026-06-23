@@ -10,7 +10,7 @@ import taack.ui.dsl.common.Style
 class UiShowVisitor implements IUiShowVisitor {
 
     @Override
-    void visitShow() {
+    void visitShow(final ShowLayout layout) {
 
     }
 

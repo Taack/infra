@@ -6,6 +6,7 @@ import taack.ast.type.GetMethodReturn
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.show.IUiShowVisitor
+import taack.ui.dsl.show.ShowLayout
 import taack.ui.dump.Parameter
 import taack.ui.dump.RawHtmlTableDump
 
@@ -20,7 +21,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     }
 
     @Override
-    void visitShow() {
+    void visitShow(final ShowLayout layout) {
         out << '<ul class="property-list taackShow pure-u-1">'
     }
 
@@ -112,4 +113,3 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     }
 }
-

@@ -9,7 +9,7 @@ import taack.ui.dsl.common.Style
 @CompileStatic
 interface IUiShowVisitor {
 
-    void visitShow()
+    void visitShow(final ShowLayout layout)
 
     void visitShowEnd()
 

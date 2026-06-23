@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.show.IUiShowVisitor
+import taack.ui.dsl.show.ShowLayout
 import taack.ui.dsl.show.ShowSpec
 
 /**
@@ -35,6 +36,7 @@ import taack.ui.dsl.show.ShowSpec
 @CompileStatic
 final class UiShowSpecifier<T> {
     Closure closure
+    ShowLayout layout = ShowLayout.LIST
 
     /**
      * Describes the block to show
@@ -46,6 +48,20 @@ final class UiShowSpecifier<T> {
      * @return itself
      */
     UiShowSpecifier ui(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+        this.layout = ShowLayout.LIST
+        this.closure = closure
+        this
+    }
+
+    /**
+     * Describes the block to show with a specific layout.
+     *
+     * @param layout whole-show layout
+     * @param closure description of what to show
+     * @return itself
+     */
+    UiShowSpecifier ui(final ShowLayout layout, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+        this.layout = layout ?: ShowLayout.LIST
         this.closure = closure
         this
     }
@@ -60,6 +76,7 @@ final class UiShowSpecifier<T> {
      */
     @Deprecated
     UiShowSpecifier ui(final T aObject, final MethodClosure action = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ShowSpec) Closure closure) {
+        this.layout = ShowLayout.LIST
         this.closure = closure
         this
     }
@@ -71,7 +88,7 @@ final class UiShowSpecifier<T> {
      */
     void visitShow(final IUiShowVisitor showVisitor) {
         if (showVisitor && closure) {
-            showVisitor.visitShow()
+            showVisitor.visitShow(layout)
             closure.delegate = new ShowSpec(showVisitor)
             closure.call()
             showVisitor.visitShowEnd()
