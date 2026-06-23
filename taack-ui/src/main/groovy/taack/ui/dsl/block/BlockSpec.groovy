@@ -105,4 +105,12 @@ final class BlockSpec extends BlockTabSpec {
         blockVisitor.visitModalEnd()
     }
 
+    void replaceModal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
+        blockVisitor.visitReplaceModal()
+        closure.delegate = this
+        closure.call()
+        counter++
+        blockVisitor.visitReplaceModalEnd()
+    }
+
 }

@@ -44,6 +44,7 @@ class Helper {
         private const val REFRESH_MODAL = "__refreshModal__:"
         private const val CLOSE_LAST_MODAL = "__closeLastModal__:"
         private const val CLOSE_LAST_MODAL_AND_UPDATE_BLOCK = "__closeLastModalAndUpdateBlock__:"
+        private const val CLOSE_LAST_MODAL_AND_REFRESH = "__closeLastModalAndRefresh__"
         private const val FIELD_INFO = ":__FieldInfo__:"
         private const val FIELD_INFO_END = ":__FieldInfoEnd__"
         private const val REDIRECT = "__redirect__"
@@ -121,7 +122,7 @@ class Helper {
             fd.set("refresh", "true")
             fd.set("filterTableId", filter.filterId)
             fd.set("ajaxBlockId", filter.parent.blockId)
-            if (offset != null) fd.set("offset",offset.toString())
+            if (offset != null) fd.set("offset", offset.toString())
             else {
                 if (sort != null) fd.set("sort", sort)
                 if (order != null && order != "neutral") fd.set("order", order)
@@ -174,7 +175,12 @@ class Helper {
         private val processingStack: ArrayDeque<CloseModalPostProcessing> = ArrayDeque()
         val urlStack: ArrayDeque<URL> = ArrayDeque()
 
-        fun processAjaxLink(url: URL? = null, text: String, base: BaseElement?, process: CloseModalPostProcessing? = null) {
+        fun processAjaxLink(
+            url: URL? = null,
+            text: String,
+            base: BaseElement?,
+            process: CloseModalPostProcessing? = null
+        ) {
             val block = base?.getParentBlock() ?: Block.getSiblingBlock(null)!!
             when {
                 text.startsWith(RELOAD) -> {
@@ -191,7 +197,8 @@ class Helper {
                     ) {
                         var posField = text.indexOf(FIELD_INFO)
                         val begin = text.indexOf('|', CLOSE_LAST_MODAL.length)
-                        val idValueMapString = if (posField == -1) text.substring(begin + 1) else text.substring(begin + 1, posField)
+                        val idValueMapString =
+                            if (posField == -1) text.substring(begin + 1) else text.substring(begin + 1, posField)
                         val idValueMap = idValueMapString.split("|").associate {
                             val (id, value) = it.split(":", limit = 2)
                             id to value
@@ -238,6 +245,38 @@ class Helper {
                     processAjaxLink(url, innerText, block.parent ?: base, process)
                 }
 
+                text.startsWith(CLOSE_LAST_MODAL_AND_REFRESH) -> {
+                    trace("Helper::CLOSE_LAST_MODAL_AND_REFRESH")
+                    if (block.parent != null) block.parent.close()
+                    else block.closeModal()
+//                    val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
+//                    processAjaxLink(url, innerText, block.parent ?: base, process)
+
+                    if (!urlStack.isEmpty()) {
+                        urlStack.removeLast()
+                        if (!urlStack.isEmpty()) {
+                            val xhr = XMLHttpRequest()
+                            xhr.onloadend = EventHandler {
+                                checkLogin(xhr)
+                                val t = xhr.responseText
+                                if (t.startsWith(OPEN_MODAL)) {
+                                    block.parent?.parent?.parent?.refreshModal(t.substring(OPEN_MODAL.length))
+                                } else {
+                                    block.parent?.parent?.updateContent(t)
+                                }
+                            }
+
+                            val targetUrl = urlStack.last()
+                            targetUrl.searchParams.append("isAjax", "true")
+                            targetUrl.searchParams.delete("refresh")
+                            xhr.open(RequestMethod.POST, targetUrl)
+                            xhr.send()
+                        } else {
+                            window.location.href = Block.href!!
+                        }
+                    }
+                }
+
                 text.startsWith(BLOCK_START) -> {
                     mapAjaxBlock(text).map {
                         val target = block.ajaxBlockElements[it.key]
@@ -279,7 +318,22 @@ class Helper {
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    block.modals.last().dModalBody.innerHTML = text
+                    mapAjaxBlock(text.substring(REFRESH_MODAL.length)).map {
+                        val target = block.ajaxBlockElements[it.key]
+                        var pos1 = 0
+                        if (it.value.startsWith(BLOCK_START))
+                            pos1 += it.value.indexOf(':') + 1
+                        var pos2 = it.value.length - pos1
+                        if (it.value.endsWith(BLOCK_END))
+                            pos2 -= BLOCK_END.length
+
+                        if (target != null) {
+                            target.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                            target.refresh()
+                        } else {
+                            block.updateContent(it.value.substring(pos1, pos2))
+                        }
+                    }
                 }
 
                 text.startsWith(REDIRECT) -> {
@@ -341,7 +395,6 @@ class Helper {
                         }
                     }
                 }
-
             }
         }
 
@@ -368,7 +421,7 @@ class Helper {
             }
         }
 
-        fun onpaste(e: ClipboardEvent, url: String, onLoadend: (xml: XMLHttpRequest) ->  Unit) {
+        fun onpaste(e: ClipboardEvent, url: String, onLoadend: (xml: XMLHttpRequest) -> Unit) {
             e.clipboardData?.files?.length?.let {
                 if (it > 0) {
                     val fd = FormData()
@@ -391,7 +444,7 @@ class Helper {
             if (e.clipboardData?.items is DataTransferItemList) {
                 val list = e.clipboardData?.items
                 for (item in list!!) {
-                    if (item.kind == "string" && item.type =="text/html") {
+                    if (item.kind == "string" && item.type == "text/html") {
                         item.getAsString({
                             trace("item: $it")
                             val fd = FormData()
@@ -410,7 +463,7 @@ class Helper {
             }
         }
 
-        fun ondrop(e: DragEvent, url: String, onLoadend: (xml: XMLHttpRequest) ->  Unit) {
+        fun ondrop(e: DragEvent, url: String, onLoadend: (xml: XMLHttpRequest) -> Unit) {
             e.dataTransfer?.files?.length?.let {
                 if (it > 0) {
                     val fd = FormData()

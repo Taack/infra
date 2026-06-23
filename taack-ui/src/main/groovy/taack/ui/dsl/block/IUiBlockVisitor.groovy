@@ -114,4 +114,8 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
     void visitKanban(String id, UiKanbanSpecifier kanbanSpecifier)
 
     void visitKanbanFilter(String aId, UiFilterSpecifier filterSpecifier, UiKanbanSpecifier kanbanSpecifier)
+
+    void visitReplaceModal()
+
+    void visitReplaceModalEnd()
 }

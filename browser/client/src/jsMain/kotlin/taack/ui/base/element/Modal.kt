@@ -143,6 +143,10 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         })
     }
 
+    fun refreshModal(t: String) {
+        dModalBody.innerHTML = t
+    }
+
     fun close() {
         traceDeIndent("Modal::close $mId")
         parent.modals.remove(this)
