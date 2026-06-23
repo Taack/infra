@@ -318,22 +318,28 @@ class Helper {
                     if (process != null) {
                         processingStack.add(process)
                     }
-                    mapAjaxBlock(text.substring(REFRESH_MODAL.length)).map {
-                        val target = block.ajaxBlockElements[it.key]
-                        var pos1 = 0
-                        if (it.value.startsWith(BLOCK_START))
-                            pos1 += it.value.indexOf(':') + 1
-                        var pos2 = it.value.length - pos1
-                        if (it.value.endsWith(BLOCK_END))
-                            pos2 -= BLOCK_END.length
+                    val textModal = text.substring(REFRESH_MODAL.length)
+                    if (textModal.startsWith(BLOCK_START))
+                        mapAjaxBlock(textModal).map {
+                            val target = block.ajaxBlockElements[it.key]
+                            var pos1 = 0
+                            if (it.value.startsWith(BLOCK_START))
+                                pos1 += it.value.indexOf(':') + 1
+                            var pos2 = it.value.length - pos1
+                            if (it.value.endsWith(BLOCK_END))
+                                pos2 -= BLOCK_END.length
 
-                        if (target != null) {
-                            target.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
-                            target.refresh()
-                        } else {
-                            block.updateContent(it.value.substring(pos1, pos2))
+                            if (target != null) {
+                                target.d.innerHTML =
+                                    it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                                target.refresh()
+                            } else {
+                                block.updateContent(it.value.substring(pos1, pos2))
+                            }
                         }
-                    }
+                    else
+                        block.updateContent(textModal)
+
                 }
 
                 text.startsWith(REDIRECT) -> {
