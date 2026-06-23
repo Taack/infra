@@ -3,7 +3,6 @@ package taack.ui.dsl.form
 import groovy.transform.CompileStatic
 import taack.ast.type.FieldInfo
 import taack.ui.IEnumOptions
-import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.BlockSpec.Width
 import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dump.html.element.ButtonStyle
@@ -61,7 +60,9 @@ interface IUiFormVisitor {
 
     void visitRowColsEnd()
 
-    void visitFormTabs(List<String> names, BlockSpec.Width width)
+    void visitFormTabs(List<String> names, Width width)
+
+    void visitFormTabs(List<String> names, Width width, String action)
 
     void visitFormTabsEnd()
 

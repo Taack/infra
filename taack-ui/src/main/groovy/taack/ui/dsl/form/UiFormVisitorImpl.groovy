@@ -123,6 +123,11 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
+    void visitFormTabs(List<String> names, BlockSpec.Width width, String action) {
+
+    }
+
+    @Override
     void visitFormTabsEnd() {
 
     }
