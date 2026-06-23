@@ -290,7 +290,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         GormEntity gormEntity = save(aClass, lockedFields)
         if (gormEntity.hasErrors()) {
             renderErrors(gormEntity.errors)
-        } else render ""
+        } else render ''
+    }
+
+    def saveOrCloseModalAndRefresh(final Class<? extends GormEntity> aClass, final FieldInfo[] lockedFields = null) {
+        GormEntity gormEntity = save(aClass, lockedFields)
+        if (gormEntity.hasErrors()) {
+            renderErrors(gormEntity.errors)
+        } else render '__closeLastModalAndRefresh__'
     }
 
     def displayBlockOrRenderErrors(final GormEntity gormEntity, final UiBlockSpecifier blockSpecifier) {

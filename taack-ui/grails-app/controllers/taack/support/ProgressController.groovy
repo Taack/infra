@@ -5,8 +5,6 @@ import grails.plugin.springsecurity.annotation.Secured
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.block.UiBlockVisitor
-
 /**
  * Support Controller for progressbar.
  *
