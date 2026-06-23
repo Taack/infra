@@ -26,7 +26,7 @@ class FormAjaxFieldSpec extends FormVisitable {
      * @param width relative total width
      * @param closure list of {@link FormTabSpec#tabLabel(java.lang.String, groovy.lang.Closure)}
      */
-    void tabs(BlockSpec.Width width = BlockSpec.Width.MAX, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure) {
+    void tabs(BlockSpec.Width width = BlockSpec.Width.MAX,  @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = FormTabSpec) Closure closure, String action=null) {
         List<String> tabNames = []
 
         // Lightweight first pass: collect tab names WITHOUT executing inner closures
@@ -34,7 +34,7 @@ class FormAjaxFieldSpec extends FormVisitable {
         closure.call()
 
         // Second pass: real rendering with names already known
-        formVisitor.visitFormTabs(tabNames, width)
+        action ? formVisitor.visitFormTabs(tabNames, width, action) : formVisitor.visitFormTabs(tabNames, width)
         closure.delegate = new FormTabSpec(formVisitor)
         closure.call()
         formVisitor.visitFormTabsEnd()
