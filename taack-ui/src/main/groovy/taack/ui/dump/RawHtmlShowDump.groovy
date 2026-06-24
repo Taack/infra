@@ -9,6 +9,7 @@ import taack.render.TaackUiService
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.show.IUiShowVisitor
+import taack.ui.dsl.show.ShowLayout
 
 @CompileStatic
 final class RawHtmlShowDump implements IUiShowVisitor {
@@ -17,6 +18,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     final private Parameter parameter
 
     final String blockId
+    private ShowLayout layout = ShowLayout.LIST
 
     RawHtmlShowDump(final String id, final ByteArrayOutputStream out, final Parameter parameter) {
         this.out = out
@@ -25,9 +27,14 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     }
 
     @Override
-    void visitShow() {
+    void visitShow(final ShowLayout layout) {
+        this.layout = layout ?: ShowLayout.LIST
+        writeShowWrapperStart()
+    }
 
-        out << "<div class='property-list taackShow col-12'>"
+    private void writeShowWrapperStart() {
+        String gridClass = layout == ShowLayout.GRID ? ' taackShowGrid' : ''
+        out << "<div class='property-list taackShow col-12${gridClass}'>"
     }
 
     @Override
@@ -37,7 +44,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
 
     @Override
     void visitSection(String i18n) {
-        out << '<div>'
+        out << "<div class='taackShowSection'>"
     }
 
     @Override
@@ -65,10 +72,16 @@ final class RawHtmlShowDump implements IUiShowVisitor {
         visitShowField(parameter.trField(methodReturn), methodReturn.value?.toString(), style)
     }
 
-    private static String showField(String i18n, String field, Style style, boolean sanitize = true) {
+    private String gridSpanClass(Style style) {
+        if (layout != ShowLayout.GRID) return ''
+        String cssClass = style?.gridSpanCssClass
+        cssClass ? " $cssClass" : ''
+    }
+
+    private String showField(String i18n, String field, Style style, boolean sanitize = true) {
         if (i18n) {
             """
-                <li class="fieldcontain">
+                <li class="fieldcontain${gridSpanClass(style)}">
                     <span class="property-label ref-prefix">${i18n}</span>
                     <span class="property-value ${style ? style.cssClassesString : ''}" style="${style ? style.cssStyleString : ''}">${field}</span>
                 </li> 
@@ -154,7 +167,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     void visitShowInlineHtml(String html, String additionalCSSClass) {
         out << '</div>'
         out << """<div class="$additionalCSSClass">$html</div>"""
-        out << '<div class="property-list taackShow col-12">'
+        writeShowWrapperStart()
     }
 
 }

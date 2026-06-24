@@ -79,22 +79,41 @@ class Style implements IStyleDescriptor {
 
     final static Style TABLE_TRUCATE = new Style('text-truncate', 'max-with: 256px;')
 
+    // GRID column spans for show layouts
+    final static Style SPAN_TWO = span('taackShowSpan2')
+    final static Style SPAN_THREE = span('taackShowSpan3')
+    final static Style SPAN_FULL = span('taackShowFull')
+
+    private static Style span(final String gridSpanCssClass) {
+        new Style('', '', false, '', '', gridSpanCssClass)
+    }
+
     Style(final String cssClassesString, final String cssStyleString = null, final boolean isDiv = false, final boolean applyToLabel = false) {
         if (applyToLabel) {
             this.labelCssClassesString = cssClassesString
             this.labelCssStyleString = cssStyleString
             this.cssClassesString = ''
             this.cssStyleString = ''
-            this.isDiv = isDiv
         } else {
             this.labelCssClassesString = ''
             this.labelCssStyleString = ''
             this.cssClassesString = cssClassesString
             this.cssStyleString = cssStyleString
-            this.isDiv = isDiv
         }
+        this.isDiv = isDiv
+        this.gridSpanCssClass = ''
     }
 
+    private Style(final String cssClassesString, final String cssStyleString, final boolean isDiv,
+                  final String labelCssClassesString, final String labelCssStyleString,
+                  final String gridSpanCssClass) {
+        this.cssClassesString = cssClassesString
+        this.cssStyleString = cssStyleString
+        this.isDiv = isDiv
+        this.labelCssClassesString = labelCssClassesString
+        this.labelCssStyleString = labelCssStyleString
+        this.gridSpanCssClass = gridSpanCssClass
+    }
 
     Style(final CssContent cssContent) {
         this(cssContent.classCss, cssContent.inlineCss)
@@ -103,15 +122,21 @@ class Style implements IStyleDescriptor {
     final String cssClassesString
     final String cssStyleString
     final boolean isDiv
-    String labelCssClassesString
-    String labelCssStyleString
+    final String labelCssClassesString
+    final String labelCssStyleString
+    // GRID column span css class added to the field's parent (the grid item), not the value span, '' == "no span"
+    final String gridSpanCssClass
 
     Style plus(Style other) {
         if (other == null) return this
-        Style res = new Style((this.cssClassesString ?: '') + ' ' + (other.cssClassesString ?: ''), (this.cssStyleString ?: '') + ' ' + (other.cssStyleString ?: ''), this.isDiv || other.isDiv)
-        res.labelCssClassesString += "${labelCssClassesString?:''} ${other.labelCssClassesString?:''}"
-        res.labelCssStyleString += "${labelCssStyleString?:''} ${other.labelCssStyleString?:''}"
-        res
+        new Style(
+                (this.cssClassesString ?: '') + ' ' + (other.cssClassesString ?: ''),
+                (this.cssStyleString ?: '') + ' ' + (other.cssStyleString ?: ''),
+                this.isDiv || other.isDiv,
+                (this.labelCssClassesString ?: '') + ' ' + (other.labelCssClassesString ?: ''),
+                (this.labelCssStyleString ?: '') + ' ' + (other.labelCssStyleString ?: ''),
+                other.gridSpanCssClass ?: this.gridSpanCssClass
+        )
     }
 
     @Override

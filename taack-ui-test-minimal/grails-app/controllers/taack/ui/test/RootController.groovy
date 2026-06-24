@@ -29,6 +29,7 @@ class RootController {
             menu this.&index as MC
             menu StatsController.&topCustomerSalesCard as MC
             menu StatsController.&listTestInlineEdit as MC
+            menu StatsController.&showGrid as MC
             menu CalendarController.&fromCustom as MC
             menu CalendarController.&fromUiTable as MC
         }

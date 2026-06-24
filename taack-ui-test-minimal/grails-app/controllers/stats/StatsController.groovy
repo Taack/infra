@@ -11,9 +11,12 @@ import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
+import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.block.BlockBase
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.Style
+import taack.ui.dsl.show.ShowLayout
 import taack.ui.test.RootController
 
 import static taack.ui.TaackUi.*
@@ -164,6 +167,22 @@ class StatsController implements WebAttributes {
                 }, {
                     menuIcon ActionIcon.ADD, StatsController.&editTestInlineEdit as MC
                 }
+            }
+        }, RootController.buildMenu())
+    }
+
+    def showGrid() {
+        TestInlineEdit t = testInlineEditList.first()
+        String summary = "${t.name}, ${t.age} years old, lives in ${t.city}"
+
+        taackUiService.show(new UiBlockSpecifier().ui {
+            show new UiShowSpecifier().ui(ShowLayout.GRID) {
+                fieldLabeled t.name_
+                fieldLabeled t.age_
+                fieldLabeled t.birthday_
+                fieldLabeled t.status_
+                fieldLabeled Style.SPAN_TWO, t.city_
+                field Style.BOLD + Style.SPAN_FULL, 'Summary', summary
             }
         }, RootController.buildMenu())
     }
