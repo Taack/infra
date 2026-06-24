@@ -9,7 +9,7 @@ dependencies {
     developmentOnly "org.springframework.boot:spring-boot-devtools" // Spring Boot DevTools may cause performance slowdowns or compatibility issues on larger applications
     implementation platform("org.apache.grails:grails-bom:$grailsVersion")
     implementation "org.apache.grails:grails-core"
-    implementation "org.apache.grails:grails-data-hibernate5"
+    implementation "org.apache.grails:grails-data-hibernate7"
     implementation "org.apache.grails:grails-databinding"
     implementation "org.apache.grails:grails-gsp"
     implementation "org.apache.grails:grails-interceptors"
