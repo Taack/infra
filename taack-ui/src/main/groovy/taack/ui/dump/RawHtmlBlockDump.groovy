@@ -278,6 +278,26 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitColEnd()
     }
 
+    @Override
+    void visitReplaceModal() {
+        logEnterBlock('visitReplaceModal modalId:' + modalId + ' isModalRefresh:' + renderDecision.isRefreshing)
+        blockLog.savePosition()
+        renderDecision.isModal = true
+        parameter.isModal = true
+        HTMLAjaxModal modal = new HTMLAjaxModal(true, false)
+        blockLog.topElement.addChildren(modal)
+        blockLog.topElement.setTaackTag(TaackTag.MODAL)
+        blockLog.topElement = modal
+        renderDecision.poke = true
+    }
+
+    @Override
+    void visitReplaceModalEnd() {
+        logExitBlock('visitReplaceModalEnd')
+        renderDecision.poke = false
+        renderDecision.isModal = false
+        blockLog.restorePosition()
+    }
 //    @Override
 //    void visitChart(final UiChartSpecifier chartSpecifier) {
 //        blockLog.stayBlock('visitChart')

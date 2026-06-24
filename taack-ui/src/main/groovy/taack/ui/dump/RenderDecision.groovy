@@ -74,7 +74,7 @@ final class RenderDecision {
         simpleLog("shouldRender3 :> currentAjaxBlockId = ${currentAjaxBlockId}, targetAjaxBlockId = ${parameter.targetAjaxBlockId}, ajaxBlockId = ${parameter.ajaxBlockId}")
 
         boolean doRender = (currentAjaxBlockId == id && (isModal || isRefreshing)) || (!currentAjaxBlockId && isModal)
-        simpleLog("shouldRender4 => doRender = $doRender && $poke")
+        simpleLog("shouldRender4 => doRender = $doRender, poke = $poke")
         return doRender
     }
 

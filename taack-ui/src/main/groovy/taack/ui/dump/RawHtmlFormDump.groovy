@@ -215,6 +215,14 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
+    void visitFormTabs(List<String> names, Width width = Width.QUARTER, String action) {
+        blockLog.savePosition()
+        blockLog.topElement.setTaackTag(TaackTag.TABS)
+        blockLog.topElement = layout.tabs(blockLog.topElement, names, action)
+        tabOccurrence = 0
+    }
+
+    @Override
     void visitFormTabsEnd() {
         blockLog.restorePosition()
         layout.setTabIdAndCounter(layout.tabIds + 1)
