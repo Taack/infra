@@ -13,6 +13,7 @@ import web.blob.Blob
 import web.clipboard.ClipboardEvent
 import web.cssom.ClassName
 import web.data.DataTransferItemList
+import web.dnd.DragEvent
 import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
@@ -22,12 +23,12 @@ import web.form.FormDataEntryValue
 import web.history.history
 import web.html.HTMLAnchorElement
 import web.html.HTMLButtonElement
+import web.html.HtmlSource
 import web.http.POST
 import web.http.RequestMethod
 import web.location.location
+import web.mouse.MouseEvent
 import web.storage.localStorage
-import web.uievents.DragEvent
-import web.uievents.MouseEvent
 import web.url.URL
 import web.window.window
 import web.xhr.XMLHttpRequest
@@ -223,7 +224,7 @@ class Helper {
                         ) {
                             mapAjaxBlock(text.substring(CLOSE_LAST_MODAL.length + 1)).map {
                                 val target = block.parent?.parent?.ajaxBlockElements?.get(it.key)
-                                target!!.d.innerHTML = it.value
+                                target!!.d.innerHTML = HtmlSource(it.value)
                                 target.refresh()
                             }
                         }
@@ -287,7 +288,7 @@ class Helper {
                             var pos2 = it.value.length - pos1
                             if (it.value.endsWith(BLOCK_END))
                                 pos2 -= BLOCK_END.length
-                            target.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                            target.d.innerHTML = HtmlSource(it.value.substring(pos1, pos2))//.substring(it.value.indexOf(':') + 1)
                             target.refresh()
                         }
                     }
@@ -331,7 +332,7 @@ class Helper {
 
                             if (target != null) {
                                 target.d.innerHTML =
-                                    it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                                    HtmlSource(it.value.substring(pos1, pos2))//.substring(it.value.indexOf(':') + 1)
                                 target.refresh()
                             } else {
                                 block.updateContent(it.value.substring(pos1, pos2))
@@ -355,7 +356,7 @@ class Helper {
                             hasErrors = true
                             val d = base.errorPlaceHolders[me.key]?.d
                             if (d != null) {
-                                d.innerHTML = me.value
+                                d.innerHTML = HtmlSource(me.value)
                                 d.style.display = "block"
                             }
                         }
@@ -371,7 +372,7 @@ class Helper {
                             hasErrors = true
                             val d = base.errorInputs[me.key]?.d
                             if (d != null) {
-                                d.innerHTML = me.value
+                                d.innerHTML = HtmlSource(me.value)
                                 d.style.display = "block"
                             }
                         }

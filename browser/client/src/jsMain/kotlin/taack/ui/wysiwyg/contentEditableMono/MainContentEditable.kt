@@ -206,7 +206,7 @@ class MainContentEditable(
                 if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
                     divAutocomplete.style.left = "${left + selectedElementPosition * 10}px"
                     divAutocomplete.style.top = "${top - scrollTop + 19}px"
-                    divAutocomplete.innerHTML = ""
+                    divAutocomplete.innerHTML = HtmlSource("")
 
 
                     for (text in texts) {
@@ -385,9 +385,9 @@ class MainContentEditable(
                     if (e is HTMLSpanElement) {
                         trace("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
                         if (range?.commonAncestorContainer?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.innerHTML =
-                            "<br>"
+                            HtmlSource("<br>")
                         else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.parentElement?.innerHTML =
-                            "<br>"
+                            HtmlSource("<br>")
                     }
                 }
 
@@ -421,7 +421,7 @@ class MainContentEditable(
         trace("asciidocToHtml +++")
         val txt = escapeHtml(e.textContent)
         if (txt?.isEmpty() == true) {
-            e.innerHTML = "<br>"
+            e.innerHTML = HtmlSource("<br>")
             return
         }
         if (txt != null) {
@@ -473,12 +473,12 @@ class MainContentEditable(
                 result = """<span class="$cn">$result</span>"""
             }
 
-            if (e.innerHTML != result) {
+            if (e.innerHTML.toString() != result) {
                 trace("selection?.focusOffset: ${selection?.focusOffset} ${e.innerHTML}||${result}")
                 trace("selection?.focusNode: ${selection?.focusNode}")
 
 
-                e.innerHTML = result
+                e.innerHTML = HtmlSource(result)
                 if (!rescanContent) repairSelection()
             }
         }
@@ -486,7 +486,7 @@ class MainContentEditable(
     }
 
     fun createCmdLine(s: String?, index: Int): HTMLDivElement? {
-        divLineNumberContainer.innerHTML = ""
+        divLineNumberContainer.innerHTML = HtmlSource("")
         if (line == 0) {
             val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
             number.style.height = "0px"
@@ -511,7 +511,7 @@ class MainContentEditable(
             cmd.classList.add(ClassName("cm-line"))
             cmd.contentEditable = "true"
 
-            cmd.innerHTML = s
+            cmd.innerHTML = HtmlSource(s)
             cmd.onchange = EventHandler {
                 trace("onchange")
             }
@@ -570,7 +570,7 @@ class MainContentEditable(
 
     fun rescanTextarea() {
         trace("rescanTextarea")
-        divContent.innerHTML = ""
+        divContent.innerHTML = HtmlSource("")
         if (text.textContent?.length == 0) {
             text.textContent = "\n"
         }

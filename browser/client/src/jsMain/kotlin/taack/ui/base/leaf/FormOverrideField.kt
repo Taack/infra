@@ -9,6 +9,7 @@ import taack.ui.base.element.Form
 import web.events.Event
 import web.events.EventHandler
 import web.html.HTMLImageElement
+import web.html.HtmlSource
 
 class FormOverrideField(private val parent: Form, private val i: HTMLImageElement) : LeafElement {
     companion object {
@@ -31,7 +32,7 @@ class FormOverrideField(private val parent: Form, private val i: HTMLImageElemen
         e.preventDefault()
         traceIndent("FormActionInputM2O::onclick +++")
         val action = i.attributes.getNamedItem("taackOnclickInnerHTML")!!.value
-        i.parentElement?.innerHTML = action
+        i.parentElement?.innerHTML = HtmlSource(action)
         parent.rescanOverridableInputs()
         traceDeIndent("FormActionInputM2O::onclick ---")
     }

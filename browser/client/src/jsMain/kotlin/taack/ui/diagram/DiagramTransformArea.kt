@@ -5,8 +5,8 @@ import kotlinx.browser.window
 import taack.ui.base.BaseElement
 import taack.ui.base.element.Block
 import web.dom.document
+import web.mouse.MouseEvent
 import web.svg.*
-import web.uievents.MouseEvent
 import kotlin.math.*
 
 class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement {

@@ -13,6 +13,7 @@ import web.file.File
 import web.html.HTMLDivElement
 import web.html.HTMLFormElement
 import web.html.HTMLTextAreaElement
+import web.html.HtmlSource
 
 class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     BaseElement {
@@ -79,7 +80,7 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
     fun cleanUpErrors() {
         for (errorInput in errorPlaceHolders.values) {
             errorInput.d.style.display = "none"
-            errorInput.d.innerHTML = ""
+            errorInput.d.innerHTML = HtmlSource("")
         }
     }
 

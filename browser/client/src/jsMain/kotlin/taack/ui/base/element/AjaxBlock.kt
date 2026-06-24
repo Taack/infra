@@ -10,6 +10,7 @@ import taack.ui.base.leaf.ContextualLink
 import taack.ui.diagram.Diagram
 import web.events.EventHandler
 import web.html.HTMLDivElement
+import web.html.HtmlSource
 import web.http.GET
 import web.http.RequestMethod
 import web.timers.TimerHandler
@@ -79,7 +80,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         shows = Show.getSiblingShow(this)
         diagrams = Diagram.getSiblingDiagram(this)
         for (i in 0 until innerScripts.length) {
-            eval(innerScripts[i].innerHTML)
+            eval(innerScripts[i].innerHTML.toString())
         }
         ActionLink.getActionLinks(this)
         AnchorHref.getAnchorHref(this)
@@ -89,7 +90,7 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
 
     fun updateContent(newContent: String) {
         Helper.trace("AjaxBlock::updateContent ... ${d.className}")
-        d.innerHTML = newContent
+        d.innerHTML = HtmlSource(newContent)
         refresh()
     }
 

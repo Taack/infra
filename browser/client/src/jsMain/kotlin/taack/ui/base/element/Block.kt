@@ -9,6 +9,7 @@ import taack.ui.base.leaf.AnchorHref
 import taack.ui.base.leaf.ContextualLink
 import web.dom.document
 import web.html.HTMLDivElement
+import web.html.HtmlSource
 
 class Block(val parent: Modal?, val d: HTMLDivElement) :
     BaseElement {
@@ -56,7 +57,7 @@ class Block(val parent: Modal?, val d: HTMLDivElement) :
 
     fun updateContent(newContent: String) {
         Helper.trace("Block::updateContent ...")
-        d.children[0].innerHTML = newContent
+        d.children[0].innerHTML = HtmlSource(newContent)
         for (i in 1 until d.children.length) {
             d.children[i].remove()
         }

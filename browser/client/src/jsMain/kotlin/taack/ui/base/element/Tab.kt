@@ -7,6 +7,7 @@ import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.*
 import web.html.HTMLUListElement
+import web.html.HtmlSource
 
 class Tab(val parent: Block, val d: HTMLUListElement) :
     BaseElement {
@@ -38,7 +39,7 @@ class Tab(val parent: Block, val d: HTMLUListElement) :
 
     fun updateContent(newContent: String) {
         Helper.trace("Block::updateContent ...")
-        d.children[0].innerHTML = newContent
+        d.children[0].innerHTML = HtmlSource(newContent)
         AjaxBlock.getSiblingAjaxBlock(this.parent)
     }
 }

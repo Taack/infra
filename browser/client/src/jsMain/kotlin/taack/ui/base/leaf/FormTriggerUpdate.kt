@@ -11,6 +11,7 @@ import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
+import web.html.HTMLTextAreaElement
 import web.http.POST
 import web.http.RequestMethod
 import web.url.URL
@@ -34,6 +35,15 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         }
         (parent.f.querySelector("input[name=${inputElement.value}]") as HTMLInputElement?)?.onchange = EventHandler { e ->
             onChange(e)
+        }
+    }
+
+    private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
+        trace("FormTriggerUpdate::modalReturnSelect $key $value $otherField")
+        for (field in otherField) {
+            val taOrI = parent.f.querySelector("#${field.key}")
+            if (taOrI is HTMLInputElement) taOrI.value = field.value
+            else if (taOrI is HTMLTextAreaElement) taOrI.value = field.value
         }
     }
 
