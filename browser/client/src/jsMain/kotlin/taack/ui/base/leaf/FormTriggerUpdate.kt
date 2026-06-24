@@ -11,7 +11,6 @@ import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLInputElement
 import web.html.HTMLSelectElement
-import web.html.HTMLTextAreaElement
 import web.http.POST
 import web.http.RequestMethod
 import web.url.URL
@@ -38,15 +37,6 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         }
     }
 
-    private fun modalReturnSelect(key: String, value: String, otherField: Map<String, String>) {
-        trace("FormTriggerUpdate::modalReturnSelect $key $value $otherField")
-        for (field in otherField) {
-            val taOrI = parent.f.querySelector("#${field.key}")
-            if (taOrI is HTMLInputElement) taOrI.value = field.value
-            else if (taOrI is HTMLTextAreaElement) taOrI.value = field.value
-        }
-    }
-
     private fun onChange(e: Event) {
         inputElement.disabled = true
         val innerText = inputElement.innerText
@@ -57,6 +47,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         val fd = FormData(f)
         fd.set("isAjax", "true")
         fd.set("refresh", "true")
+        fd.set("ajaxBlockId", parent.parent.blockId)
 
         parent.mapFileToSend.forEach { inputKey ->
             inputKey.value.forEach { fileValue ->
@@ -66,10 +57,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             checkLogin(xhr)
-            val t = xhr.responseText
-            parent.parent.d.innerHTML = t
-            parent.parent.refresh()
-//            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
+            Helper.processAjaxLink(null, xhr.responseText, parent)
         }
         val targetUrl = Helper.urlStack.last()
         targetUrl.searchParams.delete("isAjax")
