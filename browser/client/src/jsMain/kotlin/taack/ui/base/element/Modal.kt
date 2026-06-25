@@ -18,8 +18,9 @@ import web.events.addEventListener
 import web.html.ButtonType
 import web.html.HTMLButtonElement
 import web.html.HTMLDivElement
+import web.html.HtmlSource
 import web.html.button
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 import web.window.window
 
 class Modal(val parent: Block, htmlContent: String) : BaseElement {
@@ -62,13 +63,13 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         dModalDialog.classList.add(ClassName("modal-dialog"), ClassName("modal-xl"), ClassName("modal-dialog-scrollable"), ClassName("modal-dialog-centered"))
         dModalBody = document.createElement("div") as HTMLDivElement
         dModalBody.classList.add(ClassName("modal-body"), ClassName("overflow-y-auto"))
-        dModalBody.innerHTML = htmlContent
+        dModalBody.innerHTML = HtmlSource(htmlContent)
         dModalContent.classList.add(ClassName("modal-content"))
         dModalContent.classList.add(ClassName("taackModal"))
         val minimizeButton = document.createElement("button") as HTMLButtonElement
         minimizeButton.type = ButtonType.button
         minimizeButton.classList.add(ClassName("btn"), ClassName("btn-taack-minimize"))
-        minimizeButton.innerHTML = SVG_MINIMIZE
+        minimizeButton.innerHTML = HtmlSource(SVG_MINIMIZE)
         minimizeButton.onclick = EventHandler { e ->
             e.preventDefault()
             minimize()
@@ -79,17 +80,17 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         val fullscreenButton = document.createElement("button") as HTMLButtonElement
         fullscreenButton.type = ButtonType.button
         fullscreenButton.classList.add(ClassName("btn"), ClassName("btn-taack-fullscreen"))
-        fullscreenButton.innerHTML = SVG_MAXIMIZE
+        fullscreenButton.innerHTML = HtmlSource(SVG_MAXIMIZE)
         fullscreenButton.onclick = EventHandler { e ->
             e.preventDefault()
             trace("Modal::fullscreen $mId")
             dModalContent.removeAttribute("style")
             if (dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
                 dModalDialog.classList.remove(ClassName("modal-fullscreen"))
-                fullscreenButton.innerHTML = SVG_MAXIMIZE
+                fullscreenButton.innerHTML = HtmlSource(SVG_MAXIMIZE)
             } else {
                 dModalDialog.classList.add(ClassName("modal-fullscreen"))
-                fullscreenButton.innerHTML = SVG_RESTORE
+                fullscreenButton.innerHTML = HtmlSource(SVG_RESTORE)
             }
         }
         fullscreenButton.onmousedown = EventHandler { e ->
@@ -98,7 +99,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         closeButton = document.createElement("button") as HTMLButtonElement
         closeButton.type = ButtonType.button
         closeButton.classList.add(ClassName("btn"), ClassName("btn-taack-close"))
-        closeButton.innerHTML = SVG_CLOSE
+        closeButton.innerHTML = HtmlSource(SVG_CLOSE)
         closeButton.onclick = EventHandler { e ->
             e.stopPropagation()
             e.preventDefault()
@@ -144,7 +145,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
     }
 
     fun refreshModal(t: String) {
-        dModalBody.innerHTML = t
+        dModalBody.innerHTML = HtmlSource(t)
     }
 
     fun close() {
@@ -168,7 +169,7 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         val minimizeItem = document.createElement("button") as HTMLButtonElement
         minimizeItem.id = ElementId("modal-minimize-item-$mId")
         minimizeItem.classList.add(ClassName("btn"), ClassName("btn-primary"))
-        minimizeItem.innerHTML = dModalBody.querySelector("ul[taacktag='LABEL']")?.textContent ?: "Modal $mId"
+        minimizeItem.innerHTML = HtmlSource(dModalBody.querySelector("ul[taacktag='LABEL']")?.textContent ?: "Modal $mId")
         minimizeItem.onclick = EventHandler { e ->
             e.preventDefault()
             rootModal.dModal.classList.remove(ClassName("tck-hidden"))

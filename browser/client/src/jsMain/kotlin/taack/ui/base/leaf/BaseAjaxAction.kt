@@ -3,10 +3,8 @@ package taack.ui.base.leaf
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.checkLogin
 import taack.ui.base.Helper.Companion.processAjaxLink
-import taack.ui.base.Helper.Companion.saveOrOpenBlob
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
-import web.blob.Blob
 import web.cssom.ClassName
 import web.dom.ElementId
 import web.dom.document
@@ -16,12 +14,11 @@ import web.html.HTMLElement
 import web.http.GET
 import web.http.RequestMethod
 import web.location.location
-import web.uievents.MouseButton
-import web.uievents.MouseEvent
+import web.mouse.AUXILIARY
+import web.mouse.MouseButton
+import web.mouse.MouseEvent
 import web.url.URL
 import web.xhr.XMLHttpRequest
-import web.xhr.XMLHttpRequestResponseType
-import web.xhr.blob
 import kotlin.math.min
 
 open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : LeafElement {

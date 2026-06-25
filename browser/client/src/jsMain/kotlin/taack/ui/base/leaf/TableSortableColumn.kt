@@ -9,7 +9,7 @@ import web.cssom.ClassName
 import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLSpanElement
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 
 class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafElement {
     companion object {

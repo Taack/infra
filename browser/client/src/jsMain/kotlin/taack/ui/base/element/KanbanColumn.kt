@@ -11,6 +11,7 @@ import web.events.EventHandler
 import web.form.FormData
 import web.html.HTMLButtonElement
 import web.html.HTMLDivElement
+import web.html.HtmlSource
 import web.http.POST
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
@@ -88,7 +89,7 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
             hiddenArea = document.createElement("div") as HTMLDivElement
             hiddenArea.classList.add(ClassName("kanban-column"), ClassName("col"), ClassName("m-2"))
             hiddenArea.id = ElementId("kanban-hidden-columns")
-            hiddenArea.innerHTML = "<div class='kanban-column-header'>Hidden columns</div><div id='kanban-hidden-list'></div>"
+            hiddenArea.innerHTML = HtmlSource("<div class='kanban-column-header'>Hidden columns</div><div id='kanban-hidden-list'></div>")
             parent.d.appendChild(hiddenArea)
         }
         val hiddenList = hiddenArea.querySelector("#kanban-hidden-list")!!
@@ -96,7 +97,7 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
         val headerStr = d.querySelector(".kanban-column-header > div")?.textContent?.trim()
         val count: Int = kanbanCards?.size ?: 0
         columnItem.classList.add(ClassName("kanban-hidden-column"))
-        columnItem.innerHTML = "$headerStr<span>$count</span>"
+        columnItem.innerHTML = HtmlSource("$headerStr<span>$count</span>")
         columnItem.onclick = EventHandler {
             val column = parent.d.querySelector("[kanbanColumnIndex=${columnIndex}]") as HTMLDivElement?
             if (column != null) {

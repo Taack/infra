@@ -3,7 +3,7 @@ package taack.ui.wysiwyg.canvasMono.command
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.wysiwyg.canvasMono.ICanvasDrawable
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 
 class AddCharCommand(private val drawables: MutableList<ICanvasDrawable>, private val textIndex: Int, private val textSubIndex: Int, private val pos: Int? = null, private val ch: String, private val mouseEvent: MouseEvent?) : ICanvasCommand {
     override fun doIt(): Boolean {

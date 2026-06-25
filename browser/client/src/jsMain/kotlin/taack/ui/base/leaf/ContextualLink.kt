@@ -108,7 +108,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                 checkLogin(xhr)
                 if (xhr.status == 200.toShort()) {
                     val template = document.createElement("template") as HTMLTemplateElement
-                    template.innerHTML = xhr.responseText
+                    template.innerHTML = HtmlSource(xhr.responseText)
                     val fragment = template.content
                     buildCopyDropdown(a)?.let { fragment.querySelector("ul")?.append(it) }
                     val contextMenu = document.createElement("div") as HTMLDivElement

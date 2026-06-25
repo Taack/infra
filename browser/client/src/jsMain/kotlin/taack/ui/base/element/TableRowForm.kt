@@ -6,6 +6,7 @@ import taack.ui.base.Helper
 import taack.ui.base.leaf.TableRowFormButton
 import taack.ui.base.leaf.TableRowFormErrorInput
 import web.html.HTMLFormElement
+import web.html.HtmlSource
 
 class TableRowForm(val parent: TableRow, val f: HTMLFormElement):
     BaseElement {
@@ -33,7 +34,7 @@ class TableRowForm(val parent: TableRow, val f: HTMLFormElement):
     fun cleanUpErrors() {
         for (errorInput in errorInputs.values) {
             errorInput.d.style.display = "none"
-            errorInput.d.innerHTML = ""
+            errorInput.d.innerHTML = HtmlSource("")
         }
     }
 
