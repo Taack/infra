@@ -143,7 +143,7 @@ class Helper {
                         hydrateStateToUrl(formUrl)
                         history.pushState("{}", document.title, formUrl)
                     }
-                    processAjaxLink(null, xhr.responseText, filter)
+                    processAjaxLink(b?.formAction?.let { URL(it) }, xhr.responseText, filter)
                     b?.disabled = false
                     if (innerText != null) b.innerText = innerText
                     loader?.classList?.add(ClassName("tck-hidden"))
@@ -247,34 +247,33 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL_AND_REFRESH) -> {
-                    trace("Helper::CLOSE_LAST_MODAL_AND_REFRESH")
-                    if (block.parent != null) block.parent.close()
-                    else block.closeModal()
-//                    val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
-//                    processAjaxLink(url, innerText, block.parent ?: base, process)
+                    trace("Helper::CLOSE_LAST_MODAL_AND_REFRESH urlStack: $urlStack")
+                    if (block.parent != null) {
+                        urlStack.removeLast()
+                        block.parent.close()
+                    } else block.closeModal()
 
                     if (!urlStack.isEmpty()) {
-                        urlStack.removeLast()
-                        if (!urlStack.isEmpty()) {
-                            val xhr = XMLHttpRequest()
-                            xhr.onloadend = EventHandler {
-                                checkLogin(xhr)
-                                val t = xhr.responseText
-                                if (t.startsWith(OPEN_MODAL)) {
-                                    block.parent?.parent?.parent?.refreshModal(t.substring(OPEN_MODAL.length))
-                                } else {
-                                    block.parent?.parent?.updateContent(t)
-                                }
+                        val xhr = XMLHttpRequest()
+                        xhr.onloadend = EventHandler {
+                            checkLogin(xhr)
+                            val t = xhr.responseText
+                            if (t.startsWith(OPEN_MODAL)) {
+                                processAjaxLink(url, t.substring(OPEN_MODAL.length), block.parent?.parent?.parent)
+                            } else {
+                                processAjaxLink(url, t, block.parent?.parent)
                             }
-
-                            val targetUrl = urlStack.last()
-                            targetUrl.searchParams.append("isAjax", "true")
-                            targetUrl.searchParams.delete("refresh")
-                            xhr.open(RequestMethod.POST, targetUrl)
-                            xhr.send()
-                        } else {
-                            window.location.href = Block.href!!
                         }
+
+                        val targetUrl = urlStack.last()
+                        targetUrl.searchParams.append("isAjax", "true")
+                        targetUrl.searchParams.delete("refresh")
+                        xhr.open(RequestMethod.POST, targetUrl)
+                        print("xhr.open() $targetUrl")
+
+                        xhr.send()
+                    } else {
+                        window.location.href = Block.href!!
                     }
                 }
 
@@ -288,14 +287,15 @@ class Helper {
                             var pos2 = it.value.length - pos1
                             if (it.value.endsWith(BLOCK_END))
                                 pos2 -= BLOCK_END.length
-                            target.d.innerHTML = HtmlSource(it.value.substring(pos1, pos2))//.substring(it.value.indexOf(':') + 1)
+                            target.d.innerHTML =
+                                HtmlSource(it.value.substring(pos1, pos2))//.substring(it.value.indexOf(':') + 1)
                             target.refresh()
                         }
                     }
                 }
 
                 text.startsWith(OPEN_MODAL) -> {
-                    trace("Helper::opening modal ...")
+                    trace("Helper::opening modal ... url: $url, process: $process")
                     if (url != null) {
                         urlStack.addLast(url)
                     }
@@ -310,7 +310,7 @@ class Helper {
                 }
 
                 text.startsWith(REFRESH_MODAL) -> {
-                    trace("Helper::refresh modal $text")
+                    trace("Helper::refresh modal $urlStack $text")
                     if (url != null) {
                         if (urlStack.isNotEmpty()) urlStack.removeLast()
                         urlStack.addLast(url)
