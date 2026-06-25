@@ -112,8 +112,8 @@ if (isReleaseVersion) {
 subprojects {
     TaackUiPublished taackUiPublished = TaackUiPublished.fromName(name)
     if (taackUiPublished) {
-        version releaseVersion
-        group "org.taack"
+        version = releaseVersion
+        group = "org.taack"
 
         apply plugin: 'java'
         apply plugin: 'java-library'
@@ -189,7 +189,7 @@ subprojects {
         if (isReleaseVersion()) {
             apply plugin: 'signing'
 
-            group "org.taack"
+            group = "org.taack"
 
             println "isReleaseVersion() ${isReleaseVersion()}"
             println "isReleaseVersion ${isReleaseVersion}"
