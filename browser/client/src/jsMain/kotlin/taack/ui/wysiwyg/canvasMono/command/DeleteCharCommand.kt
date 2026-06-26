@@ -3,7 +3,7 @@ package taack.ui.wysiwyg.canvasMono.command
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.wysiwyg.canvasMono.ICanvasDrawable
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 
 class DeleteCharCommand(
     private val drawables: MutableList<ICanvasDrawable>,

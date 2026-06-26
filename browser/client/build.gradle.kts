@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.7.3")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-browser-js:2026.6.6")
             }
         }
     }

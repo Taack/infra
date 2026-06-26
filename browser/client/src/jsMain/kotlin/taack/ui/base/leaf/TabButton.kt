@@ -69,7 +69,7 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
             // Avoid requesting twice the same tab content
             if (divTab != null && !divTab.classList.contains(ClassName("loaded"))) {
                 // Show loading spinner while loading
-                parent.parent.d.querySelector("#tab-${tabId}-${tabIndex}-pane")?.innerHTML = "<div class='taack-tab-load'></div>"
+                parent.parent.d.querySelector("#tab-${tabId}-${tabIndex}-pane")?.innerHTML = HtmlSource("<div class='taack-tab-load'></div>")
                 xhr.open(RequestMethod.POST, b.getAttribute("action")!!)
                 xhr.send(fd)
             }

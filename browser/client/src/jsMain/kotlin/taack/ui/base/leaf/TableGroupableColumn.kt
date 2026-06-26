@@ -13,9 +13,10 @@ import web.form.FormData
 import web.html.HTMLAnchorElement
 import web.html.HTMLInputElement
 import web.html.HTMLSpanElement
+import web.html.HtmlSource
 import web.http.POST
 import web.http.RequestMethod
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 import web.xhr.XMLHttpRequest
 
 class TableGroupableColumn(private val parent: Table, s: HTMLSpanElement) : LeafElement {
@@ -69,7 +70,7 @@ class TableGroupableColumn(private val parent: Table, s: HTMLSpanElement) : Leaf
         xhr.onloadend = EventHandler {
             checkLogin(xhr)
             Helper.mapAjaxBlock(xhr.responseText).map { me ->
-                parent.parent.d.innerHTML = me.value
+                parent.parent.d.innerHTML = HtmlSource(me.value)
             }
             AjaxBlock.getSiblingAjaxBlock(parent.parent.parent)
 

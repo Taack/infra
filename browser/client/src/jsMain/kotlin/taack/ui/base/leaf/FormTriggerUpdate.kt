@@ -57,6 +57,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         val fd = FormData(f)
         fd.set("isAjax", "true")
         fd.set("refresh", "true")
+        fd.set("ajaxBlockId", parent.parent.blockId)
 
         parent.mapFileToSend.forEach { inputKey ->
             inputKey.value.forEach { fileValue ->
@@ -66,10 +67,7 @@ class FormTriggerUpdate(private val parent: Form, private val inputElement: HTML
         val xhr = XMLHttpRequest()
         xhr.onloadend = EventHandler {
             checkLogin(xhr)
-            val t = xhr.responseText
-            parent.parent.d.innerHTML = t
-            parent.parent.refresh()
-//            Helper.processAjaxLink(t, parent, ::modalReturnSelect)
+            Helper.processAjaxLink(null, xhr.responseText, parent)
         }
         val targetUrl = Helper.urlStack.last()
         targetUrl.searchParams.delete("isAjax")

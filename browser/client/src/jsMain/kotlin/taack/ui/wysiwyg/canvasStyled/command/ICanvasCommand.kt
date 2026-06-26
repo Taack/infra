@@ -4,7 +4,7 @@ import taack.ui.base.Helper.Companion.trace
 import taack.ui.wysiwyg.canvasStyled.ICanvasDrawable
 import taack.ui.wysiwyg.canvasStyled.table.CanvasTable
 import taack.ui.wysiwyg.canvasStyled.text.CanvasText
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 
 interface ICanvasCommand {
     fun doIt(): Boolean

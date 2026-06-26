@@ -13,14 +13,15 @@ import web.events.EventHandler
 import web.geometry.DOMRect
 import web.html.HTMLDivElement
 import web.html.HTMLImageElement
+import web.html.HtmlSource
 import web.http.GET
 import web.http.RequestMethod
 import web.location.location
+import web.mouse.MouseEvent
 import web.svg.*
 import web.timers.Interval
 import web.timers.clearInterval
 import web.timers.setInterval
-import web.uievents.MouseEvent
 import web.url.URL
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
@@ -61,21 +62,21 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
             tooltip.appendChild(background)
 
             val legend: SVGGElement = document.createElementNS("http://www.w3.org/2000/svg", "g") as SVGGElement
-            legend.innerHTML = """
+            legend.innerHTML = HtmlSource("""
             <rect x="0.0" y="0.0" width="${40 * fontSizePercentage}" height="${13 * fontSizePercentage}" ${if (keyColor.isNotBlank()) "style='fill: ${keyColor};'" else "class='diagram-tooltip-legend'"}></rect>
             <text x="${45 * fontSizePercentage}" y="${11 * fontSizePercentage}" text-rendering="optimizeLegibility" style="font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif; pointer-events: none;">$keyLabel</text>
-        """.trimIndent()
+        """.trimIndent())
             tooltip.appendChild(legend)
 
             val maxWidth: Double = parent.s.viewBox.baseVal.width.let { if (it > 0) it else parent.s.width.baseVal.value.toDouble() } / 2
             if (keyDescription.isNotBlank()) {
                 val testHTML : HTMLDivElement = document.createElement("div") as HTMLDivElement
-                testHTML.innerHTML = keyDescription
+                testHTML.innerHTML = HtmlSource(keyDescription)
                 if (testHTML.textContent?.trim() == keyDescription.trim()) {
                     val description: SVGTextElement = document.createElementNS("http://www.w3.org/2000/svg", "text") as SVGTextElement
                     description.setAttribute("text-rendering", "optimizeLegibility")
                     description.setAttribute("style", "font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif;")
-                    description.innerHTML = keyDescription
+                    description.innerHTML = HtmlSource(keyDescription)
                     description.setAttribute("transform", "translate(0,${30 * fontSizePercentage})")
                     tooltip.appendChild(description)
                 } else {
@@ -85,7 +86,7 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
                     description.setAttribute("height", "100%")
                     val descriptionContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
                     descriptionContainer.classList.add(ClassName("diagram-tooltip-description"))
-                    descriptionContainer.innerHTML = keyDescription
+                    descriptionContainer.innerHTML = HtmlSource(keyDescription)
                     description.appendChild(descriptionContainer)
 
                     parent.s.appendChild(description)

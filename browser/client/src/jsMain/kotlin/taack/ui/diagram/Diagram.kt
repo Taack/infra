@@ -8,9 +8,9 @@ import web.dom.document
 import web.events.EventHandler
 import web.events.EventType
 import web.events.addEventListener
+import web.mouse.MouseEvent
+import web.mouse.WheelEvent
 import web.svg.SVGSVGElement
-import web.uievents.MouseEvent
-import web.uievents.WheelEvent
 
 class Diagram(val parent: AjaxBlock, val s: SVGSVGElement): BaseElement {
     companion object {

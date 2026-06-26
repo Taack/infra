@@ -13,6 +13,7 @@ import web.blob.Blob
 import web.clipboard.ClipboardEvent
 import web.cssom.ClassName
 import web.data.DataTransferItemList
+import web.dnd.DragEvent
 import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
@@ -22,12 +23,12 @@ import web.form.FormDataEntryValue
 import web.history.history
 import web.html.HTMLAnchorElement
 import web.html.HTMLButtonElement
+import web.html.HtmlSource
 import web.http.POST
 import web.http.RequestMethod
 import web.location.location
+import web.mouse.MouseEvent
 import web.storage.localStorage
-import web.uievents.DragEvent
-import web.uievents.MouseEvent
 import web.url.URL
 import web.window.window
 import web.xhr.XMLHttpRequest
@@ -142,7 +143,7 @@ class Helper {
                         hydrateStateToUrl(formUrl)
                         history.pushState("{}", document.title, formUrl)
                     }
-                    processAjaxLink(null, xhr.responseText, filter)
+                    processAjaxLink(b?.formAction?.let { URL(it) }, xhr.responseText, filter)
                     b?.disabled = false
                     if (innerText != null) b.innerText = innerText
                     loader?.classList?.add(ClassName("tck-hidden"))
@@ -223,7 +224,7 @@ class Helper {
                         ) {
                             mapAjaxBlock(text.substring(CLOSE_LAST_MODAL.length + 1)).map {
                                 val target = block.parent?.parent?.ajaxBlockElements?.get(it.key)
-                                target!!.d.innerHTML = it.value
+                                target!!.d.innerHTML = HtmlSource(it.value)
                                 target.refresh()
                             }
                         }
@@ -246,34 +247,33 @@ class Helper {
                 }
 
                 text.startsWith(CLOSE_LAST_MODAL_AND_REFRESH) -> {
-                    trace("Helper::CLOSE_LAST_MODAL_AND_REFRESH")
-                    if (block.parent != null) block.parent.close()
-                    else block.closeModal()
-//                    val innerText = text.substring(CLOSE_LAST_MODAL_AND_UPDATE_BLOCK.length)
-//                    processAjaxLink(url, innerText, block.parent ?: base, process)
+                    trace("Helper::CLOSE_LAST_MODAL_AND_REFRESH urlStack: $urlStack")
+                    if (block.parent != null) {
+                        urlStack.removeLast()
+                        block.parent.close()
+                    } else block.closeModal()
 
                     if (!urlStack.isEmpty()) {
-                        urlStack.removeLast()
-                        if (!urlStack.isEmpty()) {
-                            val xhr = XMLHttpRequest()
-                            xhr.onloadend = EventHandler {
-                                checkLogin(xhr)
-                                val t = xhr.responseText
-                                if (t.startsWith(OPEN_MODAL)) {
-                                    block.parent?.parent?.parent?.refreshModal(t.substring(OPEN_MODAL.length))
-                                } else {
-                                    block.parent?.parent?.updateContent(t)
-                                }
+                        val xhr = XMLHttpRequest()
+                        xhr.onloadend = EventHandler {
+                            checkLogin(xhr)
+                            val t = xhr.responseText
+                            if (t.startsWith(OPEN_MODAL)) {
+                                processAjaxLink(url, t.substring(OPEN_MODAL.length), block.parent?.parent?.parent)
+                            } else {
+                                processAjaxLink(url, t, block.parent?.parent)
                             }
-
-                            val targetUrl = urlStack.last()
-                            targetUrl.searchParams.append("isAjax", "true")
-                            targetUrl.searchParams.delete("refresh")
-                            xhr.open(RequestMethod.POST, targetUrl)
-                            xhr.send()
-                        } else {
-                            window.location.href = Block.href!!
                         }
+
+                        val targetUrl = urlStack.last()
+                        targetUrl.searchParams.append("isAjax", "true")
+                        targetUrl.searchParams.delete("refresh")
+                        xhr.open(RequestMethod.POST, targetUrl)
+                        print("xhr.open() $targetUrl")
+
+                        xhr.send()
+                    } else {
+                        window.location.href = Block.href!!
                     }
                 }
 
@@ -287,14 +287,15 @@ class Helper {
                             var pos2 = it.value.length - pos1
                             if (it.value.endsWith(BLOCK_END))
                                 pos2 -= BLOCK_END.length
-                            target.d.innerHTML = it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                            target.d.innerHTML =
+                                HtmlSource(it.value.substring(pos1, pos2))//.substring(it.value.indexOf(':') + 1)
                             target.refresh()
                         }
                     }
                 }
 
                 text.startsWith(OPEN_MODAL) -> {
-                    trace("Helper::opening modal ...")
+                    trace("Helper::opening modal ... url: $url, process: $process")
                     if (url != null) {
                         urlStack.addLast(url)
                     }
@@ -309,7 +310,7 @@ class Helper {
                 }
 
                 text.startsWith(REFRESH_MODAL) -> {
-                    trace("Helper::refresh modal $text")
+                    trace("Helper::refresh modal $urlStack $text")
                     if (url != null) {
                         if (urlStack.isNotEmpty()) urlStack.removeLast()
                         urlStack.addLast(url)
@@ -331,7 +332,7 @@ class Helper {
 
                             if (target != null) {
                                 target.d.innerHTML =
-                                    it.value.substring(pos1, pos2)//.substring(it.value.indexOf(':') + 1)
+                                    HtmlSource(it.value.substring(pos1, pos2))//.substring(it.value.indexOf(':') + 1)
                                 target.refresh()
                             } else {
                                 block.updateContent(it.value.substring(pos1, pos2))
@@ -355,7 +356,7 @@ class Helper {
                             hasErrors = true
                             val d = base.errorPlaceHolders[me.key]?.d
                             if (d != null) {
-                                d.innerHTML = me.value
+                                d.innerHTML = HtmlSource(me.value)
                                 d.style.display = "block"
                             }
                         }
@@ -371,7 +372,7 @@ class Helper {
                             hasErrors = true
                             val d = base.errorInputs[me.key]?.d
                             if (d != null) {
-                                d.innerHTML = me.value
+                                d.innerHTML = HtmlSource(me.value)
                                 d.style.display = "block"
                             }
                         }

@@ -3,7 +3,7 @@ package taack.ui.wysiwyg.canvasMono.command
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.wysiwyg.canvasMono.ICanvasDrawable
 import taack.ui.wysiwyg.canvasMono.text.CanvasText
-import web.uievents.MouseEvent
+import web.mouse.MouseEvent
 
 interface ICanvasCommand {
     fun doIt(): Boolean

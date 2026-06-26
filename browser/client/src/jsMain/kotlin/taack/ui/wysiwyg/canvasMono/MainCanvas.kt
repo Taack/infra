@@ -13,6 +13,7 @@ import web.canvas.CanvasRenderingContext2D
 import web.canvas.ID
 import web.clipboard.ClipboardEvent
 import web.cssom.ClassName
+import web.dnd.DragEvent
 import web.dom.ElementId
 import web.dom.document
 import web.events.Event
@@ -22,9 +23,8 @@ import web.events.addEventListener
 import web.file.File
 import web.file.FileReader
 import web.html.*
-import web.uievents.DragEvent
-import web.uievents.KeyboardEvent
-import web.uievents.MouseEvent
+import web.keyboard.KeyboardEvent
+import web.mouse.MouseEvent
 import web.window.window
 import kotlin.math.floor
 import kotlin.math.min
@@ -332,7 +332,7 @@ class MainCanvas(
     private fun createButton(id: String, innerHtml: String, handler: () -> Unit) {
         val b = document.createElement("button") as HTMLButtonElement
         b.id = ElementId( id + textarea.name)
-        b.innerHTML = innerHtml
+        b.innerHTML = HtmlSource(innerHtml)
         b.type = ButtonType.button
         b.classList.add(ClassName("btn"))
         b.classList.add(ClassName("btn-light"))
