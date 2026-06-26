@@ -60,6 +60,24 @@ class SimpleContentEditable(
     var selectedElement: Node? = null
     private var rescanContent = false
     var selection: Selection? = null
+    enum class SpanMode {
+        INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, START_CHAR_SEQ, META;
+
+        companion object {
+            fun from(v: String): SpanMode {
+                if (v == "INLINED") return INLINED
+                else if (v == "CONTEXT_START") return CONTEXT_START
+                else if (v == "CONTEXT_END") return CONTEXT_END
+                else if (v == "START") return START
+                else if (v == "START_CHAR_SEQ") return START_CHAR_SEQ
+                else if (v == "INLINED_BREAK") return INLINED_BREAK
+                else return META
+            }
+        }
+    }
+    data class Span(
+        val pattern: String, val className: String, val inlined: SpanMode
+    )
 
     private data class Mod(val letters: String, val pos: Int)
 
@@ -422,13 +440,14 @@ class SimpleContentEditable(
 
     fun asciidocToHtml(e: HTMLDivElement) {
         trace("asciidocToHtml +++")
-        val txt = escapeHtml(e.textContent)
+        var txt = escapeHtml(e.textContent)
         if (txt?.isEmpty() == true) {
             e.innerHTML = HtmlSource("<br>")
             return
         }
         if (txt != null) {
             var hasStart: Span? = null
+            var hasStartCharSeq: Span? = null
             var inlineMatchSequence: List<Pair<Span, MatchResult>> = mutableListOf<Pair<Span, MatchResult>>()
             val entries = styles[currentContext]!!
             var inContext = false
@@ -439,22 +458,29 @@ class SimpleContentEditable(
                     break
                 }
                 if (entry.inlined == SpanMode.CONTEXT_END) {
-                    if (inContext && txt.startsWith(entry.pattern)) {
+                    if (inContext && txt!!.startsWith(entry.pattern)) {
                         inContext = false
                         break
                     }
                 }
                 if (inContext) break
 
+                if (entry.inlined == SpanMode.START_CHAR_SEQ) {
+                    if (txt!!.startsWith(entry.pattern)) {
+                        hasStartCharSeq = entry
+                        txt = txt.substring(entry.pattern.length)
+                    }
+                }
+
                 if (entry.inlined == SpanMode.START && hasStart == null) {
-                    if (txt.startsWith(entry.pattern)) {
+                    if (txt!!.startsWith(entry.pattern)) {
                         hasStart = entry
                         break
                     }
                 } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
                     val pattern = entry.pattern
                     val regex = Regex(pattern)
-                    if (regex.containsMatchIn(txt)) {
+                    if (regex.containsMatchIn(txt!!)) {
                         for (s in regex.findAll(txt)) {
                             inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
                         }
@@ -469,7 +495,7 @@ class SimpleContentEditable(
                     }
                 }
             }
-            var result = ""
+            var result = if (hasStartCharSeq != null) """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>""" else ""
             val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
 
             var i = 0
@@ -480,10 +506,10 @@ class SimpleContentEditable(
                 val ends = match.range.endInclusive
                 val replace =
                     """${match.groupValues[1]}<span class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
-                result += txt.substring(i..start - 1) + replace
+                result += txt!!.substring(i..start - 1) + replace
                 i = ends + 1
             }
-            result += txt.substring(i)
+            result += txt!!.substring(i)
 
             if (hasStart != null) {
                 val cn = hasStart.className
