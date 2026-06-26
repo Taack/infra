@@ -16,7 +16,7 @@ final class SpanRegex {
     private final Mode inlined
 
     enum Mode {
-        INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, META
+        INLINED, INLINED_BREAK, START, CONTEXT_START, START_CHAR_SEQ, CONTEXT_END, META
     }
 
     SpanRegex(String pattern, String className, Mode inlined) {

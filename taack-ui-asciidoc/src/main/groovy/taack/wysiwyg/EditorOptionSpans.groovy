@@ -16,9 +16,9 @@ enum TaackBaseAsciidocSpans {
     bullet2(new SpanRegex("()(^----\$)()", "asciidoc-bullet2", SpanRegex.Mode.INLINED)),
     bullet3(new SpanRegex("()(^------\$)()", "asciidoc-bullet3", SpanRegex.Mode.INLINED)),
     META(new SpanRegex("()(^\\\\[[^[\\\\]]*\\\\]\$)()", "asciidoc-meta", SpanRegex.Mode.INLINED)),
-    UNORDERED_LIST1(new SpanRegex("* ", "asciidoc-b1", SpanRegex.Mode.START)),
-    UNORDERED_LIST2(new SpanRegex("** ", "asciidoc-b2", SpanRegex.Mode.START)),
-    UNORDERED_LIST3(new SpanRegex("*** ", "asciidoc-b3", SpanRegex.Mode.START)),
+    UNORDERED_LIST1(new SpanRegex("* ", "asciidoc-b1", SpanRegex.Mode.START_CHAR_SEQ)),
+    UNORDERED_LIST2(new SpanRegex("** ", "asciidoc-b2", SpanRegex.Mode.START_CHAR_SEQ)),
+    UNORDERED_LIST3(new SpanRegex("*** ", "asciidoc-b3", SpanRegex.Mode.START_CHAR_SEQ)),
 
     UNCONSTRAINED_BOLD(new SpanRegex("([^*]?)(\\\\*\\\\*[^*]*\\\\*\\\\*)([^*]?)", "asciidoc-bold", SpanRegex.Mode.INLINED)),
     UNCONSTRAINED_ITALIC(new SpanRegex("([^_]?)(__[^_]*__)([^_]?)", "asciidoc-italic", SpanRegex.Mode.INLINED)),
