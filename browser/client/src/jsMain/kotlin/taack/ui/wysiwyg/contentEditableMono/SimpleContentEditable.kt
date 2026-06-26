@@ -1,5 +1,6 @@
 package taack.ui.wysiwyg.contentEditableMono
 
+import js.array.asList
 import js.buffer.AllowSharedBufferSource
 import js.iterable.iterator
 import js.typedarrays.toUint8Array
@@ -10,18 +11,17 @@ import web.compression.DecompressionStream
 import web.compression.deflate
 import web.cssom.ClassName
 import web.dom.ElementId
-import web.dom.Node
 import web.dom.document
 import web.encoding.TextDecoder
 import web.events.EventHandler
 import web.html.*
 import web.keyboard.*
-import web.selection.Selection
 import web.window.window
 import web.xhr.XMLHttpRequest
 import kotlin.io.encoding.Base64
 import kotlin.js.Date
 import kotlin.math.max
+import kotlin.math.min
 
 class SimpleContentEditable(
     internal val text: HTMLTextAreaElement,
@@ -484,7 +484,9 @@ class SimpleContentEditable(
                     }
                 }
             }
-            var result = if (hasStartCharSeq != null) """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>""" else ""
+            var result: String = (if (hasStartCharSeq != null) {
+                """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
+            } else "") as String
             val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
 
             var i = 0
@@ -495,7 +497,7 @@ class SimpleContentEditable(
                 val ends = match.range.endInclusive
                 val replace =
                     """${match.groupValues[1]}<span class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
-                result += txt!!.substring(i..start - 1) + replace
+                result += txt!!.substring(i..<start) + replace
                 i = ends + 1
             }
             result += txt!!.substring(i)
@@ -507,6 +509,15 @@ class SimpleContentEditable(
 
             if (e.innerHTML.toString() != result) {
                 e.innerHTML = HtmlSource(result)
+                window.getSelection()!!.removeAllRanges()
+                val range = document.createRange()
+                val n = e.childNodes.asList().last()
+                if (n is HTMLSpanElement) {
+                    val n2 = e.appendChild(document.createTextNode(""))
+                    range.setStart(n2, 0)
+                } else range.setStart(n, n.textContent!!.length)
+                range.collapse(true)
+                window.getSelection()!!.addRange(range)
             }
         }
         trace("asciidocToHtml --- ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
