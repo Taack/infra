@@ -3,11 +3,8 @@ package taack.ui.wysiwyg.contentEditableMono
 import js.buffer.AllowSharedBufferSource
 import js.iterable.iterator
 import js.typedarrays.toUint8Array
-import org.w3c.dom.HTMLBRElement
 import org.w3c.fetch.Response
 import taack.ui.base.Helper
-import taack.ui.wysiwyg.contentEditableMono.MainContentEditable.Span
-import taack.ui.wysiwyg.contentEditableMono.MainContentEditable.SpanMode
 import web.compression.CompressionFormat
 import web.compression.DecompressionStream
 import web.compression.deflate
@@ -30,36 +27,28 @@ class SimpleContentEditable(
     internal val text: HTMLTextAreaElement,
     divHolder: HTMLDivElement,
 ) {
-    private val numberOfLine: Int
-        get() = text.value.count { it == '\n' }
     val styles: MutableMap<Span?, MutableList<Span>> = mutableMapOf()
     private var timeMs = Date.now()
-    private var focus: Int? = 0
     private var currentContext: Span? = null
     private var upLoadUrl: String? = null
     private var selectedElementPosition = 0
-    private var currentLinePosition = 0
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divAutocomplete = document.createElement("div") as HTMLDivElement
-    private var currentLine: HTMLDivElement? = currentLineComputed
-    private val currentLineComputed: HTMLDivElement?
-        get() {
-            if (selectedElement is HTMLDivElement && selectedElement!!.textContent == "") {
-                return selectedElement as HTMLDivElement
-            } else if (selectedElement?.parentElement is HTMLDivElement) {
-                return selectedElement?.parentElement as HTMLDivElement
-            } else if (selectedElement?.parentElement?.parentElement is HTMLDivElement) {
-                return selectedElement?.parentElement?.parentElement as HTMLDivElement
-            } else if (selectedElement?.parentElement?.parentElement?.parentElement is HTMLDivElement) {
-                return selectedElement?.parentElement?.parentElement?.parentElement as HTMLDivElement
-            }
-            return null
-        }
-    var selectedElement: Node? = null
+    private var currentLine: HTMLDivElement? = null
+//    private val currentLineComputed: HTMLDivElement?
+//        get() {
+//            if (selectedElement is HTMLDivElement && selectedElement!!.textContent == "") {
+//                return selectedElement as HTMLDivElement
+//            } else if (selectedElement?.parentElement is HTMLDivElement) {
+//                return selectedElement?.parentElement as HTMLDivElement
+//            }
+//            return null
+//        }
+//    var selectedElement: Node? = null
     private var rescanContent = false
-    var selection: Selection? = null
+//    var selection: Selection? = null
     enum class SpanMode {
         INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, START_CHAR_SEQ, META;
 
@@ -207,7 +196,7 @@ class SimpleContentEditable(
         }
 
         divContent.onclick = EventHandler {
-            initSelection()
+//            initSelection()
         }
 
         divContent.onkeydown = EventHandler { event ->
@@ -243,7 +232,7 @@ class SimpleContentEditable(
         }
 
         divContent.onkeyup = EventHandler { event ->
-            initSelection()
+//            initSelection()
             trace("divContent.onkeyup ${event.key}")
             if (event.key.startsWith("Arrow")) {
                 return@EventHandler
@@ -251,18 +240,18 @@ class SimpleContentEditable(
 
             if (event.code == KeyCode.Enter) {
                 createCmdLine(null, 0)
-                val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
-                var e = range?.commonAncestorContainer
-
-                if (e != null) {
-                    if (e is HTMLSpanElement) {
-                        trace("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
-                        if (range?.commonAncestorContainer?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.innerHTML =
-                            HtmlSource("<br>")
-                        else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.parentElement?.innerHTML =
-                            HtmlSource("<br>")
-                    }
-                }
+//                val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
+//                var e = range?.commonAncestorContainer
+//
+//                if (e != null) {
+//                    if (e is HTMLSpanElement) {
+//                        trace("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
+//                        if (range?.commonAncestorContainer?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.innerHTML =
+//                            HtmlSource("<br>")
+//                        else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.parentElement?.innerHTML =
+//                            HtmlSource("<br>")
+//                    }
+//                }
 
                 return@EventHandler
             }
@@ -276,7 +265,7 @@ class SimpleContentEditable(
                     txtToSave += c.textContent + "\n"
                 }
                 textContent = txtToSave
-                trace("textContent full")
+                trace("textContent full $rescanContent")
 
                 if (rescanContent) {
                     readTextarea()
@@ -347,7 +336,7 @@ class SimpleContentEditable(
                                 )
                             selectedElementPosition = 1
                             divAutocomplete.style.display = "none"
-                            selection?.setPosition(e, selectedElementPosition)
+//                            selection?.setPosition(e, selectedElementPosition)
                         }
                         divAutocomplete.appendChild(d)
                     }
@@ -360,32 +349,32 @@ class SimpleContentEditable(
         }
     }
 
-    fun initSelection() {
-        val winSelection = window.getSelection()
-        selection = winSelection
-        focus = selection?.focusOffset
-        selectedElement = selection?.focusNode
-
-        // position in chars in parent container
-        currentLine = currentLineComputed
-
-        if (currentLine != null) {
-            selectedElementPosition = 0
-            currentLinePosition = selectedElementPosition
-            for (child in currentLine!!.childNodes.iterator()) {
-                if (child == selectedElement) { // || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
-                    selectedElementPosition += focus ?: 0
-                    currentLinePosition += selectedElementPosition
-                    trace("child == selectedElement $focus $selectedElementPosition $child ${child is HTMLBRElement}")
-                    break
-                } else {
-                    trace("child == selectedElement ELSE for ($currentLine)")
-                    currentLinePosition += child.textContent?.length ?: 0
-                }
-            }
-        } else selectedElementPosition = focus ?: 0
-        trace("selectedElementPosition: $selectedElementPosition, currentLinePosition: $currentLinePosition")
-    }
+//    fun initSelection() {
+//        val winSelection = window.getSelection()
+//        selection = winSelection
+//        focus = selection?.focusOffset
+//        selectedElement = selection?.focusNode
+//
+//        // position in chars in parent container
+//        currentLine = currentLineComputed
+//
+//        if (currentLine != null) {
+//            selectedElementPosition = 0
+//            currentLinePosition = selectedElementPosition
+//            for (child in currentLine!!.childNodes.iterator()) {
+//                if (child == selectedElement) { // || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
+//                    selectedElementPosition += focus ?: 0
+//                    currentLinePosition += selectedElementPosition
+//                    trace("child == selectedElement $focus $selectedElementPosition $child ${child is HTMLBRElement}")
+//                    break
+//                } else {
+//                    trace("child == selectedElement ELSE for ($currentLine)")
+//                    currentLinePosition += child.textContent?.length ?: 0
+//                }
+//            }
+//        } else selectedElementPosition = focus ?: 0
+//        trace("selectedElementPosition: $selectedElementPosition, currentLinePosition: $currentLinePosition")
+//    }
 
 
     fun decompress(str: String) {
@@ -439,7 +428,7 @@ class SimpleContentEditable(
     }
 
     fun asciidocToHtml(e: HTMLDivElement) {
-        trace("asciidocToHtml +++")
+        trace("asciidocToHtml +++ ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
         var txt = escapeHtml(e.textContent)
         if (txt?.isEmpty() == true) {
             e.innerHTML = HtmlSource("<br>")
@@ -520,7 +509,8 @@ class SimpleContentEditable(
                 e.innerHTML = HtmlSource(result)
             }
         }
-        trace("asciidocToHtml ---")
+        trace("asciidocToHtml --- ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
+//        TODO: window.getSelection()?.setPosition(e.childNodes[e.childElementCount], )
     }
 
     fun createCmdLine(s: String?, index: Int): HTMLDivElement? {
