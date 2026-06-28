@@ -41,6 +41,7 @@ import taack.ui.dump.Parameter
 import taack.wysiwyg.Asciidoc
 import taack.wysiwyg.Markdown
 
+import java.nio.file.Files
 import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
@@ -578,10 +579,10 @@ class CmsController implements WebAttributes {
         return false
     }
 
-    def previewBody(String previewLanguage, boolean asciidoc) {
+    def previewBody(CmsPage cmsPage, String previewLanguage, boolean asciidoc) {
         UiBlockSpecifier b = new UiBlockSpecifier()
         String toPreviewBody = params['bodyContent'][previewLanguage] as String
-        String htmlBody = asciidoc ? Asciidoc.getContentHtml(toPreviewBody): Markdown.getContentHtml(toPreviewBody)
+        String htmlBody = asciidoc ? Asciidoc.getContentHtml(toPreviewBody, "/cms/showImage/${cmsPage.id}", false): Markdown.getContentHtml(toPreviewBody)
         htmlBody = CmsHtmlGeneratorService.translateExpression(htmlBody, previewLanguage)
         String html = """\
             <div class=${asciidoc ? '"asciidocMain"': '"markdown-body"'}>
@@ -593,6 +594,19 @@ class CmsController implements WebAttributes {
             }
         }
         taackUiService.show(b)
+    }
+
+    def showImage(CmsPage cmsPage) {
+        String fileName = params.get('path').toString().substring(1)
+
+        Set<CmsImage> listOfImages = cmsPage.bodyImages
+        listOfImages += (CmsImage.findAllByCmsPage(cmsPage) as List<CmsImage>)
+
+        CmsImage image = listOfImages.find { it.originalName == fileName }
+        if (image) {
+            File f = new File(cmsFileRoot + '/' + image.filePath)
+            render([file: f, contentType: Files.probeContentType(f.toPath())] as Map)
+        } else render 'No Image ' + fileName
     }
 
     def previewBodySlideshow(CmsPage slideshow) {
