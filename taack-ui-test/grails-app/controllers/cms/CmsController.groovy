@@ -87,8 +87,6 @@ class CmsController implements WebAttributes {
             menu this.&images as MC
             menu this.&pdfs as MC
             menu this.&videos as MC
-            menu this.&blocks as MC
-            menu this.&slideshows as MC
             label 'Admin', {
                 subMenu this.&confSites as MC
                 subMenu this.&menuEntries as MC
@@ -220,32 +218,6 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private static UiFormSpecifier buildCmsInsertForm(final CmsInsert cmsInsert) {
-        new UiFormSpecifier().ui cmsInsert, {
-            section 'Position', {
-                field cmsInsert.x_
-                field cmsInsert.y_
-                field cmsInsert.width_
-            }
-
-            section 'Object', {
-                field cmsInsert.itemId_
-                field cmsInsert.subFamilyId_
-                field cmsInsert.rangeId_
-            }
-
-            tabs BlockSpec.Width.MAX, {
-                for (SupportedLanguage language : SupportedLanguage.values()) {
-                    tabLabel "Text ${language.label}", {
-                        fieldFromMap "Title ${language.toString().toLowerCase()}", cmsInsert.title_, language.toString().toLowerCase()
-                        fieldFromMap "Hat ${language.toString().toLowerCase()}", cmsInsert.hat_, language.toString().toLowerCase()
-                    }
-                }
-            }
-            formAction this.&saveCmsInsert as MC, cmsInsert?.id
-        }
-    }
-
     private static UiFormSpecifier buildCmsImageForm(final CmsImage cmsImage) {
         UiFormSpecifier f = new UiFormSpecifier()
         f.ui cmsImage, {
@@ -300,37 +272,6 @@ class CmsController implements WebAttributes {
         }
     }
 
-    private UiTableSpecifier buildBlockTable() {
-        CmsBlock cb = new CmsBlock()
-
-        TableOption tableOption = new TableOption.TableOptionBuilder()
-                .onDropAction(this.&testDrop as MC).build()
-
-        new UiTableSpecifier().ui tableOption, {
-            header {
-                sortableFieldHeader cb.position_
-                sortableFieldHeader cb.subsidiary_
-                label 'Page OR Menu Entry'
-            }
-            iterate(taackFilterService.getBuilder(CmsBlock).build()) { CmsBlock o ->
-                rowField o.position
-                rowField o.lastUpdated_
-                rowField o.subsidiary.toString()
-                String lastCol = null
-                if (o.cmsPage) {
-                    lastCol = ' PAGE: ' + o.cmsPage.title.toString()
-                }
-                if (o.cmsMenuEntry) {
-                    lastCol += ' MENU: ' + o.cmsMenuEntry.title.toString()
-                }
-                rowColumn {
-                    rowAction ActionIcon.EDIT * IconStyle.SCALE_DOWN, this.&editBlock as MC, o.id
-                    rowField lastCol
-                }
-            }
-        }
-    }
-
     def testCellDrop() {
         render 'OK testCellDrop'
     }
@@ -378,12 +319,6 @@ class CmsController implements WebAttributes {
     @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
     def saveCmsMenuEntry() {
         taackSaveService.saveThenRedirectOrRenderErrors(CmsMenuEntry, this.&menuEntries as MC)
-    }
-
-    @Transactional
-    @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
-    def saveCmsBlock() {
-        taackSaveService.saveThenRedirectOrRenderErrors(CmsBlock, this.&blocks as MC)
     }
 
     def images() {
@@ -446,24 +381,6 @@ class CmsController implements WebAttributes {
             }
         }
         taackUiService.show(b, buildMenu())
-    }
-
-    @Transactional
-    @Secured(['ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
-    def saveCmsInsert() {
-        taackSaveService.saveThenReloadOrRenderErrors(CmsInsert)
-    }
-
-    def cmsInsertForm(CmsInsert cmsInsert) {
-        UiBlockSpecifier b = new UiBlockSpecifier()
-        if (!cmsInsert) cmsInsert = new CmsInsert()
-        b.ui {
-            modal {
-                form buildCmsInsertForm(cmsInsert)
-            }
-        }
-        taackUiService.show(b, buildMenu())
-
     }
 
     def editCmsImage(CmsImage cmsImage) {
@@ -756,28 +673,6 @@ class CmsController implements WebAttributes {
             }, buildMenu()
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_CMS_DIRECTOR', 'ROLE_CMS_MANAGER'])
-    def editBlock(CmsBlock block) {
-        def cu = springSecurityService.currentUser as User
-        def cmsSub = CmsSubsidiary.values().find { it.getSubsidiary() == cu.subsidiary }
-        block ?= new CmsBlock(subsidiary: cmsSub)
-        taackUiService.show(new UiBlockSpecifier().ui {
-            modal {
-                form new UiFormSpecifier().ui(block, {
-                    section('Block Position') {
-                        field block.position_
-                        field block.subsidiary_
-                    }
-                    section('Block Content') {
-                        ajaxField block.cmsMenuEntry_, this.&selectM2oMenu as MC, ['subsidiary': block.subsidiary, 'theId': block.id]
-                        ajaxField block.cmsPage_, this.&selectM2oPage as MC, ['subsidiary': block.subsidiary]
-                    }
-                    formAction this.&saveCmsBlock as MC
-                })
-            }
-        })
-    }
-
     def selectM2oMenu() {
         UiBlockSpecifier b = new UiBlockSpecifier()
         def s = params['subsidiary'] as CmsSubsidiary
@@ -891,19 +786,6 @@ class CmsController implements WebAttributes {
         taackUiService.show(b, buildMenu())
     }
 
-    def selectM2mCmsSlideshow() {
-        def cs = taackUiService.ajaxBind(CmsConfSite)
-        CmsSubsidiary cmsSubsidiary = cs.subsidiary
-        UiBlockSpecifier b = new UiBlockSpecifier()
-        def cmsPage = new CmsPage(subsidiary: cmsSubsidiary, pageType: CmsPageType.SLIDESHOW)
-        def filter = CmsUiService.buildCmsSlideshowFilter(cmsPage)
-        b.ui {
-            modal {
-                tableFilter filter, cmsUiService.buildCmsSlideshowTable(filter)
-            }
-        }
-        taackUiService.show(b, buildMenu())
-    }
 
     @Transactional
     @Secured(['ROLE_ADMIN', 'ROLE_CMS_MANAGER', 'ROLE_CMS_DIRECTOR'])
@@ -1091,14 +973,6 @@ class CmsController implements WebAttributes {
         taackUiService.show(b, buildMenu())
     }
 
-    def blocks() {
-        taackUiService.show(new UiBlockSpecifier().ui({
-            table(buildBlockTable()) {
-                menu this.&editBlock as MC
-            }
-        }), buildMenu())
-    }
-
     def search(String q) {
         taackUiService.show(cmsSearchService.buildSearchBlock(q), buildMenu(q))
     }
@@ -1134,7 +1008,6 @@ class CmsController implements WebAttributes {
                 form new UiFormSpecifier().ui(confSite, {
                     field confSite.subsidiary_
                     field confSite.cmsSiteType_
-                    ajaxField confSite.mainSlideShow_, this.&selectM2mCmsSlideshow as MC, confSite.subsidiary_
                     formAction this.&saveCmsConfSite as MC
                 })
             }
@@ -1148,44 +1021,23 @@ class CmsController implements WebAttributes {
     }
 
     def testProgressBar() {
-        String pId = taackUiProgressBarService.progressStart(BlockSpec.buildBlockSpec {
-            row {
-                custom('''<p>Test ended2</p>''', null) {
-                    menuIcon(ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC)
+        taackUiService.show new UiBlockSpecifier().ui {
+            modal {
+
+                row {
+                    custom('''<p>Test ended2</p>''', null) {
+                        menuIcon(ActionIcon.EXPORT_PDF, this.&downloadBinPdf2 as MC)
+                    }
+                }
+                row {
+                    col {
+                        diagram barDiagram(false)
+                    }
+                    col {
+                        diagram barDiagram(true)
+                    }
                 }
             }
-            row {
-                col {
-                    diagram barDiagram(false)
-                }
-                col {
-                    diagram barDiagram(true)
-                }
-            }
-        }, 100)
-        task {
-            it.sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progress(pId, 10)
-            sleep(1_000)
-            taackUiProgressBarService.progressEnded(pId)
         }
     }
 
