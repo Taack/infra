@@ -161,7 +161,7 @@ ${insert.title.get(lang)}
     private static String renderApp(CmsImage aim, String lang, Parser.Arguments arguments) {
         String header = """
 <div class='application' style="width: ${aim.width}px; margin: auto;">
-<img src="/cms/mediaPreview/${aim.id}' alt='${aim.altText?.get(lang)}" $arguments>
+<img src="/cms/mediaPreview/${aim.id}" alt="${aim.altText?.get(lang)}" $arguments/>
 """
         StringBuffer body = new StringBuffer(header)
         println aim
@@ -187,11 +187,11 @@ ${insert.title.get(lang)}
                 it.kind == MediaStyleKind.IMAGE && it.suffix == arguments.format
             }
             """
-<img src="/cms/mediaPreview/${i.id}?mediaStyle=${mediaStyleImage}' alt='${alt}" $arguments>
+<img src="/cms/mediaPreview/${i.id}?mediaStyle=${mediaStyleImage}" alt="${alt}" $arguments/>
 """
         } else
             """
-<img src="/cms/mediaPreview/${i.id}' alt='${alt}" $arguments>
+<img src="/cms/mediaPreview/${i.id}" alt="${alt}" $arguments/>
 """
 
     }
@@ -275,7 +275,7 @@ ${insert.title.get(lang)}
 
     static String renderImageOption(CmsImage i) {
         """
-<img src="/cms/mediaPreview/${i.id}' style='width: 40px;"/>
+<img src="/cms/mediaPreview/${i.id}" style="width: 40px;"/>
             """
 
     }

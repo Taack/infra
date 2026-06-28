@@ -24,6 +24,7 @@ import taack.render.TaackSaveService
 import taack.render.TaackUiPdfService
 import taack.render.TaackUiProgressBarService
 import taack.render.TaackUiService
+import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockLayoutSpec
 import taack.ui.dsl.block.BlockSpec
@@ -58,7 +59,6 @@ class CmsController implements WebAttributes {
     TaackUiService taackUiService
     TaackUiPdfService taackUiPdfService
     TaackSaveService taackSaveService
-    CmsHtmlGeneratorService cmsHtmlGeneratorService
     TaackAttachmentService taackAttachmentService
     CmsUiService cmsUiService
     TaackFilterService taackFilterService
@@ -68,13 +68,11 @@ class CmsController implements WebAttributes {
     TaackEditorService taackEditorService
     ConvertersToAsciidocService convertersToAsciidocService
 
-    @Value('${intranet.root}')
-    String rootPath
     static String cmsFileRoot
 
     @PostConstruct
     void init() {
-        cmsFileRoot = rootPath + '/cms'
+        cmsFileRoot = TaackUiConfiguration.root + '/cms'
         def f = new File(cmsFileRoot)
         f.mkdir()
         TaackAttachmentService.filePaths.put(controllerName, f)
@@ -584,7 +582,7 @@ class CmsController implements WebAttributes {
         UiBlockSpecifier b = new UiBlockSpecifier()
         String toPreviewBody = params['bodyContent'][previewLanguage] as String
         String htmlBody = asciidoc ? Asciidoc.getContentHtml(toPreviewBody): Markdown.getContentHtml(toPreviewBody)
-
+        htmlBody = CmsHtmlGeneratorService.translateExpression(htmlBody, previewLanguage)
         String html = """\
             <div class=${asciidoc ? '"asciidocMain"': '"markdown-body"'}>
                 ${htmlBody}
@@ -613,7 +611,7 @@ class CmsController implements WebAttributes {
     def previewImage() {
         UiBlockSpecifier b = new UiBlockSpecifier()
         String html = params.long('mainImage') ? """<div class="markdown-body">
-                        <img src="/cms/mediaPreview/${params.long('mainImage')}"
+                        <img src="/cms/mediaPreview/${params.long('mainImage')}"/>
                     </div>""" : 'No Preview'
         b.ui {
             modal {
@@ -627,7 +625,7 @@ class CmsController implements WebAttributes {
         CmsVideoFile videoFile = CmsVideoFile.read params.long('mainVideo')
         UiBlockSpecifier b = new UiBlockSpecifier()
         String html = videoFile?.preview?.id ? """<div class="markdown-body">
-                        <img src="/cms/mediaPreview/${videoFile?.preview?.id}"
+                        <img src="/cms/mediaPreview/${videoFile?.preview?.id}"/>
                     </div>""" : 'No Preview'
         b.ui {
             modal {

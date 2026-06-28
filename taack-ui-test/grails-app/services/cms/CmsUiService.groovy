@@ -47,11 +47,11 @@ class CmsUiService implements WebAttributes {
 
 
     private static String previewMedia(Long id) {
-        '''<img style='max-height: 64px; max-width: 64px;' src='/cms/mediaPreview/${id ?: 0}'>'''
+        """<img style='max-height: 64px; max-width: 64px;' src='/cms/mediaPreview/${id ?: 0}'>"""
     }
 
     private static String previewPdf(Long id) {
-        '''<img style='max-height: 64px; max-width: 64px;' src='/cms/mediaPreviewPdf/${id ?: 0}'>'''
+        """<img style='max-height: 64px; max-width: 64px;' src='/cms/mediaPreviewPdf/${id ?: 0}'>"""
     }
 
     TaackFilterService taackFilterService
@@ -198,7 +198,7 @@ class CmsUiService implements WebAttributes {
                     .setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_)
                     .build()) { CmsPage cp ->
                 rowColumn {
-                    rowField this.previewMedia(cp.mainImage?.id)
+                    rowFieldRaw this.previewMedia(cp.mainImage?.id)
                 }
                 rowColumn {
                     rowField cp.dateCreated_
@@ -327,7 +327,7 @@ class CmsUiService implements WebAttributes {
                     .setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_)
                     .build()) { CmsImage ci ->
                 rowColumn {
-                    rowField this.previewMedia(ci.id)
+                    rowFieldRaw this.previewMedia(ci.id)
                 }
                 rowColumn {
                     rowField ci.dateCreated_
@@ -430,57 +430,6 @@ class CmsUiService implements WebAttributes {
         }
     }
 
-    UiTableSpecifier buildCmsInsertTable(Collection<CmsInsert> cmsInserts = null) {
-        CmsInsert i = new CmsInsert()
-
-        new UiTableSpecifier().ui {
-            header {
-                column {
-                    sortableFieldHeader i.dateCreated_
-                    sortableFieldHeader i.lastUpdated_
-                }
-                column {
-                    label 'x, y, width'
-                    label 'Title'
-                }
-                column {
-                    label 'Page'
-                    label 'Image application'
-                }
-                column {
-                    sortableFieldHeader i.itemId_
-                    sortableFieldHeader i.subFamilyId_
-                    sortableFieldHeader i.rangeId_
-                }
-                label 'Action'
-            }
-
-            iterate(taackFilterService.getBuilder(CmsInsert)
-                    .setMaxNumberOfLine(20)
-                    .setSortOrder(TaackFilter.Order.DESC, new CmsInsert().dateCreated_)
-                    .build()) { CmsInsert ci ->
-                rowColumn {
-                    rowField ci.dateCreated_
-                    rowField ci.lastUpdated_
-                }
-                rowColumn {
-                    rowField "${ci.x}, ${ci.y}, ${ci.width}"
-                    rowField ci.title_
-                }
-                rowColumn {
-                    rowField ci.cmsPage_
-                    rowField ci.imageApplication?.id + ' ' + ci.imageApplication?.originalName
-                }
-                rowColumn {
-                    rowField ci.itemId_
-                    rowField ci.subFamilyId_
-                    rowField ci.rangeId_
-                }
-                rowAction ActionIcon.EDIT, CmsController.&cmsInsertForm as MC, ci.id
-            }
-        }
-    }
-
     UiTableSpecifier buildCmsVideoTable(final CmsPage cmsPage = null, final CmsTableMode tableMode = CmsTableMode.NONE, final UiFilterSpecifier filter = null) {
         def i = new CmsVideoFile()
         User u = new User()
@@ -518,7 +467,7 @@ class CmsUiService implements WebAttributes {
                     .setSortOrder(TaackFilter.Order.DESC, new CmsVideoFile().dateCreated_)
                     .build()) { CmsVideoFile ci ->
                 rowColumn {
-                    rowField this.previewMedia(ci.preview?.id)
+                    rowFieldRaw this.previewMedia(ci.preview?.id)
                 }
                 rowColumn {
                     rowField ci.dateCreated_

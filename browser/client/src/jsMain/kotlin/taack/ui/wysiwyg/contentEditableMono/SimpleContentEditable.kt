@@ -172,6 +172,7 @@ class SimpleContentEditable(
 
         divContent.onpaste = EventHandler { e ->
             Helper.onpaste(e, upLoadUrl!!, { xhr: XMLHttpRequest ->
+                trace("onpast::url $upLoadUrl")
                 if (currentLine != null) {
                     var txtToSave = ""
                     for (c in divContent.children.iterator()) {
@@ -189,6 +190,7 @@ class SimpleContentEditable(
 
         divContent.ondrop = EventHandler { e ->
             Helper.ondrop(e, upLoadUrl!!, { xhr: XMLHttpRequest ->
+                trace("ondrop::url $upLoadUrl")
                 if (currentLine != null) {
                     var txtToSave = ""
                     for (c in divContent.children.iterator()) {
