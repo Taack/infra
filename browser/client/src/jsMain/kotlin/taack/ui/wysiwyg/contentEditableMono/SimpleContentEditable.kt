@@ -36,8 +36,15 @@ class SimpleContentEditable(
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divAutocomplete = document.createElement("div") as HTMLDivElement
-    private var currentLine: HTMLDivElement? = null
-//    private val currentLineComputed: HTMLDivElement?
+    private val currentLine: HTMLDivElement?
+        get() {
+            val n = window.getSelection()?.focusNode
+            if (n is HTMLDivElement) return n
+            else if (n is HTMLSpanElement) return n.parentElement as HTMLDivElement
+            else return null
+        }
+
+    //    private val currentLineComputed: HTMLDivElement?
 //        get() {
 //            if (selectedElement is HTMLDivElement && selectedElement!!.textContent == "") {
 //                return selectedElement as HTMLDivElement
@@ -48,7 +55,8 @@ class SimpleContentEditable(
 //        }
 //    var selectedElement: Node? = null
     private var rescanContent = false
-//    var selection: Selection? = null
+
+    //    var selection: Selection? = null
     enum class SpanMode {
         INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, START_CHAR_SEQ, META;
 
@@ -64,6 +72,7 @@ class SimpleContentEditable(
             }
         }
     }
+
     data class Span(
         val pattern: String, val className: String, val inlined: SpanMode
     )
@@ -187,7 +196,6 @@ class SimpleContentEditable(
                             txtToSave += xhr.responseText + "\n"
                         } else txtToSave += c.textContent + "\n"
                     }
-                    currentLine = null
                     textContent = txtToSave
 
                     readTextarea()
@@ -203,7 +211,7 @@ class SimpleContentEditable(
             trace("event.code: ${event.code}, event.ctrlKey: ${event.ctrlKey}")
             if (event.code == KeyCode.Space && event.ctrlKey) {
                 trace("autocomplete ...")
-                autocomplete(currentLine)
+                autocomplete()
                 event.preventDefault()
                 event.stopPropagation()
                 return@EventHandler
@@ -297,7 +305,7 @@ class SimpleContentEditable(
         }
     }
 
-    fun autocomplete(e: HTMLDivElement?) {
+    fun autocomplete() {
 
         val texts = mutableListOf<String>(
             "image:-name-[]",
@@ -309,10 +317,10 @@ class SimpleContentEditable(
             "https://-url-[]",
             "https://-url-[sunset]",
         )
-
-        val top = e?.getBoundingClientRect()?.top
-        val left = e?.getBoundingClientRect()?.left
-        if (top != null && left != null) {
+        val e = currentLine
+        if (e is HTMLDivElement) {
+            val top = e.getBoundingClientRect().top
+            val left = e.getBoundingClientRect().left
             val visibleElement = divContent.parentElement?.parentElement?.parentElement?.parentElement
             if (visibleElement != null) {
                 val scrollTop = document.body.getBoundingClientRect().top
