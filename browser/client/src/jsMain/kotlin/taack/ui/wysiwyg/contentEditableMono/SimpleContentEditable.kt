@@ -152,16 +152,7 @@ class SimpleContentEditable(
         divScroll.setAttribute("tabindex", "-1")
 
         divAutocomplete.id = ElementId("${text.name}-autocomplete")
-        divAutocomplete.style.display = "none"
-        divAutocomplete.style.backgroundColor = "rgb(200,100,100)"
-        divAutocomplete.style.position = "absolute"
-//        divAutocomplete.style.left = "100px"
-//        divAutocomplete.style.top = "50px"
-        divAutocomplete.style.textAlign = "justify"
-        divAutocomplete.style.fontSize = "12px"
-        divAutocomplete.style.width = "256px"
-        divAutocomplete.style.border = "black 1px solid"
-        divAutocomplete.style.padding = "10px"
+        divAutocomplete.classList.add(ClassName("taack-autocomplete"))
 
         document.body.appendChild(divAutocomplete)
         divScroll.appendChild(divLineNumber)
@@ -336,7 +327,7 @@ class SimpleContentEditable(
 
 
                     for (text in texts) {
-                        val d = document.createElement("div") as HTMLDivElement
+                        val d = document.createElement("li") as HTMLLIElement
                         d.classList.add(ClassName("cmd-autocomplete"))
                         d.textContent = text
                         d.onclick = EventHandler {
@@ -346,7 +337,6 @@ class SimpleContentEditable(
                                 )
                             selectedElementPosition = 1
                             divAutocomplete.style.display = "none"
-//                            selection?.setPosition(e, selectedElementPosition)
                         }
                         divAutocomplete.appendChild(d)
                     }
