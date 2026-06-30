@@ -21,7 +21,6 @@ import web.xhr.XMLHttpRequest
 import kotlin.io.encoding.Base64
 import kotlin.js.Date
 import kotlin.math.max
-import kotlin.math.min
 
 class SimpleContentEditable(
     internal val text: HTMLTextAreaElement,
@@ -44,19 +43,8 @@ class SimpleContentEditable(
             else return null
         }
 
-    //    private val currentLineComputed: HTMLDivElement?
-//        get() {
-//            if (selectedElement is HTMLDivElement && selectedElement!!.textContent == "") {
-//                return selectedElement as HTMLDivElement
-//            } else if (selectedElement?.parentElement is HTMLDivElement) {
-//                return selectedElement?.parentElement as HTMLDivElement
-//            }
-//            return null
-//        }
-//    var selectedElement: Node? = null
     private var rescanContent = false
 
-    //    var selection: Selection? = null
     enum class SpanMode {
         INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, START_CHAR_SEQ, META;
 
@@ -89,7 +77,7 @@ class SimpleContentEditable(
             undo.removeAll(undo)
             if (value.length >= textContent.length) {
                 var i = 0
-                var j = value.length - textContent.length
+                val j = value.length - textContent.length
                 for (c in value) {
                     if (textContent[i] != c) {
                         var seq = ""
@@ -103,7 +91,7 @@ class SimpleContentEditable(
                 }
             } else {
                 var i = 0
-                var j = textContent.length - value.length
+                val j = textContent.length - value.length
                 for (c in textContent) {
                     if (value[i] != c) {
                         var seq = ""
@@ -128,7 +116,7 @@ class SimpleContentEditable(
 
     init {
         val compressedOptions = text.getAttribute("editoroption")
-        if (compressedOptions != null && compressedOptions.isNotEmpty()) {
+        if (!compressedOptions.isNullOrEmpty()) {
             decompress(compressedOptions)
         }
         divLineNumberContainer.classList.add(ClassName("cm-gutter"), ClassName("cm-lineNumbers"))
