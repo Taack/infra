@@ -65,6 +65,14 @@ class SimpleContentEditable(
         val pattern: String, val className: String, val inlined: SpanMode
     )
 
+    data class MenuEntry(
+        val caption: String, val inlined: SpanMode, val decorator: String
+    )
+
+    data class AutocompleteEntry(
+        val caption: String, val inlined: SpanMode, val insertText: String
+    )
+
     private data class Mod(val letters: String, val pos: Int)
 
     private val undo = mutableListOf<Mod>()
@@ -364,6 +372,19 @@ class SimpleContentEditable(
 //        trace("selectedElementPosition: $selectedElementPosition, currentLinePosition: $currentLinePosition")
 //    }
 
+//    fun contextMenu() {
+//        val texts = mutableListOf< Pair<String, String>>(
+//            "Bold",
+//            "image:-name-[Sunset,200,100]",
+//            "image::-name-[]",
+//            "image::<name>[Sunset,200,100]",
+//            "http://-url-[]",
+//            "http://-url-[Sunset]",
+//            "https://-url-[]",
+//            "https://-url-[sunset]",
+//        )
+//
+//    }
 
     fun decompress(str: String) {
         val b = Base64.decode(str)
@@ -378,8 +399,12 @@ class SimpleContentEditable(
             val decoder = TextDecoder()
             val str = decoder.decode(arrayBuffer as AllowSharedBufferSource)
             trace(str)//arrayBuffer.unsafeCast<String>())
+            var scanningStyle = false
+            var scanningAutocomplete = false
+            var scanningMenuEntry = false
+
             for (line in str.lines()) {
-                if (line.startsWith("§§")) {
+                if (line.contains('§')) {
                     var pos1 = 2
                     var pos2 = line.indexOf("§", pos1)
                     val cn = line.substring(pos1, pos2)
@@ -391,16 +416,28 @@ class SimpleContentEditable(
                     val inlined = SpanMode.from(line.substring(pos1, pos2))
                     println("cn: $cn, pattern: $pattern, inline: $inlined")
 
-                    val s = Span(pattern, cn, inlined)
+                    if (line.startsWith("§§Style") || scanningStyle) {
+                        scanningStyle = true
 
-                    var l = styles[currentContext]
-                    if (l == null) {
-                        l = mutableListOf()
+                        val s = Span(pattern, cn, inlined)
+
+                        var l = styles[currentContext]
+                        if (l == null) {
+                            l = mutableListOf()
+                        }
+                        l.add(s)
+                        styles[currentContext] = l
+                        if (s.inlined == SpanMode.CONTEXT_START) currentContext = s
+                        if (s.inlined == SpanMode.CONTEXT_END) currentContext = null
+                    } else if (line.startsWith("§§Autocomplete") || scanningAutocomplete) {
+                        scanningStyle = false
+                        scanningAutocomplete = true
+
+                    } else if (line.startsWith("§§MenuEntry") || scanningMenuEntry) {
+                        scanningStyle = false
+                        scanningAutocomplete = false
+                        scanningMenuEntry = true
                     }
-                    l.add(s)
-                    styles[currentContext] = l
-                    if (s.inlined == SpanMode.CONTEXT_START) currentContext = s
-                    if (s.inlined == SpanMode.CONTEXT_END) currentContext = null
                 } else if (line.isNotEmpty() && !line.contains('§')) {
                     trace("upLoadUrl = $line")
                     upLoadUrl = line
