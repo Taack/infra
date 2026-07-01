@@ -36,6 +36,8 @@ import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dsl.table.TableOption
 import taack.wysiwyg.TaackAsciidocPlantUML
 import taack.wysiwyg.TaackAsciidocTable
+import taack.wysiwyg.TaackBaseAsciidocAutocomplete
+import taack.wysiwyg.TaackBaseAsciidocMenuEntries
 import taack.wysiwyg.TaackBaseAsciidocSpans
 import taack.ui.dump.Parameter
 import taack.wysiwyg.Asciidoc
@@ -174,6 +176,8 @@ class CmsController implements WebAttributes {
                             editor.addSpanRegexes(TaackBaseAsciidocSpans.spans)
                             editor.addSpanRegexes(TaackAsciidocTable.spans)
                             editor.addSpanRegexes(TaackAsciidocPlantUML.spans)
+                            editor.addMenuEntries(TaackBaseAsciidocMenuEntries.menus)
+                            editor.addSAutocompletes(TaackBaseAsciidocAutocomplete.autocompletes)
                             editor.onDropAction(CmsController.&dropEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
                             fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]

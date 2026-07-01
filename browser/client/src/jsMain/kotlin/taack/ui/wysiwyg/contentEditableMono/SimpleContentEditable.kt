@@ -27,6 +27,8 @@ class SimpleContentEditable(
     divHolder: HTMLDivElement,
 ) {
     val styles: MutableMap<Span?, MutableList<Span>> = mutableMapOf()
+    val autocompletes: MutableMap<Span?, MutableList<AutocompleteEntry>> = mutableMapOf()
+    val menues: MutableMap<Span?, MutableList<MenuEntry>> = mutableMapOf()
     private var timeMs = Date.now()
     private var currentContext: Span? = null
     private var upLoadUrl: String? = null
@@ -66,11 +68,11 @@ class SimpleContentEditable(
     )
 
     data class MenuEntry(
-        val caption: String, val inlined: SpanMode, val decorator: String
+        val caption: String, val decorator: String, val inlined: SpanMode
     )
 
     data class AutocompleteEntry(
-        val caption: String, val inlined: SpanMode, val insertText: String
+        val caption: String, val insertText: String, val inlined: SpanMode
     )
 
     private data class Mod(val letters: String, val pos: Int)
@@ -415,9 +417,12 @@ class SimpleContentEditable(
                     pos2 = line.indexOf("§", ++pos1)
                     val inlined = SpanMode.from(line.substring(pos1, pos2))
                     println("cn: $cn, pattern: $pattern, inline: $inlined")
-
-                    if (line.startsWith("§§Style") || scanningStyle) {
-                        scanningStyle = true
+                    println("line: $line")
+                    if (line.startsWith("§§Style")) scanningStyle = true
+                    if (line.startsWith("§§Autocomplete")) scanningAutocomplete = true
+                    if (line.startsWith("§§MenuEntry")) scanningMenuEntry = true
+                    if (scanningStyle && !scanningAutocomplete) {
+                        println("Add Style")
 
                         val s = Span(pattern, cn, inlined)
 
@@ -429,14 +434,33 @@ class SimpleContentEditable(
                         styles[currentContext] = l
                         if (s.inlined == SpanMode.CONTEXT_START) currentContext = s
                         if (s.inlined == SpanMode.CONTEXT_END) currentContext = null
-                    } else if (line.startsWith("§§Autocomplete") || scanningAutocomplete) {
+                    } else if (!scanningMenuEntry && scanningAutocomplete) {
+                        println("Add Autocomplete")
                         scanningStyle = false
                         scanningAutocomplete = true
+                        val s = AutocompleteEntry(pattern, cn, inlined)
 
-                    } else if (line.startsWith("§§MenuEntry") || scanningMenuEntry) {
+                        var l = autocompletes[currentContext]
+                        if (l == null) {
+                            l = mutableListOf()
+                        }
+                        l.add(s)
+                        autocompletes[currentContext] = l
+
+                    } else if (scanningMenuEntry) {
+                        println("Add MenuEntry")
                         scanningStyle = false
                         scanningAutocomplete = false
                         scanningMenuEntry = true
+                        val s = MenuEntry(pattern, cn, inlined)
+
+                        var l = menues[currentContext]
+                        if (l == null) {
+                            l = mutableListOf()
+                        }
+                        l.add(s)
+                        menues[currentContext] = l
+
                     }
                 } else if (line.isNotEmpty() && !line.contains('§')) {
                     trace("upLoadUrl = $line")
@@ -511,7 +535,7 @@ class SimpleContentEditable(
             }
             var result: String = (if (hasStartCharSeq != null) {
                 """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
-            } else "") as String
+            } else "")
             val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
 
             var i = 0

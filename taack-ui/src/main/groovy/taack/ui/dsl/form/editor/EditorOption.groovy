@@ -15,7 +15,7 @@ final class SpanRegex {
     private final String className
     private final Mode inlined
 
-    enum Mode {
+    static enum Mode {
         INLINED, INLINED_BREAK, START, CONTEXT_START, START_CHAR_SEQ, CONTEXT_END, META
     }
 
@@ -30,16 +30,43 @@ final class SpanRegex {
         return "§$data\n"
     }
 }
+@CompileStatic
+@ValueBased
+final class AutoComplete {
+    private final String pattern
+    private final String className
+    private final SpanRegex.Mode inlined
+
+
+    AutoComplete(String pattern, String className, SpanRegex.Mode inlined) {
+        this.pattern = pattern
+        this.className = className
+        this.inlined = inlined
+    }
+
+    String serializeString() {
+        String data = "§$className§$pattern§$inlined§"
+        return "§$data\n"
+    }
+}
 
 @CompileStatic
 @ValueBased
-final class AutocompleteChoice {
-    private final String selection
-    private final int caretPosition
+final class MenuEntry {
+    private final String pattern
+    private final String className
+    private final SpanRegex.Mode inlined
 
-    AutocompleteChoice(String selection, int caretPosition) {
-        this.selection = selection
-        this.caretPosition = caretPosition
+
+    MenuEntry(String pattern, String className, SpanRegex.Mode inlined) {
+        this.pattern = pattern
+        this.className = className
+        this.inlined = inlined
+    }
+
+    String serializeString() {
+        String data = "§$className§$pattern§$inlined§"
+        return "§$data\n"
     }
 }
 
@@ -48,7 +75,8 @@ final class EditorOption {
     MethodClosure uploadFileAction
     Map uploadFileActionParams
     List<SpanRegex> spanRegexes = []
-    Map<SpanRegex, AutocompleteChoice[]> autocompleteChoices = [:]
+    List<AutoComplete> autoCompletes = []
+    List<MenuEntry> menuEntries = []
 
     static EditorOptionBuilder getBuilder() {
         return new EditorOptionBuilder()
@@ -72,8 +100,13 @@ final class EditorOption {
             this
         }
 
-        EditorOptionBuilder putAutocompleteChoices(SpanRegex spanRegex, AutocompleteChoice... choices) {
-            editorOption.autocompleteChoices.put(spanRegex, choices)
+        EditorOptionBuilder addSAutocompletes(AutoComplete... autoCompletes) {
+            editorOption.autoCompletes.addAll(autoCompletes)
+            this
+        }
+
+        EditorOptionBuilder addMenuEntries(MenuEntry... menuEntries) {
+            editorOption.menuEntries.addAll(menuEntries)
             this
         }
 
@@ -83,7 +116,7 @@ final class EditorOption {
     }
 
     String serializeString() {
-        "${uploadFileAction ? '/' + Utils.getControllerName(uploadFileAction) + '/' + uploadFileAction.method : ''}${uploadFileActionParams ? '?' + Utils.paramsString(uploadFileActionParams): ''}\n\n${((spanRegexes*.serializeString()).join(''))}"
+        "${uploadFileAction ? '/' + Utils.getControllerName(uploadFileAction) + '/' + uploadFileAction.method : ''}${uploadFileActionParams ? '?' + Utils.paramsString(uploadFileActionParams): ''}\n\n§§Style\n${((spanRegexes*.serializeString()).join(''))}\n§§Autocomplete\n${((autoCompletes*.serializeString()).join(''))}\n§§MenuEntry\n${((menuEntries*.serializeString()).join(''))}"
     }
 
     String compress() {
