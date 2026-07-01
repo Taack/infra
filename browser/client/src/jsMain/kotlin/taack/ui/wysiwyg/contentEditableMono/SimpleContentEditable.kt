@@ -12,11 +12,15 @@ import web.compression.deflate
 import web.cssom.ClassName
 import web.dom.ElementId
 import web.dom.Node
+import web.dom.Text
 import web.dom.document
 import web.encoding.TextDecoder
 import web.events.EventHandler
 import web.html.*
 import web.keyboard.*
+import web.mutation.MutationObserver
+import web.mutation.MutationObserverInit
+import web.mutation.MutationRecord
 import web.window.window
 import web.xhr.XMLHttpRequest
 import kotlin.io.encoding.Base64
@@ -44,19 +48,15 @@ class SimpleContentEditable(
     private val currentLine: HTMLDivElement?
         get() {
             if (currentNode is HTMLDivElement) return currentNode as HTMLDivElement
-            else return currentNode.parentElement as HTMLDivElement
+            else if (currentNode?.parentElement is HTMLDivElement) return currentNode?.parentElement as HTMLDivElement
+            else if (currentNode?.parentElement?.parentElement is HTMLDivElement) return currentNode!!.parentElement!!.parentElement as HTMLDivElement
+            else return null
         }
 
-    private val currentElement: HTMLElement?
+    private val currentNode: Node?
         get() {
-            return if (currentNode is HTMLElement) currentNode as HTMLElement? else null
+            return window.getSelection()?.focusNode
         }
-
-    private val currentNode: Node
-        get() {
-            return window.getSelection()!!.focusNode!!
-        }
-
 
     private var rescanContent = false
 
@@ -154,7 +154,7 @@ class SimpleContentEditable(
         divContent.translate = false
         divContent.spellcheck = true
         divContent.style.tabSize = "4"
-        divContent.setAttribute("aria-multiline", "true")
+//        divContent.setAttribute("aria-multiline", "false")
         divContent.setAttribute("role", "textbox")
         divContent.classList.add(ClassName("cm-content"))
 
@@ -245,8 +245,8 @@ class SimpleContentEditable(
                 return@EventHandler
             }
 
-            if (event.code == KeyCode.Enter) {
-                createCmdLine(null, 0)
+            if (event.code == KeyCode.Enter || event.code == KeyCode.NumpadEnter) {
+                createLineNumbers(null, 0)
                 return@EventHandler
             }
 
@@ -267,6 +267,41 @@ class SimpleContentEditable(
                 }
             }
         }
+
+        val mutationObserver = MutationObserver({ m: Array<out MutationRecord>, o: MutationObserver ->
+            val mutation = m.last()
+            val an = mutation.addedNodes[0]
+            if (an is HTMLDivElement) updateSelectionNewLine(an)
+            else {
+                mutation.removedNodes[0]
+            }
+            currentNode
+        })
+        val options = MutationObserverInit()
+        options.childList = true
+        mutationObserver.observe(divContent, options)
+    }
+
+    fun updateSelection(e: HTMLDivElement) {
+        window.getSelection()!!.removeAllRanges()
+        val range = document.createRange()
+        val n = e.childNodes.asList().last()
+        if (n is HTMLSpanElement) {
+            val n2 = e.appendChild(document.createTextNode(""))
+            range.setStart(n2, 0)
+        } else range.setStart(n, n.textContent!!.length)
+        range.collapse(true)
+        window.getSelection()!!.addRange(range)
+
+    }
+
+    fun updateSelectionNewLine(e: HTMLDivElement) {
+        trace("updateSelectionNewLine $e")
+        window.getSelection()!!.removeAllRanges()
+        val range = document.createRange()
+        range.setStart(e, 0)
+        range.collapse(true)
+        window.getSelection()!!.addRange(range)
     }
 
     fun undoLetter() {
@@ -292,7 +327,7 @@ class SimpleContentEditable(
     }
 
     fun autocomplete() {
-        val topElement = currentNode.parentElement!!
+        val topElement = (if (currentNode is Text)  currentNode?.parentElement else currentNode) as HTMLElement
         val top = topElement.getBoundingClientRect().top
         val left = topElement.getBoundingClientRect().left
         val scrollTop = document.body.getBoundingClientRect().top
@@ -324,6 +359,10 @@ class SimpleContentEditable(
         }
 
         divAutocomplete.style.display = "block"
+        if (topElement is HTMLDivElement) {
+            trace("Convert Element")
+            asciidocToHtml(topElement)
+        }
     }
 
     fun decompress(str: String) {
@@ -494,54 +533,46 @@ class SimpleContentEditable(
 
             if (e.innerHTML.toString() != result) {
                 e.innerHTML = HtmlSource(result)
-                window.getSelection()!!.removeAllRanges()
-                val range = document.createRange()
-                val n = e.childNodes.asList().last()
-                if (n is HTMLSpanElement) {
-                    val n2 = e.appendChild(document.createTextNode(""))
-                    range.setStart(n2, 0)
-                } else range.setStart(n, n.textContent!!.length)
-                range.collapse(true)
-                window.getSelection()!!.addRange(range)
+                updateSelection(e)
             }
         }
         trace("asciidocToHtml --- ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
 //        TODO: window.getSelection()?.setPosition(e.childNodes[e.childElementCount], )
     }
 
-    fun createCmdLine(s: String?, index: Int): HTMLDivElement? {
-        divLineNumberContainer.innerHTML = HtmlSource("")
-
+    fun appendDivToContent(s: String?): HTMLDivElement {
         val cmd: HTMLDivElement = document.createElement("div") as HTMLDivElement
         cmd.classList.add(ClassName("cm-line"))
         cmd.contentEditable = "true"
-
         cmd.innerHTML = HtmlSource(s ?: "<br>")
-        cmd.onchange = EventHandler {
-            trace("onchange")
-        }
-        if (index == 0) divContent.appendChild(cmd)
-        else divContent.insertBefore(divContent.children[index], cmd)
-        for (i in 1 until max(divContent.childElementCount + 1, 2)) {
+        return cmd
+    }
+
+    fun createLineNumbers(s: String?, index: Int) {
+        divLineNumberContainer.innerHTML = HtmlSource("")
+        for (i in 1 until max(divContent.childNodes.length + 1, 2)) {
             val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
             if (i == 1) number.style.marginTop = "4px"
             number.classList.add(ClassName("cm-gutterElement"))
             number.textContent = i.toString()
             divLineNumberContainer.appendChild(number)
         }
-        return cmd
+//        updateSelectionNewLine(cmd)
     }
 
     fun readTextarea() {
         trace("readTextarea")
         divContent.innerHTML = HtmlSource("")
+        divContent.appendChild(appendDivToContent("<br>"))
         if (text.textContent?.length == 0) {
             text.textContent = "\n"
         }
 
         text.textContent?.split("\n")?.forEach {
-            if (it.isNotEmpty()) asciidocToHtml(createCmdLine(escapeHtml(it), 0)!!)
-            else createCmdLine("", 0)
+            if (it.isNotEmpty()) {
+                createLineNumbers(escapeHtml(it), 0)
+                if (currentLine != null) asciidocToHtml(currentLine!!)
+            } else createLineNumbers("", 0)
         }
     }
 
