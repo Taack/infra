@@ -11,6 +11,7 @@ import web.compression.DecompressionStream
 import web.compression.deflate
 import web.cssom.ClassName
 import web.dom.ElementId
+import web.dom.Node
 import web.dom.document
 import web.encoding.TextDecoder
 import web.events.EventHandler
@@ -27,23 +28,35 @@ class SimpleContentEditable(
     divHolder: HTMLDivElement,
 ) {
     val styles: MutableMap<Span?, MutableList<Span>> = mutableMapOf()
-    val autocompletes: MutableMap<Span?, MutableList<AutocompleteEntry>> = mutableMapOf()
+    val autocompletes: MutableMap<SpanMode?, MutableList<AutocompleteEntry>> = mutableMapOf()
     val menues: MutableMap<Span?, MutableList<MenuEntry>> = mutableMapOf()
     private var timeMs = Date.now()
     private var currentContext: Span? = null
     private var upLoadUrl: String? = null
-    private var selectedElementPosition = 0
+    private val selectedElementPosition: Int
+        get() {
+            return window.getSelection()?.anchorOffset ?: 0
+        }
     private val divContent: HTMLDivElement = document.createElement("div") as HTMLDivElement
     private val divLineNumberContainer = document.createElement("div") as HTMLDivElement
     private val divLineNumber = document.createElement("div") as HTMLDivElement
     private val divAutocomplete = document.createElement("div") as HTMLDivElement
     private val currentLine: HTMLDivElement?
         get() {
-            val n = window.getSelection()?.focusNode
-            if (n is HTMLDivElement) return n
-            else if (n is HTMLSpanElement) return n.parentElement as HTMLDivElement
-            else return null
+            if (currentNode is HTMLDivElement) return currentNode as HTMLDivElement
+            else return currentNode.parentElement as HTMLDivElement
         }
+
+    private val currentElement: HTMLElement?
+        get() {
+            return if (currentNode is HTMLElement) currentNode as HTMLElement? else null
+        }
+
+    private val currentNode: Node
+        get() {
+            return window.getSelection()!!.focusNode!!
+        }
+
 
     private var rescanContent = false
 
@@ -51,7 +64,7 @@ class SimpleContentEditable(
         INLINED, INLINED_BREAK, START, CONTEXT_START, CONTEXT_END, START_CHAR_SEQ, META;
 
         companion object {
-            fun from(v: String): SpanMode {
+            fun from(v: String?): SpanMode {
                 if (v == "INLINED") return INLINED
                 else if (v == "CONTEXT_START") return CONTEXT_START
                 else if (v == "CONTEXT_END") return CONTEXT_END
@@ -205,11 +218,8 @@ class SimpleContentEditable(
                 autocomplete()
                 event.preventDefault()
                 event.stopPropagation()
-                return@EventHandler
             } else if (event.code == KeyCode.KeyV && event.ctrlKey) {
                 trace("past something ...")
-//                event.preventDefault()
-//                event.stopPropagation()
                 return@EventHandler
             } else if (event.code == KeyCode.KeyW && event.ctrlKey) {
                 if (event.shiftKey) {
@@ -225,13 +235,11 @@ class SimpleContentEditable(
                 event.preventDefault()
                 event.stopPropagation()
                 return@EventHandler
-
             }
             trace("event.code: ${event.code} ends")
         }
 
         divContent.onkeyup = EventHandler { event ->
-//            initSelection()
             trace("divContent.onkeyup ${event.key}")
             if (event.key.startsWith("Arrow")) {
                 return@EventHandler
@@ -239,19 +247,6 @@ class SimpleContentEditable(
 
             if (event.code == KeyCode.Enter) {
                 createCmdLine(null, 0)
-//                val range = selection?.rangeCount?.let { if (it > 0) selection?.getRangeAt(0) else null }
-//                var e = range?.commonAncestorContainer
-//
-//                if (e != null) {
-//                    if (e is HTMLSpanElement) {
-//                        trace("Press enter, range = $range, reset style ${range?.commonAncestorContainer}")
-//                        if (range?.commonAncestorContainer?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.innerHTML =
-//                            HtmlSource("<br>")
-//                        else if (range?.commonAncestorContainer?.parentElement?.parentElement is HTMLDivElement) range.commonAncestorContainer.parentElement?.parentElement?.innerHTML =
-//                            HtmlSource("<br>")
-//                    }
-//                }
-
                 return@EventHandler
             }
 
@@ -297,96 +292,36 @@ class SimpleContentEditable(
     }
 
     fun autocomplete() {
-
-        val texts = mutableListOf<String>(
-            "image:-name-[]",
-            "image:-name-[Sunset,200,100]",
-            "image::-name-[]",
-            "image::<name>[Sunset,200,100]",
-            "http://-url-[]",
-            "http://-url-[Sunset]",
-            "https://-url-[]",
-            "https://-url-[sunset]",
-        )
-        val e = currentLine
-        if (e is HTMLDivElement) {
-            val top = e.getBoundingClientRect().top
-            val left = e.getBoundingClientRect().left
-            val visibleElement = divContent.parentElement?.parentElement?.parentElement?.parentElement
-            if (visibleElement != null) {
+        val topElement = currentNode.parentElement!!
+            val top = topElement.getBoundingClientRect().top
+            val left = topElement.getBoundingClientRect().left
                 val scrollTop = document.body.getBoundingClientRect().top
-                val bottomVisible = visibleElement.getBoundingClientRect().bottom
-                val topVisible = visibleElement.getBoundingClientRect().top
-                trace("topVisible: $topVisible, bottomVisible: $bottomVisible, position: $selectedElementPosition, top: $top, left: $left")
-                if (e.checkVisibility() && top > topVisible && top < bottomVisible) {
+                trace("topVisible: topVisible, bottomVisible: bottomVisible, position: $selectedElementPosition, top: $top, left: $left")
                     divAutocomplete.style.left = "${left + selectedElementPosition * 10}px"
                     divAutocomplete.style.top = "${top - scrollTop + 19}px"
                     divAutocomplete.innerHTML = HtmlSource("")
 
+            trace("currentLine: $currentLine")
+                    val spanMode = currentLine?.textContent?.length?.let { if (it > 0) SpanMode.INLINED else SpanMode.START }
 
-                    for (text in texts) {
-                        val d = document.createElement("li") as HTMLLIElement
-                        d.classList.add(ClassName("cmd-autocomplete"))
-                        d.textContent = text
-                        d.onclick = EventHandler {
-                            e.textContent =
-                                e.textContent?.substring(0, selectedElementPosition) + text + e.textContent?.substring(
-                                    selectedElementPosition
-                                )
-                            selectedElementPosition = 1
-                            divAutocomplete.style.display = "none"
+                    if (autocompletes[spanMode] != null) {
+                        for (text in autocompletes[spanMode]!!) {
+                            val d = document.createElement("li") as HTMLLIElement
+                            d.classList.add(ClassName("cmd-autocomplete"))
+                            d.textContent = text.caption
+                            d.onclick = EventHandler {
+                                topElement.textContent =
+                                    topElement.textContent?.substring(0, selectedElementPosition + 1) + text.insertText + topElement.textContent?.substring(
+                                        selectedElementPosition + 1
+                                    )
+                                divAutocomplete.style.display = "none"
+                            }
+                            divAutocomplete.appendChild(d)
                         }
-                        divAutocomplete.appendChild(d)
                     }
 
                     divAutocomplete.style.display = "block"
-                } else {
-                    divAutocomplete.style.display = "none"
-                }
-            }
-        }
     }
-
-//    fun initSelection() {
-//        val winSelection = window.getSelection()
-//        selection = winSelection
-//        focus = selection?.focusOffset
-//        selectedElement = selection?.focusNode
-//
-//        // position in chars in parent container
-//        currentLine = currentLineComputed
-//
-//        if (currentLine != null) {
-//            selectedElementPosition = 0
-//            currentLinePosition = selectedElementPosition
-//            for (child in currentLine!!.childNodes.iterator()) {
-//                if (child == selectedElement) { // || child == selectedElement?.parentElement || child == selectedElement?.parentElement?.parentElement) {
-//                    selectedElementPosition += focus ?: 0
-//                    currentLinePosition += selectedElementPosition
-//                    trace("child == selectedElement $focus $selectedElementPosition $child ${child is HTMLBRElement}")
-//                    break
-//                } else {
-//                    trace("child == selectedElement ELSE for ($currentLine)")
-//                    currentLinePosition += child.textContent?.length ?: 0
-//                }
-//            }
-//        } else selectedElementPosition = focus ?: 0
-//        trace("selectedElementPosition: $selectedElementPosition, currentLinePosition: $currentLinePosition")
-//    }
-
-//    fun contextMenu() {
-//        val texts = mutableListOf< Pair<String, String>>(
-//            "Bold",
-//            "image:-name-[Sunset,200,100]",
-//            "image::-name-[]",
-//            "image::<name>[Sunset,200,100]",
-//            "http://-url-[]",
-//            "http://-url-[Sunset]",
-//            "https://-url-[]",
-//            "https://-url-[sunset]",
-//        )
-//
-//    }
 
     fun decompress(str: String) {
         val b = Base64.decode(str)
@@ -440,12 +375,12 @@ class SimpleContentEditable(
                         scanningAutocomplete = true
                         val s = AutocompleteEntry(pattern, cn, inlined)
 
-                        var l = autocompletes[currentContext]
+                        var l = autocompletes[s.inlined]
                         if (l == null) {
                             l = mutableListOf()
                         }
                         l.add(s)
-                        autocompletes[currentContext] = l
+                        autocompletes[s.inlined] = l
 
                     } else if (scanningMenuEntry) {
                         println("Add MenuEntry")
@@ -545,7 +480,7 @@ class SimpleContentEditable(
                 val start = match.range.first
                 val ends = match.range.endInclusive
                 val replace =
-                    """${match.groupValues[1]}<span class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
+                    """${match.groupValues[1]}<span typeInlined="${spanStyle.inlined}" class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
                 result += txt!!.substring(i..<start) + replace
                 i = ends + 1
             }
@@ -607,7 +542,6 @@ class SimpleContentEditable(
             if (it.isNotEmpty()) asciidocToHtml(createCmdLine(escapeHtml(it), 0)!!)
             else createCmdLine("", 0)
         }
-
     }
 
 }
