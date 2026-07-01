@@ -283,9 +283,22 @@ class SimpleContentEditable(
         readTextarea()
     }
 
-    fun updateSelection(e: HTMLDivElement) {
+    fun updateSelection(e: HTMLDivElement, node: Node?, p: Int, i: Int) {
+        trace("updateSelection n: $node, p: $p, i: $i")
         window.getSelection()!!.removeAllRanges()
         val range = document.createRange()
+        if (node != null) {
+            if (e.childNodes.length >= i) {
+                e.childNodes[i].textContent?.length?.let {
+                    if (it > p) {
+                        range.setStart(e.childNodes[i].childNodes[0], p)
+                        range.collapse(true)
+                        window.getSelection()!!.addRange(range)
+                        return
+                    }
+                }
+            }
+        }
         val n = e.childNodes.asList().last()
         if (n is HTMLSpanElement) {
             val n2 = e.appendChild(document.createTextNode(""))
@@ -532,8 +545,14 @@ class SimpleContentEditable(
             }
 
             if (e.innerHTML.toString() != result) {
+                val n = currentNode
+                val p = selectedElementPosition
+                var i = 0
+                e.childNodes.asList().forEachIndexed { index, node ->
+                    if (node == n || node == n?.parentNode) i = index
+                }
                 e.innerHTML = HtmlSource(result)
-                updateSelection(e)
+                updateSelection(e, n, p, i)
             }
         }
         trace("asciidocToHtml --- ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
