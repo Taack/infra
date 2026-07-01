@@ -246,7 +246,7 @@ class SimpleContentEditable(
             }
 
             if (event.code == KeyCode.Enter || event.code == KeyCode.NumpadEnter) {
-                createLineNumbers(null, 0)
+                createLineNumbers()
                 return@EventHandler
             }
 
@@ -280,6 +280,7 @@ class SimpleContentEditable(
         val options = MutationObserverInit()
         options.childList = true
         mutationObserver.observe(divContent, options)
+        readTextarea()
     }
 
     fun updateSelection(e: HTMLDivElement) {
@@ -327,11 +328,10 @@ class SimpleContentEditable(
     }
 
     fun autocomplete() {
-        val topElement = (if (currentNode is Text)  currentNode?.parentElement else currentNode) as HTMLElement
+        val topElement = (if (currentNode is Text) currentNode?.parentElement else currentNode) as HTMLElement
         val top = topElement.getBoundingClientRect().top
         val left = topElement.getBoundingClientRect().left
         val scrollTop = document.body.getBoundingClientRect().top
-        trace("topVisible: topVisible, bottomVisible: bottomVisible, position: $selectedElementPosition, top: $top, left: $left")
         divAutocomplete.style.left = "${left + selectedElementPosition * 10}px"
         divAutocomplete.style.top = "${top - scrollTop + 19}px"
         divAutocomplete.innerHTML = HtmlSource("")
@@ -345,24 +345,24 @@ class SimpleContentEditable(
                 d.classList.add(ClassName("cmd-autocomplete"))
                 d.textContent = text.caption
                 d.onclick = EventHandler {
-                    topElement.textContent =
-                        topElement.textContent?.substring(
-                            0,
-                            selectedElementPosition + 1
-                        ) + text.insertText + topElement.textContent?.substring(
-                            selectedElementPosition + 1
-                        )
+                    topElement.textContent = topElement.textContent?.substring(
+                        0,
+                        selectedElementPosition + 1
+                    ) + text.insertText + topElement.textContent?.substring(
+                        selectedElementPosition + 1
+                    )
                     divAutocomplete.style.display = "none"
+                    if (topElement is HTMLDivElement) {
+                        trace("Convert Element")
+                        asciidocToHtml(topElement)
+                    }
+
                 }
                 divAutocomplete.appendChild(d)
             }
         }
 
         divAutocomplete.style.display = "block"
-        if (topElement is HTMLDivElement) {
-            trace("Convert Element")
-            asciidocToHtml(topElement)
-        }
     }
 
     fun decompress(str: String) {
@@ -548,7 +548,7 @@ class SimpleContentEditable(
         return cmd
     }
 
-    fun createLineNumbers(s: String?, index: Int) {
+    fun createLineNumbers() {
         divLineNumberContainer.innerHTML = HtmlSource("")
         for (i in 1 until max(divContent.childNodes.length + 1, 2)) {
             val number: HTMLDivElement = document.createElement("div") as HTMLDivElement
@@ -563,17 +563,23 @@ class SimpleContentEditable(
     fun readTextarea() {
         trace("readTextarea")
         divContent.innerHTML = HtmlSource("")
-        divContent.appendChild(appendDivToContent("<br>"))
         if (text.textContent?.length == 0) {
             text.textContent = "\n"
         }
-
-        text.textContent?.split("\n")?.forEach {
-            if (it.isNotEmpty()) {
-                createLineNumbers(escapeHtml(it), 0)
-                if (currentLine != null) asciidocToHtml(currentLine!!)
-            } else createLineNumbers("", 0)
-        }
+        if (text.textContent != null && text.textContent!!.isNotEmpty()) {
+            text.textContent!!.trimEnd().split("\n").forEach {
+                if (it.isNotEmpty()) {
+                    val d = appendDivToContent(it)
+                    divContent.appendChild(d)
+                    createLineNumbers()
+                    if (currentLine != null)
+                        asciidocToHtml(d)
+                } else {
+                    divContent.appendChild(appendDivToContent("<br>"))
+                    createLineNumbers()
+                }
+            }
+        } // else divContent.appendChild(appendDivToContent("<br>"))
     }
 
 }
