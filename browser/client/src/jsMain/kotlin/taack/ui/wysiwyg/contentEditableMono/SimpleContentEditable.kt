@@ -293,34 +293,37 @@ class SimpleContentEditable(
 
     fun autocomplete() {
         val topElement = currentNode.parentElement!!
-            val top = topElement.getBoundingClientRect().top
-            val left = topElement.getBoundingClientRect().left
-                val scrollTop = document.body.getBoundingClientRect().top
-                trace("topVisible: topVisible, bottomVisible: bottomVisible, position: $selectedElementPosition, top: $top, left: $left")
-                    divAutocomplete.style.left = "${left + selectedElementPosition * 10}px"
-                    divAutocomplete.style.top = "${top - scrollTop + 19}px"
-                    divAutocomplete.innerHTML = HtmlSource("")
+        val top = topElement.getBoundingClientRect().top
+        val left = topElement.getBoundingClientRect().left
+        val scrollTop = document.body.getBoundingClientRect().top
+        trace("topVisible: topVisible, bottomVisible: bottomVisible, position: $selectedElementPosition, top: $top, left: $left")
+        divAutocomplete.style.left = "${left + selectedElementPosition * 10}px"
+        divAutocomplete.style.top = "${top - scrollTop + 19}px"
+        divAutocomplete.innerHTML = HtmlSource("")
 
-            trace("currentLine: $currentLine")
-                    val spanMode = currentLine?.textContent?.length?.let { if (it > 0) SpanMode.INLINED else SpanMode.START }
+        trace("currentLine: $currentLine")
+        val spanMode = currentLine?.textContent?.length?.let { if (it > 0) SpanMode.INLINED else SpanMode.START }
 
-                    if (autocompletes[spanMode] != null) {
-                        for (text in autocompletes[spanMode]!!) {
-                            val d = document.createElement("li") as HTMLLIElement
-                            d.classList.add(ClassName("cmd-autocomplete"))
-                            d.textContent = text.caption
-                            d.onclick = EventHandler {
-                                topElement.textContent =
-                                    topElement.textContent?.substring(0, selectedElementPosition + 1) + text.insertText + topElement.textContent?.substring(
-                                        selectedElementPosition + 1
-                                    )
-                                divAutocomplete.style.display = "none"
-                            }
-                            divAutocomplete.appendChild(d)
-                        }
-                    }
+        if (autocompletes[spanMode] != null) {
+            for (text in autocompletes[spanMode]!!) {
+                val d = document.createElement("li") as HTMLLIElement
+                d.classList.add(ClassName("cmd-autocomplete"))
+                d.textContent = text.caption
+                d.onclick = EventHandler {
+                    topElement.textContent =
+                        topElement.textContent?.substring(
+                            0,
+                            selectedElementPosition + 1
+                        ) + text.insertText + topElement.textContent?.substring(
+                            selectedElementPosition + 1
+                        )
+                    divAutocomplete.style.display = "none"
+                }
+                divAutocomplete.appendChild(d)
+            }
+        }
 
-                    divAutocomplete.style.display = "block"
+        divAutocomplete.style.display = "block"
     }
 
     fun decompress(str: String) {
@@ -351,13 +354,11 @@ class SimpleContentEditable(
                     pos1 = pos2
                     pos2 = line.indexOf("§", ++pos1)
                     val inlined = SpanMode.from(line.substring(pos1, pos2))
-                    println("cn: $cn, pattern: $pattern, inline: $inlined")
-                    println("line: $line")
                     if (line.startsWith("§§Style")) scanningStyle = true
                     if (line.startsWith("§§Autocomplete")) scanningAutocomplete = true
                     if (line.startsWith("§§MenuEntry")) scanningMenuEntry = true
                     if (scanningStyle && !scanningAutocomplete) {
-                        println("Add Style")
+                        trace("Add Styles")
 
                         val s = Span(pattern, cn, inlined)
 
@@ -370,7 +371,7 @@ class SimpleContentEditable(
                         if (s.inlined == SpanMode.CONTEXT_START) currentContext = s
                         if (s.inlined == SpanMode.CONTEXT_END) currentContext = null
                     } else if (!scanningMenuEntry && scanningAutocomplete) {
-                        println("Add Autocomplete")
+                        trace("Add Autocompletes")
                         scanningStyle = false
                         scanningAutocomplete = true
                         val s = AutocompleteEntry(pattern, cn, inlined)
@@ -383,7 +384,7 @@ class SimpleContentEditable(
                         autocompletes[s.inlined] = l
 
                     } else if (scanningMenuEntry) {
-                        println("Add MenuEntry")
+                        trace("Add MenuEntries")
                         scanningStyle = false
                         scanningAutocomplete = false
                         scanningMenuEntry = true
