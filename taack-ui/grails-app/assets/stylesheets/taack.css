@@ -420,6 +420,26 @@ svg text {
     border-bottom: none;
 }
 
+.modal-dialog:not(.modal-fullscreen) {
+    max-width: 95vw;
+    max-height: 95vh;
+    min-width: 300px;
+    height: 50vh;
+    width: fit-content;
+}
+
+.modal-dialog:not(.modal-fullscreen) > div.modal-content {
+    width: var(--bs-modal-width);
+    resize: both;
+    min-width: 300px;
+    overflow: auto;
+}
+
+.modal-fullscreen{
+    width: 100vw;
+    max-width: none;
+}
+
 .btn-taack-close, .btn-taack-fullscreen, .btn-taack-minimize {
     font-size: larger;
     padding: 0 .15em;

@@ -65,7 +65,6 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
         blockLog.logEnterBlock('visitKanban')
         HTMLDiv kanbanDiv = new HTMLDiv().builder.addClasses('row gx-2').setTaackTag(TaackTag.KANBAN).putAttribute('taackKanbanId', blockId).build() as HTMLDiv
         blockLog.topElement.builder.addChildren(kanbanDiv)
-        blockLog.topElement = kanbanDiv
         blockLog.savePosition()
 
         parameter.paramsToKeep.each {

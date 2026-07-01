@@ -145,7 +145,7 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
                     "${currentHref}?id=$id&isAjax=true"
                 }
                 formData?.forEach { value, key ->
-                    anchorElement.href = "${anchorElement.href}&$key=${encodeURIComponent(value.toString())}"
+                    if (key != "id") anchorElement.href = "${anchorElement.href}&$key=${encodeURIComponent(value.toString())}"
                 }
             }
         }
