@@ -2,6 +2,8 @@ package taack.wysiwyg
 
 
 import groovy.transform.CompileStatic
+import taack.ui.dsl.form.editor.AutoComplete
+import taack.ui.dsl.form.editor.MenuEntry
 import taack.ui.dsl.form.editor.SpanRegex
 
 @CompileStatic
@@ -49,6 +51,60 @@ enum TaackBaseAsciidocSpans {
 
     static String serializeString(List<SpanRegex> spanRegexes) {
         ((spanRegexes ?: values()*.span)*.serializeString()).join('')
+    }
+}
+
+@CompileStatic
+enum TaackBaseAsciidocMenuEntries {
+    DOCUMENT(new MenuEntry("1,H1", "= ", SpanRegex.Mode.START)),
+    HEADER1(new MenuEntry("1,H2", "== ", SpanRegex.Mode.START)),
+    HEADER2(new MenuEntry("1,H3", "=== ", SpanRegex.Mode.START)),
+    HEADER3(new MenuEntry("1,H4", "==== ", SpanRegex.Mode.START)),
+    HEADER4(new MenuEntry("1,H4", "===== ", SpanRegex.Mode.START)),
+    TITLE(new MenuEntry("2,Title", ".", SpanRegex.Mode.START)),
+    UNORDERED_LIST1(new MenuEntry("3,Bullet1 ", "* ", SpanRegex.Mode.START_CHAR_SEQ)),
+    UNORDERED_LIST2(new MenuEntry("3,Bullet2", "** ", SpanRegex.Mode.START_CHAR_SEQ)),
+    UNORDERED_LIST3(new MenuEntry("3,Bullet3", "*** ", SpanRegex.Mode.START_CHAR_SEQ)),
+    UNCONSTRAINED_BOLD(new MenuEntry("<b>Bold</b>", "**", SpanRegex.Mode.INLINED)),
+    UNCONSTRAINED_ITALIC(new MenuEntry("<i>Italic</i>", "asciidoc-italic", SpanRegex.Mode.INLINED)),
+    UNCONSTRAINED_MONO(new MenuEntry("mono", "`", SpanRegex.Mode.INLINED)),
+
+    UNDERLINE(new MenuEntry("4,underline", "[.underline]#,#", SpanRegex.Mode.INLINED)),
+    STRIKETHROUGH(new MenuEntry("4,line-through", "[.line-through]#,#", SpanRegex.Mode.INLINED))
+
+    TaackBaseAsciidocMenuEntries(MenuEntry menu) {
+        this.menu = menu
+    }
+
+    MenuEntry menu
+
+    static MenuEntry[] getMenus() {
+        values()*.menu.toArray() as MenuEntry[]
+    }
+
+    static String serializeString(List<MenuEntry> spanRegexes) {
+        ((spanRegexes ?: values()*.menu)*.serializeString()).join('')
+    }
+}
+
+@CompileStatic
+enum TaackBaseAsciidocAutocomplete {
+    URL(new AutoComplete("URL", "http://url[]", SpanRegex.Mode.INLINED)),
+    IMAGE(new AutoComplete("Image", "image::image-name[width=500]", SpanRegex.Mode.START)),
+    IMAGE_INLINE(new AutoComplete("Image Inline", "image::image-name[width=400]", SpanRegex.Mode.INLINED))
+
+    TaackBaseAsciidocAutocomplete(AutoComplete autoComplete) {
+        this.autoComplete = autoComplete
+    }
+
+    AutoComplete autoComplete
+
+    static AutoComplete[] getAutocompletes() {
+        values()*.autoComplete.toArray() as AutoComplete[]
+    }
+
+    static String serializeString(List<AutoComplete> spanRegexes) {
+        ((spanRegexes ?: values()*.autoComplete)*.serializeString()).join('')
     }
 }
 
