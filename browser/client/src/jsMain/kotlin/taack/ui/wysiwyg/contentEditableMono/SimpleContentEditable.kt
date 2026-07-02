@@ -127,6 +127,7 @@ class SimpleContentEditable(
                     i++
                 }
             }
+//            text.textContent = escapeHtml(value)
             text.textContent = value
         }
 
@@ -289,9 +290,10 @@ class SimpleContentEditable(
         val range = document.createRange()
         if (node != null) {
             if (e.childNodes.length >= i) {
-                e.childNodes[i].textContent?.length?.let {
+                e.childNodes[i]?.textContent?.length?.let {
                     if (it > p) {
-                        range.setStart(e.childNodes[i].childNodes[0], p)
+                        val cn = if (e.childNodes[i] is Text) e.childNodes[i] else e.childNodes[i].childNodes[0]
+                        range.setStart(cn, p)
                         range.collapse(true)
                         window.getSelection()!!.addRange(range)
                         return
@@ -588,7 +590,7 @@ class SimpleContentEditable(
         if (text.textContent != null && text.textContent!!.isNotEmpty()) {
             text.textContent!!.trimEnd().split("\n").forEach {
                 if (it.isNotEmpty()) {
-                    val d = appendDivToContent(it)
+                    val d = appendDivToContent(escapeHtml(it))
                     divContent.appendChild(d)
                     createLineNumbers()
                     if (currentLine != null)
