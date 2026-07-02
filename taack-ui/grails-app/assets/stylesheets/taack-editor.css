@@ -319,6 +319,10 @@
     color: #990073;
 }
 
+.cm-editor .asciidoc-xref {
+    color: darkblue;
+}
+
 .cm-editor .asciidoc-bullet2 {
     color: #990073;
 }

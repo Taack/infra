@@ -127,6 +127,7 @@ class SimpleContentEditable(
                     i++
                 }
             }
+//            text.textContent = escapeHtml(value)
             text.textContent = value
         }
 
@@ -589,7 +590,7 @@ class SimpleContentEditable(
         if (text.textContent != null && text.textContent!!.isNotEmpty()) {
             text.textContent!!.trimEnd().split("\n").forEach {
                 if (it.isNotEmpty()) {
-                    val d = appendDivToContent(it)
+                    val d = appendDivToContent(escapeHtml(it))
                     divContent.appendChild(d)
                     createLineNumbers()
                     if (currentLine != null)

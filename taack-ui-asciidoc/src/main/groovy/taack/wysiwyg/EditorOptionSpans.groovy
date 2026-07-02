@@ -27,6 +27,8 @@ enum TaackBaseAsciidocSpans {
     UNCONSTRAINED_MONO(new SpanRegex("[^`]``([^`]*)``[^`]", "asciidoc-mono", SpanRegex.Mode.INLINED)),
     CONSTRAINED_BOLD(new SpanRegex("([^\\\\w\\\\d*])(\\\\*[^*]+\\\\*)([^\\\\w\\\\d*]?)", "asciidoc-bold", SpanRegex.Mode.INLINED)),
 
+    XREF(new SpanRegex("([^<]?)(&lt;&lt;[^<>]*&gt;&gt;)([^W]*)", "asciidoc-xref", SpanRegex.Mode.INLINED)),
+
     //            LITERAL_PARAGRAPH(new SpanRegex("^ .*", "asciidoc-literal", true)),
     CONSTRAINED_ITALIC(new SpanRegex("([^\\\\w\\\\d_])(_[^_]+_)([^\\\\w\\\\d_]?)", "asciidoc-italic", SpanRegex.Mode.INLINED)),
     CONSTRAINED_MONO(new SpanRegex("(`[^`]*`)", "asciidoc-mono", SpanRegex.Mode.INLINED)),
