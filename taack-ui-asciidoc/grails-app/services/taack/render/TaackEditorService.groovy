@@ -57,7 +57,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
     }
 
     enum ImageExtension {
-        png('png'), jpg('jpeg'), svg('svg+xml')
+        webp('webp'), png('png'), jpg('jpeg'), svg('svg+xml')
 
         ImageExtension(String mimeImage) {
             this.mimeImage = mimeImage
@@ -91,7 +91,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
                     webUtils.currentResponse.outputStream << f.bytes
                 }
             } else {
-                ImageExtension imageExtension = path[-3..-1] as ImageExtension
+                ImageExtension imageExtension = path.substring(path.lastIndexOf('.') + 1) as ImageExtension
                 webUtils.currentResponse.setContentType("image/${imageExtension.mimeImage}")
                 webUtils.currentResponse.setHeader('Content-disposition', "attachment;filename=${fileName.split('/')[-1]}")
                 webUtils.currentResponse.outputStream << cl.getResourceAsStream(fnPath + path)
