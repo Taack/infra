@@ -54,7 +54,6 @@ public final class FieldConstraint {
 
     @Override
     public String toString() {
-        final Field field = field;
         return "FieldConstraint{constraints=" + String.valueOf(constraints) + ", field=" + (field == null ? null : field.getName()) + ", constraintName='" + constraintName + "'}";
     }
 
