@@ -14,11 +14,11 @@ public final class GetMethodReturn<T> {
         this.value = value;
     }
 
-    public final Method getMethod() {
+    public Method getMethod() {
         return method;
     }
 
-    public final T getValue() {
+    public T getValue() {
         return value;
     }
 

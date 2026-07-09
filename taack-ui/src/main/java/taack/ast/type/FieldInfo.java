@@ -30,15 +30,15 @@ public final class FieldInfo<T> {
         return "FieldInfo{fieldConstraint=" + String.valueOf(getFieldConstraint()) + ", fieldName=" + getFieldName() + " value=" + String.valueOf(getValue()) + "}";
     }
 
-    public final FieldConstraint getFieldConstraint() {
+    public FieldConstraint getFieldConstraint() {
         return fieldConstraint;
     }
 
-    public final String getFieldName() {
+    public String getFieldName() {
         return fieldName;
     }
 
-    public final T getValue() {
+    public T getValue() {
         return value;
     }
 

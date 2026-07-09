@@ -3,7 +3,7 @@ package taack.ast.type;
 import java.lang.reflect.Field;
 
 /**
- * Container class with meta-data associated with the object pointer by
+ * Container class with metadata associated with the object pointer by
  * {@link FieldInfo} class.
  */
 public final class FieldConstraint {
@@ -16,7 +16,7 @@ public final class FieldConstraint {
     /**
      * Widget field of the Grails domain constraint for this field
      *
-     * @return either null, textarea, ajax, filePath, markdown, passwd...
+     * @return either null, textarea, ajax, filePath, Markdown, passwd...
      * (see {@link WidgetKind})
      */
     public String getWidget() {
@@ -54,7 +54,7 @@ public final class FieldConstraint {
 
     @Override
     public String toString() {
-        return "FieldConstraint{constraints=" + String.valueOf(constraints) + ", field=" + (field == null ? null : field.getName()) + ", constraintName='" + constraintName + "'}";
+        return "FieldConstraint{constraints=" + constraints + ", field=" + (field == null ? null : field.getName()) + ", constraintName='" + constraintName + "'}";
     }
 
     public final Constraints constraints;
@@ -75,34 +75,34 @@ public final class FieldConstraint {
 
         @Override
         public String toString() {
-            return "Constraints{widget='" + getWidget() + "', nullable=" + String.valueOf(getNullable()) + ", email=" + String.valueOf(getEmail()) + ", min=" + String.valueOf(getMin()) + ", max=" + String.valueOf(getMax()) + "}";
+            return "Constraints{widget='" + getWidget() + "', nullable=" + getNullable() + ", email=" + getEmail() + ", min=" + getMin() + ", max=" + getMax() + "}";
         }
 
-        public final String getWidget() {
+        public String getWidget() {
             return widget;
         }
 
-        public final boolean getNullable() {
+        public boolean getNullable() {
             return nullable;
         }
 
-        public final boolean isNullable() {
+        public boolean isNullable() {
             return nullable;
         }
 
-        public final boolean getEmail() {
+        public boolean getEmail() {
             return email;
         }
 
-        public final boolean isEmail() {
+        public boolean isEmail() {
             return email;
         }
 
-        public final Integer getMin() {
+        public Integer getMin() {
             return min;
         }
 
-        public final Integer getMax() {
+        public Integer getMax() {
             return max;
         }
 
