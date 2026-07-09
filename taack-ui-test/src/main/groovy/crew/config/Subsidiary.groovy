@@ -1,6 +1,5 @@
 package crew.config
 
-
 import groovy.transform.CompileStatic
 import org.springframework.context.i18n.LocaleContextHolder
 import taack.config.Country
@@ -11,7 +10,7 @@ import taack.ui.dsl.common.IStyled
 import taack.ui.dsl.common.Style
 
 @CompileStatic
-final enum SupportedCurrency {
+enum SupportedCurrency {
     EUR(2),
     USD(2),
     INR(0),
@@ -117,7 +116,7 @@ enum Address {
 }
 
 @CompileStatic
-final enum AdministrativeTax {
+enum AdministrativeTax {
     YOUR_TAX('TAX LABEL', 'TAX CODE')
 
     AdministrativeTax(final String taxLabel, final String taxCode) {
@@ -130,7 +129,7 @@ final enum AdministrativeTax {
 }
 
 @CompileStatic
-final enum AdministrativeIdentifier {
+enum AdministrativeIdentifier {
     YOUR_COMPANY_IDENTIFIER('SIRET', '123123123123')
 
     AdministrativeIdentifier(final String idLabel, final String idCode) {
@@ -143,7 +142,7 @@ final enum AdministrativeIdentifier {
 }
 
 @CompileStatic
-final enum Subsidiary implements IStyled {
+enum Subsidiary implements IStyled {
     YOUR_SUBSIDIARY1(null, 'Your Subsidiary US', Address.YOUR_ADDRESS, SupportedCurrency.USD, SupportedLanguage.EN),
     YOUR_SUBSIDIARY2(null, 'Your Subsidiary FR', Address.YOUR_ADDRESS, SupportedCurrency.EUR, SupportedLanguage.FR)
 

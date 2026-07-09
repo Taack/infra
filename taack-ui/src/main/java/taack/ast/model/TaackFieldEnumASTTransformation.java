@@ -76,7 +76,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
 
     @Override
     public void visit(ASTNode[] nodes, SourceUnit source) {
-        printOut("GroovyASTTransformation::visit " + source.getName());
+        printOut("TaackFieldEnumASTTransformation::visit +++ " + source.getName());
         init(nodes, source);
 
         AnnotationNode node = (AnnotationNode) nodes[0];
@@ -85,11 +85,11 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
             printOut("TFE_TYPE != node.getClassNode() => " + TFE_TYPE + " != " + node.getClassNode());
             return;
         }
-        if (parent instanceof ClassNode cNode) {
-            if (!checkNotInterface(cNode, TFE_TYPE_NAME)) return;
+        if (parent instanceof ClassNode classNode) {
+            if (!checkNotInterface(classNode, TFE_TYPE_NAME)) return;
 
             final Set<String> avoidDuplicate = new HashSet<>();
-            final ClassNode classNode = (ClassNode) nodes[1];
+            //final ClassNode classNode = (ClassNode) nodes[1];
             final Map<String, FieldConstraint.Constraints> constraintsMap = dumpConstraints(classNode);
             final List<MethodNode> methods = new ArrayList<>(classNode.getMethods());
 
@@ -168,6 +168,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
             if (debugEnum == DebugEnum.NORMAL)
                 addSelfObjectMethod(classNode);
         }
+        printOut("TaackFieldEnumASTTransformation::visit --- " + source.getName());
     }
 
     /**
@@ -175,7 +176,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
      *
      */
     private static void addSelfObjectMethod(final ClassNode classNode) {
-        printOut("addSelfObjectMethod: " + classNode.getName());
+        printOut("addSelfObjectMethod +++: " + classNode.getName());
 
         final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", FC_TYPE);
 
@@ -232,6 +233,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                 ClassNode.EMPTY_ARRAY,
                 code
         );
+        printOut("addSelfObjectMethod ---: " + classNode.getName());
     }
 
     static Map<String, FieldConstraint.Constraints> dumpConstraints(final ClassNode classNode) {
@@ -289,7 +291,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
     private static void addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode,
                                            final String constraintName,
                                            final FieldConstraint.Constraints constraints) {
-        printOut("addFieldMethodNode: " + classNode.getName() + "::" + fieldNode.getName());
+        printOut("addFieldMethodNode +++ : " + classNode.getName() + "::" + fieldNode.getName());
 
         final VariableExpression constrVar = constraints != null ? varX("constraints", make(FieldConstraint.Constraints.class)) : null;
 
@@ -390,6 +392,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                 ClassNode.EMPTY_ARRAY,
                 body
         );
+        printOut("addFieldMethodNode --- : " + classNode.getName() + "::" + fieldNode.getName());
     }
 
     private static ClassNode castTypeToClass(final ClassNode classNode) {
