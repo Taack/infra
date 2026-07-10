@@ -396,12 +396,10 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
     }
 
     private static ClassNode castTypeToClass(final ClassNode classNode) {
-        if (!classNode.isPrimaryClassNode()) {
-            if (boolean.class.isAssignableFrom(classNode.getTypeClass())) {
-                return make(Boolean.class);
-            } else if (int.class.isAssignableFrom(classNode.getTypeClass())) {
-                return make(Integer.class);
-            }
+        if (ClassHelper.boolean_TYPE.equals(classNode)) {
+            return ClassHelper.Boolean_TYPE;
+        } else if (ClassHelper.int_TYPE.equals(classNode)) {
+            return ClassHelper.Integer_TYPE;
         }
         return classNode;
     }
