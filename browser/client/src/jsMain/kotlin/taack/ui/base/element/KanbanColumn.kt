@@ -4,6 +4,7 @@ import js.array.asList
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.checkLogin
+import taack.ui.base.Helper.Companion.processAjaxLink
 import web.cssom.ClassName
 import web.dom.ElementId
 import web.dom.document
@@ -15,6 +16,9 @@ import web.html.HtmlSource
 import web.http.POST
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
+import web.location.location
+import taack.ui.base.leaf.BaseAjaxAction.Companion.createUrl
+import kotlin.math.min
 
 class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
     BaseElement {
@@ -50,14 +54,35 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
                 if (parent.sourceColumn != null && parent.sourceColumn != this) {
                     d.classList.remove(ClassName("drag-over"))
                     d.classList.add(ClassName("kanban-loading"))
-                    val fd = FormData()
+                    var fd: FormData? = getFilterFormDataOrNull(d)
+                    val hasExistingFormData = (fd != null)
+                    if (fd == null) {
+                        fd = FormData()
+                        fd.set("isAjax", "true")
+                    }
                     fd.set("cardId", parent.draggedItem?.cardId ?: "")
                     val xhr = XMLHttpRequest()
                     xhr.onreadystatechange = EventHandler {
                         if (xhr.readyState == xhr.DONE) {
                             checkLogin(xhr)
+                            if (hasExistingFormData) {
+                                d.classList.remove(ClassName("kanban-loading"))
+                                Helper.filterForm(parent.filter, null, null)
+                            } else {
+                                if (xhr.status == 200.toShort()) {
+                                    e.preventDefault()
+                                    val text = xhr.responseText
+                                    if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
+                                        location.href = xhr.responseURL
+                                        document.textContent = text
+                                        document.close()
+                                    } else {
+                                        processAjaxLink(createUrl(true, dropAction), text, parent)
+                                    }
+                                }
+                            }
+                        } else if (xhr.readyState == xhr.OPENED) {
                             d.classList.remove(ClassName("kanban-loading"))
-                            Helper.filterForm(parent.filter, null, null)
                         }
                     }
                     xhr.open(RequestMethod.POST, dropAction)
@@ -77,6 +102,26 @@ class KanbanColumn(val parent: Kanban, val d: HTMLDivElement):
         }
         d.oncontextmenu = EventHandler { e -> e.preventDefault() }
         Helper.traceDeIndent("KanbanColumn::init ---")
+    }
+
+    private fun getFilterFormDataOrNull(d: HTMLDivElement): FormData? { // If div is in a kanban with filter, return the formData of the filter
+        var formData: FormData? = null
+        val t = d.closest("[taackkanbanid]")
+        val div = d.closest("div[ajaxblockid]") as HTMLDivElement?
+        if (t != null && div != null) {
+            val tId = t.getAttribute("taackkanbanid")
+            val ajaxBlockId = div.getAttribute("ajaxblockid")!!
+            if (t.nextElementSibling == null) { // Exclude the case where the kanban has no filter
+                val filter: Filter? = getParentBlock().ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)
+                if (filter != null) {
+                    formData = FormData(filter.f)
+                    formData.set("refresh", "true")
+                    formData.set("filterTableId", filter.filterId)
+                    formData.set("ajaxBlockId", filter.parent.blockId)
+                }
+            }
+        }
+        return formData
     }
 
     override fun getParentBlock(): Block {
