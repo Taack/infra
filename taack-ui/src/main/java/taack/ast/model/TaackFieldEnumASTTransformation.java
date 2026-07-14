@@ -27,6 +27,7 @@ import java.util.*;
 import static org.apache.groovy.ast.tools.ClassNodeUtils.addGeneratedMethod;
 import static org.codehaus.groovy.ast.ClassHelper.make;
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*;
+
 /**
  * Handles generation of code for the @TaackFieldEnum annotation.
  */
@@ -58,8 +59,9 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
             );
 
     private static void printOut(String outputString) {
-        if (trace)
+        if (trace) {
             System.out.println(outputString);
+        }
     }
 
     private static String transformNameIntoMethodName(final String fieldNodeName) {
@@ -76,9 +78,8 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
 
     @Override
     public void visit(ASTNode[] nodes, SourceUnit source) {
-        printOut("TaackFieldEnumASTTransformation::visit +++ " + source.getName());
+        printOut("TaackFieldEnumASTTransformation::visit " + source.getName());
         init(nodes, source);
-
         AnnotationNode node = (AnnotationNode) nodes[0];
         AnnotatedNode parent = (AnnotatedNode) nodes[1];
         if (!TFE_TYPE.equals(node.getClassNode())) {
@@ -113,10 +114,10 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                     if (fIt.getInitialExpression() instanceof MapExpression me) {
 
                         for (MapEntryExpression mee : me.getMapEntryExpressions()) {
-                                ConstantExpression keyExpression = (ConstantExpression)mee.getKeyExpression();
-                            ClassExpression valueClassExpression = (ClassExpression)mee.getValueExpression();
-                            FieldConstraint.Constraints constraints = constraintsMap.get((String)keyExpression.getValue());
-                            final String fieldName = (String)keyExpression.getValue();
+                            ConstantExpression keyExpression = (ConstantExpression) mee.getKeyExpression();
+                            ClassExpression valueClassExpression = (ClassExpression) mee.getValueExpression();
+                            FieldConstraint.Constraints constraints = constraintsMap.get((String) keyExpression.getValue());
+                            final String fieldName = (String) keyExpression.getValue();
                             if (!avoidDuplicate.contains(fieldName)) {
                                 FieldNode fieldNode = new FieldNode(fieldName,
                                         2,
@@ -129,7 +130,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                                             null,
                                             constraints);
                                     printOut(valueClassExpression.toString());
-                                    printOut("Method "+ fIt.getName() + " added " + fieldName + ": " + valueClassExpression.getType());
+                                    printOut("Method " + fIt.getName() + " added " + fieldName + ": " + valueClassExpression.getType());
                                     avoidDuplicate.add(fieldName);
                                 }
                             } else {
@@ -139,9 +140,9 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                     } else if (fIt.getInitialExpression() instanceof ListExpression le) {
 
                         for (Expression it : le.getExpressions()) {
-                            ClassExpression valueClassExpression = (ClassExpression)it;
+                            ClassExpression valueClassExpression = (ClassExpression) it;
                             // TODO
-                            printOut("valueClassExpression: "+ valueClassExpression + " NOT DONE !");
+                            printOut("valueClassExpression: " + valueClassExpression + " NOT DONE !");
                         }
                     }
                 } else if (!(fIt.getName().startsWith("get") || fIt.getName().contains("_") || fIt.getName().contains("$")
@@ -154,7 +155,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                     if (!annotationNodes.isEmpty()) {
                         AnnotationNode enumName = annotationNodes.get(0);
                         ConstantExpression constantExpression = (ConstantExpression) enumName.getMember("name");
-                        constraintName = (String)constantExpression.getValue();
+                        constraintName = (String) constantExpression.getValue();
                     }
 
                     if (!avoidDuplicate.contains(fIt.getName())) {
@@ -168,7 +169,6 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
             if (debugEnum == DebugEnum.NORMAL)
                 addSelfObjectMethod(classNode);
         }
-        printOut("TaackFieldEnumASTTransformation::visit --- " + source.getName());
     }
 
     /**
@@ -176,7 +176,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
      *
      */
     private static void addSelfObjectMethod(final ClassNode classNode) {
-        printOut("addSelfObjectMethod +++: " + classNode.getName());
+        printOut("addSelfObjectMethod: " + classNode.getName());
 
         final VariableExpression fieldConstraintsVariable = varX("fieldConstraints", FC_TYPE);
 
@@ -186,7 +186,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                         nullX(),
                         nullX(),
                         nullX()
-                        )
+                )
         );
 
         ctorFC.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, FC_TYPE.getDeclaredConstructors().get(0));
@@ -233,16 +233,14 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                 ClassNode.EMPTY_ARRAY,
                 code
         );
-        printOut("addSelfObjectMethod ---: " + classNode.getName());
     }
 
     static Map<String, FieldConstraint.Constraints> dumpConstraints(final ClassNode classNode) {
         final FieldNode fn = classNode.getDeclaredField("constraints");
 
         if (fn == null) return new HashMap<>();
-
-        final ClosureExpression ce = (ClosureExpression)fn.getInitialValueExpression();
-        final BlockStatement bs = (BlockStatement)ce.getCode();
+        final ClosureExpression ce = (ClosureExpression) fn.getInitialValueExpression();
+        final BlockStatement bs = (BlockStatement) ce.getCode();
         final Map<String, FieldConstraint.Constraints> ret = new HashMap<>();
 
         for (Statement s : bs.getStatements()) {
@@ -270,11 +268,11 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                             }
                         }
                         FieldConstraint.Constraints constraints = new FieldConstraint.Constraints(
-                                (String)c.get("widget"),
-                                (Boolean)(c.get("nullable") != null ? c.get("nullable") : false),
-                                (Boolean)(c.get("email") != null ? c.get("email") : false),
-                                (Integer)c.get("min"),
-                                (Integer)c.get("max")
+                                (String) c.get("widget"),
+                                (Boolean) (c.get("nullable") != null ? c.get("nullable") : false),
+                                (Boolean) (c.get("email") != null ? c.get("email") : false),
+                                (Number) c.get("min"),
+                                (Number) c.get("max")
                         );
                         ret.put(cst.getValue().toString(), constraints);
                     }
@@ -291,7 +289,7 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
     private static void addFieldMethodNode(final ClassNode classNode, final FieldNode fieldNode,
                                            final String constraintName,
                                            final FieldConstraint.Constraints constraints) {
-        printOut("addFieldMethodNode +++ : " + classNode.getName() + "::" + fieldNode.getName());
+        printOut("addFieldMethodNode: " + classNode.getName() + "::" + fieldNode.getName());
 
         final VariableExpression constrVar = constraints != null ? varX("constraints", make(FieldConstraint.Constraints.class)) : null;
 
@@ -342,8 +340,8 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                 fieldConstraintCN,
                 args(
                         constrVar != null ? constrVar : nullX(),
-                sceGetDeclaredField,
-                new ConstantExpression(constraintName))
+                        sceGetDeclaredField,
+                        new ConstantExpression(constraintName))
         );
 
         cceFieldConstraint.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, fieldConstraintCN.getDeclaredConstructors().get(0));
@@ -392,15 +390,17 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                 ClassNode.EMPTY_ARRAY,
                 body
         );
-        printOut("addFieldMethodNode --- : " + classNode.getName() + "::" + fieldNode.getName());
     }
 
     private static ClassNode castTypeToClass(final ClassNode classNode) {
-        if (ClassHelper.boolean_TYPE.equals(classNode)) {
-            return ClassHelper.Boolean_TYPE;
-        } else if (ClassHelper.int_TYPE.equals(classNode)) {
-            return ClassHelper.Integer_TYPE;
-        }
+        if (!classNode.isPrimaryClassNode())
+            if (ClassHelper.boolean_TYPE.equals(classNode)) {
+                printOut("castTypeToClass: Boolean_TYPE: " + classNode.getName());
+                return ClassHelper.Boolean_TYPE;
+            } else if (ClassHelper.int_TYPE.equals(classNode)) {
+                printOut("castTypeToClass: Integer_TYPE: " + classNode.getName());
+                return ClassHelper.Integer_TYPE;
+            }
         return classNode;
     }
 

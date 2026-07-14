@@ -42,12 +42,12 @@ public final class FieldConstraint {
         else return constraints.getEmail();
     }
 
-    public Integer getMin() {
+    public Number getMin() {
         if (constraints == null) return null;
         else return constraints.getMin();
     }
 
-    public Integer getMax() {
+    public Number getMax() {
         if (constraints == null) return null;
         else return constraints.getMax();
     }
@@ -65,7 +65,7 @@ public final class FieldConstraint {
      * Helper class to manage Grails constraints field.
      */
     public final static class Constraints {
-        public Constraints(final String widget, final boolean nullable, final boolean email, final Integer min, final Integer max) {
+        public Constraints(final String widget, final boolean nullable, final boolean email, final Number min, final Number max) {
             this.widget = widget;
             this.nullable = nullable;
             this.email = email;
@@ -98,18 +98,18 @@ public final class FieldConstraint {
             return email;
         }
 
-        public Integer getMin() {
+        public Number getMin() {
             return min;
         }
 
-        public Integer getMax() {
+        public Number getMax() {
             return max;
         }
 
         private final String widget;
         private final boolean nullable;
         private final boolean email;
-        private final Integer min;
-        private final Integer max;
+        private final Number min;
+        private final Number max;
     }
 }
