@@ -1,11 +1,16 @@
 package taack.ast;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
+import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.MethodNode;
+import org.codehaus.groovy.ast.ModuleNode;
+import org.codehaus.groovy.ast.Parameter;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.AttributeExpression;
 import org.codehaus.groovy.ast.expr.Expression;
@@ -15,15 +20,40 @@ import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.ReturnStatement;
 import org.codehaus.groovy.transform.stc.AbstractTypeCheckingExtension;
 import org.codehaus.groovy.transform.stc.StaticTypeCheckingVisitor;
+import org.grails.datastore.gorm.GormEntity;
+
+import taack.ast.type.FieldInfo;
 
 public class TaackUiExtension extends AbstractTypeCheckingExtension {
+
+	static Set<ClassNode> mustAddGormInterface = new HashSet<>();
+	
+	private static boolean addGormInterface(ClassNode classNode, boolean force) {
+		
+		ModuleNode m = classNode.getModule();
+		
+		if (force || (m != null && m.getContext().getName().contains("domain")) || (m == null && mustAddGormInterface.contains(classNode))) {
+			classNode.addInterface(ClassHelper.make(GormEntity.class));
+			//handled = true
+			mustAddGormInterface.add(classNode);
+			return true;
+		} else if (m == null)
+			System.out.println("classNode.module is null for $classNode");
+		return false;
+	}
+
+	static void extensionLog(String trace) {
+		if (true)
+			System.out.println("TaackUiExtension::" + trace);
+	}
+	
     public TaackUiExtension(final StaticTypeCheckingVisitor typeCheckingVisitor) {
         super(typeCheckingVisitor);
     }
 
     @Override
     public boolean handleUnresolvedVariableExpression(final VariableExpression vexp) {
-    	System.out.println("handleUnresolvedVariableExpression " + vexp);
+    	extensionLog("handleUnresolvedVariableExpression " + vexp);
 //        if ("robot".equals(vexp.getName())) {
 //            storeType(vexp, ClassHelper.make(Robot.class));
 //            setHandled(true);
@@ -47,15 +77,24 @@ public class TaackUiExtension extends AbstractTypeCheckingExtension {
 	@Override
 	public boolean handleUnresolvedProperty(PropertyExpression pexp) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleUnresolvedProperty " + pexp);
-
-		return super.handleUnresolvedProperty(pexp);
+		String propAsString = pexp.getPropertyAsString();
+    	extensionLog("handleUnresolvedProperty propAsString: " + propAsString);
+		if (propAsString.endsWith("_")) {
+			storeType(pexp,classNodeFor(FieldInfo.class));
+			setHandled(true);
+			return true;
+		} else if (propAsString.equals("id")) {
+			storeType(pexp,classNodeFor(Long.class));
+			setHandled(true);
+			return true;
+		}    	
+		return false;
 	}
 
 	@Override
 	public boolean handleUnresolvedAttribute(AttributeExpression aexp) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleUnresolvedAttribute " + aexp);
+    	extensionLog("handleUnresolvedAttribute " + aexp.getText());
 		return super.handleUnresolvedAttribute(aexp);
 	}
 
@@ -63,84 +102,95 @@ public class TaackUiExtension extends AbstractTypeCheckingExtension {
 	public List<MethodNode> handleMissingMethod(ClassNode receiver, String name, ArgumentListExpression argumentList,
 			ClassNode[] argumentTypes, MethodCall call) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleMissingMethod receiver: " + receiver  + " name: " + name + " argumentList: " + argumentList + " argumentTypes " + argumentTypes);
+    	extensionLog("handleMissingMethod receiver: " + receiver.getName()  + " name: " + name);
 		return super.handleMissingMethod(receiver, name, argumentList, argumentTypes, call);
 	}
 
 	@Override
 	public boolean handleIncompatibleAssignment(ClassNode lhsType, ClassNode rhsType, Expression assignmentExpression) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleIncompatibleAssignment lhsType: " + lhsType  + " rhsType: " + rhsType + " assignmentExpression: " + assignmentExpression);
+    	extensionLog("handleIncompatibleAssignment lhsType: " + lhsType.getName()  + " rhsType: " + rhsType.getName());
 		return super.handleIncompatibleAssignment(lhsType, rhsType, assignmentExpression);
 	}
 
 	@Override
 	public List<MethodNode> handleAmbiguousMethods(List<MethodNode> nodes, Expression origin) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods nodes: " + nodes  + " nodes: " + nodes);
+    	extensionLog("handleAmbiguousMethods ");
 		return super.handleAmbiguousMethods(nodes, origin);
 	}
 
 	@Override
 	public boolean beforeVisitMethod(MethodNode node) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods node: " + node);
+//    	extensionLog("beforeVisitMethod node: " + node.getName());
 		return super.beforeVisitMethod(node);
 	}
 
 	@Override
 	public void afterVisitMethod(MethodNode node) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods node: " + node);
+//    	extensionLog("afterVisitMethod node: " + node);
 		super.afterVisitMethod(node);
 	}
 
 	@Override
 	public boolean beforeVisitClass(ClassNode node) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods node: " + node);
-		return super.beforeVisitClass(node);
+    	extensionLog("beforeVisitClass node: " + node.getName());
+    	extensionLog("AUOAUAAUOAOUOUOA mustAddGormInterface " + mustAddGormInterface);
+		return addGormInterface(node, false);
 	}
 
 	@Override
 	public void afterVisitClass(ClassNode node) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods node: " + node);
+    	extensionLog("afterVisitClass node: " + node.getName());
 		super.afterVisitClass(node);
 	}
 
 	@Override
 	public boolean beforeMethodCall(MethodCall call) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods call: " + call);
+//    	extensionLog("beforeMethodCall call: " + call.getText());
 		return super.beforeMethodCall(call);
 	}
 
 	@Override
 	public void afterMethodCall(MethodCall call) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods call: " + call);
+//    	extensionLog("afterMethodCall call: " + call.getText());
 		super.afterMethodCall(call);
 	}
 
 	@Override
 	public void onMethodSelection(Expression expression, MethodNode target) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleAmbiguousMethods expression: " + expression  + " target: " + target);
+    	extensionLog("onMethodSelection expression: " + expression.getText()  + " target: " + target.getText());
+    	if (target.getText().contains("GormEntity")) {
+    		extensionLog("AUOUOAUOAUOAUOAUOAUO " + target.getParameters());
+    		for (Parameter p : target.getParameters()) {
+    			extensionLog("Aauoaouauoauoauoauoauoauoauoaouauoauoauo " + p.getType());
+    			if (p.getType().equals(ClassHelper.make(Class.class))) {
+        			extensionLog("Aauoaouauoauoauoauoauoauoauoaouauoauoauo2 " + expression);
+        			addGormInterface(p.getType(), true);
+    			}
+    		}
+    	}
 		super.onMethodSelection(expression, target);
 	}
 
 	@Override
 	public boolean handleIncompatibleReturnType(ReturnStatement returnStatement, ClassNode inferredReturnType) {
 		// TODO Auto-generated method stub
-    	System.out.println("handleIncompatibleReturnType returnStatement: " + returnStatement  + " inferredReturnType: " + inferredReturnType);
+    	extensionLog("handleIncompatibleReturnType returnStatement: " + returnStatement.getText()  + " inferredReturnType: " + inferredReturnType.getText());
 		return super.handleIncompatibleReturnType(returnStatement, inferredReturnType);
 	}
 
 	@Override
 	public ClassNode getType(ASTNode exp) {
 		// TODO Auto-generated method stub
-    	System.out.println("getType exp: " + exp);
+    	extensionLog("getType exp: " + exp);
 		return super.getType(exp);
 	}
 

@@ -21,7 +21,7 @@ import taack.ui.dsl.filter.expression.Operator
 
 import jakarta.annotation.PostConstruct
 
-@GrailsCompileStatic
+@GrailsCompileStatic//(extensions='taack.ast.TaackUiExtension')
 class CmsUiService implements WebAttributes {
 
     static lazyInit = false
