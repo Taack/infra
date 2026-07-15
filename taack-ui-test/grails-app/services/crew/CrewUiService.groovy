@@ -18,7 +18,7 @@ import taack.ui.dsl.filter.expression.Operator
 
 import static taack.render.TaackUiService.tr
 
-@GrailsCompileStatic
+@GrailsCompileStatic(extensions='taack.ui.TaackUiExtension2')
 class CrewUiService implements WebAttributes {
 
     TaackFilterService taackFilterService
