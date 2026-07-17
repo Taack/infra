@@ -41,3 +41,5 @@ dependencies {
 
 //    testImplementation "org.apache.grails:grails-testing-support-datamapping"
 }
+
+compileJava.options.release = 21

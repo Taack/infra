@@ -30,7 +30,7 @@ enum CmsPageType {
     }
 }
 
-@GrailsCompileStatic(extensions='taack.ast.TaackUiExtension')
+@GrailsCompileStatic//(extensions='taack.ast.TaackUiExtension')
 @TaackFieldEnum
 class CmsPage {
 

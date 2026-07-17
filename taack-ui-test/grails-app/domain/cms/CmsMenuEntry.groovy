@@ -17,7 +17,7 @@ class CmsMenuEntry {
 
     CmsSubsidiary subsidiary
     String code
-    Map title
+    Map<String, String> title
     CmsMenuEntry parent
 
     Boolean isSideMenu = false

@@ -6,11 +6,9 @@ plugins {
 
 dependencies {
     profile "org.apache.grails.profiles:web"
-    developmentOnly "org.springframework.boot:spring-boot-devtools" // Spring Boot DevTools may cause performance slowdowns or compatibility issues on larger applications
+//    developmentOnly "org.springframework.boot:spring-boot-devtools" // Spring Boot DevTools may cause performance slowdowns or compatibility issues on larger applications
     runtimeOnly "com.h2database:h2"
 }
-
-compileJava.options.release = 21
 
 tasks.withType(Test) {
     useJUnitPlatform()

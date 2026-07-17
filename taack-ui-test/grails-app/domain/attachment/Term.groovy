@@ -33,7 +33,7 @@ class Term {
         return parent.getTopParent()
     }
 
-    Map translations
+    Map<String, String> translations
 
     static constraints = {
         name nullable: false, unique: 'termGroupConfig', validator: { String val, Term obj ->

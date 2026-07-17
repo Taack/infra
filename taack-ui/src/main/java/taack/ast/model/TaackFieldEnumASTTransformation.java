@@ -332,8 +332,8 @@ public final class TaackFieldEnumASTTransformation extends AbstractASTTransforma
                 "getDeclaredField",
                 args(constX(fieldNode.getName()))
         );
-
-        sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, "getDeclaredField");
+//        sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, "getDeclaredField");
+        sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.DIRECT_METHOD_CALL_TARGET, findDeclaredMethod(classNode, "getDeclaredField", 1));
         sceGetDeclaredField.setNodeMetaData(StaticTypesMarker.INFERRED_TYPE, fieldCN);
 
         final ConstructorCallExpression cceFieldConstraint = ctorX(

@@ -12,8 +12,8 @@ class CmsInsert {
     int x
     int y
     Integer width
-    Map hat
-    Map title
+    Map<String, String> hat
+    Map<String, String> title
 
     CmsPage cmsPage
     CmsImage imageApplication
