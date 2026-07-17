@@ -199,8 +199,8 @@ final class TaackMetaModelService {
      * @param constrainedIds: Constraints on Field Info Values
      * @return List of Embedding Objects
      */
-    Collection<? extends GormEntity> listEmbeddingObjectsFromFieldInfoCollection(Collection<FieldInfo<? extends GormEntity>> fields, Collection<Long> constrainedIds = null) {
-        List<? extends GormEntity> res = []
+    Collection<GormEntity> listEmbeddingObjectsFromFieldInfoCollection(Collection<FieldInfo<? extends GormEntity>> fields, Collection<Long> constrainedIds = null) {
+        List<GormEntity> res = []
         fields.each {
             final boolean isListOrSet = Collection.isAssignableFrom(it.fieldConstraint.field.type)
 
@@ -209,7 +209,7 @@ final class TaackMetaModelService {
                 q = "select distinct c from ${it.fieldConstraint.field.declaringClass.typeName} as c inner join c.${it.fieldName} as r where r.id in (?1)"
             }
 
-            Query<? extends GormEntity> query = sessionFactory.currentSession.createQuery(q, it.fieldConstraint.field.declaringClass) as Query<? extends GormEntity>
+            Query<GormEntity> query = sessionFactory.currentSession.createQuery(q, it.fieldConstraint.field.declaringClass) as Query<GormEntity>
             if (constrainedIds && !constrainedIds.empty) query = query.setParameter(1, constrainedIds)
 
             res.addAll(query.list())

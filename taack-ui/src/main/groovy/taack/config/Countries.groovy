@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 import taack.ui.IEnumOption
 
 @CompileStatic
-final enum Continent {
+enum Continent {
     AF('Africa', 30_065_000, 1_216_130_000),
     AN('Antarctica', 13_209_000, 1_500),
     AS('Asia', 44_579_000, 4_436_224_000),

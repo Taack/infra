@@ -438,12 +438,12 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         final String AJAX_PARAMS = 'ajaxParams'
         T anObject = aClass.getConstructor().newInstance()
         if (params.containsKey(AJAX_PARAMS)) {
-            GrailsParameterMap ajaxParams = params[AJAX_PARAMS]
+            GrailsParameterMap ajaxParams = params[AJAX_PARAMS] as GrailsParameterMap
             String stringKey = ajaxParams.keySet().find { it instanceof String }?.toString()
             if (ajaxParams.keySet().size() == 2 && stringKey.endsWith('id')) {
                 anObject = aClass.invokeMethod('get', ajaxParams[stringKey]) as T
             } else {
-                bindData(anObject, params.ajaxParams as GrailsParameterMap)
+                bindData(anObject, params[AJAX_PARAMS] as GrailsParameterMap)
             }
             if (deleteParams) {
                 params.remove(AJAX_PARAMS)

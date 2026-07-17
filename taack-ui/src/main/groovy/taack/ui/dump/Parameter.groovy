@@ -50,7 +50,7 @@ final class Parameter implements WebAttributes {
     final String ajaxBlockId
     final String targetAjaxBlockId
     final String fieldName
-    final Map<String, ?> paramsToKeep
+    final Map<String, Object> paramsToKeep
     final Long modalId = System.currentTimeMillis()
     final NumberFormat nf
     final MessageSource messageSource
@@ -211,7 +211,7 @@ final class Parameter implements WebAttributes {
         urlMapped(controller, action, null, params, isAjax)
     }
 
-    final String urlMapped(String controller, String action, Long id, Map<String, ? extends Object> p = null, boolean isAjax = false, boolean includeParamsToKeep = true) {
+    final String urlMapped(String controller, String action, Long id, Map<String, Object> p = null, boolean isAjax = false, boolean includeParamsToKeep = true) {
         p ?= [:]
         p.removeAll { if (it?.value) Map.isAssignableFrom(it.value.class) else false }
         if (isAjax) {
@@ -238,8 +238,8 @@ final class Parameter implements WebAttributes {
         ret
     }
 
-    final static <T extends Validateable> Map<String, ?> validateableToMap(T validateable) {
-        Map<String, ? extends Object> ret = [:]
+    final static <T extends Validateable> Map<String, Object> validateableToMap(T validateable) {
+        Map<String, Object> ret = [:]
         validateableToParamsToKeep(validateable).each {
             Object vo = validateable[it]
             ret.put(it, vo)

@@ -18,11 +18,11 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitMenuStartEnd()
 
-    void visitMenu(final String controller, final String action, final Map<String, ? extends Object> params)
+    void visitMenu(final String controller, final String action, final Map<String, Object> params)
 
-    void visitSubMenu(final String controller, final String action, final Map<String, ? extends Object> params)
+    void visitSubMenu(final String controller, final String action, final Map<String, Object> params)
 
-    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params)
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, Object> params)
 
     void visitMenuSection(final String i18n, final MenuSpec.MenuPosition position)
 
@@ -34,7 +34,7 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitMenuIconWithClosureEnd(Style style)
 
-    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params)
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params)
 
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses)
 

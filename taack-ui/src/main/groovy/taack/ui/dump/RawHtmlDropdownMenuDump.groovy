@@ -62,18 +62,18 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenu(String controller, String action, Map<String, ?> params) {
+    void visitMenu(String controller, String action, Map<String, Object> params) {
         blockLog.logStayBlock('visitMenu')
         visitLabeledSubMenu(null, controller, action, params)
     }
 
     @Override
-    void visitSubMenu(String controller, String action, Map<String, ?> params) {
+    void visitSubMenu(String controller, String action, Map<String, Object> params) {
 
     }
 
     @Override
-    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, Object> params) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
         blockLog.logStayBlock('visitLabeledSubContextualMenu ' + i18n)
@@ -126,7 +126,7 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params) {
 
     }
 

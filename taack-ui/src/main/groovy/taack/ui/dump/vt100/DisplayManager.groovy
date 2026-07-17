@@ -60,11 +60,11 @@ final class DisplayManager {
     private int screenOffsetCol = 0
     private int screenOffsetRow = 0
     private final Serializer serializer = new Serializer()
-    final enum Browsing {
+    enum Browsing {
         UP, DOWN, LEFT, RIGHT, TAB, SH_TAB
     }
 
-    final enum AreaScrollMode {
+    enum AreaScrollMode {
         NORMAL, H_LOCKED, V_LOCKED, HV_LOCKED
     }
 

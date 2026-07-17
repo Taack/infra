@@ -9,8 +9,6 @@ group = "taack.ui.test.minimal"
 version = "0.7.0"
 
 dependencies {
-    implementation platform("org.apache.grails:grails-bom:$grailsVersion")
-
     profile "org.apache.grails.profiles:web"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "com.zaxxer:HikariCP"

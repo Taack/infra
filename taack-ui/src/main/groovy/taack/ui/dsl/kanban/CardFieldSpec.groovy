@@ -58,7 +58,7 @@ final class CardFieldSpec {
 
     void cardAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map params) {
         if (taackUiEnablerService.hasAccess(action, id, params)) {
-            Map<String, ?> p = params ?: [:]
+            Map<String, Serializable> p = params ?: [:]
             p.put('id', id)
             kanbanVisitor.visitCardAction(i18n, icon, Utils.getControllerName(action), action.method, null, p, true)
         }
@@ -82,7 +82,7 @@ final class CardFieldSpec {
 
     void cardAction(final String linkText, final MethodClosure action, final Long id, final Map params, boolean isAjax = true) {
         if (linkText && taackUiEnablerService.hasAccess(action, id, params)) {
-            Map<String, ?> p = params ?: [:]
+            Map<String, Serializable> p = params ?: [:]
             p.put('id', id)
             kanbanVisitor.visitCardAction(linkText, Utils.getControllerName(action), action.method, null, p, isAjax)
         } else {

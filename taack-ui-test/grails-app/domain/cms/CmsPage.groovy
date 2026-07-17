@@ -30,7 +30,7 @@ enum CmsPageType {
     }
 }
 
-@GrailsCompileStatic
+@GrailsCompileStatic(extensions='taack.ast.TaackUiExtension')
 @TaackFieldEnum
 class CmsPage {
 
@@ -101,6 +101,6 @@ class CmsPage {
 
     @Override
     String toString() {
-        return "CmsPage: ${pageType}, ${name}($id)"
+        return "CmsPage: ${pageType}, ${name}"
     }
 }
