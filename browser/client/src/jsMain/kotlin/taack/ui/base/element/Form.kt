@@ -7,6 +7,7 @@ import taack.ui.base.Helper
 import taack.ui.base.leaf.*
 import taack.ui.wysiwyg.canvasStyled.MainCanvas
 import taack.ui.wysiwyg.contentEditableMono.MainContentEditable
+import taack.ui.wysiwyg.contentEditableMono.SimpleContentEditable
 //import taack.ui.wysiwyg.canvasMono.MainCanvas
 import web.dom.document
 import web.file.File
@@ -71,7 +72,8 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             scrollContainer.append(largeContainer)
             textarea.parentElement?.append(scrollContainer)
 //            MainCanvas(this, textarea, canvasContainer, scrollContainer)
-            MainContentEditable(element, canvasContainer)
+//            MainContentEditable(element, canvasContainer)
+            SimpleContentEditable(element, canvasContainer)
         }
 
         Helper.traceDeIndent("Form::init --- formName: $formName")

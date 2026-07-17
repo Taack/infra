@@ -460,6 +460,7 @@ class Helper {
                             xhr.onloadend = EventHandler {
                                 onLoadend(xhr)
                             }
+                            trace("divContent.onpaste $url")
                             xhr.open(RequestMethod.POST, url)
                             xhr.send(fd)
                         })

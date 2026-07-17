@@ -89,7 +89,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
         if (!params?.isEmpty()) {
             Class controllerClass = grailsApplication.getArtefactByLogicalPropertyName("Controller", controllerName).clazz
             Method m = controllerClass.getDeclaredMethods().find { it.name == actionName}
-            if (m.parameters.size() == 1) {
+            if (m?.parameters?.size() == 1) {
                 Parameter p = m.parameters[0]
                 if (Validateable.isAssignableFrom(p.type)) {
                     Constructor c = p.type.getDeclaredConstructor()

@@ -1,6 +1,9 @@
 package crew.config
 
-enum BusinessUnit {
+import groovy.transform.CompileStatic
+
+@CompileStatic
+public enum BusinessUnit {
     DIRECTION,
     FINANCE,
     MARKETING,
@@ -17,6 +20,7 @@ enum BusinessUnit {
     OTHER
 }
 
+@CompileStatic
 enum Position {
     BoardOfDirectors,
     C_Level,
@@ -34,6 +38,7 @@ enum Position {
     Receptionist
 }
 
+@CompileStatic
 enum LeadershipTitle {
     TeamLeader,
     Manager,
@@ -56,6 +61,7 @@ enum LeadershipTitle {
     Lead,
 }
 
+@CompileStatic
 enum BusinessOwnerTitle {
     CEO,
     Proprietor,
@@ -69,6 +75,7 @@ enum BusinessOwnerTitle {
     ManagingMember
 }
 
+@CompileStatic
 enum Title {
     CEO('Chief Executive Officer'),
     COO('Chief Operating Officer'),

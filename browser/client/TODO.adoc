@@ -2,20 +2,23 @@
 
 == Editor
 
-* [line-through]#Save in hidden input in AsciiDoc#
-* [line-through]#Quoting#
-* [line-through]#History#
-* [line-through]#Serialize history#
-* Serialize document (https://stackoverflow.com/questions/40370471/is-it-possible-to-specify-a-static-function-in-a-kotlin-interface)
-* [line-through]#Insert image#
-* [line-through]#Add Buttons#
-* *TQL*, other extensions
-* mode reply
-* edit pane (mono)
-* viewer pane (asynchrone, rendered on server)
-* add refresh attachment list action (see CMS code sample)
-* Turn monospaced only
-* Move save info from CanvasText to ICanvasDump (Asciidoc and Md version)
-* Modify CanvasText with static val that swith from mono to WYSIWYG
+* Autocomplete must be contextualized (using span class);
+* Create contextualized context menu (using span class);
+* Add autocomplete and menu to testEditor Builder.
 
-* dfdf *dfdf*
+
+
+== Rendering
+
+* Split into blocks rendered separately
+* Some blocks would be rendered locally (full text)
+* Some blocks should be rendered into the server
+* By default, everything is rendered into the server when previewing
+* Only editor preview allows local rendering
+
+== Renderer Extension Revival
+
+* It should be possible to extends blocks renderer, it should be simple to add the following renderers:
+** CAD DSL
+** TQL
+

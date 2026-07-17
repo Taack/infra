@@ -5,12 +5,12 @@ import taack.ui.base.element.Block
 import web.dom.document
 import web.html.HTMLAnchorElement
 
-class ContextualLinkEntry(a: HTMLAnchorElement) : BaseAjaxAction(null, a) {
+class ContextualLinkEntry(parent: Block, a: HTMLAnchorElement) : BaseAjaxAction(parent, a) {
     companion object {
 
         fun getDropdownMenu(parent: Block): List<ContextualLinkEntry> {
             return (document.querySelectorAll("a.dropdown-item[href]").asList().map {
-                ContextualLinkEntry(it as HTMLAnchorElement)
+                ContextualLinkEntry(parent, it as HTMLAnchorElement)
             })
         }
     }
