@@ -91,7 +91,7 @@ class ActionIcon {
         boolean hasNextMult = src.contains('*')
         boolean hasNextAdd = src.contains('+')
         if (!hasNextMult && !hasNextAdd) return "<img src='$src' title='${escapeHtml(title)}' ${style?"style='${style.inlineStyle}'":" width='${width}'"}/>"
-        StringBuffer res = new StringBuffer()
+        StringBuilder res = new StringBuilder()
         res << '<span class="iconStack">'
         String currentSrc
         String remainingSrc = src

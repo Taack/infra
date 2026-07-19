@@ -69,7 +69,7 @@ final class DisplayManager {
     }
 
     private class Serializer {
-        final StringBuffer serial = new StringBuffer(128)
+        final StringBuilder serial = new StringBuilder(128)
         boolean spooledMode = false
 
         void write(String s) {
@@ -345,7 +345,7 @@ final class DisplayManager {
     }
 
     private String readInputUntil(char until) {
-        StringBuffer response = new StringBuffer(32)
+        StringBuilder response = new StringBuilder(32)
         char c = ins.read()
         while (c != until) {
             c = ins.read()

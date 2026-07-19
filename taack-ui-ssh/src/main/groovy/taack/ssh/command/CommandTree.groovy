@@ -19,7 +19,7 @@ class CommandTree implements ICommand {
 
         @Override
         String getHelp(int indent) {
-            StringBuffer help = new StringBuffer()
+            StringBuilder help = new StringBuilder()
             help.append(' ' * indent)
             help.append("Sub Command \"${subCommandName}\": ${comment}")
             help.append('\n')
@@ -96,7 +96,7 @@ class CommandTree implements ICommand {
 
         @Override
         String getHelp(int indent) {
-            StringBuffer help = new StringBuffer()
+            StringBuilder help = new StringBuilder()
             help.append(' ' * indent)
             help.append("${argName ? "--${argName}" : ''} ${formatArgType()}: ${comment} (${optional ? 'Optional' : 'Mandatory'})")
             help.append('\n')
@@ -131,7 +131,7 @@ class CommandTree implements ICommand {
 
     @Override
     String getHelp(int indent) {
-        StringBuffer help = new StringBuffer()
+        StringBuilder help = new StringBuilder()
         help.append("Command \"${commandName}\": ${comment}")
         help.append('\n')
         cmdIterator.each {

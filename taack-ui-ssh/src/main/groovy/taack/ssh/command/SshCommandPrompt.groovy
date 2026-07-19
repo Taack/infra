@@ -137,7 +137,7 @@ $styleReset
 
     private String readCommand(InputStream inputStream) {
         char pc = ' '
-        StringBuffer sb = new StringBuffer(128)
+        StringBuilder sb = new StringBuilder(128)
         int cursorPosition = 0
         boolean blockLeftMovements = false
         String lastBuffer = null
@@ -157,10 +157,10 @@ $styleReset
                         if (cursorPosition > 0) {
                             blockLeftMovements = false
                             cursorPosition--
-                            sb = new StringBuffer(sb.substring(0, cursorPosition))
+                            sb = new StringBuilder(sb.substring(0, cursorPosition))
                         } else if (cursorPosition == 0) {
                             blockLeftMovements = true
-                            sb = new StringBuffer(128)
+                            sb = new StringBuilder(128)
                         }
                     }
                 } else if (c == escape) {
@@ -185,7 +185,7 @@ $styleReset
                     } else if (upArrow == escCmd) {
                         if (history.size() > 0 && historyPosition >= 0) {
                             if (!lastBuffer && !sb.toString().empty) lastBuffer = sb.toString()
-                            sb = new StringBuffer(history[historyPosition == 0 ? 0 : --historyPosition])
+                            sb = new StringBuilder(history[historyPosition == 0 ? 0 : --historyPosition])
                             refreshPrompt()
                             out << sb?.toString()?.toCharArray()
                             out << "$escape$clearFromCursorToEol"
@@ -194,8 +194,8 @@ $styleReset
                     } else if (downArrow == escCmd) {
                         if (historyPosition <= history.size() - 1 && lastBuffer) {
                             if (historyPosition == history.size() - 1) {
-                                if (lastBuffer) sb = new StringBuffer(lastBuffer)
-                            } else sb = new StringBuffer(history[++historyPosition])
+                                if (lastBuffer) sb = new StringBuilder(lastBuffer)
+                            } else sb = new StringBuilder(history[++historyPosition])
                             refreshPrompt()
                             out << sb?.toString()
                             cursorPosition = sb.length()
@@ -254,7 +254,7 @@ $styleReset
         out << "$escape[999;999H"
         out << "$escape[6n"
 
-        StringBuffer response = new StringBuffer()
+        StringBuilder response = new StringBuilder()
         char c = inputStream.read()
         while (c != (char) 'R') {
             c = inputStream.read()

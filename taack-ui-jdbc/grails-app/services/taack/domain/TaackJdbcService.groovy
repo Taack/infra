@@ -147,7 +147,7 @@ final class TaackJdbcService {
     }
 
     private static final String hqlFromTranslator(TQLTranslator translator, boolean count = false) {
-        StringBuffer out = new StringBuffer(512)
+        StringBuilder out = new StringBuilder(512)
         if (!count) {
             if (!translator.columns?.isEmpty()) {
                 out.append('select ')

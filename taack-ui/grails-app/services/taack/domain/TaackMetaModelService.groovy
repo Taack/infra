@@ -123,7 +123,7 @@ final class TaackMetaModelService {
     String modelGraph(Class toClass = null) {
         Metamodel metamodel = sessionFactory.getMetamodel()
         final Set<EntityType<?>> types = metamodel.entities
-        StringBuffer res = new StringBuffer()
+        StringBuilder res = new StringBuilder()
         res.append('digraph mygraph {\n' +
                 "  overlap = false;\n${toClass?'layout=circo;\n':''}" +
                 '  node [shape=box];\n')
@@ -153,7 +153,7 @@ final class TaackMetaModelService {
     }
 
     private String enumTransitionGraph(IEnumTransition2 enumTransition2, Set<IEnumTransition2> visited) {
-        StringBuffer ret = new StringBuffer()
+        StringBuilder ret = new StringBuilder()
         for (def et : enumTransition2.transitionsTo(null)) {
             ret << enumTransition2.toString() + ' -> ' + et.toString() + '\n'
         }

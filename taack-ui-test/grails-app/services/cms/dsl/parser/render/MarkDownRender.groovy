@@ -101,7 +101,7 @@ ${CmsHtmlGeneratorService.translateNoMatcher(insert.hat.get(lang) as String)}
             } else {
                 Pattern pattern = Pattern.compile(';')
                 String[] argument_splited = pattern.split("${insert.additionalClasses}")
-                StringBuffer output = new StringBuffer()
+                StringBuilder output = new StringBuilder()
                 for (int i = 0; i < argument_splited.length; i++) {
                     List<String> elementName = ['Dash', 'Circle', 'A']
 
@@ -163,7 +163,7 @@ ${insert.title.get(lang)}
 <div class='application' style="width: ${aim.width}px; margin: auto;">
 <img src="/cms/mediaPreview/${aim.id}" alt="${aim.altText?.get(lang)}" $arguments/>
 """
-        StringBuffer body = new StringBuffer(header)
+        StringBuilder body = new StringBuilder(header)
         println aim
         (CmsInsert.findAllByImageApplication(aim) as List<CmsInsert>).each { CmsInsert it ->
             println it

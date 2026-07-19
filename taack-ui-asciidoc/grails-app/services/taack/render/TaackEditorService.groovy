@@ -122,7 +122,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
                 resourceFile.createNewFile()
                 resourceFile.text = Asciidoc.getContentHtml(resource.text, '', false)
             }
-            StringBuffer out = new StringBuffer()
+            StringBuilder out = new StringBuilder()
             out.append resourceFile.text
 
             Resource r = assetResourceLocator.findResourceForURI('asciidoc.js')
@@ -221,7 +221,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
         ''
     }
 
-    private void treeNode(ISaveImage iSaveImage, OdfPackage odfPackage, NodeList entry, StringBuffer asciidoc, Node... parents) {
+    private void treeNode(ISaveImage iSaveImage, OdfPackage odfPackage, NodeList entry, StringBuilder asciidoc, Node... parents) {
         int indent = parents ? parents.size() : 0
         for (int i = 0; i < entry.length; i++) {
             Node n = entry.item(i)
@@ -281,7 +281,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
     String convert(ISaveImage iSaveImage, InputStream inputStream) {
         OdfDocument d = OdfDocument.loadDocument(inputStream)
         OdfPackage pack = d.package
-        StringBuffer r = new StringBuffer()
+        StringBuilder r = new StringBuilder()
         treeNode(iSaveImage, pack, d.contentDom.rootElement.childNodes, r)
 
         if (debug) println r
@@ -292,7 +292,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
     String convertFromHtml(String html) {
         Document doc = Jsoup.parse(html)
         Elements newsHeadlines = doc.select("h1,h2,h3,h4,p,table,tr,td,li,ol,ul,br,b,i,span,font")
-        StringBuffer asciidoc = new StringBuffer()
+        StringBuilder asciidoc = new StringBuilder()
         Element table = null
         Iterator<TextNode> pWithStyle = null
         for (Element headline : newsHeadlines) {
@@ -367,7 +367,7 @@ final class TaackEditorService implements WebAttributes, DataBinder {
     }
 
     String bodySlideshow(boolean controls, boolean progress, int autoSlide, int height, String content, Long id = null) {
-        StringBuffer innerHtml = new StringBuffer(4096)
+        StringBuilder innerHtml = new StringBuilder(4096)
         innerHtml.append """
 :revealjs_controls: ${controls}
 :revealjs_progress: ${progress}

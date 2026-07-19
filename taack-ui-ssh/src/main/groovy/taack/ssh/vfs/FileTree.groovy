@@ -91,7 +91,7 @@ final class FileTree {
         }
 
         String getRemoteName() {
-            StringBuffer p = new StringBuffer()
+            StringBuilder p = new StringBuilder()
             Folder f = this
             while(f) {
                 p.insert(0, '/' + f.name)

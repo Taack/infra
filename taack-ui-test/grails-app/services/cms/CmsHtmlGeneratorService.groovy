@@ -24,7 +24,7 @@ class CmsHtmlGeneratorService {
         int index = body.indexOf('${')
         if (index == -1) return body
         int previousIndex = 0
-        StringBuffer res = new StringBuffer()
+        StringBuilder res = new StringBuilder()
         Parser p = new Parser(lang)
         while (index != -1) {
             res.append(body.substring(previousIndex, index))

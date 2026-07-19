@@ -93,7 +93,7 @@ final class TaackUiPdfService implements WebAttributes, DataBinder {
         ByteArrayOutputStream blockStream = new ByteArrayOutputStream(8_000)
         RawHtmlPrintableDump htmlPdf = new RawHtmlPrintableDump(blockStream, new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.PDF))
         printableSpecifier.visitPrintableBlock(htmlPdf)
-        final StringBuffer css = new StringBuffer()
+        final StringBuilder css = new StringBuilder()
         final listCss = [
                 'taack.css',
                 'taack-pdf.css',

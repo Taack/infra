@@ -137,10 +137,10 @@ final class TaackFilter<T extends GormEntity<T>> {
         joinEntityMap[path.substring(0, path.lastIndexOf('.'))]
     }
 
-    private final StringBuffer buildJoinClause(StringBuffer join = null, JoinEntity joinEntity = null) {
+    private final StringBuilder buildJoinClause(StringBuilder join = null, JoinEntity joinEntity = null) {
         Collection<JoinEntity> joins
         if (!join) {
-            join = new StringBuffer()
+            join = new StringBuilder()
         }
         if (!joinEntity) joins = getRoots()
         else joins = joinEntity.getChildren(true)
@@ -474,8 +474,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                 where << 'sc.id is null'
             }
         }
-        StringBuffer from = new StringBuffer("from ${simpleClassName} sc")
-        StringBuffer join = new StringBuffer()
+        StringBuilder from = new StringBuilder("from ${simpleClassName} sc")
+        StringBuilder join = new StringBuilder()
         int occ = 0
 
         Map<String, Object> namedParams = [:]
@@ -654,7 +654,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                                 namedParams.put('np' + occ, entry.value.toString().toUpperCase())
                             }
                         } else {
-                            StringBuffer tmp = new StringBuffer()
+                            StringBuilder tmp = new StringBuilder()
                             tmp.append(' (')
                             Integer index = 0
                             entryValue.tokenize(',').each { String it ->
