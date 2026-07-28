@@ -6,6 +6,7 @@ import jdk.internal.ValueBased
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.dsl.helper.Utils
 
+import java.util.regex.Pattern
 import java.util.zip.Deflater
 
 @CompileStatic
@@ -19,7 +20,7 @@ final class SpanRegex {
         INLINED, INLINED_BREAK, START, CONTEXT_START, START_CHAR_SEQ, CONTEXT_END, META
     }
 
-    SpanRegex(String pattern, String className, Mode inlined) {
+    SpanRegex(CharSequence pattern, String className, Mode inlined) {
         this.pattern = pattern
         this.className = className
         this.inlined = inlined
