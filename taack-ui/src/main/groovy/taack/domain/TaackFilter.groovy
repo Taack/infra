@@ -376,6 +376,10 @@ final class TaackFilter<T extends GormEntity<T>> {
                     where << ("sc.${filterExpression.fieldName} is empty" as String)
                     occ++
                     break
+                case Operator.IS_NOT_EMPTY:
+                    where << ("sc.${filterExpression.fieldName} is not empty" as String)
+                    occ++
+                    break
             }
         }
         return occ
