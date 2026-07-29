@@ -41,7 +41,7 @@ enum TaackBaseAsciidocMenuEntries {
 
 @CompileStatic
 enum TaackBaseAsciidocSpans {
-    DOCUMENT(new SpanRegex(/= /, "asciidoc-h1", SpanRegex.Mode.START)),
+    DOCUMENT(new SpanRegex('= ', "asciidoc-h1", SpanRegex.Mode.START)),
     HEADER1(new SpanRegex('== ', "asciidoc-h2", SpanRegex.Mode.START)),
     HEADER2(new SpanRegex('=== ', "asciidoc-h3", SpanRegex.Mode.START)),
     HEADER3(new SpanRegex('==== ', "asciidoc-h4", SpanRegex.Mode.START)),
@@ -55,7 +55,6 @@ enum TaackBaseAsciidocSpans {
     UNORDERED_LIST2(new SpanRegex('** ', "asciidoc-b2", SpanRegex.Mode.START_CHAR_SEQ)),
     UNORDERED_LIST3(new SpanRegex('*** ', "asciidoc-b3", SpanRegex.Mode.START_CHAR_SEQ)),
 
-//    UNCONSTRAINED_BOLD(new SpanRegex(/()(\\*\\*(?!.*\\*\\*)\\*\\*)()/, "asciidoc-bold unconstrained", SpanRegex.Mode.INLINED)),
     UNCONSTRAINED_BOLD(new SpanRegex(/()(\\*\\*(?:(?!\\*\\*).)*\\*\\*)()/, "asciidoc-bold unconstrained", SpanRegex.Mode.INLINED)),
     UNCONSTRAINED_ITALIC(new SpanRegex('([^_]?)(__[^_]*__)([^_]?)', "asciidoc-italic", SpanRegex.Mode.INLINED)),
     UNCONSTRAINED_MONO(new SpanRegex('[^`]``([^`]*)``[^`]', "asciidoc-mono", SpanRegex.Mode.INLINED)),
@@ -113,9 +112,9 @@ enum TaackBaseAsciidocAutocomplete {
 
 @CompileStatic
 enum TaackAsciidocTable {
-    TABLE_DELIM_START(new SpanRegex("^()(\\\\|===)()\$", "asciidoc-table-sep", SpanRegex.Mode.CONTEXT_START)),
-    CELL_SEP(new SpanRegex("()(\\\\|)([^=])", "asciidoc-table-cell-sep", SpanRegex.Mode.INLINED)),
-    TABLE_DELIM_END(new SpanRegex("^()(\\\\|===)()\$", "asciidoc-table-sep", SpanRegex.Mode.CONTEXT_END))
+    TABLE_DELIM_START(new SpanRegex(/^()(\\|===)()\$/, "asciidoc-table-sep", SpanRegex.Mode.CONTEXT_START)),
+    CELL_SEP(new SpanRegex(/()(\\|)([^=])/, "asciidoc-table-cell-sep", SpanRegex.Mode.INLINED)),
+    TABLE_DELIM_END(new SpanRegex(/^()(\\|===)()$/, "asciidoc-table-sep", SpanRegex.Mode.CONTEXT_END))
 
     TaackAsciidocTable(SpanRegex span) {
         this.span = span
