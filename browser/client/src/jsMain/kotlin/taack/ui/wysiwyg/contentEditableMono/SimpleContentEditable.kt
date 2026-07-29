@@ -577,9 +577,7 @@ class SimpleContentEditable(
             var txtCursor = 0
             outerWhile@ while (txt!!.length > txtCursor) {
                 var inContext = false
-
                 for (entry in entries) {
-                    println("txtCursor: $entry $inContext")
                     if (entry.inlined == SpanMode.CONTEXT_START) {
                         inContext = true
                         break
@@ -590,30 +588,36 @@ class SimpleContentEditable(
                             break
                         }
                     }
-                    if (inContext) break
+                    if (inContext) {
+                        break
+                    }
 
                     if (txtCursor == 0) {
                         if (entry.inlined == SpanMode.START_CHAR_SEQ) {
-                            if (txt!!.startsWith(entry.pattern)) {
+                            if (txt.startsWith(entry.pattern)) {
                                 hasStartCharSeq = entry
-                                txt = txt.substring(entry.pattern.length)
+                                txtCursor = entry.pattern.length
+                                break
                             }
                         }
                     }
 
                     if (txtCursor == 0 && entry.inlined == SpanMode.START && hasStart == null) {
-                        if (txt!!.startsWith(entry.pattern)) {
+                        if (txt.startsWith(entry.pattern)) {
                             hasStart = entry
-                            break
+                            break@outerWhile
                         }
                     } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
                         val pattern = entry.pattern
                         val regex = Regex(pattern)
-                        val s = regex.find(txt!!, txtCursor)
-                        if (s != null && s.range.first == txtCursor) {
-                            txtCursor = s.range.last + 1
-                            inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
-                            continue@outerWhile
+
+                        if (txtCursor < txt.length) {
+                            val s = regex.find(txt, txtCursor)
+                            if (s != null && s.range.first == txtCursor) {
+                                txtCursor = s.range.last
+                                inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
+                                break
+                            }
                         }
                         if (entry.inlined == SpanMode.INLINED_BREAK) break
                         if (entry.inlined == SpanMode.CONTEXT_START && currentContext == null) {
@@ -628,13 +632,13 @@ class SimpleContentEditable(
                 txtCursor++
             }
 
+            var i = 0
             var result: String = (if (hasStartCharSeq != null) {
+                i += hasStartCharSeq.pattern.length
                 """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
             } else "")
-            val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
 
-            var i = 0
-            for (c in sorted) {
+            for (c in inlineMatchSequence) {
                 val spanStyle: Span = c.first
                 val match: MatchResult = c.second
                 val start = match.range.first
