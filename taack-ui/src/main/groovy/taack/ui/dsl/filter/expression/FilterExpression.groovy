@@ -11,7 +11,8 @@ enum Operator {
     LT,
     IL,
     GT,
-    IS_EMPTY
+    IS_EMPTY,
+    IS_NOT_EMPTY
 }
 
 @CompileStatic

@@ -466,6 +466,101 @@ class SimpleContentEditable(
         return str?.replace("&", "&amp;")?.replace("<", "&lt;")?.replace(">", "&gt;")
     }
 
+//    fun asciidocToHtml(e: HTMLDivElement) {
+//        trace("asciidocToHtml +++ ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
+//        var txt = escapeHtml(e.textContent)
+//        if (txt?.isEmpty() == true) {
+//            e.innerHTML = HtmlSource("<br>")
+//            return
+//        }
+//        if (txt != null) {
+//            var hasStart: Span? = null
+//            var hasStartCharSeq: Span? = null
+//            var inlineMatchSequence: List<Pair<Span, MatchResult>> = mutableListOf<Pair<Span, MatchResult>>()
+//            val entries = styles[currentContext]!!
+//            var inContext = false
+//
+//            for (entry in entries) {
+//                if (entry.inlined == SpanMode.CONTEXT_START) {
+//                    inContext = true
+//                    break
+//                }
+//                if (entry.inlined == SpanMode.CONTEXT_END) {
+//                    if (inContext && txt!!.startsWith(entry.pattern)) {
+//                        inContext = false
+//                        break
+//                    }
+//                }
+//                if (inContext) break
+//
+//                if (entry.inlined == SpanMode.START_CHAR_SEQ) {
+//                    if (txt!!.startsWith(entry.pattern)) {
+//                        hasStartCharSeq = entry
+//                        txt = txt.substring(entry.pattern.length)
+//                    }
+//                }
+//
+//                if (entry.inlined == SpanMode.START && hasStart == null) {
+//                    if (txt!!.startsWith(entry.pattern)) {
+//                        hasStart = entry
+//                        break
+//                    }
+//                } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
+//                    val pattern = entry.pattern
+//                    val regex = Regex(pattern)
+//                    if (regex.containsMatchIn(txt!!)) {
+//                        for (s in regex.findAll(txt)) {
+//                            inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
+//                        }
+//                        if (entry.inlined == SpanMode.INLINED_BREAK) break
+//                        if (entry.inlined == SpanMode.CONTEXT_START && currentContext == null) {
+//                            currentContext = entry
+//                            break
+//                        } else if (entry.inlined == SpanMode.CONTEXT_END && currentContext != null) {
+//                            currentContext = null
+//                            break
+//                        }
+//                    }
+//                }
+//            }
+//            var result: String = (if (hasStartCharSeq != null) {
+//                """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
+//            } else "")
+//            val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
+//
+//            var i = 0
+//            for (c in sorted) {
+//                val spanStyle: Span = c.first
+//                val match: MatchResult = c.second
+//                val start = match.range.first
+//                val ends = match.range.endInclusive
+//                val replace =
+//                    """${match.groupValues[1]}<span typeInlined="${spanStyle.inlined}" class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
+//                result += txt!!.substring(i..<start) + replace
+//                i = ends + 1
+//            }
+//            result += txt!!.substring(i)
+//
+//            if (hasStart != null) {
+//                val cn = hasStart.className
+//                result = """<span class="$cn">$result</span>"""
+//            }
+//
+//            if (e.innerHTML.toString() != result) {
+//                val n = currentNode
+//                val p = selectedElementPosition
+//                var i = 0
+//                e.childNodes.asList().forEachIndexed { index, node ->
+//                    if (node == n || node == n?.parentNode) i = index
+//                }
+//                e.innerHTML = HtmlSource(result)
+//                updateSelection(e, n, p, i)
+//            }
+//        }
+//        trace("asciidocToHtml --- ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
+////        TODO: window.getSelection()?.setPosition(e.childNodes[e.childElementCount], )
+//    }
+
     fun asciidocToHtml(e: HTMLDivElement) {
         trace("asciidocToHtml +++ ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
         var txt = escapeHtml(e.textContent)
@@ -478,39 +573,51 @@ class SimpleContentEditable(
             var hasStartCharSeq: Span? = null
             var inlineMatchSequence: List<Pair<Span, MatchResult>> = mutableListOf<Pair<Span, MatchResult>>()
             val entries = styles[currentContext]!!
-            var inContext = false
 
-            for (entry in entries) {
-                if (entry.inlined == SpanMode.CONTEXT_START) {
-                    inContext = true
-                    break
-                }
-                if (entry.inlined == SpanMode.CONTEXT_END) {
-                    if (inContext && txt!!.startsWith(entry.pattern)) {
-                        inContext = false
+            var txtCursor = 0
+            outerWhile@ while (txt!!.length > txtCursor) {
+                var inContext = false
+                for (entry in entries) {
+                    if (entry.inlined == SpanMode.CONTEXT_START) {
+                        inContext = true
                         break
                     }
-                }
-                if (inContext) break
-
-                if (entry.inlined == SpanMode.START_CHAR_SEQ) {
-                    if (txt!!.startsWith(entry.pattern)) {
-                        hasStartCharSeq = entry
-                        txt = txt.substring(entry.pattern.length)
+                    if (entry.inlined == SpanMode.CONTEXT_END) {
+                        if (inContext && txt!!.startsWith(entry.pattern)) {
+                            inContext = false
+                            break
+                        }
                     }
-                }
-
-                if (entry.inlined == SpanMode.START && hasStart == null) {
-                    if (txt!!.startsWith(entry.pattern)) {
-                        hasStart = entry
+                    if (inContext) {
                         break
                     }
-                } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
-                    val pattern = entry.pattern
-                    val regex = Regex(pattern)
-                    if (regex.containsMatchIn(txt!!)) {
-                        for (s in regex.findAll(txt)) {
-                            inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
+
+                    if (txtCursor == 0) {
+                        if (entry.inlined == SpanMode.START_CHAR_SEQ) {
+                            if (txt.startsWith(entry.pattern)) {
+                                hasStartCharSeq = entry
+                                txtCursor = entry.pattern.length
+                                break
+                            }
+                        }
+                    }
+
+                    if (txtCursor == 0 && entry.inlined == SpanMode.START && hasStart == null) {
+                        if (txt.startsWith(entry.pattern)) {
+                            hasStart = entry
+                            break@outerWhile
+                        }
+                    } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
+                        val pattern = entry.pattern
+                        val regex = Regex(pattern)
+
+                        if (txtCursor < txt.length) {
+                            val s = regex.find(txt, txtCursor)
+                            if (s != null && s.range.first == txtCursor) {
+                                txtCursor = s.range.last
+                                inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
+                                break
+                            }
                         }
                         if (entry.inlined == SpanMode.INLINED_BREAK) break
                         if (entry.inlined == SpanMode.CONTEXT_START && currentContext == null) {
@@ -522,14 +629,16 @@ class SimpleContentEditable(
                         }
                     }
                 }
+                txtCursor++
             }
-            var result: String = (if (hasStartCharSeq != null) {
-                """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
-            } else "")
-            val sorted = inlineMatchSequence.sortedBy { it.second.range.first }
 
             var i = 0
-            for (c in sorted) {
+            var result: String = (if (hasStartCharSeq != null) {
+                i += hasStartCharSeq.pattern.length
+                """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
+            } else "")
+
+            for (c in inlineMatchSequence) {
                 val spanStyle: Span = c.first
                 val match: MatchResult = c.second
                 val start = match.range.first
@@ -600,7 +709,7 @@ class SimpleContentEditable(
                     createLineNumbers()
                 }
             }
-        } // else divContent.appendChild(appendDivToContent("<br>"))
+        }
     }
 
 }
