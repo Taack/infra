@@ -1,6 +1,7 @@
 package taack.ui.dsl.diagram
 
 import grails.util.Holders
+import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.render.TaackUiEnablerService
@@ -64,15 +65,23 @@ final class DiagramOption {
             this
         }
 
-        DiagramOptionBuilder setClickAction(MethodClosure action, Long id = null, Map params = null) {
-            if ((Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService).hasAccess(action, id, params)) {
+        DiagramOptionBuilder setClickAction(MethodClosure action, Map params) {
+            setClickAction(action, null, params, null)
+        }
+
+        DiagramOptionBuilder setClickAction(MethodClosure action, Validateable validateable) {
+            setClickAction(action, null, null, validateable)
+        }
+
+        DiagramOptionBuilder setClickAction(MethodClosure action, Long id = null, Map params = null, Validateable validateable = null) {
+            params ?= [:]
+            if (validateable?.validate()) {
+                params.putAll(Parameter.validateableToMap(validateable))
+            }
+            if ((Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService).hasAccess(action, params)) {
                 diagramOption.clickActionUrl = (new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(Utils.getControllerName(action), action.method, id, params)
             }
             this
-        }
-
-        DiagramOptionBuilder setClickAction(MethodClosure action, Map params) {
-            setClickAction(action, null, params)
         }
 
         DiagramOptionBuilder setMaxDataNumberToShowByDefault(int maxDataNumber) {
