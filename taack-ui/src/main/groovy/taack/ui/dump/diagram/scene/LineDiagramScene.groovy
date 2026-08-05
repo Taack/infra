@@ -9,6 +9,7 @@ class LineDiagramScene extends ScatterDiagramScene {
     LineDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption) {
         super(render, dataPerKey, diagramOption, [])
         this.dataPointRadius /= 4
+        this.dataPointClickableRadius /= 2
     }
 
     @Override

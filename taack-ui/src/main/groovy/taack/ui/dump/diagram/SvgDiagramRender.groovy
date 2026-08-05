@@ -62,7 +62,7 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void fillStyle(Color color) {
-        fillStyle = "rgb(${color.red}, ${color.green}, ${color.blue})"
+        fillStyle = color.alpha > 0 ? "rgb(${color.red}, ${color.green}, ${color.blue})" : 'transparent'
     }
 
     @Override
