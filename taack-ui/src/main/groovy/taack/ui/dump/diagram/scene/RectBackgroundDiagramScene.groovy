@@ -217,16 +217,25 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             render.renderLine(render.getDiagramWidth() - (DIAGRAM_MARGIN_LEFT - BACKGROUND_LINE_EXCEED_DIAGRAM) - DIAGRAM_MARGIN_RIGHT, 0.0)
 
             // y axis label
-            String yLabel = "${gapY < 1 ? (endLabelY - gapY * i).round(1) : (endLabelY - gapY * i).toInteger()}"
-            if (render.measureText(yLabel) <= DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN) {
-                render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
-                render.renderLabel(yLabel)
-            } else {
-                while (render.measureSmallText(yLabel) > DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN) {
-                    yLabel = yLabel.substring(0, yLabel.size() - 6) + '...'
+            BigDecimal y = endLabelY - gapY * i
+            while (y % 1 != 0) {
+                String yLabel = numberToString(y)
+                if (render.measureText(yLabel) <= DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN) {
+                    break
+                } else {
+                    int decimalPlace = y.toString().length() - y.toString().indexOf('.') - 1
+                    y = y.round(Math.max(0, decimalPlace - 3))
                 }
-                render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureSmallText(yLabel), diagramMarginTop + gapHeight * i - fontSize * render.SMALL_LABEL_RATE / 2)
-                render.renderSmallLabel(yLabel)
+            }
+            for (unit in ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi']) {
+                String yLabel = numberToString(y) + unit
+                if (render.measureText(yLabel) <= DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN) {
+                    render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
+                    render.renderLabel(yLabel)
+                    break
+                } else {
+                    y = (y / 1000).round(1)
+                }
             }
         }
         render.renderGroupEnd()
