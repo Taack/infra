@@ -88,26 +88,40 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     }
 
     @Override
-    void visitColumn(String i18n, Style style, MethodClosure action, Map<String, ? extends Object> params) {
+    void visitColumn(MethodClosure action, Map<String, ? extends Object> params) {
         blockLog.logEnterBlock('visitColumn')
         blockLog.savePosition()
         HTMLDiv columnDiv = new HTMLDiv().builder.addClasses('kanban-column col m-2')
                 .putAttribute('kanbanColumnIndex', "column${columnIndex++}")
                 .putAttribute('taackDropAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
                 .setTaackTag(TaackTag.KANBAN_COL).build() as HTMLDiv
-        HTMLDiv headerDiv = new HTMLDiv().builder.addClasses(style?.cssClassesString ?: 'kanban-column-header')
-                .addChildren(new HTMLDiv().builder.addChildren(new HTMLTxtContent(i18n)).build()).build() as HTMLDiv
-        if (style?.cssStyleString) headerDiv.builder.putAttribute('style', style.cssStyleString).build()
-        if (i18n) headerDiv.builder.addChildren(new HTMLButton(SVG_MINIMIZE).builder.addClasses('close-btn').build())
-        HTMLDiv bodyDiv = new HTMLDiv().builder.addClasses('kanban-column-body').build() as HTMLDiv
-        columnDiv.builder.addChildren(headerDiv, bodyDiv)
         blockLog.topElement.builder.addChildren(columnDiv)
-        blockLog.topElement = bodyDiv
+        blockLog.topElement = columnDiv
     }
 
     @Override
     void visitColumnEnd() {
         blockLog.logExitBlock('visitColumnEnd')
+        blockLog.restorePosition()
+    }
+
+    @Override
+    void visitColumnHeader(String i18n, Style style) {
+        blockLog.logEnterBlock('visitColumnHeader')
+        HTMLDiv headerDiv = new HTMLDiv().builder.addClasses(style?.cssClassesString ?: 'kanban-column-header')
+                .addChildren(new HTMLDiv().builder.addChildren(new HTMLTxtContent(i18n)).build()).build() as HTMLDiv
+        if (style?.cssStyleString) headerDiv.builder.putAttribute('style', style.cssStyleString).build()
+        if (i18n) headerDiv.builder.addChildren(new HTMLButton(SVG_MINIMIZE).builder.addClasses('close-btn').build())
+        HTMLDiv bodyDiv = new HTMLDiv().builder.addClasses('kanban-column-body').build() as HTMLDiv
+        blockLog.topElement.builder.addChildren(headerDiv, bodyDiv)
+        blockLog.topElement = bodyDiv
+        blockLog.savePosition()
+        blockLog.topElement = headerDiv
+    }
+
+    @Override
+    void visitColumnHeaderEnd() {
+        blockLog.logExitBlock('visitColumnHeaderEnd')
         blockLog.restorePosition()
     }
 

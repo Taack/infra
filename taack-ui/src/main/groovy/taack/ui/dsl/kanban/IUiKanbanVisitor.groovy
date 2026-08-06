@@ -18,7 +18,11 @@ interface IUiKanbanVisitor {
 
     void visitKanbanEnd()
 
-    void visitColumn(String i18n, Style style, MethodClosure action, Map<String, ? extends Object> params)
+    void visitColumnHeader(String i18n, Style style)
+
+    void visitColumnHeaderEnd()
+
+    void visitColumn(MethodClosure action, Map<String, ? extends Object> params)
 
     void visitColumnEnd()
 
