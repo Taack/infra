@@ -4,6 +4,7 @@ import grails.util.Pair
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
+import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ast.type.WidgetKind
@@ -77,9 +78,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     static final <T> String dataFormat(T value, String format, Locale locale = null) {
         if (value == null) return ''
         switch (value.class) {
-            case BigDecimal:
-                DecimalFormat df = new DecimalFormat(format ?: '#,###.00')
-                return df.format(value)
+            case Number:
+                return NumberFormat.getInstance(locale ?: LocaleContextHolder.locale).format(value)
             case Date:
                 SimpleDateFormat sdf = new SimpleDateFormat(format ?: 'yyyy-MM-dd')
                 return sdf.format(value)

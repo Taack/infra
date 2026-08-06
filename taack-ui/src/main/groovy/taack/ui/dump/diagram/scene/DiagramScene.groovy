@@ -1,10 +1,12 @@
 package taack.ui.dump.diagram.scene
 
 import groovy.transform.CompileStatic
+import org.springframework.context.i18n.LocaleContextHolder
 import taack.ui.dsl.diagram.DiagramOption
 import taack.ui.dump.diagram.IDiagramRender
 
 import java.awt.Color
+import java.text.NumberFormat
 
 @CompileStatic
 enum ElementType {
@@ -54,6 +56,12 @@ abstract class DiagramScene {
     final protected Color BLACK_COLOR = new Color(64, 64, 64)
     final protected Color GREY_COLOR = new Color(231, 231, 231)
 
+    private NumberFormat nf = NumberFormat.getInstance(LocaleContextHolder.locale)
+
+    String numberToString(BigDecimal n) {
+        return nf.format(n)
+    }
+
     Color getKeyColor(int i) {
         if (i >= 0) {
             List<Color> colors = diagramOption?.keyColors ?: KeyColor.values()*.color
@@ -61,10 +69,6 @@ abstract class DiagramScene {
         } else {
             return GREY_COLOR
         }
-    }
-
-    static String numberToString(BigDecimal n) {
-        return n.toDouble() % 1 == 0 ? "${n.toInteger()}" : "$n"
     }
 
     BigDecimal drawTitle() {
