@@ -58,6 +58,7 @@ final class Parameter implements WebAttributes {
     final boolean testI18n
     final Integer tabIndex
     final Integer tabId
+    final boolean compactMode
     static ApplicationTagLib applicationTagLib = null
     static ThemeService uiThemeService = null
     boolean isModal = false
@@ -92,6 +93,7 @@ final class Parameter implements WebAttributes {
         this.nf = lcl ? NumberFormat.getInstance(lcl) : null
         this.tabIndex = params.get('tabIndex') ? params.int('tabIndex') : null
         this.tabId = params.get('tabId') ? params.int('tabId') : null
+        this.compactMode = params.get('compactMode') ? params.boolean('compactMode') : null
         if (!applicationTagLib) applicationTagLib = grailsApplication.mainContext.getBean(ApplicationTagLib)
         if (!uiThemeService) uiThemeService = grailsApplication.mainContext.getBean(ThemeService)
     }
