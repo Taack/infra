@@ -218,8 +218,16 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
             // y axis label
             String yLabel = "${gapY < 1 ? (endLabelY - gapY * i).round(1) : (endLabelY - gapY * i).toInteger()}"
-            render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
-            render.renderLabel(yLabel)
+            if (render.measureText(yLabel) <= DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN) {
+                render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureText(yLabel), diagramMarginTop + gapHeight * i - fontSize / 2)
+                render.renderLabel(yLabel)
+            } else {
+                while (render.measureSmallText(yLabel) > DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN) {
+                    yLabel = yLabel.substring(0, yLabel.size() - 6) + '...'
+                }
+                render.translateTo(DIAGRAM_MARGIN_LEFT - AXIS_LABEL_MARGIN - render.measureSmallText(yLabel), diagramMarginTop + gapHeight * i - fontSize * render.SMALL_LABEL_RATE / 2)
+                render.renderSmallLabel(yLabel)
+            }
         }
         render.renderGroupEnd()
     }
