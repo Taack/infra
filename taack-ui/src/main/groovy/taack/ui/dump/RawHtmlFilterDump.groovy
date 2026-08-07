@@ -72,6 +72,7 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
             if (aClass.name) mapAdditionalHiddenParams.put 'className', new HTMLInput(InputType.HIDDEN, aClass.name, 'className')
             if (parameter.fieldName) mapAdditionalHiddenParams.put 'fieldName', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
             if (parameter.tabIndex != null) mapAdditionalHiddenParams.put 'tabIndex', new HTMLInput(InputType.HIDDEN, parameter.tabIndex, 'tabIndex')
+            if (parameter.compactMode) mapAdditionalHiddenParams.put 'compactMode', new HTMLInput(InputType.HIDDEN, parameter.compactMode, 'compactMode')
 
             additionalParams?.each {
                 if (it.value instanceof Map) {
