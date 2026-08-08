@@ -158,13 +158,13 @@ class ContextualLink(private val parent: Block, a: HTMLSpanElement, className: S
         if (t != null && div != null) {
             val tId = t.getAttribute("taacktableid") ?: t.getAttribute("taackkanbanid")
             val ajaxBlockId = div.getAttribute("ajaxblockid")!!
-            if (t.nextElementSibling == null) { // Exclude the case where the table has no filter
-                val filter: Filter? = parent.ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)
-                if (filter != null) {
-                    formData = FormData(filter.f)
+            val filter: Filter? = parent.ajaxBlockElements[ajaxBlockId]?.filters?.get(tId + ajaxBlockId)
+            if (filter != null) {
+                formData = FormData(filter.f)
+                formData.set("ajaxBlockId", filter.parent.blockId)
+                if (t.nextElementSibling == null) {
                     formData.set("refresh", "true")
                     formData.set("filterTableId", filter.filterId)
-                    formData.set("ajaxBlockId", filter.parent.blockId)
                 }
             }
         }

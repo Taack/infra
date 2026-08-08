@@ -78,13 +78,8 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
         }
 
         if (parameter.sort) mapAdditionalHiddenParams.put 'sort', new HTMLInput(InputType.HIDDEN, parameter.sort, 'sort')
-        if (parameter.order) mapAdditionalHiddenParams.put 'order', new HTMLInput(InputType.HIDDEN, parameter.order, 'order')
-        if (parameter.offset) mapAdditionalHiddenParams.put 'offset', new HTMLInput(InputType.HIDDEN, parameter.offset, 'offset')
-        if (parameter.max) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.max, 'max')
-        if (parameter.beanId) mapAdditionalHiddenParams.put 'id', new HTMLInput(InputType.HIDDEN, parameter.beanId, 'id')
-        if (parameter.applicationTagLib.params['grouping']) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.params['grouping'], 'grouping')
-        if (parameter.fieldName) mapAdditionalHiddenParams.put 'max', new HTMLInput(InputType.HIDDEN, parameter.fieldName, 'fieldName')
         if (parameter.tabIndex != null) mapAdditionalHiddenParams.put 'tabIndex', new HTMLInput(InputType.HIDDEN, parameter.tabIndex, 'tabIndex')
+        if (parameter.compactMode) mapAdditionalHiddenParams.put 'compactMode', new HTMLInput(InputType.HIDDEN, parameter.compactMode, 'compactMode')
 
         initialForm.builder.addClasses('filter', 'rounded-3').putAttribute('taackFilterId', blockId).build()
 
@@ -93,26 +88,40 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
     }
 
     @Override
-    void visitColumn(String i18n, Style style, MethodClosure action, Map<String, ? extends Object> params) {
+    void visitColumn(MethodClosure action, Map<String, ? extends Object> params) {
         blockLog.logEnterBlock('visitColumn')
         blockLog.savePosition()
         HTMLDiv columnDiv = new HTMLDiv().builder.addClasses('kanban-column col m-2')
                 .putAttribute('kanbanColumnIndex', "column${columnIndex++}")
                 .putAttribute('taackDropAction', action ? parameter.urlMapped(Utils.getControllerName(action), action.method.toString(), params) : null)
                 .setTaackTag(TaackTag.KANBAN_COL).build() as HTMLDiv
-        HTMLDiv headerDiv = new HTMLDiv().builder.addClasses(style?.cssClassesString ?: 'kanban-column-header')
-                .addChildren(new HTMLDiv().builder.addChildren(new HTMLTxtContent(i18n)).build()).build() as HTMLDiv
-        if (style?.cssStyleString) headerDiv.builder.putAttribute('style', style.cssStyleString).build()
-        if (i18n) headerDiv.builder.addChildren(new HTMLButton(SVG_MINIMIZE).builder.addClasses('close-btn').build())
-        HTMLDiv bodyDiv = new HTMLDiv().builder.addClasses('kanban-column-body').build() as HTMLDiv
-        columnDiv.builder.addChildren(headerDiv, bodyDiv)
         blockLog.topElement.builder.addChildren(columnDiv)
-        blockLog.topElement = bodyDiv
+        blockLog.topElement = columnDiv
     }
 
     @Override
     void visitColumnEnd() {
         blockLog.logExitBlock('visitColumnEnd')
+        blockLog.restorePosition()
+    }
+
+    @Override
+    void visitColumnHeader(String i18n, Style style) {
+        blockLog.logEnterBlock('visitColumnHeader')
+        HTMLDiv headerDiv = new HTMLDiv().builder.addClasses(style?.cssClassesString ?: 'kanban-column-header')
+                .addChildren(new HTMLDiv().builder.addChildren(new HTMLTxtContent(i18n)).build()).build() as HTMLDiv
+        if (style?.cssStyleString) headerDiv.builder.putAttribute('style', style.cssStyleString).build()
+        if (i18n) headerDiv.builder.addChildren(new HTMLButton(SVG_MINIMIZE).builder.addClasses('close-btn').build())
+        HTMLDiv bodyDiv = new HTMLDiv().builder.addClasses('kanban-column-body').build() as HTMLDiv
+        blockLog.topElement.builder.addChildren(headerDiv, bodyDiv)
+        blockLog.topElement = bodyDiv
+        blockLog.savePosition()
+        blockLog.topElement = headerDiv
+    }
+
+    @Override
+    void visitColumnHeaderEnd() {
+        blockLog.logExitBlock('visitColumnHeaderEnd')
         blockLog.restorePosition()
     }
 
