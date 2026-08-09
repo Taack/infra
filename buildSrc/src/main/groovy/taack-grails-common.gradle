@@ -36,7 +36,6 @@ dependencies {
 //    console "org.apache.grails:grails-console"
     runtimeOnly "cloud.wondrify:asset-pipeline-grails"
     runtimeOnly "com.zaxxer:HikariCP"
-    runtimeOnly "org.fusesource.jansi:jansi"
     implementation "org.apache.grails:grails-spring-security:${grailsSpringSecurity}"
 
 //    testImplementation "org.apache.grails:grails-testing-support-datamapping"
