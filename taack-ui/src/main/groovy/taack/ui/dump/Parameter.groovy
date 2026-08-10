@@ -90,7 +90,7 @@ final class Parameter implements WebAttributes {
         this.isRefresh = params.boolean('refresh') == true
         this.lcl = lcl ?: LocaleContextHolder.locale
         this.testI18n = params.get('lang')?.toString()?.startsWith('test')
-        this.nf = lcl ? NumberFormat.getInstance(lcl) : null
+        this.nf = NumberFormat.getInstance(this.lcl)
         this.tabIndex = params.get('tabIndex') ? params.int('tabIndex') : null
         this.tabId = params.get('tabId') ? params.int('tabId') : null
         this.compactMode = params.get('compactMode') ? params.boolean('compactMode') : null

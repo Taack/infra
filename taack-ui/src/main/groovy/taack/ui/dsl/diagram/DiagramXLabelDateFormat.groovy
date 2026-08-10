@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat
 enum DiagramXLabelDateFormat {
     YEAR(Calendar.YEAR, Calendar.MONTH, 'yyyy', 'yyyy', 'yyyy-MM'),
     MONTH(Calendar.MONTH, Calendar.DAY_OF_MONTH, 'yyyy-MM', 'yyyy-MM', 'yyyy-MM-dd'),
+    MONTH_WITHOUT_YEAR(Calendar.MONTH, Calendar.DAY_OF_MONTH, 'yyyy-MM', 'MMM', 'MMM-dd'),
     DAY(Calendar.DAY_OF_MONTH, Calendar.HOUR_OF_DAY, 'yyyy-MM-dd', 'yyyy-MM-dd', 'yyyy-MM-dd HH\'h\'mm'),
     HOUR(Calendar.HOUR_OF_DAY, Calendar.MINUTE, 'yyyy-MM-dd HH', 'MM-dd HH\'h\'', 'HH\'h\'mm')
 

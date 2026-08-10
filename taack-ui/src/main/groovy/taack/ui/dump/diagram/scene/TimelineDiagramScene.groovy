@@ -81,10 +81,10 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         render.renderGroup(['clip-path': "url(#${id})"])
         render.renderGroup(['element-type': ElementType.HORIZONTAL_BACKGROUND])
         Set<Triple<String, String, String>> keys = timelineDataPerKey.keySet()
+        render.fillStyle(GREY_COLOR)
         for (int i = 0; i <= keys.size(); i++) {
             // background horizontal line
             render.translateTo(diagramMarginLeft - BACKGROUND_LINE_EXCEED_DIAGRAM, diagramMarginTop + gapHeight * i)
-            render.fillStyle(GREY_COLOR)
             render.renderLine(render.getDiagramWidth() - (diagramMarginLeft - BACKGROUND_LINE_EXCEED_DIAGRAM) - DIAGRAM_MARGIN_RIGHT, 0.0)
 
             // key label

@@ -46,7 +46,7 @@ class DiagramTransformArea(val parent: Diagram, val g: SVGGElement): BaseElement
             currentHoverLine = document.createElementNS("http://www.w3.org/2000/svg", "line") as SVGLineElement
             currentHoverLine!!.setAttribute("y1", verticalBackgroundLines.firstOrNull()?.getAttribute("y1") ?: "43.0")
             currentHoverLine!!.setAttribute("y2", verticalBackgroundLines.firstOrNull()?.getAttribute("y2") ?: "425.0")
-            currentHoverLine!!.setAttribute("style", "stroke:rgb(180, 180, 180);stroke-width:1.3")
+            currentHoverLine!!.setAttribute("style", "stroke:rgb(180, 180, 180);stroke-width:1.3;pointer-events: none;")
         }
 
         if (defaultScrollXNumber != 0 && verticalBackgroundLines.isNotEmpty()) {

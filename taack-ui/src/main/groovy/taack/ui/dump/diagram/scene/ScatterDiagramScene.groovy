@@ -10,15 +10,13 @@ import java.awt.Color
 class ScatterDiagramScene extends RectBackgroundDiagramScene {
     final private List<String> pointImageHref
     protected BigDecimal dataPointRadius
+    protected BigDecimal dataPointClickableRadius
 
     ScatterDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, List<String> pointImageHref = []) {
         super(render, dataPerKey, diagramOption)
         this.pointImageHref = pointImageHref
         this.dataPointRadius = LEGEND_IMAGE_WIDTH / 2
-    }
-
-    String objectToString(Object o) {
-        return o instanceof Date ? diagramOption.xLabelDateFormat.format(o) : o instanceof Number ? numberToString(o.toBigDecimal()) : o.toString()
+        this.dataPointClickableRadius = dataPointRadius
     }
 
     void drawDataPoint(Boolean hasLineBetweenPoints) {
@@ -32,13 +30,14 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                 Map<Object, BigDecimal> pointList = dataPerKey[keys[i]]
                 List<Object> xList = pointList.keySet().sort() as List<Object>
                 for (int j = 0; j < xList.size(); j++) {
-                    BigDecimal x = objectToNumber(xList[j])
-                    BigDecimal y = pointList[xList[j]]
+                    Object xData = xList[j]
+                    BigDecimal x = objectToNumber(xData)
+                    BigDecimal y = pointList[xData]
                     BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + (x - minX) / (maxX - minX) * totalWidth
                     BigDecimal yHeight = (y - startLabelY) / gapY * gapHeight
-                    String xLabel = objectToString(xList[j])
+                    String xLabel = xData instanceof Date ? diagramOption.xLabelDateFormat.detailFormat(xData) : xData instanceof Number ? numberToString(xData.toBigDecimal()) : xData.toString()
                     String yLabel = numberToString(y)
-                    String dataLabel = xList[j] instanceof Date ? "${xLabel} : ${yLabel}" : "($xLabel, $yLabel)"
+                    String dataLabel = xData instanceof Date ? "${xLabel} : ${yLabel}" : "($xLabel, $yLabel)"
                     Color keyColor = getKeyColor(i)
                     render.fillStyle(keyColor)
 
@@ -60,6 +59,11 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                         } else {
                             render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - yHeight)
                             render.renderCircle(dataPointRadius, IDiagramRender.DiagramStyle.fill)
+                        }
+                        if (dataPointClickableRadius > dataPointRadius) { // transport circle to enlarge clickable area
+                            render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - yHeight)
+                            render.fillStyle(new Color(0, 0, 0, 0))
+                            render.renderCircle(dataPointClickableRadius, IDiagramRender.DiagramStyle.fill)
                         }
                         render.renderGroupEnd()
                         render.renderGroupEnd()

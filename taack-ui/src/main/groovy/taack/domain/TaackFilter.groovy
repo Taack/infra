@@ -338,6 +338,9 @@ final class TaackFilter<T extends GormEntity<T>> {
                             where << filterSpecifierWhereClause
                             occ++
                         }
+                    } else if (filterExpression.value instanceof Date) {
+                        where << ("sc.${filterExpression.fieldName} <= '${filterExpression.value.toString()}'" as String)
+                        occ++
                     }
                     break
                 case Operator.GT:
@@ -353,11 +356,9 @@ final class TaackFilter<T extends GormEntity<T>> {
                             where << filterSpecifierWhereClause
                             occ++
                         }
-                    } else {
-                        if (filterExpression.value instanceof Date) {
-                            where << ("sc.${filterExpression.fieldName} >= '${filterExpression.value.toString()}'" as String)
-                            occ++
-                        }
+                    } else if (filterExpression.value instanceof Date) {
+                        where << ("sc.${filterExpression.fieldName} >= '${filterExpression.value.toString()}'" as String)
+                        occ++
                     }
                     break
             }
