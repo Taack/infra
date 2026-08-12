@@ -110,9 +110,6 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
             e.preventDefault()
             val offset = (a.attributes.getNamedItem("taackPageOffset")!!.value.toDouble() * max.toDouble()).toInt()
             Helper.filterForm(parent.filter, offset, null)
-            val offsetUrl = URL(location.href)
-            offsetUrl.searchParams.set("offset", offset.toString())
-            history.pushState(null, "", offsetUrl)
         }
         return a
     }
