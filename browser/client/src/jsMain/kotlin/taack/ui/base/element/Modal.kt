@@ -184,23 +184,30 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         var isDragging = false
         var startX = 0
         var startY = 0
-        var maxLeft = 0.0
-        var maxRight = 0.0
-        var maxTop = 0.0
-        var maxBottom = 0.0
-        var initialOffsetLeft = 0.0
-        var initialOffsetTop = 0.0
+        var currentTranslateX = 0.0
+        var currentTranslateY = 0.0
+        var tempTranslateX = 0.0
+        var tempTranslateY = 0.0
+        var minX = 0.0
+        var maxX = 0.0
+        var minY = 0.0
+        var maxY = 0.0
         header.addEventListener(EventType("mousedown"), EventHandler { e: MouseEvent ->
             if (!dModalDialog.classList.contains(ClassName("modal-fullscreen"))) {
                 isDragging = true
                 startX = e.clientX
                 startY = e.clientY
-                maxLeft = dModalContent.getBoundingClientRect().left
-                maxRight = window.innerWidth - dModalContent.getBoundingClientRect().right
-                maxTop = dModalContent.getBoundingClientRect().top
-                maxBottom = window.innerHeight - dModalContent.getBoundingClientRect().bottom
-                initialOffsetLeft = dModalContent.offsetLeft.toDouble()
-                initialOffsetTop = dModalContent.offsetTop.toDouble()
+
+                val rect = dModalContent.getBoundingClientRect()
+                val windowWidth = web.window.window.innerWidth.toDouble()
+                val windowHeight = web.window.window.innerHeight.toDouble()
+
+                minX = -rect.left + currentTranslateX
+                minY = -rect.top + currentTranslateY
+                maxX = windowWidth - rect.right + currentTranslateX
+                maxY = windowHeight - rect.bottom + currentTranslateY
+
+                dModalContent.style.transition = "none"
                 web.dom.document.body.style.userSelect = "none"
             }
         })
@@ -208,29 +215,24 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
             if (!isDragging) return@EventHandler
             val dx = e.clientX - startX
             val dy = e.clientY - startY
-
-            dModalContent.style.position = "absolute"
-            dModalContent.style.left = "${initialOffsetLeft + dx}px"
-            dModalContent.style.top = "${initialOffsetTop + dy}px"
+            tempTranslateX = currentTranslateX + dx
+            tempTranslateY = currentTranslateY + dy
+            dModalContent.style.transform = "translate(${tempTranslateX}px, ${tempTranslateY}px)"
         })
         web.dom.document.addEventListener(EventType("mouseup"), EventHandler { e: MouseEvent ->
             if (isDragging) {
-                val dx = e.clientX - startX
-                val dy = e.clientY - startY
-                if (dx > maxRight) {
-                    dModalContent.style.left = "${initialOffsetLeft + maxRight}px"
-                } else if (dx < -maxLeft) {
-                    dModalContent.style.left = "${initialOffsetLeft - maxLeft}px"
-                }
+                isDragging = false
+                web.dom.document.body.style.userSelect = ""
 
-                if (dy > maxBottom) {
-                    dModalContent.style.top = "${initialOffsetTop + maxBottom}px"
-                } else if (dy < -maxTop) {
-                    dModalContent.style.top = "${initialOffsetTop - maxTop}px"
-                }
+                if (tempTranslateX < minX) tempTranslateX = minX
+                if (tempTranslateX > maxX) tempTranslateX = maxX
+                if (tempTranslateY < minY) tempTranslateY = minY
+                if (tempTranslateY > maxY) tempTranslateY = maxY
+                dModalContent.style.transition = "transform 0.3s ease-out"
+                dModalContent.style.transform = "translate(${tempTranslateX}px, ${tempTranslateY}px)"
+                currentTranslateX = tempTranslateX
+                currentTranslateY = tempTranslateY
             }
-            isDragging = false
-            web.dom.document.body.style.userSelect = ""
         })
     }
 
