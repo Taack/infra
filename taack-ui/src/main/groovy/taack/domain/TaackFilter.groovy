@@ -365,11 +365,17 @@ final class TaackFilter<T extends GormEntity<T>> {
         } else {
             switch (filterExpression.operator) {
                 case Operator.EQ:
-                    if (filterExpression.value instanceof Long) {
+                    if (filterExpression.value instanceof Collection) {
+                        if ((filterExpression.value as List).every { it instanceof Long }) {
+                            where << ("exists (select sub${occ} from sc.${filterExpression.fieldName} as sub${occ} where sub${occ}.id in (${(filterExpression.value as List<Long>).join(',') ?: null}))" as String)
+                            occ++
+                        }
+                    } else if (filterExpression.value instanceof Long) {
                         where << ("${filterExpression.value} in elements(sc.${filterExpression.fieldName})" as String)
                         occ++
-                    } else if (filterExpression.value instanceof Collection && (filterExpression.value as List).every { it instanceof Long }) {
-                        where << ("exists (select sub${occ} from sc.${filterExpression.fieldName} as sub${occ} where sub${occ}.id in (${(filterExpression.value as List<Long>).join(',') ?: null}))" as String)
+                    } else if (filterExpression.value) {
+                        where << (":${'npfe' + occ} in elements(sc.${filterExpression.fieldName})" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
                     break
