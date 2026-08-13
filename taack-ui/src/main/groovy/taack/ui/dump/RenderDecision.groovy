@@ -80,6 +80,6 @@ final class RenderDecision {
 
     boolean shouldRenderLayout() {
         simpleLog("shouldRenderLayout ${parameter.isAjaxRendering}, ${parameter.ajaxBlockId} $currentAjaxBlockId ${parameter.targetAjaxBlockId}")
-        return !parameter.isAjaxRendering
+        return !parameter.isAjaxRendering || parameter.tabIndex != null
     }
 }

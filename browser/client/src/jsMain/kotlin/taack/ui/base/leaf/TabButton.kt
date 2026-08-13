@@ -35,7 +35,7 @@ class TabButton(val parent: Tab, val b: HTMLButtonElement) : BaseElement  {
         b.onclick = EventHandler { e ->
             e.preventDefault()
             val tabIndex = b.getAttribute("id")!!.split("-").last()
-            if (Block.href != null) {
+            if (Block.href != null && getParentBlock().parent == null) {
                 val url = URL(Block.href!!)
                 url.searchParams.set("tabIndex", tabIndex)
                 Block.href = url.toString()

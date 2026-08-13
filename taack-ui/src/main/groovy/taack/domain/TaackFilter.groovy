@@ -365,11 +365,17 @@ final class TaackFilter<T extends GormEntity<T>> {
         } else {
             switch (filterExpression.operator) {
                 case Operator.EQ:
-                    if (filterExpression.value instanceof Long) {
+                    if (filterExpression.value instanceof Collection) {
+                        if ((filterExpression.value as List).every { it instanceof Long }) {
+                            where << ("exists (select sub${occ} from sc.${filterExpression.fieldName} as sub${occ} where sub${occ}.id in (${(filterExpression.value as List<Long>).join(',') ?: null}))" as String)
+                            occ++
+                        }
+                    } else if (filterExpression.value instanceof Long) {
                         where << ("${filterExpression.value} in elements(sc.${filterExpression.fieldName})" as String)
                         occ++
-                    } else if (filterExpression.value instanceof Collection && (filterExpression.value as List).every { it instanceof Long }) {
-                        where << ("exists (select sub${occ} from sc.${filterExpression.fieldName} as sub${occ} where sub${occ}.id in (${(filterExpression.value as List<Long>).join(',') ?: null}))" as String)
+                    } else if (filterExpression.value) {
+                        where << (":${'npfe' + occ} in elements(sc.${filterExpression.fieldName})" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
                     break
@@ -642,36 +648,38 @@ final class TaackFilter<T extends GormEntity<T>> {
                         }
                     } else if (entry.value instanceof String) {
                         String entryValue = entry.value as String
-                        if (entryKey.contains('active')) {
-                            where << ("$aliasKey = :np$occ" as String)
-                            namedParams.put('np' + occ, entry.value)
-                        } else if (entryValue == 'null') {
-                            //Useful if the null select option is picked to filter object without object (ex: businessTodo without parent)
-                            where << ("${aliasKey} is null" as String)
-                        } else if (!entryValue.contains(',')) {
-                            if (f && f.type.isEnum()) {
-                                where << (" $aliasKey = '$entryValue' " as String)
-                            } else if (f && GormEntity.isAssignableFrom(f.type)) {
-                                where << (" ${aliasKey}.id = :np$occ " as String)
-                                namedParams.put('np' + occ, Long.parseLong(entry.value as String))
-                            } else if (f) {
-                                where << (" upper($aliasKey) like :np$occ " as String)
-                                namedParams.put('np' + occ, entry.value.toString().toUpperCase())
-                            }
-                        } else {
-                            StringBuilder tmp = new StringBuilder()
-                            tmp.append(' (')
-                            Integer index = 0
-                            entryValue.tokenize(',').each { String it ->
-                                String v = it.trim()
-                                if (v) {
-                                    if (index++ > 0) tmp.append(' or ')
-                                    tmp.append(" upper($aliasKey) like :np$index ")
-                                    namedParams.put('np' + index, v.toUpperCase())
+                        if (!entryValue.isBlank()) {
+                            if (entryKey.contains('active')) {
+                                where << ("$aliasKey = :np$occ" as String)
+                                namedParams.put('np' + occ, entry.value)
+                            } else if (entryValue == 'null') {
+                                //Useful if the null select option is picked to filter object without object (ex: businessTodo without parent)
+                                where << ("${aliasKey} is null" as String)
+                            } else if (!entryValue.contains(',')) {
+                                if (f && f.type.isEnum()) {
+                                    where << (" $aliasKey = '$entryValue' " as String)
+                                } else if (f && GormEntity.isAssignableFrom(f.type)) {
+                                    where << (" ${aliasKey}.id = :np$occ " as String)
+                                    namedParams.put('np' + occ, Long.parseLong(entry.value as String))
+                                } else if (f) {
+                                    where << (" upper($aliasKey) like :np$occ " as String)
+                                    namedParams.put('np' + occ, entry.value.toString().toUpperCase())
                                 }
+                            } else {
+                                StringBuilder tmp = new StringBuilder()
+                                tmp.append(' (')
+                                Integer index = 0
+                                entryValue.tokenize(',').each { String it ->
+                                    String v = it.trim()
+                                    if (v) {
+                                        if (index++ > 0) tmp.append(' or ')
+                                        tmp.append(" upper($aliasKey) like :np$index ")
+                                        namedParams.put('np' + index, v.toUpperCase())
+                                    }
+                                }
+                                tmp.append(') ')
+                                where << tmp.toString()
                             }
-                            tmp.append(') ')
-                            where << tmp.toString()
                         }
                     } else {
                         where << ("$aliasKey = :${'np' + occ}" as String)

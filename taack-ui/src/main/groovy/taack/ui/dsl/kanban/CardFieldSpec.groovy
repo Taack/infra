@@ -28,6 +28,15 @@ final class CardFieldSpec {
         this.kanbanVisitor = kanbanVisitor
     }
 
+    static Closure<CardFieldSpec> buildCardFieldSpec(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = CardFieldSpec) final Closure closure) {
+        closure
+    }
+
+    void inline(final Closure<CardFieldSpec> cardFieldSpecClosure) {
+        cardFieldSpecClosure.delegate = this
+        cardFieldSpecClosure.call()
+    }
+
     void cardFieldRaw(final String value, final Style style = null) {
         kanbanVisitor.visitCardFieldRaw(value, style)
     }
