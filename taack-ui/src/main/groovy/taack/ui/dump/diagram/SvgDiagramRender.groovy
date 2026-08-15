@@ -6,7 +6,7 @@ import taack.ui.dsl.diagram.DiagramOption
 
 import java.awt.Color
 import java.awt.Font
-import java.awt.FontMetrics
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
 @CompileStatic
@@ -16,7 +16,7 @@ class SvgDiagramRender implements IDiagramRender {
     private BigDecimal svgHeight
     private final boolean isViewBox
     private final BigDecimal fontSizePercentage
-    private final FontMetrics fm
+    private final Graphics2D ig2
     private Integer fontSize = 13
     private BigDecimal trX = 0.0
     private BigDecimal trY = 0.0
@@ -33,9 +33,9 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgHeight = resolution.height
         this.isViewBox = isViewBox
         this.fontSizePercentage = resolution.fontSizePercentage
+        this.ig2 = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics()
         this.fontSize = (this.fontSize * fontSizePercentage).toInteger()
         this.lineWidth *= fontSizePercentage
-        this.fm = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
 
         this.LABEL_MARGIN *= fontSizePercentage
         this.ARROW_LENGTH *= fontSizePercentage
@@ -46,9 +46,9 @@ class SvgDiagramRender implements IDiagramRender {
         this.svgHeight = height
         this.isViewBox = isViewBox
         this.fontSizePercentage = fontSizePercentage
+        this.ig2 = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics()
         this.fontSize = (this.fontSize * fontSizePercentage).toInteger()
         this.lineWidth *= fontSizePercentage
-        this.fm = new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize))
 
         this.LABEL_MARGIN *= fontSizePercentage
         this.ARROW_LENGTH *= fontSizePercentage
@@ -62,7 +62,7 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     void fillStyle(Color color) {
-        fillStyle = "rgb(${color.red}, ${color.green}, ${color.blue})"
+        fillStyle = color.alpha > 0 ? "rgb(${color.red}, ${color.green}, ${color.blue})" : 'transparent'
     }
 
     @Override
@@ -124,7 +124,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderSmallLabel(String label) {
         outStr.append("""
-              <text x="$trX" y="${trY + (fontSize * SMALL_LABEL_RATE).toInteger() - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${(fontSize * SMALL_LABEL_RATE).toInteger()}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="$trX" y="${trY + (fontSize * SMALL_LABEL_RATE).toInteger() - LABEL_MARGIN * SMALL_LABEL_RATE}" label-width="${measureSmallText(label)}" text-rendering="optimizeLegibility" style="font-size: ${(fontSize * SMALL_LABEL_RATE).toInteger()}px; font-family: sans-serif; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -148,7 +148,7 @@ class SvgDiagramRender implements IDiagramRender {
     @Override
     void renderEmphasizedLabel(String label) {
         outStr.append("""
-              <text x="${trX}" y="${trY + (fontSize * EMPHASIZED_LABEL_RATE).toInteger() - LABEL_MARGIN}" label-width="${measureText(label)}" text-rendering="optimizeLegibility" style="font-size: ${(fontSize * EMPHASIZED_LABEL_RATE).toInteger()}px; font-family: sans-serif; font-weight: bold; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
+              <text x="${trX}" y="${trY + (fontSize * EMPHASIZED_LABEL_RATE).toInteger() - LABEL_MARGIN * EMPHASIZED_LABEL_RATE}" label-width="${measureEmphasizedText(label)}" text-rendering="optimizeLegibility" style="font-size: ${(fontSize * EMPHASIZED_LABEL_RATE).toInteger()}px; font-family: sans-serif; font-weight: bold; pointer-events: none;">${label.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;")}</text>
         """.stripIndent()
         )
     }
@@ -340,17 +340,17 @@ class SvgDiagramRender implements IDiagramRender {
 
     @Override
     BigDecimal measureText(String text) {
-        return fm.stringWidth(text)
+        return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)).stringWidth(text)
     }
 
     @Override
     BigDecimal measureSmallText(String text) {
-        return new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).toInteger())).stringWidth(text)
+        return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.PLAIN, (fontSize * SMALL_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
     @Override
     BigDecimal measureEmphasizedText(String text) {
-        return new BufferedImage(svgWidth.toInteger(), svgHeight.toInteger(), BufferedImage.TYPE_INT_ARGB).createGraphics().getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger())).stringWidth(text)
+        return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
     String getRendered() {

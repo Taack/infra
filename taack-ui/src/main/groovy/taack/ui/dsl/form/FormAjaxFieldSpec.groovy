@@ -48,22 +48,18 @@ class FormAjaxFieldSpec extends FormVisitable {
      * @param action methodClosure pointing to the action
      * @param id id param
      * @param params additional params
+     * @param style
      */
-    void innerFormAction(final MethodClosure action, final Long id = null, final Map params = null) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitInnerFormAction(null, Utils.getControllerName(action), action.method, id, params, ButtonStyle.SECONDARY)
+    void innerFormAction(final String i18n, final MethodClosure action, final Long id, final Map params, ButtonStyle style) {
+        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitInnerFormAction(i18n, Utils.getControllerName(action), action.method, id, params, style)
     }
 
-    /**
-     * form action. The form is POSTed to the target action.
-     *
-     * @param style
-     * @param i18n label of the button
-     * @param action methodClosure pointing to the action
-     * @param id id param
-     * @param params additional params
-     */
+    void innerFormAction(final MethodClosure action, final Long id = null, final Map params = null) {
+        innerFormAction(null, action, id, params, ButtonStyle.SECONDARY)
+    }
+
     void innerFormAction(ButtonStyle style, final MethodClosure action, final Long id = null, final Map params = null) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) formVisitor.visitInnerFormAction(null, Utils.getControllerName(action), action.method, id, params, style)
+        innerFormAction(null, action, id, params, style)
     }
 
     void hiddenField(final FieldInfo field) {

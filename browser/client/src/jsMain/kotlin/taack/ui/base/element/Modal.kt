@@ -201,6 +201,9 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
                 maxBottom = window.innerHeight - dModalContent.getBoundingClientRect().bottom
                 initialOffsetLeft = dModalContent.offsetLeft.toDouble()
                 initialOffsetTop = dModalContent.offsetTop.toDouble()
+                dModalContent.style.position = "absolute"
+                dModalContent.style.left = "${initialOffsetLeft}px"
+                dModalContent.style.top = "${initialOffsetTop}px"
                 web.dom.document.body.style.userSelect = "none"
             }
         })
@@ -209,14 +212,18 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
             val dx = e.clientX - startX
             val dy = e.clientY - startY
 
-            dModalContent.style.position = "absolute"
             dModalContent.style.left = "${initialOffsetLeft + dx}px"
             dModalContent.style.top = "${initialOffsetTop + dy}px"
         })
         web.dom.document.addEventListener(EventType("mouseup"), EventHandler { e: MouseEvent ->
             if (isDragging) {
+                isDragging = false
+                web.dom.document.body.style.userSelect = ""
+
                 val dx = e.clientX - startX
                 val dy = e.clientY - startY
+                dModalDialog.style.transition = "left 0.3s ease-out, top 0.3s ease-out"
+
                 if (dx > maxRight) {
                     dModalContent.style.left = "${initialOffsetLeft + maxRight}px"
                 } else if (dx < -maxLeft) {
@@ -229,8 +236,6 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
                     dModalContent.style.top = "${initialOffsetTop - maxTop}px"
                 }
             }
-            isDragging = false
-            web.dom.document.body.style.userSelect = ""
         })
     }
 
