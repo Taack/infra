@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Pair
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import taack.ui.dsl.UiDiagramSpecifier
@@ -28,28 +29,41 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     UiDiagramSpecifier.DiagramBase diagramBase
-    DiagramScene scene
-    private IDiagramRender render
+    Pair<DiagramType, Map> diagramType
     private Object[] xDataList
-    private Map<String, Map<Object, BigDecimal>> dataPerKey // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
-    private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
-    private Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey // [Triple(key, keyDescription, keyImageHref): [Triple(startDate, endDate, title), Triple(startDate2, endDate2, title2), Pair...], Triple() : [...], ...]
+    private Map<String, Map<Object, BigDecimal>> dataPerKey = [:] // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
+    private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey = [:] // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
+    private Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey = [:] // [Triple(key, keyDescription, keyImageHref): [Triple(startDate, endDate, title), Triple(startDate2, endDate2, title2), Pair...], Triple() : [...], ...]
     private DiagramOption diagramOption = new DiagramOption()
+    private boolean isComboDiagram = false
+    private List<RawHtmlDiagramDump> comboDiagramList = []
 
     @Override
-    void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
+    void setDiagramBase(UiDiagramSpecifier.DiagramBase diagramBase) {
         this.diagramBase = diagramBase
     }
 
     @Override
-    void visitDiagramDataInitialization() {
-        this.out.reset()
-        this.scene = null
-        this.xDataList = []
-        this.dataPerKey = [:]
-        this.whiskersYDataListPerKey = [:]
-        this.timelineDataPerKey = [:]
-        this.diagramOption = new DiagramOption()
+    RawHtmlDiagramDump visitDiagram(DiagramType diagramType, Map params, boolean isComboDiagram) {
+        if (!isComboDiagram) {
+            this.diagramType = new Pair(diagramType, params)
+            this.out.reset()
+            this.xDataList = []
+            this.dataPerKey = [:]
+            this.whiskersYDataListPerKey = [:]
+            this.timelineDataPerKey = [:]
+            this.diagramOption = new DiagramOption()
+            return this
+        } else {
+            RawHtmlDiagramDump comboDiagram = new RawHtmlDiagramDump(out)
+            comboDiagram.isComboDiagram = true
+            comboDiagram.diagramBase = diagramBase
+            comboDiagram.diagramType = new Pair(diagramType, params)
+            comboDiagram.xDataList = xDataList
+            comboDiagram.diagramOption = diagramOption
+            comboDiagramList.add(comboDiagram)
+            return comboDiagram
+        }
     }
 
     @Override
@@ -103,70 +117,12 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         dataPerKey.put(key, dataMap)
     }
 
-    void initDiagramResolution() {
-        if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-            if (!diagramOption.resolution) {
-                diagramOption.setResolution(DiagramOption.DiagramResolution.DEFAULT_2K)
-            }
-            render = new PngDiagramRender(diagramOption.resolution)
-        } else {
-            if (!diagramOption.resolution) {
-                diagramOption.setResolution(DiagramOption.DiagramResolution.DEFAULT_540P)
-            }
-            render = new SvgDiagramRender(diagramOption.resolution, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-        }
-    }
-
-    @Override
-    void visitBarDiagram(boolean isStacked) {
-        initDiagramResolution()
-        scene = new BarDiagramScene(render, dataPerKey, diagramOption, isStacked)
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-    }
-
-    @Override
-    void visitScatterDiagram(String... pointImageHref) {
-        initDiagramResolution()
-        scene = new ScatterDiagramScene(render, dataPerKey, diagramOption, pointImageHref.toList())
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-    }
-
-    @Override
-    void visitLineDiagram() {
-        initDiagramResolution()
-        scene = new LineDiagramScene(render, dataPerKey, diagramOption)
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
-    }
-
-    @Override
-    void visitAreaDiagram() {
-        initDiagramResolution()
-        scene = new AreaDiagramScene(render, dataPerKey, diagramOption)
-        scene.draw(false)
-    }
-
-    @Override
-    void visitPieDiagram(boolean hasSlice) {
-        initDiagramResolution()
-        scene = new PieDiagramScene(render, dataPerKey, diagramOption, hasSlice)
-        scene.draw()
-    }
-
     @Override
     void whiskersBoxData(String key, BigDecimal... boxData) {
         if (xDataList) {
             List<List<BigDecimal>> yDataList = whiskersYDataListPerKey.get(key) ?: []
             yDataList.add(boxData.toList())
             whiskersYDataListPerKey[key] = yDataList
-        }
-    }
-
-    @Override
-    void visitWhiskersDiagram() {
-        initDiagramResolution()
-        if (xDataList) {
-            scene = new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramOption)
-            scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
         }
     }
 
@@ -183,53 +139,121 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         }
     }
 
-    @Override
-    void visitTimelineDiagram() {
-        initDiagramResolution()
-        scene = new TimelineDiagramScene(render, timelineDataPerKey, diagramOption)
-        scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
+    IDiagramRender initDiagramRender() {
+        if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
+            if (!diagramOption.resolution) {
+                diagramOption.setResolution(DiagramOption.DiagramResolution.DEFAULT_2K)
+            }
+            return new PngDiagramRender(diagramOption.resolution)
+        } else {
+            if (!diagramOption.resolution) {
+                diagramOption.setResolution(DiagramOption.DiagramResolution.DEFAULT_540P)
+            }
+            return new SvgDiagramRender(diagramOption.resolution, diagramBase == UiDiagramSpecifier.DiagramBase.SVG)
+        }
+    }
+
+    DiagramScene initDiagramScene() {
+        IDiagramRender render = initDiagramRender()
+        switch (diagramType?.aValue) {
+            case DiagramType.BAR:
+                return new BarDiagramScene(render, dataPerKey, diagramOption, diagramType.bValue.getOrDefault('isStacked', true) as boolean)
+            case DiagramType.SCATTER:
+                return new ScatterDiagramScene(render, dataPerKey, diagramOption, diagramType.bValue.getOrDefault('pointImageHref', []) as List<String>)
+            case DiagramType.LINE:
+                return new LineDiagramScene(render, dataPerKey, diagramOption)
+            case DiagramType.AREA:
+                return new AreaDiagramScene(render, dataPerKey, diagramOption)
+            case DiagramType.PIE:
+                return new PieDiagramScene(render, dataPerKey, diagramOption, diagramType.bValue.getOrDefault('hasSlice', false) as boolean)
+            case DiagramType.WHISKERS:
+                return new WhiskersDiagramScene(render, xDataList, whiskersYDataListPerKey, diagramOption)
+            case DiagramType.TIMELINE:
+                return new TimelineDiagramScene(render, timelineDataPerKey, diagramOption)
+            default:
+                return null
+        }
+    }
+
+    List<RawHtmlDiagramDump> getFullComboDiagramList(RawHtmlDiagramDump d) {
+        List<RawHtmlDiagramDump> fullComboDiagramList = []
+        if (!d.comboDiagramList.isEmpty()) {
+            d.comboDiagramList.each { combo ->
+                fullComboDiagramList.add(combo)
+                fullComboDiagramList.addAll(getFullComboDiagramList(combo))
+            }
+        }
+        return fullComboDiagramList
     }
 
     @Override
     void visitDiagramEnd() {
-        if (mailAttachment == null) {
-            if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-                (this.render as PngDiagramRender).writeImage(out)
-            } else {
-                out << (this.render as SvgDiagramRender).getRendered()
+        if (!isComboDiagram) {
+            List<RawHtmlDiagramDump> fullComboDiagramList = getFullComboDiagramList(this)
+            if (!fullComboDiagramList.isEmpty()) {
+                Set<String> mixedKeys = ([this] + fullComboDiagramList).collect { d ->
+                    if (d.diagramType?.aValue == DiagramType.WHISKERS)
+                        d.whiskersYDataListPerKey.keySet()
+                    else if (d.diagramType?.aValue == DiagramType.TIMELINE)
+                        d.timelineDataPerKey.keySet().collect { it.aValue }
+                    else
+                        d.dataPerKey.keySet()
+                }.flatten() as Set<String>
+                ([this] + fullComboDiagramList).each { d ->
+                    if (d.diagramType?.aValue == DiagramType.WHISKERS)
+                        d.whiskersYDataListPerKey = mixedKeys.collectEntries { String key -> [key, d.whiskersYDataListPerKey.getOrDefault(key, [])] }
+                    else if (d.diagramType?.aValue == DiagramType.TIMELINE)
+                        d.timelineDataPerKey = mixedKeys.collectEntries { String key ->
+                            Triple<String, String, String> k = d.timelineDataPerKey.keySet().find { it.aValue == key } ?: new Triple(key, null, null)
+                            [k, d.timelineDataPerKey.getOrDefault(k, [])]
+                        }
+                    else
+                        d.dataPerKey = mixedKeys.collectEntries { String key -> [key, d.dataPerKey.getOrDefault(key, [:])] }
+                }
             }
-        } else {
-            ByteArrayOutputStream fileStream = new ByteArrayOutputStream()
-            String suffix
-            if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
-                (this.render as PngDiagramRender).writeImage(fileStream)
-                suffix = 'png'
-            } else {
-                fileStream << (this.render as SvgDiagramRender).getRendered()
-                suffix = 'svg'
+            DiagramScene scene = initDiagramScene()
+            scene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, fullComboDiagramList.size(), fullComboDiagramList.size() + 1)
+            fullComboDiagramList.eachWithIndex { comboDiagram, i ->
+                ByteArrayOutputStream comboOutput = new ByteArrayOutputStream()
+                DiagramScene comboDiagramScene = comboDiagram.initDiagramScene()
+                comboDiagramScene.draw(diagramBase == UiDiagramSpecifier.DiagramBase.SVG, fullComboDiagramList.size(), i + 1)
+                comboDiagramScene.render.output(comboOutput, false)
+                scene.render.renderByteArray(comboOutput.toByteArray())
             }
-            String fileName = ThreadLocalRandom.current().nextInt(0, 1_000_000).toString() + '-diagram.' + suffix
-            mailAttachment.put(fileName, fileStream.toByteArray())
-            out << """<img src="cid:${fileName}" style="display:block" width="720" height="360">"""
-        }
-        if (blockLog) {
-            ByteArrayOutputStream clone = new ByteArrayOutputStream()
-            out.writeTo(clone)
-            blockLog.topElement.addChildren(new HTMLOutput(clone))
+            scene.render.output(out, true)
+            if (mailAttachment != null) {
+                String suffix = diagramBase == UiDiagramSpecifier.DiagramBase.PNG ? 'png' : 'svg'
+                String fileName = ThreadLocalRandom.current().nextInt(0, 1_000_000).toString() + '-diagram.' + suffix
+                mailAttachment.put(fileName, out.toByteArray())
+                out.reset()
+                out << """<img src="cid:${fileName}" style="display:block" width="720" height="360">"""
+            }
+            if (blockLog) {
+                ByteArrayOutputStream clone = new ByteArrayOutputStream(4096)
+                out.writeTo(clone)
+                blockLog.topElement.addChildren(new HTMLOutput(clone))
+            }
         }
     }
 
     @Override
     void visitDiagramOption(DiagramOption diagramOption) {
-        this.diagramOption = diagramOption
+        this.diagramOption.title = diagramOption.title
+        this.diagramOption.showDataCount = diagramOption.showDataCount
+        this.diagramOption.hideLegend = diagramOption.hideLegend
+        this.diagramOption.showTodayLine = diagramOption.showTodayLine
+        this.diagramOption.keyColors = diagramOption.keyColors
+        this.diagramOption.resolution = diagramOption.resolution
+        this.diagramOption.clickActionUrl = diagramOption.clickActionUrl
+        this.diagramOption.maxDataNumberToShowByDefault = diagramOption.maxDataNumberToShowByDefault
+        this.diagramOption.xLabelDateFormat = diagramOption.xLabelDateFormat
     }
 
     @Override
     void visitCustom(String html) {
         out << html
         if (blockLog) {
-            ByteArrayOutputStream clone = new ByteArrayOutputStream()
-
+            ByteArrayOutputStream clone = new ByteArrayOutputStream(4096)
             out.writeTo(clone)
             blockLog.topElement.addChildren(new HTMLOutput(clone))
         }

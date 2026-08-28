@@ -15,20 +15,12 @@ class PieDiagramScene extends DiagramScene {
     final private BigDecimal slicePositionRate
 
     PieDiagramScene(IDiagramRender render, Map<String, Map<Object, BigDecimal>> dataPerKey, DiagramOption diagramOption, boolean hasSlice) {
-        this.fontSize = render.getFontSize()
-        this.render = render
-        this.diagramOption = diagramOption
+        super(render, diagramOption)
         this.slicePositionRate = hasSlice ? SLICE_DISTANCE_FROM_CENTER : 0.0
 
         BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
         if (rate && rate != 1) {
-            DIAGRAM_MARGIN_LEFT *= rate
-            DIAGRAM_MARGIN_RIGHT *= rate
-            DIAGRAM_MARGIN_TOP *= rate
-            DIAGRAM_MARGIN_BOTTOM *= rate
-            TITLE_MARGIN *= rate
             OUTSIDE_LABEL_MARGIN *= rate
-            diagramMarginTop *= rate
         }
 
         Map<String, BigDecimal> pieDataPerKey = [:]
@@ -36,50 +28,60 @@ class PieDiagramScene extends DiagramScene {
         for (int i = 0; i < keys.size(); i++) {
             String key = keys[i]
             Collection<BigDecimal> pieDataList = dataPerKey[key].values()
-            if (!pieDataList.isEmpty() && pieDataList.first() != BigDecimal.ZERO) {
+            if (!pieDataList.isEmpty() && pieDataList.first() != null) {
                 pieDataPerKey.put(key, pieDataList.first())
+            } else {
+                pieDataPerKey.put(key, BigDecimal.ZERO)
             }
         }
         this.pieDataPerKey = pieDataPerKey
     }
 
     @Override
-    void draw(boolean alwaysShowFullInfo = false) {
+    void draw(boolean alwaysShowFullInfo = false, Integer comboTotalCount = 0, Integer comboCurrentCount = 1) {
+        super.draw(alwaysShowFullInfo, comboTotalCount, comboCurrentCount)
+
         drawTitle()
 
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA, 'shape-type': 'pie', 'shape-max-width': 0.0, 'area-min-x': DIAGRAM_MARGIN_LEFT, 'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT, 'area-min-y': diagramMarginTop, 'area-max-y': render.getDiagramHeight()])
-        BigDecimal radius = Math.min(((render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / 2 / 2).toDouble(), ((render.getDiagramHeight() - diagramMarginTop) / (2 + slicePositionRate)).toDouble())
+        BigDecimal radius = Math.min(((render.getDiagramWidth() - diagramMarginLeft - diagramMarginRight) / 2 / 2).toDouble(), ((render.getDiagramHeight() - diagramMarginTop) / (2 + slicePositionRate)).toDouble())
         BigDecimal centerX = render.getDiagramWidth() / 2
         BigDecimal centerY = diagramMarginTop + radius * (1 + slicePositionRate)
-        if (!pieDataPerKey.isEmpty()) {
+        if (!pieDataPerKey.findAll { it.value > BigDecimal.ZERO }.isEmpty()) {
             BigDecimal total = pieDataPerKey.values().sum() as BigDecimal
 
             // sector
             BigDecimal angle1 = 0.0
             pieDataPerKey.eachWithIndex { Map.Entry<String, BigDecimal> it, int i ->
-                Color keyColor = getKeyColor(i)
-                render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                    'data-x': it.key,
-                                    'data-y': it.value])
-                render.renderGroup(['element-type': ElementType.DATA, dataset: it.key])
-                BigDecimal value = it.value
-                BigDecimal percent = value / total
-                BigDecimal angle2 = angle1 + 360.0 * percent
-                if (i == 0 && pieDataPerKey.size() > 1) {
-                    Double sliceAngle = Math.toRadians((angle2 / 2).toDouble())
-                    BigDecimal sliceCenterX = centerX + radius * Math.sin(sliceAngle) * slicePositionRate
-                    BigDecimal sliceCenterY = centerY - radius * Math.cos(sliceAngle) * slicePositionRate
-                    render.translateTo(sliceCenterX, sliceCenterY)
-                } else {
-                    render.translateTo(centerX, centerY)
-                }
-                render.fillStyle(keyColor)
-                render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
-                render.renderGroupEnd()
-                render.renderGroupEnd()
+                if (it.value > BigDecimal.ZERO) {
+                    Color keyColor = getKeyColor(i)
+                    render.renderGroup(['element-type': ElementType.TOOLTIP,
+//                                        'key-label': it.key,
+//                                        'key-color': KeyColor.colorToString(keyColor),
+//                                        'key-description': "${it.value}: ${(it.value / total * 100).round(2)}%",
+                                        'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                        'data-x': it.key,
+                                        'data-y': it.value])
+                    render.renderGroup(['element-type': ElementType.DATA, dataset: it.key])
+                    BigDecimal value = it.value
+                    BigDecimal percent = value / total
+                    BigDecimal angle2 = angle1 + 360.0 * percent
+                    if (i == 0 && pieDataPerKey.size() > 1) {
+                        Double sliceAngle = Math.toRadians((angle2 / 2).toDouble())
+                        BigDecimal sliceCenterX = centerX + radius * Math.sin(sliceAngle) * slicePositionRate
+                        BigDecimal sliceCenterY = centerY - radius * Math.cos(sliceAngle) * slicePositionRate
+                        render.translateTo(sliceCenterX, sliceCenterY)
+                    } else {
+                        render.translateTo(centerX, centerY)
+                    }
+                    render.fillStyle(keyColor)
+                    render.renderSector(radius, angle1, angle2, IDiagramRender.DiagramStyle.fill)
+                    render.renderGroupEnd()
+                    render.renderGroupEnd()
 
-                angle1 = angle2
+                    angle1 = angle2
+                } else {
+                    angle1 += 0.0
+                }
             }
 
             // label
@@ -87,7 +89,7 @@ class PieDiagramScene extends DiagramScene {
             BigDecimal lastOutsideLabelX = -1000.0
             BigDecimal lastOutsideLabelY = -1000.0
             boolean drawByClockwise = true
-            Set<String> keys = pieDataPerKey.keySet()
+            Set<String> keys = pieDataPerKey.findAll { it.value > BigDecimal.ZERO }.keySet()
             while (!keys.isEmpty()) {
                 String key = drawByClockwise ? keys.first() : keys.last()
                 BigDecimal value = pieDataPerKey[key]
@@ -219,6 +221,5 @@ class PieDiagramScene extends DiagramScene {
             render.translateTo(centerX - render.measureText(label) / 2, centerY - fontSize / 2)
             render.renderLabel(label)
         }
-        render.renderGroupEnd()
     }
 }

@@ -14,12 +14,11 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     private BigDecimal MIN_TIMELINE_HEIGHT = 10.0
     private BigDecimal MAX_TIMELINE_HEIGHT = 20.0
     private BigDecimal TIMELINE_HEIGHT_RATE = 0.395
-    private BigDecimal MAX_DIAGRAM_MARGIN_LEFT = DIAGRAM_MARGIN_LEFT * 2
+    private BigDecimal MAX_DIAGRAM_MARGIN_LEFT = 120.0
     private BigDecimal SCROLL_BAR_WIDTH = 10.0
 
     final private Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey
     private BigDecimal timelineHeight
-    private BigDecimal diagramMarginLeft = DIAGRAM_MARGIN_LEFT
     private static boolean multiPeriods = true
 
     static Map<String, Map<Object, BigDecimal>> translateTimelineData(Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey) {
@@ -39,6 +38,18 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     TimelineDiagramScene(IDiagramRender render, Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey, DiagramOption diagramOption) {
         super(render, translateTimelineData(timelineDataPerKey), diagramOption)
         this.timelineDataPerKey = timelineDataPerKey.findAll { it.key != null }
+
+        BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
+        if (rate && rate != 1) {
+            MIN_TIMELINE_HEIGHT *= rate
+            MAX_TIMELINE_HEIGHT *= rate
+            MAX_DIAGRAM_MARGIN_LEFT *= rate
+            SCROLL_BAR_WIDTH *= rate
+        }
+    }
+
+    void initGapAndTimelineHeight() { // The timeline's height should normally be x% of gap height, but limited by min and max
+        diagramMarginLeft = MAX_DIAGRAM_MARGIN_LEFT / 2
         timelineDataPerKey.keySet()*.aValue.each { String keyLabel ->
             BigDecimal keyLabelLength = render.measureText(keyLabel)
             if (diagramMarginLeft < keyLabelLength + AXIS_LABEL_MARGIN) {
@@ -49,14 +60,6 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             diagramMarginLeft = MAX_DIAGRAM_MARGIN_LEFT
         }
 
-        BigDecimal rate = diagramOption?.resolution?.fontSizePercentage
-        if (rate && rate != 1) {
-            MIN_TIMELINE_HEIGHT *= rate
-            MAX_TIMELINE_HEIGHT *= rate
-        }
-    }
-
-    void initGapAndTimelineHeight() { // The timeline's height should normally be x% of gap height, but limited by min and max
         gapHeight = (render.getDiagramHeight() - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM) / timelineDataPerKey.size()
         if (gapHeight * TIMELINE_HEIGHT_RATE < MIN_TIMELINE_HEIGHT && (alwaysShowFullInfo || diagramOption.resolution == DiagramOption.DiagramResolution.FIT_CONTENT)) { // Limited by min only when diagram is dynamic (Allowing scroll to have full view)
             timelineHeight = MIN_TIMELINE_HEIGHT
@@ -72,20 +75,22 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     }
 
     void drawHorizontalBackground() {
-        String id = 'clipSection' + ThreadLocalRandom.current().nextInt(0, 1_000_000).toString()
+        String id = 'clipSection' + ThreadLocalRandom.current().nextInt(1, 1_000_000).toString()
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [0.0, diagramMarginTop - 1,
                                       render.getDiagramWidth(), diagramMarginTop - 1,
                                       render.getDiagramWidth(), render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + BACKGROUND_LINE_EXCEED_DIAGRAM,
                                       0.0, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + BACKGROUND_LINE_EXCEED_DIAGRAM])
         render.renderGroup(['clip-path': "url(#${id})"])
-        render.renderGroup(['element-type': ElementType.HORIZONTAL_BACKGROUND])
+        render.renderGroup(['element-type': ElementType.HORIZONTAL_BACKGROUND,
+                            'area-min-y': diagramMarginTop,
+                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM,])
         Set<Triple<String, String, String>> keys = timelineDataPerKey.keySet()
         render.fillStyle(GREY_COLOR)
         for (int i = 0; i <= keys.size(); i++) {
             // background horizontal line
             render.translateTo(diagramMarginLeft - BACKGROUND_LINE_EXCEED_DIAGRAM, diagramMarginTop + gapHeight * i)
-            render.renderLine(render.getDiagramWidth() - (diagramMarginLeft - BACKGROUND_LINE_EXCEED_DIAGRAM) - DIAGRAM_MARGIN_RIGHT, 0.0)
+            render.renderLine(render.getDiagramWidth() - (diagramMarginLeft - BACKGROUND_LINE_EXCEED_DIAGRAM) - diagramMarginRight, 0.0)
 
             // key label
             if (i < keys.size()) {
@@ -102,7 +107,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
                     render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize / 2)
                     render.renderLabel(key)
                 } else {
-                    while (render.measureSmallText(key) > diagramMarginLeft - AXIS_LABEL_MARGIN) {
+                    while (render.measureSmallText(key) > diagramMarginLeft - AXIS_LABEL_MARGIN && key.size() > 6) {
                         key = key.substring(0, key.size() - 6) + '...'
                     }
                     render.translateTo(diagramMarginLeft - AXIS_LABEL_MARGIN - render.measureSmallText(key), diagramMarginTop + gapHeight * (i + 0.5) - fontSize * render.SMALL_LABEL_RATE / 2)
@@ -116,24 +121,18 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     }
 
     void drawVerticalBackground() {
-        String id = 'clipSection' + ThreadLocalRandom.current().nextInt(1, 1_000_000).toString()
-        render.translateTo(0.0, 0.0)
-        render.renderClipSection(id, [diagramMarginLeft - 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
-                                      render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop - DIAGRAM_MARGIN_TOP,
-                                      render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT + 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
-                                      render.getDiagramWidth(), render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
-                                      render.getDiagramWidth(), render.getDiagramHeight(),
-                                      0.0, render.getDiagramHeight(),
-                                      0.0, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN,
-                                      diagramMarginLeft - 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN])
-        render.renderGroup(['clip-path': "url(#${id})"])
+        buildClipSectionStart()
 
         int displayedXLabelListNumber = xLabelList.size()
-        BigDecimal diagramWidth = render.getDiagramWidth() - diagramMarginLeft - DIAGRAM_MARGIN_RIGHT
+        BigDecimal diagramWidth = render.getDiagramWidth() - diagramMarginLeft - diagramMarginRight
         BigDecimal gapWidth = diagramWidth / (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1)
         BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { diagramOption.xLabelDateFormat.format(it as Date) }.join(''))
         int showLabelEveryX = Math.ceil((xLabelTotalLength / (diagramWidth * 0.8)).toDouble()).toInteger()
-        render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND, 'show-label-every-x': xLabelTotalLength / (diagramWidth * 0.8)])
+        render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND,
+                            'area-min-x': diagramMarginLeft,
+                            'area-max-x': render.getDiagramWidth() - diagramMarginRight,
+                            'show-label-every-x': xLabelTotalLength / (diagramWidth * 0.8),
+                            'default-scroll-x-number': diagramOption.maxDataNumberToShowByDefault])
         render.fillStyle(GREY_COLOR)
         BigDecimal minX = objectToNumber(xLabelList.first())
         BigDecimal maxX = objectToNumber(xLabelList.last())
@@ -189,7 +188,7 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         BigDecimal diagramHeight = render.getDiagramHeight() - diagramMarginTop - DIAGRAM_MARGIN_BOTTOM
         if ((gapHeight * timelineDataPerKey.size() * 100).toInteger() / 100 > diagramHeight) {
             render.renderGroup(['element-type': ElementType.VERTICAL_SCROLL_BAR])
-            render.translateTo(render.getDiagramWidth() - (DIAGRAM_MARGIN_RIGHT - SCROLL_BAR_WIDTH) / 2 - SCROLL_BAR_WIDTH, diagramMarginTop)
+            render.translateTo(render.getDiagramWidth() - diagramMarginRight + SCROLL_BAR_WIDTH / 2, diagramMarginTop)
             render.fillStyle(GREY_COLOR)
             render.renderRect(SCROLL_BAR_WIDTH, diagramHeight * (diagramHeight / (gapHeight * timelineDataPerKey.size())), IDiagramRender.DiagramStyle.fill)
             render.renderGroupEnd()
@@ -200,22 +199,17 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         String id = 'clipSection' + ThreadLocalRandom.current().nextInt(2, 1_000_000).toString()
         render.translateTo(0.0, 0.0)
         render.renderClipSection(id, [diagramMarginLeft - 1, diagramMarginTop,
-                                      render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT + 1, diagramMarginTop,
-                                      render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT + 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + BACKGROUND_LINE_EXCEED_DIAGRAM,
+                                      render.getDiagramWidth() - diagramMarginRight + 1, diagramMarginTop,
+                                      render.getDiagramWidth() - diagramMarginRight + 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + BACKGROUND_LINE_EXCEED_DIAGRAM,
                                       diagramMarginLeft - 1, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + BACKGROUND_LINE_EXCEED_DIAGRAM])
         render.renderGroup(['clip-path': "url(#${id})"])
-        render.renderGroup(['element-type': ElementType.TRANSFORM_AREA,
+        render.renderGroup(['element-type': ElementType.DATA_CONTAINER,
                             'shape-type': 'timeline',
-                            'shape-max-width': 0.0,
-                            'area-min-x': diagramMarginLeft,
-                            'area-max-x': render.getDiagramWidth() - DIAGRAM_MARGIN_RIGHT,
-                            'area-min-y': diagramMarginTop,
-                            'area-max-y': render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM,
-                            'default-scroll-x-number': diagramOption.maxDataNumberToShowByDefault])
+                            'shape-max-width': 0.0])
 
         BigDecimal minX = objectToNumber(xLabelList.first())
         BigDecimal maxX = objectToNumber(xLabelList.last())
-        BigDecimal totalWidth = render.getDiagramWidth() - diagramMarginLeft - DIAGRAM_MARGIN_RIGHT
+        BigDecimal totalWidth = render.getDiagramWidth() - diagramMarginLeft - diagramMarginRight
         Set<Triple<String, String, String>> keys = timelineDataPerKey.keySet()
         for (int i = 0; i < keys.size(); i++) {
             // data timeline periods
@@ -272,11 +266,11 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
     }
 
     @Override
-    void draw(boolean alwaysShowFullInfo = false) {
+    void draw(boolean alwaysShowFullInfo = false, Integer comboTotalCount = 0, Integer comboCurrentCount = 1) {
         if (!buildXLabelList()) {
             return
         }
-        this.alwaysShowFullInfo = alwaysShowFullInfo
+        super.draw(alwaysShowFullInfo, comboTotalCount, comboCurrentCount)
         drawLegend()
         initGapAndTimelineHeight()
         drawHorizontalBackground()

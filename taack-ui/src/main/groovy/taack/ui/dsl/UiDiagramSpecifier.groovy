@@ -20,7 +20,7 @@ final class UiDiagramSpecifier {
     }
     void visitDiagram(final IUiDiagramVisitor diagramVisitor, final DiagramBase diagramBase) {
         if (diagramVisitor && closure) {
-            diagramVisitor.visitDiagram(diagramBase)
+            diagramVisitor.setDiagramBase(diagramBase)
             closure.delegate = new DiagramTypeSpec(diagramVisitor)
             closure.call()
         }

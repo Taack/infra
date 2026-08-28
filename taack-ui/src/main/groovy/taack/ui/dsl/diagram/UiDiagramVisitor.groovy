@@ -6,13 +6,13 @@ import taack.ui.dsl.UiDiagramSpecifier
 @CompileStatic
 class UiDiagramVisitor implements IUiDiagramVisitor {
     @Override
-    void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase) {
+    void setDiagramBase(UiDiagramSpecifier.DiagramBase diagramBase) {
 
     }
 
     @Override
-    void visitDiagramDataInitialization() {
-
+    UiDiagramVisitor visitDiagram(DiagramType diagramType, Map params, boolean isComboDiagram) {
+        return null
     }
 
     @Override
@@ -46,47 +46,12 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
-    void visitBarDiagram(boolean isStacked) {
-
-    }
-
-    @Override
-    void visitScatterDiagram(String... pointImageHref) {
-
-    }
-
-    @Override
-    void visitLineDiagram() {
-
-    }
-
-    @Override
-    void visitAreaDiagram() {
-
-    }
-
-    @Override
-    void visitPieDiagram(boolean hasSlice) {
-
-    }
-
-    @Override
     void whiskersBoxData(String key, BigDecimal... boxData) {
 
     }
 
     @Override
-    void visitWhiskersDiagram() {
-
-    }
-
-    @Override
     void timelinePeriodData(String key, String keyDescription, String keyImageHref, Date startDate, Date endDate, String title) {
-
-    }
-
-    @Override
-    void visitTimelineDiagram() {
 
     }
 
