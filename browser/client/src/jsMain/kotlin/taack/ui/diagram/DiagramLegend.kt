@@ -25,7 +25,9 @@ class DiagramLegend(private val parent: Diagram, val g: SVGGElement): LeafElemen
         g.style.cursor = "pointer"
         g.onclick = EventHandler{
             text.style.textDecoration = if (isHidden) "" else "line-through"
-            parent.transformArea?.hideOrShowDataset(isHidden, dataset)
+            parent.dataContainers.forEach { dataContainer ->
+                dataContainer.hideOrShowDataset(isHidden, dataset)
+            }
             isHidden = !isHidden
         }
     }

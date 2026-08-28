@@ -13,16 +13,19 @@ class LineDiagramScene extends ScatterDiagramScene {
     }
 
     @Override
-    void draw(boolean alwaysShowFullInfo = false) {
+    void draw(boolean alwaysShowFullInfo = false, Integer comboTotalCount = 0, Integer comboCurrentCount = 1) {
         if (!buildXLabelList()) {
             return
         }
-        this.alwaysShowFullInfo = alwaysShowFullInfo
+        super.rootDraw(alwaysShowFullInfo, comboTotalCount, comboCurrentCount)
+        this.isXLabelInsideGap = !(xLabelList.every { it instanceof Number } || xLabelList.every { it instanceof Date })
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart('line')
+        buildClipSectionStart()
         drawVerticalBackground()
+        buildTransformAreaStart('line')
         drawDataPoint(true)
-        buildTransformAreaEnd()
+        render.renderGroupEnd()
+        render.renderGroupEnd()
     }
 }

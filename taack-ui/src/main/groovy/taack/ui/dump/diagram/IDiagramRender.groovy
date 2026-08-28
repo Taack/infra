@@ -55,6 +55,8 @@ interface IDiagramRender {
 
     void renderImage(String filepath, BigDecimal width, BigDecimal height)
 
+    void renderByteArray(byte[] byteArray)
+
     void renderGroup(Map attributes)
 
     void renderGroupEnd()
@@ -76,4 +78,6 @@ interface IDiagramRender {
     BigDecimal measureSmallText(String text)
 
     BigDecimal measureEmphasizedText(String text)
+
+    void output(ByteArrayOutputStream out, boolean withContainer)
 }

@@ -14,16 +14,15 @@ class DiagramScrollBar(private val parent: Diagram, val g: SVGGElement): LeafEle
     }
 
     private val scrollBarHeight = g.querySelector("rect")!!.getAttribute("height")!!.toDouble()
-    private val totalHeight = parent.transformArea!!.areaMaxY - parent.transformArea.areaMinY
+    private val totalHeight = parent.horizontalBackgrounds.first().areaMaxY - parent.horizontalBackgrounds.first().areaMinY
     val rate = scrollBarHeight / totalHeight
+    private var scrollY: Double = 0.0
 
     fun scrollBy(movingDistance: Double) {
-        val currentY = g.getAttribute("scroll-y")?.toDouble() ?: 0.0
-        val y = currentY + movingDistance * rate
-        val adjustedY = min(totalHeight - scrollBarHeight, max(0.0, y))
-        if (adjustedY != currentY) {
-            g.setAttribute("scroll-y", adjustedY.toString())
+        val adjustedY = min(totalHeight - scrollBarHeight, max(0.0, scrollY + movingDistance * rate))
+        if (adjustedY != scrollY) {
             g.setAttribute("transform", "translate(0.0,${adjustedY})")
+            scrollY = adjustedY
         }
     }
 }

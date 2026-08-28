@@ -5,9 +5,20 @@ import taack.ui.dsl.UiDiagramSpecifier
 
 @CompileStatic
 interface IUiDiagramVisitor {
-    void visitDiagram(UiDiagramSpecifier.DiagramBase diagramBase)
+    void setDiagramBase(UiDiagramSpecifier.DiagramBase diagramBase)
 
-    void visitDiagramDataInitialization()
+    enum DiagramType {
+        BAR,
+        SCATTER,
+        LINE,
+        AREA,
+        PIE,
+        WHISKERS,
+        TIMELINE,
+        CUSTOM_HTML
+    }
+
+    IUiDiagramVisitor visitDiagram(DiagramType diagramType, Map params, boolean isComboDiagram)
 
     void visitLabels(Number... labels)
 
@@ -21,23 +32,9 @@ interface IUiDiagramVisitor {
 
     void dataset(String key, Date... dates)
 
-    void visitBarDiagram(boolean isStacked)
-
-    void visitScatterDiagram(String... pointImageHref)
-
-    void visitLineDiagram()
-
-    void visitAreaDiagram()
-
-    void visitPieDiagram(boolean hasSlice)
-
     void whiskersBoxData(String key, BigDecimal... boxData)
 
-    void visitWhiskersDiagram()
-
     void timelinePeriodData(String key, String keyDescription, String keyImageHref, Date startDate, Date endDate, String title)
-
-    void visitTimelineDiagram()
 
     void visitDiagramEnd()
 

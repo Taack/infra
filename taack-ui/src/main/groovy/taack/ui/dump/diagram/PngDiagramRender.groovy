@@ -276,6 +276,11 @@ class PngDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderByteArray(byte[] byteArray) {
+        ig2.drawImage(ImageIO.read(new ByteArrayInputStream(byteArray)), 0, 0, null)
+    }
+
+    @Override
     void renderGroup(Map attributes) {
         String t = attributes.get('transform')
         if (t?.startsWith('translate')) {
@@ -338,7 +343,8 @@ class PngDiagramRender implements IDiagramRender {
         return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
-    void writeImage(OutputStream os) {
-        ImageIO.write(bi, 'PNG', os)
+    @Override
+    void output(ByteArrayOutputStream out, boolean withContainer) {
+        ImageIO.write(bi, 'PNG', out)
     }
 }

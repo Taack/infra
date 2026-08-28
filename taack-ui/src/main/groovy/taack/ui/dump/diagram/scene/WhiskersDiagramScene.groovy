@@ -18,7 +18,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
     final private Map<String, List<List<BigDecimal>>> yDataListPerKey
 
     WhiskersDiagramScene(IDiagramRender render, Object[] xDataList, Map<String, List<List<BigDecimal>>> yDataListPerKey, DiagramOption diagramOption) {
-        super(render, yDataListPerKey.collectEntries { [(it.key): xDataList.collectEntries { xData -> [(xData): 0.0] }] } as Map<String, Map<Object, BigDecimal>>, diagramOption)
+        super(render, yDataListPerKey.collectEntries { [(it.key): it.value.isEmpty() ? [:] : xDataList.collectEntries { xData -> [(xData): 0.0] }] } as Map<String, Map<Object, BigDecimal>>, diagramOption)
         this.isXLabelInsideGap = true
         this.xDataList = xDataList.toList()
         this.yDataListPerKey = yDataListPerKey
@@ -58,16 +58,16 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
     }
 
     void initGapWidth() {
-        gapWidth = (render.getDiagramWidth() - DIAGRAM_MARGIN_LEFT - DIAGRAM_MARGIN_RIGHT) / xLabelList.size()
+        gapWidth = (render.getDiagramWidth() - diagramMarginLeft - diagramMarginRight) / xLabelList.size()
         if (!alwaysShowFullInfo || diagramOption.resolution == DiagramOption.DiagramResolution.FIT_CONTENT) {
             // box width should be bigger than a min value (In the case of 'smaller', we will combine several gaps to get enough space and only draw boxes of the first gap. It means 'showGapEveryX'.)
-            int boxNumber = yDataListPerKey.keySet().size()
+            int boxNumber = yDataListPerKey.findAll { !it.value.isEmpty() }.keySet().size()
             BigDecimal singleBoxWidth = boxNumber > 1 ? (gapWidth * 0.8) * 0.8 / boxNumber : gapWidth * 0.8
             if (singleBoxWidth < MIN_BOX_WIDTH) {
                 BigDecimal minGapWidth = boxNumber > 1 ? MIN_BOX_WIDTH * boxNumber / 0.8 / 0.8 : MIN_BOX_WIDTH / 0.8
                 if (diagramOption.resolution == DiagramOption.DiagramResolution.FIT_CONTENT) {
                     gapWidth = minGapWidth
-                    render.setDiagramWidth(gapWidth * xLabelList.size() + DIAGRAM_MARGIN_LEFT + DIAGRAM_MARGIN_RIGHT)
+                    render.setDiagramWidth(gapWidth * xLabelList.size() + diagramMarginLeft + diagramMarginRight)
                 } else {
                     showGapEveryX = Math.ceil((minGapWidth / gapWidth).toDouble()).toInteger()
                     gapWidth = gapWidth * showGapEveryX
@@ -78,9 +78,8 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
 
     void drawDataWhiskersBox() {
         // calculate true value of box width
-        Set<String> keys = yDataListPerKey.keySet()
         BigDecimal gapHorizontalPadding = gapWidth * 0.2 / 2
-        int boxNumber = keys.size()
+        int boxNumber = yDataListPerKey.findAll { !it.value.isEmpty() }.keySet().size()
         BigDecimal boxWidth = boxNumber > 1 ? (gapWidth * 0.8) * 0.8 / boxNumber : gapWidth * 0.8
         BigDecimal boxMargin = boxNumber > 1 ? (gapWidth * 0.8) * 0.2 / (boxNumber - 1) : 0.0
         if (boxWidth > MAX_BOX_WIDTH) {
@@ -91,133 +90,138 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         // data whiskers box
         render.lineWidth(BOX_LINE_WIDTH)
         xDataList = xDataList.collect { objectToString(it) } as List<Object>
+        Set<String> keys = yDataListPerKey.keySet()
         for (int i = 0; i < (xLabelList.size() / showGapEveryX).toInteger(); i++) {
             String xLabel = objectToString(xLabelList[i * showGapEveryX])
             int index = xDataList.lastIndexOf(xLabel)
             if (index >= 0) {
-                BigDecimal xWidth = DIAGRAM_MARGIN_LEFT + gapWidth * i + gapHorizontalPadding
+                BigDecimal xWidth = diagramMarginLeft + gapWidth * i + gapHorizontalPadding
                 for (int j = 0; j < keys.size(); j++) {
                     List<List<BigDecimal>> yDataList = yDataListPerKey[keys[j]]
-                    List<BigDecimal> boxData = index < yDataList.size() ? yDataList[index].sort() : []
-                    int size = boxData.size()
-                    if (size > 0) {
-                        BigDecimal lowerExtreme = boxData.first()
-                        BigDecimal lowerQuartile = findMedian(boxData, 0, (size / 2).toInteger())
-                        BigDecimal median = findMedian(boxData, 0, size)
-                        BigDecimal upperQuartile = findMedian(boxData, (size / 2).toInteger() + size % 2, size)
-                        BigDecimal upperExtreme = boxData.last()
-                        Color keyColor = getKeyColor(j)
-                        if (lowerExtreme > startLabelY) {
-                            String yDataLabel = numberToString(upperExtreme)
-                            render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                                'key-label': keys[j],
-                                                'key-color': KeyColor.colorToString(keyColor),
-                                                'key-description': "${xLabel}: ${yDataLabel}",
-                                                'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                                'data-x': xLabel,
-                                                'data-y': yDataLabel])
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, style: 'pointer-events: bounding-box;'])
-                            // upperExtreme line
-                            render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
-                            render.fillStyle(BLACK_COLOR)
-                            render.renderLine(boxWidth, 0.0)
-                            // line from upperExtreme to upperQuartile
-                            render.translateTo(xWidth + boxWidth / 2, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
-                            render.renderLine(0.0, (upperExtreme - upperQuartile) / gapY * gapHeight)
-                            render.renderGroupEnd()
-                            render.renderGroupEnd()
+                    if (!yDataList.isEmpty()) {
+                        List<BigDecimal> boxData = index < yDataList.size() ? yDataList[index].sort() : []
+                        int size = boxData.size()
+                        if (size > 0) {
+                            BigDecimal lowerExtreme = boxData.first()
+                            BigDecimal lowerQuartile = findMedian(boxData, 0, (size / 2).toInteger())
+                            BigDecimal median = findMedian(boxData, 0, size)
+                            BigDecimal upperQuartile = findMedian(boxData, (size / 2).toInteger() + size % 2, size)
+                            BigDecimal upperExtreme = boxData.last()
+                            Color keyColor = getKeyColor(j)
+                            if (lowerExtreme > startLabelY) {
+                                String yDataLabel = numberToString(upperExtreme)
+                                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                    'key-label': keys[j],
+                                                    'key-color': KeyColor.colorToString(keyColor),
+                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                                    'data-x': xLabel,
+                                                    'data-y': yDataLabel])
+                                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, style: 'pointer-events: bounding-box;'])
+                                // upperExtreme line
+                                render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
+                                render.fillStyle(BLACK_COLOR)
+                                render.renderLine(boxWidth, 0.0)
+                                // line from upperExtreme to upperQuartile
+                                render.translateTo(xWidth + boxWidth / 2, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
+                                render.renderLine(0.0, (upperExtreme - upperQuartile) / gapY * gapHeight)
+                                render.renderGroupEnd()
+                                render.renderGroupEnd()
 
-                            yDataLabel = numberToString(upperQuartile)
-                            render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                                'key-label': keys[j],
-                                                'key-color': KeyColor.colorToString(keyColor),
-                                                'key-description': "${xLabel}: ${yDataLabel}",
-                                                'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                                'data-x': xLabel,
-                                                'data-y': yDataLabel])
+                                yDataLabel = numberToString(upperQuartile)
+                                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                    'key-label': keys[j],
+                                                    'key-color': KeyColor.colorToString(keyColor),
+                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                                    'data-x': xLabel,
+                                                    'data-y': yDataLabel])
+                                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
+                                // rect from upperQuartile to median
+                                render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
+                                render.fillStyle(keyColor)
+                                render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
+                                render.fillStyle(BLACK_COLOR)
+                                render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
+                                render.renderGroupEnd()
+                                render.renderGroupEnd()
+
+                                yDataLabel = numberToString(median)
+                                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                    'key-label': keys[j],
+                                                    'key-color': KeyColor.colorToString(keyColor),
+                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                                    'data-x': xLabel,
+                                                    'data-y': yDataLabel])
+                                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
+                                // rect from median to lowerQuartile
+                                render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (median - startLabelY) / gapY * gapHeight)
+                                render.fillStyle(keyColor)
+                                render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
+                                render.fillStyle(BLACK_COLOR)
+                                render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
+                                render.renderGroupEnd()
+                                render.renderGroupEnd()
+
+                                yDataLabel = numberToString(lowerQuartile)
+                                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                    'key-label': keys[j],
+                                                    'key-color': KeyColor.colorToString(keyColor),
+                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                                    'data-x': xLabel,
+                                                    'data-y': yDataLabel])
+                                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, style: 'pointer-events: bounding-box;'])
+                                // lowerQuartile line
+                                render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
+                                render.renderLine(boxWidth, 0.0)
+                                // line from lowerQuartile to lowerExtreme
+                                render.translateTo(xWidth + boxWidth / 2, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
+                                render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
+                                render.renderGroupEnd()
+                                render.renderGroupEnd()
+
+                                yDataLabel = numberToString(lowerExtreme)
+                                render.renderGroup(['element-type': ElementType.TOOLTIP,
+                                                    'key-label': keys[j],
+                                                    'key-color': KeyColor.colorToString(keyColor),
+                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'diagram-action-url': diagramOption?.clickActionUrl ?: '',
+                                                    'data-x': xLabel,
+                                                    'data-y': yDataLabel])
+                                render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
+                                // lowerExtreme line
+                                render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
+                                render.renderLine(boxWidth, 0.0)
+                                render.renderGroupEnd()
+                                render.renderGroupEnd()
+                            }
+                        } else {
                             render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
-                            // rect from upperQuartile to median
-                            render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
-                            render.fillStyle(keyColor)
-                            render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
-                            render.fillStyle(BLACK_COLOR)
-                            render.renderRect(boxWidth, (upperQuartile - median) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
-                            render.renderGroupEnd()
-                            render.renderGroupEnd()
-
-                            yDataLabel = numberToString(median)
-                            render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                                'key-label': keys[j],
-                                                'key-color': KeyColor.colorToString(keyColor),
-                                                'key-description': "${xLabel}: ${yDataLabel}",
-                                                'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                                'data-x': xLabel,
-                                                'data-y': yDataLabel])
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
-                            // rect from median to lowerQuartile
-                            render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (median - startLabelY) / gapY * gapHeight)
-                            render.fillStyle(keyColor)
-                            render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.fill)
-                            render.fillStyle(BLACK_COLOR)
-                            render.renderRect(boxWidth, (median - lowerQuartile) / gapY * gapHeight, IDiagramRender.DiagramStyle.stroke)
-                            render.renderGroupEnd()
-                            render.renderGroupEnd()
-
-                            yDataLabel = numberToString(lowerQuartile)
-                            render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                                'key-label': keys[j],
-                                                'key-color': KeyColor.colorToString(keyColor),
-                                                'key-description': "${xLabel}: ${yDataLabel}",
-                                                'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                                'data-x': xLabel,
-                                                'data-y': yDataLabel])
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, style: 'pointer-events: bounding-box;'])
-                            // lowerQuartile line
-                            render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
-                            render.renderLine(boxWidth, 0.0)
-                            // line from lowerQuartile to lowerExtreme
-                            render.translateTo(xWidth + boxWidth / 2, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
-                            render.renderLine(0.0, -(lowerQuartile - lowerExtreme) / gapY * gapHeight)
-                            render.renderGroupEnd()
-                            render.renderGroupEnd()
-
-                            yDataLabel = numberToString(lowerExtreme)
-                            render.renderGroup(['element-type': ElementType.TOOLTIP,
-                                                'key-label': keys[j],
-                                                'key-color': KeyColor.colorToString(keyColor),
-                                                'key-description': "${xLabel}: ${yDataLabel}",
-                                                'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                                'data-x': xLabel,
-                                                'data-y': yDataLabel])
-                            render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
-                            // lowerExtreme line
-                            render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)
-                            render.renderLine(boxWidth, 0.0)
-                            render.renderGroupEnd()
                             render.renderGroupEnd()
                         }
-                    } else {
-                        render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
-                        render.renderGroupEnd()
+                        xWidth += boxWidth + boxMargin
                     }
-                    xWidth += boxWidth + boxMargin
                 }
             }
         }
     }
 
     @Override
-    void draw(boolean alwaysShowFullInfo = false) {
+    void draw(boolean alwaysShowFullInfo = false, Integer comboTotalCount = 0, Integer comboCurrentCount = 1) {
         if (!buildXLabelList()) {
             return
         }
-        this.alwaysShowFullInfo = alwaysShowFullInfo
+        super.draw(alwaysShowFullInfo, comboTotalCount, comboCurrentCount)
         initGapWidth()
         drawLegend()
         drawHorizontalBackground()
-        buildTransformAreaStart('whiskers', MAX_BOX_WIDTH)
+        buildClipSectionStart()
         drawVerticalBackground(showGapEveryX, gapWidth)
+        buildTransformAreaStart('whiskers', MAX_BOX_WIDTH)
         drawDataWhiskersBox()
-        buildTransformAreaEnd()
+        render.renderGroupEnd()
+        render.renderGroupEnd()
     }
 }
