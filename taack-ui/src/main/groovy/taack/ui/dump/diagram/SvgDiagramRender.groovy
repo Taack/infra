@@ -291,6 +291,11 @@ class SvgDiagramRender implements IDiagramRender {
     }
 
     @Override
+    void renderByteArray(byte[] byteArray) {
+        outStr.append(new String(byteArray))
+    }
+
+    @Override
     void renderGroup(Map attributes) {
         outStr.append("""
                 <g ${attributes.collect { "${it.key}=\"${HtmlUtils.htmlEscape(it.value?.toString() ?: '').replace('\'', '&apos;')}\"" }.join(" ")}>
@@ -353,12 +358,17 @@ class SvgDiagramRender implements IDiagramRender {
         return ig2.getFontMetrics(new Font(Font.SANS_SERIF, Font.BOLD, (fontSize * EMPHASIZED_LABEL_RATE).toInteger())).stringWidth(text)
     }
 
-    String getRendered() {
-        return """<?xml version="1.0" encoding="utf-8"?>
+    @Override
+    void output(ByteArrayOutputStream out, boolean withContainer) {
+        if (withContainer) {
+            out << """<?xml version="1.0" encoding="utf-8"?>
             <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                 class="taackDiagram" font-size-percentage="${fontSizePercentage}"
                 ${isViewBox ? "viewBox='0 0 $svgWidth $svgHeight'" : "width='${svgWidth}px' height='${svgHeight}px'"}>
             """.stripIndent() + outStr.toString() + "</svg>"
+        } else {
+            out << outStr.toString()
+        }
     }
 }

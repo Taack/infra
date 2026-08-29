@@ -4,9 +4,9 @@ import js.array.asList
 import taack.ui.base.LeafElement
 import web.svg.*
 
-class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement): LeafElement {
+class DiagramData(private val parent: DiagramDataContainer, val g: SVGGElement): LeafElement {
     companion object {
-        fun getSiblingDiagramData(dataGroup: DiagramTransformArea): List<DiagramData> {
+        fun getSiblingDiagramData(dataGroup: DiagramDataContainer): List<DiagramData> {
             val elements: List<*> = dataGroup.g.querySelectorAll("g[element-type='DATA']").asList()
             return elements.map {
                 DiagramData(dataGroup, it as SVGGElement)
@@ -75,6 +75,19 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                         shape.setAttribute("x2", (startX + shapeWidth).toString())
                     }
                 }
+                "polygon" -> { // startX = areaMinX, shapeWidth = zoomRadio
+                    val newPoints = shape.getAttribute("points")?.trim()?.split(" ")?.map { s: String ->
+                        val coordXY = s.split(",")
+                        if (coordXY.size == 2) {
+                            ((coordXY.first().toDouble() - startX) * shapeWidth + startX).toString() + "," + coordXY[1]
+                        } else {
+                            s
+                        }
+                    }?.joinToString(" ")
+                    if (newPoints != null) {
+                        shape.setAttribute("points", newPoints)
+                    }
+                }
             }
         }
     }
@@ -106,7 +119,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
                             height = shape.getAttribute("y1")!!.toDouble() - shape.getAttribute("y2")!!.toDouble()
                         }
                         shape.setAttribute("y1", startY.toString())
-                        shape.setAttribute("y2", (startY - height!!).toString())
+                        shape.setAttribute("y2", (startY - height).toString())
                     } else { // horizontal line
                         shape.setAttribute("y1", (startY - (height ?: 0.0)).toString()) // for whiskers: move to top point
                         shape.setAttribute("y2", (startY - (height ?: 0.0)).toString())
@@ -122,7 +135,7 @@ class DiagramData(private val parent: DiagramTransformArea, val g: SVGGElement):
         return shapes.firstOrNull()?.getAttribute(name)
     }
 
-    fun getTooltip(): DiagramTooltip? {
+    private fun getTooltip(): DiagramTooltip? {
         val tooltip = g.closest("g[element-type='TOOLTIP']")
         return if (tooltip != null) {
             parent.parent.tooltips.firstOrNull { it.g == tooltip }

@@ -86,19 +86,19 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
                     description.setAttribute("height", "100%")
                     val descriptionContainer: HTMLDivElement = document.createElement("div") as HTMLDivElement
                     descriptionContainer.classList.add(ClassName("diagram-tooltip-description"))
+                    descriptionContainer.setAttribute("style", "font-size: ${(13 * fontSizePercentage).toInt()}px; font-family: sans-serif;")
                     descriptionContainer.innerHTML = HtmlSource(keyDescription)
                     description.appendChild(descriptionContainer)
 
                     parent.s.appendChild(description)
                     val descriptionWidth = min(descriptionContainer.clientWidth.toDouble(), maxWidth)
-                    description.setAttribute("width", descriptionWidth.toString())
+                    description.setAttribute("width", (descriptionWidth + 5 * fontSizePercentage).toString())
                     val descriptionHeight = descriptionContainer.clientHeight
                     description.setAttribute("height", descriptionHeight.toString())
                     description.remove()
                     tooltip.appendChild(description)
                 }
             }
-
 
             g.onmouseenter = EventHandler { e: MouseEvent ->
                 showTooltip(e)
@@ -131,12 +131,13 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
         }
     }
 
-    fun showTooltip(e: MouseEvent, refreshBackground: Boolean = false) {
+    fun showTooltip(e: MouseEvent) {
         if (tooltip != null) {
             parent.s.appendChild(tooltip)
 
             val fontSizePercentage = parent.getFontSizePercentage()
             val margin = 10 * fontSizePercentage
+            val background = tooltip.querySelector(".diagram-tooltip-background")!! as SVGPolygonElement
             if (keyImageHref.isNotBlank() && tooltip.querySelector(".diagram-tooltip-images") == null) {
                 val images: SVGForeignObjectElement = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject") as SVGForeignObjectElement
                 images.style.display = "none"
@@ -163,15 +164,14 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
                         images.style.display = ""
                         images.setAttribute("width", imagesContainer.clientWidth.toString())
                         images.setAttribute("height", imagesContainer.clientHeight.toString())
-                        showTooltip(e, true)
+                        background.removeAttribute("points")
+                        if (parent.s.contains(tooltip)) {
+                            showTooltip(e)
+                        }
                     }
                 }, 10)
             }
 
-            val background = tooltip.querySelector(".diagram-tooltip-background")!! as SVGPolygonElement
-            if (refreshBackground) {
-                background.removeAttribute("points")
-            }
             if (background.getAttribute("points") == null) {
                 val contentWidth = tooltip.getBBox().width
                 val contentHeight = tooltip.getBBox().height
@@ -184,8 +184,8 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
                             "${-contentWidth / 2 - margin},${margin}")
             }
 
-            val diagramScrollX = if (xScrolled) (parent.transformArea?.g?.getAttribute("scroll-x")?.toDouble() ?: 0.0) else 0.0
-            val diagramScrollY = if (yScrolled) (parent.transformArea?.g?.getAttribute("scroll-y")?.toDouble() ?: 0.0) else 0.0
+            val diagramScrollX = if (xScrolled) parent.scrollX else 0.0
+            val diagramScrollY = if (yScrolled) parent.scrollY else 0.0
             val diagramMinX = parent.s.viewBox.baseVal.x
             val diagramMaxX = diagramMinX + parent.s.viewBox.baseVal.width
             val mouseX = parent.translateX(e.clientX.toDouble())

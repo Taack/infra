@@ -1325,6 +1325,27 @@ class CmsController implements WebAttributes {
                     }
                 })
             })
+            // ------- Mixed diagram -------
+            diagram new UiDiagramSpecifier().ui {
+                area {
+                    labels 'Date1', 'Date2', 'Date3', 'Date4', 'Date5', 'Date6', 'Date7'
+                    dataset 'Area', 6.0, 6.0, 9.0, 6.0, 10.0, 9.0, 8.0
+
+                    // mixing different types
+                    bar {
+                        dataset 'Bar', 5.0, 8.0, 7.0, 3.0, 5.5, 10.0, 2.0
+                    }
+                    line {
+                        dataset 'Line1', 1.0, 1.6, 1.2, 1.0, 1.0, 8.0, 1.0
+                    }
+                    line {
+                        dataset 'Line2', 4.0, 6.6, 5.2, 7.0, 3.0, 8.0, 10.0
+                    }
+                    scatter {
+                        dataset 'Scatter', 8.0, 5.0, 8.5, 10.0, 9.5, 5.6, 9.3
+                    }
+                }
+            }
         }), buildMenu())
     }
 

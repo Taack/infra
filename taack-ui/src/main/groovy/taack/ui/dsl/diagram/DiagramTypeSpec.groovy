@@ -3,13 +3,13 @@ package taack.ui.dsl.diagram
 import groovy.transform.CompileStatic
 
 @CompileStatic
-final class DiagramTypeSpec {
-    final IUiDiagramVisitor diagramVisitor
-    final DiagramDatasetSpec diagramDatasetSpec
+class DiagramTypeSpec {
+    IUiDiagramVisitor diagramVisitor
+    boolean isInsideCombo
 
-    DiagramTypeSpec(final IUiDiagramVisitor diagramVisitor) {
+    DiagramTypeSpec(final IUiDiagramVisitor diagramVisitor, final boolean isInsideCombo = false) {
         this.diagramVisitor = diagramVisitor
-        this.diagramDatasetSpec = new DiagramDatasetSpec(diagramVisitor)
+        this.isInsideCombo = isInsideCombo
     }
 
     static Closure<DiagramTypeSpec> buildDiagramTypeSpec(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiagramTypeSpec) final Closure closure) {
@@ -23,64 +23,57 @@ final class DiagramTypeSpec {
 
     void bar(boolean isStacked = true,
              @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = diagramDatasetSpec
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.BAR, [isStacked: isStacked], isInsideCombo)
+        closure.delegate = new DiagramDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitBarDiagram(isStacked)
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
     void scatter(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure,
               String... pointImageHref) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = diagramDatasetSpec
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.SCATTER, [pointImageHref: pointImageHref.toList()], isInsideCombo)
+        closure.delegate = new DiagramDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitScatterDiagram(pointImageHref)
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
     void line(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = diagramDatasetSpec
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.LINE, [:], isInsideCombo)
+        closure.delegate = new DiagramDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitLineDiagram()
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
     void area(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = diagramDatasetSpec
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.AREA, [:], isInsideCombo)
+        closure.delegate = new DiagramDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitAreaDiagram()
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
-    void pie(boolean hasSlice, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = diagramDatasetSpec
+    void pie(boolean hasSlice = false, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramDatasetSpec) Closure closure) {
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.PIE, [hasSlice: hasSlice], isInsideCombo)
+        closure.delegate = new DiagramDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitPieDiagram(hasSlice)
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
     void whiskers(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramWhiskersDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = new DiagramWhiskersDatasetSpec(diagramVisitor)
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.WHISKERS, [:], isInsideCombo)
+        closure.delegate = new DiagramWhiskersDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitWhiskersDiagram()
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
     void timeline(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramTimelineDatasetSpec) Closure closure) {
-        diagramVisitor.visitDiagramDataInitialization()
-        closure.delegate = new DiagramTimelineDatasetSpec(diagramVisitor)
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.TIMELINE, [:], isInsideCombo)
+        closure.delegate = new DiagramTimelineDatasetSpec(d)
         closure.call()
-        diagramVisitor.visitTimelineDiagram()
-        diagramVisitor.visitDiagramEnd()
+        d.visitDiagramEnd()
     }
 
     void custom(String html) {
-        diagramVisitor.visitDiagramDataInitialization()
+        diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.CUSTOM_HTML, [:], false)
         diagramVisitor.visitCustom(html)
     }
 }
