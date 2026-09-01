@@ -1,0 +1,179 @@
+<%@ page import="taack.ui.ext.cal.TaackCalendarParams; calendar.CalendarDow; calendar.CalendarMonth; java.text.SimpleDateFormat" %>
+<%
+    // Model: events (List<CalendarEvent>), calendarParams (CalendarParams)
+    TaackCalendarParams taackCalParams = taackCalendarParams
+    Calendar cal = Calendar.getInstance()
+    cal.set(Calendar.YEAR, taackCalParams.year)
+    cal.set(Calendar.MONTH, taackCalParams.month)
+    cal.set(Calendar.DAY_OF_MONTH, 1)
+
+    // Day of week for 1st of month (1=Mon .. 7=Sun)
+    int firstDow = cal.get(Calendar.DAY_OF_WEEK)  // Java: 1=Sun..7=Sat
+    int firstDowMon = firstDow == Calendar.SUNDAY ? 7 : firstDow - 1  // Convert to 1=Mon..7=Sun
+
+    int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+    // Padding days from previous month
+    int paddingBefore = firstDowMon - 1
+
+    // Total cells needed (pad to full weeks)
+    int totalCells = paddingBefore + daysInMonth
+    int paddingAfter = (7 - (totalCells % 7)) % 7
+    totalCells += paddingAfter
+
+    // Previous month info for padding
+    Calendar prevCal = Calendar.getInstance()
+    prevCal.set(Calendar.YEAR, taackCalParams.year)
+    prevCal.set(Calendar.MONTH, taackCalParams.month)
+    prevCal.add(Calendar.MONTH, -1)
+    int prevMonthDays = prevCal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+    // Today
+    Calendar today = Calendar.getInstance()
+    int todayYear = today.get(Calendar.YEAR)
+    int todayMonth = today.get(Calendar.MONTH)
+    int todayDay = today.get(Calendar.DAY_OF_MONTH)
+
+    def sdf = new SimpleDateFormat('HH:mm')
+%>
+
+<style>
+#cal-body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 8px;
+}
+
+.cal-month {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.cal-day-name {
+    background: #e3f2fd;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85em;
+    padding: 6px 4px;
+    border-bottom: 1px solid #ddd;
+    color: #37474f;
+}
+
+.cal-day-cell {
+    min-height: 100px;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 4px;
+    vertical-align: top;
+    background: #fff;
+}
+
+.cal-day-cell:nth-child(7n) {
+    border-right: none;
+}
+
+.cal-day-number {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.cal-today {
+    background: #fff8e1;
+}
+
+.cal-today .cal-day-number {
+    color: #f57f17;
+    font-weight: 700;
+}
+
+.cal-other-month {
+    background: #fafafa;
+}
+
+.cal-other-month .cal-day-number {
+    color: #bbb;
+}
+
+.cal-event-chip {
+    display: block;
+    padding: 2px 5px;
+    margin: 1px 0;
+    border-radius: 3px;
+    font-size: 0.75em;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    cursor: default;
+}
+
+</style>
+
+<div id="cal-body">
+    <div class="cal-month">
+        <% CalendarDow.values().each { dn -> %>
+            <div class="cal-day-name">${dn}</div>
+        <% } %>
+
+        <% for (int i = 0; i < totalCells; i++) {
+            int dayNum
+            boolean isOtherMonth = false
+            boolean isToday = false
+            int cellMonth = taackCalParams.month
+            int cellYear = taackCalParams.year
+
+            if (i < paddingBefore) {
+                // Previous month
+                dayNum = prevMonthDays - paddingBefore + 1 + i
+                isOtherMonth = true
+                cellMonth = prevCal.get(Calendar.MONTH)
+                cellYear = prevCal.get(Calendar.YEAR)
+            } else if (i >= paddingBefore + daysInMonth) {
+
+                // Next month
+                dayNum = i - paddingBefore - daysInMonth + 1
+                isOtherMonth = true
+                if (taackCalParams.month == 11) { cellMonth = 0; cellYear = taackCalParams.year + 1 }
+                else { cellMonth = taackCalParams.month + 1 }
+            } else {
+
+                dayNum = i - paddingBefore + 1
+                isToday = (taackCalParams.year == todayYear && taackCalParams.month == todayMonth && dayNum == todayDay)
+            }
+
+            // Find events overlapping this day
+            Calendar dayStart = Calendar.getInstance()
+            dayStart.set(cellYear, cellMonth, dayNum, 0, 0, 0)
+            dayStart.set(Calendar.MILLISECOND, 0)
+            Calendar dayEnd = Calendar.getInstance()
+            dayEnd.set(cellYear, cellMonth, dayNum, 23, 59, 59)
+            dayEnd.set(Calendar.MILLISECOND, 999)
+
+            def dayEvents = events.findAll { ev ->
+                ev.fromDate.before(dayEnd.time) && ev.toDate.after(dayStart.time)
+            }
+
+            String cellClass = 'cal-day-cell'
+            if (isToday) cellClass += ' cal-today'
+            if (isOtherMonth) cellClass += ' cal-other-month'
+        %>
+
+        <div class="${cellClass}">
+                <div class="cal-day-number">${dayNum}</div>
+                <% dayEvents.eachWithIndex { ev, idx ->
+                    String color = '#4EA4DD'
+                %>
+                    <span class="cal-event-chip" style="background: ${color};"
+                          title="${sdf.format(ev.fromDate)} - ${sdf.format(ev.toDate)}: ${ev.title}">
+                        ${ev.title}
+                    </span>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
