@@ -44,7 +44,11 @@ class TaackCalendarUiService {
         calendarBlock(LocaleContextHolder.getLocale(), currentMethod, events, taackCalParams)
     }
 
-    UiTableSpecifier calendarUiTable(Locale locale, MethodClosure currentMethod, Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
+    UiTableSpecifier calendarUiTable(Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
+        calendarUiTable(LocaleContextHolder.getLocale(), events, taackCalParams)
+    }
+
+    UiTableSpecifier calendarUiTable(Locale locale, Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
         new UiTableSpecifier().ui {
             header {
                 column {
@@ -53,69 +57,45 @@ class TaackCalendarUiService {
                 }
                 label 'Title'
             }
-            Iterator<TaackCalendarEvent> sortedEvent = events.sort { it1, it2 -> it1.dateFrom <=> it2.dateFrom ?: it1.dateTo <=> it2.dateTo }
-            // Date dateStart = sortedEvent.first().fromDate
-            // Date dateEnd = sortedEvent.last().toDate
-
-            //println "dateStart: $dateStart -> dateEnd: $dateEnd"
-
+            List<TaackCalendarEvent> sortedEventList = events.sort { it1, it2 -> it1.dateFrom <=> it2.dateFrom ?: it1.dateTo <=> it2.dateTo }.toList()
             Calendar c = Calendar.getInstance()
-            c.setFirstDayOfWeek(1)
-            //c.setTime(dateStart)
-            //int y = c.get(Calendar.YEAR)
-            //int woy = c.get(Calendar.WEEK_OF_YEAR)
-            //int dow = c.get(Calendar.DAY_OF_WEEK)
-//                if (dow < c.firstDayOfWeek) woy += 1
-            //println "y: $y, woy: $woy, dow: $dow, firstDayOfWeek: ${c.firstDayOfWeek}"
-            //c.setTime(dateEnd)
-            //int yEnd = c.get(Calendar.YEAR)
-            //int woyEnd = c.get(Calendar.WEEK_OF_YEAR)
-            //int dowEnd = c.get(Calendar.DAY_OF_WEEK)
-//                if (dowEnd < c.firstDayOfWeek) woyEnd += 1
-            //println "yEnd: $yEnd, woyEnd: $woyEnd, dowEnd: $dowEnd, firstDayOfWeek: ${c.firstDayOfWeek}"
-
-            int prevWoy = 0
-            TaackCalendarEvent breakingEvent = null
-            while (sortedEvent.hasNext()) {
-                TaackCalendarEvent e = breakingEvent ?: sortedEvent.next()
+            for (int index = 0; index < sortedEventList.size(); index++) {
+                TaackCalendarEvent e = sortedEventList[index]
                 c.setTime(e.dateFrom)
                 int woy = c.get(Calendar.WEEK_OF_YEAR)
                 int year = c.get(Calendar.YEAR)
                 rowIndent(true) {
-//                        rowTree(true) {
-//                            rowField yIt, Style.RED + Style.ALIGN_CENTER
-//                        }
-                    for (int woyIt : prevWoy..woy) {
-                        rowTree(true) {
-                            rowColumn(2) {
-                                rowField "$year / $woyIt (${c.get(Calendar.MONTH)})", Style.BLUE + Style.BOLD
-                            }
+                    rowTree(true) {
+                        rowColumn(2) {
+                            rowField "$year / $woy (${c.get(Calendar.MONTH)})", Style.BLUE + Style.BOLD
                         }
-                        rowIndent(true) {
-                            for (int dowIt : 1..7) {
-
+                    }
+                    rowIndent(true) {
+                        for (int dowIt : 1..7) {
+                            int someDow = c.get(Calendar.DAY_OF_WEEK)
+                            int someDom = c.get(Calendar.DAY_OF_MONTH)
+                            c.set(Calendar.HOUR_OF_DAY, 0)
+                            c.set(Calendar.MINUTE, 0)
+                            c.set(Calendar.SECOND, 0)
+                            Date dayStart = c.time
+                            c.add(Calendar.HOUR, 24)
+                            Date dayEnd = c.time
+                            List<TaackCalendarEvent> eventsOfTheDay = []
+                            for (int index2 = index; index2 < sortedEventList.size(); index2++) {
+                                TaackCalendarEvent e2 = sortedEventList[index2]
+                                if (!(e2.dateFrom >= dayEnd || e2.dateTo <= dayStart)) eventsOfTheDay.add(e2)
+                                if (e2.dateFrom > dayEnd) break
+                                if (e2.dateTo < dayStart) index = index2
+                            }
+                            if (eventsOfTheDay.size() > 0) {
                                 rowTree(true) {
                                     rowColumn(2) {
-                                        String dayName = new DateFormatSymbols(locale).getWeekdays()[dowIt]
+                                        String dayName = new DateFormatSymbols(locale).getWeekdays()[someDow]
                                         String monthName = new DateFormatSymbols(locale).getMonths()[c.get(Calendar.MONTH)]
-                                        rowField(dayName + " (${monthName}/${c.get(Calendar.DAY_OF_MONTH)})")
+                                        rowField(dayName + " (${monthName}/${someDom})")
                                     }
                                 }
-                                c.set(Calendar.DAY_OF_WEEK, dowIt)
-                                c.set(Calendar.HOUR_OF_DAY, 0)
-                                c.set(Calendar.MINUTE, 0)
-                                c.set(Calendar.SECOND, 0)
-                                Date dayStart = c.time
-                                c.add(Calendar.HOUR, 24)
-                                Date dayEnd = c.time
                                 rowIndent(true) {
-                                    List<TaackCalendarEvent> eventsOfTheDay = [e]
-                                    while (sortedEvent.hasNext()) {
-                                        breakingEvent = sortedEvent.next()
-                                        if (breakingEvent.dateFrom.before(dayEnd))
-                                            eventsOfTheDay.add(breakingEvent)
-                                        else break
-                                    }
                                     for (TaackCalendarEvent eventIt : eventsOfTheDay) {
                                         rowTree(false) {
                                             rowColumn {
@@ -142,7 +122,6 @@ class TaackCalendarUiService {
                                             }
                                             rowField eventIt.getName(), Style.BOLD
                                         }
-
                                     }
                                 }
                             }
@@ -150,7 +129,6 @@ class TaackCalendarUiService {
                     }
                 }
             }
-
         }
     }
 }

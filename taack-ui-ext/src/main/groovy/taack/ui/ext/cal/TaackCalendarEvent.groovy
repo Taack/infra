@@ -1,6 +1,7 @@
 package taack.ui.ext.cal
 
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.dsl.common.Style
 
@@ -12,9 +13,7 @@ interface TaackCalendarEvent {
     Date getDateTo()
     Style getStyle()
     String getName()
-    String getDesc()
 
-    Iterator<Duration> getRepetitions()
-
-    Iterator<GormEntity> getGuest()
+    MethodClosure getAction()
+    Long getId()
 }
