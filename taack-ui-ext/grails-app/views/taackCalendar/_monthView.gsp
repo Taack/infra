@@ -1,4 +1,4 @@
-<%@ page import="taack.ui.ext.cal.TaackCalendarEvent; taack.ui.ext.cal.TaackCalendarParams; java.text.SimpleDateFormat" %>
+<%@ page import="taack.ui.dump.Parameter; taack.ui.ext.cal.TaackCalendarEvent; taack.ui.ext.cal.TaackCalendarParams; java.text.SimpleDateFormat" %>
 <%
     // Model: events (List<CalendarEvent>), calendarParams (CalendarParams)
     TaackCalendarParams taackCalParams = taackCalendarParams
@@ -169,7 +169,7 @@
                 %>
                     <span class="cal-event-chip" style="background: ${color};"
                           title="${sdf.format(ev.dateFrom)} - ${sdf.format(ev.dateTo)}: ${ev.name}">
-                        ${ev.name}
+            <a ajaxAction="${new Parameter().urlMapped(ev.action, [id: ev.id])}">${ev.name}</a>
                     </span>
                 <% } %>
             </div>

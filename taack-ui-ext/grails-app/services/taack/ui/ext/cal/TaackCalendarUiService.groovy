@@ -120,7 +120,9 @@ class TaackCalendarUiService {
                                                     rowField "${String.format('%02d', mo1)}/${String.format('%02d', dm1)} ${String.format('%02d', h1)}:${String.format('%02d', m1)} -> ${String.format('%02d', mo2)}/${String.format('%02d', dm2)} ${String.format('%02d', h2)}:${String.format('%02d', m2)}"
                                                 }
                                             }
-                                            rowField eventIt.getName(), Style.BOLD
+                                            rowColumn {
+                                                rowAction eventIt.getName(), eventIt.action, eventIt.id// , Style.BOLD
+                                            }
                                         }
                                     }
                                 }

@@ -6,19 +6,16 @@ import grails.validation.Validateable
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
-import org.grails.datastore.gorm.GormEntity
 import taack.ast.annotation.TaackFieldEnum
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiFormSpecifier
+import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
 import taack.ui.ext.cal.TaackCalendarEvent
 import taack.ui.ext.cal.TaackCalendarParams
 import taack.ui.ext.cal.TaackCalendarUiService
 import taack.ui.test.RootController
-
-import java.time.Duration
 
 @TaackFieldEnum
 @GrailsCompileStatic
@@ -47,12 +44,14 @@ class TaackCalendarEventAdapter implements TaackCalendarEvent {
     final Date dateTo
     final String name
     final String desc
+    final Long id
 
-    TaackCalendarEventAdapter(CalendarEvent calendarEvent) {
+    TaackCalendarEventAdapter(Long id, CalendarEvent calendarEvent) {
         name = calendarEvent.title
         desc = calendarEvent.body
         dateFrom = calendarEvent.fromDate
         dateTo = calendarEvent.toDate
+        this.id = id
     }
 
     @Override
@@ -62,12 +61,7 @@ class TaackCalendarEventAdapter implements TaackCalendarEvent {
 
     @Override
     MethodClosure getAction() {
-        return null
-    }
-
-    @Override
-    Long getId() {
-        return null
+        return CalendarController.&showCalendarEvent as MC
     }
 
     @Override
@@ -86,7 +80,7 @@ class TaackCalendarEventAdapter implements TaackCalendarEvent {
 class CalendarController {
 
     TaackUiService taackUiService
-    List<CalendarEvent> calendarEvents = []
+    Map<Long, CalendarEvent> calendarEvents = [:]
     TaackCalendarUiService taackCalendarUiService
 
     @PostConstruct
@@ -114,33 +108,13 @@ class CalendarController {
         rightNow.set(Calendar.MINUTE, 0)
         Date tomorrow13 = rightNow.time
 
-        calendarEvents << new CalendarEvent(title: 'Test0', fromDate: yesterday, toDate: today10)
-        calendarEvents << new CalendarEvent(title: 'Test3', fromDate: today8, toDate: tomorrow930)
-        calendarEvents << new CalendarEvent(title: 'Test1', fromDate: today8, toDate: today10)
-        calendarEvents << new CalendarEvent(title: 'Test2', fromDate: tomorrow9, toDate: tomorrow13)
-        calendarEvents << new CalendarEvent(title: 'Test10', fromDate: yesterday, toDate: tomorrow930)
+        calendarEvents.put 1l, new CalendarEvent(title: 'Test0', fromDate: yesterday, toDate: today10)
+        calendarEvents.put 2l, new CalendarEvent(title: 'Test3', fromDate: today8, toDate: tomorrow930)
+        calendarEvents.put 3l, new CalendarEvent(title: 'Test1', fromDate: today8, toDate: today10)
+        calendarEvents.put 4l, new CalendarEvent(title: 'Test2', fromDate: tomorrow9, toDate: tomorrow13)
+        calendarEvents.put 5l, new CalendarEvent(title: 'Test10', fromDate: yesterday, toDate: tomorrow930)
 
         println calendarEvents
-    }
-
-    def createEvent(CalendarEvent event) {
-        event ?= new CalendarEvent()
-
-        taackUiService.show(new UiBlockSpecifier().ui {
-            modal {
-                form(new UiFormSpecifier().ui(event) {
-                    field event.title_
-                    field event.fromDate_
-                    field event.toDate_
-                    field event.body_
-                    formAction(this.&saveEvent as MC)
-                })
-            }
-        })
-    }
-
-    def saveEvent() {
-
     }
 
     def fromCustom(TaackCalendarParams calendarParams) {
@@ -149,12 +123,12 @@ class CalendarController {
 
                 @Override
                 Date getDateFrom() {
-                    return it.fromDate
+                    return it.value.fromDate
                 }
 
                 @Override
                 Date getDateTo() {
-                    return it.toDate
+                    return it.value.toDate
                 }
 
                 @Override
@@ -164,17 +138,17 @@ class CalendarController {
 
                 @Override
                 String getName() {
-                    return it.title
+                    return it.value.title
                 }
 
                 @Override
                 MethodClosure getAction() {
-                    return null
+                    return CalendarController.&showCalendarEvent as MC
                 }
 
                 @Override
                 Long getId() {
-                    return null
+                    return it.key
                 }
             }
         }.iterator() as Iterator<TaackCalendarEvent>, calendarParams), RootController.buildMenu()
@@ -182,10 +156,24 @@ class CalendarController {
 
     def fromUiTable(TaackCalendarParams calendarParams) {
         UiTableSpecifier t = taackCalendarUiService.calendarUiTable(calendarEvents.collect {
-            new TaackCalendarEventAdapter(it)
+            new TaackCalendarEventAdapter(it.key, it.value)
         }.iterator() as Iterator<TaackCalendarEvent>, calendarParams)
         taackUiService.show new UiBlockSpecifier().ui {
             table t
         }, RootController.buildMenu()
+    }
+
+    def showCalendarEvent(Long id) {
+        CalendarEvent event = calendarEvents[id]
+        taackUiService.show new UiBlockSpecifier().ui {
+            modal {
+                show new UiShowSpecifier().ui {
+                    field event.fromDate_
+                    field event.toDate_
+                    field event.title_
+                }
+            }
+        }
+
     }
 }
