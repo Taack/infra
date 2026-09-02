@@ -1,4 +1,4 @@
-<%@ page import="taack.ui.ext.cal.TaackCalendarParams; calendar.CalendarDow; calendar.CalendarMonth; java.text.SimpleDateFormat" %>
+<%@ page import="taack.ui.ext.cal.TaackCalendarEvent; taack.ui.ext.cal.TaackCalendarParams; java.text.SimpleDateFormat" %>
 <%
     // Model: events (List<CalendarEvent>), calendarParams (CalendarParams)
     TaackCalendarParams taackCalParams = taackCalendarParams
@@ -116,7 +116,7 @@
 
 <div id="cal-body">
     <div class="cal-month">
-        <% CalendarDow.values().each { dn -> %>
+        <% (dayNames[2..7] + dayNames[1]).each { dn -> %>
             <div class="cal-day-name">${dn}</div>
         <% } %>
 
@@ -154,10 +154,9 @@
             dayEnd.set(cellYear, cellMonth, dayNum, 23, 59, 59)
             dayEnd.set(Calendar.MILLISECOND, 999)
 
-            def dayEvents = events.findAll { ev ->
-                ev.fromDate.before(dayEnd.time) && ev.toDate.after(dayStart.time)
+            List<TaackCalendarEvent> dayEvents = taackCalendarEvents.findAll { ev ->
+                ev.dateFrom.before(dayEnd.time) && ev.dateTo.after(dayStart.time)
             }
-
             String cellClass = 'cal-day-cell'
             if (isToday) cellClass += ' cal-today'
             if (isOtherMonth) cellClass += ' cal-other-month'
@@ -165,12 +164,12 @@
 
         <div class="${cellClass}">
                 <div class="cal-day-number">${dayNum}</div>
-                <% dayEvents.eachWithIndex { ev, idx ->
+                <% dayEvents.eachWithIndex { TaackCalendarEvent ev, idx ->
                     String color = '#4EA4DD'
                 %>
                     <span class="cal-event-chip" style="background: ${color};"
-                          title="${sdf.format(ev.fromDate)} - ${sdf.format(ev.toDate)}: ${ev.title}">
-                        ${ev.title}
+                          title="${sdf.format(ev.dateFrom)} - ${sdf.format(ev.dateTo)}: ${ev.name}">
+                        ${ev.name}
                     </span>
                 <% } %>
             </div>

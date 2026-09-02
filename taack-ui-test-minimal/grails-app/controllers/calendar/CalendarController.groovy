@@ -1,20 +1,23 @@
 package calendar
 
 import grails.compiler.GrailsCompileStatic
-import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.Validateable
-import groovy.transform.CompileStatic
 import jakarta.annotation.PostConstruct
-import org.codehaus.groovy.runtime.MethodClosure
 import org.codehaus.groovy.runtime.MethodClosure as MC
+import org.grails.datastore.gorm.GormEntity
 import taack.ast.annotation.TaackFieldEnum
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiFormSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
+import taack.ui.ext.cal.TaackCalendarEvent
+import taack.ui.ext.cal.TaackCalendarParams
+import taack.ui.ext.cal.TaackCalendarUiService
 import taack.ui.test.RootController
+
+import java.time.Duration
 
 @TaackFieldEnum
 @GrailsCompileStatic
@@ -37,59 +40,13 @@ class CalendarEvent implements Validateable {
     }
 }
 
-@CompileStatic
-enum CalendarDow {
-    MON, TUE, WED, THU, FRI, SAT, SUN
-}
-
-@CompileStatic
-enum CalendarMonth {
-    JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
-}
-
-@TaackFieldEnum
-@GrailsCompileStatic
-class CalendarParams implements Validateable {
-
-    CalendarParams() {
-        Calendar now = Calendar.getInstance()
-        now.setFirstDayOfWeek(Calendar.MONDAY)
-        year = now.get(Calendar.YEAR)
-        month = CalendarMonth.values()[now.get(Calendar.MONTH)]
-        weekOfYear = now.get(Calendar.WEEK_OF_YEAR)
-    }
-
-    Integer year
-    CalendarMonth month
-    Integer weekOfYear
-
-    CalendarParams computePrevMonth() {
-        if (month.ordinal() == 0) return new CalendarParams(year: year - 1, month: CalendarMonth.values()[11])
-        new CalendarParams(year: year, month: CalendarMonth.values()[month.ordinal() - 1])
-    }
-
-    CalendarParams computeNextMonth() {
-        if (month.ordinal() == 11) return new CalendarParams(year: year + 1, month: CalendarMonth.values()[0])
-        new CalendarParams(year: year, month: CalendarMonth.values()[month.ordinal() + 1])
-    }
-
-    @Override
-    String toString() {
-        return "CalendarParams{" +
-                "year=" + year +
-                ", month=" + month +
-                ", weekOfYear=" + weekOfYear +
-                '}'
-    }
-}
-
 @GrailsCompileStatic
 @Secured(['permitAll'])
 class CalendarController {
 
     TaackUiService taackUiService
     List<CalendarEvent> calendarEvents = []
-    PageRenderer groovyPageRenderer
+    TaackCalendarUiService taackCalendarUiService
 
     static final Map<Integer, String> dayNames = [1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday']
 
@@ -129,7 +86,7 @@ class CalendarController {
                     field event.fromDate_
                     field event.toDate_
                     field event.body_
-                    formAction(this.&saveEvent as MethodClosure)
+                    formAction(this.&saveEvent as MC)
                 })
             }
         })
@@ -139,23 +96,46 @@ class CalendarController {
 
     }
 
-    def fromCustom(CalendarParams calendarParams) {
-        calendarParams ?= new CalendarParams()
-        UiBlockSpecifier calendar = new UiBlockSpecifier().ui {
-            custom(groovyPageRenderer.render(
-                    template: '/calendar/monthView',
-                    model: [
-                            events        : calendarEvents,
-                            calendarParams: calendarParams,
-                    ]), null) {
-                label("${calendarParams.month} ${calendarParams.year}")
-                menu 'Prev', CalendarController.&fromCustom as MC, calendarParams.computePrevMonth()
-                menu 'Today', CalendarController.&fromCustom as MC, new CalendarParams()
-                menu 'Next', CalendarController.&fromCustom as MC, calendarParams.computeNextMonth()
-            }
-        }
+    def fromCustom(TaackCalendarParams calendarParams) {
+        taackUiService.show taackCalendarUiService.calendarBlock(CalendarController.&fromCustom as MC, calendarEvents.collect {
+            new TaackCalendarEvent() {
 
-        taackUiService.show(calendar, RootController.buildMenu())
+                @Override
+                Date getDateFrom() {
+                    return it.fromDate
+                }
+
+                @Override
+                Date getDateTo() {
+                    return it.toDate
+                }
+
+                @Override
+                Style getStyle() {
+                    return null
+                }
+
+                @Override
+                String getName() {
+                    return it.title
+                }
+
+                @Override
+                String getDesc() {
+                    return it.body
+                }
+
+                @Override
+                Iterator<Duration> getRepetitions() {
+                    return null
+                }
+
+                @Override
+                Iterator<GormEntity> getGuest() {
+                    return null
+                }
+            }
+        }.iterator() as Iterator<TaackCalendarEvent>, calendarParams), RootController.buildMenu()
     }
 
     def fromUiTable() {

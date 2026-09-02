@@ -3,6 +3,7 @@ package taack.ui.ext.cal
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import org.codehaus.groovy.runtime.MethodClosure
+import org.springframework.context.i18n.LocaleContextHolder
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
@@ -13,18 +14,23 @@ import java.text.DateFormatSymbols
 class TaackCalendarUiService {
     PageRenderer groovyPageRenderer
 
-    String drawCalendar(Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
-        groovyPageRenderer.render(
+    String drawCalendar(Locale locale, Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
+
+        List<TaackCalendarEvent> eventList = events.toList()
+
+        String c = groovyPageRenderer.render(
                 template: '/taackCalendar/monthView',
                 model: [
-                        taackCalendarEvents: events,
+                        dayNames           : new DateFormatSymbols(locale).getWeekdays(),
+                        taackCalendarEvents: eventList,
                         taackCalendarParams: taackCalParams,
                 ])
+        c
     }
 
     UiBlockSpecifier calendarBlock(Locale locale, MethodClosure currentMethod, Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
         new UiBlockSpecifier().ui {
-            custom(drawCalendar(events, taackCalParams), null) {
+            custom(drawCalendar(locale, events, taackCalParams), null) {
                 String monthName = new DateFormatSymbols(locale).getMonths()[taackCalParams.month]
                 label("${monthName} ${taackCalParams.year}")
                 menu 'Prev', currentMethod, taackCalParams.prevMonth()
@@ -32,6 +38,10 @@ class TaackCalendarUiService {
                 menu 'Next', currentMethod, taackCalParams.nextMonth()
             }
         }
+    }
+
+    UiBlockSpecifier calendarBlock(MethodClosure currentMethod, Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
+        calendarBlock(LocaleContextHolder.getLocale(), currentMethod, events, taackCalParams)
     }
 
     UiTableSpecifier calendarUiTable(Locale locale, MethodClosure currentMethod, Iterator<TaackCalendarEvent> events, TaackCalendarParams taackCalParams) {
