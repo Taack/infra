@@ -3,6 +3,8 @@ plugins {
     id 'org.apache.grails.gradle.grails-app'
     id 'war'
     id 'cloud.wondrify.asset-pipeline'
+    id 'org.springframework.boot.aot'
+    id 'org.graalvm.buildtools.native' version '1.1.12'
 }
 
 group = "taack.ui.test.minimal"
@@ -13,6 +15,10 @@ dependencies {
     runtimeOnly "com.h2database:h2"
     runtimeOnly "com.zaxxer:HikariCP"
     runtimeOnly "cloud.wondrify:asset-pipeline-grails"
+}
+
+processAot {
+    systemProperty 'grails.env', 'production'
 }
 
 grails {
@@ -48,6 +54,13 @@ assets {
     minifyJs = true
     minifyCss = true
 }
+graalvmNative {
+    binaries {
+        main {
+            mainClass = 'taack.ui.test.Application'
+        }
+    }
+}
 
 bootBuildImage {
     verboseLogging = true
@@ -59,21 +72,42 @@ bootBuildImage {
     buildpacks.add("paketo-buildpacks/native-image")
     buildpacks.add("paketo-buildpacks/java-native-image")
     environment = [
-            "BP_NATIVE_IMAGE": "true",
-            "BPL_SPRING_AOT_ENABLED": "true",
-            "BP_SPRING_AOT_ENABLED": "true",
-            "BP_JVM_VERSION": "24",
+            "GRAALVM_HOME"                   : "~/.jdks/graalvm-jdk-25-1",
+            "BP_NATIVE_IMAGE"                : "true",
+            "BPL_SPRING_AOT_ENABLED"         : "true",
+            "BP_SPRING_AOT_ENABLED"          : "true",
+            "BP_JVM_VERSION"                 : "24",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": """
 				--gc=serial
 				-H:+UnlockExperimentalVMOptions
 				-H:-ReduceImplicitExceptionStackTraceInformation
 				-march=compatibility 
 			""", // -O3 --link-at-build-time --gc=serial -march=native -J-XX:MaxRAMPercentage=80.0
-            "BP_HEALTH_CHECKER_ENABLED": "true"
+            "BP_HEALTH_CHECKER_ENABLED"      : "true"
     ]
     imageName = "${project.name}:${project.version}"
 
 }
+
+/*
+set -gx GRAALVM_HOME ~/.jdks/graalvm-25.3.4.1+1.1/
+../gradlew -Pagent bootRun
+../gradlew metadataCopy --task bootRun --dir src/main/resources/META-INF/native-image
+../gradlew nativeCompile
+./build/native/nativeCompile/taack-ui-test-minimal
+Exception in thread "main" java.lang.BootstrapMethodError: java.lang.NullPointerException
+        at grails.util.BuildSettings.<clinit>(BuildSettings.groovy)
+        at taack.ui.test.Application.<clinit>(Application.groovy)
+        at java.base@25.0.4.1/java.lang.invoke.DirectMethodHandle.ensureInitialized(DirectMethodHandle.java:376)
+        at java.base@25.0.4.1/java.lang.invoke.DirectMethodHandle.internalMemberNameEnsureInit(DirectMethodHandle.java:335)
+Caused by: java.lang.NullPointerException
+        at java.base@25.0.4.1/java.lang.invoke.MethodHandles.insertArgumentsChecks(MethodHandles.java:5010)
+        at java.base@25.0.4.1/java.lang.invoke.MethodHandles.insertArguments(MethodHandles.java:4979)
+        at org.codehaus.groovy.vmplugin.v8.IndyInterface.makeBootHandle(IndyInterface.java:247)
+        at org.codehaus.groovy.vmplugin.v8.IndyInterface.bootstrap(IndyInterface.java:229)
+        ... 4 more
+
+ */
 
 // OK
 // docker run -it --net=host taack-ui-test-minimal:0.7.0
