@@ -26,6 +26,7 @@ include 'taack-ui-search'
 include 'taack-ui-pdf'
 include 'taack-ui-asciidoc'
 include 'taack-ui'
+include 'taack-ui-ext'
 
 include 'taack-ui-test'
 include 'taack-ui-test-minimal'

@@ -20,6 +20,7 @@ grails {
     exploded = false
     plugins {
         implementation project(':taack-ui')
+        implementation project(':taack-ui-ext')
     }
 }
 
