@@ -1,13 +1,12 @@
 package taack.ui.dsl.kanban
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.Style
-
+import taack.ui.dump.Parameter
 /**
  * {@link taack.ui.dsl.kanban.KanbanSpec(groovy.lang.Closure)} delegated class.
  *
@@ -16,7 +15,7 @@ import taack.ui.dsl.common.Style
 @CompileStatic
 final class ColumnSpec {
     final IUiKanbanVisitor kanbanVisitor
-    ITaackUiEnabler taackUiEnablerService = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnablerService = Parameter.taackUiEnabler
 
     ColumnSpec(IUiKanbanVisitor kanbanVisitor) {
         this.kanbanVisitor = kanbanVisitor

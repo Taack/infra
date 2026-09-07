@@ -1,6 +1,6 @@
 package taack.ui.dsl.table
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.springframework.context.i18n.LocaleContextHolder
@@ -8,11 +8,11 @@ import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.IEnumOptions
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.branching.BranchingSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.Parameter
 
 import java.text.DateFormat
 import java.text.NumberFormat
@@ -23,7 +23,7 @@ import java.text.NumberFormat
 class RowColumnFieldSpec implements BranchingSpec {
     final IUiTableVisitor tableVisitor
 
-    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnabler = Parameter.taackUiEnabler
 
     RowColumnFieldSpec(IUiTableVisitor tableVisitor) {
         this.tableVisitor = tableVisitor

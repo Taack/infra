@@ -1,18 +1,19 @@
 package taack.ui.dsl.kanban
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.Style
+import taack.ui.dump.Parameter
+
 /**
  * Kanban Drawing DSL Spec. A kanban is composed of a header and columns.
  */
 @CompileStatic
 final class KanbanSpec {
     final IUiKanbanVisitor kanbanVisitor
-    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnabler = Parameter.taackUiEnabler
 
     KanbanSpec(IUiKanbanVisitor kanbanVisitor) {
         this.kanbanVisitor = kanbanVisitor

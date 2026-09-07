@@ -1,17 +1,17 @@
 package taack.ui.dsl.table
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.Parameter
 
 @CompileStatic
 class ColumnHeaderSelectSpec {
     final IUiTableVisitor tableVisitor
 
-    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnabler = Parameter.taackUiEnabler
 
     ColumnHeaderSelectSpec(IUiTableVisitor tableVisitor) {
         this.tableVisitor = tableVisitor

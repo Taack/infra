@@ -1,19 +1,18 @@
 package taack.ui.dsl.kanban
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.Parameter
 
 import java.text.NumberFormat
-
 /**
  * Base class to define fields in the card
  *
@@ -23,7 +22,7 @@ import java.text.NumberFormat
 final class CardFieldSpec {
     final IUiKanbanVisitor kanbanVisitor
 
-    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnabler = Parameter.taackUiEnabler
 
     CardFieldSpec(IUiKanbanVisitor kanbanVisitor) {
         this.kanbanVisitor = kanbanVisitor

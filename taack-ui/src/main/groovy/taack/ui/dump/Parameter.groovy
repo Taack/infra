@@ -1,5 +1,6 @@
 package taack.ui.dump
 
+import grails.util.Holders
 import grails.util.Pair
 import grails.validation.Validateable
 import grails.web.api.WebAttributes
@@ -14,6 +15,8 @@ import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.render.ThemeService
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.helper.Utils
 
 import java.lang.reflect.ParameterizedType
@@ -263,4 +266,13 @@ final class Parameter implements WebAttributes {
         }
         ret
     }
+
+    private static ITaackUiEnabler instantiateITaackUiEnabler() {
+        if (Holders.grailsApplication.mainContext.containsBean('taackUiEnablerService'))
+            return Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as ITaackUiEnabler
+        else new TrueTaackUiEnabler() as ITaackUiEnabler
+    }
+
+    final static ITaackUiEnabler taackUiEnabler =  instantiateITaackUiEnabler()
+
 }

@@ -1,24 +1,23 @@
 package taack.ui.dsl.show
 
-import grails.util.Holders
+
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
-
+import taack.ui.dump.Parameter
 /**
  * {@link ShowSpec#section(java.lang.String, groovy.lang.Closure)} delegated class
  */
 @CompileStatic
 class SectionSpec {
     final IUiShowVisitor showVisitor
-    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnabler = Parameter.taackUiEnabler
 
     SectionSpec(IUiShowVisitor showVisitor) {
         this.showVisitor = showVisitor

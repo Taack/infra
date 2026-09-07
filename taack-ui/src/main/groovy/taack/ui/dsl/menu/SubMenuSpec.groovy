@@ -1,11 +1,10 @@
 package taack.ui.dsl.menu
 
-import grails.util.Holders
+
 import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ui.ITaackUiEnabler
-import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.Parameter
@@ -14,7 +13,7 @@ import taack.ui.dump.Parameter
 final class SubMenuSpec {
     final IUiMenuVisitor menuVisitor
 
-    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
+    ITaackUiEnabler taackUiEnabler = Parameter.taackUiEnabler
 
     SubMenuSpec(final IUiMenuVisitor menuVisitor) {
         this.menuVisitor = menuVisitor
