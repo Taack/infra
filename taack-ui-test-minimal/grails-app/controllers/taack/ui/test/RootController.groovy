@@ -2,7 +2,6 @@ package taack.ui.test
 
 import calendar.CalendarController
 import grails.compiler.GrailsCompileStatic
-import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import stats.StatsController
 import stats.StatsService
@@ -18,7 +17,6 @@ TODO: Add an infrastructure to list new stuffs from a user and a timestamp
  */
 
 @GrailsCompileStatic
-@Secured(['permitAll'])
 class RootController {
     TaackUiService taackUiService
     StatsService statsService

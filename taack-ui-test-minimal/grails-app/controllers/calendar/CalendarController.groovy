@@ -1,7 +1,6 @@
 package calendar
 
 import grails.compiler.GrailsCompileStatic
-import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.Validateable
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
@@ -76,7 +75,6 @@ class TaackCalendarEventAdapter implements TaackCalendarEvent {
 }
 
 @GrailsCompileStatic
-@Secured(['permitAll'])
 class CalendarController {
 
     TaackUiService taackUiService
