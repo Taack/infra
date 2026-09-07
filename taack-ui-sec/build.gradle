@@ -1,20 +1,15 @@
 plugins {
-    id 'taack-grails-plugin'
+    id 'java'
     id 'taack-grails-security'
-    id 'taack-asciidoctor'
+    id 'taack-grails-assets-plugin'
 }
 
 dependencies {
     implementation project(':taack-ui')
-
-    implementation 'org.jsoup:jsoup:1.21.1'
-    implementation 'org.odftoolkit:odfdom-java:0.13.0'
-
-    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
 }
 
 groovydoc {
-    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-groovydoc/' + project.name)
+    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-ext-groovydoc/' + project.name)
 }
 
 // ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar

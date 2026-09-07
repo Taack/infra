@@ -6,7 +6,6 @@ import org.grails.datastore.gorm.GormEntity
 import org.hibernate.Hibernate
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -151,7 +150,7 @@ final class RawHtmlKanbanDump implements IUiKanbanVisitor {
 
     @Override
     void visitCardField(String value, Style style) {
-        blockLog.topElement.builder.addChildren(displayContent(TaackUiEnablerService.sanitizeString(value), style, null))
+        blockLog.topElement.builder.addChildren(displayContent(Parameter.sanitizeString(value), style, null))
     }
 
     @Override

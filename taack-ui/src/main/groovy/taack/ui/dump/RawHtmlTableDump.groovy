@@ -8,7 +8,6 @@ import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
 import taack.ast.type.WidgetKind
-import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
 import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
@@ -89,7 +88,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
             case [Boolean, boolean]:
                 return tr("default.boolean.${value.toString()}", locale)
             default:
-                return TaackUiEnablerService.sanitizeString(value.toString())
+                return Parameter.sanitizeString(value.toString())
         }
     }
 
@@ -110,7 +109,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (fieldInfo && style) {
             displayBlock += style
         }
-        String content = TaackUiEnablerService.sanitizeString(fieldInfo.value.toString())
+        String content = Parameter.sanitizeString(fieldInfo.value.toString())
         HTMLTxtContent cellHTML = new HTMLTxtContent(content ?: '<br/>')
 
         UiMenuSpecifier menu = TaackUiService.contextualMenuClosureFromField(fieldInfo)
@@ -384,7 +383,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private appendRowField(final String value, final Style style, final boolean sanitize) {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
-        if (sanitize) blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
+        if (sanitize) blockLog.topElement.builder.addChildren(displayCell(Parameter.sanitizeString(value), style, null))
         else blockLog.topElement.builder.addChildren(displayCell(value, style, null))
 //, firstInCol, isInCol))
         if (addColumn) visitColumnEnd()

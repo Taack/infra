@@ -4,8 +4,9 @@ import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
-import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOptions
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.form.editor.EditorOption
 import taack.ui.dsl.helper.Utils
@@ -15,7 +16,7 @@ import java.text.NumberFormat
 
 @CompileStatic
 class FormAjaxFieldSpec extends FormVisitable {
-    final static TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    final static ITaackUiEnabler taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as ITaackUiEnabler ?: new TrueTaackUiEnabler()
 
     FormAjaxFieldSpec(final IUiFormVisitor formVisitor) {
         super(formVisitor)

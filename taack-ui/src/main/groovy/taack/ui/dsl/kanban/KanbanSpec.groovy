@@ -3,16 +3,16 @@ package taack.ui.dsl.kanban
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.render.TaackUiEnablerService
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.Style
-
 /**
  * Kanban Drawing DSL Spec. A kanban is composed of a header and columns.
  */
 @CompileStatic
 final class KanbanSpec {
     final IUiKanbanVisitor kanbanVisitor
-    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
 
     KanbanSpec(IUiKanbanVisitor kanbanVisitor) {
         this.kanbanVisitor = kanbanVisitor
@@ -26,12 +26,12 @@ final class KanbanSpec {
      * @param Closure header content
      */
     void column(String i18n, Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ColumnHeaderSpec) Closure headerClosure = null, MethodClosure action = null, Map<String, ? extends Object> params = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ColumnSpec) Closure closure) {
-        kanbanVisitor.visitColumn(taackUiEnablerService.hasAccess(action, params) ? action : null, params)
+        kanbanVisitor.visitColumn(taackUiEnabler.hasAccess(action, params) ? action : null, params)
         renderColumn(i18n, style, headerClosure, closure)
     }
 
     void column(String i18n, Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ColumnHeaderSpec) Closure headerClosure = null, MethodClosure action, Long id, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ColumnSpec) Closure closure) {
-        kanbanVisitor.visitColumn(taackUiEnablerService.hasAccess(action, id) ? action : null, id ? [id: id] : null)
+        kanbanVisitor.visitColumn(taackUiEnabler.hasAccess(action, id) ? action : null, id ? [id: id] : null)
         renderColumn(i18n, style, headerClosure, closure)
     }
 

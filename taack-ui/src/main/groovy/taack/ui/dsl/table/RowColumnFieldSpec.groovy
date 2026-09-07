@@ -6,8 +6,9 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.render.TaackUiEnablerService
 import taack.ui.IEnumOptions
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.branching.BranchingSpec
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -22,7 +23,7 @@ import java.text.NumberFormat
 class RowColumnFieldSpec implements BranchingSpec {
     final IUiTableVisitor tableVisitor
 
-    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
 
     RowColumnFieldSpec(IUiTableVisitor tableVisitor) {
         this.tableVisitor = tableVisitor
@@ -81,7 +82,7 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowAction(final String i18n = null, final ActionIcon icon, final Style style = null, final MethodClosure action, final Long id, final Map params) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) {
+        if (taackUiEnabler.hasAccess(action, id, params)) {
             Map<String, Serializable> p = params ?: [:]
             p.put('id', id)
             tableVisitor.visitRowAction(i18n, icon, style, Utils.getControllerName(action), action.method, null, p, true)
@@ -97,7 +98,7 @@ class RowColumnFieldSpec implements BranchingSpec {
     }
 
     void rowAction(final String linkText, final MethodClosure action, final Long id, final Map params, boolean isAjax = true) {
-        if (linkText && taackUiEnablerService.hasAccess(action, id, params)) {
+        if (linkText && taackUiEnabler.hasAccess(action, id, params)) {
             Map<String, Serializable> p = params ?: [:]
             p.put('id', id)
             tableVisitor.visitRowAction(linkText, Utils.getControllerName(action), action.method, null, p, isAjax)

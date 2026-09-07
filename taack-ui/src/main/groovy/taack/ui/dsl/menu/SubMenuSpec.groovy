@@ -4,7 +4,8 @@ import grails.util.Holders
 import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.render.TaackUiEnablerService
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.Parameter
@@ -13,7 +14,7 @@ import taack.ui.dump.Parameter
 final class SubMenuSpec {
     final IUiMenuVisitor menuVisitor
 
-    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
 
     SubMenuSpec(final IUiMenuVisitor menuVisitor) {
         this.menuVisitor = menuVisitor
@@ -26,13 +27,13 @@ final class SubMenuSpec {
      * @param params
      */
     void subMenu(String i18n, final MethodClosure action, final Map<String, ? extends Object> params = null) {
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
+        if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
     }
 
     void subMenu(String i18n = null, final MethodClosure action, Validateable validateable) {
         if (validateable?.validate()) {
             Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
-            if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
+            if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method, params)
         } else {
             println validateable?.errors
         }
@@ -44,11 +45,11 @@ final class SubMenuSpec {
      * @param params
      */
     void subMenu(final MethodClosure action, final Map<String, ? extends Object> params = null) {
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method, params)
+        if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method, params)
     }
 
     void subMenuIcon(final ActionIcon icon, final MethodClosure action, Map<String, ? extends Object> params) {
-        if (taackUiEnablerService.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
+        if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
     }
 
     /**

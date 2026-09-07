@@ -5,7 +5,8 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.render.TaackUiEnablerService
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
@@ -17,7 +18,7 @@ import taack.ui.dsl.helper.Utils
 @CompileStatic
 class SectionSpec {
     final IUiShowVisitor showVisitor
-    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
 
     SectionSpec(IUiShowVisitor showVisitor) {
         this.showVisitor = showVisitor
@@ -105,7 +106,7 @@ class SectionSpec {
      * @param additionalParams target action additional parameters
      */
     void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
-        if (taackUiEnablerService.hasAccess(action, id, additionalParams)) showVisitor.visitShowAction(i18n, icon, Utils.getControllerName(action), action.method, id, additionalParams, true)
+        if (taackUiEnabler.hasAccess(action, id, additionalParams)) showVisitor.visitShowAction(i18n, icon, Utils.getControllerName(action), action.method, id, additionalParams, true)
     }
 
     void showAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id) {
@@ -121,7 +122,7 @@ class SectionSpec {
     }
 
     void showAction(final String i18n = null, final String linkText, final MethodClosure action, final Long id, final Map<String, ?> additionalParams) {
-        if (taackUiEnablerService.hasAccess(action, id, additionalParams)) {
+        if (taackUiEnabler.hasAccess(action, id, additionalParams)) {
             showVisitor.visitShowAction(i18n, linkText, Utils.getControllerName(action), action.method, id, additionalParams, true)
         } else {
             showVisitor.visitShowField(i18n, linkText, null)

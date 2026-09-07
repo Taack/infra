@@ -26,7 +26,7 @@ class RowColumnSpec extends RowColumnFieldSpec {
     }
 
     void rowQuickEdit(MethodClosure apply, Long id = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = RowColumnSpec) Closure closure) {
-        boolean hasAccess = taackUiEnablerService.hasAccess(apply)
+        boolean hasAccess = taackUiEnabler.hasAccess(apply)
         if (hasAccess) tableVisitor.visitRowQuickEdit(id, apply)
         closure.delegate = new RowColumnSpec(tableVisitor)
         closure.call()

@@ -1,4 +1,4 @@
-package taack.support
+package taack.ui.ext
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.annotation.Secured

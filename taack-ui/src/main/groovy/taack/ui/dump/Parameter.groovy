@@ -7,6 +7,8 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
 import org.grails.datastore.gorm.GormEntity
 import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.owasp.html.PolicyFactory
+import org.owasp.html.Sanitizers
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
@@ -63,8 +65,21 @@ final class Parameter implements WebAttributes {
     static ThemeService uiThemeService = null
     boolean isModal = false
 
+    PolicyFactory policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
+
     Parameter() {
         this(RenderingTarget.WEB)
+    }
+    static String sanitizeString(String toSanitize) {
+        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
+    }
+
+    static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
+        PolicyFactory pf = Sanitizers.FORMATTING
+        allowing?.each {
+            pf = pf.and(it)
+        }
+        return pf.sanitize(toSanitize)
     }
 
     Parameter(final Locale lcl = null, MessageSource messageSource = null, RenderingTarget target, String... paramsToKeep) {

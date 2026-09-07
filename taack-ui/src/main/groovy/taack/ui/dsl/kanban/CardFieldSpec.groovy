@@ -6,7 +6,8 @@ import org.codehaus.groovy.runtime.MethodClosure
 import org.springframework.context.i18n.LocaleContextHolder
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.render.TaackUiEnablerService
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.helper.Utils
@@ -22,7 +23,7 @@ import java.text.NumberFormat
 final class CardFieldSpec {
     final IUiKanbanVisitor kanbanVisitor
 
-    TaackUiEnablerService taackUiEnablerService = Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService
+    ITaackUiEnabler taackUiEnabler = (Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') ?: new TrueTaackUiEnabler()) as ITaackUiEnabler
 
     CardFieldSpec(IUiKanbanVisitor kanbanVisitor) {
         this.kanbanVisitor = kanbanVisitor
@@ -66,7 +67,7 @@ final class CardFieldSpec {
     }
 
     void cardAction(final String i18n = null, final ActionIcon icon, final MethodClosure action, final Long id, final Map params) {
-        if (taackUiEnablerService.hasAccess(action, id, params)) {
+        if (taackUiEnabler.hasAccess(action, id, params)) {
             Map<String, Serializable> p = params ?: [:]
             p.put('id', id)
             kanbanVisitor.visitCardAction(i18n, icon, Utils.getControllerName(action), action.method, null, p, true)
@@ -90,7 +91,7 @@ final class CardFieldSpec {
     }
 
     void cardAction(final String linkText, final MethodClosure action, final Long id, final Map params, boolean isAjax = true) {
-        if (linkText && taackUiEnablerService.hasAccess(action, id, params)) {
+        if (linkText && taackUiEnabler.hasAccess(action, id, params)) {
             Map<String, Serializable> p = params ?: [:]
             p.put('id', id)
             kanbanVisitor.visitCardAction(linkText, Utils.getControllerName(action), action.method, null, p, isAjax)

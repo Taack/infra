@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.GetMethodReturn
-import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
@@ -87,7 +86,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
                 </li> 
         """
         } else {
-            """<div class="${style ? style.cssClassesString : ''}" style="${style ? style.cssStyleString : ''}">${sanitize ? TaackUiEnablerService.sanitizeString(field) : field}</div>  """
+            """<div class="${style ? style.cssClassesString : ''}" style="${style ? style.cssStyleString : ''}">${sanitize ? Parameter.sanitizeString(field) : field}</div>  """
         }
 //        """
 //                <li class="fieldcontain">
@@ -100,7 +99,7 @@ final class RawHtmlShowDump implements IUiShowVisitor {
     @Override
     void visitShowField(final String i18n, final FieldInfo fieldInfo, final Style style) {
         if (fieldInfo?.value != null) {
-            String v = TaackUiEnablerService.sanitizeString(RawHtmlTableDump.dataFormat(fieldInfo.value, null, parameter.lcl))
+            String v = Parameter.sanitizeString(RawHtmlTableDump.dataFormat(fieldInfo.value, null, parameter.lcl))
             if (TaackUiService.contextualMenuClosureFromField(fieldInfo)) {
                 String ident = fieldInfo.value.toString()
                 String className = fieldInfo.fieldConstraint.field.type.simpleName

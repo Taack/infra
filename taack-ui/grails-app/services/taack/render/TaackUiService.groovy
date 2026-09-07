@@ -1,13 +1,9 @@
 package taack.render
 
-
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
-import grails.plugin.springsecurity.SpringSecurityService
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Pair
-import grails.util.Triple
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
@@ -35,7 +31,6 @@ import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
 import taack.user.TaackUser
-
 /**
  * Service responsible for rendering a <i>web page</i> or producing <i>ajax parts</i> of a web page.
  * <p>
@@ -67,7 +62,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     private final int bufferSize = 65_536
 
     ThemeService themeService
-    SpringSecurityService springSecurityService
 
     @Autowired
     PageRenderer g
@@ -160,12 +154,19 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         htmlBlock.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
     }
 
+    interface CurrentUserGetter {
+        TaackUser getCurrentUser()
+    }
+
+    CurrentUserGetter currentUserGetter
+
     private TaackUser getCurrentUser() {
         try {
-            return springSecurityService.currentUser as TaackUser
+            return currentUserGetter.currentUser//springSecurityService.currentUser as TaackUser
         } catch (ignored) {
             return null
         }
+        null
     }
 
     /**
@@ -599,7 +600,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (conf.hasMenuLogin) {
             TaackUser currentUser = getCurrentUser()
             if (currentUser) {
-                String switchedUsername = SpringSecurityUtils.getSwitchedUserOriginalUsername()
+                String switchedUsername = ""// SpringSecurityUtils.getSwitchedUserOriginalUsername()
                 if (switchedUsername)
                     bout << """\
                     <li class="nav-item dropdown">

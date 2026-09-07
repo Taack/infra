@@ -5,21 +5,19 @@ import grails.util.Environment
 import grails.validation.Validateable
 import grails.web.api.WebAttributes
 import grails.web.databinding.DataBinder
-import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
-import org.owasp.html.Sanitizers
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
+import taack.ui.ITaackUiEnabler
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.helper.Utils
 
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
-
 /**
  * Service enabling to predict if an action is allowed to the end user. This service allows to remove actions
  * links (buttons and links) if the target action is not allowed with those parameters to the end user.
@@ -45,7 +43,7 @@ import java.lang.reflect.Parameter
  * }</pre>
  */
 @GrailsCompileStatic
-class TaackUiEnablerService implements WebAttributes, DataBinder {
+class TaackUiEnablerService implements WebAttributes, DataBinder, ITaackUiEnabler {
 
     static lazyInit = false
 
@@ -53,22 +51,22 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
 
     PolicyFactory policy
 
-    @PostConstruct
-    void init() {
-        policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
-    }
+//    @PostConstruct
+//    void init() {
+//        policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
+//    }
 
-    static String sanitizeString(String toSanitize) {
-        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
-    }
+//    static String sanitizeString(String toSanitize) {
+//        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
+//    }
 
-    static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
-        PolicyFactory pf = Sanitizers.FORMATTING
-        allowing?.each {
-            pf = pf.and(it)
-        }
-        return pf.sanitize(toSanitize)
-    }
+//    static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
+//        PolicyFactory pf = Sanitizers.FORMATTING
+//        allowing?.each {
+//            pf = pf.and(it)
+//        }
+//        return pf.sanitize(toSanitize)
+//    }
 
     private final static Map<String, Closure> securityClosures = [:]
 

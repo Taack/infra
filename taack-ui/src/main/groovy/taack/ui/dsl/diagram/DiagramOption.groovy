@@ -4,7 +4,8 @@ import grails.util.Holders
 import grails.validation.Validateable
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.MethodClosure
-import taack.render.TaackUiEnablerService
+import taack.ui.ITaackUiEnabler
+import taack.ui.TrueTaackUiEnabler
 import taack.ui.dsl.helper.Utils
 import taack.ui.dump.Parameter
 
@@ -78,7 +79,7 @@ final class DiagramOption {
             if (validateable?.validate()) {
                 params.putAll(Parameter.validateableToMap(validateable))
             }
-            if ((Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as TaackUiEnablerService).hasAccess(action, params)) {
+            if ((Holders.grailsApplication.mainContext.getBean('taackUiEnablerService') as ITaackUiEnabler ?: new TrueTaackUiEnabler()).hasAccess(action, params)) {
                 diagramOption.clickActionUrl = (new Parameter(Parameter.RenderingTarget.WEB)).urlMapped(Utils.getControllerName(action), action.method, id, params)
             }
             this

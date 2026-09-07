@@ -1,4 +1,4 @@
-package taack.support
+package taack.ui.ext
 
 import grails.artefact.Interceptor
 import grails.compiler.GrailsCompileStatic
