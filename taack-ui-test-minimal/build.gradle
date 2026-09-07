@@ -3,9 +3,12 @@ plugins {
     id 'org.apache.grails.gradle.grails-app'
     id 'war'
     id 'cloud.wondrify.asset-pipeline'
-    id 'org.springframework.boot.aot'
+    // https://docs.spring.io/spring-boot/gradle-plugin/aot.html
+    // https://grails.apache.org/docs/latest/guide/deployment.html#deploymentAot
     id 'org.graalvm.buildtools.native' version '1.1.12'
 }
+
+apply plugin: 'org.springframework.boot.aot'
 
 group = "taack.ui.test.minimal"
 version = "0.7.0"
@@ -17,9 +20,15 @@ dependencies {
     runtimeOnly "cloud.wondrify:asset-pipeline-grails"
 }
 
-processAot {
+tasks.named('processAot') {
+    println "AUOAOUAUOUAOUOAUOAUOAUOAUOAUOAUUOAUOAOUAU"
     systemProperty 'grails.env', 'production'
 }
+
+//processAot {
+//    println "AUO1111AOUAUOUAOUOAUOAUOAUOAUOAUOAUUOAUOAOUAU"
+//    systemProperty 'grails.env', 'production'
+//}
 
 grails {
     // should use gradle -Dgrails.run.active=true bootRun
@@ -28,6 +37,13 @@ grails {
         implementation project(':taack-ui')
         implementation project(':taack-ui-ext')
     }
+    // set -gx JAVA_HOME ~/dev/graalvm/graalvm-25.3.4.1+1.1/
+    // set -gx GRAALVM_HOME ~/dev/graalvm/graalvm-25.3.4.1+1.1/
+    // ../gradlew traceNativeMetadata
+    nativeMetadata {
+        paths = ['/', '/stats/topCustomerSalesCard', '/calendar/fromCustom', '/calendar/fromUiTable']
+//        forms = ['/stats/editTestInlineEdit']
+    }
 }
 
 bootJar {
@@ -35,18 +51,18 @@ bootJar {
     requiresUnpack '**/asciidoctorj*.jar'
 }
 
-//bootRun {
-//    ignoreExitValue true
-//    jvmArgs(
-//            '-Dspring.output.ansi.enabled=always',
-////            '-noverify',
-////            '-XX:TieredStopAtLevel=1',
-////            '-XX:+UnlockExperimentalVMOptions',
-////            '-XX:+UseCompactObjectHeaders',
-////            '-XX:+UseEpsilonGC',
-//            '-Xmx256m'
-//    )
-//}
+bootRun {
+    ignoreExitValue true
+    jvmArgs(
+            '-Dspring.output.ansi.enabled=always',
+//            '-noverify',
+//            '-XX:TieredStopAtLevel=1',
+//            '-XX:+UnlockExperimentalVMOptions',
+//            '-XX:+UseCompactObjectHeaders',
+//            '-XX:+UseEpsilonGC',
+            '-Xmx256m'
+    )
+}
 
 // ~/.jdks/openjdk-24.0.1/bin/java -Xmx256m  -XX:+UseStringDeduplication -XX:+UnlockExperimentalVMOptions -XX:+UseSerialGC -XX:+UseCompactObjectHeaders -jar taack-ui-test-minimal-0.7.0.jar
 
@@ -64,48 +80,71 @@ graalvmNative {
 
 bootBuildImage {
     verboseLogging = true
-    builder = "paketobuildpacks/builder-jammy-base"
-    buildpacks.add("paketo-buildpacks/java")
-    buildpacks.add("paketo-buildpacks/syft")
-    buildpacks.add("paketo-buildpacks/executable-jar")
-    buildpacks.add("paketobuildpacks/graalvm")
-    buildpacks.add("paketo-buildpacks/native-image")
-    buildpacks.add("paketo-buildpacks/java-native-image")
+//    builder = "paketobuildpacks/builder-jammy-base"
+//    buildpacks.add("paketo-buildpacks/java")
+//    buildpacks.add("paketo-buildpacks/syft")
+//    buildpacks.add("paketo-buildpacks/executable-jar")
+//    buildpacks.add("paketobuildpacks/graalvm")
+//    buildpacks.add("paketo-buildpacks/native-image")
+//    buildpacks.add("paketo-buildpacks/java-native-image")
     environment = [
-            "GRAALVM_HOME"                   : "~/.jdks/graalvm-jdk-25-1",
+            "GRAALVM_HOME"                   : "~/dev/graalvm/graalvm-25.3.4.1+1.1/",
             "BP_NATIVE_IMAGE"                : "true",
             "BPL_SPRING_AOT_ENABLED"         : "true",
             "BP_SPRING_AOT_ENABLED"          : "true",
-            "BP_JVM_VERSION"                 : "24",
+            "BP_JVM_VERSION"                 : "25",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": """
 				--gc=serial
 				-H:+UnlockExperimentalVMOptions
 				-H:-ReduceImplicitExceptionStackTraceInformation
-				-march=compatibility 
+				-march=compatibility
 			""", // -O3 --link-at-build-time --gc=serial -march=native -J-XX:MaxRAMPercentage=80.0
             "BP_HEALTH_CHECKER_ENABLED"      : "true"
     ]
     imageName = "${project.name}:${project.version}"
-
 }
 
 /*
 set -gx GRAALVM_HOME ~/.jdks/graalvm-25.3.4.1+1.1/
-../gradlew -Pagent bootRun
-../gradlew metadataCopy --task bootRun --dir src/main/resources/META-INF/native-image
+set -gx JAVA_HOME ~/.jdks/graalvm-25.3.4.1+1.1/
+../gradlew traceNativeMetadata
 ../gradlew nativeCompile
-./build/native/nativeCompile/taack-ui-test-minimal
-Exception in thread "main" java.lang.BootstrapMethodError: java.lang.NullPointerException
+cd ./build/native/nativeCompile/
+./taack-ui-test-minimal
+Sep 07, 2026 2:29:28 PM org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl registerMethods
+WARNING: java.io.IOException: Stream closed
+        at java.base@25.0.4.1/java.io.BufferedInputStream.getInIfOpen(BufferedInputStream.java:170)
+        at java.base@25.0.4.1/java.io.BufferedInputStream.fill(BufferedInputStream.java:289)
+        at java.base@25.0.4.1/java.io.BufferedInputStream.read1(BufferedInputStream.java:330)
+        at java.base@25.0.4.1/java.io.BufferedInputStream.read(BufferedInputStream.java:388)
+        at java.base@25.0.4.1/java.io.DataInputStream.readFully(DataInputStream.java:213)
+        at java.base@25.0.4.1/java.io.DataInputStream.readUnsignedShort(DataInputStream.java:346)
+        at java.base@25.0.4.1/java.io.DataInputStream.readUTF(DataInputStream.java:580)
+        at java.base@25.0.4.1/java.io.DataInputStream.readUTF(DataInputStream.java:555)
+        at org.codehaus.groovy.reflection.GeneratedMetaMethod$DgmMethodRecord.loadDgmInfo(GeneratedMetaMethod.java:202)
+        at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.registerMethods(MetaClassRegistryImpl.java:208)
+        at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.<init>(MetaClassRegistryImpl.java:117)
+        at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.<init>(MetaClassRegistryImpl.java:95)
+        at groovy.lang.GroovySystem.<clinit>(GroovySystem.java:37)
+        at org.codehaus.groovy.runtime.InvokerHelper.<clinit>(InvokerHelper.java:69)
+        at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.createMap(ScriptBytecodeAdapter.java:678)
+        at grails.util.BuildSettings.<clinit>(BuildSettings.groovy)
+        at taack.ui.test.Application.<clinit>(Application.groovy)
+        at java.base@25.0.4.1/java.lang.invoke.DirectMethodHandle.ensureInitialized(DirectMethodHandle.java:376)
+        at java.base@25.0.4.1/java.lang.invoke.DirectMethodHandle.internalMemberNameEnsureInit(DirectMethodHandle.java:335)
+
+Exception in thread "main" java.lang.ExceptionInInitializerError
+        at org.codehaus.groovy.runtime.InvokerHelper.<clinit>(InvokerHelper.java:69)
+        at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.createMap(ScriptBytecodeAdapter.java:678)
         at grails.util.BuildSettings.<clinit>(BuildSettings.groovy)
         at taack.ui.test.Application.<clinit>(Application.groovy)
         at java.base@25.0.4.1/java.lang.invoke.DirectMethodHandle.ensureInitialized(DirectMethodHandle.java:376)
         at java.base@25.0.4.1/java.lang.invoke.DirectMethodHandle.internalMemberNameEnsureInit(DirectMethodHandle.java:335)
 Caused by: java.lang.NullPointerException
-        at java.base@25.0.4.1/java.lang.invoke.MethodHandles.insertArgumentsChecks(MethodHandles.java:5010)
-        at java.base@25.0.4.1/java.lang.invoke.MethodHandles.insertArguments(MethodHandles.java:4979)
-        at org.codehaus.groovy.vmplugin.v8.IndyInterface.makeBootHandle(IndyInterface.java:247)
-        at org.codehaus.groovy.vmplugin.v8.IndyInterface.bootstrap(IndyInterface.java:229)
-        ... 4 more
+        at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.<init>(MetaClassRegistryImpl.java:123)
+        at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.<init>(MetaClassRegistryImpl.java:95)
+        at groovy.lang.GroovySystem.<clinit>(GroovySystem.java:37)
+        ... 6 more
 
  */
 
