@@ -1,15 +1,11 @@
 plugins {
     id 'java'
+    id 'taack-grails-plugin'
     id 'taack-grails-security'
-    id 'taack-grails-assets-plugin'
 }
 
 dependencies {
     implementation project(':taack-ui')
-}
-
-groovydoc {
-    destinationDir = new File(System.properties['user.home'] as String + '/taack-ui-ext-groovydoc/' + project.name)
 }
 
 // ~/.jdks/graalvm-jdk-24.0.1/bin/java -agentlib:native-image-agent=config-output-dir=test -jar taack-ui-test.jar

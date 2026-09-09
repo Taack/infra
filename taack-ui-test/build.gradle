@@ -1,5 +1,6 @@
 plugins {
     id 'taack-grails-webapp'
+    id 'taack-grails-security'
 //    id 'org.graalvm.buildtools.native'
 }
 
@@ -11,6 +12,7 @@ grails {
     plugins {
         implementation project(':taack-ui')
         implementation project(':taack-ui-pdf')
+        implementation project(':taack-ui-sec')
         implementation project(':taack-ui-asciidoc')
         implementation project(':taack-ui-jdbc')
         implementation project(':taack-ui-search')
