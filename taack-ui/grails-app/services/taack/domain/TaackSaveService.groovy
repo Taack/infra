@@ -1,8 +1,7 @@
-package taack.render
+package taack.domain
 
 import grails.artefact.controller.support.ResponseRenderer
 import grails.compiler.GrailsCompileStatic
-import grails.plugin.springsecurity.SpringSecurityService
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBinder
@@ -15,20 +14,17 @@ import org.hibernate.SessionFactory
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.Errors
 import taack.ast.type.FieldInfo
-import taack.domain.IDomainHistory
+import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.helper.Utils
-import taack.user.IUserCreated
-import taack.user.IUserUpdated
-import taack.user.TaackUser
 
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
     TaackUiService taackUiService
-    SpringSecurityService springSecurityService
     SessionFactory sessionFactory
 
     private final static Map<String, Closure> fieldCustomSavingClosures = [:]
+    private final static Map<Class, Closure> interfaceCustomSavingClosures = [:]
 
     /**
      * Allow to register a custom save for specific field when saving a gormEntity.
@@ -46,6 +42,24 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
      */
     static final void registerFieldCustomSavingClosure(String fieldName, Closure closure) {
         fieldCustomSavingClosures.put(fieldName, closure)
+    }
+
+    /**
+     * Allow to register a custom save for specific field when saving a gormEntity.
+     *
+     * Example:
+     *      TaackSaveService.registerFieldCustomSavingClosure('projectName', { GormEntity gormEntity, Map params ->
+     *          if (gormEntity instaceof Project) {
+     *              gormEntity.projectName = 'CUSTOM_' + gormEntity.projectName
+     *              // gormEntity.projectName = 'CUSTOM_' + params['projectName']
+     *          }
+     *      }
+     *
+     * @param fieldName : Name of target field
+     * @param closure : Custom saving process
+     */
+    static final void registerInterfaceCustomSavingClosure(Class classInterface, Closure closure) {
+        interfaceCustomSavingClosures.put(classInterface, closure)
     }
 
 //    static <D extends GormEntity> boolean beanIsOwnerLocking(D entity) {
@@ -194,28 +208,12 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
                     fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
                 }
+                gormEntity.class.interfaces.toList().intersect(interfaceCustomSavingClosures.keySet()).each { interfaceClass ->
+                    fieldCustomSavingClosures.get(interfaceClass).call(gormEntity, params)
+                }
             }
 
         long c3 = System.currentTimeMillis()
-
-        try {
-            TaackUser currentUser = springSecurityService.currentUser as TaackUser
-            if (gormEntity.hasChanged()) {
-                if (gormEntity instanceof IUserCreated && gormEntity.objectGetUserCreated() == null) {
-                    gormEntity.objectSetUserCreated(currentUser)
-                } else if (gormEntity.hasProperty('userCreated') && gormEntity['userCreated'] == null) {
-                    gormEntity['userCreated'] = currentUser
-                }
-                if (gormEntity instanceof IUserUpdated) {
-                    gormEntity.objectSetUserUpdated(currentUser)
-                } else if (gormEntity.hasProperty('userUpdated')) {
-                    gormEntity['userUpdated'] = currentUser
-                } else if (gormEntity.hasProperty('userLastUpdated')) {
-                    gormEntity['userLastUpdated'] = currentUser
-                }
-            }
-        } catch (ignored) {
-        }
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {

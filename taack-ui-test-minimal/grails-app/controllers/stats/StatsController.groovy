@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct
 import lodomain.TestInlineEdit
 import lodomain.TestStatus
 import org.codehaus.groovy.runtime.MethodClosure as MC
+import taack.domain.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiShowSpecifier
@@ -49,6 +50,7 @@ class StatsController implements WebAttributes {
     TaackUiService taackUiService
     StatsService statsService
     List<TestInlineEdit> testInlineEditList = []
+    TaackSaveService taackSaveService
 
     @PostConstruct
     void init() {
@@ -126,17 +128,16 @@ class StatsController implements WebAttributes {
             bindData(testInlineEdit, params, ks)
             if (testInlineEdit.validate()) {
                 taackUiService.ajaxReload()
-            }// else
-              //  taackSaveService.reloadOrRenderErrors(testInlineEdit)
+            } else
+                taackSaveService.reloadOrRenderErrors(testInlineEdit)
         } else {
             TestInlineEdit testInlineEdit = new TestInlineEdit()
             bindData(testInlineEdit, params, [include: params.keySet()])
             if (testInlineEdit.validate()) {
                 testInlineEditList << testInlineEdit
                 taackUiService.ajaxReload()
-            } //else
-               // taackSaveService.reloadOrRenderErrors(testInlineEdit)
-
+            } else
+               taackSaveService.reloadOrRenderErrors(testInlineEdit)
         }
     }
 
