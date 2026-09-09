@@ -20,15 +20,15 @@ dependencies {
     runtimeOnly "cloud.wondrify:asset-pipeline-grails"
 }
 
-tasks.named('processAot') {
-    println "AUOAOUAUOUAOUOAUOAUOAUOAUOAUOAUUOAUOAOUAU"
-    systemProperty 'grails.env', 'production'
-}
-
-//processAot {
-//    println "AUO1111AOUAUOUAOUOAUOAUOAUOAUOAUOAUUOAUOAOUAU"
+//tasks.named('processAot') {
+//    println "AUOAOUAUOUAOUOAUOAUOAUOAUOAUOAUUOAUOAOUAU"
 //    systemProperty 'grails.env', 'production'
 //}
+
+processAot {
+    println "AUO1111AOUAUOUAOUOAUOAUOAUOAUOAUOAUUOAUOAOUAU"
+    systemProperty 'grails.env', 'production'
+}
 
 grails {
     // should use gradle -Dgrails.run.active=true bootRun
@@ -159,6 +159,9 @@ Caused by: java.lang.NullPointerException
 // docker run --rm -p 9442:9442 docker.io/library/taack-ui-test-minimal
 // docker save docker.io/library/taack-ui-test-minimal > taack-ui-test-minimal.tar
 
+//tasks.withType(GroovyCompile).configureEach {
+//    groovyOptions.optimizationOptions.indy = true
+//}
 
 groovydoc {
     enabled = false

@@ -4829,6 +4829,9 @@
       "type": "groovy.runtime.metaclass.jdk.proxy2.$Proxy78MetaClass"
     },
     {
+      "type": "groovy.runtime.metaclass.jdk.proxy2.$Proxy81MetaClass"
+    },
+    {
       "type": "groovy.runtime.metaclass.lodomain.TestInlineEdit$__clinit__closure1$_closure2MetaClass"
     },
     {
@@ -6252,6 +6255,9 @@
     },
     {
       "type": "groovy.runtime.metaclass.taack.domain.TaackMetaModelServiceMetaClass"
+    },
+    {
+      "type": "groovy.runtime.metaclass.taack.domain.TaackSaveServiceMetaClass"
     },
     {
       "type": "groovy.runtime.metaclass.taack.render.TaackUiProgressBarServiceMetaClass"
@@ -8509,6 +8515,9 @@
       "type": "java.lang.annotation.Inherited"
     },
     {
+      "type": "java.lang.annotation.Repeatable"
+    },
+    {
       "type": "java.lang.annotation.Retention"
     },
     {
@@ -9923,6 +9932,12 @@
     },
     {
       "type": "jdk.proxy2.$Proxy78Customizer"
+    },
+    {
+      "type": "jdk.proxy2.$Proxy81BeanInfo"
+    },
+    {
+      "type": "jdk.proxy2.$Proxy81Customizer"
     },
     {
       "type": "kotlin.Metadata"
@@ -21502,6 +21517,15 @@
       "type": "org.springframework.boot.autoconfigure.AutoConfiguration"
     },
     {
+      "type": "org.springframework.boot.autoconfigure.AutoConfigurationExcludeFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "org.springframework.boot.autoconfigure.AutoConfigurationImportSelector",
       "methods": [
         {
@@ -21574,6 +21598,9 @@
           "parameterTypes": []
         }
       ]
+    },
+    {
+      "type": "org.springframework.boot.autoconfigure.SpringBootApplication"
     },
     {
       "type": "org.springframework.boot.autoconfigure.aop.AopAutoConfiguration",
@@ -22212,6 +22239,15 @@
     },
     {
       "type": "org.springframework.boot.context.FileEncodingApplicationListener",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.springframework.boot.context.TypeExcludeFilter",
       "methods": [
         {
           "name": "<init>",
@@ -24217,6 +24253,15 @@
       "type": "org.springframework.context.annotation.AnnotationConfigRegistryCustomizer"
     },
     {
+      "type": "org.springframework.context.annotation.AnnotationScopeMetadataResolver",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "org.springframework.context.annotation.Bean"
     },
     {
@@ -24227,6 +24272,12 @@
           "parameterTypes": []
         }
       ]
+    },
+    {
+      "type": "org.springframework.context.annotation.ComponentScan"
+    },
+    {
+      "type": "org.springframework.context.annotation.ComponentScan$Filter"
     },
     {
       "type": "org.springframework.context.annotation.Conditional"
@@ -24422,6 +24473,9 @@
     },
     {
       "type": "org.springframework.core.annotation.AliasFor"
+    },
+    {
+      "type": "org.springframework.core.annotation.AnnotationAttributes[]"
     },
     {
       "type": "org.springframework.core.annotation.Order"
@@ -25660,6 +25714,12 @@
           "name": "setStatsService",
           "parameterTypes": [
             "stats.StatsService"
+          ]
+        },
+        {
+          "name": "setTaackSaveService",
+          "parameterTypes": [
+            "taack.domain.TaackSaveService"
           ]
         },
         {
@@ -26929,6 +26989,45 @@
     },
     {
       "type": "taack.domain.TaackMetaModelServiceCustomizer"
+    },
+    {
+      "type": "taack.domain.TaackSaveService",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "setActionResultTransformers",
+          "parameterTypes": [
+            "org.grails.web.servlet.mvc.ActionResultTransformer[]"
+          ]
+        },
+        {
+          "name": "setMimeUtility",
+          "parameterTypes": [
+            "grails.web.mime.MimeUtility"
+          ]
+        },
+        {
+          "name": "setSessionFactory",
+          "parameterTypes": [
+            "org.hibernate.SessionFactory"
+          ]
+        },
+        {
+          "name": "setTaackUiService",
+          "parameterTypes": [
+            "taack.render.TaackUiService"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "taack.domain.TaackSaveServiceBeanInfo"
+    },
+    {
+      "type": "taack.domain.TaackSaveServiceCustomizer"
     },
     {
       "type": "taack.render.TaackUiProgressBarService"
@@ -29437,6 +29536,9 @@
       "glob": "grails-appUrlMappingsInfoHandlerAdapter.groovy"
     },
     {
+      "glob": "grails/artefact/Artefact.class"
+    },
+    {
       "glob": "grails/gorm/validation/DefaultErrorMessages.properties"
     },
     {
@@ -29813,6 +29915,9 @@
     },
     {
       "glob": "org/aspectj/lang/annotation/Around.groovy"
+    },
+    {
+      "glob": "org/codehaus/groovy/transform/GroovyASTTransformationClass.class"
     },
     {
       "glob": "org/grails/databinding/converters/DefaultConvertersConfiguration.class"
@@ -30616,6 +30721,9 @@
       "glob": "taack-ui_fr_FR.properties"
     },
     {
+      "glob": "taack/domain/TaackSaveService.class"
+    },
+    {
       "glob": "taack/render/TaackUiService.class"
     },
     {
@@ -30625,10 +30733,22 @@
       "glob": "taack/ui/ext/TaackUiExtGrailsPlugin.class"
     },
     {
+      "glob": "taack/ui/test"
+    },
+    {
       "glob": "taack/ui/test/ActionDefaultLogInterceptor.class"
     },
     {
       "glob": "taack/ui/test/Application.class"
+    },
+    {
+      "glob": "taack/ui/test/BootStrap$_closure1.class"
+    },
+    {
+      "glob": "taack/ui/test/BootStrap$_closure2.class"
+    },
+    {
+      "glob": "taack/ui/test/BootStrap.class"
     },
     {
       "glob": "taack/ui/test/RootController.class"
