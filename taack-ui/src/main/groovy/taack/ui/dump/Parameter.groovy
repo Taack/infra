@@ -233,7 +233,7 @@ final class Parameter implements WebAttributes {
     final static <T extends Validateable> List<String> validateableToParamsToKeep(T validateable) {
         List<String> ret = []
         validateable.class.getDeclaredFields().each {
-            if (!it.name.contains('_') && !it.name.contains('$') && ([Boolean, String, Date, Integer, Long, Short].contains(it.type) || it.type.isEnum() || GormEntity.isAssignableFrom(it.type) || Collection.isAssignableFrom(it.type))) {
+            if (!it.name.contains('_') && !it.name.contains('$') && ([Boolean, String, Date].contains(it.type) || Number.isAssignableFrom(it.type) || it.type.isEnum() || GormEntity.isAssignableFrom(it.type) || Collection.isAssignableFrom(it.type))) {
                 ret.add(it.name)
             }
         }
