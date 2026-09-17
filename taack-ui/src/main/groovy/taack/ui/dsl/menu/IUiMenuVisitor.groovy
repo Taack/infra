@@ -18,23 +18,23 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitMenuStartEnd()
 
-    void visitMenu(final String controller, final String action, final Map<String, Object> params)
+    void visitMenu(final String controller, final String action, final Map<String, ?> params)
 
-    void visitSubMenu(final String controller, final String action, final Map<String, Object> params)
+    void visitSubMenu(final String controller, final String action, final Map<String, ?> params)
 
-    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, Object> params)
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params)
 
     void visitMenuSection(final String i18n, final MenuSpec.MenuPosition position)
 
     void visitMenuSectionEnd()
 
-    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ? extends Object> params, final boolean isModal)
+    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, final boolean isModal)
 
     void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon)
 
     void visitMenuIconWithClosureEnd(Style style)
 
-    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params)
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params)
 
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses)
 
