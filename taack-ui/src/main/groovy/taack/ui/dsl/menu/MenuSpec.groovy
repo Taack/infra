@@ -65,7 +65,7 @@ final class MenuSpec {
      * @param action
      * @param params
      */
-    void menu(String i18n, final MethodClosure action, Map<String, ? extends Object> params = null) {
+    void menu(String i18n, final MethodClosure action, Map<String, Object> params = null) {
         if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
     }
 
@@ -74,7 +74,7 @@ final class MenuSpec {
      * @param action
      * @param params
      */
-    void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {
+    void menu(final MethodClosure action, Map<String, Object> params = null) {
         if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method.toString(), params)
     }
 
@@ -84,7 +84,7 @@ final class MenuSpec {
 
     void menu(String i18n = null, final MethodClosure action, Validateable validateable) {
         if (validateable?.validate()) {
-            Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
+            Map<String, Object> params = Parameter.validateableToMap(validateable)
             if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
         }
     }
@@ -96,7 +96,7 @@ final class MenuSpec {
      * @param id
      */
     void menuIcon(final ActionIcon icon, final MethodClosure action, Long id = null) {
-        if (taackUiEnabler.hasAccess(action, id)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), id ? [id: id] : null, true)
+        if (taackUiEnabler.hasAccess(action, id)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), (id ? [id: id] : null) as Map, true)
     }
 
     /**
@@ -105,13 +105,13 @@ final class MenuSpec {
      * @param action
      * @param params
      */
-    void menuIcon(final ActionIcon icon, final MethodClosure action, Map<String, ? extends Object> params) {
+    void menuIcon(final ActionIcon icon, final MethodClosure action, Map<String, Object> params) {
         if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
     }
 
     void menuIcon(final ActionIcon icon, final MethodClosure action, Validateable validateable) {
         if (validateable?.validate()) {
-            Map<String, ? extends Object> params = Parameter.validateableToMap(validateable)
+            Map<String, Object> params = Parameter.validateableToMap(validateable)
             if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitSubMenuIcon(null, icon, Utils.getControllerName(action), action.method.toString(), params, true)
         } else {
             println validateable?.errors

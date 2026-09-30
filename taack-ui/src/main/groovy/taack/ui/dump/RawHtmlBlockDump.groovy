@@ -519,19 +519,19 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitMenu(String controller, String action, Map<String, ?> params) {
+    void visitMenu(String controller, String action, Map<String, Object> params) {
         blockLog.logStayBlock('visitMenu')
         visitLabeledSubMenu(null, controller, action, params)
     }
 
 
     @Override
-    void visitSubMenu(String controller, String action, Map<String, ?> params) {
+    void visitSubMenu(String controller, String action, Map<String, Object> params) {
         blockLog.logStayBlock('visitSubMenu')
         visitLabeledSubMenu(null, controller, action, params)
     }
 
-    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, Object> params) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
         blockLog.logStayBlock('visitLabeledSubMenu ' + i18n)
@@ -553,7 +553,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         boolean isParamsEquals = true
 
         if (params) {
-            Map<String, ?> p = [:]
+            Map<String, Object> p = [:]
             cp?.each {
                 if (it.key != 'isAjax' && it.value != null && !it.value.toString().empty)
                     p.put(it.key as String, it.value)
@@ -581,7 +581,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, ?> params, boolean isModal = false) {
+    void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, Object> params, boolean isModal = false) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
         blockLog.logStayBlock('visitSubMenuIcon ' + i18n)
         if (!blockLog.topElement.testParentTaackTag(TaackTag.MENU_SPLIT, TaackTag.MENU_COL)) {
@@ -611,7 +611,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params) {
         logEnterBlock('visitMenuSelect')
         String valueSelected = params[paramName]
         IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
