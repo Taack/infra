@@ -127,11 +127,14 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
         BigDecimal diagramWidth = render.getDiagramWidth() - diagramMarginLeft - diagramMarginRight
         BigDecimal gapWidth = diagramWidth / (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1)
         BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { diagramOption.xLabelDateFormat.format(it as Date) }.join(''))
-        int showLabelEveryX = Math.ceil((xLabelTotalLength / (diagramWidth * 0.8)).toDouble()).toInteger()
+        boolean rotateLabel = xLabelTotalLength > diagramWidth * 0.8
+        Double rate = fontSize / 0.8 / (Math.sin(Math.abs(LABEL_ROTATE_ANGLE_WHEN_MASSIVE.toDouble()) / 180.0 * Math.PI) * gapWidth)
+        int showLabelEveryX = rotateLabel ? Math.ceil(rate).toInteger() : 1
+
         render.renderGroup(['element-type': ElementType.VERTICAL_BACKGROUND,
                             'area-min-x': diagramMarginLeft,
                             'area-max-x': render.getDiagramWidth() - diagramMarginRight,
-                            'show-label-every-x': xLabelTotalLength / (diagramWidth * 0.8),
+                            'show-label-every-x': rate,
                             'default-scroll-x-number': diagramOption.maxDataNumberToShowByDefault])
         render.fillStyle(GREY_COLOR)
         BigDecimal minX = objectToNumber(xLabelList.first())
@@ -151,13 +154,9 @@ class TimelineDiagramScene extends RectBackgroundDiagramScene {
             // x axis label
             String xLabel = diagramOption.xLabelDateFormat.format(xLabelList[i] as Date)
             BigDecimal labelLength = render.measureText(xLabel)
-            if (gapWidth >= labelLength) {
+            if (!rotateLabel) {
                 render.translateTo(coordX - labelLength / 2, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
-                if (i % showLabelEveryX == 0) {
-                    render.renderLabel(xLabel)
-                } else if (alwaysShowFullInfo) {
-                    render.renderHiddenLabel(xLabel)
-                }
+                render.renderLabel(xLabel)
             } else {
                 render.translateTo(coordX - labelLength, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
                 if (i % showLabelEveryX == 0) {

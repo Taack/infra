@@ -44,7 +44,7 @@ enum KeyColor {
 abstract class DiagramScene {
     protected BigDecimal DIAGRAM_MARGIN_TOP = 20.0
     protected BigDecimal DIAGRAM_MARGIN_BOTTOM = 60.0
-    protected BigDecimal DIAGRAM_Y_AXIS_WIDTH = 40.0
+    protected BigDecimal DIAGRAM_Y_AXIS_WIDTH = 50.0
     protected BigDecimal TITLE_MARGIN = 10.0
 
     public IDiagramRender render

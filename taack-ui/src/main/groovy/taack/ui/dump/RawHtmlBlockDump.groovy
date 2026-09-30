@@ -531,7 +531,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitLabeledSubMenu(null, controller, action, params)
     }
 
-    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, Object> params) {
+    void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
         blockLog.logStayBlock('visitLabeledSubMenu ' + i18n)
@@ -611,7 +611,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     @Override
-    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params) {
+    void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
         logEnterBlock('visitMenuSelect')
         String valueSelected = params[paramName]
         IEnumOption enumSelected = enumOptions.getOptions().find { it.key == valueSelected }
