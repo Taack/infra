@@ -65,7 +65,7 @@ final class MenuSpec {
      * @param action
      * @param params
      */
-    void menu(String i18n, final MethodClosure action, Map<String, Object> params = null) {
+    void menu(String i18n, final MethodClosure action, Map<String, ? extends Object> params = null) {
         if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), params)
     }
 
@@ -74,12 +74,12 @@ final class MenuSpec {
      * @param action
      * @param params
      */
-    void menu(final MethodClosure action, Map<String, Object> params = null) {
+    void menu(final MethodClosure action, Map<String, ? extends Object> params = null) {
         if (taackUiEnabler.hasAccess(action, params)) menuVisitor.visitLabeledSubMenu(null, Utils.getControllerName(action), action.method.toString(), params)
     }
 
     void menu(String i18n = null, final MethodClosure action, Long id) {
-        if (taackUiEnabler.hasAccess(action, id)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), [id: id])
+        if (taackUiEnabler.hasAccess(action, id)) menuVisitor.visitLabeledSubMenu(i18n, Utils.getControllerName(action), action.method.toString(), [id: id] as Map)
     }
 
     void menu(String i18n = null, final MethodClosure action, Validateable validateable) {
