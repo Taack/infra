@@ -27,6 +27,11 @@ class UiFilterVisitorImpl implements IUiFilterVisitor {
     }
 
     @Override
+    void visitFilterFieldExpressionReverse(FieldInfo reverseField, boolean notIn, FilterExpression... filterExpression) {
+
+    }
+
+    @Override
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
 
     }

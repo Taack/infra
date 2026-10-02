@@ -178,6 +178,13 @@ final class RawHtmlFilterDump implements IUiFilterVisitor {
     }
 
     @Override
+    void visitFilterFieldExpressionReverse(FieldInfo reverseField, boolean notIn, FilterExpression... filterExpressions) {
+        String qualifiedName = filterExpressions*.qualifiedName.join('_')
+        blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, null, false, false, true)
+        mapAdditionalHiddenParams.put qualifiedName + 'Default', new HTMLInput(InputType.HIDDEN, '1', "${qualifiedName}Default")
+    }
+
+    @Override
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression[] filterExpressions) {
         String qualifiedName = filterExpressions*.qualifiedName.join('_')
         boolean isChecked = parameter.applicationTagLib.params[qualifiedName + 'Default'] ? parameter.applicationTagLib.params[qualifiedName] == '1' : defaultValue
