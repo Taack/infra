@@ -525,7 +525,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
     private void noTemplate(String lang, ThemeMode themeMode, ThemeMode themeAuto, RawHtmlBlockDump htmlBlock, RawHtmlBlockDump menuBlock, String... paramsToKeep) {
 
 //        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
-
+        webRequest.response.setHeader("Content-Type", "text/html; charset=UTF-8")
         BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, bufferSize)
 
         TaackUiConfiguration conf
