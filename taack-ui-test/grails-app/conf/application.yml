@@ -1,104 +1,11 @@
----
-grails:
-    profile: web
-    codegen:
-        defaultPackage: taack.website
-    gorm:
-        reactor:
-            # Whether to translate GORM events into Reactor events
-            # Disabled by default for performance reasons
-            events: false
 info:
     app:
         name: '@info.app.name@'
         version: '@info.app.version@'
         grailsVersion: '@info.app.grailsVersion@'
-spring:
-    servlet:
-        multipart:
-            maxFileSize: 200MB
-            maxRequestSize: 200MB
-    jmx:
-        unique-names: true
-    main:
-        banner-mode: "off"
-    groovy:
-        template:
-            check-template-location: false
-    devtools:
-        restart:
-            additional-exclude:
-                - '*.gsp'
-                - '**/*.gsp'
-                - '*.gson'
-                - '**/*.gson'
-                - 'logback.groovy'
-                - '*.properties'
-management:
-    endpoints:
-        enabled-by-default: false
-
----
-grails:
-    mime:
-        disable:
-            accept:
-                header:
-                    userAgents:
-                        - Gecko
-                        - WebKit
-                        - Presto
-                        - Trident
-        types:
-            all: '*/*'
-            atom: application/atom+xml
-            css: text/css
-            csv: text/csv
-            form: application/x-www-form-urlencoded
-            html:
-                - text/html
-                - application/xhtml+xml
-            js: text/javascript
-            json:
-                - application/json
-                - text/json
-            multipartForm: multipart/form-data
-            pdf: application/pdf
-            rss: application/rss+xml
-            text: text/plain
-            hal:
-                - application/hal+json
-                - application/hal+xml
-            xml:
-                - text/xml
-                - application/xml
-    urlmapping:
-        cache:
-            maxsize: 1000
-    controllers:
-        defaultScope: singleton
-
-    converters:
-        encoding: UTF-8
-    views:
-        default:
-            codec: html
-        gsp:
-            encoding: UTF-8
-            htmlcodec: xml
-            codecs:
-                expression: html
-                scriptlet: html
-                taglib: none
-                staticparts: none
-
 ---
 server:
     port: 9442
-    tomcat:
-        max-part-header-size: 8192
-        max-part-count: 80
-    max-http-request-header-size: 32KB
 
 ---
 hibernate:
@@ -211,20 +118,10 @@ taack-ui:
     solrUrl: 'http://localhost:8983/solr/taack'
     disableSecurity: false
 ---
-intercom:
-    vegaPath: ${HOME}/dev/yarn/vega/packages/vega-cli/bin/
----
 exe:
     dot.path: /usr/bin/dot # Used by Taack-ui to display some graphs
     convertPath: /usr/bin/convert
     unzipPath: /usr/bin/unzip
-plm:
-    freecadPath: /usr/bin/FreeCAD
-    singleInstance: true
-    xvfbRun: false
-    useWeston: true
-edges:
-    storePassword: ChangeIt
 
 client.js.path: ''
 bootstrap.js.tag: '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" async crossorigin="anonymous"></script>'
