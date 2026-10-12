@@ -171,7 +171,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
                 el.addChildren(new HTMLInput(InputType.HIDDEN, it?.key, qualifiedName))
             }
         }
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (noLabel) s.putAttr('aria-label', inputEscape(trI18n))
+        else el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
