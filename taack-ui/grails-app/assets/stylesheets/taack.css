@@ -526,6 +526,20 @@ svg text {
     animation: fadeIn 0.1s ease-out;
 }
 
+body > nav.navbar {
+    background-color: var(--taack-navbar-bg);
+    color: var(--taack-navbar-color);
+}
+
+.navbar-nav > li > .dropdown-menu {
+    background-color: var(--taack-navbar-bg);
+    z-index: 9999;
+}
+
+body > nav .navbar-nav a.nav-link {
+    color: var(--taack-navbar-color);
+}
+
 .dropdown-item {
     padding: 10px 16px;
 }

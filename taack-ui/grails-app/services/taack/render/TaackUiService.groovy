@@ -585,25 +585,20 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         bout << """\
     <title>${conf.defaultTitle}</title>
     ${bootstrapCssTag}
-    <link rel="stylesheet" href="/assets/application-taack.css"/>
-
     <style>
-    .navbar-nav > li > .dropdown-menu {
-        background-color: ${conf.bgColor};
-        z-index: 9999;
-    }
-
-    body > nav .navbar-nav a.nav-link {
-        color: ${conf.fgColor};
+    :root {
+        --taack-navbar-bg: ${conf.bgColor};
+        --taack-navbar-color: ${conf.fgColor};
     }
     </style>
+    <link rel="stylesheet" href="/assets/application-taack.css"/>
 
     <link rel="icon" type="image/png" href="/assets/favicon.png"/>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" : ""}" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
+<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" : ""}">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><img src='/assets/${conf.logoFileName}' width='${conf.logoWidth}'
                                                       height='${conf.logoHeight}' alt="Logo"/>
