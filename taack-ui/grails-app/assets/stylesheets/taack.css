@@ -173,8 +173,11 @@ fieldset,
     font-size: small;
 }
 
+.taackShowFields {
+    margin: 0;
+}
+
 .property-list .fieldcontain {
-    list-style: none;
     overflow: hidden;
     zoom: 1;
     display: flex;
@@ -195,11 +198,12 @@ fieldset,
 }
 
 .fieldcontain .property-label {
-    /*float: left;*/
+    font-weight: inherit;
 }
 
 .fieldcontain .property-value {
     display: block;
+    margin: 0;
 }
 
 /* Grid layout for show blocks */
@@ -209,7 +213,8 @@ fieldset,
     column-gap: 2.5rem;
 }
 
-.taackShowGrid > .taackShowSection {
+.taackShowGrid > .taackShowSection,
+.taackShowGrid .taackShowFields {
     display: contents;
 }
 
