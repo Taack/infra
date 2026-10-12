@@ -140,23 +140,24 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             )
         else
             el.addChildren(
-                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, tr('default.boolean.true', null)).builder.addClasses('form-check-label').build(),
-
-                    ).build(),
-                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, tr('default.boolean.false', null)).builder.addClasses('form-check-label').build(),
-
-                    ).build(),
-                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, '?').builder.addClasses('form-check-label').build()
-                    ).build(),
+                    new HTMLDiv().builder.addClasses('d-inline').putAttribute('role', 'radiogroup').putAttribute('aria-labelledby', qualifiedName + 'Label').addChildren(
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId(qualifiedName + 'True').build(),
+                                    new HTMLLabel(qualifiedName + 'True', tr('default.boolean.true', null)).builder.addClasses('form-check-label').build(),
+                            ).build(),
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId(qualifiedName + 'False').build(),
+                                    new HTMLLabel(qualifiedName + 'False', tr('default.boolean.false', null)).builder.addClasses('form-check-label').build(),
+                            ).build(),
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId(qualifiedName + 'Null').build(),
+                                    new HTMLLabel(qualifiedName + 'Null', '?').builder.addClasses('form-check-label').build()
+                            ).build(),
+                    ).build()
             )
 
-        el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
+        if (nullable) el.addChildren(new HTMLLabel().builder.setId(qualifiedName + 'Label').addChildren(new HTMLTxtContent(trI18n)).addClasses('form-label').build())
+        else el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
