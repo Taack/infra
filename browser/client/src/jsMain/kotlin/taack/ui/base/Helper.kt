@@ -142,6 +142,11 @@ class Helper {
                         }.toMap() as HashMap<String, FormDataEntryValue>
                         hydrateStateToUrl(formUrl)
                         history.pushState("{}", document.title, formUrl)
+                        // Modal save and reloads navigate to `Block.href`, so update it with filter and pagination params
+                        Block.href = URL(formUrl.toString()).apply {
+                            searchParams.delete("isAjax")
+                            searchParams.delete("ajaxBlockId")
+                        }.toString()
                     }
                     processAjaxLink(b?.formAction?.let { URL(it) }, xhr.responseText, filter)
                     b?.disabled = false
