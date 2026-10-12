@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    api 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260101.1'
+    api 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260924.2'
 }
 
 groovydoc {
