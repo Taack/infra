@@ -37,6 +37,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     IHTMLElement label(IHTMLElement topElement, String i18n, boolean hasClosure) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
         if (hasClosure) {
             HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build() as HTMLUl
             topElement.addChildren(
@@ -69,6 +70,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false, boolean insideSection = false) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
         topElement.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown', insideSection ? 'section-item' : '').addChildren(
                         new HTMLAnchor((insideSection || isAjax) && !isMail, url).builder
@@ -82,6 +84,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     static IHTMLElement section(IHTMLElement topElement, String i18n) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
         topElement.builder.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown', 'section-header').addChildren(
                         new HTMLSpan().builder.addClasses('navbar-text').addChildren(new HTMLTxtContent('<b>' + i18n + '</b>')).build()
@@ -99,6 +102,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     IHTMLElement menuSearch(IHTMLElement topElement, String i18n, String query, String action) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
         if (!isMail)
             topElement.addChildren(
                     new HTMLForm(action).builder.addClasses('solrSearch-input', 'py-1').addChildren(
