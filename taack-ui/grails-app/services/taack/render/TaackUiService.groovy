@@ -487,15 +487,20 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content
      */
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
-        blockSpecifier.visitBlock(htmlPdf)
-        ByteArrayOutputStream output = new ByteArrayOutputStream(bufferSize)
-        htmlPdf.getOutput(new BufferedOutputStream(output))
-        String html = g.render template: '/taackUi/block-mail', model: [
-                block: output.toString(),
-                root : TaackUiConfiguration.root
-        ]
-        html
+        dumpMailHtml(blockSpecifier, null, null, locale)
+    }
+
+    /**
+     * Dump a block in Mail HTML version with optional header and footer
+     *
+     * @param blockSpecifier block descriptor
+     * @param headerSpecifier block rendered above the content. nullable
+     * @param footerSpecifier block rendered below the content. nullable
+     * @param locale language
+     * @return HTML content
+     */
+    final String dumpMailHtml(UiBlockSpecifier blockSpecifier, UiBlockSpecifier headerSpecifier, UiBlockSpecifier footerSpecifier, Locale locale = null) {
+        dumpMailHtmlWithDiagram(blockSpecifier, headerSpecifier, footerSpecifier, locale).aValue
     }
 
     /**
@@ -506,15 +511,37 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content, and attachment to add to the mail
      */
     final Pair<String, Map<String, byte[]>> dumpMailHtmlWithDiagram(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
-        blockSpecifier.visitBlock(htmlPdf)
-        ByteArrayOutputStream output = new ByteArrayOutputStream(4096)
-        htmlPdf.getOutput(output)
+        dumpMailHtmlWithDiagram(blockSpecifier, null, null, locale)
+    }
+
+    /**
+     * Dump a block in Mail HTML version with optional header and footer.
+     *
+     * @param blockSpecifier block descriptor
+     * @param headerSpecifier block rendered above the content. nullable
+     * @param footerSpecifier block rendered below the content. nullable
+     * @param locale language
+     * @return HTML content, and attachment to add to the mail, diagrams of the header and footer included
+     */
+    final Pair<String, Map<String, byte[]>> dumpMailHtmlWithDiagram(UiBlockSpecifier blockSpecifier, UiBlockSpecifier headerSpecifier, UiBlockSpecifier footerSpecifier, Locale locale = null) {
+        Map<String, byte[]> mailAttachment = [:]
         String html = g.render template: '/taackUi/block-mail', model: [
-                block: output.toString(),
-                root : TaackUiConfiguration.root
+                header: dumpMailBlock(headerSpecifier, locale, mailAttachment),
+                block : dumpMailBlock(blockSpecifier, locale, mailAttachment),
+                footer: dumpMailBlock(footerSpecifier, locale, mailAttachment),
+                root  : TaackUiConfiguration.root
         ]
-        new Pair(html, htmlPdf.mailAttachment)
+        new Pair(html, mailAttachment)
+    }
+
+    private String dumpMailBlock(UiBlockSpecifier blockSpecifier, Locale locale, Map<String, byte[]> mailAttachment) {
+        if (!blockSpecifier) return null
+        RawHtmlBlockDump htmlMail = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
+        blockSpecifier.visitBlock(htmlMail)
+        ByteArrayOutputStream output = new ByteArrayOutputStream(bufferSize)
+        htmlMail.getOutput(output)
+        mailAttachment.putAll(htmlMail.mailAttachment)
+        output.toString()
     }
 
     final void createModal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
