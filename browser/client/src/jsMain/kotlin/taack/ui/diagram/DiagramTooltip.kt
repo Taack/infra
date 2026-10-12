@@ -25,6 +25,7 @@ import web.timers.setInterval
 import web.url.URL
 import web.xhr.XMLHttpRequest
 import kotlin.math.min
+import js.uri.encodeURIComponent
 
 class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafElement {
     companion object {
@@ -215,8 +216,7 @@ class DiagramTooltip(private val parent: Diagram, val g: SVGGElement): LeafEleme
     }
 
     private fun onClickTooltip(action: String, key: String, x: String, y: String) {
-        val targetUrl = URL(action + (if (action.contains("?")) "&" else "?") + "key=${key}&x=${x}&y=${y}&isAjax=true", "${location.protocol}//${location.host}").toString()
-
+        val targetUrl = URL(action + (if (action.contains("?")) "&" else "?") + "key=${encodeURIComponent(key)}&x=${encodeURIComponent(x)}&y=${encodeURIComponent(y)}&isAjax=true", "${location.protocol}//${location.host}").toString()
         //Display load spinner
         val loader = document.getElementById(ElementId("taack-load-spinner"))
         loader?.classList?.remove(ClassName("tck-hidden"))
