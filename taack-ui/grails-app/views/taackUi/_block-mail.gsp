@@ -7,6 +7,8 @@
 </head>
 
 <body>
+<g:if test="${header}">${raw(header)}</g:if>
 ${raw(block)}
+<g:if test="${footer}">${raw(footer)}</g:if>
 </body>
 </html>
