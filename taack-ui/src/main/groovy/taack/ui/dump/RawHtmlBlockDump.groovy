@@ -409,7 +409,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.savePosition()
         renderDecision.isModal = true
         parameter.isModal = true
-        HTMLAjaxModal modal = new HTMLAjaxModal(renderDecision.isRefreshing, reloadWhenClose)
+        String title = parameter.trField(parameter.controllerName, parameter.actionName, parameter.beanId != null)
+        HTMLAjaxModal modal = new HTMLAjaxModal(renderDecision.isRefreshing, reloadWhenClose, title)
         blockLog.topElement.addChildren(modal)
         blockLog.topElement.setTaackTag(TaackTag.MODAL)
         blockLog.topElement = modal

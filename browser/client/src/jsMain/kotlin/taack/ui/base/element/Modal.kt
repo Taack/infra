@@ -59,11 +59,17 @@ class Modal(val parent: Block, htmlContent: String) : BaseElement {
         parent.modals.addLast(this)
         dModal.classList.add(ClassName("modal"))
         dModal.style.display = "block"
+        dModal.setAttribute("role", "dialog")
+        dModal.setAttribute("aria-modal", "true")
         dModalDialog = document.createElement("div") as HTMLDivElement
         dModalDialog.classList.add(ClassName("modal-dialog"), ClassName("modal-xl"), ClassName("modal-dialog-scrollable"), ClassName("modal-dialog-centered"))
         dModalBody = document.createElement("div") as HTMLDivElement
         dModalBody.classList.add(ClassName("modal-body"), ClassName("overflow-y-auto"))
         dModalBody.innerHTML = HtmlSource(htmlContent)
+        dModalBody.querySelector(":scope > [taackModalTitle]")?.let { title ->
+            dModal.setAttribute("aria-label", title.textContent ?: "")
+            title.remove()
+        }
         dModalContent.classList.add(ClassName("modal-content"))
         dModalContent.classList.add(ClassName("taackModal"))
         val minimizeButton = document.createElement("button") as HTMLButtonElement
