@@ -22,6 +22,8 @@ import taack.user.IUserCreated
 import taack.user.IUserUpdated
 import taack.user.TaackUser
 
+import java.lang.reflect.Field
+
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
     TaackUiService taackUiService
@@ -180,16 +182,31 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 } else {
                     if (id) {
                         if (bindingName.contains(',')) {
-                            bindData(gormEntity, params, [include: bindingName.tokenize(',')])
-                        } else bindData(gormEntity, params, [include: [bindingName]])
-                    } else bindData(gormEntity, params)
+                            bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: bindingName.tokenize(',')])
+                        } else bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: [bindingName]])
+                    } else {
+                        bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')})
+                    }
                 }
             } else {
                 Map p = params as Map
                 p.remove('filePath')
                 // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
                 if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
-                else bindData(gormEntity, p)
+                else {
+                    List<String> props = []
+                    for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
+                        if (includedField.name.contains('_') || includedField.name.contains('$')) continue
+                        if (GormEntity.isAssignableFrom(includedField.type)) {
+                            props << includedField.name // + '.id'
+                        } else props << includedField.name
+                    }
+                    Map includedParams = new HashMap(p)
+                    includedParams.retainAll {
+                        props.contains(it.key)
+                    }
+                    bindData(gormEntity, includedParams, [include: props])
+                }
 
                 gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
                     fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
