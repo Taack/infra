@@ -53,6 +53,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     int level = 0
     boolean firstInCol = false
     private final IHTMLElement initialForm
+    private IHTMLElement table
     private Pair<String, String> initialSortingOrder
     private Pair<Date, String> initialLastReadingDate
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
@@ -136,7 +137,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.restorePosition()
 
         if (initialSortingOrder) {
-            blockLog.topElement.children[0].getBuilder().putAttribute('initialSortField', initialSortingOrder.aValue)
+            table.putAttr('initialSortField', initialSortingOrder.aValue)
         }
     }
 
@@ -299,14 +300,15 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.logEnterBlock('visitTable')
         blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
-        blockLog.topElement = themableTable.table(blockLog.topElement, blockId, tableOption)
+        table = themableTable.table(blockLog.topElement, blockId, tableOption)
+        blockLog.topElement = table
     }
 
     @Override
     void visitTableWithoutFilter() {
         blockLog.logEnterBlock('visitTableWithoutFilter')
         blockLog.savePosition()
-        IHTMLElement table = themableTable.table(blockLog.topElement, blockId, tableOption)
+        table = themableTable.table(blockLog.topElement, blockId, tableOption)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
 
 //        List<HTMLInput> inputList = []
