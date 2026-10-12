@@ -435,6 +435,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                     .putAttribute('taackMax', max?.toString())
                     .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: '0')
                     .putAttribute('taackCount', count?.toString())
+                    .putAttribute('taackPaginateLabel', tr('default.paginate.label', parameter.lcl))
                     .build()
             )
         }

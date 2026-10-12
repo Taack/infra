@@ -47,6 +47,10 @@
     color: gray;
 }
 
+.pagination .page-link[aria-current="page"] {
+    font-weight: bold;
+}
+
 .taackBreakAfter:after {
     content: "\a";
     white-space: pre;
