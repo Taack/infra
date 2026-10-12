@@ -191,6 +191,7 @@ fieldset,
     color: var(--bs-secondary-color, #6c757d);
     text-align: right;
     width: 20%;
+    flex-shrink: 0;
 }
 
 .fieldcontain .property-label {
