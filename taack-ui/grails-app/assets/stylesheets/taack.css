@@ -56,25 +56,35 @@
     white-space: pre;
 }
 
-span.neutral {
+.sortColumn.neutral {
     background-image: url(../images/taack/icons/modifiers/neutral.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
 }
 
-span.desc {
+.sortColumn.desc {
     background-image: url(../images/taack/icons/modifiers/descw.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
 }
 
-span.asc {
+.sortColumn.asc {
     background-image: url(../images/taack/icons/modifiers/ascw.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
+}
+
+button.sortColumn {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
 }
 
 .deleteIconM2M {

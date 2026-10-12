@@ -8,15 +8,15 @@ import taack.ui.base.element.Table
 import web.cssom.ClassName
 import web.events.EventHandler
 import web.form.FormData
-import web.html.HTMLSpanElement
+import web.html.HTMLButtonElement
 import web.mouse.MouseEvent
 
-class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafElement {
+class TableSortableColumn(private val parent: Table, s: HTMLButtonElement) : LeafElement {
     companion object {
         fun getSiblingSortableColumn(p: Table): List<TableSortableColumn> {
-            val elements: List<*> = p.t.querySelectorAll("span[sortField]").asList()
+            val elements: List<*> = p.t.querySelectorAll("button[sortField]").asList()
             return elements.map {
-                TableSortableColumn(p, it as HTMLSpanElement)
+                TableSortableColumn(p, it as HTMLButtonElement)
             }
         }
     }
@@ -37,6 +37,12 @@ class TableSortableColumn(private val parent: Table, s: HTMLSpanElement) : LeafE
         }
         trace("SortableColumn::init $property $direction")
         s.classList.add(ClassName(direction))
+        val ariaSort = when (direction) {
+            "asc" -> "ascending"
+            "desc" -> "descending"
+            else -> null
+        }
+        if (ariaSort != null) s.closest("th")?.setAttribute("aria-sort", ariaSort)
         s.onclick = EventHandler{ e ->
             onClick(e)
         }

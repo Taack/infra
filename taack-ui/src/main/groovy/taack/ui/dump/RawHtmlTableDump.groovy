@@ -345,9 +345,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
-                new HTMLSpan().builder.addClasses('sortColumn').setStyle(DISPLAY_BLOCK_DESCRIPTOR).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
-                        new HTMLTxtContent(i18n)
-                ).build()
+                new HTMLButton(i18n).builder.addClasses('sortColumn').setStyle(DISPLAY_BLOCK_DESCRIPTOR)
+                        .putAttribute('type', 'button')
+                        .putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields))
+                        .build()
         )
         if (addColumn) visitColumnEnd()
 
