@@ -188,7 +188,7 @@ fieldset,
 
 .fieldcontain label,
 .fieldcontain .property-label {
-    color: #666666;
+    color: var(--bs-secondary-color, #6c757d);
     text-align: right;
     width: 20%;
 }
@@ -227,7 +227,6 @@ fieldset,
 .taackShowGrid .property-label {
     width: auto;
     text-align: left;
-    color: var(--bs-secondary-color, #6c757d);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.06em;
