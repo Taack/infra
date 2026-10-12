@@ -154,9 +154,15 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         } else {
             HTMLTd th = new HTMLTd(colSpan, rowSpan)
             th.setTaackTag(TaackTag.TABLE_COL)
+            markFirstCellInGroup(th.builder)
             blockLog.topElement.builder.addChildren(th)
             blockLog.topElement = th
         }
+    }
+
+    private void markFirstCellInGroup(IHTMLElement.HTMLElementBuilder tdBuilder) {
+        if (firstInCol) tdBuilder.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
+        firstInCol = false
     }
 
     @Override
@@ -273,8 +279,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 tdBuilder.putAttribute('taackDropAction', new Parameter().urlMapped(cellOption.uploadFileAction, cellOption.uploadFileActionParams))
             }
         }
-        if (firstInCol) tdBuilder.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
-        firstInCol = false
+        markFirstCellInGroup(tdBuilder)
         tdBuilder.taackTag = TaackTag.TABLE_COL
         HTMLTd td = tdBuilder.build() as HTMLTd
         blockLog.topElement.builder.addChildren(td)
