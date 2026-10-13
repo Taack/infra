@@ -18,6 +18,7 @@ import taack.ast.type.FieldInfo
 import taack.domain.IDomainHistory
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.helper.Utils
+import taack.ui.dump.FormFieldRecord
 import taack.user.IUserCreated
 import taack.user.IUserUpdated
 import taack.user.TaackUser
@@ -155,16 +156,22 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
         }
 
+        final FormFieldRecord formFieldRecord = doNotBindParams ? null : verifiedFormFieldRecord(gormEntity)
+        final Map bindableParams = formFieldRecord ? formFieldRecord.bindableParams(params) : params
+
         if (!doNotBindParams)
             if (bindingName) {
                 if (lockedFields && lockedFields*.fieldName.contains(bindingName)) {
+                    return null
+                }
+                if (formFieldRecord && !bindingName.tokenize(',').every { formFieldRecord.allows(it) }) {
                     return null
                 }
                 if (bindingName.contains('.')) {
                     int iPoint = bindingName.indexOf('.')
                     String realFieldName = bindingName.substring(0, iPoint)
                     String key = bindingName.substring(iPoint + 1)
-                    (gormEntity.getAt(realFieldName) as Map).put(key, params.get(bindingName))
+                    (gormEntity.getAt(realFieldName) as Map).put(key, bindableParams.get(bindingName))
 //                } else if (bindingName.contains('_setKey_')) {
 //                    int iPoint = bindingName.indexOf('_setKey_')
 //                    String realFieldName = bindingName.substring(0, iPoint)
@@ -180,19 +187,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 //                    (gormEntity.getAt(realFieldName) as Map)[key] = params.get(bindingName)
 //                    println gormEntity.getAt(realFieldName)
                 } else {
-                    if (id) {
-                        if (bindingName.contains(',')) {
-                            bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: bindingName.tokenize(',')])
-                        } else bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: [bindingName]])
-                    } else {
-                        bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')})
-                    }
+                    bindData(gormEntity, bindableParams, [include: bindingName.tokenize(',')])
                 }
             } else {
-                Map p = params as Map
+                Map p = bindableParams
                 p.remove('filePath')
                 // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
                 if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
+                else if (formFieldRecord) bindData(gormEntity, p, [include: formFieldRecord.bindableProperties])
                 else {
                     List<String> props = []
                     for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
@@ -252,6 +254,26 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         return gormEntity
     }
 
+
+    /**
+     * @return the verified record, or null when the request carries no record
+     * @throws SecurityException when the record is not a genuine one for this entity
+     */
+    private FormFieldRecord verifiedFormFieldRecord(GormEntity gormEntity) {
+        final String className = beanRealClass(gormEntity).name
+        final String token = params[FormFieldRecord.PARAM]
+        if (!token) {
+            log.warn "Rejected save of ${className}"
+            throw new SecurityException("Invalid ${FormFieldRecord.PARAM} for ${className}")
+        }
+        final String id = gormEntity.ident()?.toString() ?: ''
+        final FormFieldRecord formFieldRecord = FormFieldRecord.verify(token, className, id)
+        if (!formFieldRecord) {
+            log.warn "Rejected save of ${className}#${id}: invalid ${FormFieldRecord.PARAM} (user: ${springSecurityService?.authentication?.name}, remoteAddr: ${request.remoteAddr}, params: ${params.keySet()})"
+            throw new SecurityException("Invalid ${FormFieldRecord.PARAM} for ${className}#${id}")
+        }
+        formFieldRecord
+    }
 
     def renderErrors(Errors errors) {
         Map<String, List<String>> fieldErrors = [:]

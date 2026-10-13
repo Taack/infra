@@ -3,6 +3,7 @@ package taack.ui.dump
 import grails.util.Triple
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
 import taack.ui.EnumOptions
@@ -35,9 +36,11 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     final private Parameter parameter
 
     private Object aObject
+    private String aObjectId
     private boolean uncollapseSection
     private int tabOccurrence = 0
     private FieldInfo[] lockedFields
+    private final Set<String> renderedFields = new LinkedHashSet<>()
 
     final BootstrapForm formThemed
     final BlockLog blockLog
@@ -67,16 +70,23 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         }
     }
 
+    private void recordField(String paramName, boolean isFieldDisabled) {
+        if (paramName && !isFieldDisabled) {
+            renderedFields.add(paramName)
+        }
+    }
+
     @Override
     void visitForm(final Object aObject, final FieldInfo[] lockedFields = null) {
         this.lockedFields = lockedFields
         this.aObject = aObject
-        String id = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : '') : ''
+        renderedFields.clear()
+        aObjectId = aObject.hasProperty(ST_ID) ? (aObject[ST_ID] != null ? aObject[ST_ID] : '') : ''
         blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(
                 formThemed.builder.addClasses('taackForm').addChildren(
-                        new HTMLInput(InputType.HIDDEN, id, 'id'),
+                        new HTMLInput(InputType.HIDDEN, aObjectId, 'id'),
                         new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.actionName, 'originAction'),
@@ -88,6 +98,10 @@ final class RawHtmlFormDump implements IUiFormVisitor {
 
     @Override
     void visitFormEnd() {
+        String className = GrailsHibernateUtil.unwrapIfProxy(aObject).class.name
+        formThemed.addChildren(
+                new HTMLInput(InputType.HIDDEN, new FormFieldRecord(className, aObjectId, renderedFields).sign(), FormFieldRecord.PARAM)
+        )
         blockLog.topElement = formThemed.formActionBlock(blockLog.topElement)
         formActions.each {
             formThemed.addFormAction(blockLog.topElement, it.cValue, it.aValue, it.bValue)
@@ -131,6 +145,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isDate = Date.isAssignableFrom(type)
         final boolean isNullable = field.fieldConstraint.nullable
         final boolean isFieldDisabled = isDisabled(field)
+        recordField(qualifiedName, isFieldDisabled)
 
         if (isBoolean) {
             blockLog.topElement = formThemed.booleanInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, false, field.value as boolean)
@@ -186,6 +201,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
+        recordField(qualifiedName, isFieldDisabled)
         if (isListOrSet)
             formThemed.ajaxField(blockLog.topElement, trI18n, field.value as List, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action, id, params), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
         else
@@ -203,6 +219,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final String trI18n = i18n ?: parameter.trField(field)
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
+        recordField(qualifiedName, isFieldDisabled)
         formThemed.ajaxField(blockLog.topElement, trI18n, enumOptions, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled)
     }
 
@@ -272,6 +289,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         String value = (field.value as Map<String, String>)?.get(mapEntry)
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
+        recordField(qualifiedName, isFieldDisabled)
         if (controller && action) {
             formThemed.ajaxField(blockLog.topElement, trI18n, field.value, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
         } else if (field.fieldConstraint.widget == WidgetKind.TEXTAREA.name) {
@@ -304,6 +322,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isNullable = field.fieldConstraint.nullable
         final boolean isFieldDisabled = isDisabled(field)
 
+        recordField(qualifiedName, isFieldDisabled)
         blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String, editorOption)
 
     }
@@ -316,6 +335,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         final boolean isFieldDisabled = isDisabled(field)
         final boolean isNullable = field.fieldConstraint.nullable
 
+        recordField(qualifiedName, isFieldDisabled)
         blockLog.topElement = formThemed.textareaInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, value, editorOption)
     }
 
@@ -359,6 +379,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     void visitFormHiddenField(FieldInfo fieldInfo) {
         final String qualifiedName = fieldInfo.fieldName
         final boolean isListOrSet = Collection.isAssignableFrom(fieldInfo.fieldConstraint.field.type)
+        recordField(qualifiedName, isDisabled(fieldInfo))
 
         String value
         if (fieldInfo.value?.hasProperty(ST_ID)) {
