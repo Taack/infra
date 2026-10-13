@@ -236,7 +236,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
-            if (oldEntity && gormEntity.validate() && gormEntity.isDirty()) {
+            if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
             }
             gormEntity.save(flush: true, failsOnError: true)
