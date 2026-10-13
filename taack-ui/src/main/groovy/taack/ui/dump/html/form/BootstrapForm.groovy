@@ -135,8 +135,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
         if (!nullable)
             el.addChildren(
-                    new HTMLInput(InputType.HIDDEN, '0', value ? null : qualifiedName),
-                    HTMLInput.inputCheck('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").setOnclick(new CheckboxDisableIsZero()).build(),
+                    new HTMLInput(InputType.HIDDEN, '0', value ? null : qualifiedName, null, disable),
+                    HTMLInput.inputCheck('1', qualifiedName, value, disable).builder.addClasses('form-check-input').setId("${qualifiedName}Check").setOnclick(new CheckboxDisableIsZero()).build(),
             )
         else
             el.addChildren(
