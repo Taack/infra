@@ -75,7 +75,8 @@ final class RawHtmlFormDump implements IUiFormVisitor {
         blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.FORM)
         blockLog.topElement.builder.addChildren(
-                formThemed.builder.addClasses('taackForm').addChildren(
+                // Server does validation, not browser
+                formThemed.builder.addClasses('taackForm').putAttribute('novalidate', null).addChildren(
                         new HTMLInput(InputType.HIDDEN, id, 'id'),
                         new HTMLInput(InputType.HIDDEN, aObject.class.name, 'className'),
                         new HTMLInput(InputType.HIDDEN, parameter.applicationTagLib.controllerName, 'originController'),

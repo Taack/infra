@@ -45,8 +45,23 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
     }
 
-    private static IHTMLElement formLabelInput(String qualifiedName, String i18n) {
-        new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
+    private static IHTMLElement formLabelInput(String qualifiedName, String i18n, boolean required = false) {
+        HTMLElementBuilder label = new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label')
+        if (required) label.addChildren(requiredMarker())
+        label.build()
+    }
+
+    private static IHTMLElement requiredMarker() {
+        new HTMLSpan().builder.addClasses('taackRequired')
+                .putAttribute('aria-hidden', 'true')
+                .putAttribute('title', inputEscape(tr('default.required.label', null)))
+                .build()
+    }
+
+    private static boolean markRequired(IHTMLElement control, boolean nullable, boolean disable) {
+        boolean required = !nullable && !disable
+        if (required) control.putAttr('required', null)
+        required
     }
 
     private static IHTMLElement removeButton(String removed, IJavascriptDescriptor onclick) {
@@ -190,6 +205,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
         HTMLSelect s = new HTMLSelect(options, multiple, disable, (!nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
+        // A collection's nullable: false still allows an empty one.
+        boolean required = markRequired(s, nullable || multiple, disable)
         el.addChildren(s)
         if (disable) {
             options.currents?.each { IEnumOption it ->
@@ -197,7 +214,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             }
         }
         if (noLabel) s.putAttr('aria-label', inputEscape(trI18n))
-        else el.addChildren(formLabelInput(qualifiedName, trI18n))
+        else el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -274,7 +291,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren removeButton(valueLabel ?: trI18n, new DeleteSiblingInputContent())
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
+        boolean required = markRequired(input, nullable, disabled)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n, required))
         el.addChildren(inputHidden)
         el.addChildren(divError(qualifiedName))
         topElement
@@ -285,7 +303,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value) : null, qualifiedName, inputEscape(trI18n), disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        boolean required = markRequired(input, nullable, disable)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -334,7 +353,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLTextarea input = inputBuilder.build() as HTMLTextarea
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        boolean required = markRequired(input, nullable, disable)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -345,6 +365,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
         HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses('wysiwyg-content', 'markdown').setId(qualifiedName).build() as HTMLTextarea
+        markRequired(textareaInput, nullable, disable)
         container.addChildren(textareaInput)
         HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses('wysiwyg-markdown-preview markdown-body').build() as HTMLDiv
         container.addChildren(preview)
@@ -362,8 +383,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement asciidocInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
-        if (!noLabel) container.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses('asciidoctor').setId(qualifiedName).build() as HTMLTextarea
+        boolean required = markRequired(textareaInput, nullable, disable)
+        if (!noLabel) container.addChildren(formLabelInput(qualifiedName, trI18n, required))
         container.addChildren(textareaInput)
         el.addChildren(container)
         el.addChildren(divError(qualifiedName))
@@ -387,7 +409,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         if (floating) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        boolean required = markRequired(input, nullable, disable)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
