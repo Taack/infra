@@ -159,6 +159,10 @@ form.taackForm legend {
     font-size: small;
 }
 
+.taackFilterField > legend {
+    font-size: inherit;
+}
+
 input, select, textarea {
     font-size: 1em;
     padding: 0.2em 0.4em;

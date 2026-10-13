@@ -69,6 +69,20 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         ret
     }
 
+    private static IHTMLElement filterField(IHTMLElement topElement, String controlId, String i18n) {
+        IHTMLElement field = new HTMLDiv().builder.addClasses('taackFilterField').addChildren(formLabelInput(controlId, i18n)).build()
+        topElement.addChildren(field)
+        field
+    }
+
+    private static IHTMLElement filterGroup(IHTMLElement topElement, String i18n) {
+        IHTMLElement group = new HTMLFieldset().builder.addClasses('taackFilterField').addChildren(
+                new HTMLLegend().builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
+        ).build()
+        topElement.addChildren(group)
+        group
+    }
+
     private static IHTMLElement divError(String qualifiedName) {
         new HTMLDiv().builder.putAttribute('taackfielderror', qualifiedName).addClasses('form-text').build()
     }
@@ -142,8 +156,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Boolean value) {
-        //IHTMLElement el = themeStartInputs(topElement)
-        IHTMLElement el = topElement
+        IHTMLElement el = nullable ? filterGroup(topElement, trI18n) : topElement
 
         if (!nullable)
             el.addChildren(
@@ -152,31 +165,30 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             )
         else
             el.addChildren(
-                    new HTMLDiv().builder.addClasses('d-inline').putAttribute('role', 'radiogroup').putAttribute('aria-labelledby', qualifiedName + 'Label').addChildren(
+                    new HTMLDiv().builder.addChildren(
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId(qualifiedName + 'Null').build(),
+                                    new HTMLLabel(qualifiedName + 'Null', tr('default.filter.boolean.null', null)).builder.addClasses('form-check-label').build()
+                            ).build(),
                             new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
                                     HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId(qualifiedName + 'True').build(),
-                                    new HTMLLabel(qualifiedName + 'True', tr('default.boolean.true', null)).builder.addClasses('form-check-label').build(),
+                                    new HTMLLabel(qualifiedName + 'True', tr('default.filter.boolean.true', null)).builder.addClasses('form-check-label').build(),
                             ).build(),
                             new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
                                     HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId(qualifiedName + 'False').build(),
-                                    new HTMLLabel(qualifiedName + 'False', tr('default.boolean.false', null)).builder.addClasses('form-check-label').build(),
-                            ).build(),
-                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                                    HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId(qualifiedName + 'Null').build(),
-                                    new HTMLLabel(qualifiedName + 'Null', '?').builder.addClasses('form-check-label').build()
+                                    new HTMLLabel(qualifiedName + 'False', tr('default.filter.boolean.false', null)).builder.addClasses('form-check-label').build(),
                             ).build(),
                     ).build()
             )
 
-        if (nullable) el.addChildren(new HTMLLabel().builder.setId(qualifiedName + 'Label').addChildren(new HTMLTxtContent(trI18n)).addClasses('form-label').build())
-        else el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
+        if (!nullable) el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
-        IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
         HTMLSelect s = new HTMLSelect(options, multiple, disable, (!nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
         el.addChildren(s)
         if (disable) {
@@ -280,7 +292,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime) {
-        IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = noLabel ? filterGroup(topElement, trI18n) : themeStartInputs(topElement)
         HTMLDiv div = new HTMLDiv().builder.setStyle(new Style(null, 'display: flex;')).build() as HTMLDiv
 
         Date value1 = value.aValue
@@ -371,9 +383,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
-        IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
-        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
+        if (floating) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
         el.addChildren(divError(qualifiedName))
