@@ -122,99 +122,40 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
     final <T extends GormEntity> T save(final T gormEntity, final FieldInfo[] lockedFields = null, final boolean doNotSave = false, boolean doNotBindParams = false) {
         final id = gormEntity.ident()
-        if (lockedFields && lockedFields.size() == 0) return null
-        final String bindingName = params['fieldName']
-        Map includeOrExclude = null
-        if (lockedFields) {
-            if (lockedFields.size() == 0) {
-                includeOrExclude = [exclude: lockedFields*.fieldName]
-            } else {
-                // includeOrExclude = [include: lockedFields[1..<lockedFields.size()]*.fieldName]
-                includeOrExclude = [include: lockedFields*.fieldName]
-            }
+        if (lockedFields != null && lockedFields.size() == 0) {
+            log.error "Not supposed to call save on $gormEntity"
+            throw new SecurityException("Update not allowed")
         }
-//
-//        if (beanIsLocked(gormEntity))
-//            if (!bindingName)// || !bindingName.equals(transitionName))
-//                throw new SecurityException('bean is locked!')
-
-        long c1 = System.currentTimeMillis()
-// TODO very slow
-//        gormEntity.getProperties().get('constrainedProperties').each {
-//            if (it.properties.get('value')['widget'] == 'ajax') {
-//                if (params[it.properties.get('key')] && (params[it.properties.get('key')] as String).isEmpty()) {
-//                    params[it.properties.get('key')] = null
-//                }
-//            }
-//        }
-
-        long c2 = System.currentTimeMillis()
 
         T oldEntity
         if (gormEntity instanceof IDomainHistory && id != null) {
             oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
         }
 
-        if (!doNotBindParams)
-            if (bindingName) {
-                if (lockedFields && lockedFields*.fieldName.contains(bindingName)) {
-                    return null
-                }
-                if (bindingName.contains('.')) {
-                    int iPoint = bindingName.indexOf('.')
-                    String realFieldName = bindingName.substring(0, iPoint)
-                    String key = bindingName.substring(iPoint + 1)
-                    (gormEntity.getAt(realFieldName) as Map).put(key, params.get(bindingName))
-//                } else if (bindingName.contains('_setKey_')) {
-//                    int iPoint = bindingName.indexOf('_setKey_')
-//                    String realFieldName = bindingName.substring(0, iPoint)
-//                    String key = bindingName.substring(iPoint + 8)
-//                    Object o = (gormEntity.getAt(realFieldName) as Map)[key]
-//                    (gormEntity.getAt(realFieldName) as Map).remove(key)
-//                    String newKey = params.get(bindingName)
-//                    (gormEntity.getAt(realFieldName) as Map).put(newKey, o ?: '')
-//                } else if (bindingName.contains('_setValue_')) {
-//                    int iPoint = bindingName.indexOf('_setValue_')
-//                    String realFieldName = bindingName.substring(0, iPoint)
-//                    String key = bindingName.substring(iPoint + 10)
-//                    (gormEntity.getAt(realFieldName) as Map)[key] = params.get(bindingName)
-//                    println gormEntity.getAt(realFieldName)
-                } else {
-                    if (id) {
-                        if (bindingName.contains(',')) {
-                            bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: bindingName.tokenize(',')])
-                        } else bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: [bindingName]])
-                    } else {
-                        bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')})
-                    }
-                }
-            } else {
-                Map p = params as Map
-                p.remove('filePath')
-                // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
-                if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
-                else {
-                    List<String> props = []
-                    for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
-                        if (includedField.name.contains('_') || includedField.name.contains('$')) continue
-                        if (GormEntity.isAssignableFrom(includedField.type)) {
-                            if (p[includedField.name].toString().isLong())
-                                props << includedField.name // + '.id'
-                        } else props << includedField.name
-                    }
-                    Map includedParams = new HashMap(p)
-                    includedParams.retainAll {
-                        props.contains(it.key)
-                    }
-                    bindData(gormEntity, includedParams, [include: props])
-                }
+        if (!doNotBindParams) {
+            Map p = params as Map
+            p.remove('filePath')
+            List<String> props = []
+            for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
+                if (lockedFields && lockedFields[0] != null && lockedFields.contains(includedField))
+                // Modify only fields that are not in lockedField
+                    continue else if (lockedFields && lockedFields[0] == null && !lockedFields.contains(includedField))
+                // Modify only fields that are after null. [null, f1, f2 ...]
+                    continue
 
-                gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
-                    fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
-                }
+                if (includedField.name.contains('_') || includedField.name.contains('$')) continue
+                if (GormEntity.isAssignableFrom(includedField.type)) {
+                    if (p[includedField.name].toString().isLong()) props << includedField.name // + '.id'
+                } else props << includedField.name
             }
-
-        long c3 = System.currentTimeMillis()
+            Map includedParams = new HashMap(p)
+            includedParams.retainAll {
+                props.contains(it.key)
+            }
+            bindData(gormEntity, includedParams, [include: props])
+            gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
+            }
+        }
 
         try {
             TaackUser currentUser = springSecurityService.currentUser as TaackUser
@@ -235,7 +176,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         } catch (ignored) {
         }
 
-        long c4 = System.currentTimeMillis()
         if (!doNotSave) {
             if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
@@ -243,16 +183,11 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             gormEntity.save(flush: true, failsOnError: true)
         }
 
-        long c5 = System.currentTimeMillis()
-
-        log.info "constrainedProperties: ${c2 - c1}ms, bindingName: ${c3 - c2}ms, gormEntity.hasChanged: ${c4 - c3}ms, save: ${c5 - c4}ms: ELAPSED:${c5 - c1}ms"
-
         if (!doNotSave && gormEntity.hasErrors()) {
             log.error "${gormEntity.errors}"
         }
         return gormEntity
     }
-
 
     def renderErrors(Errors errors) {
         Map<String, List<String>> fieldErrors = [:]
