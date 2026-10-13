@@ -90,8 +90,9 @@ open class BaseAjaxAction(private val parent: BaseElement?, a: HTMLElement) : Le
                         val text = xhr.responseText
                         if (text.substring(0, min(20, text.length)).contains(Regex(" html"))) {
                             trace("Full webpage ...|$action|${document.title}|${document.documentURI}|${xhr.responseURL}")
-                            history.pushState("{}", document.title, xhr.responseURL)
-                            location.href = xhr.responseURL
+                            val pageUrl = URL(xhr.responseURL).apply { searchParams.delete("isAjax") }.toString()
+                            history.pushState("{}", document.title, pageUrl)
+                            location.href = pageUrl
                             document.textContent = text
                             document.close()
                         } else {

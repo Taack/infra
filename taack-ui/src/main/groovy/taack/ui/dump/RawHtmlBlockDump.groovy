@@ -532,6 +532,22 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitLabeledSubMenu(null, controller, action, params)
     }
 
+    /**
+     * A block menu entry that targets the current action asks for its block only. Otherwise the
+     * action answers with the whole page, which the client can only load by navigating again.
+     */
+    private Map<String, ?> refreshingBlock(String controller, String action, Map<String, ?> params) {
+        if (!futurCurrentAjaxBlockId || parameter.controllerName != controller || parameter.actionName != action) return params
+        Map<String, Object> refreshing = (params ?: [:]) as Map<String, Object>
+        refreshing.put('ajaxBlockId', futurCurrentAjaxBlockId)
+        refreshing.put('refresh', 'true')
+        if (parameter.tabId && parameter.tabIndex) {
+            refreshing.put('tabId', parameter.tabId)
+            refreshing.put('tabIndex', parameter.tabIndex)
+        }
+        refreshing
+    }
+
     void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, ?> params) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
@@ -541,14 +557,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
             if (cp.containsKey('action')) cp.remove('action')
             if (cp.containsKey('controller')) cp.remove('controller')
-            if (futurCurrentAjaxBlockId && parameter.controllerName == controller && parameter.actionName == action) {
-                params.put('ajaxBlockId', futurCurrentAjaxBlockId)
-                params.put('refresh', 'true')
-                if (parameter.tabId && parameter.tabIndex) {
-                    params.put('tabId', parameter.tabId)
-                    params.put('tabIndex', parameter.tabIndex)
-                }
-            }
+            params = refreshingBlock(controller, action, params)
         }
 
         boolean isParamsEquals = true
@@ -590,7 +599,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         }
 
         if (parameter.target != Parameter.RenderingTarget.MAIL)
-            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, refreshingBlock(controller, action, params), isModal), isModal)
         else
             menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
     }
