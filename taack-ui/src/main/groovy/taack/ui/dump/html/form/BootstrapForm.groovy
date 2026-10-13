@@ -14,6 +14,7 @@ import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.script.CheckboxDisableIsZero
 import taack.ui.dump.html.script.DeleteM2MParentElement
 import taack.ui.dump.html.script.DeleteSiblingInputContent
+import taack.ui.dump.html.script.IJavascriptDescriptor
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
@@ -46,6 +47,17 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     private static IHTMLElement formLabelInput(String qualifiedName, String i18n) {
         new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
+    }
+
+    private static IHTMLElement removeButton(String removed, IJavascriptDescriptor onclick) {
+        new HTMLButton(null).builder
+                .putAttribute('type', 'button')
+                .putAttribute('aria-label', inputEscape(tr('default.remove.label', null, removed)))
+                .addClasses('deleteIconM2M')
+                .setStyle(new ZIndex100())
+                .setOnclick(onclick)
+                .addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').putAttribute('alt', '').build())
+                .build()
     }
 
     private IHTMLElement themeStartInputs(IHTMLElement topElement, boolean localFloating = true) {
@@ -183,9 +195,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, choices?.options?.find { it.key == current?.key }?.value ?: current?.value, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        String currentLabel = choices?.options?.find { it.key == current?.key }?.value ?: current?.value
+        HTMLInput input = new HTMLInput(InputType.STRING, currentLabel, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
-        if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+        if (!disable) el.addChildren removeButton(currentLabel ?: trI18n, new DeleteSiblingInputContent())
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
         el.addChildren(inputHidden)
@@ -215,8 +228,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             String hiddenInputId = idPrefix + "-${occ++}"
             String inputLabelId = hiddenInputId + '-label'
             HTMLDiv m2mParent = themeStartInputs(el).builder.addClasses('M2MParent').build() as HTMLDiv
-            if (!disabled) m2mParent.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
-            HTMLInput input = new HTMLInput(InputType.STRING, it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
+            String valueLabel = it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString()
+            if (!disabled) m2mParent.addChildren removeButton(valueLabel ?: trI18n, new DeleteM2MParentElement())
+            HTMLInput input = new HTMLInput(InputType.STRING, valueLabel, null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
             m2mParent.addChildren(input)
             if (!noLabel) m2mParent.addChildren(formLabelInput(inputLabelId, trI18n))
@@ -226,7 +240,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         String hiddenInputId = idPrefix + "-${occ++}"
         String inputLabelId = hiddenInputId + '-label'
         HTMLDiv m2mToDuplicate = themeStartInputs(el).builder.addClasses('M2MToDuplicate').build() as HTMLDiv
-        if (!disabled) m2mToDuplicate.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
+        if (!disabled) m2mToDuplicate.addChildren removeButton(trI18n, new DeleteM2MParentElement())
         HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         m2mToDuplicate.addChildren(input)
@@ -243,9 +257,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
 
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString(), null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        String valueLabel = val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString()
+        HTMLInput input = new HTMLInput(InputType.STRING, valueLabel, null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
-        if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+        if (!disabled) el.addChildren removeButton(valueLabel ?: trI18n, new DeleteSiblingInputContent())
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
         el.addChildren(inputHidden)
