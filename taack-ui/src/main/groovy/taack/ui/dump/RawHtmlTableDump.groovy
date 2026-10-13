@@ -79,6 +79,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     static final <T> String dataFormat(T value, String format, Locale locale = null) {
         if (value == null) return ''
         switch (value.class) {
+            case Collection:
+                return (value as Collection).collect { dataFormat(it, format, locale) }.join(', ')
             case Number:
                 return NumberFormat.getInstance(locale ?: LocaleContextHolder.locale).format(value)
             case Date:
