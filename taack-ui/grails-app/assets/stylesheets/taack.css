@@ -1,27 +1,44 @@
 /* Bootstrap has a `.table > :not(caption) > * > *` style that colours every cell, so a cell (rowColumn) needs a selector above it. */
 .taackColorRed,
 .table > :not(caption) > * > .taackColorRed {
-    color: #990000;
+    color: var(--taack-color-red);
 }
 
 .taackColorBlue,
 .table > :not(caption) > * > .taackColorBlue {
-    color: #000099;
+    color: var(--taack-color-blue);
 }
 
 .taackColorGreen,
 .table > :not(caption) > * > .taackColorGreen {
-    color: #009900;
+    color: var(--taack-color-green);
 }
 
 .taackColorOrange,
 .table > :not(caption) > * > .taackColorOrange {
-    color: #ba731b;
+    color: var(--taack-color-orange);
 }
 
 .taackColorYellow,
 .table > :not(caption) > * > .taackColorYellow {
-    color: #baaf1b;
+    color: var(--taack-color-yellow);
+}
+
+:root,
+[data-bs-theme=light] {
+    --taack-color-red: #990000;
+    --taack-color-blue: #000099;
+    --taack-color-green: #007a00;
+    --taack-color-orange: #a35200;
+    --taack-color-yellow: #756c00;
+}
+
+[data-bs-theme=dark] {
+    --taack-color-red: #ff7171;
+    --taack-color-blue: #9393ff;
+    --taack-color-green: #00b800;
+    --taack-color-orange: #df8b22;
+    --taack-color-yellow: #baaf1b;
 }
 
 .taackFontBold {
