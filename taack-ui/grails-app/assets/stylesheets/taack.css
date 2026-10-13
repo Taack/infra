@@ -163,6 +163,46 @@ form.taackForm legend {
     font-size: inherit;
 }
 
+/* A tableFilter declared FilterLayout.TOOLBAR: the filter is a bar above the table, its fields in a wrapping row and the Filter button at the end. FilterLayout.SIDE and no layout keep the Bootstrap columns. */
+[data-filter-layout="toolbar"] > [taacktag="FILTER"],
+[data-filter-layout="toolbar"] > [taacktag="TABLE"] {
+    width: 100%;
+}
+
+[data-filter-layout="toolbar"] form.filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0 1rem;
+    margin-bottom: 0.5rem;
+}
+
+[data-filter-layout="toolbar"] form.filter > [taacktag="SECTION"] {
+    flex: 1 1 auto;
+}
+
+[data-filter-layout="toolbar"] [taacktag="SECTION"] > fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0 1rem;
+}
+
+[data-filter-layout="toolbar"] .taackFilterField {
+    flex: 0 1 11rem;
+}
+
+/* A choice group takes its choices' width, on one line. */
+[data-filter-layout="toolbar"] fieldset.taackFilterField {
+    flex-basis: auto;
+    white-space: nowrap;
+}
+
+/* The button's w-75 is an !important utility, so the wrapper is sized to keep the button compact. */
+[data-filter-layout="toolbar"] form.filter > .d-flex {
+    width: 6rem;
+}
+
 input, select, textarea {
     font-size: 1em;
     padding: 0.2em 0.4em;

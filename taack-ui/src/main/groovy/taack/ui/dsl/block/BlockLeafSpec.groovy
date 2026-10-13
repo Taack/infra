@@ -5,6 +5,7 @@ import org.codehaus.groovy.runtime.MethodClosure
 import taack.ast.type.FieldInfo
 import taack.ui.dsl.*
 import taack.ui.dsl.common.Style
+import taack.ui.dsl.filter.FilterLayout
 import taack.ui.dsl.menu.MenuSpec
 
 // TODO: try to remove ajaxBlock
@@ -106,7 +107,7 @@ class BlockLeafSpec extends BlockBase {
     }
 
     /**
-     * Add a filter and its associated table to the block
+     * Add a filter and its associated table to the block, the filter in a column beside the table
      *
      * @param i18nFilter filter label
      * @param filterSpecifier description of the filter
@@ -117,6 +118,21 @@ class BlockLeafSpec extends BlockBase {
     void tableFilter(final UiFilterSpecifier filterSpecifier,
                      final UiTableSpecifier tableSpecifier,
                      @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
+        tableFilter(null, filterSpecifier, tableSpecifier, closure)
+    }
+
+    /**
+     * Add a filter and its associated table to the block
+     *
+     * @param layout where the filter goes relative to the table, see {@link FilterLayout}. {@code null} lays it out as the call without a layout does
+     * @param filterSpecifier description of the filter
+     * @param tableSpecifier description of the table
+     * @param closure action ot display along with the label in the header
+     */
+    void tableFilter(final FilterLayout layout,
+                     final UiFilterSpecifier filterSpecifier,
+                     final UiTableSpecifier tableSpecifier,
+                     @DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = MenuSpec) final Closure closure = null) {
         String aId = theAjaxBlockId('tableFilter')
         boolean doRender = blockVisitor.doRenderElement(aId)
         simpleLog("tableFilter $aId $doRender")
@@ -124,7 +140,7 @@ class BlockLeafSpec extends BlockBase {
             blockVisitor.visitAjaxBlock(aId)
             processMenuBlock(aId, closure)
             blockVisitor.visitRow()
-            blockVisitor.visitTableFilter(aId, filterSpecifier, tableSpecifier)
+            blockVisitor.visitTableFilter(aId, layout, filterSpecifier, tableSpecifier)
             blockVisitor.visitRowEnd()
             blockVisitor.visitAjaxBlockEnd()
         }

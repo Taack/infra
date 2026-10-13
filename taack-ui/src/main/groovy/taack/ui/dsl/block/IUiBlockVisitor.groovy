@@ -10,6 +10,7 @@ import taack.ui.dsl.UiKanbanSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.UiTableSpecifier
 import taack.ui.dsl.common.Style
+import taack.ui.dsl.filter.FilterLayout
 import taack.ui.dsl.menu.IUiMenuVisitor
 
 @CompileStatic
@@ -55,7 +56,7 @@ interface IUiBlockVisitor extends IUiMenuVisitor {
 
     void visitTable(String id, UiTableSpecifier tableSpecifier)
 
-    void visitTableFilter(String id, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier)
+    void visitTableFilter(String id, FilterLayout layout, UiFilterSpecifier filterSpecifier, UiTableSpecifier tableSpecifier)
 
     void visitDiagram(UiDiagramSpecifier diagramSpecifier)
 
