@@ -156,6 +156,14 @@ form.taackForm legend {
     margin-top: 1rem;
 }
 
+.taackRequired {
+    pointer-events: auto;
+}
+
+.taackRequired::after {
+    content: "*";
+}
+
 .grid-title {
     line-height: 48px;
     /* text-align: center; */
