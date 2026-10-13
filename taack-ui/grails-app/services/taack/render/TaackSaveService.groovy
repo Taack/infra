@@ -198,7 +198,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
                         if (includedField.name.contains('_') || includedField.name.contains('$')) continue
                         if (GormEntity.isAssignableFrom(includedField.type)) {
-                            props << includedField.name // + '.id'
+                            if (p[includedField.name].toString().isLong())
+                                props << includedField.name // + '.id'
                         } else props << includedField.name
                     }
                     Map includedParams = new HashMap(p)
