@@ -136,6 +136,23 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             Map p = params as Map
             p.remove('filePath')
             List<String> props = []
+            if (gormEntity.class.hasProperty('belongsTo')) {
+                Map properties = gormEntity.class.getProperties()
+                if (properties['belongsTo'] instanceof Map) {
+                    Map belongsTo = properties['belongsTo'] as Map
+                    List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
+                    for (String key in belongsToProps) {
+                        if (params[key] instanceof Map) {
+                            Map km = params[key]
+                            if (km.size() == 1 && km.containsKey('id'))
+                                props.add key
+                            else throw new SecurityException('Attempt to change pointed data')
+                        }
+                    }
+                    props.addAll(belongsTo.keySet().collect { it.toString() + '.id' })
+
+                }
+            }
             for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
                 if (lockedFields && lockedFields[0] != null && lockedFields.contains(includedField))
                 // Modify only fields that are not in lockedField
@@ -153,7 +170,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 props.contains(it.key)
             }
             bindData(gormEntity, includedParams, [include: props])
-            gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
+            gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each {
+                fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
             }
         }
 
