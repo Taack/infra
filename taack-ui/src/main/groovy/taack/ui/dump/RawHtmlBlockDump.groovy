@@ -31,6 +31,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     int poll = 0
 
+    boolean closesModal = false
+
     private int tabOccurrence = 0
 
     final BootstrapBlock block
@@ -334,6 +336,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitCloseModal(final Map<String, String> idValueMap, FieldInfo[] fields = null) {
         blockLog.logStayBlock('visitCloseModal')
+        closesModal = true
         blockLog.topElement.addChildren(new HTMLAjaxCloseLastModal(idValueMap))
         for (FieldInfo fi : fields) {
             String label

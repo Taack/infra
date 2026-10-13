@@ -157,6 +157,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (!blockSpecifier) return
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep))
         blockSpecifier.visitBlock(htmlBlock)
+        if (htmlBlock.closesModal) {
+            writeModalCloseInstruction(htmlBlock)
+            return
+        }
         htmlBlock.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
     }
 
@@ -178,6 +182,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
         blockSpecifier.visitBlock(htmlBlock)
+        if (htmlBlock.closesModal) {
+            writeModalCloseInstruction(htmlBlock)
+            return
+        }
         if (p.isModal && params.boolean('isAjax') != false) {
             params['isAjax'] = true
             htmlBlock.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
@@ -213,6 +221,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             )
         }
 
+    }
+
+    private void writeModalCloseInstruction(RawHtmlBlockDump instruction) {
+        webRequest.response.contentType = 'text/plain;charset=UTF-8'
+        instruction.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
     }
 
     void visitMenu(final UiMenuSpecifier menuSpecifier, String... paramsToKeep) {
