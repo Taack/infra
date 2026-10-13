@@ -245,6 +245,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowAction(String i18n, final ActionIcon actionIcon, final Style style, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
         i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
 
         params ?= [:]
@@ -257,6 +258,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowAction(String linkText, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        linkText = TaackUiEnablerService.sanitizeString(linkText)
         params ?= [:]
         blockLog.topElement.addChildren(
                 new HTMLDiv().builder.addChildren(

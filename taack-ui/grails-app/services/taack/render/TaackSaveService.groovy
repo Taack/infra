@@ -7,24 +7,22 @@ import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBinder
 import org.codehaus.groovy.runtime.MethodClosure as MC
-import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.gorm.GormStaticApi
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.hibernate.LockMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.Errors
 import taack.ast.type.FieldInfo
 import taack.domain.IDomainHistory
-import taack.domain.TaackGormClassRegisterService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.helper.Utils
 import taack.user.IUserCreated
 import taack.user.IUserUpdated
 import taack.user.TaackUser
+
+import java.lang.reflect.Field
 
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
@@ -184,16 +182,31 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 } else {
                     if (id) {
                         if (bindingName.contains(',')) {
-                            bindData(gormEntity, params, [include: bindingName.tokenize(',')])
-                        } else bindData(gormEntity, params, [include: [bindingName]])
-                    } else bindData(gormEntity, params)
+                            bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: bindingName.tokenize(',')])
+                        } else bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')}, [include: [bindingName]])
+                    } else {
+                        bindData(gormEntity, params.retainAll { !it.key.toString().contains('.')})
+                    }
                 }
             } else {
                 Map p = params as Map
                 p.remove('filePath')
                 // TODO: gormEntity.save() will always fail on 'filePath' if this field has been treated by bindData (Although we re-set a new value after). Why ??
                 if (includeOrExclude) bindData(gormEntity, p, includeOrExclude)
-                else bindData(gormEntity, p)
+                else {
+                    List<String> props = []
+                    for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
+                        if (includedField.name.contains('_') || includedField.name.contains('$')) continue
+                        if (GormEntity.isAssignableFrom(includedField.type)) {
+                            props << includedField.name // + '.id'
+                        } else props << includedField.name
+                    }
+                    Map includedParams = new HashMap(p)
+                    includedParams.retainAll {
+                        props.contains(it.key)
+                    }
+                    bindData(gormEntity, includedParams, [include: props])
+                }
 
                 gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
                     fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
@@ -223,7 +236,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
 
         long c4 = System.currentTimeMillis()
         if (!doNotSave) {
-            if (oldEntity && gormEntity.validate() && gormEntity.isDirty()) {
+            if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
             }
             gormEntity.save(flush: true, failsOnError: true)
