@@ -124,7 +124,6 @@ final class EditorOption {
         String s = serializeString()
 //        s = StringEscapeUtils.unescapeJava(UriEncoder.encode(s))
         s = StringEscapeUtils.unescapeJava(s)
-        println s
         Deflater deflater = new Deflater()
         deflater.setInput(s.getBytes())
         deflater.finish()

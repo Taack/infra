@@ -137,23 +137,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             Map p = params as Map
             p.remove('filePath')
             List<String> props = ['id']
-//            if (gormEntity.class.hasProperty('belongsTo')) {
-//                Map properties = gormEntity.class.getProperties()
-//                if (properties['belongsTo'] instanceof Map) {
-//                    Map belongsTo = properties['belongsTo'] as Map
-//                    List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
-//                    for (String key in belongsToProps) {
-//                        if (params[key] instanceof Map) {
-//                            Map km = params[key]
-//                            if (km.size() == 1 && km.containsKey('id'))
-//                                props.add key
-//                            else throw new SecurityException('Attempt to change pointed data')
-//                        }
-//                    }
-//                    props.addAll(belongsTo.keySet().collect { it.toString() + '.id' })
-//
-//                }
-//            }
             for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
                 if (lockedFields && lockedFields[0] != null && lockedFields.contains(includedField)) {
                     // Modify only fields that are not in lockedField
@@ -187,50 +170,42 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     } else if (p[includedField.name]) throw new SecurityException('ID not Long')
                 } else {
                     props << includedField.name
-                    if (params[includedField.name] != null) {
-                        println "set ${includedField.name} ${params[includedField.name]}"
-                        Field valueField = gormEntity.class.getDeclaredField(includedField.name)
-                        valueField.setAccessible(true)
-                        if (Boolean.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toBoolean()
-                        else if (BigDecimal.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toBigDecimal()
-                        else if (Double.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toDouble()
-                        else if (Float.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toFloat()
-                        else if (Long.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toLong()
-                        else if (Integer.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toInteger()
-                        else if (Short.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name].toString().toShort()
-                        else if (Date.isAssignableFrom(valueField.type))
-                            valueField.set gormEntity, params[includedField.name]
-                        else {
-                            valueField.set gormEntity, params[includedField.name]
-                        }
+                    if (!['id', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated', 'log'].contains(includedField.name)) {
+                        if (params[includedField.name] != null) {
+                            Object value = params[includedField.name]
+                            boolean notEmpty = !value.toString().empty
+                            Field valueField = gormEntity.class.getDeclaredField(includedField.name)
+                            valueField.setAccessible(true)
+                            if (notEmpty) {
+                                if (Boolean.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toBoolean()
+                                else if (BigDecimal.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toBigDecimal()
+                                else if (notEmpty && Double.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toDouble()
+                                else if (Float.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toFloat()
+                                else if (Long.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toLong()
+                                else if (Integer.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toInteger()
+                                else if (Short.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value.toString().toShort()
+                                else if (Date.isAssignableFrom(valueField.type))
+                                    valueField.set gormEntity, value
+                                else {
+                                    gormEntity[includedField.name] = value
+                                }
+                            } else {
+                                valueField.set gormEntity, null
+                            }
+                        } else gormEntity[includedField.name] = null
                     }
                 }
             }
-//            Map includedParams = new HashMap(p)
-//            includedParams.retainAll {
-//                props.contains(it.key)
-//            }
-//            println "+++++++++++++++++++++++"
-//            for (String keyToKeep in ['instanceControllersDomainBindingApi, instanceConvertersApi, metaClass']) {
-//                includedParams.put(keyToKeep, params.get(keyToKeep))
-//                println "$keyToKeep, ${params.get(keyToKeep)}"
-//            }
-            println params
-            println props
-//            println gormEntity.properties
-//            println includedParams
-//            println "-----------------------"
 //            bindData(gormEntity, includedParams, [include: props]) // IS BUGGY,
 //            gormEntity.properties[params.keySet()] = params // DO NOT WORK
             gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each {
-//                fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, includedParams)
                 fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
             }
         }
@@ -253,23 +228,17 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             }
         } catch (ignored) {
         }
-        println "AUAOAUOAUO1111"
 
         if (!doNotSave) {
-            println "AUAOAUOAUO1111 sav"
             if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
             }
             gormEntity.save(flush: true, failsOnError: true)
-            println "AUAOAUOAUO1111 saved"
         }
 
-        println "AUAOAUOAUO22222 ${gormEntity.hasErrors()}"
         if (!doNotSave && gormEntity.hasErrors()) {
-            println "AUAOAUOAUO22222err ${gormEntity.errors}"
             log.error "${gormEntity.errors}"
         }
-        println "AUAOAUOAUO3333 $gormEntity"
         return gormEntity
     }
 
