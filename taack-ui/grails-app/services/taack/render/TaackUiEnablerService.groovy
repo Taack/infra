@@ -55,7 +55,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
 
     @PostConstruct
     void init() {
-        policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
+        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS).and(Sanitizers.IMAGES).and(Sanitizers.STYLES).and(Sanitizers.BLOCKS)
     }
 
     static String sanitizeString(String toSanitize) {
