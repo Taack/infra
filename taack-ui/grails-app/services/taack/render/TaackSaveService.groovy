@@ -8,6 +8,7 @@ import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBinder
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.Session
@@ -148,9 +149,16 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 } else if (includedField.type.isEnum() && params[includedField.name]) {
                     String enumString = params[includedField.name]
                     Enum enumInstance = Enum.valueOf(includedField.type as Class<Enum>, enumString)
-                    Field enumField = gormEntity.class.getDeclaredField(includedField.name)
-                    enumField.setAccessible(true)
-                    enumField.set gormEntity, enumInstance
+                    if ((gormEntity[includedField.name] as Enum) != enumInstance) { // TODO: need to mark dirty ...
+                        Field enumField = gormEntity.class.getDeclaredField(includedField.name)
+                        enumField.setAccessible(true)
+                        enumField.set gormEntity, enumInstance
+
+                        println "enum changed ! ${gormEntity[includedField.name]} to ${enumInstance}"
+                        (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    } else {
+                        println "enum did not change ! ${gormEntity[includedField.name]} to ${enumInstance}"
+                    }
                 } else if (includedField.name.contains('_') || includedField.name.contains('$')) {
                     // Fall throw
                 } else if (Map.isAssignableFrom(includedField.type)) {
@@ -247,7 +255,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
             }
-            gormEntity.save(flush: true, failsOnError: true)
+
+            println "hasChanged: ${gormEntity.hasChanged()}"
+
+            gormEntity.save(flush: true, failOnError: true)
         }
 
         if (!doNotSave && gormEntity.hasErrors()) {
