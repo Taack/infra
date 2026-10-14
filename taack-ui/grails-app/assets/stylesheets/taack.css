@@ -131,6 +131,11 @@ form .form-floating .form-label {
     color: grey;
 }
 
+html:not([data-taack-theme]) .form-label {
+    margin-top: .2rem;
+    margin-bottom: 0;
+}
+
 label {
     cursor: pointer;
     display: inline-block;
@@ -247,6 +252,31 @@ input, select, textarea {
 
 .taackTable th a {
     display: block;
+}
+
+.taackRowActions {
+    display: flex;
+}
+
+/* Right to left, the order each icon showed in when it floated right on its own. */
+.taackRowActionsRight {
+    float: right;
+    flex-direction: row-reverse;
+}
+
+.taackRowActionsLeft {
+    float: left;
+}
+
+/* A flex item ignores float, so the link takes the box of an icon its IconStyle floats. */
+.taackRowActions a {
+    display: flex;
+}
+
+/* An icon with only a viewBox has no natural size and would shrink to 0 in the floated
+   group, so it gets the height its IconStyle caps it at. */
+.taackRowActions img {
+    height: 22px;
 }
 
 fieldset,
