@@ -24,6 +24,7 @@ import taack.user.TaackUser
 import taack.utils.DateFormat
 
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
@@ -128,6 +129,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             throw new SecurityException("Update not allowed")
         }
 
+        println gormEntity
+
         T oldEntity
         if (gormEntity instanceof IDomainHistory && id != null) {
             oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
@@ -165,41 +168,51 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     mapField.setAccessible(true)
                     mapField.set gormEntity, entries
                 } else if (GormEntity.isAssignableFrom(includedField.type)) {
+                    // TODO: Fix
                     if (p[includedField.name]?.toString()?.isLong()) {
                         props << includedField.name // + '.id'
                     } else if (p[includedField.name]) throw new SecurityException('ID not Long')
                 } else {
                     props << includedField.name
-                    if (!['id', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated', 'log'].contains(includedField.name)) {
+                    if (!['id', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(includedField.name)) {
+                        if (Modifier.isFinal(includedField.modifiers) || Modifier.isStatic(includedField.modifiers) || Modifier.isTransient(includedField.modifiers)) {
+                            println "continue for F:${Modifier.isFinal(includedField.modifiers)} S:${Modifier.isStatic(includedField.modifiers)} T:${Modifier.isTransient(includedField.modifiers)} ${includedField.name} ${params[includedField.name]} ${includedField.type} ${includedField.metaPropertyValues}"
+                            continue
+                        }
                         if (params[includedField.name] != null) {
+                            Field valueField = gormEntity.class.getDeclaredField(includedField.name)
                             Object value = params[includedField.name]
                             boolean notEmpty = !value.toString().empty
-                            Field valueField = gormEntity.class.getDeclaredField(includedField.name)
                             valueField.setAccessible(true)
                             if (notEmpty) {
-                                if (Boolean.isAssignableFrom(valueField.type))
+                                if (Boolean.isAssignableFrom(valueField.type) || boolean.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toBoolean()
                                 else if (BigDecimal.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toBigDecimal()
-                                else if (notEmpty && Double.isAssignableFrom(valueField.type))
+                                else if (Double.isAssignableFrom(valueField.type) || double.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toDouble()
-                                else if (Float.isAssignableFrom(valueField.type))
+                                else if (Float.isAssignableFrom(valueField.type) || float.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toFloat()
-                                else if (Long.isAssignableFrom(valueField.type))
+                                else if (Long.isAssignableFrom(valueField.type) || long.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toLong()
-                                else if (Integer.isAssignableFrom(valueField.type))
+                                else if (Integer.isAssignableFrom(valueField.type) || int.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toInteger()
-                                else if (Short.isAssignableFrom(valueField.type))
+                                else if (Short.isAssignableFrom(valueField.type) || short.isAssignableFrom(valueField.type))
                                     valueField.set gormEntity, value.toString().toShort()
                                 else if (Date.isAssignableFrom(valueField.type))
-                                    valueField.set gormEntity, value
+                                    valueField.set gormEntity, DateFormat.parse('yyyy-MM-dd', value.toString())
                                 else {
-                                    gormEntity[includedField.name] = value
+                                    valueField.set gormEntity, value
+                                    //gormEntity[includedField.name] = value
                                 }
                             } else {
-                                valueField.set gormEntity, null
+                                println "null on ${includedField.name}"
+                                //valueField.set gormEntity, null
                             }
-                        } else gormEntity[includedField.name] = null
+                        } else {
+                            println "null2 on ${includedField.name}"
+                            //gormEntity[includedField.name] = null
+                        }
                     }
                 }
             }
@@ -227,6 +240,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 }
             }
         } catch (ignored) {
+            log.warn("Ignored Exception: " + ignored.message)
         }
 
         if (!doNotSave) {
@@ -239,6 +253,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         if (!doNotSave && gormEntity.hasErrors()) {
             log.error "${gormEntity.errors}"
         }
+        println gormEntity
+
         return gormEntity
     }
 
