@@ -6,6 +6,7 @@ import grails.plugin.springsecurity.SpringSecurityService
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBinder
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormStaticApi
@@ -129,7 +130,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         save(gormEntity, lockedFields, doNotSave)
     }
 
-    final void bindObject(Object gormEntity, Map<String, Object> p, final FieldInfo[] lockedFields = null) {
+    final void bindObject(Object gormEntity, GrailsParameterMap p, final FieldInfo[] lockedFields = null) {
         boolean isDirtyCheckable = false
         if (DirtyCheckable.isAssignableFrom(gormEntity.class)) {
             isDirtyCheckable = true
@@ -173,6 +174,16 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     gormEntity[includedField.name] = entries
                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                 }
+            } else if (Collection.isAssignableFrom(includedField.type)) {
+                if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as List<Long> == p.list(includedField.name) as List<Long>) {
+                    println "collection identical"
+                } else {
+                    (gormEntity[includedField.name] as Collection<GormEntity>).removeAll()
+                    GormStaticApi gormStaticApi = new GormStaticApi(includedField.type, datastore, null)
+                    (gormEntity[includedField.name] as Collection<GormEntity>).addAll(p.list(includedField.name).collect { gormStaticApi.get(it as Long) } as Collection<GormEntity>)
+                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+
+                }
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
                     Long entryId = p[includedField.name]?.toString()?.toLong()
@@ -199,7 +210,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                             Boolean valueStringBoolean = valueString.toBoolean()
                             if (gormEntity[includedField.name] != valueStringBoolean) {
                                 valueField.set gormEntity, valueStringBoolean
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)                            }
+                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                            }
                         } else if (Integer.isAssignableFrom(valueField.type) || int.isAssignableFrom(valueField.type)) {
                             Integer valueStringInteger = valueString.toInteger()
                             if (gormEntity[includedField.name] != valueStringInteger) {
@@ -284,9 +296,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
         }
         if (!doNotBindParams) {
-            Map p = params as Map
-            // ? p.remove('filePath')
-            bindObject(gormEntity, p, lockedFields)
+            bindObject(gormEntity, params, lockedFields)
         }
 
         try {
