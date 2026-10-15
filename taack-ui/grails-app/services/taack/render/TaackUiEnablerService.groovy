@@ -50,6 +50,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
     static lazyInit = false
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
+    TaackSaveService taackSaveService
 
     PolicyFactory policy
 
@@ -94,7 +95,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
                 if (Validateable.isAssignableFrom(p.type)) {
                     Constructor c = p.type.getDeclaredConstructor()
                     Validateable v = c.newInstance() as Validateable
-                    bindData(v, params)
+                    taackSaveService.bindObject(v, params)
                     boolean ret = v.validate()
                     if (!ret) log.warn("${v.errors}")
                     return ret
