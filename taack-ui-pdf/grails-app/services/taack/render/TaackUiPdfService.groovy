@@ -19,8 +19,6 @@ package taack.render
 import grails.compiler.GrailsCompileStatic
 import grails.gsp.PageRenderer
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
-//import org.apache.commons.text.StringEscapeUtils
 import org.grails.core.io.ResourceLocator
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
@@ -58,7 +56,7 @@ import taack.ui.dump.pdf.RawHtmlPrintableDump
  * @since taack-ui 0.1
  */
 @GrailsCompileStatic
-final class TaackUiPdfService implements WebAttributes, DataBinder {
+final class TaackUiPdfService implements WebAttributes {
 
     TaackPdfConverterFromHtmlService taackPdfConverterFromHtmlService
 

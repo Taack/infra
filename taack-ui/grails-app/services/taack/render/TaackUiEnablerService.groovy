@@ -4,7 +4,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
 import grails.validation.Validateable
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
+import grails.web.servlet.mvc.GrailsParameterMap
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
@@ -45,11 +45,12 @@ import java.lang.reflect.Parameter
  * }</pre>
  */
 @GrailsCompileStatic
-class TaackUiEnablerService implements WebAttributes, DataBinder {
+class TaackUiEnablerService implements WebAttributes {
 
     static lazyInit = false
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
+    TaackSaveService taackSaveService
 
     PolicyFactory policy
 
@@ -85,7 +86,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
         }
     }
 
-    private boolean checkValidateableValidity(final String controller, final String action, Map params) {
+    private boolean checkValidateableValidity(final String controller, final String action, GrailsParameterMap params) {
         if (!params?.isEmpty()) {
             Class controllerClass = grailsApplication.getArtefactByLogicalPropertyName("Controller", controllerName).clazz
             Method m = controllerClass.getDeclaredMethods().find { it.name == actionName}
@@ -94,7 +95,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
                 if (Validateable.isAssignableFrom(p.type)) {
                     Constructor c = p.type.getDeclaredConstructor()
                     Validateable v = c.newInstance() as Validateable
-                    bindData(v, params)
+                    taackSaveService.bindObject(v, params)
                     boolean ret = v.validate()
                     if (!ret) log.warn("${v.errors}")
                     return ret
@@ -115,7 +116,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder {
      */
     boolean hasAccess(final String controller, final String action, final Long id, Map params, boolean fromWeb = true) {
 
-        if (fromWeb && !id && !checkValidateableValidity(controller, action, params)) return false
+        if (fromWeb && !id && !checkValidateableValidity(controller, action, params as GrailsParameterMap)) return false
 
         Authentication authContext = SecurityContextHolder.getContext().getAuthentication()
         if (!authContext?.authenticated) {

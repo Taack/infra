@@ -7,7 +7,6 @@ import grails.compiler.GrailsCompileStatic
 import grails.util.Pair
 import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
 import jakarta.annotation.PostConstruct
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.web.multipart.MultipartFile
@@ -25,7 +24,7 @@ import javax.imageio.stream.ImageInputStream
 import java.security.MessageDigest
 
 @GrailsCompileStatic
-class TaackAttachmentService implements WebAttributes, DataBinder, ServletAttributes {
+class TaackAttachmentService implements WebAttributes, ServletAttributes {
     final Object imageConverter = new Object()
 
     TaackSearchService taackSearchService

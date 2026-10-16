@@ -24,7 +24,7 @@ class CrewSecurityService {
     private securityClosure(Long id, Map p) {
         if (!id && !p) return true
         if (!id) return true
-        canEdit(User.read(id))
+        canEdit(User.get(id))
     }
 
     @PostConstruct

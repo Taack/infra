@@ -7,11 +7,9 @@ import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Pair
-import grails.util.Triple
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
 import jakarta.annotation.PostConstruct
@@ -60,7 +58,7 @@ import taack.user.TaackUser
  * @since taack-ui 0.1
  */
 @GrailsCompileStatic
-final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinder, ServletAttributes {
+final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAttributes {
 
     static lazyInit = false
 
@@ -68,6 +66,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
 
     ThemeService themeService
     SpringSecurityService springSecurityService
+    TaackSaveService taackSaveService
 
     @Autowired
     PageRenderer g
@@ -456,7 +455,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             if (ajaxParams.keySet().size() == 2 && stringKey.endsWith('id')) {
                 anObject = aClass.invokeMethod('get', ajaxParams[stringKey]) as T
             } else {
-                bindData(anObject, params[AJAX_PARAMS] as GrailsParameterMap)
+                taackSaveService.bindObject(anObject, params[AJAX_PARAMS] as GrailsParameterMap)
             }
             if (deleteParams) {
                 params.remove(AJAX_PARAMS)

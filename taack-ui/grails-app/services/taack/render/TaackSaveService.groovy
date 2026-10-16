@@ -5,9 +5,10 @@ import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
-import grails.web.databinding.DataBinder
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.Session
@@ -21,11 +22,15 @@ import taack.ui.dsl.helper.Utils
 import taack.user.IUserCreated
 import taack.user.IUserUpdated
 import taack.user.TaackUser
+import taack.utils.DateFormat
 
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+import java.lang.reflect.ParameterizedType
+import java.text.ParseException
 
 @GrailsCompileStatic
-class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
+class TaackSaveService implements ResponseRenderer, ServletAttributes {
     TaackUiService taackUiService
     SpringSecurityService springSecurityService
     SessionFactory sessionFactory
@@ -120,59 +125,226 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         save(gormEntity, lockedFields, doNotSave)
     }
 
+    final void bindObject(Object gormEntity, GrailsParameterMap p, final FieldInfo[] lockedFields = null) {
+        boolean isDirtyCheckable = false
+        if (DirtyCheckable.isAssignableFrom(gormEntity.class)) {
+            isDirtyCheckable = true
+        }
+
+        Map<String, Long> belongsToKey = [:]
+        if (gormEntity.class.hasProperty('belongsTo')) {
+            Map belongsTo = gormEntity['belongsTo'] as Map
+            if (belongsTo) {
+                List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
+                for (String key in belongsToProps) {
+                    if (params[key] instanceof Map) {
+                        Map km = params[key]
+                        if (km.size() == 1 && km.containsKey('id'))
+                            belongsToKey.put key, km['id'].toString().toLong()
+                        else throw new SecurityException('Attempt to change pointed data')
+                    }
+                }
+            }
+        }
+
+        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll { Field f ->
+            !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) &&
+                    !(f.name.contains('_') || f.name.contains('$')) &&
+                    !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) &&
+                    (f.name in p.keySet() || f.name in belongsToKey.keySet())
+        }
+
+        for (Field includedField in classFields) {
+            if (lockedFields && lockedFields[0] != null && lockedFields*.fieldConstraint*.field.contains(includedField)) {
+                // Modify only fields that are not in lockedField
+                continue
+            } else if (lockedFields && lockedFields[0] == null && !lockedFields*.fieldConstraint*.field.contains(includedField)) {
+                // Modify only fields that are after null. [null, f1, f2 ...]
+                continue
+            }
+
+            if (includedField.type.isEnum() && p[includedField.name]) {
+                String enumString = p[includedField.name]
+                Enum enumInstance = Enum.valueOf(includedField.type as Class<Enum>, enumString)
+                if ((gormEntity[includedField.name] as Enum) != enumInstance) { // TODO: need to mark dirty ...
+                    Field enumField = gormEntity.class.getDeclaredField(includedField.name)
+                    enumField.setAccessible(true)
+                    enumField.set gormEntity, enumInstance
+
+                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                }
+            } else if (Map.isAssignableFrom(includedField.type)) {
+                Map entries = [:]
+                Set<String> mapKeys = p.keySet().findAll { it ->
+                    it.toString().startsWith(includedField.name + '.')
+                }
+                for (mapKey in mapKeys) {
+                    if (mapKey.count('.') == 1) {
+                        entries.put(mapKey - (includedField.name + '.'), p.get(mapKey))
+                    } else throw new SecurityException('Map Key with more than one point.')
+                }
+                if ((gormEntity[includedField.name] as Map) != entries) {
+                    gormEntity[includedField.name] = entries
+                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                }
+            } else if (Collection.isAssignableFrom(includedField.type)) { // TODO: What if reodering a list
+                Class genericType = (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class
+                if (GormEntity.isAssignableFrom(genericType)) {
+                    List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
+                    if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
+                        Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
+                        gormEntityField.clear()
+                        // The other way is to add only new elements / remove only some elements ...
+                        gormEntityField.addAll(p.list(includedField.name).collect {
+                            getGorm(it as Long, genericType, sessionFactory.currentSession)
+                        } as Collection<GormEntity>)
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                } else if (genericType.isEnum()) {
+                    List<Enum> enums = p.list(includedField.name).grep { !it.toString().empty }.collect {
+                        Enum.valueOf(genericType as Class<Enum>, it.toString())
+                    }
+                    if ((gormEntity[includedField.name] as Collection<Enum>)*.name() as Set<String> != enums*.name() as Set<String>) {
+                        Collection<Enum> enumField = gormEntity[includedField.name] as Collection<Enum>
+                        enumField.clear()
+                        // The other way is to add only new elements / remove only some elements ...
+                        enumField.addAll(enums)
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                } else if (String.isAssignableFrom(genericType)) {
+                    List<String> strings = p.list(includedField.name).grep { !it.toString().empty }
+                    if (gormEntity[includedField.name] as Set<String> != strings as Set<String>) {
+                        Collection<String> stringField = gormEntity[includedField.name] as Collection<String>
+                        stringField.clear()
+                        // The other way is to add only new elements / remove only some elements ...
+                        stringField.addAll(strings)
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+
+                }
+            } else if (GormEntity.isAssignableFrom(includedField.type)) {
+                if (!p[includedField.name]?.toString()?.empty) {
+                    Long entryId = belongsToKey.containsKey(includedField.name) ? belongsToKey[includedField.name] : p[includedField.name]?.toString()?.toLong()
+                    if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
+                        GormEntity entryEntity = getGorm(entryId, includedField.type, sessionFactory.currentSession)
+                        gormEntity[includedField.name] = entryEntity
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                } else {
+                    if (gormEntity[includedField.name] != null) {
+                        gormEntity[includedField.name] = null
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                }
+            } else {
+                if (p[includedField.name] != null) {
+                    Field valueField = gormEntity.class.getDeclaredField(includedField.name)
+                    Object value = p[includedField.name]
+                    String valueString = value?.toString()
+                    boolean notEmpty = !value.toString().empty
+                    valueField.setAccessible(true)
+                    if (notEmpty) {
+                        String i18n = 'typeMismatch'
+                        try {
+                            if (Boolean.isAssignableFrom(valueField.type) || boolean.isAssignableFrom(valueField.type)) {
+                                Boolean valueStringBoolean = valueString.toBoolean()
+                                if (gormEntity[includedField.name] != valueStringBoolean) {
+                                    valueField.set gormEntity, valueStringBoolean
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Integer.isAssignableFrom(valueField.type) || int.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Integer'
+                                Integer valueStringInteger = valueString.toInteger()
+                                if (gormEntity[includedField.name] != valueStringInteger) {
+                                    valueField.set gormEntity, valueStringInteger
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (BigDecimal.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.math.BigDecimal'
+                                BigDecimal valueStringBigDecimal = valueString.toBigDecimal()
+                                if (gormEntity[includedField.name] != valueStringBigDecimal) {
+                                    valueField.set gormEntity, valueStringBigDecimal
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Double.isAssignableFrom(valueField.type) || double.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Double'
+                                Double valueStringDouble = valueString.toDouble()
+                                if (gormEntity[includedField.name] != valueStringDouble) {
+                                    valueField.set gormEntity, valueStringDouble
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Float.isAssignableFrom(valueField.type) || float.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Float'
+                                Float valueStringFloat = valueString.toFloat()
+                                if (gormEntity[includedField.name] != valueStringFloat) {
+                                    valueField.set gormEntity, valueStringFloat
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Long.isAssignableFrom(valueField.type) || long.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Long'
+                                Long valueStringLong = valueString.toLong()
+                                if (gormEntity[includedField.name] != valueStringLong) {
+                                    valueField.set gormEntity, valueStringLong
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Short.isAssignableFrom(valueField.type) || short.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Short'
+                                Short valueStringShort = valueString.toShort()
+                                if (gormEntity[includedField.name] != valueStringShort) {
+                                    valueField.set gormEntity, valueStringShort
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Date.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Date'
+                                Date valueStringDate = DateFormat.parse("yyyy-MM-dd HH:mm:ss z", valueString)
+                                if (gormEntity[includedField.name] != valueStringDate) {
+                                    valueField.set gormEntity, valueStringDate
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else {
+                                if (gormEntity[includedField.name] != value) {
+                                    valueField.set gormEntity, value
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            }
+                        } catch (ParseException|NumberFormatException parseException) {
+                            log.error(parseException.message)
+                            (gormEntity as GormEntity).errors.rejectValue(includedField.name, i18n, [params[includedField.name]] as Object[], null)
+//                            gormEntity.properties[includedField.name] = params[includedField.name]
+                            if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                        }
+
+                    } else {
+                        if (gormEntity[includedField.name] != value) {
+                            valueField.set gormEntity, null // ''
+                            if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                        }
+                    }
+                } else {
+                    if (gormEntity[includedField.name] != null) {
+                        gormEntity[includedField.name] = null
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                }
+            }
+        }
+        gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each {
+            fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
+        }
+    }
+
     final <T extends GormEntity> T save(final T gormEntity, final FieldInfo[] lockedFields = null, final boolean doNotSave = false, boolean doNotBindParams = false) {
         final id = gormEntity.ident()
         if (lockedFields != null && lockedFields.size() == 0) {
             log.error "Not supposed to call save on $gormEntity"
             throw new SecurityException("Update not allowed")
         }
-
         T oldEntity
         if (gormEntity instanceof IDomainHistory && id != null) {
             oldEntity = (gormEntity as IDomainHistory<T>).cloneDirectObjectData()
         }
-
         if (!doNotBindParams) {
-            Map p = params as Map
-            p.remove('filePath')
-            List<String> props = []
-            if (gormEntity.class.hasProperty('belongsTo')) {
-                Map properties = gormEntity.class.getProperties()
-                if (properties['belongsTo'] instanceof Map) {
-                    Map belongsTo = properties['belongsTo'] as Map
-                    List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
-                    for (String key in belongsToProps) {
-                        if (params[key] instanceof Map) {
-                            Map km = params[key]
-                            if (km.size() == 1 && km.containsKey('id'))
-                                props.add key
-                            else throw new SecurityException('Attempt to change pointed data')
-                        }
-                    }
-                    props.addAll(belongsTo.keySet().collect { it.toString() + '.id' })
-
-                }
-            }
-            for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
-                if (lockedFields && lockedFields[0] != null && lockedFields.contains(includedField))
-                // Modify only fields that are not in lockedField
-                    continue else if (lockedFields && lockedFields[0] == null && !lockedFields.contains(includedField))
-                // Modify only fields that are after null. [null, f1, f2 ...]
-                    continue
-
-                if (includedField.name.contains('_') || includedField.name.contains('$')) continue
-                if (GormEntity.isAssignableFrom(includedField.type)) {
-                    if (p[includedField.name].toString().isLong()) props << includedField.name // + '.id'
-                } else props << includedField.name
-            }
-            Map includedParams = new HashMap(p)
-            includedParams.retainAll {
-                props.contains(it.key)
-            }
-            bindData(gormEntity, includedParams, [include: props])
-            gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each {
-                fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
-            }
+            bindObject(gormEntity, params, lockedFields)
         }
 
         try {
@@ -192,18 +364,21 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 }
             }
         } catch (ignored) {
+            log.warn("Ignored Exception: " + ignored.message)
         }
 
-        if (!doNotSave) {
+        if (!doNotSave && !gormEntity.hasErrors()) {
             if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
             }
-            gormEntity.save(flush: true, failsOnError: true)
+
+            gormEntity.save(flush: true)
         }
 
         if (!doNotSave && gormEntity.hasErrors()) {
             log.error "${gormEntity.errors}"
         }
+
         return gormEntity
     }
 

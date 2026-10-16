@@ -2,7 +2,6 @@ package taack.render
 
 import grails.compiler.GrailsCompileStatic
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
 import jakarta.annotation.PostConstruct
 import org.apache.xerces.dom.TextImpl
 import org.asciidoctor.*
@@ -45,7 +44,7 @@ import java.nio.file.Path
  * Service providing TQL support to scripts in the editor
  */
 @GrailsCompileStatic
-final class TaackEditorService implements WebAttributes, DataBinder {
+final class TaackEditorService implements WebAttributes {
 
     private Asciidoctor asciidoctor
 
