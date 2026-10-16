@@ -136,4 +136,8 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     }
 
+    @Override
+    void visitMenuInlineHtml(String html) {
+
+    }
 }

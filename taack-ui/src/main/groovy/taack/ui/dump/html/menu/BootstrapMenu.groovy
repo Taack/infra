@@ -70,11 +70,11 @@ final class BootstrapMenu implements IHTMLElement {
         return topElement
     }
 
-    IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false, boolean insideSection = false) {
+    IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
         i18n = TaackUiEnablerService.sanitizeString(i18n)
         topElement.addChildren(
-                new HTMLLi().builder.addClasses('nav-item', 'dropdown', insideSection ? 'section-item' : '').addChildren(
-                        new HTMLAnchor((insideSection || isAjax) && !isMail, url).builder
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                        new HTMLAnchor(isAjax && !isMail, url).builder
                                 .addClasses("nav-link${active ? ' active' : ''}", 'taackMenu')
                                 .putAttributeIfNotNull('ajaxBlockId', ajaxBlockId)
                                 .addChildren(new HTMLTxtContent(i18n))
@@ -156,6 +156,15 @@ final class BootstrapMenu implements IHTMLElement {
                 ).build(),
         )
         topElement.children.last().children.first().children.last()
+    }
+
+    static IHTMLElement menuHtml(IHTMLElement topElement, String html) {
+        topElement.addChildren(
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                        new HTMLTxtContent(html)
+                ).build()
+        )
+        topElement
     }
 
     @Override

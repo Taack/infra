@@ -36,4 +36,7 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses)
 
-    void visitMenuOptions(IEnumOptions enumOptions)}
+    void visitMenuOptions(IEnumOptions enumOptions)
+
+    void visitMenuInlineHtml(String html)
+}

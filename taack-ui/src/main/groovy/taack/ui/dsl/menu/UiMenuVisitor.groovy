@@ -80,4 +80,8 @@ class UiMenuVisitor implements IUiMenuVisitor {
 
     }
 
+    @Override
+    void visitMenuInlineHtml(String html) {
+
+    }
 }

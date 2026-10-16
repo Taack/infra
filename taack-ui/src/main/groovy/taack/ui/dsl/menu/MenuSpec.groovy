@@ -152,4 +152,7 @@ final class MenuSpec {
         menuVisitor.visitMenuOptions(options)
     }
 
+    void inlineHtml(final String html) {
+        menuVisitor.visitMenuInlineHtml(html)
+    }
 }

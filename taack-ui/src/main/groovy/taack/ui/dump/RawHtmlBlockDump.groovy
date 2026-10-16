@@ -456,7 +456,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     BootstrapMenu menu
-    boolean insideMenuSection = false
 
     @Override
     void visitMenuLabel(String i18n) {
@@ -572,20 +571,18 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             isParamsEquals = p.isEmpty() && !cp.isEmpty()
         }
 
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && isParamsEquals, insideMenuSection)
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && isParamsEquals)
     }
 
     @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
         logEnterBlock('visitMenuSection ' + i18n)
-        insideMenuSection = true
         menu.section(blockLog.topElement, i18n)
     }
 
     @Override
     void visitMenuSectionEnd() {
         logExitBlock('visitMenuSectionEnd')
-        insideMenuSection = false
     }
 
     @Override
@@ -662,6 +659,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.restorePosition()
         splitMenuEnd()
         logExitBlock('visitMenuOptions')
+    }
+
+    @Override
+    void visitMenuInlineHtml(String html) {
+        menu.menuHtml(blockLog.topElement, html)
     }
 
     // --- Accordion ---
