@@ -9,14 +9,11 @@ import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.gorm.GormStaticApi
-import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.dirty.checking.DirtyCheckable
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.Session
 import org.hibernate.SessionFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.validation.Errors
 import taack.ast.type.FieldInfo
@@ -37,9 +34,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
     TaackUiService taackUiService
     SpringSecurityService springSecurityService
     SessionFactory sessionFactory
-
-    @Autowired
-    Datastore datastore
 
     private final static Map<String, Closure> fieldCustomSavingClosures = [:]
 
@@ -137,10 +131,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             isDirtyCheckable = true
         }
         for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
-            if (lockedFields && lockedFields[0] != null && lockedFields.contains(includedField)) {
+            if (lockedFields && lockedFields[0] != null && lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are not in lockedField
                 continue
-            } else if (lockedFields && lockedFields[0] == null && !lockedFields.contains(includedField)) {
+            } else if (lockedFields && lockedFields[0] == null && !lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are after null. [null, f1, f2 ...]
                 continue
             }
@@ -178,17 +172,16 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             } else if (Collection.isAssignableFrom(includedField.type)) { // TODO: What if reodering a list
                 List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
                 if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
-                    GormStaticApi gormStaticApi = new GormStaticApi((includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class, datastore, null)
                     Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
                     gormEntityField.clear() // The other way is to add only new elements / remove only some elements ...
-                    gormEntityField.addAll(p.list(includedField.name).collect { gormStaticApi.get(it as Long) } as Collection<GormEntity>)
+                    gormEntityField.addAll(p.list(includedField.name).collect { getGorm(it as Long, (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class<GormEntity>, sessionFactory.currentSession)/*gormStaticApi.get(it as Long)*/ } as Collection<GormEntity>)
                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                 }
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
                     Long entryId = p[includedField.name]?.toString()?.toLong()
                     if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
-                        GormEntity entryEntity = (new GormStaticApi(includedField.type, datastore, null)).get(entryId) as GormEntity
+                        GormEntity entryEntity = getGorm(entryId, includedField.type, sessionFactory.currentSession)
                         gormEntity[includedField.name] = entryEntity
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
