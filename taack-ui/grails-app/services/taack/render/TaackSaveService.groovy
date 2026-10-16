@@ -5,7 +5,6 @@ import grails.compiler.GrailsCompileStatic
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
-import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import org.grails.datastore.gorm.GormEntity
@@ -31,7 +30,7 @@ import java.lang.reflect.ParameterizedType
 import java.text.ParseException
 
 @GrailsCompileStatic
-class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
+class TaackSaveService implements ResponseRenderer, ServletAttributes {
     TaackUiService taackUiService
     SpringSecurityService springSecurityService
     SessionFactory sessionFactory

@@ -4,7 +4,6 @@ import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
 import grails.validation.Validateable
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import jakarta.annotation.PostConstruct
 import org.codehaus.groovy.runtime.MethodClosure
@@ -46,7 +45,7 @@ import java.lang.reflect.Parameter
  * }</pre>
  */
 @GrailsCompileStatic
-class TaackUiEnablerService implements WebAttributes, DataBinder {
+class TaackUiEnablerService implements WebAttributes {
 
     static lazyInit = false
 
