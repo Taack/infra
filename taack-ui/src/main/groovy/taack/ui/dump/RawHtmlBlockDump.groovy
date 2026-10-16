@@ -456,32 +456,26 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     BootstrapMenu menu
-    boolean insideMenuSection = false
-
-    private boolean menuLabelSaved = false
 
     @Override
-    void visitMenuLabel(String i18n, boolean hasClosure) {
-        if (hasClosure) {
-            blockLog.savePosition()
-            menuLabelSaved = true
-            logEnterBlock('visitMenuLabel ' + i18n)
-        } else {
-            menuLabelSaved = false
-            blockLog.logStayBlock('visitMenuLabel ' + i18n)
-        }
+    void visitMenuLabel(String i18n) {
+        blockLog.logStayBlock('visitMenuLabel ' + i18n)
         blockLog.topElement.setTaackTag(TaackTag.LABEL)
-        blockLog.topElement = menu.label(blockLog.topElement, i18n, hasClosure)
+        blockLog.topElement = menu.label(blockLog.topElement, i18n)
     }
 
     @Override
-    void visitMenuLabelEnd() {
-        logExitBlock('visitMenuLabelEnd')
-        if (menuLabelSaved) {
-            blockLog.restorePosition()
-        } else {
-            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.LABEL)
-        }
+    void visitSubMenuStart(String headerContent, Style style) {
+        blockLog.savePosition()
+        logEnterBlock('visitSubMenuStart ' + headerContent)
+        blockLog.topElement.setTaackTag(TaackTag.MENU_COL)
+        blockLog.topElement = menu.subMenuHeader(blockLog.topElement, headerContent, style).builder.build()
+    }
+
+    @Override
+    void visitSubMenuEnd() {
+        logExitBlock('visitSubMenuEnd')
+        blockLog.restorePosition()
     }
 
     @Override
@@ -577,20 +571,18 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             isParamsEquals = p.isEmpty() && !cp.isEmpty()
         }
 
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && isParamsEquals, insideMenuSection)
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && isParamsEquals)
     }
 
     @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
         logEnterBlock('visitMenuSection ' + i18n)
-        insideMenuSection = true
         menu.section(blockLog.topElement, i18n)
     }
 
     @Override
     void visitMenuSectionEnd() {
         logExitBlock('visitMenuSectionEnd')
-        insideMenuSection = false
     }
 
     @Override
@@ -605,22 +597,6 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, refreshingBlock(controller, action, params), isModal), isModal)
         else
             menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
-    }
-
-    @Override
-    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
-        logEnterBlock('visitMenuIconWithClosure ' + i18n)
-        blockLog.savePosition()
-        blockLog.topElement.setTaackTag(TaackTag.MENU_COL)
-
-        blockLog.topElement = menu.label(blockLog.topElement, actionIcon.getHtml(i18n, 24), true).builder.build()
-    }
-
-    @Override
-    void visitMenuIconWithClosureEnd(Style style) {
-        logExitBlock('visitMenuIconWithClosureEnd')
-        blockLog.restorePosition()
-        if (style) blockLog.topElement.children.last().setStyleDescriptor(style)
     }
 
     @Override
@@ -683,6 +659,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.restorePosition()
         splitMenuEnd()
         logExitBlock('visitMenuOptions')
+    }
+
+    @Override
+    void visitMenuInlineHtml(String html) {
+        menu.menuHtml(blockLog.topElement, html)
     }
 
     // --- Accordion ---
