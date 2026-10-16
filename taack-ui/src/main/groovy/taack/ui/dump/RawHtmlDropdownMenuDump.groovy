@@ -37,11 +37,17 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuLabel(String i18n, boolean hasClosure) {
+    void visitMenuLabel(String i18n) {
     }
 
     @Override
-    void visitMenuLabelEnd() {
+    void visitSubMenuStart(String text, Style style) {
+
+    }
+
+    @Override
+    void visitSubMenuEnd() {
+
     }
 
     @Override
@@ -116,16 +122,6 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
-
-    }
-
-    @Override
-    void visitMenuIconWithClosureEnd(Style style) {
-
-    }
-
-    @Override
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params) {
 
     }
@@ -140,4 +136,8 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
 
     }
 
+    @Override
+    void visitMenuInlineHtml(String html) {
+
+    }
 }
