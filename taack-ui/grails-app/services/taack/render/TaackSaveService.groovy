@@ -130,6 +130,25 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         if (DirtyCheckable.isAssignableFrom(gormEntity.class)) {
             isDirtyCheckable = true
         }
+
+        Map<String, Long> belongsToKey = [:]
+
+        if (gormEntity.class.hasProperty('belongsTo')) {
+            Map properties = gormEntity.class.getProperties()
+            if (properties['belongsTo'] instanceof Map) {
+                Map belongsTo = properties['belongsTo'] as Map
+                List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
+                for (String key in belongsToProps) {
+                    if (params[key] instanceof Map) {
+                        Map km = params[key]
+                        if (km.size() == 1 && km.containsKey('id'))
+                            belongsToKey.put key, km['id'].toString().toLong()
+                        else throw new SecurityException('Attempt to change pointed data')
+                    }
+                }
+            }
+        }
+
         for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
             if (lockedFields && lockedFields[0] != null && lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are not in lockedField
@@ -174,12 +193,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
                     Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
                     gormEntityField.clear() // The other way is to add only new elements / remove only some elements ...
-                    gormEntityField.addAll(p.list(includedField.name).collect { getGorm(it as Long, (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class<GormEntity>, sessionFactory.currentSession)/*gormStaticApi.get(it as Long)*/ } as Collection<GormEntity>)
+                    gormEntityField.addAll(p.list(includedField.name).collect {
+                        getGorm(it as Long, (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class<GormEntity>, sessionFactory.currentSession)
+                    } as Collection<GormEntity>)
                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                 }
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
-                    Long entryId = p[includedField.name]?.toString()?.toLong()
+                    Long entryId = belongsToKey.containsKey(includedField.name) ? belongsToKey[includedField.name] : p[includedField.name]?.toString()?.toLong()
                     if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
                         GormEntity entryEntity = getGorm(entryId, includedField.type, sessionFactory.currentSession)
                         gormEntity[includedField.name] = entryEntity
