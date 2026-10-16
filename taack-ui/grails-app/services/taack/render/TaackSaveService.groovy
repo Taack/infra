@@ -30,6 +30,7 @@ import taack.utils.DateFormat
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.lang.reflect.ParameterizedType
 
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
@@ -170,19 +171,18 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                         entries.put(mapKey - (includedField.name + '.'), p.get(mapKey))
                     } else throw new SecurityException('Map Key with more than one point.')
                 }
-                if ((gormEntity[includedField.name] as Map) != entries) { // TODO: need to mark dirty ...
+                if ((gormEntity[includedField.name] as Map) != entries) {
                     gormEntity[includedField.name] = entries
                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                 }
-            } else if (Collection.isAssignableFrom(includedField.type)) {
-                if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as List<Long> == p.list(includedField.name) as List<Long>) {
-                    println "collection identical"
-                } else {
-                    (gormEntity[includedField.name] as Collection<GormEntity>).removeAll()
-                    GormStaticApi gormStaticApi = new GormStaticApi(includedField.type, datastore, null)
-                    (gormEntity[includedField.name] as Collection<GormEntity>).addAll(p.list(includedField.name).collect { gormStaticApi.get(it as Long) } as Collection<GormEntity>)
+            } else if (Collection.isAssignableFrom(includedField.type)) { // TODO: What if reodering a list
+                List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
+                if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
+                    GormStaticApi gormStaticApi = new GormStaticApi((includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class, datastore, null)
+                    Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
+                    gormEntityField.clear() // The other way is to add only new elements / remove only some elements ...
+                    gormEntityField.addAll(p.list(includedField.name).collect { gormStaticApi.get(it as Long) } as Collection<GormEntity>)
                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-
                 }
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
