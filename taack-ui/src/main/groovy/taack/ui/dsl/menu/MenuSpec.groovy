@@ -49,12 +49,12 @@ final class MenuSpec {
      */
     void label(final String i18n, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure = null) {
         if (closure) {
-            menuVisitor.visitMenuLabel(i18n, true)
+            menuVisitor.visitSubMenuStart(i18n, null)
             closure.delegate = subMenuSpec
             closure.call()
-            menuVisitor.visitMenuLabelEnd()
+            menuVisitor.visitSubMenuEnd()
         } else {
-            menuVisitor.visitMenuLabel(i18n, false)
+            menuVisitor.visitMenuLabel(i18n)
         }
     }
 
@@ -119,10 +119,10 @@ final class MenuSpec {
     }
 
     void menuIcon(final String i18n, final ActionIcon icon, final Style style = null, @DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SubMenuSpec) final Closure closure) {
-        menuVisitor.visitMenuIconWithClosure(i18n, icon)
+        menuVisitor.visitSubMenuStart(icon.getHtml(i18n, 24), style)
         closure.delegate = subMenuSpec
         closure.call()
-        menuVisitor.visitMenuIconWithClosureEnd(style)
+        menuVisitor.visitSubMenuEnd()
     }
 
     /**

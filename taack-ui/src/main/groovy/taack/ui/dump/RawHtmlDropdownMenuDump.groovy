@@ -37,11 +37,17 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuLabel(String i18n, boolean hasClosure) {
+    void visitMenuLabel(String i18n) {
     }
 
     @Override
-    void visitMenuLabelEnd() {
+    void visitSubMenuStart(String text, Style style) {
+
+    }
+
+    @Override
+    void visitSubMenuEnd() {
+
     }
 
     @Override
@@ -113,16 +119,6 @@ class RawHtmlDropdownMenuDump implements IUiMenuVisitor {
             menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
         else
             menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
-    }
-
-    @Override
-    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
-
-    }
-
-    @Override
-    void visitMenuIconWithClosureEnd(Style style) {
-
     }
 
     @Override

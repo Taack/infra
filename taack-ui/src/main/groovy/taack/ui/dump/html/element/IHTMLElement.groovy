@@ -193,7 +193,7 @@ trait IHTMLElement {
         }
 
         HTMLElementBuilder<T> setStyle(IStyleDescriptor styleDescriptor) {
-            element.styleDescriptor = styleDescriptor
+            if (styleDescriptor) element.styleDescriptor = styleDescriptor
             this
         }
 

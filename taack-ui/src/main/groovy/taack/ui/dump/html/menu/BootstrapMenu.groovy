@@ -3,6 +3,7 @@ package taack.ui.dump.html.menu
 import groovy.transform.CompileStatic
 import taack.render.TaackUiEnablerService
 import taack.render.TaackUiService
+import taack.ui.dsl.common.Style
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 
@@ -36,37 +37,37 @@ final class BootstrapMenu implements IHTMLElement {
         topElement.children.last()
     }
 
-    IHTMLElement label(IHTMLElement topElement, String i18n, boolean hasClosure) {
-        i18n = TaackUiEnablerService.sanitizeString(i18n)
-        if (hasClosure) {
-            HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build() as HTMLUl
-            topElement.addChildren(
-                    new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                            new HTMLAnchor(false, '#').builder
-                                    .addClasses('nav-link', 'dropdown-toggle')
-                                    .putAttribute('role', 'button')
-                                    .putAttribute('data-bs-toggle', 'dropdown')
-                                    .putAttribute('aria-expanded', 'false')
-                                    .addChildren(
-                                            new HTMLTxtContent(i18n)
-                                    ).build(),
-                            ul
-                    ).build()
-            )
-            return ul
-        } else {
-            if (!isMail)
-            topElement.addChildren(
-                    new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
-                            new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
-                                    new HTMLTxtContent(i18n)
-                            ).build()
-                    ).build()
-            )
-            else topElement.addChildren(new HTMLH2Content(i18n))
+    static IHTMLElement subMenuHeader(IHTMLElement topElement, String headerContent, Style style) {
+        HTMLUl ul = new HTMLUl().builder.addClasses('dropdown-menu').build() as HTMLUl
+        topElement.addChildren(
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown').setStyle(style).addChildren(
+                        new HTMLAnchor(false, '#').builder
+                                .addClasses('nav-link', 'dropdown-toggle')
+                                .putAttribute('role', 'button')
+                                .putAttribute('data-bs-toggle', 'dropdown')
+                                .putAttribute('aria-expanded', 'false')
+                                .addChildren(
+                                        new HTMLTxtContent(headerContent)
+                                ).build(),
+                        ul
+                ).build()
+        )
+        return ul
+    }
 
-            return topElement
-        }
+    IHTMLElement label(IHTMLElement topElement, String i18n) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
+        if (!isMail)
+        topElement.addChildren(
+                new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
+                        new HTMLAnchor(false, '#').builder.addClasses('nav-link').addChildren(
+                                new HTMLTxtContent(i18n)
+                        ).build()
+                ).build()
+        )
+        else topElement.addChildren(new HTMLH2Content(i18n))
+
+        return topElement
     }
 
     IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false, boolean insideSection = false) {
