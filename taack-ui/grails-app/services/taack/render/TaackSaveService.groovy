@@ -132,11 +132,9 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         }
 
         Map<String, Long> belongsToKey = [:]
-
         if (gormEntity.class.hasProperty('belongsTo')) {
-            Map properties = gormEntity.class.getProperties()
-            if (properties['belongsTo'] instanceof Map) {
-                Map belongsTo = properties['belongsTo'] as Map
+            Map belongsTo = gormEntity['belongsTo'] as Map
+            if (belongsTo) {
                 List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
                 for (String key in belongsToProps) {
                     if (params[key] instanceof Map) {
@@ -149,18 +147,21 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             }
         }
 
-        for (Field includedField in (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields)) {
+        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll { Field f ->
+            !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) &&
+                    !(f.name.contains('_') || f.name.contains('$')) &&
+                    !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) &&
+                    (f.name in p.keySet() || f.name in belongsToKey.keySet())
+        }
+
+        println "classField $classFields"
+
+        for (Field includedField in classFields) {
             if (lockedFields && lockedFields[0] != null && lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are not in lockedField
                 continue
             } else if (lockedFields && lockedFields[0] == null && !lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are after null. [null, f1, f2 ...]
-                continue
-            }
-            if (['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(includedField.name) || includedField.name.contains('_') || includedField.name.contains('$')) {
-                continue
-            }
-            if (Modifier.isFinal(includedField.modifiers) || Modifier.isStatic(includedField.modifiers) || Modifier.isTransient(includedField.modifiers)) {
                 continue
             }
 
@@ -192,7 +193,8 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                 List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
                 if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
                     Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
-                    gormEntityField.clear() // The other way is to add only new elements / remove only some elements ...
+                    gormEntityField.clear()
+                    // The other way is to add only new elements / remove only some elements ...
                     gormEntityField.addAll(p.list(includedField.name).collect {
                         getGorm(it as Long, (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class<GormEntity>, sessionFactory.currentSession)
                     } as Collection<GormEntity>)
