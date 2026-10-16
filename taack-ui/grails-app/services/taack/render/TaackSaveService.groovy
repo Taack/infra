@@ -28,8 +28,6 @@ import taack.utils.DateFormat
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.text.ParseException
 
 @GrailsCompileStatic
@@ -157,8 +155,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     (f.name in p.keySet() || f.name in belongsToKey.keySet())
         }
 
-        println "classField $classFields"
-
         for (Field includedField in classFields) {
             if (lockedFields && lockedFields[0] != null && lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are not in lockedField
@@ -193,15 +189,39 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                 }
             } else if (Collection.isAssignableFrom(includedField.type)) { // TODO: What if reodering a list
-                List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
-                if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
-                    Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
-                    gormEntityField.clear()
-                    // The other way is to add only new elements / remove only some elements ...
-                    gormEntityField.addAll(p.list(includedField.name).collect {
-                        getGorm(it as Long, (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class<GormEntity>, sessionFactory.currentSession)
-                    } as Collection<GormEntity>)
-                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                Class genericType = (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class
+                if (GormEntity.isAssignableFrom(genericType)) {
+                    List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
+                    if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
+                        Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
+                        gormEntityField.clear()
+                        // The other way is to add only new elements / remove only some elements ...
+                        gormEntityField.addAll(p.list(includedField.name).collect {
+                            getGorm(it as Long, genericType, sessionFactory.currentSession)
+                        } as Collection<GormEntity>)
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                } else if (genericType.isEnum()) {
+                    List<Enum> enums = p.list(includedField.name).grep { !it.toString().empty }.collect {
+                        Enum.valueOf(genericType as Class<Enum>, it.toString())
+                    }
+                    if ((gormEntity[includedField.name] as Collection<Enum>)*.name() as Set<String> != enums*.name() as Set<String>) {
+                        Collection<Enum> enumField = gormEntity[includedField.name] as Collection<Enum>
+                        enumField.clear()
+                        // The other way is to add only new elements / remove only some elements ...
+                        enumField.addAll(enums)
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+                } else if (String.isAssignableFrom(genericType)) {
+                    List<String> strings = p.list(includedField.name).grep { !it.toString().empty }
+                    if (gormEntity[includedField.name] as Set<String> != strings as Set<String>) {
+                        Collection<String> stringField = gormEntity[includedField.name] as Collection<String>
+                        stringField.clear()
+                        // The other way is to add only new elements / remove only some elements ...
+                        stringField.addAll(strings)
+                        if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                    }
+
                 }
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
@@ -292,7 +312,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                             log.error(parseException.message)
                             (gormEntity as GormEntity).errors.rejectValue(includedField.name, i18n, [params[includedField.name]] as Object[], null)
 //                            gormEntity.properties[includedField.name] = params[includedField.name]
-                            println "${(gormEntity as GormEntity).errors}"
                             if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                         }
 
@@ -348,8 +367,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
         } catch (ignored) {
             log.warn("Ignored Exception: " + ignored.message)
         }
-
-        println gormEntity.hasErrors()
 
         if (!doNotSave && !gormEntity.hasErrors()) {
             if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
