@@ -242,7 +242,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                                 }
                             } else if (BigDecimal.isAssignableFrom(valueField.type)) {
                                 i18n = 'typeMismatch.java.math.BigDecimal'
-                                BigDecimal valueStringBigDecimal = DecimalFormat.getInstance(LocaleContextHolder.getLocale()).parse(valueString)
+                                BigDecimal valueStringBigDecimal = valueString.toBigDecimal()
                                 if (gormEntity[includedField.name] != valueStringBigDecimal) {
                                     valueField.set gormEntity, valueStringBigDecimal
                                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
@@ -288,7 +288,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                                 }
                             }
-                        } catch (ParseException parseException) {
+                        } catch (ParseException|NumberFormatException parseException) {
                             log.error(parseException.message)
                             (gormEntity as GormEntity).errors.rejectValue(includedField.name, i18n, [params[includedField.name]] as Object[], null)
 //                            gormEntity.properties[includedField.name] = params[includedField.name]
