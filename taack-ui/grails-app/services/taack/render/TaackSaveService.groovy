@@ -28,6 +28,9 @@ import taack.utils.DateFormat
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.text.ParseException
 
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinder {
@@ -222,66 +225,77 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
                     boolean notEmpty = !value.toString().empty
                     valueField.setAccessible(true)
                     if (notEmpty) {
-                        if (Boolean.isAssignableFrom(valueField.type) || boolean.isAssignableFrom(valueField.type)) {
-                            Boolean valueStringBoolean = valueString.toBoolean()
-                            if (gormEntity[includedField.name] != valueStringBoolean) {
-                                valueField.set gormEntity, valueStringBoolean
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                        String i18n = 'typeMismatch'
+                        try {
+                            if (Boolean.isAssignableFrom(valueField.type) || boolean.isAssignableFrom(valueField.type)) {
+                                Boolean valueStringBoolean = valueString.toBoolean()
+                                if (gormEntity[includedField.name] != valueStringBoolean) {
+                                    valueField.set gormEntity, valueStringBoolean
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Integer.isAssignableFrom(valueField.type) || int.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Integer'
+                                Integer valueStringInteger = valueString.toInteger()
+                                if (gormEntity[includedField.name] != valueStringInteger) {
+                                    valueField.set gormEntity, valueStringInteger
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (BigDecimal.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.math.BigDecimal'
+                                BigDecimal valueStringBigDecimal = DecimalFormat.getInstance(LocaleContextHolder.getLocale()).parse(valueString)
+                                if (gormEntity[includedField.name] != valueStringBigDecimal) {
+                                    valueField.set gormEntity, valueStringBigDecimal
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Double.isAssignableFrom(valueField.type) || double.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Double'
+                                Double valueStringDouble = valueString.toDouble()
+                                if (gormEntity[includedField.name] != valueStringDouble) {
+                                    valueField.set gormEntity, valueStringDouble
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Float.isAssignableFrom(valueField.type) || float.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Float'
+                                Float valueStringFloat = valueString.toFloat()
+                                if (gormEntity[includedField.name] != valueStringFloat) {
+                                    valueField.set gormEntity, valueStringFloat
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Long.isAssignableFrom(valueField.type) || long.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Long'
+                                Long valueStringLong = valueString.toLong()
+                                if (gormEntity[includedField.name] != valueStringLong) {
+                                    valueField.set gormEntity, valueStringLong
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Short.isAssignableFrom(valueField.type) || short.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Short'
+                                Short valueStringShort = valueString.toShort()
+                                if (gormEntity[includedField.name] != valueStringShort) {
+                                    valueField.set gormEntity, valueStringShort
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else if (Date.isAssignableFrom(valueField.type)) {
+                                i18n = 'typeMismatch.java.lang.Date'
+                                Date valueStringDate = DateFormat.parse("yyyy-MM-dd HH:mm:ss z", valueString)
+                                if (gormEntity[includedField.name] != valueStringDate) {
+                                    valueField.set gormEntity, valueStringDate
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
+                            } else {
+                                if (gormEntity[includedField.name] != value) {
+                                    valueField.set gormEntity, value
+                                    if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                                }
                             }
-                        } else if (Integer.isAssignableFrom(valueField.type) || int.isAssignableFrom(valueField.type)) {
-                            Integer valueStringInteger = valueString.toInteger()
-                            if (gormEntity[includedField.name] != valueStringInteger) {
-                                valueField.set gormEntity, valueStringInteger
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (BigDecimal.isAssignableFrom(valueField.type)) {
-                            BigDecimal valueStringBigDecimal = valueString.toBigDecimal()
-                            if (gormEntity[includedField.name] != valueStringBigDecimal) {
-                                valueField.set gormEntity, valueStringBigDecimal
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (Double.isAssignableFrom(valueField.type) || double.isAssignableFrom(valueField.type)) {
-                            Double valueStringDouble = valueString.toDouble()
-                            if (gormEntity[includedField.name] != valueStringDouble) {
-                                valueField.set gormEntity, valueStringDouble
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (Float.isAssignableFrom(valueField.type) || float.isAssignableFrom(valueField.type)) {
-                            Float valueStringFloat = valueString.toFloat()
-                            if (gormEntity[includedField.name] != valueStringFloat) {
-                                valueField.set gormEntity, valueStringFloat
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (Long.isAssignableFrom(valueField.type) || long.isAssignableFrom(valueField.type)) {
-                            Long valueStringLong = valueString.toLong()
-                            if (gormEntity[includedField.name] != valueStringLong) {
-                                valueField.set gormEntity, valueStringLong
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (Integer.isAssignableFrom(valueField.type) || int.isAssignableFrom(valueField.type)) {
-                            Integer valueStringInteger = valueString.toInteger()
-                            if (gormEntity[includedField.name] != valueStringInteger) {
-                                valueField.set gormEntity, valueStringInteger
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (Short.isAssignableFrom(valueField.type) || short.isAssignableFrom(valueField.type)) {
-                            Short valueStringShort = valueString.toShort()
-                            if (gormEntity[includedField.name] != valueStringShort) {
-                                valueField.set gormEntity, valueStringShort
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else if (Date.isAssignableFrom(valueField.type)) {
-                            Date valueStringDate = DateFormat.parse("yyyy-MM-dd", valueString)
-                            if (gormEntity[includedField.name] != valueStringDate) {
-                                valueField.set gormEntity, valueStringDate
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
-                        } else {
-                            if (gormEntity[includedField.name] != value) {
-                                valueField.set gormEntity, value
-                                if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
-                            }
+                        } catch (ParseException parseException) {
+                            log.error(parseException.message)
+                            (gormEntity as GormEntity).errors.rejectValue(includedField.name, i18n, [params[includedField.name]] as Object[], null)
+//                            gormEntity.properties[includedField.name] = params[includedField.name]
+                            println "${(gormEntity as GormEntity).errors}"
+                            if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                         }
+
                     } else {
                         if (gormEntity[includedField.name] != value) {
                             valueField.set gormEntity, null // ''
@@ -335,7 +349,9 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes, DataBinde
             log.warn("Ignored Exception: " + ignored.message)
         }
 
-        if (!doNotSave) {
+        println gormEntity.hasErrors()
+
+        if (!doNotSave && !gormEntity.hasErrors()) {
             if (oldEntity && gormEntity.validate() && (doNotBindParams || gormEntity.isDirty())) {
                 save(oldEntity, lockedFields, doNotSave, true)
             }

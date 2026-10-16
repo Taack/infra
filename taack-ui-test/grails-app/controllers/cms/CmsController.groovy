@@ -42,6 +42,7 @@ import taack.wysiwyg.TaackBaseAsciidocSpans
 import taack.ui.dump.Parameter
 import taack.wysiwyg.Asciidoc
 import taack.wysiwyg.Markdown
+import test.BindingTest
 
 import java.nio.file.Files
 import java.text.SimpleDateFormat
@@ -1417,5 +1418,10 @@ class CmsController implements WebAttributes {
             page.save(flush: true, failOnError: true)
         }
         render status: 200
+    }
+
+    def testBinding() {
+        BindingTest bindingTest = taackSaveService.save(BindingTest)
+        render "${bindingTest.errors}"
     }
 }
