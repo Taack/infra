@@ -304,7 +304,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                                 }
                             }
-                        } catch (ParseException|NumberFormatException parseException) {
+                        } catch (ParseException|NumberFormatException|IllegalArgumentException parseException) {
                             log.error(parseException.message)
                             (gormEntity as GormEntity).errors.rejectValue(includedField.name, i18n, [params[includedField.name]] as Object[], null)
 //                            gormEntity.properties[includedField.name] = params[includedField.name]
