@@ -195,7 +195,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                         gormEntityField.clear()
                         // The other way is to add only new elements / remove only some elements ...
                         gormEntityField.addAll(p.list(includedField.name).collect {
-                            getGorm(it as Long, genericType, sessionFactory.currentSession)
+                            getGorm(it as Long, genericType as Class<GormEntity>, sessionFactory.currentSession)
                         } as Collection<GormEntity>)
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
@@ -225,7 +225,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 if (!p[includedField.name]?.toString()?.empty) {
                     Long entryId = belongsToKey.containsKey(includedField.name) ? belongsToKey[includedField.name] : p[includedField.name]?.toString()?.toLong()
                     if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
-                        GormEntity entryEntity = getGorm(entryId, includedField.type, sessionFactory.currentSession)
+                        GormEntity entryEntity = getGorm(entryId, includedField.type as Class<GormEntity>, sessionFactory.currentSession)
                         gormEntity[includedField.name] = entryEntity
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
