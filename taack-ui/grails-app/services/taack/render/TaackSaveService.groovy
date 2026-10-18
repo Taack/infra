@@ -133,15 +133,17 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
 
         Map<String, Long> belongsToKey = [:]
         if (gormEntity.class.hasProperty('belongsTo')) {
-            Map belongsTo = gormEntity['belongsTo'] as Map
-            if (belongsTo) {
-                List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
-                for (String key in belongsToProps) {
-                    if (params[key] instanceof Map) {
-                        Map km = params[key]
-                        if (km.size() == 1 && km.containsKey('id'))
-                            belongsToKey.put key, km['id'].toString().toLong()
-                        else throw new SecurityException('Attempt to change pointed data')
+            if (Map.isAssignableFrom(gormEntity['belongsTo'].class)) {
+                Map belongsTo = gormEntity['belongsTo'] as Map
+                if (belongsTo) {
+                    List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
+                    for (String key in belongsToProps) {
+                        if (params[key] instanceof Map) {
+                            Map km = params[key]
+                            if (km.size() == 1 && km.containsKey('id'))
+                                belongsToKey.put key, km['id'].toString().toLong()
+                            else throw new SecurityException('Attempt to change pointed data')
+                        }
                     }
                 }
             }
