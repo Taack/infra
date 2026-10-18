@@ -27,6 +27,8 @@ import taack.utils.DateFormat
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.ParseException
 
 @GrailsCompileStatic
@@ -260,7 +262,9 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                                 }
                             } else if (BigDecimal.isAssignableFrom(valueField.type)) {
                                 i18n = 'typeMismatch.java.math.BigDecimal'
-                                BigDecimal valueStringBigDecimal = valueString.toBigDecimal()
+                                NumberFormat nf = DecimalFormat.getInstance(LocaleContextHolder.locale)
+                                if (nf instanceof DecimalFormat) nf.setParseBigDecimal(true)
+                                BigDecimal valueStringBigDecimal = nf.parse(valueString)
                                 if (gormEntity[includedField.name] != valueStringBigDecimal) {
                                     gormEntity[includedField.name] = valueStringBigDecimal
                                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
