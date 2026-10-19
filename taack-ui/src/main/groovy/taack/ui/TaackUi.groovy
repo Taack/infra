@@ -2,12 +2,7 @@ package taack.ui
 
 import grails.compiler.GrailsCompileStatic
 import taack.ast.type.FieldInfo
-import taack.domain.TaackFilter
-import taack.ui.dsl.UiBlockSpecifier
-import taack.ui.dsl.UiFilterSpecifier
-import taack.ui.dsl.UiFormSpecifier
-import taack.ui.dsl.UiMenuSpecifier
-import taack.ui.dsl.UiTableSpecifier
+import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.filter.FilterSpec
 import taack.ui.dsl.form.FormSpec

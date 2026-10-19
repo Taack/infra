@@ -309,7 +309,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                                 }
                             } else if (Date.isAssignableFrom(valueField.type)) {
                                 i18n = 'typeMismatch.java.lang.Date'
-                                Date valueStringDate = DateFormat.parse(valueString.length() < 10 ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm", valueString)
+                                Date valueStringDate = DateFormat.parse(valueString.length() <= 11 ? "yyyy-MM-dd" : "yyyy-MM-dd'T'HH:mm", valueString)
                                 if (gormEntity[includedField.name] != valueStringDate) {
                                     gormEntity[includedField.name] = valueStringDate
                                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
