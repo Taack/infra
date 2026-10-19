@@ -123,6 +123,17 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         save(gormEntity, lockedFields, doNotSave)
     }
 
+    private static Long associationId(Object posted) {
+        Object id = posted
+        if (posted instanceof Map) {
+            Map nested = posted as Map
+            if (nested.size() != 1 || !nested.containsKey('id')) throw new SecurityException('Attempt to change pointed data')
+            id = nested['id']
+        }
+        String idString = id?.toString()
+        idString ? idString.toLong() : null
+    }
+
     /**
      * Binds request parameters to entity fields with type conversion, field-locking enforcement, and dirty checking.
      * <p>
@@ -140,23 +151,18 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
             isDirtyCheckable = true
         }
 
-        Map<String, Long> belongsToKey = [:]
-        if (gormEntity.class.hasProperty('belongsTo')) {
-            if (Map.isAssignableFrom(gormEntity['belongsTo'].class)) {
-                Map belongsTo = gormEntity['belongsTo'] as Map
-                if (belongsTo) {
-                    List<String> belongsToProps = belongsTo.keySet().collect { it.toString() }
-                    for (String key in belongsToProps) {
-                        if (params[key] instanceof Map) {
-                            Map km = params[key]
-                            if (km.size() == 1 && km.containsKey('id')) belongsToKey.put key, km['id'].toString().toLong() else throw new SecurityException('Attempt to change pointed data')
-                        }
-                    }
-                }
-            }
-        }
+//        Set<String> belongsToKey = []
+//        if (gormEntity.class.hasProperty('belongsTo')) {
+//            if (Map.isAssignableFrom(gormEntity['belongsTo'].class)) {
+//                Map belongsTo = gormEntity['belongsTo'] as Map
+//                if (belongsTo) {
+//                    belongsToKey = belongsTo.keySet()
+//                }
+//            }
+//        }
 
-        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll { Field f -> !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) && !(f.name.contains('_') || f.name.contains('$')) && !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) && (f.name in p.keySet() || f.name in belongsToKey.keySet())
+        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll {
+            Field f -> !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) && !(f.name.contains('_') || f.name.contains('$')) && !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) && /*(*/f.name in p.keySet() //|| f.name in belongsToKey)
         }
 
         for (Field includedField in classFields) {
@@ -225,10 +231,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 }
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
-                    Long entryId = belongsToKey.containsKey(includedField.name) ? belongsToKey[includedField.name] : p[includedField.name]?.toString()?.toLong()
-                    if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
-                        GormEntity entryEntity = getGorm(entryId, includedField.type as Class<GormEntity>, sessionFactory.currentSession)
-                        gormEntity[includedField.name] = entryEntity
+                    Long entryId = associationId(p[includedField.name])
+                    if (entryId == null) {
+                        if (gormEntity[includedField.name] != null) {
+                            gormEntity[includedField.name] = null
+                            if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
+                        }
+                    } else if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
+                        gormEntity[includedField.name] = getGorm(entryId, includedField.type as Class<GormEntity>, sessionFactory.currentSession)
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
                 } else {
