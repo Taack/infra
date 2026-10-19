@@ -14,6 +14,7 @@ import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dsl.table.TableOption
@@ -64,6 +65,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private boolean isQuickEdit = false
     private int formId = 0
     private IHTMLElement quickEditSubmitPlace = null
+    private IHTMLElement lastRowActionGroup = null
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -248,6 +250,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     void visitRowAction(String i18n, final ActionIcon actionIcon, final Style style, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
         i18n = TaackUiEnablerService.sanitizeString(i18n)
         i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
+        blockLog.savePosition()
+        if (actionIcon.style) blockLog.topElement = rowActionGroup(actionIcon.style)
 
         params ?= [:]
         IHTMLElement.HTMLElementBuilder div = new HTMLDiv().builder.addChildren(
@@ -255,6 +259,20 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                         new HTMLTxtContent(actionIcon.getHtml(i18n))).build())
         blockLog.topElement.builder.addChildren(div.build())
         if (style) div.build().setStyleDescriptor(style)
+        blockLog.restorePosition()
+    }
+
+    /**
+     * The group holding a cell's consecutive styled row actions, so a theme can style them
+     * together. The group floats instead of each icon.
+     */
+    private IHTMLElement rowActionGroup(IconStyle iconStyle) {
+        List<IHTMLElement> siblings = blockLog.topElement.children
+        if (siblings && siblings.last().is(lastRowActionGroup)) return lastRowActionGroup
+        lastRowActionGroup = new HTMLDiv()
+        lastRowActionGroup.addClasses('taackRowActions', iconStyle.floatsRight ? 'taackRowActionsRight' : 'taackRowActionsLeft')
+        blockLog.topElement.addChildren(lastRowActionGroup)
+        lastRowActionGroup
     }
 
     @Override

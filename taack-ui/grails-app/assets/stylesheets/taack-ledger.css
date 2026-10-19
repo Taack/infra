@@ -1,0 +1,2091 @@
+/*
+ * Ledger: an accounting spreadsheet over Taack's markup, for people who live in tables all day.
+ * Cool blue-grey neutrals, a navy top bar as the only heavy chrome, one strong blue accent.
+ * 25 px rows in 12 px type with gridlines both ways, quiet zebra rows and a tinted sticky header
+ * of small capitals. Status tags are square stamps. Shows and forms are ruled sheets with a
+ * shaded label column, filters a dense label grid, tabs sheet tabs, the modal a side pane.
+ * A user picks it as the Ledger look in the theme dialog, which loads this file and sets
+ * data-taack-theme="ledger".
+ */
+
+:root[data-taack-theme="ledger"] {
+    --lg-canvas: #e3e8ef;
+    --lg-surface: #ffffff;
+    --lg-surface-2: #edf1f6;
+    --lg-zebra: #f6f8fb;
+    --lg-hover: #e2ecfa;
+    --lg-grid: #dae0e8;
+    --lg-border: #c6cfdb;
+    --lg-border-strong: #a7b3c3;
+    --lg-text: #151e2b;
+    --lg-text-2: #435167;
+    --lg-text-3: #56657b;
+    --lg-head: #2c3c55;
+    --lg-accent: #0b5ad0;
+    --lg-accent-hover: #0847a6;
+    --lg-accent-soft: #dbe8fb;
+    --lg-accent-rgb: 11, 90, 208;
+    --lg-on-accent: #ffffff;
+    --lg-danger: #b3261e;
+    --lg-shadow: 0 10px 28px rgba(16, 32, 56, 0.18), 0 1px 3px rgba(16, 32, 56, 0.12);
+    --lg-button-top: #ffffff;
+    --lg-button-bottom: #e9eef4;
+
+    --lg-nav-bg: #12233f;
+    --lg-nav-text: #c2cee0;
+    --lg-nav-strong: #ffffff;
+    --lg-nav-hover: #1e3558;
+    --lg-nav-field: rgba(255, 255, 255, 0.1);
+    --lg-nav-field-border: rgba(255, 255, 255, 0.22);
+
+    --lg-pill-green-bg: #e3f4e9;
+    --lg-pill-green: #0d6630;
+    --lg-pill-yellow-bg: #fbf1d5;
+    --lg-pill-yellow: #7d4806;
+    --lg-pill-grey-bg: #eaeef3;
+    --lg-pill-grey: #3e4b5e;
+    --lg-pill-red-bg: #fbe7e6;
+    --lg-pill-red: #a6231b;
+    --lg-pill-blue-bg: #e1ebfb;
+    --lg-pill-blue: #0d4cb0;
+    --lg-pill-orange-bg: #fcebdc;
+    --lg-pill-orange: #973809;
+
+    --lg-row: 25px;
+    --lg-control: 22px;
+    --lg-field: 24px;
+    --lg-topbar: 72px;
+    --lg-topbar-space: var(--lg-topbar);
+    --lg-gutter: 8px;
+    --lg-cell-x: 8px;
+    --lg-label-width: 148px;
+    --lg-filter-label: 84px;
+    --lg-filter-field: 260px;
+    --lg-rail-width: 320px;
+    --lg-chevron-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 1 7 5 3 9' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E");
+    --lg-rows-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 2.5h10M1 6h10M1 9.5h10M4.5 1v10' fill='none' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E");
+    --lg-lookup-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1.5 1.5h9v9h-9zM1.5 4.5h9M1.5 7.5h9M4.5 4.5v6' fill='none' stroke='%23435167' stroke-width='1.1'/%3E%3C/svg%3E");
+    --lg-drawer-width: 640px;
+    --lg-radius: 2px;
+    --lg-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --lg-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --bs-body-font-family: var(--lg-font);
+    --bs-body-font-size: 0.75rem;
+    --bs-body-line-height: 1.45;
+    --bs-body-bg: var(--lg-surface);
+    --bs-body-bg-rgb: 255, 255, 255;
+    --bs-body-color: var(--lg-text);
+    --bs-body-color-rgb: 21, 30, 43;
+    --bs-emphasis-color: var(--lg-text);
+    --bs-heading-color: var(--lg-text);
+    --bs-secondary-color: var(--lg-text-2);
+    --bs-tertiary-color: var(--lg-text-3);
+    --bs-secondary-bg: var(--lg-surface-2);
+    --bs-tertiary-bg: var(--lg-surface-2);
+    --bs-border-color: var(--lg-border);
+    --bs-border-color-translucent: var(--lg-border);
+    --bs-border-radius: var(--lg-radius);
+    --bs-border-radius-sm: var(--lg-radius);
+    --bs-border-radius-lg: var(--lg-radius);
+    --bs-link-color: var(--lg-accent);
+    --bs-link-color-rgb: var(--lg-accent-rgb);
+    --bs-link-hover-color: var(--lg-accent-hover);
+    --bs-link-hover-color-rgb: 8, 71, 166;
+    --bs-primary: var(--lg-accent);
+    --bs-primary-rgb: var(--lg-accent-rgb);
+    --bs-primary-bg-subtle: var(--lg-accent-soft);
+    --bs-primary-border-subtle: var(--lg-border-strong);
+    --bs-primary-text-emphasis: var(--lg-accent);
+    --bs-focus-ring-color: rgba(var(--lg-accent-rgb), 0.35);
+    --taack-navbar-bg: var(--lg-nav-bg);
+    --taack-navbar-color: var(--lg-nav-text);
+}
+
+:root[data-taack-theme="ledger"][data-bs-theme="dark"] {
+    --lg-canvas: #050911;
+    --lg-surface: #0a101b;
+    --lg-surface-2: #111a2a;
+    --lg-zebra: #0d1421;
+    --lg-hover: #13233d;
+    --lg-grid: #19243a;
+    --lg-border: #22314b;
+    --lg-border-strong: #34486b;
+    --lg-text: #d8e1ee;
+    --lg-text-2: #a1b0c6;
+    --lg-text-3: #8798b1;
+    --lg-head: #b4c3d9;
+    --lg-accent: #5b9dff;
+    --lg-accent-hover: #86b6ff;
+    --lg-accent-soft: #11274a;
+    --lg-accent-rgb: 91, 157, 255;
+    --lg-on-accent: #04101f;
+    --lg-danger: #f2756b;
+    --lg-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --lg-button-top: #17223a;
+    --lg-button-bottom: #111a2b;
+
+    --lg-nav-bg: #0c1c38;
+    --lg-nav-text: #a8b9d4;
+    --lg-nav-hover: #183059;
+
+    --lg-pill-green-bg: #0d2617;
+    --lg-pill-green: #74dc9c;
+    --lg-pill-yellow-bg: #2a210c;
+    --lg-pill-yellow: #f3cc5c;
+    --lg-pill-grey-bg: #182235;
+    --lg-pill-grey: #bcc8da;
+    --lg-pill-red-bg: #2f1214;
+    --lg-pill-red: #ff9f97;
+    --lg-pill-blue-bg: #10223f;
+    --lg-pill-blue: #8fbcff;
+    --lg-pill-orange-bg: #2d1a0b;
+    --lg-pill-orange: #fbb170;
+
+    --lg-lookup-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1.5 1.5h9v9h-9zM1.5 4.5h9M1.5 7.5h9M4.5 4.5v6' fill='none' stroke='%23a1b0c6' stroke-width='1.1'/%3E%3C/svg%3E");
+
+    --bs-body-bg-rgb: 10, 16, 27;
+    --bs-body-color-rgb: 216, 225, 238;
+    --bs-link-hover-color-rgb: 134, 182, 255;
+}
+
+/* Shell */
+
+[data-taack-theme="ledger"] body {
+    background: var(--lg-canvas);
+    color: var(--lg-text);
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] :focus-visible {
+    outline: 2px solid var(--lg-accent);
+    outline-offset: 1px;
+}
+
+[data-taack-theme="ledger"] body > nav.navbar {
+    min-height: var(--lg-topbar);
+    padding: 0 8px;
+    border-bottom: 1px solid #0a172b;
+}
+
+[data-taack-theme="ledger"] .navbar-brand {
+    padding: 0;
+    margin-right: 14px;
+}
+
+[data-taack-theme="ledger"] .navbar-brand img {
+    width: auto;
+    height: 52px;
+}
+
+/* The bar's lists fill its height and share it among their rows, so one row of links reaches the bar's bottom edge and two rows split it. */
+[data-taack-theme="ledger"] body > nav > .container-fluid,
+[data-taack-theme="ledger"] body > nav .navbar-collapse {
+    align-self: stretch;
+}
+
+[data-taack-theme="ledger"] body > nav .navbar-nav {
+    align-self: stretch;
+    align-items: stretch;
+}
+
+/* A narrow bar wraps whole links onto a second row instead of breaking a link over three lines. */
+[data-taack-theme="ledger"] body > nav .navbar-nav.me-auto {
+    flex-wrap: wrap;
+}
+
+[data-taack-theme="ledger"] body > nav .navbar-nav a.nav-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 13px;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    white-space: nowrap;
+}
+
+[data-taack-theme="ledger"] body > nav .nav-link.dropdown-toggle > img {
+    margin-right: 8px;
+}
+
+[data-taack-theme="ledger"] body > nav .solrSearch-input {
+    align-self: center;
+    padding: 0;
+}
+
+/* The field carries Bootstrap's bg-white, an !important utility that reads its alpha from this variable. */
+[data-taack-theme="ledger"] body > nav .solrSearch-input .form-control {
+    --bs-bg-opacity: 0.1;
+    min-width: 128px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 10px;
+    border-color: var(--lg-nav-field-border);
+    border-radius: var(--lg-radius) !important;
+    color: var(--lg-nav-strong);
+    font-size: 15px;
+}
+
+[data-taack-theme="ledger"] body > nav .solrSearch-input .form-control::placeholder {
+    color: var(--lg-nav-text);
+}
+
+[data-taack-theme="ledger"] body > nav .solrSearch-input .form-control:focus {
+    --bs-bg-opacity: 0.16;
+    border-color: var(--lg-accent);
+}
+
+/* Below 992 px a long menu wraps onto a third row, and Bootstrap's mb-2 adds 8 px under the list, so the page block leaves room for the tallest bar. */
+@media (max-width: 991.98px) {
+    :root[data-taack-theme="ledger"] {
+        --lg-topbar-space: 81px;
+    }
+}
+
+/* The toggle fills the bar's height, so the unread count sits from the middle, by the caret. */
+[data-taack-theme="ledger"] .navbar-nav .user-notifications::after {
+    top: calc(50% - 16px);
+    right: 0;
+    line-height: 16px;
+    background: #e5484d;
+    color: #ffffff;
+}
+
+[data-taack-theme="ledger"] body > nav .navbar-nav a.nav-link:hover,
+[data-taack-theme="ledger"] body > nav .navbar-nav a.nav-link:focus-visible {
+    background: var(--lg-nav-hover);
+    color: var(--lg-nav-strong);
+}
+
+/* The current menu wears the accent as a bottom bar, the way a spreadsheet marks the open sheet. */
+[data-taack-theme="ledger"] body > nav > .container-fluid > .navbar-collapse > .navbar-nav > li > .nav-link.active,
+[data-taack-theme="ledger"] body > nav > .container-fluid > .navbar-collapse > .navbar-nav > li:has(a.nav-link.active) > a.nav-link {
+    background: var(--lg-nav-hover);
+    color: var(--lg-nav-strong);
+    box-shadow: inset 0 -3px 0 #4f93ff;
+}
+
+[data-taack-theme="ledger"] .navbar-nav .dropdown-toggle::after {
+    opacity: 0.6;
+    vertical-align: 0.15em;
+}
+
+/* Taack paints dropdowns with the bar's colour. Here they open as light panels, so their links take the page's text colours. */
+[data-taack-theme="ledger"] .navbar-nav > li > .dropdown-menu {
+    padding: 4px 0;
+    border: 1px solid var(--lg-border-strong);
+    border-radius: var(--lg-radius);
+    background: var(--lg-surface);
+    box-shadow: var(--lg-shadow);
+}
+
+[data-taack-theme="ledger"] body > nav .navbar-nav .dropdown-menu a.nav-link {
+    padding: 0 15px;
+    font-size: 15px;
+    line-height: 30px;
+    color: var(--lg-text);
+    box-shadow: none;
+}
+
+[data-taack-theme="ledger"] body > nav .navbar-nav .dropdown-menu a.nav-link:hover,
+[data-taack-theme="ledger"] body > nav .navbar-nav .dropdown-menu a.nav-link:focus-visible {
+    background: var(--lg-hover);
+    color: var(--lg-text);
+}
+
+[data-taack-theme="ledger"] body > nav .navbar-nav .dropdown-menu a.nav-link.active {
+    background: var(--lg-accent-soft);
+    color: var(--lg-accent);
+}
+
+[data-taack-theme="ledger"] #taack-main-block {
+    padding: var(--lg-gutter);
+}
+
+[data-taack-theme="ledger"] .taackBlock {
+    padding: 0;
+    border: 1px solid var(--lg-border);
+    border-radius: var(--lg-radius);
+    background: var(--lg-surface);
+}
+
+/* Sections that follow each other, or sit side by side, are parted by a rule. A card has its own frame, so a column holding one takes none. */
+[data-taack-theme="ledger"] .taackBlock > [taacktag] + [taacktag] {
+    border-top: 1px solid var(--lg-border);
+}
+
+@media (min-width: 768px) {
+    [data-taack-theme="ledger"] .row[taacktag="COL"]:not(:has(> [taacktag="FILTER"])) > [class*="col-md-"]:not(:has(> [taacktag="CARD"])) + [class*="col-md-"]:not(:has(> [taacktag="CARD"])) {
+        border-left: 1px solid var(--lg-border);
+    }
+
+    /* Outside a form, block columns meet at the rule with no gutter, so each column's title band runs edge to edge on both sides of it. */
+    [data-taack-theme="ledger"] .taackBlock .row[taacktag="COL"]:not(form .row, :has(> [taacktag="FILTER"])) {
+        --bs-gutter-x: 0;
+    }
+}
+
+/*
+ * overflow-y-auto makes the block a scroll container, so a sticky header only sticks if
+ * the block itself scrolls. A keyboard user can only scroll it from a focused element
+ * inside, so a block with nothing focusable keeps its height and the page scrolls. A document
+ * reads down the page, so a block holding asciidoc prose keeps its height too.
+ */
+[data-taack-theme="ledger"] .taackBlock:has(a[href], button, input:not([type="hidden"]), select, textarea):not(:has(.asciidocMain)) {
+    max-height: calc(100vh - var(--lg-topbar-space) - 2 * var(--lg-gutter));
+}
+
+[data-taack-theme="ledger"] div[taacktag="MENU_BLOCK"] {
+    border: 0;
+}
+
+/* Title bands read as a sheet's caption: small capitals on the header tint. An app may tint them too (intranet3's custom.css does), which would turn into a light slab in dark mode. */
+[data-taack-theme="ledger"] div:is([taacktag="MENU_BLOCK"], [taacktag="TABLE"], [taacktag="ROW"]) > nav {
+    min-height: 28px;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 1px solid var(--lg-border);
+    background: var(--lg-surface-2);
+}
+
+[data-taack-theme="ledger"] div:is([taacktag="MENU_BLOCK"], [taacktag="TABLE"], [taacktag="ROW"]) > nav [taacktag="LABEL"] .nav-link {
+    padding: 0;
+    color: var(--lg-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 28px;
+    text-transform: uppercase;
+}
+
+[data-taack-theme="ledger"] div:is([taacktag="MENU_BLOCK"], [taacktag="TABLE"], [taacktag="ROW"]) > nav .nav-link:not([taacktag="LABEL"] .nav-link) {
+    padding: 2px 4px;
+    color: var(--lg-text-2);
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] div:is([taacktag="MENU_BLOCK"], [taacktag="TABLE"], [taacktag="ROW"]) > nav .nav-icon img {
+    width: 18px;
+    height: 18px;
+}
+
+/* Asciidoc fixes its table of contents to the window's left edge, which is the gutter here, not the block. With no top it would start below the document title, leaving its column empty above. */
+[data-taack-theme="ledger"] .asciidocMain #toc.toc2 {
+    top: calc(var(--lg-topbar-space) + var(--lg-gutter) + 1px);
+    left: calc(var(--lg-gutter) + 1px);
+    height: calc(100% - var(--lg-topbar-space) - 2 * var(--lg-gutter));
+    padding-top: 8px;
+}
+
+[data-taack-theme="ledger"] .asciidocMain #toc a {
+    color: var(--lg-accent);
+}
+
+/* intranet3's comment icon is a black outline on a white fill, a white blob on the dark sheet. */
+[data-taack-theme="ledger"][data-bs-theme="dark"] .table td img[src$="/comments.svg"] {
+    filter: invert(0.85);
+}
+
+[data-taack-theme="ledger"] .wysiwyg-markdown-preview {
+    border-color: var(--lg-border-strong);
+    border-radius: var(--lg-radius);
+    background: var(--lg-surface);
+}
+
+/* Asciidoc's inline code keeps a white chip in dark mode. */
+[data-taack-theme="ledger"][data-bs-theme="dark"] .asciidocMain :not(pre):not([class^=L]) > code {
+    background: var(--lg-surface-2);
+    color: var(--lg-text);
+}
+
+/* Taack's charts draw their grid in an inline light grey, which glares on the dark sheet; the ledger's own gridline colour replaces it. */
+[data-taack-theme="ledger"] svg.taackDiagram line[style*="231, 231, 231"] {
+    stroke: var(--lg-grid) !important;
+}
+
+[data-taack-theme="ledger"] .accordion {
+    --bs-accordion-border-radius: var(--lg-radius);
+    --bs-accordion-inner-border-radius: var(--lg-radius);
+    --bs-accordion-btn-padding-y: 6px;
+    --bs-accordion-btn-padding-x: 10px;
+    --bs-accordion-body-padding-y: 8px;
+    --bs-accordion-body-padding-x: 10px;
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 2px rgba(var(--lg-accent-rgb), 0.35);
+    --bs-accordion-active-bg: var(--lg-surface-2);
+    --bs-accordion-active-color: var(--lg-text);
+    --bs-accordion-border-color: var(--lg-border);
+}
+
+[data-taack-theme="ledger"] .accordion-button {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Sheet tabs: flat tinted tabs on a ruled strip, the open one joined to its sheet under an accent top edge. */
+[data-taack-theme="ledger"] .nav-tabs {
+    --bs-nav-tabs-border-width: 1px;
+    --bs-nav-tabs-border-color: var(--lg-border);
+    --bs-nav-tabs-border-radius: 0;
+    --bs-nav-tabs-link-hover-border-color: var(--lg-border) var(--lg-border) var(--lg-border);
+    --bs-nav-tabs-link-active-color: var(--lg-text);
+    --bs-nav-tabs-link-active-bg: var(--lg-surface);
+    --bs-nav-tabs-link-active-border-color: var(--lg-border) var(--lg-border) var(--lg-surface);
+    gap: 0;
+    padding: 4px 6px 0;
+    background: var(--lg-surface-2);
+}
+
+[data-taack-theme="ledger"] .nav-tabs .nav-link {
+    margin-right: -1px;
+    padding: 3px 12px;
+    border-color: var(--lg-border);
+    background: var(--lg-surface-2);
+    color: var(--lg-text-2);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+}
+
+[data-taack-theme="ledger"] .nav-tabs .nav-link:hover {
+    background: var(--lg-hover);
+    color: var(--lg-text);
+}
+
+[data-taack-theme="ledger"] .nav-tabs .nav-link.active {
+    position: relative;
+    background: var(--lg-surface);
+    color: var(--lg-text);
+    font-weight: 600;
+    box-shadow: inset 0 2px 0 var(--lg-accent);
+}
+
+/* Tables */
+
+[data-taack-theme="ledger"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--lg-text);
+    --bs-table-striped-bg: transparent;
+    --bs-table-striped-color: var(--lg-text);
+    --bs-table-hover-bg: var(--lg-hover);
+    --bs-table-hover-color: var(--lg-text);
+    --bs-table-border-color: var(--lg-grid);
+    margin: 0;
+    font-size: 12px;
+    line-height: 17px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Tabular digits line numbers up, but the system font's wide tabular 1 makes "1024" read "1 024" anywhere else. */
+[data-taack-theme="ledger"] .table [data-type="number"] {
+    font-variant-numeric: tabular-nums;
+}
+
+[data-taack-theme="ledger"] .table td[data-type="number"] {
+    text-align: right;
+}
+
+[data-taack-theme="ledger"] .table-bordered > :not(caption) > *,
+[data-taack-theme="ledger"] .table-bordered > :not(caption) > * > * {
+    border-width: 0;
+}
+
+[data-taack-theme="ledger"] .table > :not(caption) > * > * {
+    height: var(--lg-row);
+    padding: 3px var(--lg-cell-x);
+    vertical-align: middle;
+    border-right: 1px solid var(--lg-grid);
+    border-bottom: 1px solid var(--lg-grid);
+}
+
+[data-taack-theme="ledger"] .table > :not(caption) > * > :last-child {
+    border-right: 0;
+}
+
+/* Cells that wrap start on one line across the row, so a multi-line row reads as one record. */
+[data-taack-theme="ledger"] .table > tbody > tr > td {
+    vertical-align: top;
+}
+
+[data-taack-theme="ledger"] .table > tbody > tr:nth-child(even) {
+    --bs-table-bg: var(--lg-zebra);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    [data-taack-theme="ledger"] .table > tbody > tr:hover {
+        --bs-table-bg: var(--lg-hover);
+    }
+}
+
+[data-taack-theme="ledger"] .table > thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    vertical-align: bottom;
+    border-right-color: var(--lg-border);
+    border-bottom: 1px solid var(--lg-border-strong);
+    background: var(--lg-surface-2);
+    color: var(--lg-head);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 14px;
+    text-transform: uppercase;
+    text-wrap: balance;
+    box-shadow: none;
+}
+
+[data-taack-theme="ledger"] .table > tbody > tr:last-child > td {
+    border-bottom-color: var(--lg-grid);
+}
+
+/* A wrapping label keeps its arrow at the end of its last line: the arrow sits in reserved padding instead of flowing as a word. */
+[data-taack-theme="ledger"] button.sortColumn {
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 13px 0 0;
+    background-image: none;
+    color: var(--lg-head);
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    text-transform: inherit;
+}
+
+[data-taack-theme="ledger"] button.sortColumn::after {
+    position: absolute;
+    right: 0;
+    bottom: 3px;
+}
+
+[data-taack-theme="ledger"] button.sortColumn::after,
+[data-taack-theme="ledger"] [data-type="number"] > button.sortColumn::before {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-left: 4px;
+    vertical-align: -1px;
+    background-color: currentColor;
+    -webkit-mask: var(--lg-sort-icon) center / contain no-repeat;
+    mask: var(--lg-sort-icon) center / contain no-repeat;
+    opacity: 0.3;
+}
+
+/* A number header's label ends over its digits, so its icon comes before the label. */
+[data-taack-theme="ledger"] [data-type="number"] > button.sortColumn {
+    margin-left: auto;
+    padding-right: 0;
+}
+
+[data-taack-theme="ledger"] [data-type="number"] > button.sortColumn::before {
+    margin: 0 4px 0 0;
+}
+
+[data-taack-theme="ledger"] [data-type="number"] > button.sortColumn::after {
+    content: none;
+}
+
+[data-taack-theme="ledger"] button.sortColumn.neutral {
+    --lg-sort-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 1 8 4H2zM5 9 2 6h6z'/%3E%3C/svg%3E");
+}
+
+[data-taack-theme="ledger"] button.sortColumn.asc {
+    --lg-sort-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 2 9 7H1z'/%3E%3C/svg%3E");
+}
+
+[data-taack-theme="ledger"] button.sortColumn.desc {
+    --lg-sort-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 8 1 3h8z'/%3E%3C/svg%3E");
+}
+
+[data-taack-theme="ledger"] button.sortColumn:hover {
+    color: var(--lg-accent);
+}
+
+[data-taack-theme="ledger"] button.sortColumn:hover::after,
+[data-taack-theme="ledger"] button.sortColumn:focus-visible::after,
+[data-taack-theme="ledger"] button.sortColumn:hover::before,
+[data-taack-theme="ledger"] button.sortColumn:focus-visible::before {
+    opacity: 0.7;
+}
+
+/* A stacked header sets aria-sort on its th for whichever field is sorted, so the state is read from the button. */
+[data-taack-theme="ledger"] button.sortColumn:is(.asc, .desc) {
+    color: var(--lg-accent);
+}
+
+[data-taack-theme="ledger"] button.sortColumn:is(.asc, .desc)::after,
+[data-taack-theme="ledger"] button.sortColumn:is(.asc, .desc)::before {
+    opacity: 1;
+    background-color: var(--lg-accent);
+}
+
+/* No column carries its field name, so the code column is found through its sort button. */
+[data-taack-theme="ledger"] table:has(thead th:nth-child(1) .sortColumn[sortfield="code"]) tbody td:nth-child(1) > span,
+[data-taack-theme="ledger"] table:has(thead th:nth-child(2) .sortColumn[sortfield="code"]) tbody td:nth-child(2) > span,
+[data-taack-theme="ledger"] table:has(thead th:nth-child(3) .sortColumn[sortfield="code"]) tbody td:nth-child(3) > span,
+[data-taack-theme="ledger"] [blockid="root-index"] tbody td:nth-child(4) > span {
+    font-family: var(--lg-mono);
+    font-size: 11px;
+    color: var(--lg-text-2);
+}
+
+[data-taack-theme="ledger"] [blockid="root-index"] tbody td:nth-child(1) > span {
+    color: var(--lg-text-3);
+}
+
+[data-taack-theme="ledger"] .table-link {
+    color: var(--lg-accent);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+[data-taack-theme="ledger"] .table-link:hover {
+    color: var(--lg-accent-hover);
+    text-decoration: underline;
+}
+
+/* Row actions */
+
+/* A column shrinks to its actions only when every cell in it holds nothing else: a single 1% cell narrows the whole column, so a column mixing action-only cells with content (intranet3's milestone dates) would be crushed. Only the first and last columns can be tested this way. */
+[data-taack-theme="ledger"] table:not(:has(tbody td:first-child > :not(.taackRowActions))) td:first-child:has(> .taackRowActions),
+[data-taack-theme="ledger"] table:not(:has(tbody td:last-child > :not(.taackRowActions))) td:last-child:has(> .taackRowActions) {
+    width: 1%;
+}
+
+/* Only a cell holding nothing but actions shrinks to them. An app can put actions beside a record's name, and that cell keeps its width. */
+[data-taack-theme="ledger"] td:has(> .taackRowActions):not(:has(> :not(.taackRowActions))) {
+    padding-right: 3px;
+    padding-left: 3px;
+}
+
+/*
+ * In a cell shared with a field, right-hand actions sit in the cell's corner. Floated, they
+ * would push the field below them whenever the column is narrower than both, so the cell
+ * reserves their width instead, one 22 px slot per icon.
+ */
+[data-taack-theme="ledger"] td:has(> .taackRowActionsRight):has(> :not(.taackRowActions)) {
+    --lg-row-actions: 1;
+    position: relative;
+    padding-right: calc(var(--lg-cell-x) + var(--lg-row-actions) * 22px);
+}
+
+[data-taack-theme="ledger"] td:has(> .taackRowActionsRight > :nth-child(2)) { --lg-row-actions: 2; }
+[data-taack-theme="ledger"] td:has(> .taackRowActionsRight > :nth-child(3)) { --lg-row-actions: 3; }
+[data-taack-theme="ledger"] td:has(> .taackRowActionsRight > :nth-child(4)) { --lg-row-actions: 4; }
+
+[data-taack-theme="ledger"] td:has(> :not(.taackRowActions)) > .taackRowActionsRight {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    float: none;
+}
+
+[data-taack-theme="ledger"] table:has(tbody td:first-child > .taackRowActions):not(:has(tbody td:first-child > :not(.taackRowActions))) thead th:first-child > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Often the only way into a record, so the actions show at rest and brighten on the row in use. */
+[data-taack-theme="ledger"] .taackRowActions {
+    gap: 1px;
+    opacity: 0.65;
+}
+
+/* The 20 px hit area overhangs the cell padding, so a row with actions stays one line tall. */
+[data-taack-theme="ledger"] .table > tbody .taackRowActions {
+    margin-top: -2px;
+    margin-bottom: -2px;
+}
+
+[data-taack-theme="ledger"] tr:focus-within .taackRowActions {
+    opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    [data-taack-theme="ledger"] tr:hover .taackRowActions {
+        opacity: 1;
+    }
+}
+
+[data-taack-theme="ledger"] .taackRowActions a {
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--lg-radius);
+    color: var(--lg-text-2);
+}
+
+[data-taack-theme="ledger"] .taackRowActions a:hover {
+    background: var(--lg-accent-soft);
+    color: var(--lg-text);
+}
+
+[data-taack-theme="ledger"] .taackRowActions img {
+    width: 14px;
+    height: 14px;
+}
+
+/* Tags: square stamps outlined in their own ink, so a tint still reads on a zebra or hovered row. */
+
+[data-taack-theme="ledger"] .tag:not(td) {
+    height: 17px;
+    padding: 0 4px;
+    margin: 0;
+    border: 1px solid color-mix(in srgb, var(--lg-pill, var(--lg-pill-blue)) 35%, transparent);
+    border-radius: 1px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 15px;
+    text-shadow: none;
+    background: var(--lg-pill-bg, var(--lg-pill-blue-bg));
+    color: var(--lg-pill, var(--lg-pill-blue));
+}
+
+/* Tags placed straight in a cell stack as blocks and would touch. Tags inside a field sit inline and are already spaced. */
+[data-taack-theme="ledger"] td > .tag + .tag {
+    margin-top: 2px;
+}
+
+[data-taack-theme="ledger"] :not(td) > .tag:not(td) + .tag:not(td) {
+    margin-left: 3px;
+}
+
+[data-taack-theme="ledger"] .greenTag { --lg-pill-bg: var(--lg-pill-green-bg); --lg-pill: var(--lg-pill-green); }
+[data-taack-theme="ledger"] .yellowTag { --lg-pill-bg: var(--lg-pill-yellow-bg); --lg-pill: var(--lg-pill-yellow); }
+[data-taack-theme="ledger"] .greyTag,
+[data-taack-theme="ledger"] .whiteTag { --lg-pill-bg: var(--lg-pill-grey-bg); --lg-pill: var(--lg-pill-grey); }
+[data-taack-theme="ledger"] .pinkTag { --lg-pill-bg: var(--lg-pill-red-bg); --lg-pill: var(--lg-pill-red); }
+/* Red marks an alarm (a critical priority, an unreachable system), so it is the one solid stamp. */
+[data-taack-theme="ledger"] .redTag { --lg-pill-bg: var(--lg-danger); --lg-pill: var(--lg-on-accent); }
+[data-taack-theme="ledger"][data-bs-theme="dark"] .redTag { --lg-pill: #1a0605; }
+[data-taack-theme="ledger"] .orangeTag { --lg-pill-bg: var(--lg-pill-orange-bg); --lg-pill: var(--lg-pill-orange); }
+
+/* Taack's colour styles are literals that fail contrast, so they take the tag text colours. */
+[data-taack-theme="ledger"] .taackColorRed,
+[data-taack-theme="ledger"] .table > :not(caption) > * > .taackColorRed { color: var(--lg-pill-red); }
+[data-taack-theme="ledger"] .taackColorBlue,
+[data-taack-theme="ledger"] .table > :not(caption) > * > .taackColorBlue { color: var(--lg-pill-blue); }
+[data-taack-theme="ledger"] .taackColorGreen,
+[data-taack-theme="ledger"] .table > :not(caption) > * > .taackColorGreen { color: var(--lg-pill-green); }
+[data-taack-theme="ledger"] .taackColorOrange,
+[data-taack-theme="ledger"] .table > :not(caption) > * > .taackColorOrange { color: var(--lg-pill-orange); }
+[data-taack-theme="ledger"] .taackColorYellow,
+[data-taack-theme="ledger"] .table > :not(caption) > * > .taackColorYellow { color: var(--lg-pill-yellow); }
+
+/* Kanban: columns are framed sheets with a header band, cards flat ruled entries. */
+
+[data-taack-theme="ledger"] .kanban-column {
+    min-height: 320px;
+    padding: 0;
+    border: 1px solid var(--lg-border);
+    border-radius: var(--lg-radius);
+    background: var(--lg-surface);
+    box-shadow: none;
+}
+
+[data-taack-theme="ledger"] .kanban-column:is(:hover, :focus-within) {
+    border-color: var(--lg-border-strong);
+    box-shadow: none;
+}
+
+[data-taack-theme="ledger"] .kanban-column-header {
+    margin: 0;
+    padding: 4px 28px 4px 8px;
+    border-bottom: 1px solid var(--lg-border);
+    background: var(--lg-surface-2);
+    color: var(--lg-text);
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] .kanban-column-header > div:first-child {
+    color: var(--lg-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+[data-taack-theme="ledger"] .kanban-column-header .close-btn {
+    top: 3px;
+    right: 4px;
+    border-radius: var(--lg-radius);
+    color: var(--lg-text-2);
+}
+
+[data-taack-theme="ledger"] .kanban-column-body {
+    padding: 4px;
+}
+
+[data-taack-theme="ledger"] .kanban-card {
+    margin-bottom: 4px;
+    padding: 4px 6px;
+    border-color: var(--lg-grid);
+    border-left: 3px solid var(--lg-border-strong);
+    border-radius: var(--lg-radius);
+    background: var(--lg-surface);
+    box-shadow: none;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] .kanban-card:hover {
+    transform: none;
+    border-color: var(--lg-border-strong);
+    border-left-color: var(--lg-accent);
+    background: var(--lg-hover);
+    box-shadow: none;
+}
+
+[data-taack-theme="ledger"] .kanban-column.drag-over {
+    border: 1px dashed var(--lg-accent);
+    background: var(--lg-accent-soft);
+    box-shadow: none;
+    transform: none;
+}
+
+/* Paging */
+
+[data-taack-theme="ledger"] [taacktag="TABLE"]:has(> .taackTablePaginate) {
+    display: flex;
+    flex-direction: column;
+}
+
+/* A capped block scrolls its own table, so the pager sticks to the block's visible bottom instead of the list's end. */
+[data-taack-theme="ledger"] .taackTablePaginate {
+    order: 2;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 28px;
+    padding: 2px 6px 2px 8px;
+    border-top: 1px solid var(--lg-border-strong);
+    background: var(--lg-surface-2);
+    color: var(--lg-text-2);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The page's lang attribute is not reliable (intranet3 sends "null"), so the count takes an icon rather than a word. */
+[data-taack-theme="ledger"] .taackTablePaginate::before {
+    content: attr(taackcount);
+    margin-right: auto;
+    font-weight: 600;
+}
+
+[data-taack-theme="ledger"] .taackTablePaginate::after {
+    content: "";
+    order: -1;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    background-color: currentColor;
+    -webkit-mask: var(--lg-rows-icon) center / contain no-repeat;
+    mask: var(--lg-rows-icon) center / contain no-repeat;
+}
+
+[data-taack-theme="ledger"] .pagination {
+    --bs-pagination-color: var(--lg-text-2);
+    --bs-pagination-bg: transparent;
+    --bs-pagination-border-width: 0;
+    --bs-pagination-hover-color: var(--lg-text);
+    --bs-pagination-hover-bg: var(--lg-hover);
+    --bs-pagination-focus-color: var(--lg-text);
+    --bs-pagination-focus-bg: var(--lg-hover);
+    --bs-pagination-focus-box-shadow: none;
+    --bs-pagination-active-color: var(--lg-on-accent);
+    --bs-pagination-active-bg: var(--lg-accent);
+    --bs-pagination-border-radius: var(--lg-radius);
+    gap: 1px;
+    margin: 0;
+}
+
+[data-taack-theme="ledger"] .pagination .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--lg-control);
+    height: var(--lg-control);
+    padding: 0 5px;
+    border-radius: var(--lg-radius);
+    font-size: 11px;
+}
+
+/* Tree */
+
+[data-taack-theme="ledger"] .taackTreeExpander {
+    color: var(--lg-text-2);
+}
+
+[data-taack-theme="ledger"] .taackTreeExpander:hover {
+    color: var(--lg-text);
+}
+
+[data-taack-theme="ledger"] .taackTreeExpander[aria-expanded]::before {
+    top: calc(50% - 4px);
+    left: 6px;
+    width: 7px;
+    height: 7px;
+    border: 0;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+}
+
+[data-taack-theme="ledger"] .taackTreeExpander[aria-expanded="true"]::before {
+    top: calc(50% - 6px);
+    transform: rotate(45deg);
+}
+
+[data-taack-theme="ledger"] td[class*="firstCellInGroup-"]::after {
+    border-width: 0 0 0 1px;
+    border-color: var(--lg-border-strong);
+}
+
+/* Filter toolbar: a filter declared FilterLayout.TOOLBAR, or a small one with no declared layout. The form rules below are also the base the rail overrides. */
+
+[data-taack-theme="ledger"] [taacktag="COL"].row:has(> [taacktag="FILTER"]) {
+    --bs-gutter-x: 0;
+    --bs-gutter-y: 0;
+    flex-direction: column;
+}
+
+[data-taack-theme="ledger"] [taacktag="COL"] > [taacktag="FILTER"],
+[data-taack-theme="ledger"] [taacktag="COL"] > [taacktag="TABLE"],
+[data-taack-theme="ledger"] [taacktag="COL"]:has(> [taacktag="FILTER"]) > * {
+    width: 100%;
+}
+
+/* A kanban's row, and what a filter drives besides a table, such as a chart, have no inset of their own. */
+[data-taack-theme="ledger"] [taacktag="COL"]:has(> [taacktag="FILTER"]) > :is([taacktag="KANBAN"], :not([taacktag])) {
+    padding: 8px;
+}
+
+[data-taack-theme="ledger"] form.filter {
+    background: var(--lg-surface-2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--lg-border);
+    font-size: 12px;
+}
+
+/* A table without filters still carries a filter form of hidden paging inputs. */
+[data-taack-theme="ledger"] form.filter:not(:has(fieldset)) {
+    display: none;
+}
+
+[data-taack-theme="ledger"] form.filter > [taacktag="SECTION"] {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+[data-taack-theme="ledger"] form.filter fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] form.filter legend {
+    width: auto;
+    margin: 0 4px 0 0;
+    padding: 0;
+    color: var(--lg-head);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: var(--lg-control);
+    text-transform: uppercase;
+}
+
+/* A toolbar control fits its value or placeholder, within bounds, so a long option is never cut mid-word. */
+[data-taack-theme="ledger"] form.filter .form-control,
+[data-taack-theme="ledger"] form.filter .form-select {
+    field-sizing: content;
+    width: auto;
+    min-width: 120px;
+    max-width: 260px;
+    height: var(--lg-control);
+    min-height: var(--lg-control);
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] .form-text:empty {
+    display: none;
+}
+
+[data-taack-theme="ledger"] form.filter .taackFilterField {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+[data-taack-theme="ledger"] form.filter .taackFilterField > :is(.form-label, legend) {
+    width: auto;
+    margin: 0 0 0 4px;
+    padding: 0;
+    font-size: 12px;
+    letter-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    font-weight: normal;
+    color: var(--lg-text-2);
+}
+
+/* A date range's dash carries Taack's inline padding, which made its row taller than the controls beside it. */
+[data-taack-theme="ledger"] form.filter .taackFilterField > div:has(> input + span + input) {
+    align-items: center;
+}
+
+[data-taack-theme="ledger"] form.filter .taackFilterField > div:has(> input + span + input) > span {
+    padding: 0 4px !important;
+}
+
+/* A zero font size removes the whitespace between the inline choices, so their borders join. */
+[data-taack-theme="ledger"] form.filter .taackFilterField > div:has(.form-check-inline) {
+    white-space: nowrap;
+    font-size: 0;
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: var(--lg-control);
+    min-height: 0;
+    margin: 0;
+    padding: 0 7px;
+    border: 1px solid var(--lg-border-strong);
+    background: var(--lg-surface);
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-inline + .form-check-inline {
+    margin-left: -1px;
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-inline:first-child {
+    border-radius: var(--lg-radius) 0 0 var(--lg-radius);
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-inline:last-child {
+    border-radius: 0 var(--lg-radius) var(--lg-radius) 0;
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-inline:has(:checked) {
+    position: relative;
+    border-color: var(--lg-accent);
+    background: var(--lg-accent-soft);
+    color: var(--lg-accent);
+    font-weight: 600;
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-inline .form-check-input {
+    float: none;
+    width: 11px;
+    height: 11px;
+    margin: 0;
+}
+
+[data-taack-theme="ledger"] form.filter .form-check-label,
+[data-taack-theme="ledger"] form.filter fieldset > .form-check-input + .form-label {
+    margin: 0;
+}
+
+[data-taack-theme="ledger"] form.filter fieldset > .form-check-input {
+    margin: 0 0 0 4px;
+}
+
+[data-taack-theme="ledger"] form.filter > .d-flex {
+    flex: none;
+    gap: 6px;
+}
+
+[data-taack-theme="ledger"] form.filter > .d-flex > .btn {
+    white-space: nowrap;
+}
+
+/* Filter rail */
+
+/*
+ * A filter declared FilterLayout.SIDE docks beside its table or kanban as a rail, and stacks above it in a narrow
+ * block. A filter with no declared layout takes the rail when it has three sections or a section of six fields,
+ * the size that wraps a toolbar onto a second row. CSS cannot count fields across sections, hence the two tests.
+ */
+[data-taack-theme="ledger"] [taacktag="COL"].row:is(
+    [data-filter-layout="side"],
+    :not([data-filter-layout]):has(> :is([taacktag="TABLE"], [taacktag="KANBAN"])):has(
+        > [taacktag="FILTER"] > form.filter > :nth-child(3 of [taacktag="SECTION"]),
+        > [taacktag="FILTER"] > form.filter > [taacktag="SECTION"] > fieldset > :nth-child(6 of .taackFilterField, .form-check-input)
+    )
+) {
+    container: lg-filter-tool / inline-size;
+    flex-direction: row;
+    align-items: flex-start;
+    background: var(--lg-surface-2);
+}
+
+/* The row's tint shows only where the rail or the table ends first, as a spreadsheet's unused area. */
+[data-taack-theme="ledger"] [taacktag="COL"].row > [taacktag="TABLE"] {
+    background: var(--lg-surface);
+}
+
+/*
+ * Only a rail row is a lg-filter-tool container, so this always-true query scopes the rules to the rail.
+ * Each field is one ruled line, its label in a narrow column beside the control, like a spreadsheet's input pane.
+ */
+@container lg-filter-tool (min-width: 0) {
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter {
+        --lg-rail-padding: 8px;
+        --lg-chevron: 9px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--lg-rail-width)), 1fr));
+        align-items: start;
+        gap: 6px 20px;
+        padding: 0 var(--lg-rail-padding) var(--lg-rail-padding);
+        background: var(--lg-surface);
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter > .d-flex {
+        grid-column: 1 / -1;
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        justify-content: flex-end;
+        margin: 0 calc(-1 * var(--lg-rail-padding)) calc(-1 * var(--lg-rail-padding));
+        padding: 5px var(--lg-rail-padding);
+        border-top: 1px solid var(--lg-border);
+        background: var(--lg-surface-2);
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter > .d-flex > .btn {
+        margin: 0;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset {
+        align-items: center;
+        gap: 3px 6px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > * {
+        flex: 1 0 100%;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > .form-check-input {
+        flex: none;
+        margin: 0;
+    }
+
+    /* A basis of the row less about one checkbox keeps each checkbox and its label on a row of their own. */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > .form-check-input + .form-label {
+        flex: 1 0 calc(100% - 2em);
+        margin: 0;
+    }
+
+    /* Taack indents every nested fieldset by 1em, which pushes a date range past the rail's edge. */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > fieldset.taackFilterField {
+        margin-left: 0;
+    }
+
+    /* A section's legend is a tinted band across the rail, like a header row over its fields. */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter > [taacktag="SECTION"] > fieldset > legend {
+        float: none;
+        width: calc(100% + 2 * var(--lg-rail-padding));
+        margin: 0 calc(-1 * var(--lg-rail-padding)) 3px;
+        padding: 0 var(--lg-rail-padding);
+        border-bottom: 1px solid var(--lg-border);
+        background: var(--lg-surface-2);
+        line-height: 22px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField {
+        display: grid;
+        grid-template-columns: var(--lg-filter-label) minmax(0, 1fr);
+        align-items: center;
+        gap: 0 6px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField > :not(.form-label, legend) {
+        grid-column: 2;
+    }
+
+    /* A choice group's legend becomes the label cell of its line. Floated, it stops being the fieldset's border legend and becomes a grid item. */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset.taackFilterField > legend {
+        grid-column: 1;
+        grid-row: 1;
+        float: left;
+        width: auto;
+        margin: 0;
+        letter-spacing: normal;
+        text-transform: none;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField > :is(.form-label, legend) {
+        margin: 0;
+        color: var(--lg-text-2);
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 13px;
+        overflow-wrap: break-word;
+    }
+
+    /* Half a point smaller than the table, so an enum's longest option, such as RMA's analysis choice, still fits beside its label. */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .form-control,
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .form-select {
+        field-sizing: fixed;
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        font-size: 11.5px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .form-select {
+        padding-right: 18px;
+        background-position: right 3px center;
+        background-size: 12px 9px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField > div:has(.form-check-inline) {
+        display: flex;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .form-check-inline {
+        flex: 1 1 0;
+        justify-content: center;
+        padding: 0 4px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .btn-collapse {
+        --bs-btn-padding-x: 0;
+        --bs-btn-padding-y: 0;
+        --bs-btn-font-size: 12px;
+        --bs-btn-font-weight: 600;
+        --bs-btn-line-height: var(--lg-control);
+        --bs-btn-color: var(--lg-text);
+        --bs-btn-hover-color: var(--lg-accent);
+        --bs-btn-active-color: var(--lg-accent);
+        --bs-btn-border-width: 0;
+        --bs-btn-bg: transparent;
+        --bs-btn-hover-bg: transparent;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: var(--lg-control);
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .btn-collapse::before {
+        content: "";
+        flex: none;
+        width: var(--lg-chevron);
+        height: var(--lg-chevron);
+        background-color: currentColor;
+        -webkit-mask: var(--lg-chevron-icon) center / contain no-repeat;
+        mask: var(--lg-chevron-icon) center / contain no-repeat;
+        opacity: 0.6;
+        transform: rotate(90deg);
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .btn-collapse.collapsed::before {
+        transform: none;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > .btn-collapse + [taacktag="SECTION"] {
+        padding-left: calc(var(--lg-chevron) + 6px);
+    }
+
+    /* A date range keeps its label in the label column and stacks its Min and Max inputs beside it. */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField:has(> div > input + span + input) > legend {
+        grid-row: 1 / span 2;
+        align-self: center;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField > div:has(> input + span + input) {
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter .taackFilterField > div:has(> input + span + input) > span {
+        display: none;
+    }
+}
+
+/*
+ * Too narrow for a rail, the filter stacks above the table. Its fields share rows, and the filter
+ * scrolls past a height that still leaves the first rows of the table on screen.
+ */
+@container lg-filter-tool (width < 60rem) {
+    [data-taack-theme="ledger"] [taacktag="COL"].row > [taacktag="FILTER"] {
+        max-height: 45vh;
+        overflow-y: auto;
+    }
+
+    /* The drawer's body already scrolls, and a filter scrolling inside it would be a second scrollbar. */
+    [data-taack-theme="ledger"] .modal-body [taacktag="COL"].row > [taacktag="FILTER"] {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > .taackFilterField {
+        flex: 1 1 var(--lg-filter-field);
+    }
+
+    /*
+     * A checkbox and its label wrap as one field: the checkbox's right margin reserves a field's width,
+     * and the label's negative left margin brings it back beside the checkbox, so neither wraps alone.
+     * 6px is the fieldset's column gap.
+     */
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > .form-check-input {
+        margin-right: calc(var(--lg-filter-field) - 1em);
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter fieldset > .form-check-input + .form-label {
+        flex: 1 1 calc(var(--lg-filter-field) - 1em - 6px);
+        margin-left: calc(1em - var(--lg-filter-field));
+    }
+}
+
+/*
+ * Rail and table both stick, and only the shorter one can: a short rail stays beside a long
+ * table, and a long table stays beside a long rail, whose Filter bar pins to the block's visible
+ * bottom. A rail scrolling on its own would need a height that leaves out the block's menu row,
+ * which CSS cannot measure.
+ */
+@container lg-filter-tool (min-width: 60rem) {
+    [data-taack-theme="ledger"] [taacktag="COL"].row > [taacktag="FILTER"] {
+        flex: none;
+        width: var(--lg-rail-width);
+        position: sticky;
+        top: 0;
+        border-right: 1px solid var(--lg-border-strong);
+    }
+
+    [data-taack-theme="ledger"] [taacktag="COL"].row > :not([taacktag="FILTER"]) {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        position: sticky;
+        top: 0;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter {
+        grid-template-columns: minmax(0, 1fr);
+        border-bottom: 0;
+    }
+
+    [data-taack-theme="ledger"] [taacktag="FILTER"] > form.filter > [taacktag="SECTION"] + [taacktag="SECTION"] {
+        padding-top: 2px;
+        border-top: 1px solid var(--lg-border);
+    }
+}
+
+/* Controls and buttons */
+
+[data-taack-theme="ledger"] .form-control,
+[data-taack-theme="ledger"] .form-select {
+    border-color: var(--lg-border-strong);
+    border-radius: var(--lg-radius);
+    background-color: var(--lg-surface);
+    color: var(--lg-text);
+}
+
+[data-taack-theme="ledger"] .form-select {
+    background-position: right 6px center;
+    padding-right: 22px;
+}
+
+[data-taack-theme="ledger"] :is(.form-control, .form-select).form-control-sm,
+[data-taack-theme="ledger"] .form-select-sm {
+    padding-left: 6px;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] .form-control::placeholder {
+    color: var(--lg-text-3);
+}
+
+[data-taack-theme="ledger"] .form-control:focus,
+[data-taack-theme="ledger"] .form-select:focus {
+    border-color: var(--lg-accent);
+    box-shadow: 0 0 0 1px var(--lg-accent);
+}
+
+[data-taack-theme="ledger"] .form-check-input {
+    border-color: var(--lg-border-strong);
+    border-radius: 1px;
+    background-color: var(--lg-surface);
+}
+
+[data-taack-theme="ledger"] .form-check-input[type="radio"] {
+    border-radius: 50%;
+}
+
+[data-taack-theme="ledger"] .form-check-input:checked {
+    border-color: var(--lg-accent);
+    background-color: var(--lg-accent);
+}
+
+[data-taack-theme="ledger"] .form-check-input:focus {
+    border-color: var(--lg-accent);
+    box-shadow: 0 0 0 2px rgba(var(--lg-accent-rgb), 0.3);
+}
+
+[data-taack-theme="ledger"] .btn {
+    --bs-btn-padding-y: 0;
+    --bs-btn-padding-x: 10px;
+    --bs-btn-font-size: 12px;
+    --bs-btn-font-weight: 600;
+    --bs-btn-line-height: 22px;
+    --bs-btn-border-radius: var(--lg-radius);
+}
+
+/* Secondary buttons are raised the way a desktop toolbar button is, so they read as pressable beside flat fields. */
+[data-taack-theme="ledger"] .btn-light,
+[data-taack-theme="ledger"] .btn-secondary {
+    --bs-btn-color: var(--lg-text);
+    --bs-btn-bg: var(--lg-button-bottom);
+    --bs-btn-border-color: var(--lg-border-strong);
+    --bs-btn-hover-color: var(--lg-text);
+    --bs-btn-hover-bg: var(--lg-hover);
+    --bs-btn-hover-border-color: var(--lg-border-strong);
+    --bs-btn-active-color: var(--lg-text);
+    --bs-btn-active-bg: var(--lg-surface-2);
+    --bs-btn-active-border-color: var(--lg-border-strong);
+    background-image: linear-gradient(var(--lg-button-top), var(--lg-button-bottom));
+}
+
+[data-taack-theme="ledger"] :is(.btn-light, .btn-secondary):hover {
+    background-image: none;
+}
+
+[data-taack-theme="ledger"] .btn-primary,
+[data-taack-theme="ledger"] .btn-success {
+    --bs-btn-color: var(--lg-on-accent);
+    --bs-btn-bg: var(--lg-accent);
+    --bs-btn-border-color: var(--lg-accent-hover);
+    --bs-btn-hover-color: var(--lg-on-accent);
+    --bs-btn-hover-bg: var(--lg-accent-hover);
+    --bs-btn-hover-border-color: var(--lg-accent-hover);
+    --bs-btn-active-color: var(--lg-on-accent);
+    --bs-btn-active-bg: var(--lg-accent-hover);
+    --bs-btn-active-border-color: var(--lg-accent-hover);
+    --bs-btn-focus-shadow-rgb: var(--lg-accent-rgb);
+}
+
+/* An inline edit in a table cell renders bare inputs with no class, which the browser paints grey in dark mode. */
+[data-taack-theme="ledger"] .table td > input:not([class], [type="checkbox"], [type="radio"], [type="hidden"], [type="submit"]) {
+    height: var(--lg-control);
+    padding: 0 6px;
+    border: 1px solid var(--lg-border-strong);
+    border-radius: var(--lg-radius);
+    background: var(--lg-surface);
+    color: var(--lg-text);
+    font: inherit;
+}
+
+[data-taack-theme="ledger"] .table td > input:not([class], [type="checkbox"], [type="radio"], [type="hidden"], [type="submit"]):focus {
+    outline: 0;
+    border-color: var(--lg-accent);
+    box-shadow: 0 0 0 1px var(--lg-accent);
+}
+
+[data-taack-theme="ledger"] .table td > input[type="submit"]:not([class]) {
+    height: var(--lg-control);
+    padding: 0 10px;
+    border: 1px solid var(--lg-accent-hover);
+    border-radius: var(--lg-radius);
+    background: var(--lg-accent);
+    color: var(--lg-on-accent);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Show: a ledger page, each field a ruled line with its label in a shaded column. */
+
+[data-taack-theme="ledger"] .taackShow {
+    padding: 8px;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] .taackShow:not(.taackShowGrid) {
+    container: lg-show / inline-size;
+    max-width: 820px;
+}
+
+/* A grid sheet would shrink beside the status tags an app floats above it, down to a few letters per line. */
+[data-taack-theme="ledger"] .taackShowFields:not(.taackShowGrid .taackShowFields) {
+    --lg-show-label: var(--lg-label-width);
+    display: grid;
+    grid-template-columns: var(--lg-show-label) minmax(0, 1fr);
+    clear: both;
+    margin: 0;
+    border: 1px solid var(--lg-grid);
+    border-bottom: 0;
+}
+
+/* An app's show-level icon floats too. Anchored to the end of the row below it, it takes no width from the sheet. */
+[data-taack-theme="ledger"] :is(.taackShow, .taackShowSection) > .icon {
+    position: relative;
+    height: 0;
+}
+
+/* Sized to the app's 22 px cap on the icon: a link sized by its floated image alone collapses to nothing. */
+[data-taack-theme="ledger"] :is(.taackShow, .taackShowSection) > .icon > a {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    z-index: 1;
+    width: 22px;
+    height: 22px;
+}
+
+/* A narrow column keeps label and value side by side on a narrower label column, and stacks them only when even that leaves the value too little room. */
+@container lg-show (width < 420px) {
+    [data-taack-theme="ledger"] .taackShowFields:not(.taackShowGrid .taackShowFields) {
+        --lg-show-label: 112px;
+    }
+}
+
+@container lg-show (width < 260px) {
+    [data-taack-theme="ledger"] .taackShowFields:not(.taackShowGrid .taackShowFields) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    [data-taack-theme="ledger"] .property-list:not(.taackShowGrid) .fieldcontain .property-label {
+        border-right: 0;
+    }
+}
+
+[data-taack-theme="ledger"] .property-list:not(.taackShowGrid) .fieldcontain {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    min-height: var(--lg-row);
+    border-bottom: 1px solid var(--lg-grid);
+}
+
+[data-taack-theme="ledger"] .property-list:not(.taackShowGrid) .fieldcontain:hover > .property-value {
+    background: var(--lg-hover);
+}
+
+[data-taack-theme="ledger"] .property-list:not(.taackShowGrid) .fieldcontain .property-label {
+    width: auto;
+    margin: 0;
+    padding: 4px var(--lg-cell-x);
+    border-right: 1px solid var(--lg-grid);
+    background: var(--lg-surface-2);
+    color: var(--lg-text-2);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+    text-align: left;
+}
+
+/* An app can make the value itself a tag. It shrinks to a stamp in the value cell instead of filling the line. */
+[data-taack-theme="ledger"] .property-list:not(.taackShowGrid) .fieldcontain > .property-value.tag {
+    justify-self: start;
+    align-self: center;
+    height: 17px;
+    margin: 0 var(--lg-cell-x);
+    padding: 0 4px;
+    line-height: 15px;
+}
+
+/* break-word, not anywhere: anywhere also drops the value's minimum width to one letter, so a squeezed sheet breaks every word instead of growing. */
+[data-taack-theme="ledger"] .fieldcontain .property-value {
+    color: var(--lg-text);
+    overflow-wrap: break-word;
+}
+
+[data-taack-theme="ledger"] .property-list:not(.taackShowGrid) .fieldcontain .property-value {
+    margin: 0;
+    padding: 3px var(--lg-cell-x);
+    line-height: 17px;
+}
+
+/* Form: a ruled input sheet. Each field is a line with its label in a shaded cell, so a long form scans like a show. */
+
+[data-taack-theme="ledger"] form.taackForm {
+    max-width: 820px;
+    padding: 8px 10px 0;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] form.taackForm fieldset {
+    display: grid;
+    grid-template-columns: var(--lg-label-width) minmax(0, 1fr);
+    grid-auto-flow: row dense;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+    padding: 4px 0 10px;
+    font-size: 12px;
+}
+
+[data-taack-theme="ledger"] form.taackForm:has([taacktag="COL"]) {
+    max-width: none;
+}
+
+/* A column cell is a container too, so a field placed straight in a narrow column, with no section around it, still stacks. */
+[data-taack-theme="ledger"] form.taackForm :is([taacktag="SECTION"], .row[taacktag="COL"] > :is(.col, [class*="col-"])) {
+    container-type: inline-size;
+}
+
+[data-taack-theme="ledger"] form.taackForm fieldset > * {
+    grid-column: 1 / -1;
+}
+
+[data-taack-theme="ledger"] form.taackForm legend {
+    margin: 0 0 4px;
+    padding: 0;
+    color: var(--lg-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+[data-taack-theme="ledger"] form.taackForm fieldset > div:not(.form-floating):has(> .form-floating) {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-auto-flow: row dense;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+}
+
+/* The wrapper can be a Bootstrap row, whose column widths and gutters would shrink each grid item. */
+[data-taack-theme="ledger"] form.taackForm fieldset > div:not(.form-floating):has(> .form-floating) > * {
+    width: auto;
+    margin-top: 0;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+/*
+ * A field sets its own label column rather than a subgrid, because a field in a tab pane, a column
+ * or straight in the form has no fieldset grid to share, and a subgrid there sizes each label to its text.
+ * Each field draws a full frame and overlaps the one above by its width, so stacked fields share one rule.
+ */
+[data-taack-theme="ledger"] form.taackForm .form-floating {
+    display: grid;
+    grid-template-columns: var(--lg-label-width) minmax(0, 1fr);
+    grid-column: 1 / -1;
+    align-items: stretch;
+    gap: 0;
+    margin: -1px 0 0;
+    border: 1px solid var(--lg-grid);
+    background: var(--lg-surface);
+    isolation: isolate;
+}
+
+/* Bootstrap's mb-1 on each field is !important, so the next field reaches up over it instead. */
+[data-taack-theme="ledger"] form.taackForm .form-floating.mb-1 + .form-floating {
+    margin-top: calc(-0.25rem - 1px);
+}
+
+[data-taack-theme="ledger"] form.taackForm .form-floating:first-child {
+    margin-top: 0;
+}
+
+[data-taack-theme="ledger"] form.taackForm .form-floating:focus-within {
+    z-index: 1;
+    border-color: var(--lg-accent);
+}
+
+/*
+ * A rowCols row outside a section asks for its fields side by side, as a dashboard's filter strip does.
+ * Each field is then a column of the strip, its label a header cell over its control, and the cells
+ * share their rules. A section flattens the same row into its label column instead (above).
+ */
+[data-taack-theme="ledger"] form.taackForm:has(.row[class*="row-cols-"]:not(.row-cols-1, fieldset .row)) {
+    max-width: none;
+}
+
+[data-taack-theme="ledger"] form.taackForm .row[class*="row-cols-"]:not(.row-cols-1, fieldset .row) {
+    --bs-gutter-x: 0;
+    --bs-gutter-y: 0;
+    margin: 0 0 8px 1px;
+}
+
+[data-taack-theme="ledger"] form.taackForm .row[class*="row-cols-"]:not(.row-cols-1, fieldset .row) > .form-floating {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    margin: 0 0 0 -1px;
+}
+
+/* Undoes each field's mb-1, an !important utility, so the strip's cells line up along one bottom rule. */
+[data-taack-theme="ledger"] form.taackForm .row[class*="row-cols-"]:not(.row-cols-1, fieldset .row) > .form-floating.mb-1 {
+    margin-bottom: 0 !important;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .row[class*="row-cols-"]:not(.row-cols-1, fieldset .row) > .form-floating > label {
+    border-right: 0;
+    border-bottom: 1px solid var(--lg-grid);
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .row[class*="row-cols-"]:not(.row-cols-1, fieldset .row) > .form-floating > :is(.form-control, .form-select, .form-text) {
+    grid-column: 1;
+    grid-row: auto;
+}
+
+[data-taack-theme="ledger"] form.taackForm .row[class*="row-cols-"]:not(.row-cols-1, fieldset .row) > .form-floating > .deleteIconM2M {
+    top: auto;
+    bottom: 5px;
+}
+
+/* An editor widget, such as the markdown one, takes the whole row. */
+[data-taack-theme="ledger"] form.taackForm .form-floating > div:not(.form-text) {
+    grid-column: 1 / -1;
+    padding: 3px;
+    border-top: 1px solid var(--lg-grid);
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > label {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    grid-column: 1;
+    grid-row: 1;
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 3px var(--lg-cell-x);
+    margin: 0;
+    border: 0;
+    border-right: 1px solid var(--lg-grid);
+    background: var(--lg-surface-2);
+    transform: none;
+    color: var(--lg-text-2);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 14px;
+    white-space: normal;
+    overflow: visible;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > label::after {
+    content: none;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .taackRequired {
+    color: var(--lg-danger);
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating:has(> textarea, > select[multiple]) > label {
+    align-items: flex-start;
+    padding-top: 6px;
+}
+
+/* Controls sit flush in their cell: the field's frame is the box, and the control only shows its own edge on focus. */
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-control,
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-select {
+    grid-column: 2;
+    grid-row: 1;
+    height: var(--lg-field);
+    min-height: var(--lg-field);
+    padding: 0 var(--lg-cell-x);
+    border-color: transparent;
+    border-radius: 0;
+    background-color: var(--lg-surface);
+    line-height: 22px;
+    font-size: 12px;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-select {
+    padding-right: 22px;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > :is(.form-control, .form-select):focus {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > :is(.form-control, .form-select):disabled,
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-control[readonly]:not([taackajaxformm2oaction], [taackajaxformm2maction]) {
+    background-color: var(--lg-zebra);
+    color: var(--lg-text-2);
+}
+
+/* A textarea grows with its text, so a long value reads without scrolling a box a few lines tall. */
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > textarea.form-control {
+    field-sizing: content;
+    height: auto;
+    min-height: 66px;
+    max-height: 24lh;
+    padding: 4px var(--lg-cell-x);
+    line-height: 1.45;
+}
+
+[data-taack-theme="ledger"] form.taackForm .form-floating > .form-text,
+[data-taack-theme="ledger"] form.taackForm fieldset > .form-text {
+    grid-column: 2;
+    margin: 0;
+    padding: 0 var(--lg-cell-x) 3px;
+    font-size: 11px;
+    color: var(--lg-danger);
+}
+
+[data-taack-theme="ledger"] form.taackForm :is(fieldset, fieldset > div:not(.form-floating):has(> .form-floating)) > .form-check-input {
+    grid-column: 2;
+    justify-self: start;
+    width: 14px;
+    height: 14px;
+    margin: 5px var(--lg-cell-x);
+}
+
+/*
+ * A checkbox field is a bare checkbox and label with no wrapper, so the label draws the whole ruled line:
+ * its own shaded cell, and through ::after the value cell's frame across the section, which is a size container.
+ */
+[data-taack-theme="ledger"] form.taackForm :is(fieldset, fieldset > div:not(.form-floating):has(> .form-floating)) > label.form-label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    grid-column: 1;
+    min-height: var(--lg-row);
+    margin: -1px 0 0;
+    padding: 3px var(--lg-cell-x);
+    border: 1px solid var(--lg-grid);
+    background: var(--lg-surface-2);
+    color: var(--lg-text-2);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 14px;
+}
+
+[data-taack-theme="ledger"] form.taackForm [taacktag="SECTION"] :is(fieldset, fieldset > div:not(.form-floating):has(> .form-floating)) > label.form-label::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: 100%;
+    width: calc(100cqw - var(--lg-label-width));
+    border: 1px solid var(--lg-grid);
+    border-left: 0;
+    pointer-events: none;
+}
+
+[data-taack-theme="ledger"] form.taackForm .form-floating.mb-1 + input[type="hidden"] + .form-check-input + label.form-label {
+    margin-top: calc(-0.25rem - 1px);
+}
+
+/* Checkboxes laid out inline in a column, each checkbox before its label, are spaced as pairs. */
+[data-taack-theme="ledger"] form.taackForm .col > .form-check-input {
+    margin: 0 6px 0 0;
+    vertical-align: -2px;
+}
+
+[data-taack-theme="ledger"] form.taackForm .col > .form-check-input + label.form-label {
+    margin: 0 18px 0 0;
+}
+
+[data-taack-theme="ledger"] form.taackForm .form-floating > .deleteIconM2M {
+    top: 5px;
+    right: 6px;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    opacity: 0.55;
+    cursor: pointer;
+}
+
+[data-taack-theme="ledger"] .deleteIconM2M {
+    filter: grayscale(1);
+}
+
+[data-taack-theme="ledger"][data-bs-theme="dark"] .deleteIconM2M {
+    filter: grayscale(1) invert(1);
+}
+
+[data-taack-theme="ledger"] form.taackForm input[readonly][taackajaxformm2oaction],
+[data-taack-theme="ledger"] form.taackForm input[readonly][taackajaxformm2maction] {
+    cursor: pointer;
+}
+
+:root[data-taack-theme="ledger"] form.taackForm .form-floating:has(> .deleteIconM2M) > .form-control {
+    padding-right: 28px;
+}
+
+/* A relation field opens a table to pick from, so its cell ends in a ruled-off lookup cell showing a small table, and the clear icon moves in front of it. */
+:root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-control:is([taackajaxformm2oaction], [taackajaxformm2maction]):not(:disabled) {
+    padding-right: 50px;
+    background-image: var(--lg-lookup-icon), linear-gradient(var(--lg-grid), var(--lg-grid)), linear-gradient(var(--lg-surface-2), var(--lg-surface-2));
+    background-position: right 5px center, right 22px top, right top;
+    background-size: 12px 12px, 1px 100%, 22px 100%;
+    background-repeat: no-repeat;
+}
+
+[data-taack-theme="ledger"] form.taackForm .form-floating:has(> .form-control:is([taackajaxformm2oaction], [taackajaxformm2maction]):not(:disabled)) > .deleteIconM2M {
+    right: 28px;
+}
+
+/* A second picker for the same relation repeats the label, so only the first one shows it. */
+:root[data-taack-theme="ledger"] form.taackForm .M2MParent ~ .form-floating > label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* A field in a narrow section or form column narrows its label cell, and stacks the label above its control only when that is too tight. */
+@container (max-width: 440px) {
+    [data-taack-theme="ledger"] form.taackForm :is(fieldset, .form-floating) {
+        --lg-label-width: 108px;
+    }
+}
+
+/* A checkbox field is left out: its control needs no more room than the narrow label cell leaves, so it keeps its line. */
+@container (max-width: 300px) {
+    :root[data-taack-theme="ledger"] form.taackForm .form-floating > label {
+        grid-column: 1 / -1;
+        border-right: 0;
+    }
+
+    :root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-control,
+    :root[data-taack-theme="ledger"] form.taackForm .form-floating > .form-select,
+    [data-taack-theme="ledger"] form.taackForm .form-floating > .form-text {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    /* The label now sits above the control, so the clear icon anchors to the control's row at the bottom. */
+    [data-taack-theme="ledger"] form.taackForm .form-floating > .deleteIconM2M {
+        top: auto;
+        bottom: 5px;
+    }
+}
+
+[data-taack-theme="ledger"] form.taackForm > .d-flex {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    justify-content: flex-end;
+    gap: 6px;
+    margin: 0 -10px;
+    padding: 5px 10px;
+    /* A form is capped at 820 px, but its save bar spans the block: the border image paints past the form's right edge without widening it. */
+    border-image: linear-gradient(var(--lg-border) 0 1px, var(--lg-surface-2) 1px) fill 0 / 0 / 0 100vmax 0 0;
+}
+
+/* Undoes the button's w-75, an !important utility, so a long action label stays on one line. */
+[data-taack-theme="ledger"] :is(form.taackForm, form.filter) > .d-flex > .btn {
+    width: auto !important;
+    margin: 0;
+}
+
+/* Modal as a side pane, so the table it came from stays in view. */
+
+[data-taack-theme="ledger"] .modal-backdrop {
+    --bs-backdrop-bg: #08121f;
+    --bs-backdrop-opacity: 0.35;
+}
+
+[data-taack-theme="ledger"] .modal-dialog:not(.modal-fullscreen) {
+    width: min(var(--lg-drawer-width), 100vw);
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    min-height: 100%;
+    margin: 0 0 0 auto;
+    align-items: stretch;
+}
+
+[data-taack-theme="ledger"] .modal-dialog:not(.modal-fullscreen) > div.modal-content {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    resize: none;
+    border: 0;
+    border-left: 1px solid var(--lg-border-strong);
+    border-radius: 0;
+    box-shadow: var(--lg-shadow);
+}
+
+[data-taack-theme="ledger"] .modal-header {
+    gap: 2px;
+    height: 32px;
+    padding: 0 6px;
+    border-bottom: 1px solid var(--lg-border-strong);
+    border-radius: 0;
+    background: var(--lg-surface-2);
+}
+
+[data-taack-theme="ledger"] .modal-header > .modal-title {
+    padding-left: 4px;
+    color: var(--lg-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+[data-taack-theme="ledger"] .btn-taack-close,
+[data-taack-theme="ledger"] .btn-taack-fullscreen,
+[data-taack-theme="ledger"] .btn-taack-minimize {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lg-radius);
+    color: var(--lg-text-2);
+    opacity: 1;
+}
+
+[data-taack-theme="ledger"] .btn-taack-close:hover,
+[data-taack-theme="ledger"] .btn-taack-fullscreen:hover,
+[data-taack-theme="ledger"] .btn-taack-minimize:hover {
+    background: var(--lg-hover);
+    color: var(--lg-text);
+}
+
+[data-taack-theme="ledger"] .btn-taack-close svg,
+[data-taack-theme="ledger"] .btn-taack-fullscreen svg,
+[data-taack-theme="ledger"] .btn-taack-minimize svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* intranet3's last.css lifts the body 1em into Taack's padded header; this header has no such padding, so the lift put the form over it. */
+[data-taack-theme="ledger"] .modal-body {
+    top: 0;
+    padding: 0;
+}
+
+[data-taack-theme="ledger"] .modal-body form.taackForm {
+    --lg-label-width: 124px;
+    max-width: none;
+}

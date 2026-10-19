@@ -11,6 +11,7 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
+import taack.ui.dsl.filter.FilterLayout
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.kanban.IUiKanbanVisitor
@@ -232,9 +233,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitTableFilter(final String id,
+                          final FilterLayout layout,
                           final UiFilterSpecifier filterSpecifier,
                           final UiTableSpecifier tableSpecifier) {
         blockLog.logStayBlock('visitTableFilter ' + id)
+        if (layout) blockLog.topElement.putAttr('data-filter-layout', layout.name().toLowerCase())
         visitCol(BlockSpec.Width.QUARTER)
         IUiTableVisitor tableVisitor = new RawHtmlTableDump(blockLog, id, parameter)
         IUiFilterVisitor filterVisitor = new RawHtmlFilterDump(blockLog, id, parameter)

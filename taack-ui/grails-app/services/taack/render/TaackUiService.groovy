@@ -29,6 +29,7 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.*
+import taack.ui.dump.html.theme.ThemeLook
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
@@ -193,6 +194,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
             ThemeSize themeSize = themeSelector.themeSize
             ThemeMode themeMode = themeSelector.themeMode
             ThemeMode themeAuto = themeSelector.themeAuto
+            ThemeLook themeLook = themeSelector.themeLook
 
 
 //            ModelAndView mv = new ModelAndView('/taackUi/blockNoLayout', [
@@ -215,6 +217,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
                     params.lang as String,
                     themeMode,
                     themeAuto,
+                    themeLook,
                     htmlBlock,
                     menuBlock
             )
@@ -560,17 +563,19 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
         show(TaackUi.createModal(closure))
     }
 
-    private void noTemplate(String lang, ThemeMode themeMode, ThemeMode themeAuto, RawHtmlBlockDump htmlBlock, RawHtmlBlockDump menuBlock, String... paramsToKeep) {
+    private void noTemplate(String lang, ThemeMode themeMode, ThemeMode themeAuto, ThemeLook themeLook, RawHtmlBlockDump htmlBlock, RawHtmlBlockDump menuBlock, String... paramsToKeep) {
 
 //        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
 
         BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, bufferSize)
 
         TaackUiConfiguration conf
+        String lookAttribute = themeLook.themeAttribute ? " data-taack-theme=${themeLook.themeAttribute}" : ''
+        String lookStylesheet = themeLook.themeAttribute ? "<link rel=\"stylesheet\" href=\"/assets/taack-${themeLook.themeAttribute}.css\"/>" : ''
         bout << """\
 <!DOCTYPE html>
 
-<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
+<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}${lookAttribute}>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
@@ -604,6 +609,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
     }
     </style>
     <link rel="stylesheet" href="/assets/application-taack.css"/>
+    ${lookStylesheet}
 
     <link rel="icon" type="image/png" href="/assets/favicon.png"/>
 </head>
