@@ -37,10 +37,10 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     private var forms: List<Form> = mutableListOf()
     private var shows: List<Show> = mutableListOf()
     private var diagrams: List<Diagram> = mutableListOf()
-    private var progressId: String = ""
-    private val onPoll: TimerHandler = { onPoll() }
+//    private var progressId: String = ""
+//    private val onPoll: TimerHandler = { onPoll() }
 
-    private val innerScripts = d.getElementsByTagName("script")
+    private val innerScripts = d.querySelectorAll("script[postExecute='true']")
 
     init {
         Helper.traceIndent("AjaxBlock::init +++ blockId: $blockId")
@@ -50,29 +50,29 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
     }
 
 
-    private fun onPoll() {
-        Helper.trace("AjaxBlock::onPoll")
-        val xhr = XMLHttpRequest()
-        xhr.onloadend = EventHandler {
-            checkLogin(xhr)
-            Helper.processAjaxLink(null, xhr.responseText, parent)
-        }
-        xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true", true)
-        xhr.send()
-    }
+//    private fun onPoll() {
+//        Helper.trace("AjaxBlock::onPoll")
+//        val xhr = XMLHttpRequest()
+//        xhr.onloadend = EventHandler {
+//            checkLogin(xhr)
+//            Helper.processAjaxLink(null, xhr.responseText, parent)
+//        }
+//        xhr.open(RequestMethod.GET,"/progress/drawProgress/$progressId?isAjax=true&refresh=true", true)
+//        xhr.send()
+//    }
 
-    private fun poolDrawProgress(blockId: String) {
-        progressId = blockId.substring(13)
-        Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
-        setTimeout(Duration.parse("1s"), onPoll)
-        Helper.traceDeIndent("poolDrawProgress::start ---")
-    }
+//    private fun poolDrawProgress(blockId: String) {
+//        progressId = blockId.substring(13)
+//        Helper.traceIndent("poolDrawProgress::start +++ progressId: $progressId")
+//        setTimeout(Duration.parse("1s"), onPoll)
+//        Helper.traceDeIndent("poolDrawProgress::start ---")
+//    }
 
     fun refresh() {
         Helper.traceIndent("AjaxBlock::refresh +++ blockId: $blockId")
-        if (blockId.startsWith("drawProgress=")) {
-            poolDrawProgress(blockId)
-        }
+//        if (blockId.startsWith("drawProgress=")) {
+//            poolDrawProgress(blockId)
+//        }
         filters = Filter.getSiblingFilterBlock(this).associateBy { it.filterId + blockId }
         tables = Table.getSiblingTable(this).associateBy { it.tableId + blockId }
         kanbans = Kanban.getSiblingKanban(this).associateBy { it.kanbanId + blockId }
@@ -88,11 +88,11 @@ class AjaxBlock(val parent: Block, val d: HTMLDivElement) :
         Helper.traceDeIndent("AjaxBlock::refresh --- ")
     }
 
-    fun updateContent(newContent: String) {
-        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
-        d.innerHTML = HtmlSource(newContent)
-        refresh()
-    }
+//    fun updateContent(newContent: String) {
+//        Helper.trace("AjaxBlock::updateContent ... ${d.className}")
+//        d.innerHTML = HtmlSource(newContent)
+//        refresh()
+//    }
 
     override fun getParentBlock(): Block {
         return parent
