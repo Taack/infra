@@ -31,6 +31,16 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.ParseException
 
+/**
+ * Service managing automated data binding, validation, audit trailing, and persistence of GORM entities from HTTP form submissions.
+ * <p>
+ * Features include:
+ * <ul>
+ * <li>Field locking enforcement via {@link FieldInfo}</li>
+ * <li>Custom field saving hooks registered with {@link #registerFieldCustomSavingClosure}</li>
+ * <li>Automatic audit tracking (user created/updated, date created/updated, domain history)</li>
+ * <li>Form validation and AJAX response rendering</li>
+ * </ul>*/
 @GrailsCompileStatic
 class TaackSaveService implements ResponseRenderer, ServletAttributes {
     TaackUiService taackUiService
@@ -40,34 +50,20 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
     private final static Map<String, Closure> fieldCustomSavingClosures = [:]
 
     /**
-     * Allow to register a custom save for specific field when saving a gormEntity.
+     * Registers a custom saving closure for a specific entity field.
      *
-     * Example:
-     *      TaackSaveService.registerFieldCustomSavingClosure('projectName', { GormEntity gormEntity, Map params ->
-     *          if (gormEntity instaceof Project) {
-     *              gormEntity.projectName = 'CUSTOM_' + gormEntity.projectName
-     *              // gormEntity.projectName = 'CUSTOM_' + params['projectName']
-     *          }
-     *      }
-     *
-     * @param fieldName : Name of target field
-     * @param closure : Custom saving process
+     * @param fieldName the target field name
+     * @param closure closure executing the custom save logic: {@code (GormEntity entity, Map params) -> ...}
      */
     static final void registerFieldCustomSavingClosure(String fieldName, Closure closure) {
         fieldCustomSavingClosures.put(fieldName, closure)
     }
-
-//    static <D extends GormEntity> boolean beanIsOwnerLocking(D entity) {
-//        boolean ret = false
-//        return ret
-//    }
 
     final String urlMapped(String controller, String action, Map<String, ? extends Object> params = null, boolean isAjax = false) {
         def p = params
         if (isAjax && params && !params.containsKey('isAjax')) {
             p = new HashMap<String, Object>()
             p.putAll(params)
-//            p.remove('recordState')
             p.put('isAjax', true)
         }
         grailsApplication.mainContext.getBean(ApplicationTagLib).createLink(controller: controller, action: action, params: p)
@@ -81,7 +77,6 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 params.containsKey(it.name)
                 p.put(it.name, params[it.name])
             }
-//            p.remove('recordState')
             p.put('isAjax', true)
         }
         grailsApplication.mainContext.getBean(ApplicationTagLib).createLink(controller: controller, action: action, params: p)
@@ -99,34 +94,46 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         }
     }
 
-//    static <D extends GormEntity> boolean beanIsLocked(D entity) {
-//        Class beanClass = beanRealClass(entity)
-////        if (IUserInterface.isAssignableFrom(beanClass) && beanClass.getAt('enumTransition')) {
-////            IEnumTransition enumTransition = entity.getAt(beanClass.getAt('enumTransition') as String) as IEnumTransition
-////            if (enumTransition.lockedFields?.contains('*') && enumTransition.lockedFields?.size() == 1) {
-////                return true
-////            }
-////        }
-//        return beanIsOwnerLocking(entity)
-//    }
-
     private static <D extends GormEntity> D getGorm(Long id, Class<D> classD, Session session) {
-//        GormEntity gormEntity = ((GormStaticApi<D>) GormEnhancer.findEntity(classD)).get(id)
         D gormEntity = id ? session.find(classD, id) : classD.getDeclaredConstructor().newInstance()
-//        if (!gormEntity) gormEntity = classD.getDeclaredConstructor().newInstance()
         return gormEntity
     }
-
+    /**
+     * Binds request parameters and validates the entity without persisting it to the database.
+     *
+     * @param aClass GORM entity class
+     * @param lockedFields optional array of fields protected from binding
+     * @return the bound, unpersisted entity instance
+     */
     final <T extends GormEntity> T prepareSave(final Class<T> aClass, final FieldInfo[] lockedFields = null) {
         save(aClass, lockedFields, true)
     }
 
+    /**
+     * Binds request parameters to an entity resolved by {@code params.id} (or creates a new instance) and persists it.
+     *
+     * @param aClass GORM entity class
+     * @param lockedFields optional array of fields protected from binding
+     * @param doNotSave if {@code true}, validates and binds without executing {@code save()}
+     * @return the bound entity instance
+     */
     final <T extends GormEntity> T save(final Class<T> aClass, final FieldInfo[] lockedFields = null, final boolean doNotSave = false) {
         final Long id = params.long('id')
         T gormEntity = getGorm(id, aClass, sessionFactory.currentSession)
         save(gormEntity, lockedFields, doNotSave)
     }
 
+    /**
+     * Binds request parameters to entity fields with type conversion, field-locking enforcement, and dirty checking.
+     * <p>
+     * Handles enums, date parsing, numbers (locale-sensitive), collections of GORM entities, nested maps,
+     * and triggers any registered custom saving closures.
+     *
+     * @param gormEntity the target entity instance to populate
+     * @param p the HTTP request parameters map
+     * @param lockedFields optional array of locked fields; if the first element is {@code null},
+     *                     acts as an allowlist (only subsequent fields are editable)
+     */
     final void bindObject(Object gormEntity, GrailsParameterMap p, final FieldInfo[] lockedFields = null) {
         boolean isDirtyCheckable = false
         if (DirtyCheckable.isAssignableFrom(gormEntity.class)) {
@@ -142,20 +149,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                     for (String key in belongsToProps) {
                         if (params[key] instanceof Map) {
                             Map km = params[key]
-                            if (km.size() == 1 && km.containsKey('id'))
-                                belongsToKey.put key, km['id'].toString().toLong()
-                            else throw new SecurityException('Attempt to change pointed data')
+                            if (km.size() == 1 && km.containsKey('id')) belongsToKey.put key, km['id'].toString().toLong() else throw new SecurityException('Attempt to change pointed data')
                         }
                     }
                 }
             }
         }
 
-        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll { Field f ->
-            !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) &&
-                    !(f.name.contains('_') || f.name.contains('$')) &&
-                    !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) &&
-                    (f.name in p.keySet() || f.name in belongsToKey.keySet())
+        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll { Field f -> !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) && !(f.name.contains('_') || f.name.contains('$')) && !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) && (f.name in p.keySet() || f.name in belongsToKey.keySet())
         }
 
         for (Field includedField in classFields) {
@@ -176,8 +177,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 }
             } else if (Map.isAssignableFrom(includedField.type)) {
                 Map entries = [:]
-                Set<String> mapKeys = p.keySet().findAll { it ->
-                    it.toString().startsWith(includedField.name + '.')
+                Set<String> mapKeys = p.keySet().findAll { it -> it.toString().startsWith(includedField.name + '.')
                 }
                 for (mapKey in mapKeys) {
                     if (mapKey.count('.') == 1) {
@@ -310,7 +310,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                                     if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                                 }
                             }
-                        } catch (ParseException|NumberFormatException|IllegalArgumentException parseException) {
+                        } catch (ParseException | NumberFormatException | IllegalArgumentException parseException) {
                             log.error(parseException.message)
                             (gormEntity as GormEntity).errors.rejectValue(includedField.name, i18n, [params[includedField.name]] as Object[], null)
 //                            gormEntity.properties[includedField.name] = params[includedField.name]
@@ -331,11 +331,21 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 }
             }
         }
-        gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each {
-            fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
+        gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName -> fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
         }
     }
 
+    /**
+     * Binds request parameters, updates audit metadata (creator, updater), handles domain history cloning,
+     * validates, and persists the GORM entity.
+     *
+     * @param gormEntity the entity instance to save
+     * @param lockedFields optional array of protected fields [null, f1, f2, ...] lock all field but f1, f2, ... but [f1, f2, ...] lock field f1, f2, ...
+     * @param doNotSave if {@code true}, validates and binds without calling {@code save(flush: true)}
+     * @param doNotBindParams if {@code true}, skips parameter binding (useful for internal history saves)
+     * @return the processed entity instance
+     * @throws SecurityException if all fields are locked or binding security is violated
+     */
     final <T extends GormEntity> T save(final T gormEntity, final FieldInfo[] lockedFields = null, final boolean doNotSave = false, boolean doNotBindParams = false) {
         final id = gormEntity.ident()
         if (lockedFields != null && lockedFields.size() == 0) {
@@ -384,7 +394,13 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
 
         return gormEntity
     }
-
+    /**
+     * Formats validation errors into Taack-specific HTML markup delimited by
+     * {@code __ErrorKeyStart__<field>:<errors>__ErrorKeyEnd__} for client-side field highlighting.
+     *
+     * @param errors the Spring/Grails validation errors
+     * @return HTML string formatted for Taack UI error rendering
+     */
     def renderErrors(Errors errors) {
         Map<String, List<String>> fieldErrors = [:]
         errors.fieldErrors.each {
@@ -399,6 +415,13 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         }.join('')
     }
 
+    /**
+     * Evaluates validation on a {@link Validateable} object; renders errors if invalid,
+     * or outputs the {@code '__reload__'} client instruction on success.
+     *
+     * @param validateable the command object or validateable instance to check
+     * @return rendered error markup or {@code '__reload__'}
+     */
     def reloadOrRenderErrors(Validateable validateable) {
         if (validateable.hasErrors()) {
             return renderErrors(validateable.errors)
@@ -407,6 +430,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         }
     }
 
+    /**
+     * Evaluates a {@link Validateable} object; renders errors if invalid, or generates a client
+     * redirection instruction ({@code '__redirect__<url>'}) using the validateable properties as parameters.
+     *
+     * @param validateable the command object to validate
+     * @param redirectAction method closure of the target action (or {@code null} to emit {@code '__reload__'})
+     * @return rendered error markup, a {@code '__redirect__...'} token, or {@code '__reload__'}
+     */
     def redirectOrRenderErrors(Validateable validateable, final MC redirectAction = null) {
         if (validateable.hasErrors()) {
             return renderErrors(validateable.errors)
@@ -417,6 +448,14 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         }
     }
 
+    /**
+     * Evaluates a {@link GormEntity}; renders errors if invalid, or generates a client
+     * redirection instruction ({@code '__redirect__<url>/<id>'}) targeting the entity.
+     *
+     * @param gormEntity the entity to validate
+     * @param redirectAction method closure of the target action (or {@code null} to emit {@code '__reload__'})
+     * @return rendered error markup, a {@code '__redirect__...'} token, or {@code '__reload__'}
+     */
     def redirectOrRenderErrors(final GormEntity gormEntity, final MC redirectAction = null) {
         if (gormEntity.hasErrors()) {
             return renderErrors(gormEntity.errors)
@@ -427,15 +466,36 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         }
     }
 
-    // TODO: Implement cases where formSpecifier is not null
+    /**
+     * Binds and saves an entity of type {@code aClass}, then redirects to the target action
+     * on success or renders validation errors on failure.
+     *
+     * @param aClass GORM entity class
+     * @param redirectAction method closure of the destination action
+     * @param lockedFields optional array of protected fields
+     */
     void saveThenRedirectOrRenderErrors(final Class<? extends GormEntity> aClass, final MC redirectAction, final FieldInfo[] lockedFields = null) {
         redirectOrRenderErrors(save(aClass, lockedFields), redirectAction)
     }
 
+    /**
+     * Binds and saves an entity of type {@code aClass}, then triggers a page reload ({@code '__reload__'})
+     * on success or renders validation errors on failure.
+     *
+     * @param aClass GORM entity class
+     * @param lockedFields optional array of protected fields
+     */
     void saveThenReloadOrRenderErrors(final Class<? extends GormEntity> aClass, final FieldInfo[] lockedFields = null) {
         redirectOrRenderErrors(save(aClass, lockedFields), null)
     }
 
+    /**
+     * Persists the entity and returns either the validation errors or a UI instruction to close the current modal and refresh.
+     *
+     * @param aClass GORM entity class to bind and save
+     * @param lockedFields optional array of fields protected from binding
+     * @return HTML error markup if invalid, or {@code ''} on success
+     */
     def saveOrRenderErrors(final Class<? extends GormEntity> aClass, final FieldInfo[] lockedFields = null) {
         GormEntity gormEntity = save(aClass, lockedFields)
         if (gormEntity.hasErrors()) {
@@ -443,6 +503,13 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         } else render ''
     }
 
+    /**
+     * Persists the entity and returns either the validation errors or a UI instruction to close the current modal and refresh.
+     *
+     * @param aClass GORM entity class to bind and save
+     * @param lockedFields optional array of fields protected from binding
+     * @return HTML error markup if invalid, or {@code '__closeLastModalAndRefresh__'} on success
+     */
     def saveOrCloseModalAndRefresh(final Class<? extends GormEntity> aClass, final FieldInfo[] lockedFields = null) {
         GormEntity gormEntity = save(aClass, lockedFields)
         if (gormEntity.hasErrors()) {
@@ -450,6 +517,13 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
         } else render '__closeLastModalAndRefresh__'
     }
 
+    /**
+     * Renders a UI block if the entity has no validation errors, or returns the rendered errors otherwise.
+     *
+     * @param gormEntity the validated entity
+     * @param blockSpecifier the UI block to render on success
+     * @return error markup if errors exist, or visits the block specifier
+     */
     def displayBlockOrRenderErrors(final GormEntity gormEntity, final UiBlockSpecifier blockSpecifier) {
         if (gormEntity.hasErrors()) {
             return renderErrors(gormEntity.errors)
