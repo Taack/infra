@@ -199,12 +199,10 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 if (GormEntity.isAssignableFrom(genericType)) {
                     List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
                     if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
-                        Collection<GormEntity> gormEntityField = gormEntity[includedField.name] as Collection<GormEntity>
-                        gormEntityField.clear()
                         // The other way is to add only new elements / remove only some elements ...
-                        gormEntityField.addAll(p.list(includedField.name).collect {
-                            getGorm(it as Long, genericType as Class<GormEntity>, sessionFactory.currentSession)
-                        } as Collection<GormEntity>)
+                        gormEntity[includedField.name] = ids.collect {
+                            getGorm(it, genericType as Class<GormEntity>, sessionFactory.currentSession)
+                        } as Collection<GormEntity>
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
                 } else if (genericType.isEnum()) {
@@ -212,19 +210,15 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                         Enum.valueOf(genericType as Class<Enum>, it.toString())
                     }
                     if ((gormEntity[includedField.name] as Collection<Enum>)*.name() as Set<String> != enums*.name() as Set<String>) {
-                        Collection<Enum> enumField = gormEntity[includedField.name] as Collection<Enum>
-                        enumField.clear()
                         // The other way is to add only new elements / remove only some elements ...
-                        enumField.addAll(enums)
+                        gormEntity[includedField.name] = enums
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
                 } else if (String.isAssignableFrom(genericType)) {
                     List<String> strings = p.list(includedField.name).grep { !it.toString().empty }
                     if (gormEntity[includedField.name] as Set<String> != strings as Set<String>) {
-                        Collection<String> stringField = gormEntity[includedField.name] as Collection<String>
-                        stringField.clear()
                         // The other way is to add only new elements / remove only some elements ...
-                        stringField.addAll(strings)
+                        gormEntity[includedField.name] = strings
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
 
