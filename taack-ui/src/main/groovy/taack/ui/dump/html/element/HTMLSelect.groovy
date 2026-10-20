@@ -33,8 +33,8 @@ final class HTMLOption implements IHTMLElement {
 @CompileStatic
 final class HTMLSelect implements IHTMLElement {
 
-    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean disabled = false, String defaultOptionLabel = null) {
-        if (defaultOptionLabel != null) addChildren(new HTMLOption(new EnumOption(null, defaultOptionLabel), false))
+    HTMLSelect(IEnumOptions options, boolean multiple = false, boolean disabled = false, boolean nullable = false) {
+        if (nullable) addChildren(new HTMLOption(new EnumOption(null, null), false))
         addChildren(options.options.toList().collect {
             new HTMLOption(it, options.currents*.key?.contains(it.key))
         } as HTMLOption[])

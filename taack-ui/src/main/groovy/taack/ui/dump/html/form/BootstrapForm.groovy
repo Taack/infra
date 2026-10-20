@@ -204,7 +204,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, (!nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
         // A collection's nullable: false still allows an empty one.
         boolean required = markRequired(s, nullable || multiple, disable)
         el.addChildren(s)

@@ -632,10 +632,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (isBoolean) {
             blockLog.topElement = formThemed.booleanInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, false, field.value as boolean)
         } else if (eos) {
-            blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
+            blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+                blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
             } else if (isListOrSet) {
                 // Not yet
             }
