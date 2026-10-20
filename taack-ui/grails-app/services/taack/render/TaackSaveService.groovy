@@ -226,12 +226,15 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
             } else if (GormEntity.isAssignableFrom(includedField.type)) {
                 if (!p[includedField.name]?.toString()?.empty) {
                     Long entryId = associationId(p[includedField.name])
+                    Long currentId = (gormEntity instanceof GormEntity
+                            ? (gormEntity as GormEntity).getAssociationId(includedField.name)
+                            : (gormEntity[includedField.name] as GormEntity)?.ident()) as Long
                     if (entryId == null) {
                         if (gormEntity[includedField.name] != null) {
                             gormEntity[includedField.name] = null
                             if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                         }
-                    } else if ((gormEntity[includedField.name + 'Id'] as Long) != entryId) {
+                    } else if (currentId != entryId) {
                         gormEntity[includedField.name] = getGorm(entryId, includedField.type as Class<GormEntity>, sessionFactory.currentSession)
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
