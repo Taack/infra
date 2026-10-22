@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie
 import org.codehaus.groovy.runtime.MethodClosure as MC
 import taack.render.TaackUiService
 import taack.render.ThemeService
+import taack.ui.dump.html.theme.ThemeLook
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dsl.UiBlockSpecifier
@@ -29,6 +30,7 @@ class ThemeController {
                     section TaackUiService.tr('theme.choice.label'), {
                         field themeSelector.themeMode_
                         field themeSelector.themeSize_
+                        field themeSelector.themeLook_
                     }
                     formAction(this.&changeTheme as MC)
                 })
@@ -39,20 +41,25 @@ class ThemeController {
     def changeTheme() {
         def tm = params['themeMode'] as ThemeMode
         def ts = params['themeSize'] as ThemeSize
+        def tl = params['themeLook'] as ThemeLook
 
         def modeCookie = new Cookie(ThemeSelector.SESSION_THEME_MODE, tm.toString())
         def sizeCookie = new Cookie(ThemeSelector.SESSION_THEME_SIZE, ts.toString())
+        def lookCookie = new Cookie(ThemeSelector.SESSION_THEME_LOOK, tl.toString())
 
         // Set cookie expiration to 1 year
         modeCookie.maxAge = 365 * 24 * 60 * 60
         sizeCookie.maxAge = 365 * 24 * 60 * 60
+        lookCookie.maxAge = 365 * 24 * 60 * 60
 
         // Set path to root to make cookies available across the site
         modeCookie.path = '/'
         sizeCookie.path = '/'
+        lookCookie.path = '/'
 
         response.addCookie(modeCookie)
         response.addCookie(sizeCookie)
+        response.addCookie(lookCookie)
 
         taackUiService.ajaxReload()
     }

@@ -30,12 +30,12 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
         final int bc = blockCounter ++
         HTMLDiv menuDiv = new HTMLDiv().builder.addClasses('collapse', 'navbar-collapse').setId('navbarSupportedContent' + bc).build() as HTMLDiv
         if (parameter.target != Parameter.RenderingTarget.MAIL) {
-            HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
+            HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').addChildren(
                     new HTMLButton(null, '<span class="navbar-toggler-icon"></span>').builder
                             .addClasses('navbar-toggler', 'navbar-dark')
                             .putAttribute('data-bs-toggle', 'collapse')
                             .putAttribute('data-bs-target', '#navbarSupportedContent' + bc)
-                            .putAttribute('aria-controls', 'navbarSupportedContent')
+                            .putAttribute('aria-controls', 'navbarSupportedContent' + bc)
                             .putAttribute('aria-expanded', 'false')
                             .putAttribute('aria-label', 'Toggle navigation')
                             .build(),
@@ -48,7 +48,7 @@ final class BootstrapBlock extends BootstrapLayout implements IHTMLElement {
                     ).build()
             )
         } else {
-            HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').setId('dropdownNav').addChildren(
+            HTMLDiv div = new HTMLDiv().builder.addClasses('container-fluid').addChildren(
                     menuDiv
             ).build() as HTMLDiv
 

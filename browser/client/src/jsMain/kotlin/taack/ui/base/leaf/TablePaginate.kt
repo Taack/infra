@@ -1,5 +1,9 @@
 package taack.ui.base.leaf
 
+import js.array.Tuple2
+import js.array.component1
+import js.array.component2
+import js.iterable.asSequence
 import taack.ui.base.Helper
 import taack.ui.base.Helper.Companion.trace
 import taack.ui.base.LeafElement
@@ -7,6 +11,8 @@ import taack.ui.base.element.Table
 import web.cssom.ClassName
 import web.dom.document
 import web.events.EventHandler
+import web.form.FormData
+import web.form.FormDataEntryValue
 import web.history.history
 import web.html.*
 import web.location.location
@@ -35,6 +41,7 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
     private val max: Int = d.attributes.getNamedItem("taackMax")!!.value.toInt()
     private val offset: Int = d.attributes.getNamedItem("taackOffset")?.value?.toInt() ?: 0
     private val count: Int = d.attributes.getNamedItem("taackCount")!!.value.toInt()
+    private val label: String? = d.attributes.getNamedItem("taackPaginateLabel")?.value
     private val currentPage = offset / max
     private val numberOfPage = count / max - (if (count % max == 0) 1 else 0)
     private val ul = document.createElement("ul") as HTMLUListElement
@@ -46,6 +53,7 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
         trace("TablePaginate2 currentPage: $currentPage, numberOfPage: $numberOfPage")
 
         val nav = document.createElement("nav")
+        if (label != null) nav.setAttribute("aria-label", label)
         ul.classList.add(ClassName("pagination"))
         ul.classList.add(ClassName("pagination-sm"))
         nav.appendChild(ul)
@@ -92,11 +100,12 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
         trace("createAnchor $pageOffset")
         val li = document.createElement("li") as HTMLLIElement
         li.classList.add(ClassName("page-item"))
+        val a = createAnchor(pageOffset)
         if (pageOffset == currentPage) {
-            li.style.fontWeight = "bold"
             li.classList.add(ClassName("active"))
+            a.setAttribute("aria-current", "page")
         }
-        li.appendChild(createAnchor(pageOffset))
+        li.appendChild(a)
         ul.appendChild(li)
     }
 
@@ -106,12 +115,24 @@ class TablePaginate(private val parent: Table, d: HTMLDivElement) : LeafElement 
         a.classList.add(ClassName("taackPageOffset"))
         a.classList.add(ClassName("page-link"))
         a.setAttribute("taackPageOffset", pageOffset.toString())
+        val offset = pageOffset * max
+        a.href = pageUrl(offset)
         a.onclick = EventHandler { e ->
+            if (e.ctrlKey || e.metaKey || e.shiftKey) return@EventHandler
             e.preventDefault()
-            val offset = (a.attributes.getNamedItem("taackPageOffset")!!.value.toDouble() * max.toDouble()).toInt()
             Helper.filterForm(parent.filter, offset, null)
         }
         return a
+    }
+
+    private fun pageUrl(offset: Int): String {
+        val url = URL(parent.filter.f.action)
+        FormData(parent.filter.f).entries().asSequence().forEach { entry: Tuple2<String, FormDataEntryValue> ->
+            val value = entry.component2().toString()
+            if (value.isNotEmpty()) url.searchParams.append(entry.component1(), value)
+        }
+        url.searchParams.set("offset", offset.toString())
+        return url.toString()
     }
 
     private fun appendOmittedSection(medianPageOffset: Int?) {

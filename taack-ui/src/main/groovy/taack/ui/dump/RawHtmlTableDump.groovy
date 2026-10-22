@@ -13,6 +13,7 @@ import taack.ui.EnumOptions
 import taack.ui.IEnumOptions
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.common.ActionIcon
+import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.table.IUiTableVisitor
 import taack.ui.dsl.table.TableOption
@@ -26,7 +27,6 @@ import taack.ui.dump.html.style.Height2p8rem
 import taack.ui.dump.html.table.*
 
 import java.text.DateFormat
-import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -52,6 +52,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     int level = 0
     boolean firstInCol = false
     private final IHTMLElement initialForm
+    private IHTMLElement table
     private Pair<String, String> initialSortingOrder
     private Pair<Date, String> initialLastReadingDate
     private final Map<String, HTMLInput> mapAdditionalHiddenParams = [:]
@@ -63,6 +64,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     private boolean isQuickEdit = false
     private int formId = 0
     private IHTMLElement quickEditSubmitPlace = null
+    private IHTMLElement lastRowActionGroup = null
 
     RawHtmlTableDump(final BlockLog blockLog, final String id, final Parameter parameter) {
         this.blockLog = blockLog
@@ -77,6 +79,8 @@ final class RawHtmlTableDump implements IUiTableVisitor {
     static final <T> String dataFormat(T value, String format, Locale locale = null) {
         if (value == null) return ''
         switch (value.class) {
+            case Collection:
+                return (value as Collection).collect { dataFormat(it, format, locale) }.join(', ')
             case Number:
                 return NumberFormat.getInstance(locale ?: LocaleContextHolder.locale).format(value)
             case Date:
@@ -135,7 +139,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.restorePosition()
 
         if (initialSortingOrder) {
-            blockLog.topElement.children[0].getBuilder().putAttribute('initialSortField', initialSortingOrder.aValue)
+            table.putAttr('initialSortField', initialSortingOrder.aValue)
         }
     }
 
@@ -153,9 +157,15 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         } else {
             HTMLTd th = new HTMLTd(colSpan, rowSpan)
             th.setTaackTag(TaackTag.TABLE_COL)
+            markFirstCellInGroup(th.builder)
             blockLog.topElement.builder.addChildren(th)
             blockLog.topElement = th
         }
+    }
+
+    private void markFirstCellInGroup(IHTMLElement.HTMLElementBuilder tdBuilder) {
+        if (firstInCol) tdBuilder.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
+        firstInCol = false
     }
 
     @Override
@@ -237,7 +247,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowAction(String i18n, final ActionIcon actionIcon, final Style style, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        i18n = TaackUiEnablerService.sanitizeString(i18n)
         i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
+        blockLog.savePosition()
+        if (actionIcon.style) blockLog.topElement = rowActionGroup(actionIcon.style)
 
         params ?= [:]
         IHTMLElement.HTMLElementBuilder div = new HTMLDiv().builder.addChildren(
@@ -245,10 +258,25 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                         new HTMLTxtContent(actionIcon.getHtml(i18n))).build())
         blockLog.topElement.builder.addChildren(div.build())
         if (style) div.build().setStyleDescriptor(style)
+        blockLog.restorePosition()
+    }
+
+    /**
+     * The group holding a cell's consecutive styled row actions, so a theme can style them
+     * together. The group floats instead of each icon.
+     */
+    private IHTMLElement rowActionGroup(IconStyle iconStyle) {
+        List<IHTMLElement> siblings = blockLog.topElement.children
+        if (siblings && siblings.last().is(lastRowActionGroup)) return lastRowActionGroup
+        lastRowActionGroup = new HTMLDiv()
+        lastRowActionGroup.addClasses('taackRowActions', iconStyle.floatsRight ? 'taackRowActionsRight' : 'taackRowActionsLeft')
+        blockLog.topElement.addChildren(lastRowActionGroup)
+        lastRowActionGroup
     }
 
     @Override
     void visitRowAction(String linkText, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
+        linkText = TaackUiEnablerService.sanitizeString(linkText)
         params ?= [:]
         blockLog.topElement.addChildren(
                 new HTMLDiv().builder.addChildren(
@@ -272,8 +300,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                 tdBuilder.putAttribute('taackDropAction', new Parameter().urlMapped(cellOption.uploadFileAction, cellOption.uploadFileActionParams))
             }
         }
-        if (firstInCol) tdBuilder.addClasses('firstCellInGroup', "firstCellInGroup-${indent}")
-        firstInCol = false
+        markFirstCellInGroup(tdBuilder)
         tdBuilder.taackTag = TaackTag.TABLE_COL
         HTMLTd td = tdBuilder.build() as HTMLTd
         blockLog.topElement.builder.addChildren(td)
@@ -293,14 +320,15 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         blockLog.logEnterBlock('visitTable')
         blockLog.savePosition()
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
-        blockLog.topElement = themableTable.table(blockLog.topElement, blockId, tableOption)
+        table = themableTable.table(blockLog.topElement, blockId, tableOption)
+        blockLog.topElement = table
     }
 
     @Override
     void visitTableWithoutFilter() {
         blockLog.logEnterBlock('visitTableWithoutFilter')
         blockLog.savePosition()
-        IHTMLElement table = themableTable.table(blockLog.topElement, blockId, tableOption)
+        table = themableTable.table(blockLog.topElement, blockId, tableOption)
         blockLog.topElement.setTaackTag(TaackTag.TABLE)
 
 //        List<HTMLInput> inputList = []
@@ -337,9 +365,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         boolean addColumn = !isInCol
         if (addColumn) visitColumn(null, null)
         blockLog.topElement.builder.addChildren(
-                new HTMLSpan().builder.addClasses('sortColumn').setStyle(DISPLAY_BLOCK_DESCRIPTOR).putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields)).addChildren(
-                        new HTMLTxtContent(i18n)
-                ).build()
+                new HTMLButton(i18n).builder.addClasses('sortColumn').setStyle(DISPLAY_BLOCK_DESCRIPTOR)
+                        .putAttribute('type', 'button')
+                        .putAttribute('sortField', RawHtmlFilterDump.getQualifiedName(fields))
+                        .build()
         )
         if (addColumn) visitColumnEnd()
 
@@ -427,6 +456,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
                     .putAttribute('taackMax', max?.toString())
                     .putAttribute('taackOffset', parameter.params.long('offset')?.toString() ?: '0')
                     .putAttribute('taackCount', count?.toString())
+                    .putAttribute('taackPaginateLabel', tr('default.paginate.label', parameter.lcl))
                     .build()
             )
         }
@@ -601,10 +631,10 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (isBoolean) {
             blockLog.topElement = formThemed.booleanInput(formId, blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, false, field.value as boolean)
         } else if (eos) {
-            blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, eos, isListOrSet, isFieldDisabled, isNullable)
+            blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, eos, isListOrSet, isFieldDisabled, isNullable)
         } else if (isEnum || isListOrSet) {
             if (isEnum) {
-                blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, trI18n, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
+                blockLog.topElement = formThemed.selects(formId, blockLog.topElement, qualifiedName, new EnumOptions(field.fieldConstraint.field.type as Class<Enum>, qualifiedName, field.value as Enum), isListOrSet, isFieldDisabled, field.fieldConstraint.nullable)
             } else if (isListOrSet) {
                 // Not yet
             }

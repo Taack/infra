@@ -31,7 +31,10 @@ import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.IconStyle
 import taack.ui.dsl.common.Style
 import taack.ui.dsl.form.editor.EditorOption
+import taack.ui.dsl.table.TableOption
+import taack.ui.dump.Parameter
 import taack.wysiwyg.*
+import test.BindingTest
 
 import java.nio.file.Files
 import java.text.SimpleDateFormat
@@ -1377,20 +1380,20 @@ class CmsController implements WebAttributes {
         b.ui {
             kanbanFilter CmsUiService.buildCmsPageFilter(), new UiKanbanSpecifier().ui {
                 List<CmsPage> pageList = taackFilterService.getBuilder(CmsPage).setSortOrder(TaackFilter.Order.DESC, new CmsPage().dateCreated_).build().list().aValue as List<CmsPage>
-                Closure kanbanCol = { MethodClosure action, Map<String, ? extends Object> params, String headerStr, List<CmsPage> pages ->
-                    column headerStr, Style.ALIGN_CENTER, action, params, {
-                        pages.forEach { CmsPage page ->
-                            card page, { // page.selfObject_ means the id of page
-                                cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, CmsController.&editPage as MethodClosure, page.id
-                                cardField page.title_, null, Style.BOLD
-                                cardField page.dateCreated_
-                                cardFieldRaw ""
-                            }
-                        }
-                    }
-                }
-                kanbanCol(CmsController.&changePageType as MethodClosure, [newType: CmsPageType.PAGE], "Page", pageList.grep { CmsPage p -> p.pageType == CmsPageType.PAGE }.sort { -it.lastUpdated.getTime() })
-                kanbanCol(CmsController.&changePageType as MethodClosure, [newType: CmsPageType.NEWS], "News", pageList.grep { CmsPage p -> p.pageType == CmsPageType.NEWS }.sort { -it.lastUpdated.getTime() })
+//                Closure kanbanCol = { MethodClosure action, Map<String, ? extends Object> params, String headerStr, List<CmsPage> pages ->
+//                    column headerStr, Style.ALIGN_CENTER, action, params, {
+//                        pages.forEach { CmsPage page ->
+//                            card page, { // page.selfObject_ means the id of page
+//                                cardAction ActionIcon.SHOW * IconStyle.SCALE_DOWN, CmsController.&editPage as MethodClosure, page.id
+//                                cardField page.title_, null, Style.BOLD
+//                                cardField page.dateCreated_
+//                                cardFieldRaw ""
+//                            }
+//                        }
+//                    }
+//                }
+//                kanbanCol(CmsController.&changePageType as MethodClosure, [newType: CmsPageType.PAGE], "Page", pageList.grep { CmsPage p -> p.pageType == CmsPageType.PAGE }.sort { -it.lastUpdated.getTime() })
+//                kanbanCol(CmsController.&changePageType as MethodClosure, [newType: CmsPageType.NEWS], "News", pageList.grep { CmsPage p -> p.pageType == CmsPageType.NEWS }.sort { -it.lastUpdated.getTime() })
             }
         }
         taackUiService.show(b, buildMenu())
@@ -1405,5 +1408,10 @@ class CmsController implements WebAttributes {
             page.save(flush: true, failOnError: true)
         }
         render status: 200
+    }
+
+    def testBinding() {
+        BindingTest bindingTest = taackSaveService.save(BindingTest)
+        render "${bindingTest.errors}"
     }
 }

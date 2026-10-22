@@ -4,7 +4,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.util.Environment
 import grails.validation.Validateable
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
+import grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.runtime.MethodClosure
 import org.owasp.html.PolicyFactory
 import org.springframework.security.access.AccessDeniedException
@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
 import taack.ui.ITaackUiEnabler
 import taack.ui.TaackUiConfiguration
+import taack.ui.ITaackUiEnabler
 import taack.ui.dsl.helper.Utils
 
 import java.lang.reflect.Constructor
@@ -43,17 +44,18 @@ import java.lang.reflect.Parameter
  * }</pre>
  */
 @GrailsCompileStatic
-class TaackUiEnablerService implements WebAttributes, DataBinder, ITaackUiEnabler {
+class TaackUiEnablerService implements WebAttributes, ITaackUiEnabler {
 
     static lazyInit = false
 
     WebInvocationPrivilegeEvaluator webInvocationPrivilegeEvaluator
+    TaackSaveService taackSaveService
 
     PolicyFactory policy
 
 //    @PostConstruct
 //    void init() {
-//        policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
+//        policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS).and(Sanitizers.IMAGES).and(Sanitizers.STYLES).and(Sanitizers.BLOCKS)
 //    }
 
 //    static String sanitizeString(String toSanitize) {
@@ -83,7 +85,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder, ITaackUiEnable
         }
     }
 
-    private boolean checkValidateableValidity(final String controller, final String action, Map params) {
+    private boolean checkValidateableValidity(final String controller, final String action, GrailsParameterMap params) {
         if (!params?.isEmpty()) {
             Class controllerClass = grailsApplication.getArtefactByLogicalPropertyName("Controller", controllerName).clazz
             Method m = controllerClass.getDeclaredMethods().find { it.name == actionName}
@@ -92,7 +94,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder, ITaackUiEnable
                 if (Validateable.isAssignableFrom(p.type)) {
                     Constructor c = p.type.getDeclaredConstructor()
                     Validateable v = c.newInstance() as Validateable
-                    bindData(v, params)
+                    taackSaveService.bindObject(v, params)
                     boolean ret = v.validate()
                     if (!ret) log.warn("${v.errors}")
                     return ret
@@ -113,7 +115,7 @@ class TaackUiEnablerService implements WebAttributes, DataBinder, ITaackUiEnable
      */
     boolean hasAccess(final String controller, final String action, final Long id, Map params, boolean fromWeb = true) {
 
-        if (fromWeb && !id && !checkValidateableValidity(controller, action, params)) return false
+        if (fromWeb && !id && !checkValidateableValidity(controller, action, params as GrailsParameterMap)) return false
 
         Authentication authContext = SecurityContextHolder.getContext().getAuthentication()
         if (!authContext?.authenticated) {

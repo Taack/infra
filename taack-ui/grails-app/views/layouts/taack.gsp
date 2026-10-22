@@ -21,18 +21,15 @@
 
     <title>${conf.defaultTitle}</title>
     ${raw(bootstrapCssTag)}
+    <style>
+    :root {
+        --taack-navbar-bg: ${conf.bgColor};
+        --taack-navbar-color: ${conf.fgColor};
+    }
+    </style>
     <asset:stylesheet href="application-taack.css"/>
 
     <style>
-    .navbar-nav > li > .dropdown-menu {
-        background-color: ${conf.bgColor};
-        z-index: 9999;
-    }
-
-    body > nav .navbar-nav a.nav-link {
-        color: ${conf.fgColor};
-    }
-
 <g:if test="${conf.fixedTop}">
     body {
         padding-top: 4.5rem;
@@ -46,7 +43,7 @@
 
 <body>
 
-<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" :""}" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
+<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" :""}">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><asset:image src='${conf.logoFileName}' width='${conf.logoWidth}'
                                                       height='${conf.logoHeight}' alt="Logo"/>

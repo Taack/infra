@@ -45,6 +45,10 @@ class FilterCommon {
         filterVisitor.visitFilterFieldExpressionBool(filterExpression)
     }
 
+    void filterFieldExpressionReverse(final FieldInfo operand, boolean notIn, final FilterExpression filterExpression) {
+        filterVisitor.visitFilterFieldExpressionReverse(operand, notIn, filterExpression)
+    }
+
     void filterFieldExpressionBool(final FilterExpression... filterExpressions) {
         filterVisitor.visitFilterFieldExpressionBool(filterExpressions)
     }

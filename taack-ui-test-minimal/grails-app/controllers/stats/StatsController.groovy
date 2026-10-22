@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct
 import lodomain.TestInlineEdit
 import lodomain.TestStatus
 import org.codehaus.groovy.runtime.MethodClosure as MC
+import org.grails.datastore.gorm.GormEntity
 import taack.domain.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
@@ -124,15 +125,15 @@ class StatsController implements WebAttributes {
         Integer id = params.int('id')
         if (id != null) {
             TestInlineEdit testInlineEdit = id != null ? testInlineEditList[id] : new TestInlineEdit()
-            Map ks = [include: params.keySet()]
-            bindData(testInlineEdit, params, ks)
+            taackSaveService.bindObject(testInlineEdit as GormEntity, params)
             if (testInlineEdit.validate()) {
                 taackUiService.ajaxReload()
             } else
                 taackSaveService.reloadOrRenderErrors(testInlineEdit)
         } else {
             TestInlineEdit testInlineEdit = new TestInlineEdit()
-            bindData(testInlineEdit, params, [include: params.keySet()])
+            taackSaveService.bindObject(testInlineEdit as GormEntity, params)
+
             if (testInlineEdit.validate()) {
                 testInlineEditList << testInlineEdit
                 taackUiService.ajaxReload()

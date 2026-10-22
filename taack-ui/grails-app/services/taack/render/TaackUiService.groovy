@@ -7,7 +7,6 @@ import grails.util.Pair
 import grails.validation.Validateable
 import grails.web.api.ServletAttributes
 import grails.web.api.WebAttributes
-import grails.web.databinding.DataBinder
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.json.JsonSlurper
 import jakarta.annotation.PostConstruct
@@ -27,6 +26,7 @@ import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*
 import taack.ui.dsl.block.BlockSpec
 import taack.ui.dump.*
+import taack.ui.dump.html.theme.ThemeLook
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSelector
 import taack.ui.dump.html.theme.ThemeSize
@@ -55,13 +55,14 @@ import taack.user.TaackUser
  * @since taack-ui 0.1
  */
 @GrailsCompileStatic
-final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinder, ServletAttributes {
+final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAttributes {
 
     static lazyInit = false
 
     private final int bufferSize = 65_536
 
     ThemeService themeService
+    TaackSaveService taackSaveService
 
     @Autowired
     PageRenderer g
@@ -151,6 +152,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         if (!blockSpecifier) return
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep))
         blockSpecifier.visitBlock(htmlBlock)
+        if (htmlBlock.closesModal) {
+            writeModalCloseInstruction(htmlBlock)
+            return
+        }
         htmlBlock.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
     }
 
@@ -179,6 +184,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         Parameter p = new Parameter(LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.WEB, paramsToKeep)
         RawHtmlBlockDump htmlBlock = new RawHtmlBlockDump(p)
         blockSpecifier.visitBlock(htmlBlock)
+        if (htmlBlock.closesModal) {
+            writeModalCloseInstruction(htmlBlock)
+            return
+        }
         if (p.isModal && params.boolean('isAjax') != false) {
             params['isAjax'] = true
             htmlBlock.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
@@ -187,6 +196,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             ThemeSize themeSize = themeSelector.themeSize
             ThemeMode themeMode = themeSelector.themeMode
             ThemeMode themeAuto = themeSelector.themeAuto
+            ThemeLook themeLook = themeSelector.themeLook
 
 
 //            ModelAndView mv = new ModelAndView('/taackUi/blockNoLayout', [
@@ -209,11 +219,17 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
                     params.lang as String,
                     themeMode,
                     themeAuto,
+                    themeLook,
                     htmlBlock,
                     menuBlock
             )
         }
 
+    }
+
+    private void writeModalCloseInstruction(RawHtmlBlockDump instruction) {
+        webRequest.response.contentType = 'text/plain;charset=UTF-8'
+        instruction.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
     }
 
     void visitMenu(final UiMenuSpecifier menuSpecifier, String... paramsToKeep) {
@@ -444,7 +460,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
             if (ajaxParams.keySet().size() == 2 && stringKey.endsWith('id')) {
                 anObject = aClass.invokeMethod('get', ajaxParams[stringKey]) as T
             } else {
-                bindData(anObject, params[AJAX_PARAMS] as GrailsParameterMap)
+                taackSaveService.bindObject(anObject, params[AJAX_PARAMS] as GrailsParameterMap)
             }
             if (deleteParams) {
                 params.remove(AJAX_PARAMS)
@@ -488,15 +504,20 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content
      */
     final String dumpMailHtml(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
-        blockSpecifier.visitBlock(htmlPdf)
-        ByteArrayOutputStream output = new ByteArrayOutputStream(bufferSize)
-        htmlPdf.getOutput(new BufferedOutputStream(output))
-        String html = g.render template: '/taackUi/block-mail', model: [
-                block: output.toString(),
-                root : TaackUiConfiguration.root
-        ]
-        html
+        dumpMailHtml(blockSpecifier, null, null, locale)
+    }
+
+    /**
+     * Dump a block in Mail HTML version with optional header and footer
+     *
+     * @param blockSpecifier block descriptor
+     * @param headerSpecifier block rendered above the content. nullable
+     * @param footerSpecifier block rendered below the content. nullable
+     * @param locale language
+     * @return HTML content
+     */
+    final String dumpMailHtml(UiBlockSpecifier blockSpecifier, UiBlockSpecifier headerSpecifier, UiBlockSpecifier footerSpecifier, Locale locale = null) {
+        dumpMailHtmlWithDiagram(blockSpecifier, headerSpecifier, footerSpecifier, locale).aValue
     }
 
     /**
@@ -507,32 +528,56 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
      * @return HTML content, and attachment to add to the mail
      */
     final Pair<String, Map<String, byte[]>> dumpMailHtmlWithDiagram(UiBlockSpecifier blockSpecifier, Locale locale = null) {
-        RawHtmlBlockDump htmlPdf = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
-        blockSpecifier.visitBlock(htmlPdf)
-        ByteArrayOutputStream output = new ByteArrayOutputStream(4096)
-        htmlPdf.getOutput(output)
+        dumpMailHtmlWithDiagram(blockSpecifier, null, null, locale)
+    }
+
+    /**
+     * Dump a block in Mail HTML version with optional header and footer.
+     *
+     * @param blockSpecifier block descriptor
+     * @param headerSpecifier block rendered above the content. nullable
+     * @param footerSpecifier block rendered below the content. nullable
+     * @param locale language
+     * @return HTML content, and attachment to add to the mail, diagrams of the header and footer included
+     */
+    final Pair<String, Map<String, byte[]>> dumpMailHtmlWithDiagram(UiBlockSpecifier blockSpecifier, UiBlockSpecifier headerSpecifier, UiBlockSpecifier footerSpecifier, Locale locale = null) {
+        Map<String, byte[]> mailAttachment = [:]
         String html = g.render template: '/taackUi/block-mail', model: [
-                block: output.toString(),
-                root : TaackUiConfiguration.root
+                header: dumpMailBlock(headerSpecifier, locale, mailAttachment),
+                block : dumpMailBlock(blockSpecifier, locale, mailAttachment),
+                footer: dumpMailBlock(footerSpecifier, locale, mailAttachment),
+                root  : TaackUiConfiguration.root
         ]
-        new Pair(html, htmlPdf.mailAttachment)
+        new Pair(html, mailAttachment)
+    }
+
+    private String dumpMailBlock(UiBlockSpecifier blockSpecifier, Locale locale, Map<String, byte[]> mailAttachment) {
+        if (!blockSpecifier) return null
+        RawHtmlBlockDump htmlMail = new RawHtmlBlockDump(new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.MAIL))
+        blockSpecifier.visitBlock(htmlMail)
+        ByteArrayOutputStream output = new ByteArrayOutputStream(bufferSize)
+        htmlMail.getOutput(output)
+        mailAttachment.putAll(htmlMail.mailAttachment)
+        output.toString()
     }
 
     final void createModal(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = BlockSpec) final Closure closure) {
         show(TaackUi.createModal(closure))
     }
 
-    private void noTemplate(String lang, ThemeMode themeMode, ThemeMode themeAuto, RawHtmlBlockDump htmlBlock, RawHtmlBlockDump menuBlock, String... paramsToKeep) {
+    private void noTemplate(String lang, ThemeMode themeMode, ThemeMode themeAuto, ThemeLook themeLook, RawHtmlBlockDump htmlBlock, RawHtmlBlockDump menuBlock, String... paramsToKeep) {
 
 //        AssetResourceLocator assets = assetResourceLocator as AssetResourceLocator
         webRequest.response.setHeader("Content-Type", "text/html; charset=UTF-8")
         BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, bufferSize)
 
         TaackUiConfiguration conf
+        String lookAttribute = themeLook.themeAttribute ? " data-taack-theme=${themeLook.themeAttribute}" : ''
+        String lookStylesheet = themeLook.themeAttribute ? "<link rel=\"stylesheet\" href=\"/assets/taack-${themeLook.themeAttribute}.css\"/>" : ''
         bout << """\
 <!DOCTYPE html>
 
-<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}>
+<html lang="${lang}" ${themeMode == ThemeMode.NORMAL ? "data-bs-theme-auto=auto data-bs-theme=${themeAuto.name}" : "data-bs-theme=${themeMode.name}"}${lookAttribute}>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
@@ -559,25 +604,21 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, DataBinde
         bout << """\
     <title>${conf.defaultTitle}</title>
     ${bootstrapCssTag}
-    <link rel="stylesheet" href="/assets/application-taack.css"/>
-
     <style>
-    .navbar-nav > li > .dropdown-menu {
-        background-color: ${conf.bgColor};
-        z-index: 9999;
-    }
-
-    body > nav .navbar-nav a.nav-link {
-        color: ${conf.fgColor};
+    :root {
+        --taack-navbar-bg: ${conf.bgColor};
+        --taack-navbar-color: ${conf.fgColor};
     }
     </style>
+    <link rel="stylesheet" href="/assets/application-taack.css"/>
+    ${lookStylesheet}
 
     <link rel="icon" type="image/png" href="/assets/favicon.png"/>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" : ""}" style="background-color: ${conf.bgColor}; color: ${conf.fgColor};">
+<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" : ""}">
     <div id="dropdownNav" class="container-fluid">
         <a class="navbar-brand" href="/"><img src='/assets/${conf.logoFileName}' width='${conf.logoWidth}'
                                                       height='${conf.logoHeight}' alt="Logo"/>

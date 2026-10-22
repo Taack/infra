@@ -32,6 +32,8 @@ interface IUiFilterVisitor  {
 
     void visitFilterFieldExpressionBool(FilterExpression... filterExpression)
 
+    void visitFilterFieldExpressionReverse(FieldInfo reverseField, boolean notIn, FilterExpression... filterExpression)
+
     void visitFilterFieldExpressionBool(String i18n, Boolean defaultValue, FilterExpression... filterExpressions)
 
     void visitFilterAction(String i18n, MethodClosure action, ButtonStyle style)

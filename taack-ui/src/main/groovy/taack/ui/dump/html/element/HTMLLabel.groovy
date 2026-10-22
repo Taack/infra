@@ -4,6 +4,9 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 final class HTMLLabel implements IHTMLElement{
+    HTMLLabel() {
+    }
+
     HTMLLabel(String forEntry) {
         putAttr('for', forEntry)
     }

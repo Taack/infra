@@ -18,6 +18,7 @@ import taack.utils.DateFormat
 
 import java.lang.reflect.Field
 import java.lang.reflect.ParameterizedType
+
 /**
  * Service allowing to automatically filter data in a tableFilter. It is typically
  * used in a table block. It uses params given from the {@link UiFilterSpecifier} to filter data.
@@ -417,7 +418,7 @@ final class TaackFilter<T extends GormEntity<T>> {
 
     /**
      *  Given number string like '1 - 10' to get numMin and numMax for filter.
-     *  @return String list
+     * @return String list
      */
     final List<String> parseNumber(final String numString) {
         if (!(numString ==~ /.*\s+-\s+.*/)) {
@@ -511,6 +512,17 @@ final class TaackFilter<T extends GormEntity<T>> {
                     filterExpression.each {
                         occ = visitFilterFieldExpressionBool(it, occ, where, namedParams)
                     }
+                }
+
+                @Override
+                void visitFilterFieldExpressionReverse(FieldInfo reverseField, boolean notIn, FilterExpression... filterExpressions) {
+                    List<String> innerWhere = []
+                    int innerOcc = 0
+                    filterExpressions.each {
+                        innerOcc = visitFilterFieldExpressionBool(it, innerOcc, innerWhere, namedParams)
+                    }
+                    where << (" sc.id ${notIn ? 'NOT' : ''} IN (select auo.${reverseField.fieldName}.id from ${reverseField.fieldConstraint.field.declaringClass.simpleName} auo where ${innerWhere.join(" and ").replace('sc.', 'auo.')}) " as String)
+
                 }
 
                 @Override

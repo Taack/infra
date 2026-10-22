@@ -14,6 +14,7 @@ import taack.ui.dump.html.layout.BootstrapLayout
 import taack.ui.dump.html.script.CheckboxDisableIsZero
 import taack.ui.dump.html.script.DeleteM2MParentElement
 import taack.ui.dump.html.script.DeleteSiblingInputContent
+import taack.ui.dump.html.script.IJavascriptDescriptor
 import taack.ui.dump.html.style.ZIndex100
 import taack.ui.dump.html.theme.ThemeMode
 import taack.ui.dump.html.theme.ThemeSize
@@ -44,8 +45,34 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         val?.replace('"', '&quot;')?.replace('\'', '&#39;')?.replace('\n', '')?.replace('\r', '')
     }
 
-    private static IHTMLElement formLabelInput(String qualifiedName, String i18n) {
-        new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
+    private static IHTMLElement formLabelInput(String qualifiedName, String i18n, boolean required = false) {
+        HTMLElementBuilder label = new HTMLLabel(qualifiedName).builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label')
+        if (required) label.addChildren(requiredMarker())
+        label.build()
+    }
+
+    private static IHTMLElement requiredMarker() {
+        new HTMLSpan().builder.addClasses('taackRequired')
+                .putAttribute('aria-hidden', 'true')
+                .putAttribute('title', inputEscape(tr('default.required.label', null)))
+                .build()
+    }
+
+    private static boolean markRequired(IHTMLElement control, boolean nullable, boolean disable) {
+        boolean required = !nullable && !disable
+        if (required) control.putAttr('required', null)
+        required
+    }
+
+    private static IHTMLElement removeButton(String removed, IJavascriptDescriptor onclick) {
+        new HTMLButton(null).builder
+                .putAttribute('type', 'button')
+                .putAttribute('aria-label', inputEscape(tr('default.remove.label', null, removed)))
+                .addClasses('deleteIconM2M')
+                .setStyle(new ZIndex100())
+                .setOnclick(onclick)
+                .addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').putAttribute('alt', '').build())
+                .build()
     }
 
     private IHTMLElement themeStartInputs(IHTMLElement topElement, boolean localFloating = true) {
@@ -55,6 +82,20 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             topElement.builder.addChildren(ret)
         }
         ret
+    }
+
+    private static IHTMLElement filterField(IHTMLElement topElement, String controlId, String i18n) {
+        IHTMLElement field = new HTMLDiv().builder.addClasses('taackFilterField').addChildren(formLabelInput(controlId, i18n)).build()
+        topElement.addChildren(field)
+        field
+    }
+
+    private static IHTMLElement filterGroup(IHTMLElement topElement, String i18n) {
+        IHTMLElement group = new HTMLFieldset().builder.addClasses('taackFilterField').addChildren(
+                new HTMLLegend().builder.addChildren(new HTMLTxtContent(i18n)).addClasses('form-label').build()
+        ).build()
+        topElement.addChildren(group)
+        group
     }
 
     private static IHTMLElement divError(String qualifiedName) {
@@ -130,48 +171,50 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement booleanInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Boolean value) {
-        //IHTMLElement el = themeStartInputs(topElement)
-        IHTMLElement el = topElement
+        IHTMLElement el = nullable ? filterGroup(topElement, trI18n) : topElement
 
         if (!nullable)
             el.addChildren(
-                    new HTMLInput(InputType.HIDDEN, '0', value ? null : qualifiedName),
-                    HTMLInput.inputCheck('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").setOnclick(new CheckboxDisableIsZero()).build(),
+                    new HTMLInput(InputType.HIDDEN, '0', value ? null : qualifiedName, null, disable),
+                    HTMLInput.inputCheck('1', qualifiedName, value, disable).builder.addClasses('form-check-input').setId("${qualifiedName}Check").setOnclick(new CheckboxDisableIsZero()).build(),
             )
         else
             el.addChildren(
-                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, tr('default.boolean.true', null)).builder.addClasses('form-check-label').build(),
-
-                    ).build(),
-                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, tr('default.boolean.false', null)).builder.addClasses('form-check-label').build(),
-
-                    ).build(),
-                    new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
-                            HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId("${qualifiedName}Check").build(),
-                            new HTMLLabel(qualifiedName, '?').builder.addClasses('form-check-label').build()
-                    ).build(),
+                    new HTMLDiv().builder.addChildren(
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio(null, qualifiedName, value == null).builder.addClasses('form-check-input').setId(qualifiedName + 'Null').build(),
+                                    new HTMLLabel(qualifiedName + 'Null', tr('default.filter.boolean.null', null)).builder.addClasses('form-check-label').build()
+                            ).build(),
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio('1', qualifiedName, value).builder.addClasses('form-check-input').setId(qualifiedName + 'True').build(),
+                                    new HTMLLabel(qualifiedName + 'True', tr('default.filter.boolean.true', null)).builder.addClasses('form-check-label').build(),
+                            ).build(),
+                            new HTMLDiv().builder.addClasses('form-check', 'form-check-inline').addChildren(
+                                    HTMLInput.inputRadio('0', qualifiedName, value != null && !value).builder.addClasses('form-check-input').setId(qualifiedName + 'False').build(),
+                                    new HTMLLabel(qualifiedName + 'False', tr('default.filter.boolean.false', null)).builder.addClasses('form-check-label').build(),
+                            ).build(),
+                    ).build()
             )
 
-        el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
+        if (!nullable) el.addChildren(formLabelInput(qualifiedName + 'Check', trI18n))
         el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement selects(IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
-        IHTMLElement el = themeStartInputs(topElement)
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, (!nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
+        IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.setId(qualifiedName).addClasses(formSelect).build() as HTMLSelect
+        // A collection's nullable: false still allows an empty one.
+        boolean required = markRequired(s, nullable || multiple, disable)
         el.addChildren(s)
         if (disable) {
             options.currents?.each { IEnumOption it ->
                 el.addChildren(new HTMLInput(InputType.HIDDEN, it?.key, qualifiedName))
             }
         }
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        if (noLabel) s.putAttr('aria-label', inputEscape(trI18n))
+        else el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -181,9 +224,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, choices?.options?.find { it.key == current?.key }?.value ?: current?.value, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        String currentLabel = choices?.options?.find { it.key == current?.key }?.value ?: current?.value
+        HTMLInput input = new HTMLInput(InputType.STRING, currentLabel, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
-        if (!disable) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+        if (!disable) el.addChildren removeButton(currentLabel ?: trI18n, new DeleteSiblingInputContent())
         el.addChildren(input)
         if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
         el.addChildren(inputHidden)
@@ -213,8 +257,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             String hiddenInputId = idPrefix + "-${occ++}"
             String inputLabelId = hiddenInputId + '-label'
             HTMLDiv m2mParent = themeStartInputs(el).builder.addClasses('M2MParent').build() as HTMLDiv
-            if (!disabled) m2mParent.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
-            HTMLInput input = new HTMLInput(InputType.STRING, it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString(), null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
+            String valueLabel = it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString()
+            if (!disabled) m2mParent.addChildren removeButton(valueLabel ?: trI18n, new DeleteM2MParentElement())
+            HTMLInput input = new HTMLInput(InputType.STRING, valueLabel, null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
             m2mParent.addChildren(input)
             if (!noLabel) m2mParent.addChildren(formLabelInput(inputLabelId, trI18n))
@@ -224,7 +269,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         String hiddenInputId = idPrefix + "-${occ++}"
         String inputLabelId = hiddenInputId + '-label'
         HTMLDiv m2mToDuplicate = themeStartInputs(el).builder.addClasses('M2MToDuplicate').build() as HTMLDiv
-        if (!disabled) m2mToDuplicate.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteM2MParentElement()).build()
+        if (!disabled) m2mToDuplicate.addChildren removeButton(trI18n, new DeleteM2MParentElement())
         HTMLInput input = new HTMLInput(InputType.STRING, '', null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         m2mToDuplicate.addChildren(input)
@@ -241,11 +286,13 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
 
         HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        HTMLInput input = new HTMLInput(InputType.STRING, val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString(), null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
+        String valueLabel = val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString()
+        HTMLInput input = new HTMLInput(InputType.STRING, valueLabel, null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
-        if (!disabled) el.addChildren new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.putAttribute('width', '16px').addClasses('deleteIconM2M').setStyle(new ZIndex100()).setOnclick(new DeleteSiblingInputContent()).build()
+        if (!disabled) el.addChildren removeButton(valueLabel ?: trI18n, new DeleteSiblingInputContent())
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
+        boolean required = markRequired(input, nullable, disabled)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n, required))
         el.addChildren(inputHidden)
         el.addChildren(divError(qualifiedName))
         topElement
@@ -256,14 +303,15 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         IHTMLElement el = themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value) : null, qualifiedName, inputEscape(trI18n), disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        boolean required = markRequired(input, nullable, disable)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
 
     @Override
     IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime) {
-        IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = noLabel ? filterGroup(topElement, trI18n) : themeStartInputs(topElement)
         HTMLDiv div = new HTMLDiv().builder.setStyle(new Style(null, 'display: flex;')).build() as HTMLDiv
 
         Date value1 = value.aValue
@@ -305,7 +353,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLTextarea input = inputBuilder.build() as HTMLTextarea
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        boolean required = markRequired(input, nullable, disable)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }
@@ -316,6 +365,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
         HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses('wysiwyg-content', 'markdown').setId(qualifiedName).build() as HTMLTextarea
+        markRequired(textareaInput, nullable, disable)
         container.addChildren(textareaInput)
         HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses('wysiwyg-markdown-preview markdown-body').build() as HTMLDiv
         container.addChildren(preview)
@@ -333,8 +383,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement asciidocInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
         IHTMLElement el = themeStartInputs(topElement)
         HTMLDiv container = new HTMLDiv().builder.setId("${qualifiedName}-editor").build() as HTMLDiv
-        if (!noLabel) container.addChildren(formLabelInput(qualifiedName, trI18n))
         HTMLTextarea textareaInput = new HTMLTextarea(value, qualifiedName, null, disable).builder.addClasses('asciidoctor').setId(qualifiedName).build() as HTMLTextarea
+        boolean required = markRequired(textareaInput, nullable, disable)
+        if (!noLabel) container.addChildren(formLabelInput(qualifiedName, trI18n, required))
         container.addChildren(textareaInput)
         el.addChildren(container)
         el.addChildren(divError(qualifiedName))
@@ -354,11 +405,12 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement normalInput(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, String value) {
-        IHTMLElement el = themeStartInputs(topElement)
+        IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
         HTMLInput input = new HTMLInput(InputType.STRING, value, qualifiedName, null, disable).builder.setId(qualifiedName).addClasses(formControl).build() as HTMLInput
-        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
+        if (floating) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n))
+        boolean required = markRequired(input, nullable, disable)
+        if (!noLabel) el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
     }

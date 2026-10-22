@@ -11,6 +11,7 @@ import taack.ui.dsl.block.BlockSpec
 import taack.ui.dsl.block.IUiBlockVisitor
 import taack.ui.dsl.common.ActionIcon
 import taack.ui.dsl.common.Style
+import taack.ui.dsl.filter.FilterLayout
 import taack.ui.dsl.filter.IUiFilterVisitor
 import taack.ui.dsl.helper.Utils
 import taack.ui.dsl.kanban.IUiKanbanVisitor
@@ -30,6 +31,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     Map<String, byte[]> mailAttachment = [:]
 
     int poll = 0
+
+    boolean closesModal = false
 
     private int tabOccurrence = 0
 
@@ -230,9 +233,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
 
     @Override
     void visitTableFilter(final String id,
+                          final FilterLayout layout,
                           final UiFilterSpecifier filterSpecifier,
                           final UiTableSpecifier tableSpecifier) {
         blockLog.logStayBlock('visitTableFilter ' + id)
+        if (layout) blockLog.topElement.putAttr('data-filter-layout', layout.name().toLowerCase())
         visitCol(BlockSpec.Width.QUARTER)
         IUiTableVisitor tableVisitor = new RawHtmlTableDump(blockLog, id, parameter)
         IUiFilterVisitor filterVisitor = new RawHtmlFilterDump(blockLog, id, parameter)
@@ -334,6 +339,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     @Override
     void visitCloseModal(final Map<String, String> idValueMap, FieldInfo[] fields = null) {
         blockLog.logStayBlock('visitCloseModal')
+        closesModal = true
         blockLog.topElement.addChildren(new HTMLAjaxCloseLastModal(idValueMap))
         for (FieldInfo fi : fields) {
             String label
@@ -409,7 +415,8 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.savePosition()
         renderDecision.isModal = true
         parameter.isModal = true
-        HTMLAjaxModal modal = new HTMLAjaxModal(renderDecision.isRefreshing, reloadWhenClose)
+        String title = parameter.trField(parameter.controllerName, parameter.actionName, parameter.beanId != null)
+        HTMLAjaxModal modal = new HTMLAjaxModal(renderDecision.isRefreshing, reloadWhenClose, title)
         blockLog.topElement.addChildren(modal)
         blockLog.topElement.setTaackTag(TaackTag.MODAL)
         blockLog.topElement = modal
@@ -452,32 +459,26 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
     }
 
     BootstrapMenu menu
-    boolean insideMenuSection = false
-
-    private boolean menuLabelSaved = false
 
     @Override
-    void visitMenuLabel(String i18n, boolean hasClosure) {
-        if (hasClosure) {
-            blockLog.savePosition()
-            menuLabelSaved = true
-            logEnterBlock('visitMenuLabel ' + i18n)
-        } else {
-            menuLabelSaved = false
-            blockLog.logStayBlock('visitMenuLabel ' + i18n)
-        }
+    void visitMenuLabel(String i18n) {
+        blockLog.logStayBlock('visitMenuLabel ' + i18n)
         blockLog.topElement.setTaackTag(TaackTag.LABEL)
-        blockLog.topElement = menu.label(blockLog.topElement, i18n, hasClosure)
+        blockLog.topElement = menu.label(blockLog.topElement, i18n)
     }
 
     @Override
-    void visitMenuLabelEnd() {
-        logExitBlock('visitMenuLabelEnd')
-        if (menuLabelSaved) {
-            blockLog.restorePosition()
-        } else {
-            blockLog.topElement = blockLog.topElement.toParentTaackTag(TaackTag.LABEL)
-        }
+    void visitSubMenuStart(String headerContent, Style style) {
+        blockLog.savePosition()
+        logEnterBlock('visitSubMenuStart ' + headerContent)
+        blockLog.topElement.setTaackTag(TaackTag.MENU_COL)
+        blockLog.topElement = menu.subMenuHeader(blockLog.topElement, headerContent, style).builder.build()
+    }
+
+    @Override
+    void visitSubMenuEnd() {
+        logExitBlock('visitSubMenuEnd')
+        blockLog.restorePosition()
     }
 
     @Override
@@ -531,6 +532,22 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         visitLabeledSubMenu(null, controller, action, params)
     }
 
+    /**
+     * A block menu entry that targets the current action asks for its block only. Otherwise the
+     * action answers with the whole page, which the client can only load by navigating again.
+     */
+    private Map<String, ?> refreshingBlock(String controller, String action, Map<String, Object> params) {
+        if (!futurCurrentAjaxBlockId || parameter.controllerName != controller || parameter.actionName != action) return params
+        Map<String, Object> refreshing = (params ?: [:]) as Map<String, Object>
+        refreshing.put('ajaxBlockId', futurCurrentAjaxBlockId)
+        refreshing.put('refresh', 'true')
+        if (parameter.tabId && parameter.tabIndex) {
+            refreshing.put('tabId', parameter.tabId)
+            refreshing.put('tabIndex', parameter.tabIndex)
+        }
+        refreshing
+    }
+
     void visitLabeledSubMenu(String i18n, String controller, String action, Map<String, Object> params) {
         i18n ?= parameter.trField(controller, action, params?.containsKey('id'))
 
@@ -540,14 +557,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             if (cp.containsKey('lang') && !params.containsKey('lang')) cp.remove('lang')
             if (cp.containsKey('action')) cp.remove('action')
             if (cp.containsKey('controller')) cp.remove('controller')
-            if (futurCurrentAjaxBlockId && parameter.controllerName == controller && parameter.actionName == action) {
-                params.put('ajaxBlockId', futurCurrentAjaxBlockId)
-                params.put('refresh', 'true')
-                if (parameter.tabId && parameter.tabIndex) {
-                    params.put('tabId', parameter.tabId)
-                    params.put('tabIndex', parameter.tabIndex)
-                }
-            }
+            params = refreshingBlock(controller, action, params)
         }
 
         boolean isParamsEquals = true
@@ -564,20 +574,18 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
             isParamsEquals = p.isEmpty() && !cp.isEmpty()
         }
 
-        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && isParamsEquals, insideMenuSection)
+        blockLog.topElement = menu.menu(blockLog.topElement, i18n, futurCurrentAjaxBlockId?.size() > 0, futurCurrentAjaxBlockId, parameter.urlMapped(controller, action, params), controller == parameter.controllerName && action == parameter.actionName && isParamsEquals)
     }
 
     @Override
     void visitMenuSection(String i18n, MenuSpec.MenuPosition position) {
         logEnterBlock('visitMenuSection ' + i18n)
-        insideMenuSection = true
         menu.section(blockLog.topElement, i18n)
     }
 
     @Override
     void visitMenuSectionEnd() {
         logExitBlock('visitMenuSectionEnd')
-        insideMenuSection = false
     }
 
     @Override
@@ -589,25 +597,9 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         }
 
         if (parameter.target != Parameter.RenderingTarget.MAIL)
-            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, params, isModal), isModal)
+            menu.menuIcon(blockLog.topElement, actionIcon.getHtml(i18n, 24), parameter.urlMapped(controller, action, refreshingBlock(controller, action, params), isModal), isModal)
         else
             menu.menu(blockLog.topElement, i18n, false, null, parameter.urlMapped(controller, action, params, isModal))
-    }
-
-    @Override
-    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
-        logEnterBlock('visitMenuIconWithClosure ' + i18n)
-        blockLog.savePosition()
-        blockLog.topElement.setTaackTag(TaackTag.MENU_COL)
-
-        blockLog.topElement = menu.label(blockLog.topElement, actionIcon.getHtml(i18n, 24), true).builder.build()
-    }
-
-    @Override
-    void visitMenuIconWithClosureEnd(Style style) {
-        logExitBlock('visitMenuIconWithClosureEnd')
-        blockLog.restorePosition()
-        if (style) blockLog.topElement.children.last().setStyleDescriptor(style)
     }
 
     @Override
@@ -670,6 +662,11 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
         blockLog.restorePosition()
         splitMenuEnd()
         logExitBlock('visitMenuOptions')
+    }
+
+    @Override
+    void visitMenuInlineHtml(String html) {
+        menu.menuHtml(blockLog.topElement, html)
     }
 
     // --- Accordion ---

@@ -1,21 +1,44 @@
-.taackColorRed {
-    color: #990000;
+/* Bootstrap has a `.table > :not(caption) > * > *` style that colours every cell, so a cell (rowColumn) needs a selector above it. */
+.taackColorRed,
+.table > :not(caption) > * > .taackColorRed {
+    color: var(--taack-color-red);
 }
 
-.taackColorBlue {
-    color: #000099;
+.taackColorBlue,
+.table > :not(caption) > * > .taackColorBlue {
+    color: var(--taack-color-blue);
 }
 
-.taackColorGreen {
-    color: #009900;
+.taackColorGreen,
+.table > :not(caption) > * > .taackColorGreen {
+    color: var(--taack-color-green);
 }
 
-.taackColorOrange {
-    color: #ba731b;
+.taackColorOrange,
+.table > :not(caption) > * > .taackColorOrange {
+    color: var(--taack-color-orange);
 }
 
-.taackColorYellow {
-    color: #baaf1b;
+.taackColorYellow,
+.table > :not(caption) > * > .taackColorYellow {
+    color: var(--taack-color-yellow);
+}
+
+:root,
+[data-bs-theme=light] {
+    --taack-color-red: #990000;
+    --taack-color-blue: #000099;
+    --taack-color-green: #007a00;
+    --taack-color-orange: #a35200;
+    --taack-color-yellow: #756c00;
+}
+
+[data-bs-theme=dark] {
+    --taack-color-red: #ff7171;
+    --taack-color-blue: #9393ff;
+    --taack-color-green: #00b800;
+    --taack-color-orange: #df8b22;
+    --taack-color-yellow: #baaf1b;
 }
 
 .taackFontBold {
@@ -41,36 +64,53 @@
     color: gray;
 }
 
+.pagination .page-link[aria-current="page"] {
+    font-weight: bold;
+}
+
 .taackBreakAfter:after {
     content: "\a";
     white-space: pre;
 }
 
-span.neutral {
+.sortColumn.neutral {
     background-image: url(../images/taack/icons/modifiers/neutral.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
 }
 
-span.desc {
+.sortColumn.desc {
     background-image: url(../images/taack/icons/modifiers/descw.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
 }
 
-span.asc {
+.sortColumn.asc {
     background-image: url(../images/taack/icons/modifiers/ascw.svg);
     background-repeat: no-repeat;
     background-position-x: right;
     background-position-y: center;
 }
 
+button.sortColumn {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+}
+
 .deleteIconM2M {
     position: absolute;
     margin-top: 3px;
-
+    padding: 0;
+    border: 0;
+    background: none;
+    line-height: 0;
 }
 
 .form-label-group > label {
@@ -89,6 +129,11 @@ span.asc {
 
 form .form-floating .form-label {
     color: grey;
+}
+
+html:not([data-taack-theme]) .form-label {
+    margin-top: .2rem;
+    margin-bottom: 0;
 }
 
 label {
@@ -116,6 +161,14 @@ form.taackForm legend {
     margin-top: 1rem;
 }
 
+.taackRequired {
+    pointer-events: auto;
+}
+
+.taackRequired::after {
+    content: "*";
+}
+
 .grid-title {
     line-height: 48px;
     /* text-align: center; */
@@ -134,6 +187,50 @@ form.taackForm legend {
 
 .filter {
     font-size: small;
+}
+
+.taackFilterField > legend {
+    font-size: inherit;
+}
+
+/* A tableFilter declared FilterLayout.TOOLBAR: the filter is a bar above the table, its fields in a wrapping row and the Filter button at the end. FilterLayout.SIDE and no layout keep the Bootstrap columns. */
+[data-filter-layout="toolbar"] > [taacktag="FILTER"],
+[data-filter-layout="toolbar"] > [taacktag="TABLE"] {
+    width: 100%;
+}
+
+[data-filter-layout="toolbar"] form.filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0 1rem;
+    margin-bottom: 0.5rem;
+}
+
+[data-filter-layout="toolbar"] form.filter > [taacktag="SECTION"] {
+    flex: 1 1 auto;
+}
+
+[data-filter-layout="toolbar"] [taacktag="SECTION"] > fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0 1rem;
+}
+
+[data-filter-layout="toolbar"] .taackFilterField {
+    flex: 0 1 11rem;
+}
+
+/* A choice group takes its choices' width, on one line. */
+[data-filter-layout="toolbar"] fieldset.taackFilterField {
+    flex-basis: auto;
+    white-space: nowrap;
+}
+
+/* The button's w-75 is an !important utility, so the wrapper is sized to keep the button compact. */
+[data-filter-layout="toolbar"] form.filter > .d-flex {
+    width: 6rem;
 }
 
 input, select, textarea {
@@ -157,6 +254,31 @@ input, select, textarea {
     display: block;
 }
 
+.taackRowActions {
+    display: flex;
+}
+
+/* Right to left, the order each icon showed in when it floated right on its own. */
+.taackRowActionsRight {
+    float: right;
+    flex-direction: row-reverse;
+}
+
+.taackRowActionsLeft {
+    float: left;
+}
+
+/* A flex item ignores float, so the link takes the box of an icon its IconStyle floats. */
+.taackRowActions a {
+    display: flex;
+}
+
+/* An icon with only a viewBox has no natural size and would shrink to 0 in the floated
+   group, so it gets the height its IconStyle caps it at. */
+.taackRowActions img {
+    height: 22px;
+}
+
 fieldset,
 .property-list {
     /*margin: 0.6em 1.25em 0 1.25em;
@@ -167,8 +289,11 @@ fieldset,
     font-size: small;
 }
 
+.taackShowFields {
+    margin: 0;
+}
+
 .property-list .fieldcontain {
-    list-style: none;
     overflow: hidden;
     zoom: 1;
     display: flex;
@@ -182,17 +307,19 @@ fieldset,
 
 .fieldcontain label,
 .fieldcontain .property-label {
-    color: #666666;
+    color: var(--bs-secondary-color, #6c757d);
     text-align: right;
     width: 20%;
+    flex-shrink: 0;
 }
 
 .fieldcontain .property-label {
-    /*float: left;*/
+    font-weight: inherit;
 }
 
 .fieldcontain .property-value {
     display: block;
+    margin: 0;
 }
 
 /* Grid layout for show blocks */
@@ -202,7 +329,8 @@ fieldset,
     column-gap: 2.5rem;
 }
 
-.taackShowGrid > .taackShowSection {
+.taackShowGrid > .taackShowSection,
+.taackShowGrid .taackShowFields {
     display: contents;
 }
 
@@ -221,7 +349,6 @@ fieldset,
 .taackShowGrid .property-label {
     width: auto;
     text-align: left;
-    color: var(--bs-secondary-color, #6c757d);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -290,49 +417,57 @@ tr[taacktablerowgrouphaschildren] td.firstCellInGroup {
     position: relative;
 }
 
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup:before {
-    content: '';
+.taackTreeExpander {
     position: absolute;
-    top: calc(50% - 5px);
-    width: 0;
-    height: 0;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
     cursor: pointer;
 }
 
-tr[taacktablerowgrouphaschildren='true'][taacktablerowisexpended='true'] td.firstCellInGroup:before { /* ARROW_DOWN */
+.taackTreeExpander:before {
+    content: '';
+    position: absolute;
+    top: calc(50% - 5px);
+    left: 5px;
+    width: 0;
+    height: 0;
+}
+
+.taackTreeExpander[aria-expanded='true']:before { /* ARROW_DOWN */
     border-top: 10px solid #000;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
 }
 
-tr[taacktablerowgrouphaschildren='true']:not([taacktablerowisexpended='true']) td.firstCellInGroup:before { /* ARROW_RIGHT */
+.taackTreeExpander[aria-expanded='false']:before { /* ARROW_RIGHT */
     border-left: 10px solid #000;
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
 }
 
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup-0:before {
-    left: 5px;
+td.firstCellInGroup-1 > .taackTreeExpander {
+    left: 30px;
 }
 
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup-1:before {
-    left: calc(5px + 30px);
+td.firstCellInGroup-2 > .taackTreeExpander {
+    left: calc(30px * 2);
 }
 
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup-2:before {
-    left: calc(5px + 30px * 2);
+td.firstCellInGroup-3 > .taackTreeExpander {
+    left: calc(30px * 3);
 }
 
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup-3:before {
-    left: calc(5px + 30px * 3);
+td.firstCellInGroup-4 > .taackTreeExpander {
+    left: calc(30px * 4);
 }
 
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup-4:before {
-    left: calc(5px + 30px * 4);
-}
-
-tr[taacktablerowgrouphaschildren='true'] td.firstCellInGroup-5:before {
-    left: calc(5px + 30px * 5);
+td.firstCellInGroup-5 > .taackTreeExpander {
+    left: calc(30px * 5);
 }
 
 td.firstCellInGroup-1:after,
@@ -524,6 +659,20 @@ svg text {
 
 .custom-context-menu {
     animation: fadeIn 0.1s ease-out;
+}
+
+body > nav.navbar {
+    background-color: var(--taack-navbar-bg);
+    color: var(--taack-navbar-color);
+}
+
+.navbar-nav > li > .dropdown-menu {
+    background-color: var(--taack-navbar-bg);
+    z-index: 9999;
+}
+
+body > nav .navbar-nav a.nav-link {
+    color: var(--taack-navbar-color);
 }
 
 .dropdown-item {

@@ -65,4 +65,8 @@ final class SubMenuSpec {
         menuVisitor.visitMenuSectionEnd()
     }
 
+    void inlineHtml(final String html) {
+        menuVisitor.visitMenuInlineHtml(html)
+    }
+
 }

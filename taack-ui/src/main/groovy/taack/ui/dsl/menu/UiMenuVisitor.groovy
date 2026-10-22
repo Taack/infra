@@ -11,12 +11,17 @@ import taack.ui.dsl.common.Style
 class UiMenuVisitor implements IUiMenuVisitor {
 
     @Override
-    void visitMenuLabel(String i18n, boolean hasClosure) {
+    void visitMenuLabel(String i18n) {
 
     }
 
     @Override
-    void visitMenuLabelEnd() {
+    void visitSubMenuStart(String headerContent, Style style) {
+
+    }
+
+    @Override
+    void visitSubMenuEnd() {
 
     }
 
@@ -61,16 +66,6 @@ class UiMenuVisitor implements IUiMenuVisitor {
     }
 
     @Override
-    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon) {
-
-    }
-
-    @Override
-    void visitMenuIconWithClosureEnd(Style style) {
-
-    }
-
-    @Override
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, ?> params) {
 
     }
@@ -85,4 +80,8 @@ class UiMenuVisitor implements IUiMenuVisitor {
 
     }
 
+    @Override
+    void visitMenuInlineHtml(String html) {
+
+    }
 }

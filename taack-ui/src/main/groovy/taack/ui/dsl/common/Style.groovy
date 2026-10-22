@@ -14,7 +14,7 @@ enum CssContent {
     FONT_BOLD('taackFontBold', 'font-weight: bold;'),
     FONT_ITALIC('taackFontItalic', 'font-style: italic;'),
     FONT_EMPHASIS('taackFontEmphasis', 'font-weight: bolder;font-size: larger;'),
-    FONT_SMALLER('taackFontSmaller', 'font-size: small;'),
+    FONT_SMALLER('taackFontSmaller', 'font-size: smaller;'),
 
     FORM_DISABLE('taackCssDisabled', 'color: gray;'),
     FORM_ENABLED('taackCssDisabled', ''),

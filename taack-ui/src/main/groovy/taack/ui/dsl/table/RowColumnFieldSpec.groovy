@@ -57,12 +57,20 @@ class RowColumnFieldSpec implements BranchingSpec {
         tableVisitor.visitRowField(field, format, style)
     }
 
+    void rowField(final FieldInfo field, final Style style) {
+        rowField(field, null as String, style)
+    }
+
     void rowFieldEdit(final FieldInfo field, final String format = null, final Style style = null, IEnumOptions eos = null) {
         tableVisitor.visitRowFieldEdit(field, format, style, eos)
     }
 
     void rowField(final GetMethodReturn field, final String format = null, final Style style = null) {
         tableVisitor.visitRowField(field, format, style)
+    }
+
+    void rowField(final GetMethodReturn field, final Style style) {
+        rowField(field, null as String, style)
     }
 
     void rowAction(final String i18n = null, final ActionIcon icon, final Long id, String label) {

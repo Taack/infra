@@ -7,11 +7,20 @@ import taack.render.TaackUiService
 import taack.ui.EnumOption
 import taack.ui.dsl.helper.Utils
 
+/**
+ * Represents an application module entry point in Taack UI, encapsulating its controller action and SVG icon.
+ */
 @CompileStatic
 final class TaackApp implements Comparable {
     final MethodClosure entryPoint
     final String svg
 
+    /**
+     * Creates a new application descriptor. i18n allow to give a description and an app name localized.
+     *
+     * @param entryPoint controller action closure (e.g. {@code MyController.&index})
+     * @param svg SVG markup representing the application icon
+     */
     TaackApp(MethodClosure entryPoint, String svg) {
         this.entryPoint = entryPoint
         this.svg = svg
@@ -40,6 +49,11 @@ final class TaackApp implements Comparable {
     }
 }
 
+/**
+ * Registry service for managing application modules ({@link TaackApp}) available in your Intranet.
+ * <p>
+ * Provides methods to register applications at startup and retrieve them as lists or UI options.
+ */
 @GrailsCompileStatic
 class TaackAppRegisterService {
     private final static SortedSet<TaackApp> taackApps = new TreeSet<TaackApp>()

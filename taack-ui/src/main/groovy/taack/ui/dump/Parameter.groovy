@@ -22,6 +22,7 @@ import taack.ui.dsl.helper.Utils
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 
 @CompileStatic
 final class Parameter implements WebAttributes {
@@ -259,12 +260,11 @@ final class Parameter implements WebAttributes {
     }
 
     final static <T extends Validateable> Map<String, Object> validateableToMap(T validateable) {
-        Map<String, Object> ret = [:]
-        validateableToParamsToKeep(validateable).each {
+        SimpleDateFormat sdf = new SimpleDateFormat('yyyy-MM-dd')
+        validateableToParamsToKeep(validateable).collectEntries {
             Object vo = validateable[it]
-            ret.put(it, vo)
+            [it, vo instanceof Date ? sdf.format(vo) : vo]
         }
-        ret
     }
 
     private static ITaackUiEnabler instantiateITaackUiEnabler() {

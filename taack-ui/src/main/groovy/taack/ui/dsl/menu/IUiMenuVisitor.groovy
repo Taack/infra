@@ -10,9 +10,11 @@ import taack.ui.dump.html.element.IHTMLElement
 
 interface IUiMenuVisitor extends IHTMLElement {
 
-    void visitMenuLabel(String i18n, boolean hasClosure)
+    void visitMenuLabel(String i18n)
 
-    void visitMenuLabelEnd()
+    void visitSubMenuStart(String headerContent, Style style)
+
+    void visitSubMenuEnd()
 
     void visitMenuStart(MenuSpec.MenuMode menuMode, String ajaxBlockId)
 
@@ -30,12 +32,11 @@ interface IUiMenuVisitor extends IHTMLElement {
 
     void visitSubMenuIcon(String i18n, ActionIcon actionIcon, String controller, String action, Map<String, Object> params, final boolean isModal)
 
-    void visitMenuIconWithClosure(String i18n, ActionIcon actionIcon)
-
-    void visitMenuIconWithClosureEnd(Style style)
-
     void visitMenuSelect(String paramName, IEnumOptions enumOptions, Map<String, Object> params)
 
     void visitMenuSearch(MethodClosure action, String q, Class<? extends GormEntity>[] aClasses)
 
-    void visitMenuOptions(IEnumOptions enumOptions)}
+    void visitMenuOptions(IEnumOptions enumOptions)
+
+    void visitMenuInlineHtml(String html)
+}

@@ -1,13 +1,18 @@
 package taack.ui.base.element
 
 import js.array.asList
+import kotlinx.browser.document
 import taack.ui.base.BaseElement
 import taack.ui.base.Helper.Companion.traceDeIndent
 import taack.ui.base.Helper.Companion.traceIndent
 import taack.ui.base.leaf.TableRowFormErrorInput
+import web.cssom.ClassName
 import web.events.EventHandler
+import web.html.ButtonType
+import web.html.HTMLButtonElement
 import web.html.HTMLTableCellElement
 import web.html.HTMLTableRowElement
+import web.html.button
 
 class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     BaseElement {
@@ -24,25 +29,36 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     private val rowGroupHasChildren: Boolean? = r.attributes.getNamedItem("taackTableRowGroupHasChildren")?.value?.toBoolean()
     private val cells = TableRowCell.getSiblingRowCells(this)
     private val forms = TableRowForm.getSiblingForm(this)
+    private val expander: HTMLButtonElement? = if (rowGroup != null && rowGroupHasChildren == true) expanderButton() else null
 
     init {
         traceIndent("TableRow::init +++ ${rowGroup ?: ""} ${rowGroupHasChildren ?: ""}")
-        if (rowGroup != null && rowGroupHasChildren == true) {
-            (r.querySelector(".firstCellInGroup")!! as HTMLTableCellElement).onclick = EventHandler { e ->
-                if (e.target is HTMLTableCellElement) {
-                    val offsetX = e.clientX - (e.target as HTMLTableCellElement).getBoundingClientRect().left
-                    if (offsetX in (5.0 + 30.0 * rowGroup)..(15.0 + 30.0 * rowGroup)) {
-                        onclick()
-                    }
-                }
-            }
-        }
-
+        expander?.onclick = EventHandler { onclick() }
         traceDeIndent("TableRow::init ---")
     }
 
+    private fun expanderButton(): HTMLButtonElement? {
+        val cell = r.querySelector(".firstCellInGroup") as HTMLTableCellElement? ?: return null
+
+        (cell.querySelector("button.taackTreeExpander") as HTMLButtonElement?)?.let { return it }
+        val button = document.createElement("button") as HTMLButtonElement
+        button.type = ButtonType.button
+        button.classList.add(ClassName("taackTreeExpander"))
+        button.setAttribute("aria-label", cell.textContent?.trim() ?: "")
+        button.setAttribute("aria-expanded", isExpanded().toString())
+        cell.prepend(button)
+        return button
+    }
+
+    private fun isExpanded(): Boolean = r.attributes.getNamedItem("taackTableRowIsExpended")?.value?.toBoolean() == true
+
+    private fun setExpanded(expanded: Boolean) {
+        r.setAttribute("taackTableRowIsExpended", expanded.toString())
+        expander?.setAttribute("aria-expanded", expanded.toString())
+    }
+
     private fun expends() {
-        r.setAttribute("taackTableRowIsExpended", "true")
+        setExpanded(true)
         var expends = false
         val rg = rowGroup!! + 1
 
@@ -59,15 +75,15 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
     }
 
     private fun collapse() {
-        r.setAttribute("taackTableRowIsExpended", "false")
+        setExpanded(false)
         var collapse = false
         val rg = rowGroup!! + 1
 
         for (r in parent.rows) {
             if (collapse && r.rowGroup!! >= rg) {
                 r.r.style.display = "none"
-                if (rowGroupHasChildren == true) {
-                    r.r.setAttribute("taackTableRowIsExpended", "false")
+                if (r.rowGroupHasChildren == true) {
+                    r.setExpanded(false)
                 }
             } else if (collapse && r.rowGroup!! == rowGroup) {
                 break
@@ -78,13 +94,12 @@ class TableRow(val parent: Table, val r: HTMLTableRowElement) :
         }
     }
 
-    private fun onclick(): Boolean {
-        if (r.attributes.getNamedItem("taackTableRowIsExpended")?.value?.toBoolean() == true) {
+    private fun onclick() {
+        if (isExpanded()) {
             collapse()
         } else {
             expends()
         }
-        return false
     }
 
     override fun getParentBlock(): Block {

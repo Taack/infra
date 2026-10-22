@@ -12,9 +12,11 @@ enum IconStyle {
 
     IconStyle(final String inlineStyle) {
         this.inlineStyle = inlineStyle
+        this.floatsRight = inlineStyle.contains('float: right')
     }
 
     final String inlineStyle
+    final boolean floatsRight
 }
 
 @CompileStatic

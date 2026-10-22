@@ -72,9 +72,9 @@ final class BootstrapTableEdit<T extends GormEntity<T>> {
         topElement
     }
 
-    IHTMLElement selects(String formId, IHTMLElement topElement, String qualifiedName, String trI18n, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
+    static IHTMLElement selects(String formId, IHTMLElement topElement, String qualifiedName, IEnumOptions options, boolean multiple, boolean disable, boolean nullable) {
         IHTMLElement el = topElement
-        HTMLSelect s = new HTMLSelect(options, multiple, disable, (multiple || !nullable ? null : floating ? '' : "--${trI18n}--") as String).builder.putAttribute('form', formId).setId(qualifiedName).build() as HTMLSelect
+        HTMLSelect s = new HTMLSelect(options, multiple, disable, nullable).builder.putAttribute('form', formId).setId(qualifiedName).build() as HTMLSelect
         el.addChildren(s)
         if (disable) {
             options.currents?.each { IEnumOption it ->
