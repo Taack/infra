@@ -21,6 +21,7 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.Resource
 import taack.ast.type.FieldInfo
+import taack.domain.TaackSaveService
 import taack.ui.TaackUi
 import taack.ui.TaackUiConfiguration
 import taack.ui.dsl.*

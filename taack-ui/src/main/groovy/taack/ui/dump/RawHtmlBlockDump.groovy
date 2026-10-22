@@ -536,7 +536,7 @@ final class RawHtmlBlockDump implements IUiBlockVisitor {
      * A block menu entry that targets the current action asks for its block only. Otherwise the
      * action answers with the whole page, which the client can only load by navigating again.
      */
-    private Map<String, ?> refreshingBlock(String controller, String action, Map<String, Object> params) {
+    private Map<String, Object> refreshingBlock(String controller, String action, Map<String, Object> params) {
         if (!futurCurrentAjaxBlockId || parameter.controllerName != controller || parameter.actionName != action) return params
         Map<String, Object> refreshing = (params ?: [:]) as Map<String, Object>
         refreshing.put('ajaxBlockId', futurCurrentAjaxBlockId)

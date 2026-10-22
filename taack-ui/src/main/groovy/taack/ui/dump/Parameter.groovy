@@ -69,19 +69,17 @@ final class Parameter implements WebAttributes {
     static ThemeService uiThemeService = null
     boolean isModal = false
 
-    PolicyFactory policy = Sanitizers.FORMATTING.and Sanitizers.LINKS
-
     Parameter() {
         this(RenderingTarget.WEB)
     }
     static String sanitizeString(String toSanitize) {
-        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS)
+        return sanitizeStringWithAllowing(toSanitize, Sanitizers.LINKS, Sanitizers.IMAGES, Sanitizers.STYLES, Sanitizers.BLOCKS)
     }
 
     static String sanitizeStringWithAllowing(String toSanitize, PolicyFactory... allowing) {
         PolicyFactory pf = Sanitizers.FORMATTING
         allowing?.each {
-            pf = pf.and(it)
+            pf = pf & (it as PolicyFactory)
         }
         return pf.sanitize(toSanitize)
     }

@@ -3,6 +3,7 @@ package taack.ui.dump.html.menu
 import groovy.transform.CompileStatic
 import taack.render.TaackUiService
 import taack.ui.dsl.common.Style
+import taack.ui.dump.Parameter
 import taack.ui.dump.common.BlockLog
 import taack.ui.dump.html.element.*
 
@@ -55,7 +56,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     IHTMLElement label(IHTMLElement topElement, String i18n) {
-        i18n = TaackUiEnablerService.sanitizeString(i18n)
+        i18n = Parameter.sanitizeString(i18n)
         if (!isMail)
         topElement.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
@@ -70,7 +71,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     IHTMLElement menu(IHTMLElement topElement, String i18n, boolean isAjax, String ajaxBlockId, String url, boolean active = false) {
-        i18n = TaackUiEnablerService.sanitizeString(i18n)
+        i18n = Parameter.sanitizeString(i18n)
         topElement.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown').addChildren(
                         new HTMLAnchor(isAjax && !isMail, url).builder
@@ -84,7 +85,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     static IHTMLElement section(IHTMLElement topElement, String i18n) {
-        i18n = TaackUiEnablerService.sanitizeString(i18n)
+        i18n = Parameter.sanitizeString(i18n)
         topElement.builder.addChildren(
                 new HTMLLi().builder.addClasses('nav-item', 'dropdown', 'section-header').addChildren(
                         new HTMLSpan().builder.addClasses('navbar-text').addChildren(new HTMLTxtContent('<b>' + i18n + '</b>')).build()
@@ -102,7 +103,7 @@ final class BootstrapMenu implements IHTMLElement {
     }
 
     IHTMLElement menuSearch(IHTMLElement topElement, String i18n, String query, String action) {
-        i18n = TaackUiEnablerService.sanitizeString(i18n)
+        i18n = Parameter.sanitizeString(i18n)
         if (!isMail)
             topElement.addChildren(
                     new HTMLForm(action).builder.addClasses('solrSearch-input', 'py-1').addChildren(

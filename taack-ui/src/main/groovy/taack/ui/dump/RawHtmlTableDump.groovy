@@ -247,7 +247,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowAction(String i18n, final ActionIcon actionIcon, final Style style, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
-        i18n = TaackUiEnablerService.sanitizeString(i18n)
+        i18n = Parameter.sanitizeString(i18n)
         i18n ?= parameter.trField(controller, action, id != null || params.containsKey('id'))
         blockLog.savePosition()
         if (actionIcon.style) blockLog.topElement = rowActionGroup(actionIcon.style)
@@ -276,7 +276,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
 
     @Override
     void visitRowAction(String linkText, final String controller, final String action, final Long id, Map<String, ?> params, final Boolean isAjax) {
-        linkText = TaackUiEnablerService.sanitizeString(linkText)
+        linkText = Parameter.sanitizeString(linkText)
         params ?= [:]
         blockLog.topElement.addChildren(
                 new HTMLDiv().builder.addChildren(
@@ -610,7 +610,7 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         // TODO
 //        boolean addColumn = !isInCol
 //        if (addColumn) visitColumn(null, null)
-//        blockLog.topElement.builder.addChildren(displayCell(TaackUiEnablerService.sanitizeString(value), style, null))
+//        blockLog.topElement.builder.addChildren(displayCell(Parameter.sanitizeString(value), style, null))
 ////, firstInCol, isInCol))
 //        if (addColumn) visitColumnEnd()
 
