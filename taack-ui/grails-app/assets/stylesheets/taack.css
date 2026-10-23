@@ -830,7 +830,9 @@ span[taackcontextualmenu]:not(.kanban-card) {
 }
 .taack-sticky-table .taack-sticky-cell {
     position: sticky;
-    background-color: var(--bs-table-bg, #fff);
+    /* A theme may make --bs-table-bg transparent, so the row's tint is layered over an opaque base to hide the columns scrolling underneath */
+    background-color: var(--bs-body-bg, #fff);
+    background-image: linear-gradient(var(--bs-table-bg), var(--bs-table-bg));
 }
 .taack-sticky-table thead .taack-sticky-cell {
     z-index: 5;

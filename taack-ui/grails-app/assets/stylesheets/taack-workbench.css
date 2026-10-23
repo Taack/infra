@@ -417,6 +417,11 @@
     box-shadow: none;
 }
 
+/* Frozen header cells stay above the header cells scrolling under them. */
+[data-taack-theme="workbench"] .table > thead > tr > th.taack-sticky-cell {
+    z-index: 5;
+}
+
 [data-taack-theme="workbench"] .table > tbody > tr:last-child > td {
     border-bottom-color: transparent;
 }
@@ -542,8 +547,12 @@
  */
 [data-taack-theme="workbench"] td:has(> .taackRowActionsRight):has(> :not(.taackRowActions)) {
     --wb-row-actions: 1;
-    position: relative;
     padding-right: calc(12px + var(--wb-row-actions) * 26px);
+}
+
+/* A frozen cell is already sticky, which positions the actions; relative would unfreeze it. */
+[data-taack-theme="workbench"] td:has(> .taackRowActionsRight):has(> :not(.taackRowActions)):not(.taack-sticky-cell) {
+    position: relative;
 }
 
 [data-taack-theme="workbench"] td:has(> .taackRowActionsRight > :nth-child(2)) { --wb-row-actions: 2; }
