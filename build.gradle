@@ -60,7 +60,8 @@ enum TaackUiPublished {
     TAACK_UI_ASCIIDOC('Taack UI Asciidoc', 'Add Asciidoc rendering to forms and shows DSL'),
     TAACK_UI_SEARCH('Taack UI Search', 'Domain Solr Search'),
     TAACK_UI_JDBC('Taack UI JDBC', 'JDBC Driver allowing to access domain from Jdbc'),
-    TAACK_JDBC_COMMON('Taack JDBC Common', 'Taack JDBC Common')
+    TAACK_JDBC_COMMON('Taack JDBC Common', 'Taack JDBC Common'),
+    TAACK_UI_SEC('Taack UI Security', 'Taack UI Security')
 
     TaackUiPublished(String name, String desc, Licence licence = Licence.APACHE) {
         this.name = name

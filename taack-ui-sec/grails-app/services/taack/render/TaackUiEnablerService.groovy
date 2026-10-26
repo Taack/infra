@@ -11,7 +11,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator
-import taack.ui.ITaackUiEnabler
+import taack.domain.TaackSaveService
 import taack.ui.TaackUiConfiguration
 import taack.ui.ITaackUiEnabler
 import taack.ui.dsl.helper.Utils
