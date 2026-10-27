@@ -312,8 +312,11 @@ final class TaackFilter<T extends GormEntity<T>> {
                     if (filterExpression.value == null) {
                         where << ("sc.${filterExpression.fieldName} IS NOT NULL" as String)
                         occ++
+                    } else if (filterExpression.value instanceof Boolean || filterExpression.value instanceof Number) {
+                        where << ("(sc.${filterExpression.fieldName} != ${filterExpression.value} OR sc.${filterExpression.fieldName} IS NULL)" as String)
+                        occ++
                     } else {
-                        where << ("(sc.${filterExpression.fieldName} != '${filterExpression.value.toString()}' OR sc.${filterExpression.fieldName} IS NULL)" as String)
+                        where << ("(sc.${filterExpression.fieldName} != '${filterExpression.value}' OR sc.${filterExpression.fieldName} IS NULL)" as String)
                         occ++
                     }
                     break
