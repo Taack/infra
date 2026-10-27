@@ -348,7 +348,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
             fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
         }
         gormEntity.class.interfaces.toList().intersect(interfaceCustomSavingClosures.keySet()).each { interfaceClass ->
-            fieldCustomSavingClosures.get(interfaceClass).call(gormEntity, params)
+            interfaceCustomSavingClosures.get(interfaceClass).call(gormEntity, params)
         }
     }
 
