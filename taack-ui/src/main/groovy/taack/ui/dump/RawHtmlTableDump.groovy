@@ -254,9 +254,11 @@ final class RawHtmlTableDump implements IUiTableVisitor {
         if (actionIcon.style) blockLog.topElement = rowActionGroup(actionIcon.style)
 
         params ?= [:]
-        IHTMLElement.HTMLElementBuilder div = new HTMLDiv().builder.addChildren(
-                new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
-                        new HTMLTxtContent(actionIcon.getHtml(i18n))).build())
+        IHTMLElement.HTMLElementBuilder anchor = new HTMLAnchor(isAjax, parameter.urlMapped(controller, action, id, params)).builder.addChildren(
+                new HTMLTxtContent(actionIcon.getHtml(i18n)))
+        // A file shown inline would replace the page, as downloadBin links bypass ajax
+        if (action?.startsWith('downloadBin') && params.inline) anchor.putAttribute('target', '_blank')
+        IHTMLElement.HTMLElementBuilder div = new HTMLDiv().builder.addChildren(anchor.build())
         blockLog.topElement.builder.addChildren(div.build())
         if (style) div.build().setStyleDescriptor(style)
         blockLog.restorePosition()
