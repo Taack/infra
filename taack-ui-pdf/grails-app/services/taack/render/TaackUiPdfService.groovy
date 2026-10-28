@@ -89,7 +89,7 @@ final class TaackUiPdfService implements WebAttributes {
      */
     final String streamPdf(final UiPrintableSpecifier printableSpecifier, final OutputStream outputStream = null, Locale locale = null) {
         ByteArrayOutputStream blockStream = new ByteArrayOutputStream(8_000)
-        RawHtmlPrintableDump htmlPdf = new RawHtmlPrintableDump(blockStream, new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.PDF))
+        RawHtmlPrintableDump htmlPdf = new RawHtmlPrintableDump(blockStream, new Parameter(locale ?: LocaleContextHolder.locale, messageSource, Parameter.RenderingTarget.PDF), printableSpecifier.orientation)
         printableSpecifier.visitPrintableBlock(htmlPdf)
         final StringBuilder css = new StringBuilder()
         final listCss = [
@@ -112,6 +112,7 @@ final class TaackUiPdfService implements WebAttributes {
                 css            : css.toString(),
                 root           : TaackUiConfiguration.root,
                 headerHeight   : htmlPdf.headerHeight,
+                orientation    : printableSpecifier.orientation,
                 bootstrapJsTag : bootstrapJsTag,
                 bootstrapCssTag: bootstrapCssTag
         ]
