@@ -721,12 +721,9 @@ final class TaackFilter<T extends GormEntity<T>> {
 
         try {
             Integer offset = (theParams['offset'] ?: '0') as Integer
-            if (simpleSort && simpleOrder) {
-                res = (executeQuery(query, namedParams, (max == -1) ? null : max, offset) as List<List>)*.first() as List<T>
-            } else {
-                res = executeQuery(query, namedParams, (max == -1) ? null : max, offset) as List<T>
-            }
+            res = executeQuery(query, namedParams, (max == -1) ? null : max, offset).collect { it.class.isArray() ? it[0] : it } as List<T>
         } catch (e) {
+            res = []
             println "ERROR: $e Filter KO: $query"
             if (Environment.current == Environment.DEVELOPMENT) e.printStackTrace()
         }
