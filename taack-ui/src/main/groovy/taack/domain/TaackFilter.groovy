@@ -592,9 +592,7 @@ final class TaackFilter<T extends GormEntity<T>> {
                 } else {
                     Field f = getTheField(aClass, entryKey)
                     if (f == null) return
-                    if (([String, Map].contains(f.type) || Collection.isAssignableFrom(f.type) || f.type.isEnum()) && (entry.value as String).empty) {
-                        return
-                    }
+                    if (entry.value instanceof String && (entry.value as String).isBlank()) return
                     addJoinEntity(entryKey)
                     JoinEntity joinEntity = getJoinEntity(entryKey)
 
