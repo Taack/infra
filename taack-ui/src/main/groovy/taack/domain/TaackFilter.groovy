@@ -343,7 +343,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                             occ++
                         }
                     } else if (filterExpression.value instanceof Date) {
-                        where << ("sc.${filterExpression.fieldName} <= '${filterExpression.value.toString()}'" as String)
+                        where << ("sc.${filterExpression.fieldName} <= :${'npfe' + occ}" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
                     break
@@ -361,7 +362,8 @@ final class TaackFilter<T extends GormEntity<T>> {
                             occ++
                         }
                     } else if (filterExpression.value instanceof Date) {
-                        where << ("sc.${filterExpression.fieldName} >= '${filterExpression.value.toString()}'" as String)
+                        where << ("sc.${filterExpression.fieldName} >= :${'npfe' + occ}" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
                     break
@@ -606,10 +608,15 @@ final class TaackFilter<T extends GormEntity<T>> {
 
                     if (f && f.type == Date) {
                         def dates = parseDate(entry.value as String)
-                        if (dates.aValue)
-                            where << ("$aliasKey >= '${DateFormat.format(dates.aValue, 'yyyy-MM-dd')}'" as String)
-                        if (dates.bValue)
-                            where << ("$aliasKey < '${DateFormat.format(dates.bValue, 'yyyy-MM-dd')}'" as String)
+                        if (dates.aValue) {
+                            where << ("$aliasKey >= :${'npfe' + occ}" as String)
+                            namedParams.put('npfe' + occ, dates.aValue)
+                        }
+                        if (dates.bValue) {
+                            occ++
+                            where << ("$aliasKey < :${'npfe' + occ}" as String)
+                            namedParams.put('npfe' + occ, dates.bValue)
+                        }
                     } else if (f && (f.type == boolean || f.type == Boolean)) {
                         if (!entry.value.toString().isBlank()) {
                             boolean entryValue = entry.value instanceof String ? entry.value == '1' : entry.value as Boolean
