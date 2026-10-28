@@ -94,7 +94,7 @@ class PieDiagramScene extends DiagramScene {
                 String key = drawByClockwise ? keys.first() : keys.last()
                 BigDecimal value = pieDataPerKey[key]
                 BigDecimal percent = value / total
-                String valueLabel = "${numberToString(value)} (${(percent * 100).round(2)}%)"
+                String valueLabel = "${numberToString(value)} (${numberToString((percent * 100).round(2))}%)"
                 BigDecimal keyLabelLength = render.measureText(key)
                 BigDecimal valueLabelLength = render.measureText(valueLabel)
 

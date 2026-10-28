@@ -269,7 +269,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
             BigDecimal diagramWidth = render.getDiagramWidth() - diagramMarginLeft - diagramMarginRight
             gapWidth ?= diagramWidth / (isXLabelInsideGap ? displayedXLabelListNumber : (displayedXLabelListNumber > 1 ? displayedXLabelListNumber - 1 : 1))
             boolean isDate = xLabelList.every { it instanceof Date }
-            BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { isDate ? diagramOption.xLabelDateFormat.format(it as Date) : it.toString() }.join('')) / showGapEveryX
+            BigDecimal xLabelTotalLength = render.measureText(xLabelList.collect { xLabelToString(it) }.join('')) / showGapEveryX
             boolean rotateLabel = xLabelTotalLength > diagramWidth * 0.8
             Double rate = fontSize / 0.8 / (Math.sin(Math.abs(LABEL_ROTATE_ANGLE_WHEN_MASSIVE.toDouble()) / 180.0 * Math.PI) * gapWidth)
             int showLabelEveryX = rotateLabel ? Math.ceil(rate).toInteger() : 1
@@ -299,7 +299,7 @@ abstract class RectBackgroundDiagramScene extends DiagramScene {
 
                 // x axis label
                 BigDecimal xOffset = isXLabelInsideGap ? gapWidth / 2 : 0
-                String xLabel = isDate ? diagramOption.xLabelDateFormat.format(xLabelList[i * showGapEveryX] as Date) : xLabelList[i * showGapEveryX].toString()
+                String xLabel = xLabelToString(xLabelList[i * showGapEveryX])
                 BigDecimal labelLength = render.measureText(xLabel)
                 if (!rotateLabel) {
                     render.translateTo(coordX - labelLength / 2 + xOffset, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM + AXIS_LABEL_MARGIN)
