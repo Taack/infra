@@ -1,6 +1,7 @@
 package cms
 
 import attachement.ConvertersToAsciidocService
+import java.util.concurrent.ConcurrentHashMap
 import attachment.config.AttachmentContentType
 import cms.config.CmsSubsidiary
 import crew.User
@@ -71,6 +72,7 @@ class CmsController implements WebAttributes {
     TaackUiProgressBarService taackUiProgressBarService
     TaackEditorService taackEditorService
     ConvertersToAsciidocService convertersToAsciidocService
+    CmsLspService cmsLspService
 
     static String cmsFileRoot
 
@@ -180,6 +182,7 @@ class CmsController implements WebAttributes {
                             editor.addMenuEntries(TaackBaseAsciidocMenuEntries.menus)
                             editor.addSAutocompletes(TaackBaseAsciidocAutocomplete.autocompletes)
                             editor.onDropAction(CmsController.&dropEditor as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
+                            editor.onLspAction(CmsController.&lsp as MethodClosure, [cmsPage: cmsPage.id, l: language.toString()])
                             fieldEditorFromMap cmsPage.bodyContent_, language.toString().toLowerCase(), editor.build()
                             innerFormAction this.&previewBody as MC, null, [previewLanguage: language.toString().toLowerCase(), asciidoc: true]
                         }
@@ -499,6 +502,22 @@ class CmsController implements WebAttributes {
             }
         }
         return false
+    }
+
+    /**
+     * JSON-RPC endpoint of the body editor Language Server, one message per request.
+     */
+    def lsp() {
+        CmsPage page = params.long('cmsPage') ? CmsPage.read(params.long('cmsPage')) : null
+        String language = (params.get('l') as String ?: 'en').toLowerCase()
+        Map<String, String> documents = session.getAttribute('cmsLspDocuments') as Map<String, String>
+        if (documents == null) {
+            documents = new ConcurrentHashMap<String, String>()
+            session.setAttribute('cmsLspDocuments', documents)
+        }
+        String response = cmsLspService.handle(request.inputStream.getText('UTF-8'), documents, page, language)
+        if (response) render(text: response, contentType: 'application/json', encoding: 'UTF-8')
+        else render(status: 204)
     }
 
     def previewBody(CmsPage cmsPage, String previewLanguage, boolean asciidoc) {

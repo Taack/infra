@@ -380,3 +380,34 @@
 .taack-autocomplete li.cmd-autocomplete:hover {
     background-color: #DEF;
 }
+
+/* Diagnostics from the editor Language Server (LspClient.kt) */
+.ͼ1 .cm-line.lsp-error {
+    text-decoration: underline wavy #d33;
+    text-underline-offset: 3px;
+}
+
+.ͼ1 .cm-line.lsp-warning {
+    text-decoration: underline wavy #e90;
+    text-underline-offset: 3px;
+}
+
+.ͼ1 .cm-line.lsp-info {
+    text-decoration: underline dotted #39f;
+    text-underline-offset: 3px;
+}
+
+.ͼ1 .cm-lineNumbers .cm-gutterElement.lsp-error {
+    background-color: #fdd;
+    color: #a00;
+}
+
+.ͼ1 .cm-lineNumbers .cm-gutterElement.lsp-warning {
+    background-color: #fec;
+    color: #a60;
+}
+
+.taack-autocomplete li.lsp-completion small {
+    color: #888;
+    margin-left: 0.5em;
+}
