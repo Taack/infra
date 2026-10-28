@@ -75,6 +75,8 @@ final class MenuEntry {
 final class EditorOption {
     MethodClosure uploadFileAction
     Map uploadFileActionParams
+    MethodClosure lspAction
+    Map lspActionParams
     List<SpanRegex> spanRegexes = []
     List<AutoComplete> autoCompletes = []
     List<MenuEntry> menuEntries = []
@@ -96,6 +98,21 @@ final class EditorOption {
             this
         }
 
+        /**
+         * Connect the editor to a Language Server. The action receives JSON-RPC 2.0 messages
+         * (one per POST body, LSP 3.17, full text synchronization) and must answer requests with
+         * the JSON response, and notifications with an empty body.
+         *
+         * @param c          the controller action handling the JSON-RPC messages
+         * @param parameters parameters added to the action URL, typically to identify the edited document
+         * @return the builder
+         */
+        EditorOptionBuilder onLspAction(MethodClosure c, Map<String, ? extends Serializable> parameters = null) {
+            editorOption.lspAction = c
+            editorOption.lspActionParams = parameters
+            this
+        }
+
         EditorOptionBuilder addSpanRegexes(SpanRegex... spanRegexes) {
             editorOption.spanRegexes.addAll(spanRegexes)
             this
@@ -114,6 +131,10 @@ final class EditorOption {
         EditorOption build() {
             editorOption
         }
+    }
+
+    String getLspUrl() {
+        lspAction ? '/' + Utils.getControllerName(lspAction) + '/' + lspAction.method + (lspActionParams ? '?' + Utils.paramsString(lspActionParams) : '') : null
     }
 
     String serializeString() {
