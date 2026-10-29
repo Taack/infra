@@ -688,11 +688,17 @@
 [data-taack-theme="ledger"] td:has(> .taackRowActionsRight > :nth-child(3)) { --lg-row-actions: 3; }
 [data-taack-theme="ledger"] td:has(> .taackRowActionsRight > :nth-child(4)) { --lg-row-actions: 4; }
 
-[data-taack-theme="ledger"] td:has(> :not(.taackRowActions)) > .taackRowActionsRight {
+/* Only a cell's first group takes the corner. A later group, such as one beside a second record's name, would cover it there and take its clicks. */
+[data-taack-theme="ledger"] td:has(> :not(.taackRowActions)) > .taackRowActionsRight:not(.taackRowActionsRight ~ .taackRowActionsRight) {
     position: absolute;
     top: 2px;
     right: 4px;
     float: none;
+}
+
+/* A later group floats beside its own line, pulled into the reserved padding to line up with the corner. */
+[data-taack-theme="ledger"] td:has(> :not(.taackRowActions)) > .taackRowActionsRight ~ .taackRowActionsRight {
+    margin-right: calc(4px - var(--lg-cell-x) - var(--lg-row-actions) * 22px);
 }
 
 [data-taack-theme="ledger"] table:has(tbody td:first-child > .taackRowActions):not(:has(tbody td:first-child > :not(.taackRowActions))) thead th:first-child > span {
