@@ -298,25 +298,18 @@ final class TaackFilter<T extends GormEntity<T>> {
                         where << ("sc.${filterExpression.fieldName} IS NULL" as String)
                         occ++
                     } else {
-                        if (filterExpression.value instanceof Boolean || filterExpression.value instanceof Number) {
-                            where << ("sc.${filterExpression.fieldName} = ${filterExpression.value}" as String)
-                            occ++
-                        } else if (filterExpression.value) {
-                            where << ("sc.${filterExpression.fieldName} = :${'npfe' + occ}" as String)
-                            namedParams.put('npfe' + occ, filterExpression.value)
-                            occ++
-                        }
+                        where << ("sc.${filterExpression.fieldName} = :${'npfe' + occ}" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
+                        occ++
                     }
                     break
                 case Operator.NE:
                     if (filterExpression.value == null) {
                         where << ("sc.${filterExpression.fieldName} IS NOT NULL" as String)
                         occ++
-                    } else if (filterExpression.value instanceof Boolean || filterExpression.value instanceof Number) {
-                        where << ("(sc.${filterExpression.fieldName} != ${filterExpression.value} OR sc.${filterExpression.fieldName} IS NULL)" as String)
-                        occ++
                     } else {
-                        where << ("(sc.${filterExpression.fieldName} != '${filterExpression.value}' OR sc.${filterExpression.fieldName} IS NULL)" as String)
+                        where << ("(sc.${filterExpression.fieldName} != :${'npfe' + occ} OR sc.${filterExpression.fieldName} IS NULL)" as String)
+                        namedParams.put('npfe' + occ, filterExpression.value)
                         occ++
                     }
                     break
