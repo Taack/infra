@@ -37,6 +37,8 @@ class PngDiagramRender implements IDiagramRender {
         lineWidth *= resolution.fontSizePercentage
         bi = new BufferedImage(pngWidth.toInteger(), pngHeight.toInteger(), BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
+        ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        ig2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
         ig2.setPaint(fillStyle)
         Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
         ig2.setFont(f)
@@ -54,6 +56,8 @@ class PngDiagramRender implements IDiagramRender {
         lineWidth *= fontSizePercentage
         bi = new BufferedImage(pngWidth.toInteger(), pngHeight.toInteger(), BufferedImage.TYPE_INT_ARGB)
         ig2 = bi.createGraphics()
+        ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        ig2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
         ig2.setPaint(fillStyle)
         Font f = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
         ig2.setFont(f)
@@ -266,13 +270,38 @@ class PngDiagramRender implements IDiagramRender {
 
     @Override
     void renderImage(String filepath, BigDecimal width, BigDecimal height) {
-        File image = new File(filepath)
-        if (image.exists()) {
-            ig2.drawImage(ImageIO.read(image), trX.toInteger(), trY.toInteger(), width.toInteger(), height.toInteger(), null)
+        File imageFile = new File(filepath)
+        BufferedImage image = imageFile.exists() ? ImageIO.read(imageFile) : null
+        if (image) {
+            // Fits the image in the box, centered, as SVG does by default
+            BigDecimal ratio = [width / image.width, height / image.height].min()
+            int scaledWidth = Math.max((image.width * ratio).toInteger(), 1)
+            int scaledHeight = Math.max((image.height * ratio).toInteger(), 1)
+            ig2.drawImage(downscale(image, scaledWidth, scaledHeight), (trX + (width - scaledWidth) / 2).toInteger(), (trY + (height - scaledHeight) / 2).toInteger(), null)
         } else {
             translateTo(trX + width / 2, trY + height / 2)
             renderCircle(width / 2)
         }
+    }
+
+    /**
+     * Halves the size step by step before the final resize: a single bicubic pass from a large picture skips most source pixels and looks noisy.
+     */
+    private static BufferedImage downscale(BufferedImage image, int width, int height) {
+        BufferedImage scaled = image
+        while (scaled.width.intdiv(2) >= width && scaled.height.intdiv(2) >= height) {
+            scaled = resize(scaled, scaled.width.intdiv(2), scaled.height.intdiv(2))
+        }
+        resize(scaled, width, height)
+    }
+
+    private static BufferedImage resize(BufferedImage image, int width, int height) {
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        Graphics2D g = resized.createGraphics()
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+        g.drawImage(image, 0, 0, width, height, null)
+        g.dispose()
+        resized
     }
 
     @Override
