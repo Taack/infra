@@ -160,21 +160,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
         htmlBlock.getOutput(new BufferedOutputStream(webRequest.response.outputStream))
     }
 
-    interface CurrentUserGetter {
-        TaackUser getCurrentUser()
-    }
-
-    CurrentUserGetter currentUserGetter
-
-    private TaackUser getCurrentUser() {
-        try {
-            return currentUserGetter.currentUser//springSecurityService.currentUser as TaackUser
-        } catch (ignored) {
-            return null
-        }
-        null
-    }
-
     /**
      * Render a block.
      *
@@ -640,15 +625,14 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
             <ul class="navbar-nav flex-row ml-md-auto ">
 """
         if (conf.hasMenuLogin) {
-            TaackUser currentUser = getCurrentUser()
-            if (currentUser) {
-                String switchedUsername = ""// SpringSecurityUtils.getSwitchedUserOriginalUsername()
-                if (switchedUsername)
+            String username = request.remoteUser
+            if (username) {
+                if (request.isUserInRole("ROLE_PREVIOUS_ADMINISTRATOR"))
                     bout << """\
                     <li class="nav-item dropdown">
                         <form action='${request.contextPath}/logout/impersonate' method='POST'>
                             <input type='submit'
-                                   value="Resume as ${switchedUsername}"/>
+                                   value="Resume"/>
                         </form>
                     </li>
                 """
@@ -657,7 +641,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            ${currentUser.username}
+                            ${username}
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUser" style="text-align: center;">
