@@ -1,5 +1,6 @@
 package taack.ui.base.element
 
+import web.cssom.ClassName
 import js.array.asList
 import js.iterable.iterator
 import taack.ui.base.BaseElement
@@ -62,9 +63,8 @@ class Form(val parent: AjaxBlock, val f: HTMLFormElement):
             val textarea = element as HTMLTextAreaElement
             textarea.style.display = "none"
             val scrollContainer = document.createElement("div") as HTMLDivElement
-            scrollContainer.style.height = "240px"
-            scrollContainer.style.border = "1px solid grey"
-            scrollContainer.style.overflow = "auto"
+            // its size is in taack-editor.css: it grows with a modal
+            scrollContainer.classList.add(ClassName("taack-editor-scroll"))
             val largeContainer = document.createElement("div") as HTMLDivElement
 //            largeContainer.style.overflow = "hidden"
             val canvasContainer = document.createElement("div") as HTMLDivElement

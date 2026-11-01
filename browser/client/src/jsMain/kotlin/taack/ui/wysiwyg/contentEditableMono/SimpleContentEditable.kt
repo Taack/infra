@@ -232,6 +232,11 @@ class SimpleContentEditable(
                 autocomplete()
                 event.preventDefault()
                 event.stopPropagation()
+            } else if (event.code == KeyCode.Tab && !shortcut && !event.altKey && !event.shiftKey) {
+                // A tab in the code, rather than the focus on the next field; Shift+Tab still leaves the editor
+                insertTab()
+                event.preventDefault()
+                event.stopPropagation()
             } else if (event.code == KeyCode.Escape) {
                 divAutocomplete.style.display = "none"
             } else if (event.code == KeyCode.KeyV && event.ctrlKey) {
@@ -484,6 +489,18 @@ class SimpleContentEditable(
         trace("replaceMultilineSelection $start $end")
         replaceText(start.first, start.second, end.first, end.second, newText)
         return true
+    }
+
+    /**
+     * Replace the selection, or insert at the caret, a tab character.
+     */
+    private fun insertTab() {
+        val selection = window.getSelection() ?: return
+        if (selection.rangeCount == 0) return
+        val range = selection.getRangeAt(0)
+        val start = positionOf(range.startContainer, range.startOffset) ?: return
+        val end = positionOf(range.endContainer, range.endOffset) ?: return
+        replaceText(start.first, start.second, end.first, end.second, "\t")
     }
 
     /**
