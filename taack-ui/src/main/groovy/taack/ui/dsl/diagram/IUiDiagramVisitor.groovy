@@ -15,6 +15,7 @@ interface IUiDiagramVisitor {
         PIE,
         WHISKERS,
         TIMELINE,
+        ORG_CHART,
         CUSTOM_HTML
     }
 
@@ -35,6 +36,8 @@ interface IUiDiagramVisitor {
     void whiskersBoxData(String key, BigDecimal... boxData)
 
     void timelinePeriodData(String key, String keyDescription, String keyImageHref, Date startDate, Date endDate, String title)
+
+    void orgChartNode(String key, String parentKey, String title, String subtitle, String header, String image)
 
     void visitDiagramEnd()
 

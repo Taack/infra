@@ -34,6 +34,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     private Map<String, Map<Object, BigDecimal>> dataPerKey = [:] // [key1: [xData1: yData1, xData2: yData2,...], key2: [...], ...]
     private Map<String, List<List<BigDecimal>>> whiskersYDataListPerKey = [:] // [key1: [yBoxData1, yBoxData2, ...], key2: [...], ...]; yBoxData = [data1, data2, ...]
     private Map<Triple<String, String, String>, List<Triple<Date, Date, String>>> timelineDataPerKey = [:] // [Triple(key, keyDescription, keyImageHref): [Triple(startDate, endDate, title), Triple(startDate2, endDate2, title2), Pair...], Triple() : [...], ...]
+    private List<OrgChartNode> orgChartNodes = []
     private DiagramOption diagramOption = new DiagramOption()
     private boolean isComboDiagram = false
     private List<RawHtmlDiagramDump> comboDiagramList = []
@@ -52,6 +53,7 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
             this.dataPerKey = [:]
             this.whiskersYDataListPerKey = [:]
             this.timelineDataPerKey = [:]
+            this.orgChartNodes = []
             this.diagramOption = new DiagramOption()
             return this
         } else {
@@ -139,6 +141,11 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
         }
     }
 
+    @Override
+    void orgChartNode(String key, String parentKey, String title, String subtitle, String header, String image) {
+        orgChartNodes.add(new OrgChartNode(key, parentKey, title, subtitle, header, image))
+    }
+
     IDiagramRender initDiagramRender() {
         if (diagramBase == UiDiagramSpecifier.DiagramBase.PNG) {
             if (!diagramOption.resolution) {
@@ -154,6 +161,9 @@ class RawHtmlDiagramDump implements IUiDiagramVisitor {
     }
 
     DiagramScene initDiagramScene() {
+        if (diagramType?.aValue == DiagramType.ORG_CHART) {
+            return OrgChartDiagramScene.create(diagramBase == UiDiagramSpecifier.DiagramBase.PNG, diagramBase == UiDiagramSpecifier.DiagramBase.SVG, orgChartNodes, diagramOption)
+        }
         IDiagramRender render = initDiagramRender()
         switch (diagramType?.aValue) {
             case DiagramType.BAR:

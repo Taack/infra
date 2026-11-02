@@ -28,7 +28,9 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
     }
 
     String objectToString(Object o) {
-        return o instanceof Date ? diagramOption.xLabelDateFormat.format(o) : o.toString()
+        if (o instanceof Date) return diagramOption.xLabelDateFormat.format(o)
+        if (o instanceof Number) return numberToParam(o.toBigDecimal()) // 2020, 2020.0 and 2020.00 must match
+        return o.toString()
     }
 
     void initData() {
@@ -106,6 +108,7 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                 Map<String, BigDecimal> data = dataPerKey[keys[j]] as Map<String, BigDecimal>
                 if (!data.isEmpty()) {
                     String xLabel = objectToString(xLabelList[i * showGapEveryX])
+                    String xLabelText = xLabelToString(xLabelList[i * showGapEveryX])
                     BigDecimal yData = data.get(xLabel) ?: 0.0
                     String yDataLabel = numberToString(yData)
                     BigDecimal barHeight = (yData - startLabelY) / gapY * gapHeight
@@ -113,10 +116,10 @@ class BarDiagramScene extends RectBackgroundDiagramScene {
                     render.renderGroup(['element-type': ElementType.TOOLTIP,
                                         'key-label': keys[j],
                                         'key-color': KeyColor.colorToString(keyColor),
-                                        'key-description': "${xLabel}: ${yDataLabel}",
+                                        'key-description': "${xLabelText}: ${yDataLabel}",
                                         'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                         'data-x': xLabel,
-                                        'data-y': yDataLabel])
+                                        'data-y': numberToParam(yData)])
                     render.renderGroup(['element-type': ElementType.DATA,
                                         dataset: keys[j],
                                         'gap-index': i])

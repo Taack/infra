@@ -88,7 +88,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                     render.renderGroup(['element-type': ElementType.TOOLTIP,
                                         'key-label': keys[i],
                                         'key-color': KeyColor.colorToString(keyColor),
-                                        'key-description': dataPerKey[keys[i]].collect { "${objectToNumber(it.key)}: ${it.value}" }.join(',<br />'),
+                                        'key-description': dataPerKey[keys[i]].collect { "${xLabelToString(objectToNumber(it.key))}: ${numberToString(it.value)}" }.join(',<br />'),
                                         'diagram-action-url': diagramOption?.clickActionUrl ?: ''])
                     render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i]])
                     List<BigDecimal> coordsToDraw = [] // x1, y1, x2, y2, ...
@@ -119,7 +119,7 @@ class AreaDiagramScene extends RectBackgroundDiagramScene {
                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                     'key-label': keys[i],
                                     'key-color': KeyColor.colorToString(keyColor),
-                                    'key-description': dataPerKey[keys[i]].collect { "${it.key}: ${it.value}" }.join(',<br />'),
+                                    'key-description': dataPerKey[keys[i]].collect { "${xLabelToString(it.key)}: ${numberToString(it.value)}" }.join(',<br />'),
                                     'diagram-action-url': diagramOption?.clickActionUrl ?: ''])
                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[i]])
 

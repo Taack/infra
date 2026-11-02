@@ -61,6 +61,7 @@ abstract class DiagramScene {
     final protected Color GREY_COLOR = new Color(231, 231, 231)
 
     private NumberFormat nf = NumberFormat.getInstance(LocaleContextHolder.locale)
+    private NumberFormat xLabelNf = NumberFormat.getInstance(LocaleContextHolder.locale).tap { groupingUsed = false } // avoid '2,020' for years
 
     DiagramScene(IDiagramRender render, DiagramOption diagramOption) {
         this.render = render
@@ -78,6 +79,22 @@ abstract class DiagramScene {
 
     String numberToString(BigDecimal n) {
         return nf.format(n)
+    }
+
+    /**
+     * Value transmitted to the click action (data-x, data-y), independent of the user locale.
+     */
+    static String numberToParam(BigDecimal n) {
+        return n.stripTrailingZeros().toPlainString()
+    }
+
+    /**
+     * Displayed text of an X label, localized. Not to be used as a data key.
+     */
+    String xLabelToString(Object o) {
+        if (o instanceof Date) return diagramOption.xLabelDateFormat.format(o)
+        if (o instanceof Number) return xLabelNf.format(o)
+        return o.toString()
     }
 
     Color getKeyColor(int i) {

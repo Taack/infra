@@ -72,6 +72,17 @@ class DiagramTypeSpec {
         d.visitDiagramEnd()
     }
 
+    /**
+     * Organisation chart: a forest of boxes linked to their parent. Nodes whose parent is null or unknown are roots.
+     * Sibling leaves are stacked vertically under their parent to keep wide teams readable.
+     */
+    void orgChart(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = DiagramOrgChartSpec) Closure closure) {
+        IUiDiagramVisitor d = diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.ORG_CHART, [:], isInsideCombo)
+        closure.delegate = new DiagramOrgChartSpec(d)
+        closure.call()
+        d.visitDiagramEnd()
+    }
+
     void custom(String html) {
         diagramVisitor.visitDiagram(IUiDiagramVisitor.DiagramType.CUSTOM_HTML, [:], false)
         diagramVisitor.visitCustom(html)

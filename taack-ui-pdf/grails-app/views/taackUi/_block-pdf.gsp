@@ -24,7 +24,7 @@ ${raw(css)}
 
 @page {
     /*-fs-page-orientation: portrait;*/
-    size: 210mm 297mm;
+    size: ${orientation.pageSize};
     @top-left {
         content: element(header-top-left)
     }
@@ -48,14 +48,18 @@ ${raw(css)}
     }
 }
 
+body {
+    width: ${orientation.bodyWidth};
+}
+
 .pure-u-1-3 {
-    width: 60mm;
+    width: ${orientation.thirdWidth};
     display: inline-block;
     vertical-align: top;
 }
 
 .pure-u-1-2 {
-    width: 90mm;
+    width: ${orientation.halfWidth};
     display: inline-block;
     vertical-align: top;
 }

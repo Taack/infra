@@ -576,6 +576,20 @@ svg text {
     max-width: none;
 }
 
+/* The iframes of a modal (a 3D viewer, a document) take the height left, and follow the modal when it is resized or
+   maximized; several of them share it, 300px each at least, the modal scrolling beyond */
+.taackModal .modal-body:has(> iframe) {
+    display: flex;
+    flex-direction: column;
+}
+
+.taackModal .modal-body > iframe {
+    flex: 1 1 70vh;
+    min-height: 300px;
+    height: auto;
+    border: 0;
+}
+
 .btn-taack-close, .btn-taack-fullscreen, .btn-taack-minimize {
     font-size: larger;
     padding: 0 .15em;

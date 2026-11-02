@@ -56,6 +56,11 @@ class UiDiagramVisitor implements IUiDiagramVisitor {
     }
 
     @Override
+    void orgChartNode(String key, String parentKey, String title, String subtitle, String header, String image) {
+
+    }
+
+    @Override
     void visitDiagramEnd() {
 
     }

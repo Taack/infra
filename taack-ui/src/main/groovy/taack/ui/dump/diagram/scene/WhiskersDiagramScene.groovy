@@ -54,7 +54,9 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
     }
 
     String objectToString(Object o) {
-        return o instanceof Date ? diagramOption.xLabelDateFormat.format(o) : o.toString()
+        if (o instanceof Date) return diagramOption.xLabelDateFormat.format(o)
+        if (o instanceof Number) return numberToParam(o.toBigDecimal()) // 2020, 2020.0 and 2020.00 must match
+        return o.toString()
     }
 
     void initGapWidth() {
@@ -93,6 +95,7 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
         Set<String> keys = yDataListPerKey.keySet()
         for (int i = 0; i < (xLabelList.size() / showGapEveryX).toInteger(); i++) {
             String xLabel = objectToString(xLabelList[i * showGapEveryX])
+            String xLabelText = xLabelToString(xLabelList[i * showGapEveryX])
             int index = xDataList.lastIndexOf(xLabel)
             if (index >= 0) {
                 BigDecimal xWidth = diagramMarginLeft + gapWidth * i + gapHorizontalPadding
@@ -113,10 +116,10 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                                     'key-label': keys[j],
                                                     'key-color': KeyColor.colorToString(keyColor),
-                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'key-description': "${xLabelText}: ${yDataLabel}",
                                                     'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                                     'data-x': xLabel,
-                                                    'data-y': yDataLabel])
+                                                    'data-y': numberToParam(upperExtreme)])
                                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, style: 'pointer-events: bounding-box;'])
                                 // upperExtreme line
                                 render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperExtreme - startLabelY) / gapY * gapHeight)
@@ -132,10 +135,10 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                                     'key-label': keys[j],
                                                     'key-color': KeyColor.colorToString(keyColor),
-                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'key-description': "${xLabelText}: ${yDataLabel}",
                                                     'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                                     'data-x': xLabel,
-                                                    'data-y': yDataLabel])
+                                                    'data-y': numberToParam(upperQuartile)])
                                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
                                 // rect from upperQuartile to median
                                 render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (upperQuartile - startLabelY) / gapY * gapHeight)
@@ -150,10 +153,10 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                                     'key-label': keys[j],
                                                     'key-color': KeyColor.colorToString(keyColor),
-                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'key-description': "${xLabelText}: ${yDataLabel}",
                                                     'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                                     'data-x': xLabel,
-                                                    'data-y': yDataLabel])
+                                                    'data-y': numberToParam(median)])
                                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
                                 // rect from median to lowerQuartile
                                 render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (median - startLabelY) / gapY * gapHeight)
@@ -168,10 +171,10 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                                     'key-label': keys[j],
                                                     'key-color': KeyColor.colorToString(keyColor),
-                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'key-description': "${xLabelText}: ${yDataLabel}",
                                                     'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                                     'data-x': xLabel,
-                                                    'data-y': yDataLabel])
+                                                    'data-y': numberToParam(lowerQuartile)])
                                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i, style: 'pointer-events: bounding-box;'])
                                 // lowerQuartile line
                                 render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerQuartile - startLabelY) / gapY * gapHeight)
@@ -186,10 +189,10 @@ class WhiskersDiagramScene extends RectBackgroundDiagramScene {
                                 render.renderGroup(['element-type': ElementType.TOOLTIP,
                                                     'key-label': keys[j],
                                                     'key-color': KeyColor.colorToString(keyColor),
-                                                    'key-description': "${xLabel}: ${yDataLabel}",
+                                                    'key-description': "${xLabelText}: ${yDataLabel}",
                                                     'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                                     'data-x': xLabel,
-                                                    'data-y': yDataLabel])
+                                                    'data-y': numberToParam(lowerExtreme)])
                                 render.renderGroup(['element-type': ElementType.DATA, dataset: keys[j], 'gap-index': i])
                                 // lowerExtreme line
                                 render.translateTo(xWidth, render.getDiagramHeight() - DIAGRAM_MARGIN_BOTTOM - (lowerExtreme - startLabelY) / gapY * gapHeight)

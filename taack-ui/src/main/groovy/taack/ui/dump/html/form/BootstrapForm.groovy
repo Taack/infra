@@ -350,6 +350,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         HTMLElementBuilder inputBuilder = new HTMLTextarea(value, qualifiedName, null, disable).builder
                 .addClasses(formControl).setId(qualifiedName)
         if (editorOption) inputBuilder.putAttribute('editorOption', editorOption.compress())
+        if (editorOption?.lspUrl) inputBuilder.putAttribute('editorLspUrl', editorOption.lspUrl.replace('&', '&amp;'))
         HTMLTextarea input = inputBuilder.build() as HTMLTextarea
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         el.addChildren(input)

@@ -355,11 +355,40 @@
     caret-color: red;
 }
 
+/* The box of a code editor in a form, see Form.kt: 240px, resized by its handle */
+.taack-editor-scroll {
+    height: 240px;
+    min-height: 120px;
+    border: 1px solid grey;
+    overflow: auto;
+    resize: vertical;
+}
+
+/* In a modal, the editor takes the height left, half the screen at first, and follows the modal when it is resized
+   or maximized: every box from the modal body to the editor is a flex column */
+.taackModal .modal-body:has(> div > form > .taack-editor-scroll),
+.taackModal .modal-body > div:has(> form > .taack-editor-scroll),
+.taackModal form:has(> .taack-editor-scroll) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.taackModal form > .taack-editor-scroll {
+    flex: 1 1 50vh;
+    height: auto;
+    resize: none;
+}
+
+/* Appended to the body: above the Bootstrap modals (1055) and tooltips (1080) the editor may be in */
 .taack-autocomplete {
     display: none;
-    z-index: 1000;
+    z-index: 2000;
     position: absolute;
-    overflow: hidden;
+    max-height: 50vh;
+    overflow-x: hidden;
+    overflow-y: auto;
     border: 1px solid #CCC;
     white-space: nowrap;
     font-family: sans-serif;
@@ -379,4 +408,35 @@
 
 .taack-autocomplete li.cmd-autocomplete:hover {
     background-color: #DEF;
+}
+
+/* Diagnostics from the editor Language Server (LspClient.kt) */
+.ͼ1 .cm-line.lsp-error {
+    text-decoration: underline wavy #d33;
+    text-underline-offset: 3px;
+}
+
+.ͼ1 .cm-line.lsp-warning {
+    text-decoration: underline wavy #e90;
+    text-underline-offset: 3px;
+}
+
+.ͼ1 .cm-line.lsp-info {
+    text-decoration: underline dotted #39f;
+    text-underline-offset: 3px;
+}
+
+.ͼ1 .cm-lineNumbers .cm-gutterElement.lsp-error {
+    background-color: #fdd;
+    color: #a00;
+}
+
+.ͼ1 .cm-lineNumbers .cm-gutterElement.lsp-warning {
+    background-color: #fec;
+    color: #a60;
+}
+
+.taack-autocomplete li.lsp-completion small {
+    color: #888;
+    margin-left: 0.5em;
 }

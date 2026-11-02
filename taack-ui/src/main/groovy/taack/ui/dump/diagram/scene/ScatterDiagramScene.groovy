@@ -48,8 +48,8 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                                             'key-color': KeyColor.colorToString(keyColor),
                                             'key-description': dataLabel,
                                             'diagram-action-url': diagramOption?.clickActionUrl ?: '',
-                                            'data-x': xLabel,
-                                            'data-y': yLabel])
+                                            'data-x': xData instanceof Number ? numberToParam(xData.toBigDecimal()) : xLabel,
+                                            'data-y': numberToParam(y)])
                         render.renderGroup(['element-type': ElementType.DATA,
                                             dataset: keys[i],
                                             style: 'pointer-events: bounding-box;'])
@@ -108,10 +108,10 @@ class ScatterDiagramScene extends RectBackgroundDiagramScene {
                             render.renderGroup(['element-type': ElementType.TOOLTIP,
                                                 'key-label': keys[j],
                                                 'key-color': KeyColor.colorToString(keyColor),
-                                                'key-description': "${xLabelList[i]}: ${yDataLabel}",
+                                                'key-description': "${xLabelToString(xLabelList[i])}: ${yDataLabel}",
                                                 'diagram-action-url': diagramOption?.clickActionUrl ?: '',
                                                 'data-x': xLabelList[i],
-                                                'data-y': yDataLabel])
+                                                'data-y': numberToParam(y)])
                             render.renderGroup(['element-type': ElementType.DATA,
                                                 dataset: keys[j],
                                                 style: 'pointer-events: bounding-box;'])
