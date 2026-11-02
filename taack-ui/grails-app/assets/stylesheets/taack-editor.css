@@ -440,3 +440,27 @@
     color: #888;
     margin-left: 0.5em;
 }
+
+/* Code highlighting: the regexes of TaackGroovySpans, then the semantic tokens of the Language Server (LspClient.kt),
+   both with the classes tok-<type> and tok-<modifier> */
+.cm-editor .tok-keyword { color: #0033b3; font-weight: 600; }
+.cm-editor .tok-string { color: #067d17; }
+.cm-editor .tok-comment { color: #8c8c8c; font-style: italic; }
+.cm-editor .tok-number { color: #1750eb; }
+.cm-editor .tok-decorator { color: #9e880d; }
+.cm-editor .tok-type { color: #008080; }
+.cm-editor .tok-method { color: #00627a; }
+.cm-editor .tok-method.tok-declaration { font-weight: 600; }
+.cm-editor .tok-property { color: #871094; }
+.cm-editor .tok-parameter { color: #6b4fa1; }
+.cm-editor .tok-static { font-style: italic; }
+
+[data-bs-theme=dark] .cm-editor .tok-keyword { color: #cf8e6d; }
+[data-bs-theme=dark] .cm-editor .tok-string { color: #6aab73; }
+[data-bs-theme=dark] .cm-editor .tok-comment { color: #7a7e85; }
+[data-bs-theme=dark] .cm-editor .tok-number { color: #2aacb8; }
+[data-bs-theme=dark] .cm-editor .tok-decorator { color: #b3ae60; }
+[data-bs-theme=dark] .cm-editor .tok-type { color: #6fafbd; }
+[data-bs-theme=dark] .cm-editor .tok-method { color: #56a8f5; }
+[data-bs-theme=dark] .cm-editor .tok-property { color: #c77dbb; }
+[data-bs-theme=dark] .cm-editor .tok-parameter { color: #b189f5; }

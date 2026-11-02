@@ -152,10 +152,12 @@ final class EditorOption {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
         byte[] buffer = new byte[4096]
 
-//        while (!deflater.finished()) {
-        int compressedSize = deflater.deflate(buffer)
-        outputStream.write(buffer, 0, compressedSize)
-//        }
+        // Many span regexes compress to more than one buffer
+        while (!deflater.finished()) {
+            int compressedSize = deflater.deflate(buffer)
+            outputStream.write(buffer, 0, compressedSize)
+        }
+        deflater.end()
         String b64 = new String(Base64.encoder.encode(outputStream.toByteArray()))
         return b64
 //        return new String(Base64.encoder.encode(StringEscapeUtils.unescapeJava(UriEncoder.encode(s)).bytes))

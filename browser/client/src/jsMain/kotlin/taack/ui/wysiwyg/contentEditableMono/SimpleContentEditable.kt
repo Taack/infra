@@ -82,7 +82,16 @@ class SimpleContentEditable(
 
     data class Span(
         val pattern: String, val className: String, val inlined: SpanMode
-    )
+    ) {
+        /** Compiled once, matched at each character of the lines */
+        val regex: Regex by lazy { Regex(pattern) }
+    }
+
+    /**
+     * The semantic tokens of the Language Server, by line, with the text of the line they describe: a line edited
+     * since is highlighted by the regexes until the next tokens.
+     */
+    private var semanticLines: Map<Int, Pair<String, List<LspClient.SemanticToken>>> = emptyMap()
 
     data class MenuEntry(
         val caption: String, val decorator: String, val inlined: SpanMode
@@ -141,7 +150,7 @@ class SimpleContentEditable(
         }
         val lspUrl = text.getAttribute("editorlspurl")
         if (!lspUrl.isNullOrEmpty()) {
-            lsp = LspClient(lspUrl) {
+            lsp = LspClient(lspUrl, { tokens, text -> applySemanticTokens(tokens, text) }) {
                 diagnostics = it
                 showDiagnostics()
             }
@@ -178,7 +187,18 @@ class SimpleContentEditable(
         divHolder.appendChild(divScroll)
 
         divContent.onpaste = EventHandler { e ->
-            Helper.onpaste(e, upLoadUrl!!, { xhr: XMLHttpRequest ->
+            val data = e.clipboardData
+            val url = upLoadUrl
+            // Files and HTML go to the upload action, which answers the text to insert (a link, AsciiDoc)
+            if (url == null || ((data?.files?.length ?: 0) == 0 && data?.getData("text/html").isNullOrEmpty())) {
+                // Plain text: the browser would put its lines in the current one, as <br> or nested divs
+                val pasted = data?.getData("text/plain") ?: return@EventHandler
+                e.preventDefault()
+                e.stopPropagation()
+                replaceSelection(pasted.replace("\r\n", "\n").replace('\r', '\n'))
+                return@EventHandler
+            }
+            Helper.onpaste(e, url, { xhr: XMLHttpRequest ->
                 trace("onpast::url $upLoadUrl")
                 if (currentLine != null) {
                     var txtToSave = ""
@@ -234,7 +254,7 @@ class SimpleContentEditable(
                 event.stopPropagation()
             } else if (event.code == KeyCode.Tab && !shortcut && !event.altKey && !event.shiftKey) {
                 // A tab in the code, rather than the focus on the next field; Shift+Tab still leaves the editor
-                insertTab()
+                replaceSelection("\t")
                 event.preventDefault()
                 event.stopPropagation()
             } else if (event.code == KeyCode.Escape) {
@@ -261,6 +281,11 @@ class SimpleContentEditable(
 
             if (event.code == KeyCode.Enter || event.code == KeyCode.NumpadEnter) {
                 // Record the line break on its own, the undo history needs the caret before it
+                // The line split, or the new one, highlighted again
+                currentLine?.let { line ->
+                    (line.previousElementSibling as? HTMLDivElement)?.let { asciidocToHtml(it) }
+                    asciidocToHtml(line)
+                }
                 var txtToSave = ""
                 for (c in divContent.children.iterator()) txtToSave += c.textContent + "\n"
                 textContent = txtToSave
@@ -492,15 +517,15 @@ class SimpleContentEditable(
     }
 
     /**
-     * Replace the selection, or insert at the caret, a tab character.
+     * Replace the selection, or insert at the caret, a text of one or more lines.
      */
-    private fun insertTab() {
+    private fun replaceSelection(newText: String) {
         val selection = window.getSelection() ?: return
         if (selection.rangeCount == 0) return
         val range = selection.getRangeAt(0)
         val start = positionOf(range.startContainer, range.startOffset) ?: return
         val end = positionOf(range.endContainer, range.endOffset) ?: return
-        replaceText(start.first, start.second, end.first, end.second, "\t")
+        replaceText(start.first, start.second, end.first, end.second, newText)
     }
 
     /**
@@ -812,113 +837,149 @@ class SimpleContentEditable(
 ////        TODO: window.getSelection()?.setPosition(e.childNodes[e.childElementCount], )
 //    }
 
+    /**
+     * Highlight a line: from the semantic tokens of the Language Server when they describe its current text, else
+     * from the regexes of the editor options. The caret stays where it was in the line.
+     */
     fun asciidocToHtml(e: HTMLDivElement) {
-        trace("asciidocToHtml +++ ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
-        var txt = escapeHtml(e.textContent)
-        if (txt?.isEmpty() == true) {
+        val raw = e.textContent ?: ""
+        if (raw.isEmpty()) {
             e.innerHTML = HtmlSource("<br>")
             return
         }
-        if (txt != null) {
-            var hasStart: Span? = null
-            var hasStartCharSeq: Span? = null
-            var inlineMatchSequence: List<Pair<Span, MatchResult>> = mutableListOf<Pair<Span, MatchResult>>()
-            val entries = styles[currentContext]!!
+        val semantic = semanticLines[lineIndexOf(e)]
+        val result = (if (semantic != null && semantic.first == raw) semanticHtml(raw, semantic.second)
+        else regexHtml(escapeHtml(raw)!!)) ?: return
 
-            var txtCursor = 0
-            outerWhile@ while (txt!!.length > txtCursor) {
-                var inContext = false
-                for (entry in entries) {
-                    if (entry.inlined == SpanMode.CONTEXT_START) {
-                        inContext = true
-                        break
-                    }
-                    if (entry.inlined == SpanMode.CONTEXT_END) {
-                        if (inContext && txt!!.startsWith(entry.pattern)) {
-                            inContext = false
-                            break
-                        }
-                    }
-                    if (inContext) {
-                        break
-                    }
-
-                    if (txtCursor == 0) {
-                        if (entry.inlined == SpanMode.START_CHAR_SEQ) {
-                            if (txt.startsWith(entry.pattern)) {
-                                hasStartCharSeq = entry
-                                txtCursor = entry.pattern.length
-                                break
-                            }
-                        }
-                    }
-
-                    if (txtCursor == 0 && entry.inlined == SpanMode.START && hasStart == null) {
-                        if (txt.startsWith(entry.pattern)) {
-                            hasStart = entry
-                            break@outerWhile
-                        }
-                    } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
-                        val pattern = entry.pattern
-                        val regex = Regex(pattern)
-
-                        if (txtCursor < txt.length) {
-                            val s = regex.find(txt, txtCursor)
-                            if (s != null && s.range.first == txtCursor) {
-                                txtCursor = s.range.last
-                                inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
-                                break
-                            }
-                        }
-                        if (entry.inlined == SpanMode.INLINED_BREAK) break
-                        if (entry.inlined == SpanMode.CONTEXT_START && currentContext == null) {
-                            currentContext = entry
-                            break
-                        } else if (entry.inlined == SpanMode.CONTEXT_END && currentContext != null) {
-                            currentContext = null
-                            break
-                        }
-                    }
-                }
-                txtCursor++
-            }
-
-            var i = 0
-            var result: String = (if (hasStartCharSeq != null) {
-                i += hasStartCharSeq.pattern.length
-                """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
-            } else "")
-
-            for (c in inlineMatchSequence) {
-                val spanStyle: Span = c.first
-                val match: MatchResult = c.second
-                val start = match.range.first
-                val ends = match.range.endInclusive
-                val replace =
-                    """${match.groupValues[1]}<span typeInlined="${spanStyle.inlined}" class="${spanStyle.className}">${match.groupValues[2]}</span>${match.groupValues[3]}"""
-                result += txt!!.substring(i..<start) + replace
-                i = ends + 1
-            }
-            result += txt!!.substring(i)
-
-            if (hasStart != null) {
-                val cn = hasStart.className
-                result = """<span class="$cn">$result</span>"""
-            }
-
-            if (e.innerHTML.toString() != result) {
-                val n = currentNode
-                val p = selectedElementPosition
-                var i = 0
-                e.childNodes.asList().forEachIndexed { index, node ->
-                    if (node == n || node == n?.parentNode) i = index
-                }
-                e.innerHTML = HtmlSource(result)
-                updateSelection(e, n, p, i)
-            }
+        if (e.innerHTML.toString() != result) {
+            val caret = caretPosition()
+            val index = lineIndexOf(e)
+            e.innerHTML = HtmlSource(result)
+            if (caret != null && caret.first == index) setCaret(caret.first, caret.second)
         }
-        trace("asciidocToHtml --- ${window.getSelection()?.anchorOffset} ${window.getSelection()?.focusNode}")
-//        TODO: window.getSelection()?.setPosition(e.childNodes[e.childElementCount], )
+    }
+
+    private fun lineIndexOf(e: HTMLDivElement): Int {
+        val children = divContent.children
+        for (i in 0 until children.length) if (children[i] == e) return i
+        return -1
+    }
+
+    private fun semanticHtml(raw: String, tokens: List<LspClient.SemanticToken>): String {
+        var result = ""
+        var i = 0
+        for (t in tokens) {
+            if (t.start < i || t.start + t.length > raw.length) continue
+            result += escapeHtml(raw.substring(i, t.start)) + """<span class="${t.classes}">""" +
+                    escapeHtml(raw.substring(t.start, t.start + t.length)) + "</span>"
+            i = t.start + t.length
+        }
+        return result + escapeHtml(raw.substring(i))
+    }
+
+    /**
+     * Keep the tokens when they describe the current text, and highlight the lines again
+     */
+    private fun applySemanticTokens(tokens: List<LspClient.SemanticToken>, text: String) {
+        if (text != textContent) return
+        val lines = text.split("\n")
+        val byLine = tokens.groupBy { it.line }
+        semanticLines = lines.indices.associateWith { Pair(lines[it], byLine[it] ?: emptyList()) }
+        for (c in divContent.children.iterator()) asciidocToHtml(c as HTMLDivElement)
+    }
+
+    /**
+     * The HTML of a line from the regexes, null without any
+     */
+    private fun regexHtml(escaped: String): String? {
+        val txt = escaped
+        var hasStart: Span? = null
+        var hasStartCharSeq: Span? = null
+        var inlineMatchSequence: List<Pair<Span, MatchResult>> = mutableListOf<Pair<Span, MatchResult>>()
+        val entries = styles[currentContext] ?: return null
+
+        var txtCursor = 0
+        outerWhile@ while (txt.length > txtCursor) {
+            var inContext = false
+            for (entry in entries) {
+                if (entry.inlined == SpanMode.CONTEXT_START) {
+                    inContext = true
+                    break
+                }
+                if (entry.inlined == SpanMode.CONTEXT_END) {
+                    if (inContext && txt.startsWith(entry.pattern)) {
+                        inContext = false
+                        break
+                    }
+                }
+                if (inContext) {
+                    break
+                }
+
+                if (txtCursor == 0) {
+                    if (entry.inlined == SpanMode.START_CHAR_SEQ) {
+                        if (txt.startsWith(entry.pattern)) {
+                            hasStartCharSeq = entry
+                            txtCursor = entry.pattern.length
+                            break
+                        }
+                    }
+                }
+
+                if (txtCursor == 0 && entry.inlined == SpanMode.START && hasStart == null) {
+                    if (txt.startsWith(entry.pattern)) {
+                        hasStart = entry
+                        break@outerWhile
+                    }
+                } else if (entry.inlined == SpanMode.INLINED || entry.inlined == SpanMode.INLINED_BREAK || entry.inlined == SpanMode.CONTEXT_START || entry.inlined == SpanMode.CONTEXT_END) {
+                    if (txtCursor < txt.length) {
+                        val s = entry.regex.matchAt(txt, txtCursor)
+                        if (s != null && s.value.isNotEmpty()) {
+                            txtCursor = s.range.last
+                            inlineMatchSequence = inlineMatchSequence.plusElement(Pair(entry, s))
+                            break
+                        }
+                    }
+                    if (entry.inlined == SpanMode.INLINED_BREAK) break
+                    if (entry.inlined == SpanMode.CONTEXT_START && currentContext == null) {
+                        currentContext = entry
+                        break
+                    } else if (entry.inlined == SpanMode.CONTEXT_END && currentContext != null) {
+                        currentContext = null
+                        break
+                    }
+                }
+            }
+            txtCursor++
+        }
+
+        var i = 0
+        var result: String = (if (hasStartCharSeq != null) {
+            i += hasStartCharSeq.pattern.length
+            """<span class="${hasStartCharSeq.className}">${hasStartCharSeq.pattern}</span>"""
+        } else "")
+
+        for (c in inlineMatchSequence) {
+            val spanStyle: Span = c.first
+            val match: MatchResult = c.second
+            val start = match.range.first
+            val ends = match.range.endInclusive
+            val g = match.groupValues
+            // Patterns are written ()(highlighted)(), the others are highlighted whole
+            val replace = if (g.size >= 4)
+                """${g[1]}<span typeInlined="${spanStyle.inlined}" class="${spanStyle.className}">${g[2]}</span>${g[3]}"""
+            else """<span typeInlined="${spanStyle.inlined}" class="${spanStyle.className}">${g[0]}</span>"""
+            result += txt.substring(i..<start) + replace
+            i = ends + 1
+        }
+        result += txt.substring(i)
+
+        if (hasStart != null) {
+            val cn = hasStart.className
+            result = """<span class="$cn">$result</span>"""
+        }
+
+        return result
     }
 
     fun appendDivToContent(s: String?): HTMLDivElement {
@@ -953,15 +1014,13 @@ class SimpleContentEditable(
                 if (it.isNotEmpty()) {
                     val d = appendDivToContent(escapeHtml(it))
                     divContent.appendChild(d)
-                    createLineNumbers()
-                    if (currentLine != null)
-                        asciidocToHtml(d)
+                    asciidocToHtml(d)
                 } else {
                     divContent.appendChild(appendDivToContent("<br>"))
-                    createLineNumbers()
                 }
             }
         }
+        createLineNumbers()
         showDiagnostics()
     }
 
