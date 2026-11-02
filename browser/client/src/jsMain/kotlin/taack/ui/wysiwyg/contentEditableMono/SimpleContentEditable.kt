@@ -10,6 +10,7 @@ import web.compression.CompressionFormat
 import web.compression.DecompressionStream
 import web.compression.deflate
 import web.cssom.ClassName
+import web.dom.Element
 import web.dom.ElementId
 import web.dom.Node
 import web.dom.Text
@@ -611,9 +612,11 @@ class SimpleContentEditable(
             range.collapse(false)
         }
         range.collapse(true)
-        divContent.focus()
+        // focus() scrolls to the top of the editor: the line of the caret is scrolled to only when out of view
+        divContent.asDynamic().focus(js("({preventScroll: true})"))
         window.getSelection()?.removeAllRanges()
         window.getSelection()?.addRange(range)
+        lineDiv.asDynamic().scrollIntoView(js("({block: 'nearest', inline: 'nearest'})"))
         lastCaret = Pair(line, character)
     }
 
@@ -1004,6 +1007,13 @@ class SimpleContentEditable(
 
     fun readTextarea() {
         trace("readTextarea")
+        // Emptied, the editor loses its scroll, and the boxes holding it theirs
+        val scrolls = mutableListOf<Triple<Element, Double, Double>>()
+        var scrolled: Element? = divContent.parentElement
+        while (scrolled != null) {
+            if (scrolled.scrollTop != 0.0 || scrolled.scrollLeft != 0.0) scrolls.add(Triple(scrolled, scrolled.scrollTop, scrolled.scrollLeft))
+            scrolled = scrolled.parentElement
+        }
         divContent.innerHTML = HtmlSource("")
         if (text.textContent?.length == 0) {
             text.textContent = "\n"
@@ -1022,6 +1032,10 @@ class SimpleContentEditable(
         }
         createLineNumbers()
         showDiagnostics()
+        for ((e, top, left) in scrolls) {
+            e.scrollTop = top
+            e.scrollLeft = left
+        }
     }
 
 }
