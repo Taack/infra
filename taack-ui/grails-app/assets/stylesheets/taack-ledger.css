@@ -383,6 +383,16 @@
     color: var(--lg-accent);
 }
 
+[data-taack-theme="ledger"] :is(.asciidocMain, .asciidocToc) {
+    --doc-text: var(--lg-text);
+    --doc-muted: var(--lg-text-3);
+    --doc-heading: var(--lg-text);
+    --doc-accent: var(--lg-accent);
+    --doc-border: var(--lg-border);
+    --doc-surface-2: var(--lg-surface-2);
+    --doc-radius: var(--lg-radius);
+}
+
 /* intranet3's comment icon is a black outline on a white fill, a white blob on the dark sheet. */
 [data-taack-theme="ledger"][data-bs-theme="dark"] .table td img[src$="/comments.svg"] {
     filter: invert(0.85);
