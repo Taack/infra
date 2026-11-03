@@ -311,7 +311,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
 
     @Override
     IHTMLElement datePairInputs(IHTMLElement topElement, String qualifiedName, String trI18n, boolean disable, boolean nullable, Pair<Date, Date> value, boolean isInTime) {
-        IHTMLElement el = noLabel ? filterGroup(topElement, trI18n) : themeStartInputs(topElement)
+        IHTMLElement el = noLabel ? filterField(topElement, qualifiedName, trI18n) : themeStartInputs(topElement)
         HTMLDiv div = new HTMLDiv().builder.setStyle(new Style(null, 'display: flex;')).build() as HTMLDiv
 
         Date value1 = value.aValue
@@ -319,7 +319,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             HTMLInput dateInput1 = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value1 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value1) : null, qualifiedName, inputEscape(trI18n) + ' (Min)', disable).builder.setId(qualifiedName + '-min').addClasses(formControl).build() as HTMLInput
             div.addChildren(dateInput1, formLabelInput(qualifiedName + '-min', trI18n))
         } else {
-            HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value1 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value1) : null, qualifiedName, inputEscape(trI18n) + ' (Min)', disable).builder.setId(qualifiedName + '-min').addClasses(formControl).build() as HTMLInput
+            HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value1 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value1) : null, qualifiedName, 'Min', disable).builder.setId(qualifiedName + '-min').addClasses(formControl).build() as HTMLInput
             dateInput1.putAttr('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
             dateInput1.putAttr('onblur', "this.type='${InputType.STRING.typeText}'" as String)
             div.addChildren(dateInput1)
@@ -333,7 +333,7 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             HTMLInput dateInput1 = new HTMLInput(isInTime ? InputType.DATETIME : InputType.DATE, value2 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value2) : null, qualifiedName, inputEscape(trI18n) + ' (Max)', disable).builder.setId(qualifiedName + '-max').addClasses(formControl).build() as HTMLInput
             div.addChildren(dateInput1, formLabelInput(qualifiedName + '-max', trI18n))
         } else {
-            HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value2 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value2) : null, qualifiedName, inputEscape(trI18n) + ' (Max)', disable).builder.setId(qualifiedName + '-max').addClasses(formControl).build() as HTMLInput
+            HTMLInput dateInput1 = new HTMLInput(InputType.STRING, value2 ? new SimpleDateFormat('yyyy-MM-dd' + (isInTime ? ' HH:mm' : '')).format(value2) : null, qualifiedName, 'Max', disable).builder.setId(qualifiedName + '-max').addClasses(formControl).build() as HTMLInput
             dateInput1.putAttr('onfocus', "this.type='${(isInTime ? InputType.DATETIME : InputType.DATE).typeText}'" as String)
             dateInput1.putAttr('onblur', "this.type='${InputType.STRING.typeText}'" as String)
             div.addChildren(dateInput1)
