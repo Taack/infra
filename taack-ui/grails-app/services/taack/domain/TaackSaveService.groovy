@@ -167,11 +167,11 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
 //            }
 //        }
 
-        List<Field> classFields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields).findAll {
-            Field f -> !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) && !(f.name.contains('_') || f.name.contains('$')) && !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) && /*(*/f.name in p.keySet() //|| f.name in belongsToKey)
-        }
+        List<Field> fields = (gormEntity.class.declaredFields + gormEntity.class.superclass.declaredFields) as List<Field>
 
-        for (Field includedField in classFields) {
+        for (Field includedField in fields.findAll {
+            Field f -> !['id', 'filePath', 'version', 'userCreated', 'userUpdated', 'userLastUpdated', 'dateCreated', 'lastUpdated'].contains(f.name) && !(f.name.contains('_') || f.name.contains('$')) && !(Modifier.isFinal(f.modifiers) || Modifier.isStatic(f.modifiers) || Modifier.isTransient(f.modifiers)) && /*(*/f.name in p.keySet() //|| f.name in belongsToKey)
+        }) {
             if (lockedFields && lockedFields[0] != null && lockedFields*.fieldConstraint*.field.contains(includedField)) {
                 // Modify only fields that are not in lockedField
                 continue
@@ -344,7 +344,7 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 }
             }
         }
-        gormEntity.class.declaredFields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
+        fields*.name.intersect(fieldCustomSavingClosures.keySet()).each { fieldName ->
             fieldCustomSavingClosures.get(fieldName).call(gormEntity, params)
         }
         gormEntity.class.interfaces.toList().intersect(interfaceCustomSavingClosures.keySet()).each { interfaceClass ->
