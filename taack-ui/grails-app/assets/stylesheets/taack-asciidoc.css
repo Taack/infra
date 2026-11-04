@@ -1971,3 +1971,432 @@ pre.rouge {
     padding: 0;
   }
 }
+
+/*
+ * Documentation look, layered over the Asciidoctor default stylesheet above.
+ * Colours derive from Bootstrap's variables, so documents follow the light and dark modes;
+ * a theme retunes them through the --doc-* variables.
+ */
+.asciidocMain, .asciidocToc {
+  --doc-text: var(--bs-body-color);
+  --doc-muted: var(--bs-secondary-color);
+  --doc-heading: var(--bs-emphasis-color);
+  --doc-accent: var(--bs-link-color);
+  --doc-border: var(--bs-border-color);
+  --doc-surface-2: var(--bs-tertiary-bg);
+  --doc-code-bg: var(--bs-secondary-bg);
+  --doc-button-bg: var(--bs-success);
+  --doc-radius: 6px;
+  --doc-toc-top: 1rem;
+  --doc-measure: 52rem;
+  --doc-note: #0969da;
+  --doc-tip: #1a7f37;
+  --doc-important: #8250df;
+  --doc-warning: #9a6700;
+  --doc-caution: #cf222e;
+}
+
+[data-bs-theme="dark"] :is(.asciidocMain, .asciidocToc) {
+  --doc-note: #4493f8;
+  --doc-tip: #3fb950;
+  --doc-important: #ab7df8;
+  --doc-warning: #d29922;
+  --doc-caution: #f85149;
+}
+
+.asciidocMain {
+  max-width: 72rem;
+  padding: 0 1.5rem 4rem;
+  color: var(--doc-text);
+  font-family: var(--bs-body-font-family);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.asciidocMain :is(.paragraph, .ulist, .olist, .dlist, .admonitionblock, .listingblock, .literalblock, .quoteblock) {
+  max-width: var(--doc-measure);
+}
+
+.asciidocMain p {
+  margin-bottom: 0.9em;
+}
+
+/* The Asciidoctor stylesheet paints the lead paragraph near-black, unreadable in dark mode. */
+.asciidocMain .paragraph.lead > p, .asciidocMain #preamble > .sectionbody > [class=paragraph]:first-of-type p {
+  color: var(--doc-text);
+}
+
+/* Headings */
+
+.asciidocMain :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+  color: var(--doc-heading);
+  font-family: var(--bs-body-font-family);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  padding: 0;
+}
+
+.asciidocMain > h1:first-child {
+  margin: 1.5rem 0 1.25rem;
+  font-size: 2.25rem;
+  font-weight: 750;
+}
+
+/* A book's parts: the strongest break of the document. */
+.asciidocMain h1.sect0 {
+  margin: 3.5rem 0 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 3px solid var(--doc-accent);
+  font-size: 1.9rem;
+}
+
+.asciidocMain .sect1 + .sect1 {
+  border-top: 0;
+}
+
+.asciidocMain .sect1 > h2 {
+  margin: 2.75rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--doc-border);
+  font-size: 1.5rem;
+}
+
+.asciidocMain .sect2 > h3 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.2rem;
+}
+
+.asciidocMain .sect3 > h4 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.asciidocMain :is(h1, h2, h3, h4) > a.anchor {
+  color: var(--doc-muted);
+}
+
+/* Links and inline text */
+
+.asciidocMain a {
+  color: var(--doc-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.asciidocMain a:hover, .asciidocMain a:focus {
+  color: var(--doc-accent);
+  text-decoration-thickness: 2px;
+}
+
+.asciidocMain :not(pre):not([class^=L]) > code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--doc-code-bg);
+  color: inherit;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.875em;
+  word-spacing: normal;
+}
+
+.asciidocMain mark {
+  padding: 0 0.2em;
+  border-radius: 3px;
+}
+
+/* btn:[Save] reads as the green form button it names. */
+.asciidocMain b.button {
+  display: inline-block;
+  padding: 0.05em 0.55em;
+  border-radius: 4px;
+  background: var(--doc-button-bg);
+  color: #fff;
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.asciidocMain b.button::before, .asciidocMain b.button::after {
+  content: none;
+}
+
+.asciidocMain .menuseq {
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--doc-border);
+  border-radius: 4px;
+  background: var(--doc-surface-2);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.asciidocMain .menuseq b:not(.caret) {
+  font-weight: 600;
+}
+
+.asciidocMain .menuseq i.caret::before {
+  content: "\203A";
+  color: var(--doc-muted);
+}
+
+.asciidocMain kbd {
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--doc-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--doc-surface-2);
+  box-shadow: none;
+  color: inherit;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.8em;
+}
+
+/* The intranet's own action icons, shown inline in sentences. */
+.asciidocMain .image.ui-icon img {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+}
+
+/* Images */
+
+.asciidocMain .imageblock {
+  margin: 1.25rem 0 2rem;
+}
+
+.asciidocMain .imageblock > .content > img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--doc-border);
+  border-radius: var(--doc-radius);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 28px -12px rgba(0, 0, 0, 0.25);
+  cursor: zoom-in;
+}
+
+.asciidocMain :is(.imageblock, .tableblock, .listingblock) > .title,
+.asciidocMain table.tableblock > caption.title {
+  margin: 0.6rem 0 0.4rem;
+  color: var(--doc-muted);
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 500;
+  text-align: left;
+}
+
+.asciidocZoom {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.75);
+  cursor: zoom-out;
+}
+
+.asciidocZoom img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* Tables */
+
+.asciidocMain table.tableblock {
+  margin-bottom: 1.75rem;
+  border: 1px solid var(--doc-border);
+  border-radius: var(--doc-radius);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  font-size: 0.925rem;
+}
+
+.asciidocMain table.tableblock > * > tr > * {
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--doc-border);
+  color: var(--doc-text);
+  line-height: 1.45;
+  vertical-align: top;
+}
+
+.asciidocMain table.tableblock > :last-child > tr:last-child > * {
+  border-bottom: 0;
+}
+
+.asciidocMain table.tableblock > thead > tr > th {
+  background: var(--doc-surface-2);
+  color: var(--doc-heading);
+  font-weight: 650;
+}
+
+.asciidocMain table.tableblock > tbody > tr:nth-of-type(even) {
+  background: transparent;
+}
+
+/* A cell spanning several rows titles them, like the section column of a field table. */
+.asciidocMain table.tableblock td[rowspan] {
+  border-right: 1px solid var(--doc-border);
+  background: var(--doc-surface-2);
+  font-weight: 600;
+}
+
+.asciidocMain table.tableblock p.tableblock {
+  margin: 0;
+  line-height: inherit;
+}
+
+.asciidocMain table.tableblock p.tableblock + p.tableblock {
+  margin-top: 0.5em;
+}
+
+/* Admonitions: a tinted callout led by its label. */
+.asciidocMain .admonitionblock {
+  --doc-admonition: var(--doc-note);
+  margin: 1.25rem 0 1.5rem;
+}
+
+.asciidocMain .admonitionblock.tip { --doc-admonition: var(--doc-tip); }
+.asciidocMain .admonitionblock.important { --doc-admonition: var(--doc-important); }
+.asciidocMain .admonitionblock.warning { --doc-admonition: var(--doc-warning); }
+.asciidocMain .admonitionblock.caution { --doc-admonition: var(--doc-caution); }
+
+.asciidocMain .admonitionblock > table {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--doc-admonition);
+  border-radius: 0 var(--doc-radius) var(--doc-radius) 0;
+  background: color-mix(in srgb, var(--doc-admonition) 9%, transparent);
+}
+
+.asciidocMain .admonitionblock > table > tbody,
+.asciidocMain .admonitionblock > table > tbody > tr,
+.asciidocMain .admonitionblock > table td {
+  display: block;
+  padding: 0;
+  border: 0;
+}
+
+.asciidocMain .admonitionblock > table td.icon {
+  width: auto;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+.asciidocMain .admonitionblock > table td.icon .title {
+  color: var(--doc-admonition);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.asciidocMain .admonitionblock > table td.content {
+  color: var(--doc-text);
+}
+
+.asciidocMain .admonitionblock td.content > :last-child > :last-child {
+  margin-bottom: 0;
+}
+
+.asciidocMain .admonitionblock td.content .ulist {
+  margin-bottom: 0;
+}
+
+/* Table of contents, moved by asciidoc.js into the empty column beside the document. */
+
+/* overflow-y-auto would make the block the sticky contents' scroller, so they would scroll away with the page. */
+.taackBlock:has(.asciidocToc) {
+  overflow: visible !important;
+}
+
+/* Anchor jumps leave the heading the same breathing room as the sticky contents. */
+.asciidocMain :is(h1, h2, h3, h4)[id] {
+  scroll-margin-top: var(--doc-toc-top);
+}
+
+.asciidocToc {
+  position: sticky;
+  top: var(--doc-toc-top);
+  max-height: calc(100vh - var(--doc-toc-top) - 1rem);
+  overflow-y: auto;
+  padding: 1.5rem 0.75rem 1rem 1rem;
+  font-size: 0.875rem;
+}
+
+.asciidocToc #toc {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.asciidocToc #toctitle {
+  margin: 0 0 0.75rem 0.5rem;
+  color: var(--doc-muted);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.asciidocToc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asciidocToc ul ul {
+  margin: 0.1rem 0 0.35rem 0.6rem;
+  padding-left: 0.4rem;
+  border-left: 1px solid var(--doc-border);
+}
+
+.asciidocToc a {
+  display: block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  color: var(--doc-muted);
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.asciidocToc a:hover {
+  background: var(--doc-surface-2);
+  color: var(--doc-text);
+}
+
+.asciidocToc a.active {
+  background: color-mix(in srgb, var(--doc-accent) 12%, transparent);
+  color: var(--doc-accent);
+  font-weight: 600;
+}
+
+.asciidocToc ul.sectlevel0 > li > a {
+  margin-top: 0.75rem;
+  color: var(--doc-heading);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.asciidocToc ul.sectlevel0 > li:first-child > a {
+  margin-top: 0;
+}
+
+@media (max-width: 767.98px) {
+  .asciidocToc {
+    position: static;
+    max-height: none;
+  }
+
+  .asciidocMain {
+    padding: 0 0.75rem 3rem;
+  }
+}
