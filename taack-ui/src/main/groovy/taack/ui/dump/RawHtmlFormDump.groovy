@@ -167,10 +167,6 @@ final class RawHtmlFormDump implements IUiFormVisitor {
                 blockLog.topElement = formThemed.asciidocInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, field.value as String)
             } else {
                 String valueString = inputEscape(field.value?.toString())
-                if (field.value instanceof Number) {
-                    numberFormat ?= parameter.nf
-                    valueString = numberFormat.format(field.value)
-                }
                 if (field.fieldConstraint.widget == WidgetKind.PASSWD.name)
                     blockLog.topElement = formThemed.passwdInput(blockLog.topElement, qualifiedName, trI18n, isFieldDisabled, isNullable, valueString)
                 else
