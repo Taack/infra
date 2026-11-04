@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Draft: an envelope with a pencil -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<rect x="20" y="120" width="380" height="270" rx="18" style="fill:#CEE8FA;stroke:#2D527C;stroke-width:30;stroke-linejoin:round;"/>
+	<polyline points="32,136 210,276 388,136" style="fill:none;stroke:#2D527C;stroke-width:30;stroke-linejoin:round;stroke-linecap:round;"/>
+	<g transform="rotate(45 380 300)">
+		<rect x="335" y="110" width="90" height="290" style="fill:#F4B459;stroke:#2D527C;stroke-width:26;stroke-linejoin:round;"/>
+		<rect x="335" y="110" width="90" height="56" style="fill:#E8697E;stroke:#2D527C;stroke-width:26;stroke-linejoin:round;"/>
+		<polygon points="335,400 425,400 380,480" style="fill:#FCE3C2;stroke:#2D527C;stroke-width:26;stroke-linejoin:round;"/>
+	</g>
+</svg>

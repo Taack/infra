@@ -54,6 +54,8 @@ class ActionIcon {
     final static ActionIcon REPLY = new ActionIcon('/assets/taack/icons/actions/reply.svg')
     final static ActionIcon COPY = new ActionIcon('/assets/taack/icons/actions/copy.svg')
     final static ActionIcon MAIL = new ActionIcon('/assets/taack/icons/actions/mail.svg')
+    final static ActionIcon MAIL_SEND = new ActionIcon('/assets/taack/icons/actions/send.svg')
+    final static ActionIcon MAIL_DRAFT = new ActionIcon('/assets/taack/icons/actions/draft.svg')
     final static ActionIcon HELP = new ActionIcon('/assets/taack/icons/actions/help.svg')
     final static ActionIcon GRAPH = new ActionIcon('/assets/taack/icons/actions/graph-model.svg')
     final static ActionIcon CHART = new ActionIcon('/assets/taack/icons/actions/chart.svg')
