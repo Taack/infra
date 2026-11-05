@@ -12,6 +12,8 @@ import taack.ui.dsl.UiBlockSpecifier
 import taack.ui.dsl.UiMenuSpecifier
 import taack.ui.dsl.UiShowSpecifier
 import taack.ui.dsl.block.BlockSpec
+import taack.ui.dsl.common.ActionIcon
+
 /*
 TODO: Add an infrastructure to list new stuffs from a user and a timestamp
  */
@@ -30,6 +32,7 @@ class RootController {
             menu StatsController.&showGrid as MC
             menu CalendarController.&fromCustom as MC
             menu CalendarController.&fromUiTable as MC
+            menuIcon ActionIcon.ADD, StatsController.&topCustomerSalesCardModal as MC
         }
         m
     }
