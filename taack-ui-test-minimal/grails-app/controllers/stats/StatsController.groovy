@@ -84,14 +84,12 @@ class StatsController implements WebAttributes {
             row {
                 poke p1, {
                     col BlockSpec.Width.HALF, {
-                        card({ // Menu not refresh
+                        diagram(statsService::buildChart1 as MC) { // Menu not refresh
                             label 'Sales1'
                             menu 'Yearly', StatsController.&topCustomerSalesCard as MC, new StatsParams(showMonthlyGraph1: false, v: 1)
                             menu 'Monthly', StatsController.&topCustomerSalesCard as MC, new StatsParams(groupPerMonth1: false, v: 1)
                             menu 'Group by month', StatsController.&topCustomerSalesCard as MC, new StatsParams(v: 1)
-                        }, {
-                            diagram(statsService::buildChart1 as MC)
-                        })
+                        }
                     }
                 }
                 poke p2, {
@@ -107,6 +105,48 @@ class StatsController implements WebAttributes {
             }
             BlockBase.debug = false
         }, RootController.buildMenu(), statsParams)
+    }
+
+    def topCustomerSalesCardModal(StatsParams statsParams) {
+
+        println params
+
+        boolean p0 = statsParams.v == 0
+        boolean p1 = statsParams.v == 1
+        boolean p2 = statsParams.v == 2
+
+        BlockBase.debug = false
+
+        taackUiService.show(new UiBlockSpecifier().ui {
+            modal {
+                poke p0, { // Needed to refresh links with parameter to keep
+                    table statsService.buildTable()
+                }
+                row {
+                    poke p1, {
+                        col BlockSpec.Width.HALF, {
+                            diagram(statsService::buildChart1 as MC) { // Menu not refresh
+                                label 'Sales1'
+                                menu 'Yearly', StatsController.&topCustomerSalesCardModal as MC, new StatsParams(showMonthlyGraph1: false, v: 1)
+                                menu 'Monthly', StatsController.&topCustomerSalesCardModal as MC, new StatsParams(groupPerMonth1: false, v: 1)
+                                menu 'Group by month', StatsController.&topCustomerSalesCardModal as MC, new StatsParams(v: 1)
+                            }
+                        }
+                    }
+                    poke p2, {
+                        col BlockSpec.Width.HALF, {
+                            diagram(statsService::buildChart2 as MC) {
+                                label 'Sales2'
+                                menu 'Yearly', StatsController.&topCustomerSalesCardModal as MC, new StatsParams(showMonthlyGraph2: false)
+                                menu 'Group by month', StatsController.&topCustomerSalesCardModal as MC, new StatsParams(groupPerMonth2: false)
+                                menu 'Monthly', StatsController.&topCustomerSalesCardModal as MC, new StatsParams()
+                            }
+                        }
+                    }
+                }
+            }
+            BlockBase.debug = false
+        }, statsParams)
     }
 
     def editTestInlineEdit(TestInlineEdit testInlineEdit) {
