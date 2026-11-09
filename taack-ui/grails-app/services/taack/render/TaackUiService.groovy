@@ -569,7 +569,6 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
 
         BufferedOutputStream bout = new BufferedOutputStream(webRequest.response.outputStream, bufferSize)
 
-        TaackUiConfiguration conf
         String lookAttribute = themeLook.themeAttribute ? " data-taack-theme=${themeLook.themeAttribute}" : ''
         String lookStylesheet = themeLook.themeAttribute ? "<link rel=\"stylesheet\" href=\"/assets/taack-${themeLook.themeAttribute}.css\"/>" : ''
         bout << """\
@@ -600,12 +599,12 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
     <script src="/assets/application-taack.js"></script>
     """
         bout << """\
-    <title>${conf.defaultTitle}</title>
+    <title>${TaackUiConfiguration.defaultTitle}</title>
     ${bootstrapCssTag}
     <style>
     :root {
-        --taack-navbar-bg: ${conf.bgColor};
-        --taack-navbar-color: ${conf.fgColor};
+        --taack-navbar-bg: ${TaackUiConfiguration.bgColor};
+        --taack-navbar-color: ${TaackUiConfiguration.fgColor};
     }
     </style>
     <link rel="stylesheet" href="/assets/application-taack.css"/>
@@ -616,10 +615,10 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
 
 <body>
 
-<nav class="navbar navbar-expand-md ${conf.fixedTop ? "fixed-top" : ""}">
+<nav class="navbar navbar-expand-md ${TaackUiConfiguration.fixedTop ? "fixed-top" : ""}">
     <div id="dropdownNav" class="container-fluid">
-        <a class="navbar-brand" href="/"><img src='/assets/${conf.logoFileName}' width='${conf.logoWidth}'
-                                                      height='${conf.logoHeight}' alt="Logo"/>
+        <a class="navbar-brand" href="/"><img src='/assets/${TaackUiConfiguration.logoFileName}' width='${TaackUiConfiguration.logoWidth}'
+                                                      height='${TaackUiConfiguration.logoHeight}' alt="Logo"/>
         </a>
         <button id="dLabel" class="navbar-toggler navbar-dark" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent"
@@ -636,9 +635,11 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
         bout << """
             <ul class="navbar-nav flex-row ml-md-auto ">
 """
-        if (conf.hasMenuLogin) {
+        boolean hasMenu = false
+        if (TaackUiConfiguration.hasMenuLogin) {
             TaackUser currentUser = getCurrentUser()
             if (currentUser) {
+                hasMenu = true
                 String switchedUsername = SpringSecurityUtils.getSwitchedUserOriginalUsername()
                 if (switchedUsername)
                     bout << """\
@@ -669,7 +670,8 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
                     </li>
                 """
             }
-        } else
+        }
+        if (!hasMenu && TaackUiConfiguration.hasMenuLogin)
             bout << """\
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarUser" role="button"
@@ -682,7 +684,7 @@ final class TaackUiService implements WebAttributes, ResponseRenderer, ServletAt
                                 <a class="nav-link" ajaxaction="/theme?isAjax=true">${tr('theme.label')}</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link" href="/taackLogin">Login</a>
+                                <a class="nav-link" href="/login">Login</a>
                             </li>
 
                         </ul>
