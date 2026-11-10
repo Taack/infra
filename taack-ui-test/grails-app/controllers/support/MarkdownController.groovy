@@ -3,6 +3,7 @@ package support
 import attachement.AttachmentUiService
 import attachment.Attachment
 import grails.compiler.GrailsCompileStatic
+import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.runtime.MethodClosure
@@ -10,6 +11,7 @@ import taack.render.TaackSaveService
 import taack.render.TaackUiService
 import taack.ui.dsl.UiBlockSpecifier
 import taack.wysiwyg.Markdown
+import taack.wysiwyg.MarkdownCustomMenuButton
 
 @GrailsCompileStatic
 @Secured(['isAuthenticated()'])
@@ -20,6 +22,12 @@ class MarkdownController {
 
     def showPreview(String body) {
         render Markdown.getContentHtml(body)
+    }
+
+    def serializeCustomMenuButtons() {
+        def button1 = new MarkdownCustomMenuButton(title: "Image", icon: '<img width="20" height="20" src="/assets/icons/image.svg">', openModalUrl: '/markdown/selectAttachment')
+//        def button2 = new MarkdownCustomMenuButton(...)
+        render status: 200, text: ([button1/*, button2*/] as JSON).toString()
     }
 
     def selectAttachment() {
@@ -37,7 +45,8 @@ class MarkdownController {
     def selectAttachmentCloseModal(Attachment attachment) {
         UiBlockSpecifier block = new UiBlockSpecifier()
         block.ui {
-            closeModal "/attachment/preview/${attachment.id}", attachment.toString()
+            String src = "/attachment/preview/${attachment.id}"
+            closeModal src, "<img alt='${attachment.toString()}' src='$src' width='400'>"
         }
         taackUiService.show(block)
     }

@@ -370,10 +370,10 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
         container.addChildren(textareaInput)
         HTMLDiv preview = new HTMLDiv().builder.setId("${qualifiedName}-markdown-preview").addClasses('wysiwyg-markdown-preview markdown-body').build() as HTMLDiv
         container.addChildren(preview)
-        HTMLInput attachmentSelectInput = new HTMLInput(InputType.STRING, null, null, null, false, true).builder.setId("${qualifiedName}-attachment-select").addClasses(formControl).putAttribute('taackajaxformm2oaction', '/markdown/selectAttachment').build() as HTMLInput
-        container.addChildren(attachmentSelectInput)
-        HTMLInput attachmentLinkInput = new HTMLInput(InputType.HIDDEN, null, null).builder.setId("${qualifiedName}-attachment-link").build() as HTMLInput
-        container.addChildren(attachmentLinkInput)
+        HTMLInput openModalInput = new HTMLInput(InputType.STRING, null, null, null, false, true).builder.setId("${qualifiedName}-open-modal").addClasses(formControl, 'hidden').putAttribute('taackajaxformm2oaction', '').build() as HTMLInput
+        container.addChildren(openModalInput)
+        HTMLInput closeModalInput = new HTMLInput(InputType.HIDDEN, null, null).builder.setId("${qualifiedName}-close-modal").build() as HTMLInput
+        container.addChildren(closeModalInput)
 
         el.addChildren(container)
         el.addChildren(divError(qualifiedName))
