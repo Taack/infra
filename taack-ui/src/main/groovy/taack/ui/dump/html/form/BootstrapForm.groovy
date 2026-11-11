@@ -212,6 +212,9 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             options.currents?.each { IEnumOption it ->
                 el.addChildren(new HTMLInput(InputType.HIDDEN, it?.key, qualifiedName))
             }
+        } else if (multiple) {
+            // Post an empty value, so that server can set field to empty when no options are selected
+            el.addChildren(new HTMLInput(InputType.HIDDEN, null, qualifiedName))
         }
         if (noLabel) s.putAttr('aria-label', inputEscape(trI18n))
         else el.addChildren(formLabelInput(qualifiedName, trI18n, required))
