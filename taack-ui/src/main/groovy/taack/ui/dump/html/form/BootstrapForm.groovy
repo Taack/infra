@@ -212,38 +212,14 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             options.currents?.each { IEnumOption it ->
                 el.addChildren(new HTMLInput(InputType.HIDDEN, it?.key, qualifiedName))
             }
+        } else if (multiple) {
+            // Post an empty value, so that server can set field to empty when no options are selected
+            el.addChildren(new HTMLInput(InputType.HIDDEN, null, qualifiedName))
         }
         if (noLabel) s.putAttr('aria-label', inputEscape(trI18n))
         else el.addChildren(formLabelInput(qualifiedName, trI18n, required))
         el.addChildren(divError(qualifiedName))
         topElement
-    }
-
-    @Override
-    IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disable) {
-        IHTMLElement el = themeStartInputs(topElement)
-        IEnumOption current = choices?.currents?.size() > 0 ? choices.currents.first() : null
-        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, current?.key, qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        String currentLabel = choices?.options?.find { it.key == current?.key }?.value ?: current?.value
-        HTMLInput input = new HTMLInput(InputType.STRING, currentLabel, null, null, disable, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
-        if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
-        if (!disable) el.addChildren removeButton(currentLabel ?: trI18n, new DeleteSiblingInputContent())
-        el.addChildren(input)
-        if (!noLabel) el.addChildren(formLabelInput(qualifiedName + 'String', trI18n))
-        el.addChildren(inputHidden)
-        el.addChildren(divError(qualifiedName))
-        topElement
-
-//        HTMLSelect s = new HTMLSelect(choices, false, false, disable)
-//        HTMLDiv d = new HTMLDiv()
-//        if (!disable) {
-//            d.addChildren(new HTMLImg('/assets/taack/icons/actions/delete.svg').builder.setId(qualifiedName).addClasses('deleteIconM2M').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).build())
-//        }
-//        d.addChildren(s)
-//        el.addChildren(s)
-//        el.addChildren(formLabelInput(qualifiedName, trI18n))
-//        el.addChildren(divError(qualifiedName))
-//        topElement
     }
 
     @Override
@@ -257,13 +233,13 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
             String hiddenInputId = idPrefix + "-${occ++}"
             String inputLabelId = hiddenInputId + '-label'
             HTMLDiv m2mParent = themeStartInputs(el).builder.addClasses('M2MParent').build() as HTMLDiv
-            String valueLabel = it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it?.toString()
+            String valueLabel = it instanceof Enum ? EnumOptions.translateEnumValue(it.toString()) : it instanceof IEnumOption ? it.value : it?.toString()
             if (!disabled) m2mParent.addChildren removeButton(valueLabel ?: trI18n, new DeleteM2MParentElement())
             HTMLInput input = new HTMLInput(InputType.STRING, valueLabel, null, null, disabled, true).builder.putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).putAttribute('taackajaxformm2minputid', hiddenInputId).setId(inputLabelId).addClasses(formControl).putAttribute('taackajaxformm2maction', url).build() as HTMLInput
             if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
             m2mParent.addChildren(input)
             if (!noLabel) m2mParent.addChildren(formLabelInput(inputLabelId, trI18n))
-            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it instanceof GormEntity ? it.ident() : it instanceof Enum ? it.name() : it?.toString(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(hiddenInputId).addClasses(formControl).build() as HTMLInput
+            HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, it instanceof GormEntity ? it.ident() : it instanceof Enum ? it.name() : it instanceof IEnumOption ? it.key : it?.toString(), qualifiedName).builder.putAttribute('attr-name', qualifiedName).setId(hiddenInputId).addClasses(formControl).build() as HTMLInput
             m2mParent.addChildren(inputHidden)
         }
         String hiddenInputId = idPrefix + "-${occ++}"
@@ -285,8 +261,8 @@ final class BootstrapForm<T extends GormEntity<T>> extends BootstrapLayout imple
     IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, Object val, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable) {
         IHTMLElement el = themeStartInputs(topElement)
 
-        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
-        String valueLabel = val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val?.toString()
+        HTMLInput inputHidden = new HTMLInput(InputType.HIDDEN, val instanceof GormEntity ? val.ident() : val instanceof Enum ? val.name() : val instanceof IEnumOption ? val.key : val?.toString(), qualifiedName).builder.setId(qualifiedName + 'Id').addClasses(formControl).build() as HTMLInput
+        String valueLabel = val instanceof Enum ? EnumOptions.translateEnumValue(val.toString()) : val instanceof IEnumOption ? val.value : val?.toString()
         HTMLInput input = new HTMLInput(InputType.STRING, valueLabel, null, null, disabled, true).builder.setId(qualifiedName + 'String').putAttribute('taackFieldInfoParams', fieldInfoParams.join(',')).addClasses(formControl).putAttribute('taackajaxformm2oaction', url).build() as HTMLInput
         if (floating || noLabel) input.putAttr('placeholder', inputEscape(trI18n))
         if (!disabled) el.addChildren removeButton(valueLabel ?: trI18n, new DeleteSiblingInputContent())

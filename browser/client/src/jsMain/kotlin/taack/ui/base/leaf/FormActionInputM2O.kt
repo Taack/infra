@@ -14,6 +14,7 @@ import web.html.HTMLTextAreaElement
 import web.http.GET
 import web.http.RequestMethod
 import web.xhr.XMLHttpRequest
+import web.html.*
 
 class FormActionInputM2O(private val parent: Form, private val i: HTMLInputElement) : LeafElement {
     companion object {
@@ -37,19 +38,31 @@ class FormActionInputM2O(private val parent: Form, private val i: HTMLInputEleme
         trace("FormActionInputM2O::onclick")
         val action = i.attributes.getNamedItem("taackAjaxFormM2OAction")!!.value
         val additionalParams = mutableMapOf<String, String>()
-        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.map {
-            var v = parent.f.elements.namedItem(it.replace(".id", ""))
-            if (v == null) v = parent.f.elements.namedItem(it)
-            if (v is HTMLSelectElement) {
-                if (v.value.isNotBlank())
-                    additionalParams["ajaxParams.$it"] = v.value
-
+        i.attributes.getNamedItem("taackFieldInfoParams")?.value?.split(",")?.forEach { s: String ->
+            val v = parent.f.elements.asList().find { it.attributes.getNamedItem("name")?.value == s }
+            val collectedValues = mutableListOf<String>()
+            when (v) {
+                is HTMLSelectElement -> {
+                    if (v.multiple) {
+                        val options = v.selectedOptions.asList().map { it as HTMLOptionElement }
+                        options.forEach { opt ->
+                            if (opt.value.isNotBlank()) collectedValues.add(opt.value)
+                        }
+                    } else {
+                        if (v.value.isNotBlank()) {
+                            collectedValues.add(v.value)
+                        }
+                    }
+                }
+                is HTMLInputElement -> {
+                    if (v.value.isNotBlank()) collectedValues.add(v.value)
+                }
             }
-            if (v is HTMLInputElement) {
-                if (v.value.isNotBlank())
-                    additionalParams["ajaxParams.$it"] = v.value
+            if (collectedValues.isNotEmpty()) {
+                additionalParams["ajaxParams.$s"] = collectedValues.joinToString(",")
             }
         }
+
         val url = BaseAjaxAction.createUrl(true, action, additionalParams)
         // TODO: change to Post (see FilterActionButton.kt)
         val xhr = XMLHttpRequest()

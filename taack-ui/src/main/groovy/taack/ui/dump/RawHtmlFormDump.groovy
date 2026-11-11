@@ -5,7 +5,9 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import taack.ast.type.FieldInfo
 import taack.ast.type.WidgetKind
+import taack.ui.EnumOption
 import taack.ui.EnumOptions
+import taack.ui.IEnumOption
 import taack.ui.IEnumOptions
 import taack.ui.dsl.block.BlockSpec.Width
 import taack.ui.dsl.form.IUiFormVisitor
@@ -180,7 +182,7 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, Long id, Map<String, ?> params, FieldInfo[] fieldInfos) {
+    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, IEnumOptions enumOptions, Long id, Map<String, ?> params, FieldInfo[] fieldInfos) {
         final String trI18n = i18n ?: parameter.trField(field)
 
         final boolean isListOrSet = Collection.isAssignableFrom(field.fieldConstraint.field.type)
@@ -202,9 +204,21 @@ final class RawHtmlFormDump implements IUiFormVisitor {
     @Override
     void visitFormAjaxField(String i18n, String controller, String action, FieldInfo field, IEnumOptions enumOptions, FieldInfo[] fieldInfos) {
         final String trI18n = i18n ?: parameter.trField(field)
+        final boolean isListOrSet = Collection.isAssignableFrom(field.fieldConstraint.field.type)
         final String qualifiedName = field.fieldName
         final boolean isFieldDisabled = isDisabled(field)
-        formThemed.ajaxField(blockLog.topElement, trI18n, enumOptions, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled)
+        final boolean isNullable = field.fieldConstraint.nullable
+        if (isListOrSet) { // Adapt to M2M field
+            List<Object> data = []
+            enumOptions?.currents?.each { io ->
+                data.add(new EnumOption(io.key, enumOptions?.options?.find { it.key == io?.key }?.value ?: io?.value))
+            }
+            formThemed.ajaxField(blockLog.topElement, trI18n, data, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+        } else {
+            IEnumOption current = enumOptions?.currents?.size() > 0 ? enumOptions.currents.first() : null
+            EnumOption eo = new EnumOption(current?.key, enumOptions?.options?.find { it.key == current?.key }?.value ?: current?.value)
+            formThemed.ajaxField(blockLog.topElement, trI18n, eo, qualifiedName, parameter.modalId, parameter.urlMapped(controller, action), fieldInfoCollect(fieldInfos), isFieldDisabled, isNullable)
+        }
     }
 
     @Override

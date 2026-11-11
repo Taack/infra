@@ -58,8 +58,6 @@ trait IFormTheme<T extends GormEntity<T>> implements IHTMLElement {
 
     abstract IHTMLElement selects(IHTMLElement topElement, String trI18n, String qualifiedName, IEnumOptions choices, boolean multiple, boolean disable, boolean nullable)
 
-    abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, IEnumOptions choices, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disable)
-
     abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, List<Object> vals, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable)
 
     abstract IHTMLElement ajaxField(IHTMLElement topElement, String trI18n, Object vals, String qualifiedName, Long modalId, String url, List<String> fieldInfoParams, boolean disabled, boolean nullable)
