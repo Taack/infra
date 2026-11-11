@@ -196,8 +196,12 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                 }
             } else if (Collection.isAssignableFrom(includedField.type)) { // TODO: What if reodering a list
                 Class genericType = (includedField.genericType as ParameterizedType).getActualTypeArguments()[0] as Class
+                List<String> parsedValues = p.list(includedField.name).findAll { it != null }
+                        .collect { it.toString().split(',') }.flatten()
+                        .collect { it.toString().trim() }
+                        .findAll { !it.empty }
                 if (GormEntity.isAssignableFrom(genericType)) {
-                    List<Long> ids = p.list(includedField.name).grep { !it.toString().empty }.collect { it.toString().toLong() }
+                    List<Long> ids = parsedValues.collect { it.toLong() }
                     if ((gormEntity[includedField.name] as Collection<GormEntity>)*.ident() as Set<Long> != ids as Set<Long>) {
                         // The other way is to add only new elements / remove only some elements ...
                         gormEntity[includedField.name] = ids.collect {
@@ -206,19 +210,16 @@ class TaackSaveService implements ResponseRenderer, ServletAttributes {
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
                 } else if (genericType.isEnum()) {
-                    List<Enum> enums = p.list(includedField.name).grep { !it.toString().empty }.collect {
-                        Enum.valueOf(genericType as Class<Enum>, it.toString())
-                    }
+                    List<Enum> enums = parsedValues.collect {Enum.valueOf(genericType as Class<Enum>, it) }
                     if ((gormEntity[includedField.name] as Collection<Enum>)*.name() as Set<String> != enums*.name() as Set<String>) {
                         // The other way is to add only new elements / remove only some elements ...
                         gormEntity[includedField.name] = enums
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
                 } else if (String.isAssignableFrom(genericType)) {
-                    List<String> strings = p.list(includedField.name).grep { !it.toString().empty }
-                    if (gormEntity[includedField.name] as Set<String> != strings as Set<String>) {
+                    if (gormEntity[includedField.name] as Set<String> != parsedValues as Set<String>) {
                         // The other way is to add only new elements / remove only some elements ...
-                        gormEntity[includedField.name] = strings
+                        gormEntity[includedField.name] = parsedValues
                         if (isDirtyCheckable) (gormEntity as DirtyCheckable).markDirty(includedField.name)
                     }
 
