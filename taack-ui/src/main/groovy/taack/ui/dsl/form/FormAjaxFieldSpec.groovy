@@ -87,19 +87,19 @@ class FormAjaxFieldSpec extends FormVisitable {
     }
 
     void ajaxField(final String i18n = null, final FieldInfo field, final MethodClosure action, final Map<String, ?> params, final FieldInfo<?>... fieldInfos = null) {
-        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, (Long)null, params, fieldInfos)
+        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, null, (Long)null, params, fieldInfos)
     }
 
     void ajaxField(final String i18n = null, final FieldInfo field, final MethodClosure action, final Long id = null, final Map<String, ?> params = null) {
-        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, id, params)
+        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, null, id, params)
     }
 
     void ajaxField(final String i18n = null, final FieldInfo field, final MethodClosure action, final Long id, final FieldInfo<?>... fieldInfos) {
-        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, id, null, fieldInfos)
+        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, null, id, null, fieldInfos)
     }
 
     void ajaxField(final String i18n = null, final FieldInfo field, final MethodClosure action, final FieldInfo<?>... fieldInfos) {
-        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, null, null, fieldInfos)
+        formVisitor.visitFormAjaxField(i18n, Utils.getControllerName(action), action.method, field, null,  null, null, fieldInfos)
     }
 
     void ajaxField(final String i18n = null, final FieldInfo field, IEnumOptions enumOptions, final MethodClosure action, final FieldInfo<?>... fieldInfos) {

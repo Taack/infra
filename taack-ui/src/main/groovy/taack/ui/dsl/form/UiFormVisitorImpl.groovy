@@ -88,7 +88,7 @@ class UiFormVisitorImpl implements IUiFormVisitor {
     }
 
     @Override
-    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo fieldInfo, Long id, Map<String, ?> params, FieldInfo[] fieldInfos) {
+    void visitFormAjaxField(String i18n, String controller, String action, FieldInfo fieldInfo, IEnumOptions choices, Long id, Map<String, ?> params, FieldInfo[] fieldInfos) {
 
     }
 
